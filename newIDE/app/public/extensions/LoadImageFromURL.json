@@ -1,0 +1,115 @@
+{
+  "author": "",
+  "category": "General",
+  "description": "With this extension, you can load images from any URL (including a DataURL) into a sprite or image resource.\nLoading it into a sprite will load the URL into a sprite, replacing the image it displays until the sprite's displayed image is changed, e.g. by going to the next frame of an animation or switching animations.\nLoading it into a resource will discard the old image that a resource was using and replace it with the image loaded from a URL. Any sprite that is displaying this resource as a part of their animation will start showing the new image instead of the  old one. The old image of the resource will not be accessible anymore unless you restart the game or reload the original image from a URL into it.",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Load images from a URL",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZpbGUtZG93bmxvYWQiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTQsMkg2QzQuODksMiA0LDIuODkgNCw0VjIwQzQsMjEuMTEgNC44OSwyMiA2LDIySDE4QzE5LjExLDIyIDIwLDIxLjExIDIwLDIwVjhMMTQsMk0xMiwxOUw4LDE1SDEwLjVWMTJIMTMuNVYxNUgxNkwxMiwxOU0xMyw5VjMuNUwxOC41LDlIMTNaIiAvPjwvc3ZnPg==",
+  "name": "LoadImageFromURL",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/file-download.svg",
+  "shortDescription": "Adds multiple actions to load images from a URL into the game.",
+  "version": "1.0.0",
+  "tags": "resource,art,image,url,base64,data,url,load,json,file,download,get,request",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Replaces the image contained by a sprite by a new one, from a URL. This will only affect the sprite in question and only until the image in it is changed through its animation or another action, unless you also modify the resource.",
+      "fullName": "Load URL into a sprite",
+      "functionType": "Action",
+      "group": "",
+      "name": "LoadURLIntoSprite",
+      "private": false,
+      "sentence": "Load URL _PARAM1_ into sprite _PARAM2_ (and into the corresponding resource: _PARAM3_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "if (eventsFunctionContext.getArgument(\"ChangeResource\")) {\n    const texture = PIXI.BaseTexture.from(eventsFunctionContext.getArgument(\"URL\"));\n    for (const obj of objects) obj.getRendererObject().texture.baseTexture = texture;\n} else {\n    const texture = PIXI.Texture.from(eventsFunctionContext.getArgument(\"URL\"));\n    for (const obj of objects) obj.getRendererObject().texture = texture;\n}\n",
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The URL to load the new image for the sprite from",
+          "longDescription": "",
+          "name": "URL",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The object to modify",
+          "longDescription": "",
+          "name": "Object",
+          "optional": false,
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Modify the resource?",
+          "longDescription": "If yes, modifies the image contained in the resource of the sprite's current frame instead of just the sprite's displayed image. This makes the changes affect all other sprites that also display this resource, and allows the change to persist after changing animations or the current frame.",
+          "name": "ChangeResource",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Replaces the image contained by a resource by a new one, from a URL. This will update all sprites displaying the resource.",
+      "fullName": "Load URL into an image resource",
+      "functionType": "Action",
+      "group": "",
+      "name": "LoadURLIntoImageResource",
+      "private": false,
+      "sentence": "Load URL _PARAM1_ into resource _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "runtimeScene\n    .getGame()\n    .getImageManager()\n    .getPIXITexture(eventsFunctionContext.getArgument(\"Resource\"))\n    .baseTexture = PIXI.BaseTexture.from(eventsFunctionContext.getArgument(\"URL\"));\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The URL to load the new image for the resource from",
+          "longDescription": "",
+          "name": "URL",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The resource to modify",
+          "longDescription": "",
+          "name": "Resource",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "imageResource"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

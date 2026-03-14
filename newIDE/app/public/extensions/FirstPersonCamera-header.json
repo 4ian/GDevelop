@@ -1,0 +1,33 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "m8kleQHonagHWsvILDhyJhgVhuF2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "First person 3D camera",
+  "name": "FirstPersonCamera",
+  "version": "1.0.4",
+  "url": "https://resources.gdevelop-app.com/extensions/FirstPersonCamera.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/FirstPersonCamera-header.json",
+  "tags": "3d,camera,fps",
+  "category": "Camera",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Security and Protection/e8248ffd504c314e6a9d9d560c3a0fdad3398a5f125ae6a4c0654d4e68c86376_Security and Protection_security_protection_eye_scan_lock.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Move the camera to look though objects eyes.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/first-person-camera",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "LookFrom3DObjectEyes",
+      "fullName": "Look through object eyes",
+      "description": "Move the camera to look though the object eyes. The object must look to the right when all its angles are 0 and the top of its head be toward Z+.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Move the camera to look though objects eyes.\n\nThis extension can be used with the \"Mouse pointer lock\" or \"Gamepad\" extension to build a first person camera.\n\nThe first person example uses this extension ([open the project online](https://editor.gdevelop.io/?project=example://3d-first-person)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjcsMTZjMCwwLTQuOSw3LTExLDdTNSwxNiw1LDE2czQuOS03LDExLTdTMjcsMTYsMjcsMTZ6Ii8+DQo8Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSIxNiIgY3k9IjE2IiByPSIzIi8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSIzLDkgMywzIDksMyAiLz4NCjxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjksMjkgMywyOSAzLDIzICIvPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMjksMjMgMjksMjkgMjMsMjkgIi8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSIyMywzIDI5LDMgMjksOSAiLz4NCjwvc3ZnPg0K"
+}

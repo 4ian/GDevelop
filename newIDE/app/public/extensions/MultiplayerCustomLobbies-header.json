@@ -1,0 +1,50 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "dt0tRnf2kHWJnjkrpnzTzNj9Yc63"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Multiplayer custom lobbies",
+  "name": "MultiplayerCustomLobbies",
+  "version": "1.0.1",
+  "url": "https://resources.gdevelop-app.com/extensions/MultiplayerCustomLobbies.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/MultiplayerCustomLobbies-header.json",
+  "tags": "multiplayer,lobby,lobbies",
+  "category": "Network",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Glyphster Pack/Master/SVG/Applications and Programming/a99813f48b4c6bc26cf2a28cb711a75105386ad69408d7e895ff69bb29051e95_Applications and Programming_application_coding_web_page_add.svg",
+  "gdevelopVersion": "",
+  "shortDescription": "Custom lobbies for built-in multiplayer.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/multiplayer-custom-lobbies",
+  "requiredExtensions": [
+    {
+      "extensionName": "PanelSpriteButton",
+      "extensionVersion": "2.1.1"
+    },
+    {
+      "extensionName": "Scrollbar",
+      "extensionVersion": "1.0.0"
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [
+    {
+      "description": "Customize the interface of multiplayer lobbies.\n\nJoining will only work if the \"join after game starts\" setting is enabled, as the game automatically starts after joining a lobby.",
+      "fullName": "Multiplayer custom lobbies",
+      "name": "CustomLobbies",
+      "defaultName": "CustomLobbies",
+      "eventsFunctions": [
+        {
+          "name": "LastError",
+          "fullName": "Last error",
+          "description": "Return last error.",
+          "functionType": "StringExpression"
+        }
+      ]
+    }
+  ],
+  "description": "Customize the interface of multiplayer lobbies.\n\nThere are ready-to-use custom lobbies in the asset-store [lobbies pack](https://editor.gdevelop.io/?initial-dialog=asset-store&asset-pack=multiplayer-custom-lobbies-multiplayer-custom-lobbies).\n\nJoining will only work if the \"join after game starts\" setting is enabled, as the game automatically starts after joining a lobby.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggZD0iTTI3LDRINUMzLjMsNCwyLDUuMywyLDd2MThjMCwxLjcsMS4zLDMsMywzaDEwLjRjLTAuOS0xLjUtMS40LTMuMi0xLjQtNWMwLTUuNSw0LjUtMTAsMTAtMTBjMi4zLDAsNC4zLDAuOCw2LDJWNw0KCUMzMCw1LjMsMjguNyw0LDI3LDR6IE03LjksOC40QzcuOSw4LjUsNy44LDguNiw3LjcsOC43QzcuNSw4LjksNy4zLDksNyw5UzYuNSw4LjksNi4zLDguN0M2LjEsOC41LDYsOC4zLDYsOGMwLTAuMywwLjEtMC41LDAuMy0wLjcNCgljMCwwLDAuMS0wLjEsMC4xLTAuMWMwLjEsMCwwLjEtMC4xLDAuMi0wLjFDNi43LDcsNi43LDcsNi44LDdjMC4xLDAsMC4zLDAsMC40LDBjMC4xLDAsMC4xLDAsMC4yLDAuMWMwLjEsMCwwLjEsMC4xLDAuMiwwLjENCgljMCwwLDAuMSwwLjEsMC4xLDAuMWMwLjEsMC4xLDAuMiwwLjIsMC4yLDAuM0M4LDcuNyw4LDcuOSw4LDhDOCw4LjEsOCw4LjMsNy45LDguNHogTTEwLjcsOC43QzEwLjUsOC45LDEwLjMsOSwxMCw5DQoJQzkuNyw5LDkuNSw4LjksOS4zLDguN0M5LjEsOC41LDksOC4zLDksOGMwLTAuMSwwLTAuMywwLjEtMC40YzAuMS0wLjEsMC4xLTAuMiwwLjItMC4zYzAuMS0wLjEsMC4yLTAuMiwwLjMtMC4yDQoJQzEwLDYuOSwxMC40LDcsMTAuNyw3LjNjMC4xLDAuMSwwLjIsMC4yLDAuMiwwLjNDMTEsNy43LDExLDcuOSwxMSw4QzExLDguMywxMC45LDguNSwxMC43LDguN3ogTTEzLjksOC40Yy0wLjEsMC4xLTAuMSwwLjItMC4yLDAuMw0KCUMxMy41LDguOSwxMy4zLDksMTMsOWMtMC4xLDAtMC4zLDAtMC40LTAuMWMtMC4xLTAuMS0wLjItMC4xLTAuMy0wLjJjLTAuMS0wLjEtMC4yLTAuMi0wLjItMC4zQzEyLDguMywxMiw4LjEsMTIsOA0KCWMwLTAuMSwwLTAuMywwLjEtMC40YzAuMS0wLjEsMC4xLTAuMiwwLjItMC4zYzAuNC0wLjQsMS0wLjQsMS40LDBjMC4xLDAuMSwwLjIsMC4yLDAuMiwwLjNDMTQsNy43LDE0LDcuOSwxNCw4DQoJQzE0LDguMSwxNCw4LjMsMTMuOSw4LjR6Ii8+DQo8cGF0aCBkPSJNMjQsMTVjLTQuNCwwLTgsMy42LTgsOHMzLjYsOCw4LDhzOC0zLjYsOC04UzI4LjQsMTUsMjQsMTV6IE0yNywyNGgtMnYyYzAsMC42LTAuNCwxLTEsMXMtMS0wLjQtMS0xdi0yaC0yDQoJYy0wLjYsMC0xLTAuNC0xLTFzMC40LTEsMS0xaDJ2LTJjMC0wLjYsMC40LTEsMS0xczEsMC40LDEsMXYyaDJjMC42LDAsMSwwLjQsMSwxUzI3LjYsMjQsMjcsMjR6Ii8+DQo8L3N2Zz4NCg=="
+}

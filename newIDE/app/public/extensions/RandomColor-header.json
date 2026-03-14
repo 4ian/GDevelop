@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "4ng4NsgThidN4cnjobO4RdE5zKG2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Random Color Generator",
+  "name": "RandomColor",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/RandomColor.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/RandomColor-header.json",
+  "tags": "random,color",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/format-color-fill.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Create a random color for a scene, an object, or any other color input.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/random-color",
+  "description": "Allows you to create a random color.\nTo use it, go in the text area to set a color and type `RandomColor::CreateRandomColor()`.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZvcm1hdC1jb2xvci1maWxsIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE5LDExLjVDMTksMTEuNSAxNywxMy42NyAxNywxNUEyLDIgMCAwLDAgMTksMTdBMiwyIDAgMCwwIDIxLDE1QzIxLDEzLjY3IDE5LDExLjUgMTksMTEuNU01LjIxLDEwTDEwLDUuMjFMMTQuNzksMTBNMTYuNTYsOC45NEw3LjYyLDBMNi4yMSwxLjQxTDguNTksMy43OUwzLjQ0LDguOTRDMi44NSw5LjUgMi44NSwxMC40NyAzLjQ0LDExLjA2TDguOTQsMTYuNTZDOS4yMywxNi44NSA5LjYyLDE3IDEwLDE3QzEwLjM4LDE3IDEwLjc3LDE2Ljg1IDExLjA2LDE2LjU2TDE2LjU2LDExLjA2QzE3LjE1LDEwLjQ3IDE3LjE1LDkuNSAxNi41Niw4Ljk0WiIgLz48L3N2Zz4="
+}

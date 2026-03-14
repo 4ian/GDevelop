@@ -1,0 +1,331 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
+    "taRwmWxwAFYFL9yyBwB3cwBw0BO2",
+    "mnImQKdn8nQxwzkS5D6a1JB27V23",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Gamepads (controllers)",
+  "name": "Gamepads",
+  "version": "0.9.1",
+  "url": "https://resources.gdevelop-app.com/extensions/Gamepads.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Gamepads-header.json",
+  "tags": "controllers,gamepads,joysticks,axis,xbox,ps4,platformer,platform,top-down",
+  "category": "Input",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/gamepad-variant-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Gamepad/controller support: buttons, sticks, triggers, vibration. Mapper behaviors for 2D/3D.",
+  "eventsBasedBehaviorsCount": 6,
+  "eventsFunctionsCount": 25,
+  "helpPath": "/all-features/gamepad",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Control a platformer character with a gamepad.",
+      "fullName": "Platformer gamepad mapper",
+      "name": "PlatformerGamepadMapper",
+      "objectType": "",
+      "eventsFunctions": []
+    },
+    {
+      "description": "Control a 3D physics character with a gamepad.",
+      "fullName": "3D platformer gamepad mapper",
+      "name": "Platformer3DGamepadMapper",
+      "objectType": "",
+      "eventsFunctions": []
+    },
+    {
+      "description": "Control a 3D physics character with a gamepad.",
+      "fullName": "3D shooter gamepad mapper",
+      "name": "Shooter3DGamepadMapper",
+      "objectType": "",
+      "eventsFunctions": []
+    },
+    {
+      "description": "Control camera rotations with a gamepad.",
+      "fullName": "First person camera gamepad mapper",
+      "name": "FirstPersonGamepadMapper",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "HorizontalRotationSpeedMax",
+          "fullName": "Maximum horizontal rotation speed",
+          "description": "Compare the maximum horizontal rotation speed of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHorizontalRotationSpeedMax",
+          "fullName": "Maximum horizontal rotation speed",
+          "description": "Change the maximum horizontal rotation speed of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HorizontalRotationAcceleration",
+          "fullName": "Horizontal rotation acceleration",
+          "description": "Compare the horizontal rotation acceleration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHorizontalRotationAcceleration",
+          "fullName": "Horizontal rotation acceleration",
+          "description": "Change the horizontal rotation acceleration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HorizontalRotationDeceleration",
+          "fullName": "Horizontal rotation deceleration",
+          "description": "Compare the horizontal rotation deceleration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHorizontalRotationDeceleration",
+          "fullName": "Horizontal rotation deceleration",
+          "description": "Change the horizontal rotation deceleration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "VerticalRotationSpeedMax",
+          "fullName": "Maximum vertical rotation speed",
+          "description": "Compare the maximum vertical rotation speed of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetVerticalRotationSpeedMax",
+          "fullName": "Maximum vertical rotation speed",
+          "description": "Change the maximum vertical rotation speed of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "VerticalRotationAcceleration",
+          "fullName": "Vertical rotation acceleration",
+          "description": "Compare the vertical rotation acceleration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetVerticalRotationAcceleration",
+          "fullName": "Vertical rotation acceleration",
+          "description": "Change the vertical rotation acceleration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "VerticalRotationDeceleration",
+          "fullName": "Vertical rotation deceleration",
+          "description": "Compare the vertical rotation deceleration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetVerticalRotationDeceleration",
+          "fullName": "Vertical rotation deceleration",
+          "description": "Change the vertical rotation deceleration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "VerticalAngleMin",
+          "fullName": "Minimum vertical camera angle",
+          "description": "Compare the minimum vertical camera angle of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetVerticalAngleMin",
+          "fullName": "Minimum vertical camera angle",
+          "description": "Change the minimum vertical camera angle of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "VerticalAngleMax",
+          "fullName": "Maximum vertical camera angle",
+          "description": "Compare the maximum vertical camera angle of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetVerticalAngleMax",
+          "fullName": "Maximum vertical camera angle",
+          "description": "Change the maximum vertical camera angle of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "OffsetZ",
+          "fullName": "Z position offset",
+          "description": "Compare the z position offset of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetOffsetZ",
+          "fullName": "Z position offset",
+          "description": "Change the z position offset of the object.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Control a 3D physics car with a gamepad.",
+      "fullName": "3D car gamepad mapper",
+      "name": "PhysicsCar3DGamepadMapper",
+      "objectType": "",
+      "eventsFunctions": []
+    },
+    {
+      "description": "Control a top-down character with a gamepad.",
+      "fullName": "Top-down gamepad mapper",
+      "name": "TopDownGamepadMapper",
+      "objectType": "",
+      "eventsFunctions": []
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "name": "TriggerPressure",
+      "fullName": "Pressure on a gamepad trigger",
+      "description": "Get the value of the pressure on a gamepad trigger.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "StickForce",
+      "fullName": "Stick force",
+      "description": "Compare the force of gamepad stick (from 0 to 1).",
+      "functionType": "Condition"
+    },
+    {
+      "name": "StickAngle",
+      "fullName": "Stick angle",
+      "description": "Return the angle of a gamepad stick.\nIf the deadzone value is high, the angle value is rounded to main axes, left, left, up, down.\nAn zero deadzone value give a total freedom on the angle value.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "StickForceX",
+      "fullName": "Stick X force",
+      "description": "Return the gamepad stick force on X axis (from -1 at the left to 1 at the right).",
+      "functionType": "Expression"
+    },
+    {
+      "name": "StickForceY",
+      "fullName": "Stick Y force",
+      "description": "Return the gamepad stick force on Y axis (from -1 at the top to 1 at the bottom).",
+      "functionType": "Expression"
+    },
+    {
+      "name": "C_Button_released",
+      "fullName": "Gamepad button released",
+      "description": "Test if a button is released on a gamepad. Buttons can be:\n* Xbox: \"A\", \"B\", \"X\", \"Y\", \"LB\", \"RB\", \"LT\", \"RT\", \"BACK\", \"START\",\n* PS4: \"CROSS\", \"SQUARE\", \"CIRCLE\", \"TRIANGLE\", \"L1\", \"L2\", \"R1\", \"R2\", \"SHARE\", \"OPTIONS\", \"PS_BUTTON\", \"CLICK_TOUCHPAD\",\n* Other: \"UP\", \"DOWN\", \"LEFT\", \"RIGHT\", \"CLICK_STICK_LEFT\", \"CLICK_STICK_RIGHT\".",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsButtonJustPressed",
+      "fullName": "Gamepad button just pressed",
+      "description": "Check if a button was just pressed on a gamepad. Buttons can be:\n* Xbox: \"A\", \"B\", \"X\", \"Y\", \"LB\", \"RB\", \"LT\", \"RT\", \"BACK\", \"START\",\n* PS4: \"CROSS\", \"SQUARE\", \"CIRCLE\", \"TRIANGLE\", \"L1\", \"L2\", \"R1\", \"R2\", \"SHARE\", \"OPTIONS\", \"PS_BUTTON\", \"CLICK_TOUCHPAD\",\n* Other: \"UP\", \"DOWN\", \"LEFT\", \"RIGHT\", \"CLICK_STICK_LEFT\", \"CLICK_STICK_RIGHT\".",
+      "functionType": "Condition"
+    },
+    {
+      "name": "LastButtonID",
+      "fullName": "Last pressed button (id)",
+      "description": "Return the index of the last pressed button of a gamepad.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "C_Any_Button_pressed",
+      "fullName": "Any gamepad button pressed",
+      "description": "Check if any button is pressed on a gamepad.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "LastButtonString",
+      "fullName": "Last pressed button (string)",
+      "description": "Return the last button pressed. \nButtons for Xbox and PS4 can be:\n* Xbox: \"A\", \"B\", \"X\", \"Y\", \"LB\", \"RB\", \"LT\", \"RT\", \"BACK\", \"START\",\n* PS4: \"CROSS\", \"SQUARE\", \"CIRCLE\", \"TRIANGLE\", \"L1\", \"L2\", \"R1\", \"R2\", \"SHARE\", \"OPTIONS\", \"PS_BUTTON\", \"CLICK_TOUCHPAD\",\n* Both: \"UP\", \"DOWN\", \"LEFT\", \"RIGHT\", \"CLICK_STICK_LEFT\", \"CLICK_STICK_RIGHT\".",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "GamepadCount",
+      "fullName": "Gamepad count",
+      "description": "Return the number of gamepads.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "C_Button_pressed",
+      "fullName": "Gamepad button pressed",
+      "description": "Check if a button is pressed on a gamepad. \nButtons can be:\n* Xbox: \"A\", \"B\", \"X\", \"Y\", \"LB\", \"RB\", \"LT\", \"RT\", \"BACK\", \"START\",\n* PS4: \"CROSS\", \"SQUARE\", \"CIRCLE\", \"TRIANGLE\", \"L1\", \"L2\", \"R1\", \"R2\", \"SHARE\", \"OPTIONS\", \"PS_BUTTON\", \"CLICK_TOUCHPAD\",\n* Other: \"UP\", \"DOWN\", \"LEFT\", \"RIGHT\", \"CLICK_STICK_LEFT\", \"CLICK_STICK_RIGHT\".",
+      "functionType": "Condition"
+    },
+    {
+      "name": "Deadzone",
+      "fullName": "Gamepad deadzone for sticks",
+      "description": "Return the value of the deadzone applied to a gamepad sticks, between 0 and 1.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "A_Set_deadzone",
+      "fullName": "Set gamepad deadzone for sticks",
+      "description": "Set the deadzone for sticks of the gamepad. The deadzone is an area for which movement on sticks won't be taken into account (instead, the stick will be considered as not moved). Deadzone is between 0 and 1, and is by default 0.2.",
+      "functionType": "Action"
+    },
+    {
+      "name": "C_Axis_pushed",
+      "fullName": "Gamepad stick pushed (axis)",
+      "description": "Check if a stick of a gamepad is pushed in a given direction.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ConnectedGamepadsCount",
+      "fullName": "Connected gamepads count",
+      "description": "Return the number of connected gamepads.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "GamepadType",
+      "fullName": "Gamepad type",
+      "description": "Return a string containing informations about the specified gamepad.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "C_Controller_type",
+      "fullName": "Gamepad type",
+      "description": "Check if the specified gamepad has the specified information in its description. Useful to know if the gamepad is a Xbox or PS4 controller.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "C_Controller_X_is_connected",
+      "fullName": "Gamepad connected",
+      "description": "Check if a gamepad is connected.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "A_Vibrate_controller",
+      "fullName": "Gamepad vibration",
+      "description": "Generate a vibration on the specified controller. Might only work if the game is running in a recent web browser.",
+      "functionType": "Action"
+    },
+    {
+      "name": "A_Advanced_Vibration_Controller",
+      "fullName": "Advanced gamepad vibration",
+      "description": "Generate an advanced vibration on the specified controller. Incompatible with Firefox.",
+      "functionType": "Action"
+    },
+    {
+      "name": "A_Change_Vibration_Magnitude",
+      "fullName": "Change gamepad active vibration",
+      "description": "Change a vibration on the specified controller. Incompatible with Firefox.",
+      "functionType": "Action"
+    },
+    {
+      "name": "C_any_button_released",
+      "fullName": "Any gamepad button released",
+      "description": "Check if any button is released on a gamepad.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "WeakVibrationMagnitude",
+      "fullName": "Weak rumble magnitude",
+      "description": "Return the strength of the weak vibration motor on the gamepad of a player.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "StrongVibrationMagnitude",
+      "fullName": "Strong rumble magnitude",
+      "description": "Return the strength of the strong vibration motor on the gamepad of a player.",
+      "functionType": "Expression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Add support for gamepads (or other physical controllers).\n\nIt gives access to:\n- button presses,\n- axis positions and force,\n- trigger pressure,\n- configurable deadzone,\n- vibration,\n- automatic \"gamepad mapper\" behaviors for 2D and 3D movement behaviors (platformer characters, top-down movement, 3D character etc...). Add one of these to the object with the movement behavior (i.e: the player most of the time) and the behavior will then be controlled automatically by the gamepad (it works by reading the gamepad state and simulating controls). No need for additional events to make it work once the behaviors are set up.\n\nThe Bomberman-like example handles 4 players with gamepads ([open the project online](https://editor.gdevelop.io/?project=example://goose-bomberman)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdhbWVwYWQtdmFyaWFudC1vdXRsaW5lIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTYsOUg4VjExSDEwVjEzSDhWMTVINlYxM0g0VjExSDZWOU0xOC41LDlBMS41LDEuNSAwIDAsMSAyMCwxMC41QTEuNSwxLjUgMCAwLDEgMTguNSwxMkExLjUsMS41IDAgMCwxIDE3LDEwLjVBMS41LDEuNSAwIDAsMSAxOC41LDlNMTUuNSwxMkExLjUsMS41IDAgMCwxIDE3LDEzLjVBMS41LDEuNSAwIDAsMSAxNS41LDE1QTEuNSwxLjUgMCAwLDEgMTQsMTMuNUExLjUsMS41IDAgMCwxIDE1LjUsMTJNMTcsNUE3LDcgMCAwLDEgMjQsMTJBNyw3IDAgMCwxIDE3LDE5QzE1LjA0LDE5IDEzLjI3LDE4LjIgMTIsMTYuOUMxMC43MywxOC4yIDguOTYsMTkgNywxOUE3LDcgMCAwLDEgMCwxMkE3LDcgMCAwLDEgNyw1SDE3TTcsN0E1LDUgMCAwLDAgMiwxMkE1LDUgMCAwLDAgNywxN0M4LjY0LDE3IDEwLjA5LDE2LjIxIDExLDE1SDEzQzEzLjkxLDE2LjIxIDE1LjM2LDE3IDE3LDE3QTUsNSAwIDAsMCAyMiwxMkE1LDUgMCAwLDAgMTcsN0g3WiIgLz48L3N2Zz4="
+}

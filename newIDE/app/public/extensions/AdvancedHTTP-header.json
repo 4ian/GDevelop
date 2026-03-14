@@ -1,0 +1,164 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Advanced HTTP",
+  "name": "AdvancedHTTP",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/AdvancedHTTP.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/AdvancedHTTP-header.json",
+  "tags": "header,beacon,http,request,get,post,delete,patch,head,method,body,html,request,web,curl,url",
+  "category": "Network",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Email/04e28ac117741933d15ac1cadb34e0d799c7a561352b1525a1b75c5bd1dbeabc_Email_email_envelope_letter_message_fast.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "HTTP requests with custom headers, methods, caching, CORS bypass, and JSON/FormData body.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 23,
+  "helpPath": "/extensions/advanced-http",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "CreateRequest",
+      "fullName": "Create a new request template",
+      "description": "Creates a template for your request. All requests must be made from a request template.",
+      "functionType": "Action"
+    },
+    {
+      "name": "CopyRequest",
+      "fullName": "Copy a request template",
+      "description": "Creates a new request template with all the attributes from an existing one.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetRequestMethod",
+      "fullName": "HTTP Method (Verb)",
+      "description": "The HTTP method of the request. GET is the default and what you should use if you are unsure which to pick. A request to a REST API endpoint may have a different effect depending on the method - refer to the documentation of the API you are calling to learn about the appropriate method to use.",
+      "functionType": "Action"
+    },
+    {
+      "name": "RequestMethod",
+      "fullName": "HTTP Method (Verb)",
+      "description": "Compare the HTTP method of the request. GET is the default and what you should use if you are unsure which to pick. A request to a REST API endpoint may have a different effect depending on the method - refer to the documentation of the API you are calling to learn about the appropriate method to use.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "SetRequestCache",
+      "fullName": "HTTP Caching strategy",
+      "description": "Defines to what extent the results of the request is can/must be cached. When cached, instead of sending a request to the server, the browser will avoid making a real request to the server and will use a previous response given by the server for the same request.\n\nThe server also has a say in this via the Cache-Control header.",
+      "functionType": "Action"
+    },
+    {
+      "name": "RequestCache",
+      "fullName": "HTTP Caching",
+      "description": "Compare the HTTP method of the request. GET is the default and what you should use if you are unsure which to pick. A request to a REST API endpoint may have a different effect depending on the method - refer to the documentation of the API you are calling to learn about the appropriate method to use.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "SetRequestBody",
+      "fullName": "Body",
+      "description": "Change the body of the HTTP request. Contains data to send to the server, ususally in plain text, JSON or FormData format. This cannot be set for GET requests.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetJSONRequestBody",
+      "fullName": "Body as JSON",
+      "description": "Sets the body of an HTTP request to a JSON representation of a structure variable.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetFormDataRequestBody",
+      "fullName": "Body as form data",
+      "description": "Sets the body of an HTTP request to a form data representation of a structure variable.",
+      "functionType": "Action"
+    },
+    {
+      "name": "RequestBody",
+      "fullName": "Body",
+      "description": "Compare the body of the HTTP request. Contains data to send to the server, ususally in plain text, JSON or FormData format. This cannot be set for GET requests.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "SetRequestHeader",
+      "fullName": "Header",
+      "description": "Change an HTTP header to be sent with the request.",
+      "functionType": "Action"
+    },
+    {
+      "name": "RequestHeader",
+      "fullName": "Header",
+      "description": "Compare an HTTP header to be sent with the request.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "SetRequestURL",
+      "fullName": "URL",
+      "description": "Change the request template's target URL.",
+      "functionType": "Action"
+    },
+    {
+      "name": "RequestURL",
+      "fullName": "URL",
+      "description": "Compare the request template's target URL.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "UseCORSBypass",
+      "fullName": "Enable CORS Bypass",
+      "description": "CORS prevents most external websites from being queried with the browser's HTTP client, since the browser may be authenticated on that website and as such another website would be able to impersonate the player on that other website.\n\nWhen the CORS Bypass is enabled, the request will be made from a server that is not authenticated anywhere and as such is not blocked by CORS, and it will share the response with your game. Note that as such, authentication cookies are ignored! If you own the REST API you are requesting, add CORS headers to your server instead of using this CORS Bypass.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsUsingCORSBypass",
+      "fullName": "CORS Bypass enabled",
+      "description": "Checks whether or not CORS Bypass has been enabled for the request template.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ExecuteRequest",
+      "fullName": "Execute the request",
+      "description": "Executes the request defined by a request template.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ResponseSuccess",
+      "fullName": "Success",
+      "description": "Checks whether the server marked the response as a success (status code 1XX/2XX), not as a failure (status code 4XX/5XX).",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ResponseStatusCode",
+      "fullName": "Status code",
+      "description": "Compare the status code of the HTTP request (e.g. 200 if succeeded, 404 if not found, etc).",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ResponseStatusText",
+      "fullName": "Status text",
+      "description": "Gets the status text for a response. For example, for a response with the status code 404, the status text will be \"Not Found\".",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "ResponseHeader",
+      "fullName": "Header",
+      "description": "Compare one of the HTTP headers included in the server's response.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ReadResponseText",
+      "fullName": "Get response body (text)",
+      "description": "Reads the body sent by the server, and store it as a string in a variable.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ReadResponseJSON",
+      "fullName": "Get response body (JSON)",
+      "description": "Reads the body sent by the server, parses it as JSON and stores the resulting structure in a variable.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "An extension to create HTTP requests with more advanced settings than the built-in \"Network request\" action, like specifying headers or bypassing CORS.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSIxMSwxMiAyMSwxOCAzMSwxMiAiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSI0IiB5MT0iMTIiIHgyPSIxMSIgeTI9IjEyIi8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMSIgeTE9IjE2IiB4Mj0iMTIiIHkyPSIxNiIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjQiIHkxPSIyMCIgeDI9IjExIiB5Mj0iMjAiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMSwxMnYtMWMwLTIuMiwxLjgtNCw0LTRoMTJjMi4yLDAsNCwxLjgsNCw0djEwYzAsMi4yLTEuOCw0LTQsNEgxNWMtMi4yLDAtNC0xLjgtNC00di0xIi8+DQo8L3N2Zz4NCg=="
+}

@@ -1,0 +1,66 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "AlZ3D1xkH0QDao7T37VZZUeYNpn1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Platformer and top-down remapper",
+  "name": "BehaviorRemapper",
+  "version": "1.1.1",
+  "url": "https://resources.gdevelop-app.com/extensions/BehaviorRemapper.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/BehaviorRemapper-header.json",
+  "tags": "remapper,key,bindings,presets,platformer,platform,top-down",
+  "category": "Input",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/alpha-w-box-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Remap keyboard controls for platformer and top-down movements.",
+  "eventsBasedBehaviorsCount": 2,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/behavior-remapper",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Remap keyboard controls of the top-down movement.",
+      "fullName": "Top-down keyboard remapper",
+      "name": "RemapForTopdown",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "SetCustom",
+          "fullName": "Remap Top-Down controls to a custom scheme",
+          "description": "Remaps Top-Down behavior controls to a custom control scheme.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetPreset",
+          "fullName": "Remap Top-Down controls to a preset",
+          "description": "Remaps Top-Down behavior controls to a preset control scheme.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Remap keyboard controls of the platformer character movement.",
+      "fullName": "Platformer keyboard mapper",
+      "name": "RemapForPlatformer",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "SetCustom",
+          "fullName": "Remap Platformer controls to a custom scheme",
+          "description": "Remaps Platformer behavior controls to a custom control scheme.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetPreset",
+          "fullName": "Remap Platformer controls to a preset",
+          "description": "Remaps Platformer behavior controls to a preset control scheme.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Make sure to disable default controls unless you want two keys to do the same action.\n\nActions have two versions. `custom` allow the movement keys to be changed to what ever you would like. `presets` provide a common key-bindings that can be selected from a list.\n\n### Available Presets:\n\n##### `WASD`\n-\tW: Up\n-\tA: Left\n-\tS: Down\n-\tD: Right\n-\tSpace: Jump\n\n##### `ZQSD`\n-\tZ: Up\n-\tQ: Left\n-\tS: Down\n-\tD: Right\n-\tSpace: Jump\n\n##### `Numpad` (Num lock must be disabled)\n-\tNumpad Up: Up\n-\tNumpad Left: Left\n-\tNumpad Down: Down\n-\tNumpad Right: Right\n-\tNumpad Return/Enter: Jump\n\n##### `IJKL`\n-\tI: Up\n-\tJ: Left\n-\tK: Down\n-\tL: Right\n-\tReturn/Enter: Jump\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWFscGhhLXctYm94LW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNOSwxN0EyLDIgMCAwLDEgNywxNVY3SDlWMTVIMTFWOEgxM1YxNUgxNVY3SDE3VjE1QTIsMiAwIDAsMSAxNSwxN0g5TTUsM0gxOUEyLDIgMCAwLDEgMjEsNVYxOUEyLDIgMCAwLDEgMTksMjFINUEyLDIgMCAwLDEgMywxOVY1QTIsMiAwIDAsMSA1LDNNNSw1VjE5SDE5VjVINVoiIC8+PC9zdmc+"
+}

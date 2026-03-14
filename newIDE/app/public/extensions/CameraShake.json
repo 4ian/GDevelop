@@ -1,0 +1,3576 @@
+{
+  "author": "westboy31, Tristan Rhodes (https://victrisgames.itch.io/)",
+  "category": "Camera",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Camera shake",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZlY3Rvci1kaWZmZXJlbmNlLWFiIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTMsMUMxLjg5LDEgMSwxLjg5IDEsM1Y1SDNWM0g1VjFIM003LDFWM0gxMFYxSDdNMTIsMVYzSDE0VjVIMTZWM0MxNiwxLjg5IDE1LjExLDEgMTQsMUgxMk0xLDdWMTBIM1Y3SDFNMTQsN0MxNCw3IDE0LDExLjY3IDE0LDE0QzExLjY3LDE0IDcsMTQgNywxNEM3LDE0IDcsMTggNywyMEM3LDIxLjExIDcuODksMjIgOSwyMkgyMEMyMS4xMSwyMiAyMiwyMS4xMSAyMiwyMFY5QzIyLDcuODkgMjEuMTEsNyAyMCw3QzE4LDcgMTQsNyAxNCw3TTE2LDlIMjBWMjBIOVYxNkgxNEMxNS4xMSwxNiAxNiwxNS4xMSAxNiwxNFY5TTEsMTJWMTRDMSwxNS4xMSAxLjg5LDE2IDMsMTZINVYxNEgzVjEySDFaIiAvPjwvc3ZnPg==",
+  "name": "CameraShake",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/vector-difference-ab.svg",
+  "shortDescription": "Shake layer cameras.",
+  "dimension": "2D",
+  "version": "3.2.0",
+  "description": [
+    "Shake layer cameras with translation, rotation and zoom.",
+    "",
+    "- Short shaking can be used to give impact (explosion, hit)",
+    "- Shaking can go indefinitely to set an ambiance (engine vibration, earthquake, pulsing)",
+    "- Low frequency shaking allows to simulate slow moving objects (ship rocking back and forth)",
+    "",
+    "Release notes:",
+    "- Version 3.0.0",
+    "    - No adaptation of the game events is needed.",
+    "    - It fixes an issue when used with scrolling, the amplitude will feel bigger in this case.",
+    "    - The shaking relies on noise which could feel a bit different.",
+    "    - This extension can no longer do impulses. For this, another extension \"Camera impulse\" can be used."
+  ],
+  "origin": {
+    "identifier": "CameraShake",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "shaking,camera,effect,screen,shake",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "m4hBMBTUilft4s1V4FQQPakVDGx1"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [
+    {
+      "folded": true,
+      "name": "DefaultFrequency",
+      "type": "number",
+      "value": 12
+    },
+    {
+      "folded": true,
+      "name": "DefaultAmplitudeX",
+      "type": "number",
+      "value": 4
+    },
+    {
+      "folded": true,
+      "name": "DefaultAmplitudeY",
+      "type": "number",
+      "value": 4
+    },
+    {
+      "folded": true,
+      "name": "DefaultAmplitudeAngle",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "folded": true,
+      "name": "DefaultAmplitudeZoom",
+      "type": "number",
+      "value": 1
+    },
+    {
+      "folded": true,
+      "name": "Duration",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "Layers",
+      "type": "structure",
+      "children": []
+    },
+    {
+      "name": "Layer",
+      "type": "structure",
+      "children": [
+        {
+          "name": "AmplitudeAngle",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "AmplitudeX",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "AmplitudeY",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": true,
+          "name": "AmplitudeZoom",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": true,
+          "name": "CameraDeltaAngle",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "CameraDeltaX",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "CameraDeltaY",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": true,
+          "name": "CameraDeltaZoom",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": true,
+          "name": "Frequency",
+          "type": "number",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "folded": true,
+      "name": "LayerName",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "folded": true,
+      "name": "Time",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "folded": true,
+      "name": "StartEaseDuration",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "folded": true,
+      "name": "StopEaseDuration",
+      "type": "number",
+      "value": 0
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CameraShake::SetLayerShakable"
+              },
+              "parameters": [
+                "",
+                "",
+                "\"\"",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onScenePostEvents",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Step time counters."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Time",
+                "+",
+                "TimeDelta()"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CameraShake::IsShaking"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "Time",
+                        "<",
+                        "StartEaseDuration"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "Time",
+                        ">",
+                        "Duration - StopEaseDuration"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "EaseFactor",
+                        "=",
+                        "clamp(Time / StartEaseDuration, 0, 1)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "Time",
+                        ">",
+                        "Duration - StopEaseDuration"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "EaseFactor",
+                        "=",
+                        "clamp((Duration - Time) / StopEaseDuration, 0, 1)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::ForEachChildVariable",
+                  "iterableVariableName": "Layers",
+                  "valueIteratorVariableName": "Layer",
+                  "keyIteratorVariableName": "LayerName",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "Layer.Shakable",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetStringVariable"
+                          },
+                          "parameters": [
+                            "ActualLayerName",
+                            "=",
+                            "LayerName"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "LayerName",
+                            "=",
+                            "\"__BaseLayer\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetStringVariable"
+                          },
+                          "parameters": [
+                            "ActualLayerName",
+                            "=",
+                            "\"\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Use user defined default values when there is no layer specific value set."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "CameraShake::SetFrequency"
+                          },
+                          "parameters": [
+                            "",
+                            "DefaultFrequency",
+                            "\"\"",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "AmplitudeX",
+                            "=",
+                            "DefaultAmplitudeX"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "AmplitudeY",
+                            "=",
+                            "DefaultAmplitudeY"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "AmplitudeAngle",
+                            "=",
+                            "DefaultAmplitudeAngle"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "AmplitudeZoom",
+                            "=",
+                            "DefaultAmplitudeZoom"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "Layers[LayerName].CameraDeltaX",
+                            "=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "Layers[LayerName].CameraDeltaY",
+                            "=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "Layers[LayerName].CameraDeltaAngle",
+                            "=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "Layers[LayerName].CameraDeltaZoom",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VariableChildExists2"
+                              },
+                              "parameters": [
+                                "Layer",
+                                "\"Frequency\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "CameraShake::SetFrequency"
+                              },
+                              "parameters": [
+                                "",
+                                "Layer.Frequency",
+                                "\"\"",
+                                ""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VariableChildExists2"
+                              },
+                              "parameters": [
+                                "Layer",
+                                "\"AmplitudeX\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeX",
+                                "=",
+                                "Layer.AmplitudeX"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VariableChildExists2"
+                              },
+                              "parameters": [
+                                "Layer",
+                                "\"AmplitudeY\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeY",
+                                "=",
+                                "Layer.AmplitudeY"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VariableChildExists2"
+                              },
+                              "parameters": [
+                                "Layer",
+                                "\"AmplitudeAngle\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeAngle",
+                                "=",
+                                "Layer.AmplitudeAngle"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VariableChildExists2"
+                              },
+                              "parameters": [
+                                "Layer",
+                                "\"AmplitudeZoom\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeZoom",
+                                "=",
+                                "Layer.AmplitudeZoom"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Shake the layer camera.\nSave the camera displacement to revert it in onScenePostEvents."
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeX",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Layers[LayerName].CameraDeltaX",
+                                "=",
+                                "CameraShake::Noise2d(\"\", TimeFromStart(), 1000) * AmplitudeX * EaseFactor"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetCameraCenterX"
+                              },
+                              "parameters": [
+                                "",
+                                "+",
+                                "Layers[LayerName].CameraDeltaX",
+                                "ActualLayerName",
+                                "0"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeY",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Layers[LayerName].CameraDeltaY",
+                                "=",
+                                "CameraShake::Noise2d(\"\", TimeFromStart(), 2000) * AmplitudeY * EaseFactor"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetCameraCenterY"
+                              },
+                              "parameters": [
+                                "",
+                                "+",
+                                "Layers[LayerName].CameraDeltaY",
+                                "ActualLayerName",
+                                "0"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeAngle",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Layers[LayerName].CameraDeltaAngle",
+                                "=",
+                                "CameraShake::Noise2d(\"\", TimeFromStart(), 3000) * AmplitudeAngle * EaseFactor"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetCameraAngle"
+                              },
+                              "parameters": [
+                                "",
+                                "+",
+                                "Layers[LayerName].CameraDeltaAngle",
+                                "ActualLayerName",
+                                "0"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeZoom",
+                                "!=",
+                                "1"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Layers[LayerName].CameraDeltaZoom",
+                                "=",
+                                "pow(AmplitudeZoom, CameraShake::Noise2d(\"\", TimeFromStart(), 4000) * EaseFactor)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ZoomCamera"
+                              },
+                              "parameters": [
+                                "",
+                                "CameraZoom(ActualLayerName, 0) * Layers[LayerName].CameraDeltaZoom",
+                                "ActualLayerName",
+                                "0"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "variables": [
+                {
+                  "folded": true,
+                  "name": "AmplitudeX",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "folded": true,
+                  "name": "AmplitudeY",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "folded": true,
+                  "name": "AmplitudeAngle",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "folded": true,
+                  "name": "AmplitudeZoom",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "folded": true,
+                  "name": "EaseFactor",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "folded": true,
+                  "name": "ActualLayerName",
+                  "type": "string",
+                  "value": ""
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onScenePreEvents",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Revert the shaking."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CameraShake::IsShaking"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::ForEachChildVariable",
+                  "iterableVariableName": "Layers",
+                  "valueIteratorVariableName": "Layer",
+                  "keyIteratorVariableName": "LayerName",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "Layer.Shakable",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "CameraDeltaX",
+                        "=",
+                        "Layer.CameraDeltaX"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "CameraDeltaY",
+                        "=",
+                        "Layer.CameraDeltaY"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "CameraDeltaAngle",
+                        "=",
+                        "Layer.CameraDeltaAngle"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "CameraDeltaZoom",
+                        "=",
+                        "Layer.CameraDeltaZoom"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetStringVariable"
+                      },
+                      "parameters": [
+                        "ActualLayerName",
+                        "=",
+                        "LayerName"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "LayerName",
+                            "=",
+                            "\"__BaseLayer\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetStringVariable"
+                          },
+                          "parameters": [
+                            "ActualLayerName",
+                            "=",
+                            "\"\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "CameraDeltaX",
+                            "!=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetCameraCenterX"
+                          },
+                          "parameters": [
+                            "",
+                            "-",
+                            "CameraDeltaX",
+                            "ActualLayerName",
+                            "0"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "CameraDeltaY",
+                            "!=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetCameraCenterY"
+                          },
+                          "parameters": [
+                            "",
+                            "-",
+                            "CameraDeltaY",
+                            "ActualLayerName",
+                            "0"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "CameraDeltaAngle",
+                            "!=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetCameraAngle"
+                          },
+                          "parameters": [
+                            "",
+                            "-",
+                            "CameraDeltaAngle",
+                            "ActualLayerName",
+                            "0"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "CameraDeltaZoom",
+                            "!=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ZoomCamera"
+                          },
+                          "parameters": [
+                            "",
+                            "CameraZoom(ActualLayerName) / CameraDeltaZoom",
+                            "ActualLayerName",
+                            "0"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "variables": [
+                {
+                  "folded": true,
+                  "name": "ActualLayerName",
+                  "type": "string",
+                  "value": ""
+                },
+                {
+                  "folded": true,
+                  "name": "CameraDeltaX",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "folded": true,
+                  "name": "CameraDeltaY",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "folded": true,
+                  "name": "CameraDeltaAngle",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "folded": true,
+                  "name": "CameraDeltaZoom",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Shake the camera on layers chosen with configuration actions.",
+      "fullName": "Shake camera",
+      "functionType": "Action",
+      "name": "ShakeCamera",
+      "sentence": "Shake camera for _PARAM1_ seconds with _PARAM2_ seconds of easing to start and _PARAM3_ seconds to stop",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Time",
+                "=",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Duration",
+                "=",
+                "NewDuration"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "StartEaseDuration",
+                "=",
+                "NewStartEaseDuration"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "StopEaseDuration",
+                "=",
+                "NewStopEaseDuration"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "Duration",
+                "<",
+                "StartEaseDuration + StopEaseDuration"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "StartEaseDuration",
+                "=",
+                "StartEaseDuration * Duration / (StartEaseDuration + StopEaseDuration)"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "StopEaseDuration",
+                "=",
+                "StopEaseDuration * Duration / (StartEaseDuration + StopEaseDuration)"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Duration (in seconds)",
+          "name": "NewDuration",
+          "type": "expression"
+        },
+        {
+          "description": "Ease duration to start (in seconds)",
+          "name": "NewStartEaseDuration",
+          "type": "expression"
+        },
+        {
+          "description": "Ease duration to stop (in seconds)",
+          "name": "NewStopEaseDuration",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Shake the camera on the specified layer, using one or more ways to shake (position, angle, zoom). This action is deprecated. Please use the other one with the same name.",
+      "fullName": "Shake camera (deprecated)",
+      "functionType": "Action",
+      "name": "CameraShake",
+      "private": true,
+      "sentence": "Shake camera on _PARAM3_ layer for _PARAM5_ seconds. Use an amplitude of _PARAM1_px on X axis and _PARAM2_px on Y axis, angle rotation amplitude _PARAM6_ degrees, and zoom amplitude _PARAM7_ percent.  Wait _PARAM8_ seconds between shakes. Keep shaking until stopped: _PARAM9_",
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Camera Shake",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ClearVariableChildren"
+                  },
+                  "parameters": [
+                    "Layers"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "CameraShake::SetLayerShakable"
+                  },
+                  "parameters": [
+                    "",
+                    "",
+                    "NewLayer",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Time",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "Layer",
+                    "=",
+                    "NewLayer"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Duration",
+                    "=",
+                    "NewDuration"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "StartEaseDuration",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "StopEaseDuration",
+                    "=",
+                    "NewDuration"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "DefaultAmplitudeX",
+                    "=",
+                    "abs(AmplitudeX)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "DefaultAmplitudeY",
+                    "=",
+                    "abs(AmplitudeY)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "DefaultAmplitudeAngle",
+                    "=",
+                    "AmplitudeAngle"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "DefaultAmplitudeZoom",
+                    "=",
+                    "1 + AmplitudeZoom / 100"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                      },
+                      "parameters": [
+                        "ShakePeriod",
+                        "!=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "DefaultFrequency",
+                        "=",
+                        "1 / ShakePeriod"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                      },
+                      "parameters": [
+                        "ShakePeriod",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "DefaultFrequency",
+                        "=",
+                        "1 / 0.08"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Determine if the shake should keep going until stopped"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "ShakeForever",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Duration",
+                    "=",
+                    "1234567890"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Add default values if none were provided"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "NewDuration",
+                    "=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Duration",
+                    "=",
+                    "0.5"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Amplitude of shaking on the X axis (in pixels)",
+          "name": "AmplitudeX",
+          "type": "expression"
+        },
+        {
+          "description": "Amplitude of shaking on the Y axis (in pixels)",
+          "name": "AmplitudeY",
+          "type": "expression"
+        },
+        {
+          "description": "Layer (base layer if empty)",
+          "name": "NewLayer",
+          "type": "layer"
+        },
+        {
+          "description": "Camera index (Default: 0)",
+          "name": "Camera",
+          "type": "expression"
+        },
+        {
+          "description": "Duration (in seconds) (Default: 0.5)",
+          "name": "NewDuration",
+          "type": "expression"
+        },
+        {
+          "description": "Angle rotation amplitude (in degrees) (For example: 2)",
+          "name": "AmplitudeAngle",
+          "type": "expression"
+        },
+        {
+          "description": "Zoom factor amplitude",
+          "name": "AmplitudeZoom",
+          "type": "expression"
+        },
+        {
+          "description": "Period between shakes (in seconds) (Default: 0.08)",
+          "name": "ShakePeriod",
+          "type": "expression"
+        },
+        {
+          "description": "Keep shaking until stopped",
+          "longDescription": "Duration value will be ignored",
+          "name": "ShakeForever",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Start shaking the camera indefinitely.",
+      "fullName": "Start camera shaking",
+      "functionType": "Action",
+      "name": "StartShaking",
+      "sentence": "Start shaking the camera with _PARAM1_ seconds of easing",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Time",
+                "=",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Duration",
+                "=",
+                "1234567890"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "StartEaseDuration",
+                "=",
+                "EaseDuration"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Ease duration (in seconds)",
+          "name": "EaseDuration",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Stop shaking the camera.",
+      "fullName": "Stop camera shaking",
+      "functionType": "Action",
+      "name": "StopShaking",
+      "sentence": "Stop shaking the camera with _PARAM1_ seconds of easing",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Time",
+                "=",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Duration",
+                "=",
+                "EaseDuration"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "StopEaseDuration",
+                "=",
+                "EaseDuration"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Ease duration (in seconds)",
+          "name": "EaseDuration",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Mark a layer as shakable.",
+      "fullName": "Shakable layer",
+      "functionType": "Action",
+      "group": "Camera shake configuration",
+      "name": "SetLayerShakable",
+      "sentence": "Mark the layer: _PARAM2_ as shakable: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "LayerName",
+                "=",
+                "NewLayerName"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::CompareStrings"
+              },
+              "parameters": [
+                "NewLayerName",
+                "=",
+                "\"\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "LayerName",
+                "=",
+                "\"__BaseLayer\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Shakable",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetBooleanVariable"
+              },
+              "parameters": [
+                "Layers[LayerName].Shakable",
+                "False",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Shakable",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetBooleanVariable"
+              },
+              "parameters": [
+                "Layers[LayerName].Shakable",
+                "True",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "defaultValue": "yes",
+          "description": "Shakable",
+          "name": "Shakable",
+          "optional": true,
+          "type": "yesorno"
+        },
+        {
+          "description": "Layer",
+          "name": "NewLayerName",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the camera is shaking.",
+      "fullName": "Camera is shaking",
+      "functionType": "Condition",
+      "name": "IsShaking",
+      "sentence": "Camera is shaking",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "Time",
+                "<",
+                "Duration"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the translation amplitude of the shaking (in pixels).",
+      "fullName": "Layer translation amplitude",
+      "functionType": "Action",
+      "group": "Camera shake configuration",
+      "name": "SetLayerTranslationAmplitude",
+      "sentence": "Change the translation amplitude of the shaking to _PARAM1_; _PARAM2_ (layer: _PARAM3_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "LayerName",
+                "=",
+                "NewLayerName"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::CompareStrings"
+              },
+              "parameters": [
+                "NewLayerName",
+                "=",
+                "\"\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "LayerName",
+                "=",
+                "\"__BaseLayer\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Layers[LayerName].AmplitudeX",
+                "=",
+                "AmplitudeX"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Layers[LayerName].AmplitudeY",
+                "=",
+                "AmplitudeY"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Amplitude of shaking on the X axis (in pixels)",
+          "name": "AmplitudeX",
+          "type": "expression"
+        },
+        {
+          "description": "Amplitude of shaking on the Y axis (in pixels)",
+          "name": "AmplitudeY",
+          "type": "expression"
+        },
+        {
+          "description": "Layer",
+          "name": "NewLayerName",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the rotation amplitude of the shaking (in degrees).",
+      "fullName": "Layer rotation amplitude",
+      "functionType": "Action",
+      "group": "Camera shake configuration",
+      "name": "SetLayerRotationAmplitude",
+      "sentence": "Change the rotation amplitude of the shaking to _PARAM1_ degrees (layer: _PARAM2_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "LayerName",
+                "=",
+                "NewLayerName"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::CompareStrings"
+              },
+              "parameters": [
+                "NewLayerName",
+                "=",
+                "\"\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "LayerName",
+                "=",
+                "\"__BaseLayer\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Layers[LayerName].AmplitudeAngle",
+                "=",
+                "AmplitudeAngle"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Angle (in degree)",
+          "name": "AmplitudeAngle",
+          "type": "expression"
+        },
+        {
+          "description": "NewLayerName",
+          "name": "NewLayerName",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the zoom factor amplitude of the shaking. The shaking will zoom and unzoom by this factor (for instance 1.0625 is a valid value).",
+      "fullName": "Layer zoom amplitude",
+      "functionType": "Action",
+      "group": "Camera shake configuration",
+      "name": "SetLayerZoomAmplitude",
+      "sentence": "Change the zoom factor amplitude of the shaking to _PARAM1_ (layer: _PARAM2_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "LayerName",
+                "=",
+                "NewLayerName"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::CompareStrings"
+              },
+              "parameters": [
+                "NewLayerName",
+                "=",
+                "\"\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "LayerName",
+                "=",
+                "\"__BaseLayer\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Layers[LayerName].AmplitudeZoom",
+                "=",
+                "AmplitudeZoom"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Zoom factor",
+          "name": "AmplitudeZoom",
+          "type": "expression"
+        },
+        {
+          "description": "NewLayerName",
+          "name": "NewLayerName",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the number of back and forth per seconds.",
+      "fullName": "Layer shaking frequency",
+      "functionType": "Action",
+      "group": "Camera shake configuration",
+      "name": "SetLayerShakingFrequency",
+      "sentence": "Change the shaking frequency to _PARAM1_ (layer: _PARAM2_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "LayerName",
+                "=",
+                "NewLayerName"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::CompareStrings"
+              },
+              "parameters": [
+                "NewLayerName",
+                "=",
+                "\"\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "LayerName",
+                "=",
+                "\"__BaseLayer\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Layers[LayerName].Frequency",
+                "=",
+                "Frequency"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Frequency",
+          "name": "Frequency",
+          "type": "expression"
+        },
+        {
+          "description": "NewLayerName",
+          "name": "NewLayerName",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the default translation amplitude of the shaking (in pixels).",
+      "fullName": "Default translation amplitude",
+      "functionType": "Action",
+      "group": "Camera shake configuration",
+      "name": "SetDefaultTranslationAmplitude",
+      "sentence": "Change the default translation amplitude of the shaking to _PARAM1_; _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "DefaultAmplitudeX",
+                "=",
+                "AmplitudeX"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "DefaultAmplitudeY",
+                "=",
+                "AmplitudeY"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Amplitude of shaking on the X axis (in pixels)",
+          "name": "AmplitudeX",
+          "type": "expression"
+        },
+        {
+          "description": "Amplitude of shaking on the Y axis (in pixels)",
+          "name": "AmplitudeY",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the default rotation amplitude of the shaking (in degrees).",
+      "fullName": "Default rotation amplitude",
+      "functionType": "Action",
+      "group": "Camera shake configuration",
+      "name": "SetDefaultRotationAmplitude",
+      "sentence": "Change the default rotation amplitude of the shaking to _PARAM1_ degrees",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "DefaultAmplitudeAngle",
+                "=",
+                "AmplitudeAngle"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Angle (in degree)",
+          "name": "AmplitudeAngle",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the default zoom factor amplitude of the shaking. The shaking will zoom and unzoom by this factor (for instance 1.0625 is a valid value).",
+      "fullName": "Default zoom amplitude",
+      "functionType": "Action",
+      "group": "Camera shake configuration",
+      "name": "SetDefaultZoomAmplitude",
+      "sentence": "Change the default zoom factor amplitude of the shaking to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "DefaultAmplitudeZoom",
+                "=",
+                "AmplitudeZoom"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Zoom factor",
+          "name": "AmplitudeZoom",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the default number of back and forth per seconds.",
+      "fullName": "Default shaking frequency",
+      "functionType": "Action",
+      "group": "Camera shake configuration",
+      "name": "SetDefaultShakingFrequency",
+      "sentence": "Change the default shaking frequency to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "DefaultFrequency",
+                "=",
+                "Frequency"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Frequency",
+          "name": "Frequency",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (gdjs._cameraShakeExtension) {",
+            "    return;",
+            "}",
+            "",
+            "/** Noise generator manager. */",
+            "class NoiseManager {",
+            "    /**",
+            "     * Create the manager of noise generators.",
+            "     */",
+            "    constructor() {",
+            "        this.seed = gdjs.randomInRange(1, Number.MAX_SAFE_INTEGER);",
+            "        /** @type {Map<string, NoiseGenerator>} */",
+            "        this.generators = new Map();",
+            "    }",
+            "",
+            "    /**",
+            "     * @param name {string}",
+            "     * @return {NoiseGenerator}",
+            "     */",
+            "    getGenerator(name) {",
+            "        let generator = this.generators.get(name);",
+            "        if (!generator) {",
+            "            generator = new NoiseGenerator(name + this.seed);",
+            "            this.generators.set(name, generator);",
+            "        }",
+            "        return generator;",
+            "    }",
+            "",
+            "    /**",
+            "     * @param seed {number}",
+            "     */",
+            "    setSeed(seed) {",
+            "        this.seed = seed;",
+            "        this.generators.forEach(generator => generator.setSeed(name + this.seed));",
+            "    }",
+            "",
+            "    /**",
+            "     * @param name {string}",
+            "     */",
+            "    deleteGenerator(name) {",
+            "        this.generators.delete(name);",
+            "    }",
+            "",
+            "    /**",
+            "     */",
+            "    deleteAllGenerators() {",
+            "        this.generators.clear();",
+            "    }",
+            "}",
+            "",
+            "/** Noise generator with octaves. */",
+            "class NoiseGenerator {",
+            "    /**",
+            "     * Create a noise generator with a seed.",
+            "     * @param seed {string}",
+            "     */",
+            "    constructor(seed) {",
+            "        this.simplexNoise = new SimplexNoise(seed);",
+            "        this.frequency = 1;",
+            "        this.octaves = 1;",
+            "        this.persistence = 0.5;",
+            "        this.lacunarity = 2;",
+            "        this.xLoopPeriod = 0;",
+            "        this.yLoopPeriod = 0;",
+            "    }",
+            "",
+            "    /**",
+            "     * @param seed {string}",
+            "     */",
+            "    setSeed(seed) {",
+            "        this.simplexNoise = new SimplexNoise(seed);",
+            "    }",
+            "",
+            "    /**",
+            "     * @param x {float}",
+            "     * @param y {float}",
+            "     * @param z {float} optionnal",
+            "     * @param w {float} optionnal",
+            "     * @return {float}",
+            "     */",
+            "    noise(x, y, z, w) {",
+            "        if (this.xLoopPeriod && this.yLoopPeriod) {",
+            "            const circleRatioX = 2 * Math.PI / this.xLoopPeriod;",
+            "            const circleRatioY = 2 * Math.PI / this.yLoopPeriod;",
+            "            const angleX = circleRatioX * x;",
+            "            const angleY = circleRatioY * y;",
+            "            x = Math.cos(angleX) / circleRatioX;",
+            "            y = Math.sin(angleX) / circleRatioX;",
+            "            z = Math.cos(angleY) / circleRatioY;",
+            "            w = Math.sin(angleY) / circleRatioY;",
+            "        }",
+            "        else if (this.xLoopPeriod) {",
+            "            const circleRatio = 2 * Math.PI / this.xLoopPeriod;",
+            "            const angleX = circleRatio * x;",
+            "            w = z;",
+            "            z = y;",
+            "            x = Math.cos(angleX) / circleRatio;",
+            "            y = Math.sin(angleX) / circleRatio;",
+            "        }",
+            "        else if (this.yLoopPeriod) {",
+            "            const circleRatio = 2 * Math.PI / this.xLoopPeriod;",
+            "            const angleX = circleRatio * x;",
+            "            w = z;",
+            "            // Make the circle perimeter equals to the looping period",
+            "            // to keep the same perceived frequency with or without looping.",
+            "            y = Math.cos(angleX) / circleRatio;",
+            "            z = Math.sin(angleX) / circleRatio;",
+            "        }",
+            "        let noiseFunction = this.simplexNoise.noise4D.bind(this.simplexNoise);",
+            "        if (z === undefined) {",
+            "            noiseFunction = this.simplexNoise.noise2D.bind(this.simplexNoise);",
+            "        }",
+            "        else if (w === undefined) {",
+            "            noiseFunction = this.simplexNoise.noise3D.bind(this.simplexNoise);",
+            "        }",
+            "        let frequency = this.frequency;",
+            "        let noiseSum = 0;",
+            "        let amplitudeSum = 0;",
+            "        let amplitude = 1;",
+            "        for (let i = 0; i < this.octaves; i++) {",
+            "            noiseSum += noiseFunction(x * frequency, y * frequency, z * frequency, w * frequency) * amplitude;",
+            "            amplitudeSum += Math.abs(amplitude);",
+            "            amplitude *= this.persistence;",
+            "            frequency *= this.lacunarity;",
+            "        }",
+            "        return noiseSum / amplitudeSum;",
+            "    }",
+            "}",
+            "",
+            "/*",
+            "A fast javascript implementation of simplex noise by Jonas Wagner",
+            "https://github.com/jwagner/simplex-noise.js",
+            "",
+            "Based on a speed-improved simplex noise algorithm for 2D, 3D and 4D in Java.",
+            "Which is based on example code by Stefan Gustavson (stegu@itn.liu.se).",
+            "With Optimisations by Peter Eastman (peastman@drizzle.stanford.edu).",
+            "Better rank ordering method by Stefan Gustavson in 2012.",
+            "",
+            " Copyright (c) 2021 Jonas Wagner",
+            "",
+            " Permission is hereby granted, free of charge, to any person obtaining a copy",
+            " of this software and associated documentation files (the \"Software\"), to deal",
+            " in the Software without restriction, including without limitation the rights",
+            " to use, copy, modify, merge, publish, distribute, sublicense, and/or sell",
+            " copies of the Software, and to permit persons to whom the Software is",
+            " furnished to do so, subject to the following conditions:",
+            "",
+            " The above copyright notice and this permission notice shall be included in all",
+            " copies or substantial portions of the Software.",
+            "",
+            " THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR",
+            " IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,",
+            " FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE",
+            " AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER",
+            " LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,",
+            " OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE",
+            " SOFTWARE.",
+            " */",
+            "",
+            "const F2 = 0.5 * (Math.sqrt(3.0) - 1.0);",
+            "const G2 = (3.0 - Math.sqrt(3.0)) / 6.0;",
+            "const F3 = 1.0 / 3.0;",
+            "const G3 = 1.0 / 6.0;",
+            "const F4 = (Math.sqrt(5.0) - 1.0) / 4.0;",
+            "const G4 = (5.0 - Math.sqrt(5.0)) / 20.0;",
+            "const grad3 = new Float32Array([1, 1, 0,",
+            "    -1, 1, 0,",
+            "    1, -1, 0,",
+            "    -1, -1, 0,",
+            "    1, 0, 1,",
+            "    -1, 0, 1,",
+            "    1, 0, -1,",
+            "    -1, 0, -1,",
+            "    0, 1, 1,",
+            "    0, -1, 1,",
+            "    0, 1, -1,",
+            "    0, -1, -1]);",
+            "const grad4 = new Float32Array([0, 1, 1, 1, 0, 1, 1, -1, 0, 1, -1, 1, 0, 1, -1, -1,",
+            "    0, -1, 1, 1, 0, -1, 1, -1, 0, -1, -1, 1, 0, -1, -1, -1,",
+            "    1, 0, 1, 1, 1, 0, 1, -1, 1, 0, -1, 1, 1, 0, -1, -1,",
+            "    -1, 0, 1, 1, -1, 0, 1, -1, -1, 0, -1, 1, -1, 0, -1, -1,",
+            "    1, 1, 0, 1, 1, 1, 0, -1, 1, -1, 0, 1, 1, -1, 0, -1,",
+            "    -1, 1, 0, 1, -1, 1, 0, -1, -1, -1, 0, 1, -1, -1, 0, -1,",
+            "    1, 1, 1, 0, 1, 1, -1, 0, 1, -1, 1, 0, 1, -1, -1, 0,",
+            "    -1, 1, 1, 0, -1, 1, -1, 0, -1, -1, 1, 0, -1, -1, -1, 0]);",
+            "",
+            "",
+            "/**",
+            " * Builds a random permutation table.",
+            " * This is exported only for (internal) testing purposes.",
+            " * Do not rely on this export.",
+            " * @param {() => number} random",
+            " * @private",
+            " */",
+            "function buildPermutationTable(random) {",
+            "    const p = new Uint8Array(256);",
+            "    for (let i = 0; i < 256; i++) {",
+            "        p[i] = i;",
+            "    }",
+            "    for (let i = 0; i < 255; i++) {",
+            "        const r = i + ~~(random() * (256 - i));",
+            "        const aux = p[i];",
+            "        p[i] = p[r];",
+            "        p[r] = aux;",
+            "    }",
+            "    return p;",
+            "}",
+            "",
+            "/*",
+            "The ALEA PRNG and masher code used by simplex-noise.js",
+            "is based on code by Johannes Baagøe, modified by Jonas Wagner.",
+            "See alea.md for the full license.",
+            "@param {string|number} seed",
+            "*/",
+            "function alea(seed) {",
+            "    let s0 = 0;",
+            "    let s1 = 0;",
+            "    let s2 = 0;",
+            "    let c = 1;",
+            "    const mash = masher();",
+            "    s0 = mash(' ');",
+            "    s1 = mash(' ');",
+            "    s2 = mash(' ');",
+            "    s0 -= mash(seed);",
+            "    if (s0 < 0) {",
+            "        s0 += 1;",
+            "    }",
+            "    s1 -= mash(seed);",
+            "    if (s1 < 0) {",
+            "        s1 += 1;",
+            "    }",
+            "    s2 -= mash(seed);",
+            "    if (s2 < 0) {",
+            "        s2 += 1;",
+            "    }",
+            "    return function () {",
+            "        const t = 2091639 * s0 + c * 2.3283064365386963e-10; // 2^-32",
+            "        s0 = s1;",
+            "        s1 = s2;",
+            "        return s2 = t - (c = t | 0);",
+            "    };",
+            "}",
+            "",
+            "function masher() {",
+            "    let n = 0xefc8249d;",
+            "    return function (data) {",
+            "        data = data.toString();",
+            "        for (let i = 0; i < data.length; i++) {",
+            "            n += data.charCodeAt(i);",
+            "            let h = 0.02519603282416938 * n;",
+            "            n = h >>> 0;",
+            "            h -= n;",
+            "            h *= n;",
+            "            n = h >>> 0;",
+            "            h -= n;",
+            "            n += h * 0x100000000; // 2^32",
+            "        }",
+            "        return (n >>> 0) * 2.3283064365386963e-10; // 2^-32",
+            "    };",
+            "}",
+            "",
+            "/** Deterministic simplex noise generator suitable for 2D, 3D and 4D spaces. */",
+            "class SimplexNoise {",
+            "    /**",
+            "     * Creates a new `SimplexNoise` instance.",
+            "     * This involves some setup. You can save a few cpu cycles by reusing the same instance.",
+            "     * @param {(() => number)|string|number} randomOrSeed A random number generator or a seed (string|number).",
+            "     * Defaults to Math.random (random irreproducible initialization).",
+            "     */",
+            "    constructor(randomOrSeed) {",
+            "        if (randomOrSeed === void 0) { randomOrSeed = Math.random; }",
+            "        const random = typeof randomOrSeed == 'function' ? randomOrSeed : alea(randomOrSeed);",
+            "        this.p = buildPermutationTable(random);",
+            "        this.perm = new Uint8Array(512);",
+            "        this.permMod12 = new Uint8Array(512);",
+            "        for (let i = 0; i < 512; i++) {",
+            "            this.perm[i] = this.p[i & 255];",
+            "            this.permMod12[i] = this.perm[i] % 12;",
+            "        }",
+            "    }",
+            "",
+            "    /**",
+            "     * Samples the noise field in 2 dimensions",
+            "     * @param {number} x",
+            "     * @param {number} y",
+            "     * @returns a number in the interval [-1, 1]",
+            "     */",
+            "    noise2D(x, y) {",
+            "        const permMod12 = this.permMod12;",
+            "        const perm = this.perm;",
+            "        let n0 = 0; // Noise contributions from the three corners",
+            "        let n1 = 0;",
+            "        let n2 = 0;",
+            "        // Skew the input space to determine which simplex cell we're in",
+            "        const s = (x + y) * F2; // Hairy factor for 2D",
+            "        const i = Math.floor(x + s);",
+            "        const j = Math.floor(y + s);",
+            "        const t = (i + j) * G2;",
+            "        const X0 = i - t; // Unskew the cell origin back to (x,y) space",
+            "        const Y0 = j - t;",
+            "        const x0 = x - X0; // The x,y distances from the cell origin",
+            "        const y0 = y - Y0;",
+            "        // For the 2D case, the simplex shape is an equilateral triangle.",
+            "        // Determine which simplex we are in.",
+            "        let i1, j1; // Offsets for second (middle) corner of simplex in (i,j) coords",
+            "        if (x0 > y0) {",
+            "            i1 = 1;",
+            "            j1 = 0;",
+            "        } // lower triangle, XY order: (0,0)->(1,0)->(1,1)",
+            "        else {",
+            "            i1 = 0;",
+            "            j1 = 1;",
+            "        } // upper triangle, YX order: (0,0)->(0,1)->(1,1)",
+            "        // A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and",
+            "        // a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where",
+            "        // c = (3-sqrt(3))/6",
+            "        const x1 = x0 - i1 + G2; // Offsets for middle corner in (x,y) unskewed coords",
+            "        const y1 = y0 - j1 + G2;",
+            "        const x2 = x0 - 1.0 + 2.0 * G2; // Offsets for last corner in (x,y) unskewed coords",
+            "        const y2 = y0 - 1.0 + 2.0 * G2;",
+            "        // Work out the hashed gradient indices of the three simplex corners",
+            "        const ii = i & 255;",
+            "        const jj = j & 255;",
+            "        // Calculate the contribution from the three corners",
+            "        let t0 = 0.5 - x0 * x0 - y0 * y0;",
+            "        if (t0 >= 0) {",
+            "            const gi0 = permMod12[ii + perm[jj]] * 3;",
+            "            t0 *= t0;",
+            "            n0 = t0 * t0 * (grad3[gi0] * x0 + grad3[gi0 + 1] * y0); // (x,y) of grad3 used for 2D gradient",
+            "        }",
+            "        let t1 = 0.5 - x1 * x1 - y1 * y1;",
+            "        if (t1 >= 0) {",
+            "            const gi1 = permMod12[ii + i1 + perm[jj + j1]] * 3;",
+            "            t1 *= t1;",
+            "            n1 = t1 * t1 * (grad3[gi1] * x1 + grad3[gi1 + 1] * y1);",
+            "        }",
+            "        let t2 = 0.5 - x2 * x2 - y2 * y2;",
+            "        if (t2 >= 0) {",
+            "            const gi2 = permMod12[ii + 1 + perm[jj + 1]] * 3;",
+            "            t2 *= t2;",
+            "            n2 = t2 * t2 * (grad3[gi2] * x2 + grad3[gi2 + 1] * y2);",
+            "        }",
+            "        // Add contributions from each corner to get the final noise value.",
+            "        // The result is scaled to return values in the interval [-1,1].",
+            "        return 70.0 * (n0 + n1 + n2);",
+            "    }",
+            "",
+            "    /**",
+            "     * Samples the noise field in 3 dimensions",
+            "     * @param {number} x",
+            "     * @param {number} y",
+            "     * @param {number} z",
+            "     * @returns a number in the interval [-1, 1]",
+            "     */",
+            "    noise3D(x, y, z) {",
+            "        const permMod12 = this.permMod12;",
+            "        const perm = this.perm;",
+            "        let n0, n1, n2, n3; // Noise contributions from the four corners",
+            "        // Skew the input space to determine which simplex cell we're in",
+            "        const s = (x + y + z) * F3; // Very nice and simple skew factor for 3D",
+            "        const i = Math.floor(x + s);",
+            "        const j = Math.floor(y + s);",
+            "        const k = Math.floor(z + s);",
+            "        const t = (i + j + k) * G3;",
+            "        const X0 = i - t; // Unskew the cell origin back to (x,y,z) space",
+            "        const Y0 = j - t;",
+            "        const Z0 = k - t;",
+            "        const x0 = x - X0; // The x,y,z distances from the cell origin",
+            "        const y0 = y - Y0;",
+            "        const z0 = z - Z0;",
+            "        // For the 3D case, the simplex shape is a slightly irregular tetrahedron.",
+            "        // Determine which simplex we are in.",
+            "        let i1, j1, k1; // Offsets for second corner of simplex in (i,j,k) coords",
+            "        let i2, j2, k2; // Offsets for third corner of simplex in (i,j,k) coords",
+            "        if (x0 >= y0) {",
+            "            if (y0 >= z0) {",
+            "                i1 = 1;",
+            "                j1 = 0;",
+            "                k1 = 0;",
+            "                i2 = 1;",
+            "                j2 = 1;",
+            "                k2 = 0;",
+            "            } // X Y Z order",
+            "            else if (x0 >= z0) {",
+            "                i1 = 1;",
+            "                j1 = 0;",
+            "                k1 = 0;",
+            "                i2 = 1;",
+            "                j2 = 0;",
+            "                k2 = 1;",
+            "            } // X Z Y order",
+            "            else {",
+            "                i1 = 0;",
+            "                j1 = 0;",
+            "                k1 = 1;",
+            "                i2 = 1;",
+            "                j2 = 0;",
+            "                k2 = 1;",
+            "            } // Z X Y order",
+            "        }",
+            "        else { // x0<y0",
+            "            if (y0 < z0) {",
+            "                i1 = 0;",
+            "                j1 = 0;",
+            "                k1 = 1;",
+            "                i2 = 0;",
+            "                j2 = 1;",
+            "                k2 = 1;",
+            "            } // Z Y X order",
+            "            else if (x0 < z0) {",
+            "                i1 = 0;",
+            "                j1 = 1;",
+            "                k1 = 0;",
+            "                i2 = 0;",
+            "                j2 = 1;",
+            "                k2 = 1;",
+            "            } // Y Z X order",
+            "            else {",
+            "                i1 = 0;",
+            "                j1 = 1;",
+            "                k1 = 0;",
+            "                i2 = 1;",
+            "                j2 = 1;",
+            "                k2 = 0;",
+            "            } // Y X Z order",
+            "        }",
+            "        // A step of (1,0,0) in (i,j,k) means a step of (1-c,-c,-c) in (x,y,z),",
+            "        // a step of (0,1,0) in (i,j,k) means a step of (-c,1-c,-c) in (x,y,z), and",
+            "        // a step of (0,0,1) in (i,j,k) means a step of (-c,-c,1-c) in (x,y,z), where",
+            "        // c = 1/6.",
+            "        const x1 = x0 - i1 + G3; // Offsets for second corner in (x,y,z) coords",
+            "        const y1 = y0 - j1 + G3;",
+            "        const z1 = z0 - k1 + G3;",
+            "        const x2 = x0 - i2 + 2.0 * G3; // Offsets for third corner in (x,y,z) coords",
+            "        const y2 = y0 - j2 + 2.0 * G3;",
+            "        const z2 = z0 - k2 + 2.0 * G3;",
+            "        const x3 = x0 - 1.0 + 3.0 * G3; // Offsets for last corner in (x,y,z) coords",
+            "        const y3 = y0 - 1.0 + 3.0 * G3;",
+            "        const z3 = z0 - 1.0 + 3.0 * G3;",
+            "        // Work out the hashed gradient indices of the four simplex corners",
+            "        const ii = i & 255;",
+            "        const jj = j & 255;",
+            "        const kk = k & 255;",
+            "        // Calculate the contribution from the four corners",
+            "        let t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0;",
+            "        if (t0 < 0)",
+            "            n0 = 0.0;",
+            "        else {",
+            "            const gi0 = permMod12[ii + perm[jj + perm[kk]]] * 3;",
+            "            t0 *= t0;",
+            "            n0 = t0 * t0 * (grad3[gi0] * x0 + grad3[gi0 + 1] * y0 + grad3[gi0 + 2] * z0);",
+            "        }",
+            "        let t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1;",
+            "        if (t1 < 0)",
+            "            n1 = 0.0;",
+            "        else {",
+            "            const gi1 = permMod12[ii + i1 + perm[jj + j1 + perm[kk + k1]]] * 3;",
+            "            t1 *= t1;",
+            "            n1 = t1 * t1 * (grad3[gi1] * x1 + grad3[gi1 + 1] * y1 + grad3[gi1 + 2] * z1);",
+            "        }",
+            "        let t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2;",
+            "        if (t2 < 0)",
+            "            n2 = 0.0;",
+            "        else {",
+            "            const gi2 = permMod12[ii + i2 + perm[jj + j2 + perm[kk + k2]]] * 3;",
+            "            t2 *= t2;",
+            "            n2 = t2 * t2 * (grad3[gi2] * x2 + grad3[gi2 + 1] * y2 + grad3[gi2 + 2] * z2);",
+            "        }",
+            "        let t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3;",
+            "        if (t3 < 0)",
+            "            n3 = 0.0;",
+            "        else {",
+            "            const gi3 = permMod12[ii + 1 + perm[jj + 1 + perm[kk + 1]]] * 3;",
+            "            t3 *= t3;",
+            "            n3 = t3 * t3 * (grad3[gi3] * x3 + grad3[gi3 + 1] * y3 + grad3[gi3 + 2] * z3);",
+            "        }",
+            "        // Add contributions from each corner to get the final noise value.",
+            "        // The result is scaled to stay just inside [-1,1]",
+            "        return 32.0 * (n0 + n1 + n2 + n3);",
+            "    }",
+            "",
+            "    /**",
+            "     * Samples the noise field in 4 dimensions",
+            "     * @param {number} x",
+            "     * @param {number} y",
+            "     * @param {number} z",
+            "     * @returns a number in the interval [-1, 1]",
+            "     */",
+            "    noise4D(x, y, z, w) {",
+            "        const perm = this.perm;",
+            "        let n0, n1, n2, n3, n4; // Noise contributions from the five corners",
+            "        // Skew the (x,y,z,w) space to determine which cell of 24 simplices we're in",
+            "        const s = (x + y + z + w) * F4; // Factor for 4D skewing",
+            "        const i = Math.floor(x + s);",
+            "        const j = Math.floor(y + s);",
+            "        const k = Math.floor(z + s);",
+            "        const l = Math.floor(w + s);",
+            "        const t = (i + j + k + l) * G4; // Factor for 4D unskewing",
+            "        const X0 = i - t; // Unskew the cell origin back to (x,y,z,w) space",
+            "        const Y0 = j - t;",
+            "        const Z0 = k - t;",
+            "        const W0 = l - t;",
+            "        const x0 = x - X0; // The x,y,z,w distances from the cell origin",
+            "        const y0 = y - Y0;",
+            "        const z0 = z - Z0;",
+            "        const w0 = w - W0;",
+            "        // For the 4D case, the simplex is a 4D shape I won't even try to describe.",
+            "        // To find out which of the 24 possible simplices we're in, we need to",
+            "        // determine the magnitude ordering of x0, y0, z0 and w0.",
+            "        // Six pair-wise comparisons are performed between each possible pair",
+            "        // of the four coordinates, and the results are used to rank the numbers.",
+            "        let rankx = 0;",
+            "        let ranky = 0;",
+            "        let rankz = 0;",
+            "        let rankw = 0;",
+            "        if (x0 > y0)",
+            "            rankx++;",
+            "        else",
+            "            ranky++;",
+            "        if (x0 > z0)",
+            "            rankx++;",
+            "        else",
+            "            rankz++;",
+            "        if (x0 > w0)",
+            "            rankx++;",
+            "        else",
+            "            rankw++;",
+            "        if (y0 > z0)",
+            "            ranky++;",
+            "        else",
+            "            rankz++;",
+            "        if (y0 > w0)",
+            "            ranky++;",
+            "        else",
+            "            rankw++;",
+            "        if (z0 > w0)",
+            "            rankz++;",
+            "        else",
+            "            rankw++;",
+            "        // simplex[c] is a 4-vector with the numbers 0, 1, 2 and 3 in some order.",
+            "        // Many values of c will never occur, since e.g. x>y>z>w makes x<z, y<w and x<w",
+            "        // impossible. Only the 24 indices which have non-zero entries make any sense.",
+            "        // We use a thresholding to set the coordinates in turn from the largest magnitude.",
+            "        // Rank 3 denotes the largest coordinate.",
+            "        // Rank 2 denotes the second largest coordinate.",
+            "        // Rank 1 denotes the second smallest coordinate.",
+            "        // The integer offsets for the second simplex corner",
+            "        const i1 = rankx >= 3 ? 1 : 0;",
+            "        const j1 = ranky >= 3 ? 1 : 0;",
+            "        const k1 = rankz >= 3 ? 1 : 0;",
+            "        const l1 = rankw >= 3 ? 1 : 0;",
+            "        // The integer offsets for the third simplex corner",
+            "        const i2 = rankx >= 2 ? 1 : 0;",
+            "        const j2 = ranky >= 2 ? 1 : 0;",
+            "        const k2 = rankz >= 2 ? 1 : 0;",
+            "        const l2 = rankw >= 2 ? 1 : 0;",
+            "        // The integer offsets for the fourth simplex corner",
+            "        const i3 = rankx >= 1 ? 1 : 0;",
+            "        const j3 = ranky >= 1 ? 1 : 0;",
+            "        const k3 = rankz >= 1 ? 1 : 0;",
+            "        const l3 = rankw >= 1 ? 1 : 0;",
+            "        // The fifth corner has all coordinate offsets = 1, so no need to compute that.",
+            "        const x1 = x0 - i1 + G4; // Offsets for second corner in (x,y,z,w) coords",
+            "        const y1 = y0 - j1 + G4;",
+            "        const z1 = z0 - k1 + G4;",
+            "        const w1 = w0 - l1 + G4;",
+            "        const x2 = x0 - i2 + 2.0 * G4; // Offsets for third corner in (x,y,z,w) coords",
+            "        const y2 = y0 - j2 + 2.0 * G4;",
+            "        const z2 = z0 - k2 + 2.0 * G4;",
+            "        const w2 = w0 - l2 + 2.0 * G4;",
+            "        const x3 = x0 - i3 + 3.0 * G4; // Offsets for fourth corner in (x,y,z,w) coords",
+            "        const y3 = y0 - j3 + 3.0 * G4;",
+            "        const z3 = z0 - k3 + 3.0 * G4;",
+            "        const w3 = w0 - l3 + 3.0 * G4;",
+            "        const x4 = x0 - 1.0 + 4.0 * G4; // Offsets for last corner in (x,y,z,w) coords",
+            "        const y4 = y0 - 1.0 + 4.0 * G4;",
+            "        const z4 = z0 - 1.0 + 4.0 * G4;",
+            "        const w4 = w0 - 1.0 + 4.0 * G4;",
+            "        // Work out the hashed gradient indices of the five simplex corners",
+            "        const ii = i & 255;",
+            "        const jj = j & 255;",
+            "        const kk = k & 255;",
+            "        const ll = l & 255;",
+            "        // Calculate the contribution from the five corners",
+            "        let t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0;",
+            "        if (t0 < 0)",
+            "            n0 = 0.0;",
+            "        else {",
+            "            const gi0 = (perm[ii + perm[jj + perm[kk + perm[ll]]]] % 32) * 4;",
+            "            t0 *= t0;",
+            "            n0 = t0 * t0 * (grad4[gi0] * x0 + grad4[gi0 + 1] * y0 + grad4[gi0 + 2] * z0 + grad4[gi0 + 3] * w0);",
+            "        }",
+            "        let t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1;",
+            "        if (t1 < 0)",
+            "            n1 = 0.0;",
+            "        else {",
+            "            const gi1 = (perm[ii + i1 + perm[jj + j1 + perm[kk + k1 + perm[ll + l1]]]] % 32) * 4;",
+            "            t1 *= t1;",
+            "            n1 = t1 * t1 * (grad4[gi1] * x1 + grad4[gi1 + 1] * y1 + grad4[gi1 + 2] * z1 + grad4[gi1 + 3] * w1);",
+            "        }",
+            "        let t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2;",
+            "        if (t2 < 0)",
+            "            n2 = 0.0;",
+            "        else {",
+            "            const gi2 = (perm[ii + i2 + perm[jj + j2 + perm[kk + k2 + perm[ll + l2]]]] % 32) * 4;",
+            "            t2 *= t2;",
+            "            n2 = t2 * t2 * (grad4[gi2] * x2 + grad4[gi2 + 1] * y2 + grad4[gi2 + 2] * z2 + grad4[gi2 + 3] * w2);",
+            "        }",
+            "        let t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3;",
+            "        if (t3 < 0)",
+            "            n3 = 0.0;",
+            "        else {",
+            "            const gi3 = (perm[ii + i3 + perm[jj + j3 + perm[kk + k3 + perm[ll + l3]]]] % 32) * 4;",
+            "            t3 *= t3;",
+            "            n3 = t3 * t3 * (grad4[gi3] * x3 + grad4[gi3 + 1] * y3 + grad4[gi3 + 2] * z3 + grad4[gi3 + 3] * w3);",
+            "        }",
+            "        let t4 = 0.6 - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4;",
+            "        if (t4 < 0)",
+            "            n4 = 0.0;",
+            "        else {",
+            "            const gi4 = (perm[ii + 1 + perm[jj + 1 + perm[kk + 1 + perm[ll + 1]]]] % 32) * 4;",
+            "            t4 *= t4;",
+            "            n4 = t4 * t4 * (grad4[gi4] * x4 + grad4[gi4 + 1] * y4 + grad4[gi4 + 2] * z4 + grad4[gi4 + 3] * w4);",
+            "        }",
+            "        // Sum up and scale the result to cover the range [-1,1]",
+            "        return 27.0 * (n0 + n1 + n2 + n3 + n4);",
+            "    };",
+            "}",
+            "",
+            "gdjs._cameraShakeExtension = {",
+            "    noiseManager: new NoiseManager(),",
+            "};",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Generate a number from 2 dimensional simplex noise.",
+      "fullName": "2D noise",
+      "functionType": "Expression",
+      "name": "Noise2d",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "const x = eventsFunctionContext.getArgument(\"X\");\r",
+            "const y = eventsFunctionContext.getArgument(\"Y\");\r",
+            "\r",
+            "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.getGenerator(name).noise(x, y);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "description": "X coordinate",
+          "name": "X",
+          "type": "expression"
+        },
+        {
+          "description": "Y coordinate",
+          "name": "Y",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Generate a number from 3 dimensional simplex noise.",
+      "fullName": "3D noise",
+      "functionType": "Expression",
+      "name": "Noise3d",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "const x = eventsFunctionContext.getArgument(\"X\");\r",
+            "const y = eventsFunctionContext.getArgument(\"Y\");\r",
+            "const z = eventsFunctionContext.getArgument(\"Z\");\r",
+            "\r",
+            "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.getGenerator(name).noise(x, y, z);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "description": "X coordinate",
+          "name": "X",
+          "type": "expression"
+        },
+        {
+          "description": "Y coordinate",
+          "name": "Y",
+          "type": "expression"
+        },
+        {
+          "description": "Z coordinate",
+          "name": "Z",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Generate a number from 4 dimensional simplex noise.",
+      "fullName": "4D noise",
+      "functionType": "Expression",
+      "name": "Noise4d",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "const x = eventsFunctionContext.getArgument(\"X\");\r",
+            "const y = eventsFunctionContext.getArgument(\"Y\");\r",
+            "const z = eventsFunctionContext.getArgument(\"Z\");\r",
+            "const w = eventsFunctionContext.getArgument(\"W\");\r",
+            "\r",
+            "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.getGenerator(name).noise(x, y, z, w);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "description": "X coordinate",
+          "name": "X",
+          "type": "expression"
+        },
+        {
+          "description": "Y coordinate",
+          "name": "Y",
+          "type": "expression"
+        },
+        {
+          "description": "Z coordinate",
+          "name": "Z",
+          "type": "expression"
+        },
+        {
+          "description": "W coordinate",
+          "name": "W",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Create a noise generator with default settings (frequency = 1,  octaves = 1, persistence = 0.5, lacunarity = 2).",
+      "fullName": "Create a noise generator",
+      "functionType": "Action",
+      "name": "Create",
+      "private": true,
+      "sentence": "Create a noise generator named _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "\r",
+            "gdjs._cameraShakeExtension.noiseManager.getGenerator(name);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Delete a noise generator and loose its settings.",
+      "fullName": "Delete a noise generator",
+      "functionType": "Action",
+      "name": "Delete",
+      "private": true,
+      "sentence": "Delete _PARAM1_ noise generator",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "\r",
+            "gdjs._cameraShakeExtension.noiseManager.deleteGenerator(name);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Delete all noise generators and loose their settings.",
+      "fullName": "Delete all noise generators",
+      "functionType": "Action",
+      "name": "DeleteAll",
+      "private": true,
+      "sentence": "Delete all noise generators",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "gdjs._cameraShakeExtension.noiseManager.deleteAllGenerators();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "The seed is a number used to generate the random noise. Setting the same seed will result in the same random noise generation. It's for example useful to generate the same world, by saving this seed value and reusing it later to generate again a world.",
+      "fullName": "Noise seed",
+      "functionType": "Action",
+      "name": "SetSeed",
+      "private": true,
+      "sentence": "Change the noise seed to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "gdjs._cameraShakeExtension.noiseManager.setSeed(eventsFunctionContext.getArgument(\"Seed\"));",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Seed",
+          "longDescription": "15 digits numbers maximum",
+          "name": "Seed",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the looping period on X used for noise generation. The noise will wrap-around on X.",
+      "fullName": "Noise looping period on X",
+      "functionType": "Action",
+      "name": "SetLoopPeriodX",
+      "private": true,
+      "sentence": "Change the looping period on X of _PARAM2_: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "\r",
+            "gdjs._cameraShakeExtension.noiseManager.getGenerator(name).xLoopPeriod = eventsFunctionContext.getArgument(\"LoopPeriod\");"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Looping period on X",
+          "name": "LoopPeriod",
+          "type": "expression"
+        },
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the looping period on Y used for noise generation. The noise will wrap-around on Y.",
+      "fullName": "Noise looping period on Y",
+      "functionType": "Action",
+      "name": "SetLoopPeriodY",
+      "private": true,
+      "sentence": "Change the looping period on Y of _PARAM2_: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "\r",
+            "gdjs._cameraShakeExtension.noiseManager.getGenerator(name).yLoopPeriod = eventsFunctionContext.getArgument(\"LoopPeriod\");"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Looping period on Y",
+          "name": "LoopPeriod",
+          "type": "expression"
+        },
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the base frequency used for noise generation. A lower frequency will zoom in the noise.",
+      "fullName": "Noise base frequency",
+      "functionType": "Action",
+      "name": "SetFrequency",
+      "private": true,
+      "sentence": "Change the noise frequency of _PARAM2_: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "\r",
+            "gdjs._cameraShakeExtension.noiseManager.getGenerator(name).frequency = eventsFunctionContext.getArgument(\"Frequency\");"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Frequency",
+          "name": "Frequency",
+          "type": "expression"
+        },
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the number of octaves used for noise generation. It can be seen as layers of noise with different zoom.",
+      "fullName": "Noise octaves",
+      "functionType": "Action",
+      "name": "SetOctaves",
+      "private": true,
+      "sentence": "Change the number of noise octaves of _PARAM2_: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "\r",
+            "gdjs._cameraShakeExtension.noiseManager.getGenerator(name).octaves = eventsFunctionContext.getArgument(\"Octaves\");"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Octaves",
+          "name": "Octaves",
+          "type": "expression"
+        },
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the persistence used for noise generation. At its default value \"0.5\", it halves the noise amplitude at each octave.",
+      "fullName": "Noise persistence",
+      "functionType": "Action",
+      "name": "SetPersistence",
+      "private": true,
+      "sentence": "Change the noise persistence of _PARAM2_: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "\r",
+            "gdjs._cameraShakeExtension.noiseManager.getGenerator(name).persistence = eventsFunctionContext.getArgument(\"Persistence\");"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Persistence",
+          "name": "Persistence",
+          "type": "expression"
+        },
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the lacunarity used for noise generation. At its default value \"2\", it doubles the frequency at each octave.",
+      "fullName": "Noise lacunarity",
+      "functionType": "Action",
+      "name": "SetLacunarity",
+      "private": true,
+      "sentence": "Change the noise lacunarity of _PARAM2_: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "\r",
+            "gdjs._cameraShakeExtension.noiseManager.getGenerator(name).lacunarity = eventsFunctionContext.getArgument(\"Lacunarity\");"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Lacunarity",
+          "name": "Lacunarity",
+          "type": "expression"
+        },
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The seed used for noise generation.",
+      "fullName": "Noise seed",
+      "functionType": "Expression",
+      "name": "Seed",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.seed;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "The base frequency used for noise generation.",
+      "fullName": "Noise base frequency",
+      "functionType": "Expression",
+      "name": "Frequency",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "\r",
+            "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.getGenerator(name).frequency;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The number of octaves used for noise generation.",
+      "fullName": "Noise octaves number",
+      "functionType": "Expression",
+      "name": "Octaves",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "\r",
+            "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.getGenerator(name).octaves;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The persistence used for noise generation.",
+      "fullName": "Noise persistence",
+      "functionType": "Expression",
+      "name": "Persistence",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "\r",
+            "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.getGenerator(name).persistence;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The lacunarity used for noise generation.",
+      "fullName": "Noise lacunarity",
+      "functionType": "Expression",
+      "name": "Lacunarity",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "\r",
+            "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.getGenerator(name).lacunarity;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Generator name",
+          "name": "Name",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

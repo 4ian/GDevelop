@@ -1,0 +1,131 @@
+{
+  "author": "Arthur Pacaud (arthuro555)",
+  "category": "Device",
+  "description": "Adds an action to locate the player using the built-in GPS, or other techniques if unavailable. \nYou can also track whether or not you've gotten the permission to use the GPS sensor, and track realtime player movement.",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "GPS",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNyb3NzaGFpcnMtZ3BzIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLDhBNCw0IDAgMCwxIDE2LDEyQTQsNCAwIDAsMSAxMiwxNkE0LDQgMCAwLDEgOCwxMkE0LDQgMCAwLDEgMTIsOE0zLjA1LDEzSDFWMTFIMy4wNUMzLjUsNi44MyA2LjgzLDMuNSAxMSwzLjA1VjFIMTNWMy4wNUMxNy4xNywzLjUgMjAuNSw2LjgzIDIwLjk1LDExSDIzVjEzSDIwLjk1QzIwLjUsMTcuMTcgMTcuMTcsMjAuNSAxMywyMC45NVYyM0gxMVYyMC45NUM2LjgzLDIwLjUgMy41LDE3LjE3IDMuMDUsMTNNMTIsNUE3LDcgMCAwLDAgNSwxMkE3LDcgMCAwLDAgMTIsMTlBNyw3IDAgMCwwIDE5LDEyQTcsNyAwIDAsMCAxMiw1WiIgLz48L3N2Zz4=",
+  "name": "Geolocation",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/crosshairs-gps.svg",
+  "shortDescription": "Adds a way to locate the player.",
+  "version": "1.0.0",
+  "tags": "geolocation,gps,position,location,locate,where,place",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "dependencies": [
+    {
+      "exportName": "cordova-plugin-geolocation",
+      "name": "Geolocation cordova support",
+      "type": "cordova",
+      "version": "https://github.com/apache/cordova-plugin-geolocation.git"
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "description": "",
+      "fullName": "",
+      "functionType": "Action",
+      "group": "",
+      "name": "onFirstSceneLoaded",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "gdjs.evtTools.geolocation = {\n    permission: { state: navigator.permissions ? \"loading\" : \"unknown\" }\n};\n\n// Prefetch the permission and set up an event handler to keep it up to date\nif (navigator.permissions) navigator.permissions.query({ name: 'geolocation' })\n    .then((permission) => {\n        gdjs.evtTools.geolocation.permission = permission;\n    });\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns the status of the geolocation permission.",
+      "fullName": "Permission status",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "PermissionStatus",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs.evtTools.geolocation.permission.state;\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Detects when the player's device is moved and get its new location. If the permission status is pending, it will ask for user permission. Every time the location is updated, stores it in the callback variable.",
+      "fullName": "Watch the player",
+      "functionType": "Action",
+      "group": "",
+      "name": "WatchPlayer",
+      "private": false,
+      "sentence": "Watch player movements and store their position in scene variable _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "this.logger = (this.logger || new gdjs.Logger(\"Geolocation extension\"))\n\nif (navigator && navigator.geolocation) navigator\n    .geolocation\n    .watchPosition(\n        location => {\n            const variable = eventsFunctionContext.getArgument(\"callback\");\n            for (const child of Object.keys(location.coords.__proto__)) {\n                variable.getChild(child).setNumber(location.coords[child]);\n            }\n        },\n        (error) => this.logger.error(`Couldn't locate player: ` + error.message),\n        { enableHighAccuracy: true }\n    );\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Callback variable",
+          "longDescription": "",
+          "name": "callback",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "scenevar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Locates the player. If the permission status is pending, it will ask for user permission. Once the location is fetched, stores it in the callback variable.",
+      "fullName": "Locate the player",
+      "functionType": "Action",
+      "group": "",
+      "name": "LocatePlayer",
+      "private": false,
+      "sentence": "Locate the player and store the result in scene variable _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "this.logger = (this.logger || new gdjs.Logger(\"Geolocation extension\"))\n\nif (navigator && navigator.geolocation) navigator\n    .geolocation\n    .getCurrentPosition(\n        location => {\n            const variable = eventsFunctionContext.getArgument(\"callback\");\n            for (const child in location.coords) {\n                variable.getChild(child).setNumber(location.coords[child]);\n            }\n        },\n        (error) => this.logger.error(`Couldn't locate player: ` + error.message),\n        { enableHighAccuracy: true }\n    );\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Callback variable",
+          "longDescription": "",
+          "name": "callback",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "scenevar"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

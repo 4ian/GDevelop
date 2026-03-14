@@ -1,0 +1,181 @@
+{
+  "author": "Arthur Pacaud (arthuro555)",
+  "category": "Third-party",
+  "description": "Allows adding discord rich presence to your games. Only works on Windows/Mac/Linux exports. To test it on a preview, restart the discord desktop client while GDevelop is already opened, and start a preview.\n\nYou can get more infos on each field via [the discord documentation](https://discord.com/developers/docs/rich-presence/how-to#updating-presence-update-presence-payload-fields).",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.6.256",
+  "fullName": "Discord rich presence (Windows, Mac, Linux)",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWRpc2NvcmQiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjIsMjRMMTYuNzUsMTlMMTcuMzgsMjFINC41QTIuNSwyLjUgMCAwLDEgMiwxOC41VjMuNUEyLjUsMi41IDAgMCwxIDQuNSwxSDE5LjVBMi41LDIuNSAwIDAsMSAyMiwzLjVWMjRNMTIsNi44QzkuMzIsNi44IDcuNDQsNy45NSA3LjQ0LDcuOTVDOC40Nyw3LjAzIDEwLjI3LDYuNSAxMC4yNyw2LjVMMTAuMSw2LjMzQzguNDEsNi4zNiA2Ljg4LDcuNTMgNi44OCw3LjUzQzUuMTYsMTEuMTIgNS4yNywxNC4yMiA1LjI3LDE0LjIyQzYuNjcsMTYuMDMgOC43NSwxNS45IDguNzUsMTUuOUw5LjQ2LDE1QzguMjEsMTQuNzMgNy40MiwxMy42MiA3LjQyLDEzLjYyQzcuNDIsMTMuNjIgOS4zLDE0LjkgMTIsMTQuOUMxNC43LDE0LjkgMTYuNTgsMTMuNjIgMTYuNTgsMTMuNjJDMTYuNTgsMTMuNjIgMTUuNzksMTQuNzMgMTQuNTQsMTVMMTUuMjUsMTUuOUMxNS4yNSwxNS45IDE3LjMzLDE2LjAzIDE4LjczLDE0LjIyQzE4LjczLDE0LjIyIDE4Ljg0LDExLjEyIDE3LjEyLDcuNTNDMTcuMTIsNy41MyAxNS41OSw2LjM2IDEzLjksNi4zM0wxMy43Myw2LjVDMTMuNzMsNi41IDE1LjUzLDcuMDMgMTYuNTYsNy45NUMxNi41Niw3Ljk1IDE0LjY4LDYuOCAxMiw2LjhNOS45MywxMC41OUMxMC41OCwxMC41OSAxMS4xMSwxMS4xNiAxMS4xLDExLjg2QzExLjEsMTIuNTUgMTAuNTgsMTMuMTMgOS45MywxMy4xM0M5LjI5LDEzLjEzIDguNzcsMTIuNTUgOC43NywxMS44NkM4Ljc3LDExLjE2IDkuMjgsMTAuNTkgOS45MywxMC41OU0xNC4xLDEwLjU5QzE0Ljc1LDEwLjU5IDE1LjI3LDExLjE2IDE1LjI3LDExLjg2QzE1LjI3LDEyLjU1IDE0Ljc1LDEzLjEzIDE0LjEsMTMuMTNDMTMuNDYsMTMuMTMgMTIuOTQsMTIuNTUgMTIuOTQsMTEuODZDMTIuOTQsMTEuMTYgMTMuNDUsMTAuNTkgMTQuMSwxMC41OVoiIC8+PC9zdmc+",
+  "name": "DiscordRichPresence",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/discord.svg",
+  "shortDescription": "Display game activity status in Discord via Rich Presence integration.",
+  "version": "1.1.1",
+  "tags": "discord,rich,presence,integration,status",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "dependencies": [
+    {
+      "exportName": "@xhayper/discord-rpc",
+      "name": "Discord SDK",
+      "type": "npm",
+      "version": "1.3.0"
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "description": "",
+      "fullName": "",
+      "functionType": "Action",
+      "group": "",
+      "name": "onFirstSceneLoaded",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "gdjs.evtTools.discordRP = {\n    client: null,\n};\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Attempts to connect to discord if it is installed, and initialize rich presence.",
+      "fullName": "Initialize rich presence",
+      "functionType": "Action",
+      "group": "",
+      "name": "ConnectToDiscord",
+      "private": false,
+      "sentence": "Initialize rich presence with ID _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const remote = runtimeScene.getGame().getRenderer().getElectronRemote\n    ? runtimeScene.getGame().getRenderer().getElectronRemote()\n    : runtimeScene.getGame().getRenderer().getElectron() && runtimeScene.getGame().getRenderer().getElectron().remote;\n\nif (!remote) return;\nconst { Client } = remote.require(\"@xhayper/discord-rpc\");\n\nif (gdjs.evtTools.discordRP.client) gdjs.evtTools.discordRP.client.destroy();\ngdjs.evtTools.discordRP.client = new Client({ clientId: eventsFunctionContext.getArgument(\"clientId\") });\ngdjs.evtTools.discordRP.client.on(\"error\", (e) => gdjs.Logger.getLoggerOutput().log(\"Discord Rich Presence\", e));\ngdjs.evtTools.discordRP.client.login().catch((e) => gdjs.Logger.getLoggerOutput().log(\"Discord Rich Presence\", e));\n\nwindow.addEventListener(\"beforeunload\", () => gdjs.evtTools.discordRP.client.destroy());\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The discord client ID",
+          "longDescription": "",
+          "name": "clientId",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Update the data in the rich presence. See the discord documentation for more info on each field. Each field except state is optional.",
+      "fullName": "Update rich presence",
+      "functionType": "Action",
+      "group": "",
+      "name": "UpdateRichPresence",
+      "private": false,
+      "sentence": "Update rich presence to state _PARAM1_, details _PARAM2_, begin timestamp _PARAM3_, end timestamp _PARAM4_, large image _PARAM5_ with text _PARAM6_ and small image _PARAM7_ with text _PARAM8_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "if (!gdjs.evtTools.discordRP.client || !gdjs.evtTools.discordRP.client.user) return;\n\nconst payload = {\n    state: undefined,\n    details: undefined,\n    startTimestamp: undefined,\n    endTimestamp: undefined,\n    largeImageKey: undefined,\n    largeImageText: undefined,\n    smallImageKey: undefined,\n    smallImageText: undefined,\n};\n\nfor (const i in payload) {\n    payload[i] = eventsFunctionContext.getArgument(i);\n    if (payload[i] === 0 || payload[i] === \"\") delete payload[i];\n};\n\ngdjs.evtTools.discordRP.client.user.setActivity(payload).catch((e) => gdjs.Logger.getLoggerOutput().log(\"Discord Rich Presence\", e));\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The current state",
+          "longDescription": "",
+          "name": "state",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The details of the current state",
+          "longDescription": "",
+          "name": "details",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The timstamp of the start of the match",
+          "longDescription": "If this is filled, discord will show the time elapsed since the start.",
+          "name": "startTimestamp",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The timestamp of the end of the match",
+          "longDescription": "If this is filled, discord will display the remaining time.",
+          "name": "endTimestamp",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The name of the big image",
+          "longDescription": "",
+          "name": "largeImageKey",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The text of the large image",
+          "longDescription": "",
+          "name": "largeImageText",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The name of the small image",
+          "longDescription": "",
+          "name": "smallImageKey",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The text of the small image",
+          "longDescription": "",
+          "name": "smallImageText",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

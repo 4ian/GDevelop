@@ -1,0 +1,32 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Slice a 2D object into pieces",
+  "name": "ObjectSlicer",
+  "version": "1.1.1",
+  "url": "https://resources.gdevelop-app.com/extensions/ObjectSlicer.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ObjectSlicer-header.json",
+  "tags": "slice,brick,destruction,pixelizer",
+  "category": "Visual effect",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/2ea979b9db9294f26b40687e214f26d7926682457113ccc6dca4174bce6033aa_knife.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Slice sprites into smaller color-matched pieces for destruction/break effects.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/object-slicer",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "SliceObjectIntoPieces",
+      "fullName": "Slice object into smaller pieces",
+      "description": "Slice an object into smaller pieces that match color of the original object. The new object should be a solid white color.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Useful for creating death animations such as explosions, crumbling, dissolve, or teleportation effects.\nObject used for pieces should be a solid white color (otherwise the color will not match the original object color).\n\nTips:\n- Adjust the collision mask to control where pieces will be created,\n- Pieces are linked to the original object which can be used in other events (i.e. explode away from the original object)\n\nThis example shows how to slice objects: [open the project online](https://editor.gdevelop.io/?project=example://object-slicer.json).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWtuaWZlIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTIwLjYyLDJDMjMuOTcsNy42MSAxMi40NywyMC4xNSAxMi40NywyMC4xNUw5LjYsMTcuMjhMNC45MSwyMkwyLjc3LDE5Ljg2TDIwLjYyLDJaIiAvPjwvc3ZnPg=="
+}

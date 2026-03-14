@@ -1,0 +1,665 @@
+{
+  "author": "",
+  "category": "User interface",
+  "extensionNamespace": "",
+  "fullName": "ChatBubble",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNoYXQtb3V0bGluZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMiwzQzYuNSwzIDIsNi41OCAyLDExQzIuMDUsMTMuMTUgMy4wNiwxNS4xNyA0Ljc1LDE2LjVDNC43NSwxNy4xIDQuMzMsMTguNjcgMiwyMUM0LjM3LDIwLjg5IDYuNjQsMjAgOC40NywxOC41QzkuNjEsMTguODMgMTAuODEsMTkgMTIsMTlDMTcuNSwxOSAyMiwxNS40MiAyMiwxMUMyMiw2LjU4IDE3LjUsMyAxMiwzTTEyLDE3QzcuNTgsMTcgNCwxNC4zMSA0LDExQzQsNy42OSA3LjU4LDUgMTIsNUMxNi40Miw1IDIwLDcuNjkgMjAsMTFDMjAsMTQuMzEgMTYuNDIsMTcgMTIsMTdaIiAvPjwvc3ZnPg==",
+  "name": "ChatBubble",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/chat-outline.svg",
+  "shortDescription": "Create chat bubbles dynamically. ",
+  "version": "1.7.1",
+  "description": [
+    "Create chat bubbles dynamically",
+    "",
+    "currently support:",
+    "- auto adjustments for text width",
+    "- auto adjustments for text height",
+    "- chat bubble colors",
+    "- name tags",
+    "",
+    "future support:",
+    "- different positions for the chat bubble tail",
+    "- adjustable paddings.",
+    "",
+    "[Example link](https://gdevelop.io/game-example/chat-bubble)"
+  ],
+  "origin": {
+    "identifier": "ChatBubble",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "bubble,chat,ui",
+  "authorIds": [
+    "rotBq28wITdtfsrE7McHQri4k2w2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Draws a chat bubble into a text object.",
+      "fullName": "Chat Bubble Behavior",
+      "name": "ChatBubble",
+      "objectType": "PrimitiveDrawing::Drawer",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::ClearBetweenFrames"
+                  },
+                  "parameters": [
+                    "Object",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "DefaultColor",
+                    "=",
+                    "ToString(Object.FillColorRed()) + \";\" +\nToString(Object.FillColorGreen()) + \";\" +\nToString(Object.FillColorBlue())"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "DefaultOutlineColor",
+                    "=",
+                    "ToString(Object.OutlineColorRed()) + \";\" +\nToString(Object.OutlineColorGreen()) + \";\" +\nToString(Object.OutlineColorBlue())"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PrimitiveDrawing::Drawer",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ChatBubble::ChatBubble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Draw a chat bubble.",
+          "fullName": "Draw a chat bubble",
+          "functionType": "Action",
+          "group": "ChatBubbleExtension",
+          "name": "DrawChatBubble",
+          "sentence": "Draw a chat bubble at point _PARAM2_, _PARAM3_ using text object _PARAM4_, shape painter _PARAM0_, layer: _PARAM5_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SceneInstancesCount"
+                  },
+                  "parameters": [
+                    "",
+                    "ChatBubbleText",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "ChatBubbleText",
+                    "0",
+                    "0",
+                    "Layer"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Object",
+                    "__ChatBubble.DrawWidth",
+                    "=",
+                    "ChatBubbleText.Width()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Object",
+                    "__ChatBubble.DrawHeight",
+                    "=",
+                    "ChatBubbleText.Height()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ChangePlan"
+                  },
+                  "parameters": [
+                    "ChatBubbleText",
+                    "+",
+                    "ChatBubbleText.ZOrder()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Calculate positions"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::OutlineColor"
+                  },
+                  "parameters": [
+                    "Object",
+                    "DefaultOutlineColor"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::FillColor"
+                  },
+                  "parameters": [
+                    "Object",
+                    "DefaultColor"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__ChatBubble.DrawChatX",
+                    "=",
+                    "PointX-32"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__ChatBubble.DrawChatY",
+                    "=",
+                    "PointY-18-24-18"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "ChatBubbleText",
+                    "=",
+                    "Variable(__ChatBubble.DrawChatX)+24",
+                    "=",
+                    "Variable(__ChatBubble.DrawChatY)+18-ChatBubbleText.Height()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Object",
+                    "__ChatBubble.DrawWidth",
+                    "=",
+                    "lerp(Object.Variable(__ChatBubble.DrawWidth),ChatBubbleText.Width(),0.08)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Object",
+                    "__ChatBubble.DrawHeight",
+                    "=",
+                    "lerp(Object.Variable(__ChatBubble.DrawHeight),ChatBubbleText.Height(),0.08)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "ChatBubbleText"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Variable(__ChatBubble.DrawWidth)",
+                    ">=",
+                    "ChatBubbleText.Width()-24"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Variable(__ChatBubble.DrawHeight)",
+                    ">=",
+                    "ChatBubbleText.Height()-24"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Montre"
+                  },
+                  "parameters": [
+                    "ChatBubbleText",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Draw ChatBubble"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::RoundedRectangle"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Variable(__ChatBubble.DrawChatX)",
+                    "Variable(__ChatBubble.DrawChatY)-Object.Variable(__ChatBubble.DrawHeight)",
+                    "Variable(__ChatBubble.DrawChatX)+24+max(40,Object.Variable(__ChatBubble.DrawWidth))+24",
+                    "Variable(__ChatBubble.DrawChatY)+18+18",
+                    "40"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::BeginFillPath"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Variable(__ChatBubble.DrawChatX)+32",
+                    "Variable(__ChatBubble.DrawChatY)+18+18"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::PathLineTo"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Variable(__ChatBubble.DrawChatX)+32",
+                    "Variable(__ChatBubble.DrawChatY)+18+24+18"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::PathLineTo"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Variable(__ChatBubble.DrawChatX)+32+24",
+                    "Variable(__ChatBubble.DrawChatY)+18+18"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::closePath"
+                  },
+                  "parameters": [
+                    "Object"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PrimitiveDrawing::Drawer",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ChatBubble::ChatBubble",
+              "type": "behavior"
+            },
+            {
+              "description": "X position",
+              "name": "PointX",
+              "type": "expression"
+            },
+            {
+              "description": "Y position",
+              "name": "PointY",
+              "type": "expression"
+            },
+            {
+              "description": "Chat bubble text object",
+              "name": "ChatBubbleText",
+              "supplementaryInformation": "TextObject::Text",
+              "type": "objectList"
+            },
+            {
+              "description": "Layer",
+              "name": "Layer",
+              "type": "layer"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Draw a chat bubble with name tag.",
+          "fullName": "Draw a chat bubble with name tag",
+          "functionType": "Action",
+          "group": "ChatBubbleExtension",
+          "name": "DrawChatBubbleWithNameTag",
+          "sentence": "Draw a chat bubble at point _PARAM2_, _PARAM3_ using text object _PARAM4_, shape painter _PARAM0_, name tag text object: _PARAM6_, layer: _PARAM5_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Draw Chat Bubble"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ChatBubble::ChatBubble::DrawChatBubble"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "PointX",
+                    "PointY",
+                    "ChatBubbleText",
+                    "\"\"",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Draw Nametag"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SceneInstancesCount"
+                  },
+                  "parameters": [
+                    "",
+                    "NameTagText",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "NameTagText",
+                    "0",
+                    "0",
+                    "Layer"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ChangePlan"
+                  },
+                  "parameters": [
+                    "NameTagText",
+                    "+",
+                    "ChatBubbleText.ZOrder()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "NameTagText",
+                    "=",
+                    "Variable(__ChatBubble.DrawChatX)-18+17+5",
+                    "=",
+                    "Variable(__ChatBubble.DrawChatY)-Object.Variable(__ChatBubble.DrawHeight)-18+3+9"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::OutlineColor"
+                  },
+                  "parameters": [
+                    "Object",
+                    "NameTagBackgroundColor"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::FillColor"
+                  },
+                  "parameters": [
+                    "Object",
+                    "NameTagBackgroundColor"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::RoundedRectangle"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Variable(__ChatBubble.DrawChatX)-18+15",
+                    "Variable(__ChatBubble.DrawChatY)-Object.Variable(__ChatBubble.DrawHeight)-9",
+                    "Variable(__ChatBubble.DrawChatX)+NameTagText.Width()+5+5",
+                    "Variable(__ChatBubble.DrawChatY)-Object.Variable(__ChatBubble.DrawHeight)-18+24+7",
+                    "10"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PrimitiveDrawing::Drawer",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ChatBubble::ChatBubble",
+              "type": "behavior"
+            },
+            {
+              "description": "X position",
+              "name": "PointX",
+              "type": "expression"
+            },
+            {
+              "description": "Y position",
+              "name": "PointY",
+              "type": "expression"
+            },
+            {
+              "description": "Chat bubble text object",
+              "name": "ChatBubbleText",
+              "supplementaryInformation": "TextObject::Text",
+              "type": "objectList"
+            },
+            {
+              "description": "Layer",
+              "name": "Layer",
+              "type": "layer"
+            },
+            {
+              "description": "Name tag text object (optional)",
+              "name": "NameTagText",
+              "supplementaryInformation": "TextObject::Text",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "155;155;155",
+          "type": "Color",
+          "label": "Name Tag Background Color (if you only call draw with name tag)",
+          "group": "Name Tag Properties",
+          "name": "NameTagBackgroundColor"
+        },
+        {
+          "value": "",
+          "type": "Color",
+          "label": "",
+          "group": "Chat Bubble Properties",
+          "hidden": true,
+          "name": "DefaultColor"
+        },
+        {
+          "value": "",
+          "type": "Color",
+          "label": "",
+          "group": "Chat Bubble Properties",
+          "hidden": true,
+          "name": "DefaultOutlineColor"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "Draw Chat Width",
+          "group": "Chat Bubble Properties",
+          "hidden": true,
+          "name": "DrawChatWidth"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "Draw Chat Height",
+          "group": "Chat Bubble Properties",
+          "hidden": true,
+          "name": "DrawChatHeight"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

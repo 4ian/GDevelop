@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "KLN0u3Yk4CgE5TVVllYPti8TNRf1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Audio Context",
+  "name": "AudioContext",
+  "version": "0.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/AudioContext.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/AudioContext-header.json",
+  "tags": "audio,sound,music,volume",
+  "category": "Audio",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Glyphster Pack/Master/SVG/Music/308ee40b08fc7798832654e3ab95d1df6a66bfb8e7aae0a19697e120449931d0_Music_speaker_audio_sound.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Create procedural audio.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 11,
+  "helpPath": "https://aliustaoglu.itch.io/audiocontext-gdevelop-extension",
+  "description": "This extension enables you to create your own sounds in real time without using any wav, mp3 or ogg files. It procedurally creates sounds using the Web Audio API and AudioContext.\n\nThe Web Audio API provides a powerful and versatile system for controlling audio on the Web, allowing developers to choose audio sources, add effects to audio, create audio visualizations, apply spatial effects (such as panning) and much more.\n\nThis extension can easily create chiptunes.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8Y2lyY2xlIGN4PSIxNiIgY3k9IjE5IiByPSIzIi8+DQoJPHBhdGggZD0iTTI2LDJINkM1LjQsMiw1LDIuNCw1LDN2MjZjMCwwLjYsMC40LDEsMSwxaDIwYzAuNiwwLDEtMC40LDEtMVYzQzI3LDIuNCwyNi42LDIsMjYsMnogTTE2LDI3Yy00LjQsMC04LTMuNi04LThzMy42LTgsOC04DQoJCXM4LDMuNiw4LDhTMjAuNCwyNywxNiwyN3ogTTIxLDExYy0xLjcsMC0zLTEuMy0zLTNzMS4zLTMsMy0zczMsMS4zLDMsM1MyMi43LDExLDIxLDExeiIvPg0KPC9nPg0KPC9zdmc+DQo="
+}

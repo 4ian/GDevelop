@@ -7,15 +7,7 @@ type BundledSerializedExtension = {
   version?: string,
 };
 
-// $FlowFixMe[cannot-resolve-module]
-const waterShaderExtension: BundledSerializedExtension = require('./watershader.json');
-// $FlowFixMe[cannot-resolve-module]
-const toonShaderExtension: BundledSerializedExtension = require('./toonshader.json');
-
-const bundledSerializedExtensions: Array<BundledSerializedExtension> = [
-  waterShaderExtension,
-  toonShaderExtension,
-];
+const bundledSerializedExtensions: Array<BundledSerializedExtension> = [];
 
 const shouldInstallBundledExtension = (
   project: gdProject,

@@ -1,0 +1,2583 @@
+{
+  "author": "",
+  "category": "Input",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Selection tools",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNlbGVjdGlvbi1kcmFnIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE0LDE3SDE3VjE0SDE5VjE3SDIyVjE5SDE5VjIySDE3VjE5SDE0VjE3TTEyLDE3VjE5SDlWMTdIMTJNNywxN1YxOUgzVjE1SDVWMTdIN00zLDEzVjEwSDVWMTNIM00zLDhWNEg3VjZINVY4SDNNOSw0SDEyVjZIOVY0TTE1LDRIMTlWOEgxN1Y2SDE1VjRNMTksMTBWMTJIMTdWMTBIMTlaIiAvPjwvc3ZnPg==",
+  "name": "SelectionTools",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/9183b1a2c466ffc831a749b3a2692200b070a88f807696d99caa662632c2ed73_selection-drag.svg",
+  "shortDescription": "Select object instances by drawing rectangular, polygonal or lasso selection.",
+  "version": "1.1.0",
+  "description": [
+    "### How to use:",
+    "",
+    "- Activate SelectionTools using the `De/Activate selection tools` action.",
+    "- Create a shape painter object and add the `Selection painter` behavior. Create a single instance of this object.",
+    "- Use `Activate rectangular selection`, `Activate polygonal selection`, or `Activate lasso selection` action to activate the type of selection you need.",
+    "- Use the `Select` condition to check which object instances are inside the selection.",
+    "",
+    "---",
+    "",
+    "### Tips:",
+    "",
+    "- None of the actions require you to call them each frame. Use them with the `At the beginning of the scene` condition or `Triggred Once`.",
+    "- If you set `Pre-select?` to `Yes` in the `Select` condition, do not add a `Triggred Once` to that event.",
+    "",
+    "---",
+    "",
+    "#### Actions:",
+    "",
+    "- `De/Activate selection tools`",
+    "- `Activate rectangular selection`",
+    "- `Activate polygonal selection`",
+    "- `Activate lasso selection`",
+    "- `Clear selection`",
+    "",
+    "#### Condition:",
+    "",
+    "- `Select`",
+    "- `Selection activated`",
+    "- `Current selection type`",
+    "",
+    "#### Behavior:",
+    "",
+    "- `Selection painter`"
+  ],
+  "tags": "select,selection,tool,lasso,marquee,polygon,rectangle",
+  "authorIds": [
+    "TJLmS4MUFJSWNNietFUWDxVSKnB3"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "De/Activate selection tools.",
+      "fullName": "De/Activate selection tools",
+      "functionType": "Action",
+      "name": "De_ActivateSelectionTools",
+      "sentence": "Activate selection tools: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Choice",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetSceneVariableAsBoolean"
+              },
+              "parameters": [
+                "__SelectionTools.Active",
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Choice",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetSceneVariableAsBoolean"
+              },
+              "parameters": [
+                "__SelectionTools.Active",
+                "False"
+              ]
+            },
+            {
+              "type": {
+                "value": "SelectionTools::ClearSelection"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "defaultValue": "yes",
+          "description": "Activate?",
+          "name": "Choice",
+          "optional": true,
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the current selection type to rectangular selection.",
+      "fullName": "Activate rectangular selection",
+      "functionType": "Action",
+      "name": "ActivateRectangularSelection",
+      "sentence": "Activate rectangular selection",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarSceneTxt"
+              },
+              "parameters": [
+                "__SelectionTools.SelectionType",
+                "=",
+                "\"Rectangular\""
+              ]
+            },
+            {
+              "type": {
+                "value": "SelectionTools::ClearSelection"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the current selection type to polygonal selection.",
+      "fullName": "Activate polygonal selection",
+      "functionType": "Action",
+      "name": "ActivatePolygonalSelection",
+      "sentence": "Activate polygonal selection (true polygon: _PARAM4_, minimum side length: _PARAM1_, maximum vertex count: _PARAM2_, merge proximity: _PARAM3_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarSceneTxt"
+              },
+              "parameters": [
+                "__SelectionTools.SelectionType",
+                "=",
+                "\"Polygonal\""
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__SelectionTools.SideLength",
+                "=",
+                "SideLength"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__SelectionTools.MaximumVertexCount",
+                "=",
+                "MaximumVertexCount"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__SelectionTools.MergeProximity",
+                "=",
+                "MergeProximity"
+              ]
+            },
+            {
+              "type": {
+                "value": "SelectionTools::ClearSelection"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "TruePolygon",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetSceneVariableAsBoolean"
+              },
+              "parameters": [
+                "__SelectionTools.TruePolygon",
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "TruePolygon",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetSceneVariableAsBoolean"
+              },
+              "parameters": [
+                "__SelectionTools.TruePolygon",
+                "False"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "MaximumVertexCount",
+                "<",
+                "3"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__SelectionTools.MaximumVertexCount",
+                "=",
+                "3"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "SideLength",
+                "<",
+                "1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__SelectionTools.SideLength",
+                "=",
+                "1"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "MergeProximity",
+                "<",
+                "1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__SelectionTools.MergeProximity",
+                "=",
+                "1"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Minimum length of each side of the shape/polygon (in pixels)",
+          "name": "SideLength",
+          "type": "expression"
+        },
+        {
+          "description": "Maximum number of vertices that the shape/polygon can have",
+          "longDescription": "Too many vertices can affect the performance. A limit on the vertex count ensures that doesn't happen.",
+          "name": "MaximumVertexCount",
+          "type": "expression"
+        },
+        {
+          "description": "Merge proximity",
+          "longDescription": "When clicked, how far (at maximum, in pixels) the cursor needs to be from the first vertex to close the shape.",
+          "name": "MergeProximity",
+          "type": "expression"
+        },
+        {
+          "description": "True polygon?",
+          "longDescription": "If the selection is a true polygon, dragging while the mouse button or touch is down will not place new vertices.",
+          "name": "TruePolygon",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the current selection type to lasso selection.",
+      "fullName": "Activate lasso selection",
+      "functionType": "Action",
+      "name": "ActivateLassoSelection",
+      "sentence": "Activate lasso selection (side length: _PARAM1_, maximum vertex count: _PARAM2_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarSceneTxt"
+              },
+              "parameters": [
+                "__SelectionTools.SelectionType",
+                "=",
+                "\"Lasso\""
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__SelectionTools.MaximumVertexCount",
+                "=",
+                "MaximumVertexCount"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__SelectionTools.SideLength",
+                "=",
+                "SideLength"
+              ]
+            },
+            {
+              "type": {
+                "value": "SelectionTools::ClearSelection"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "MaximumVertexCount",
+                "<",
+                "3"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__SelectionTools.MaximumVertexCount",
+                "=",
+                "3"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "SideLength",
+                "<",
+                "1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__SelectionTools.SideLength",
+                "=",
+                "1"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Length of each side of the shape representing the lasso (in pixels)",
+          "name": "SideLength",
+          "type": "expression"
+        },
+        {
+          "description": "Maximum number of vertices that the shape representing the lasso can have",
+          "longDescription": "Too many vertices can affect the performance. A limit on the vertex count ensures that doesn't happen.",
+          "name": "MaximumVertexCount",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Clear the selection (Note: This action does not deslect selected objects).",
+      "fullName": "Clear selection",
+      "functionType": "Action",
+      "name": "ClearSelection",
+      "sentence": "Clear the selection",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__SelectionTools.VertexCount",
+                "=",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "VariableClearChildren"
+              },
+              "parameters": [
+                "__SelectionTools.Vertices"
+              ]
+            },
+            {
+              "type": {
+                "value": "VariableClearChildren"
+              },
+              "parameters": [
+                "__SelectionTools.Vertex"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetSceneVariableAsBoolean"
+              },
+              "parameters": [
+                "__SelectionTools.ClearPainter",
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Select objects inside the selection boundary.",
+      "fullName": "Select",
+      "functionType": "Condition",
+      "name": "Select",
+      "sentence": "Select all _PARAM1_ inside the selection boundary (invert selection: _PARAM2_, pre select: _PARAM3_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "SceneVariableAsBoolean"
+              },
+              "parameters": [
+                "__SelectionTools.Active",
+                "True"
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Or"
+              },
+              "parameters": [],
+              "subInstructions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "MouseButtonPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Left"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GetArgumentAsBoolean"
+                  },
+                  "parameters": [
+                    "\"PreSelect\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "folded": true,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "VarSceneTxt"
+                  },
+                  "parameters": [
+                    "__SelectionTools.SelectionType",
+                    "=",
+                    "\"Rectangular\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SceneVariableChildCount"
+                  },
+                  "parameters": [
+                    "__SelectionTools.Vertex",
+                    "=",
+                    "4"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const targets = eventsFunctionContext.getObjectsLists(\"Targets\").items;\r",
+                    "const invertSelection = eventsFunctionContext.getArgument(\"InvertSelection\");\r",
+                    "\r",
+                    "const vertex = runtimeScene\r",
+                    "  .getVariables()\r",
+                    "  .get(\"__SelectionTools\")\r",
+                    "  .getChild(\"Vertex\")\r",
+                    "  .getAllChildrenArray();\r",
+                    "\r",
+                    "const vertexMinX = vertex[0].getAsNumber() < vertex[2].getAsNumber() ? vertex[0].getAsNumber() : vertex[2].getAsNumber();\r",
+                    "const vertexMaxX = vertex[0].getAsNumber() > vertex[2].getAsNumber() ? vertex[0].getAsNumber() : vertex[2].getAsNumber();\r",
+                    "const vertexMinY = vertex[1].getAsNumber() < vertex[3].getAsNumber() ? vertex[1].getAsNumber() : vertex[3].getAsNumber();\r",
+                    "const vertexMaxY = vertex[1].getAsNumber() > vertex[3].getAsNumber() ? vertex[1].getAsNumber() : vertex[3].getAsNumber();\r",
+                    "\r",
+                    "const tempDict = {};\r",
+                    "\r",
+                    "//filter the targets whose center lie inside the rectangle\r",
+                    "for (const targetName in targets){\r",
+                    "  tempDict[targetName] = targets[targetName].filter(object => {\r",
+                    "    const objectX = object.getCenterXInScene();\r",
+                    "    const objectY = object.getCenterYInScene();\r",
+                    "\r",
+                    "    const result = objectX > vertexMinX && objectX < vertexMaxX && objectY > vertexMinY && objectY < vertexMaxY;\r",
+                    "    return invertSelection ? !result : result;\r",
+                    "  });\r",
+                    "  targets[targetName].length = 0;\r",
+                    "}\r",
+                    "\r",
+                    "for (const targetName in tempDict){\r",
+                    "  for (const value of tempDict[targetName]){\r",
+                    "    targets[targetName].push(value);\r",
+                    "  }\r",
+                    "}"
+                  ],
+                  "parameterObjects": "",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "folded": true,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "__SelectionTools.VertexCount",
+                    "!=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "value": "VarSceneTxt"
+                      },
+                      "parameters": [
+                        "__SelectionTools.SelectionType",
+                        "=",
+                        "\"Lasso\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::And"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "VarSceneTxt"
+                          },
+                          "parameters": [
+                            "__SelectionTools.SelectionType",
+                            "=",
+                            "\"Polygonal\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "GetArgumentAsBoolean"
+                              },
+                              "parameters": [
+                                "\"PreSelect\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "__SelectionTools.CloseSelection",
+                                "True"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Add the cursor position to the end of the vertices array if \"PreSelect\" is true. Thus pre-selecting the objects that get selected if a new vertex gets created at that position."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarSceneTxt"
+                      },
+                      "parameters": [
+                        "__SelectionTools.SelectionType",
+                        "=",
+                        "\"Polygonal\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "PreSelect",
+                        "True",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SceneVariableChildCount"
+                      },
+                      "parameters": [
+                        "__SelectionTools.Vertices",
+                        ">",
+                        "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "__SelectionTools.CloseSelection",
+                        "False"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "VariableClearChildren"
+                      },
+                      "parameters": [
+                        "__SelectionTools.ChildVertex"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SceneVariablePushNumber"
+                      },
+                      "parameters": [
+                        "__SelectionTools.ChildVertex",
+                        "round(CursorX())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SceneVariablePushNumber"
+                      },
+                      "parameters": [
+                        "__SelectionTools.ChildVertex",
+                        "round(CursorY())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SceneVariablePush"
+                      },
+                      "parameters": [
+                        "__SelectionTools.Vertices",
+                        "__SelectionTools.ChildVertex"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "__SelectionTools.PopVertex",
+                        "True"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Check if object's center lies inside the polygon"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const targets = eventsFunctionContext.getObjectsLists(\"Targets\").items;\r",
+                    "const invertSelection = eventsFunctionContext.getArgument(\"InvertSelection\");\r",
+                    "const preSelect = eventsFunctionContext.getArgument(\"PreSelect\");\r",
+                    "\r",
+                    "const vertices = runtimeScene\r",
+                    "    .getVariables()\r",
+                    "    .get(\"__SelectionTools\")\r",
+                    "    .getChild(\"Vertices\")\r",
+                    "    .getAllChildrenArray();\r",
+                    "\r",
+                    "const temporaryDictionary = {};\r",
+                    "\r",
+                    "//filter the targets whose center lie inside the polygon\r",
+                    "for (const targetName in targets){\r",
+                    "  temporaryDictionary[targetName] = targets[targetName].filter(object => {\r",
+                    "    const x = object.getCenterXInScene();\r",
+                    "    const y = object.getCenterYInScene();\r",
+                    "\r",
+                    "    let inside = false;\r",
+                    "\r",
+                    "    for (let i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {\r",
+                    "  \r",
+                    "      const vi = [vertices[i].getAllChildrenArray()[0].getAsNumber(), vertices[i].getAllChildrenArray()[1].getAsNumber()];\r",
+                    "      const vj = [vertices[j].getAllChildrenArray()[0].getAsNumber(), vertices[j].getAllChildrenArray()[1].getAsNumber()];\r",
+                    "      \r",
+                    "      if (vi[1] > y != vj[1] > y && x < ((vj[0] - vi[0]) * (y - vi[1])) / (vj[1] - vi[1]) + vi[0]){\r",
+                    "        inside = !inside;\r",
+                    "      }\r",
+                    "    }\r",
+                    "    return invertSelection ? !inside : inside;\r",
+                    "  });\r",
+                    "  targets[targetName].length = 0;\r",
+                    "}\r",
+                    "\r",
+                    "for (const targetName in temporaryDictionary){\r",
+                    "  for (const value of temporaryDictionary[targetName]){\r",
+                    "    targets[targetName].push(value);\r",
+                    "  }\r",
+                    "}"
+                  ],
+                  "parameterObjects": "",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Pop the last element in vertices array (cursor position) since it is not an actual vertex."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "__SelectionTools.PopVertex",
+                        "True"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SceneVariableRemoveAt"
+                      },
+                      "parameters": [
+                        "__SelectionTools.Vertices",
+                        "VariableChildCount(__SelectionTools.Vertices) - 1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "__SelectionTools.PopVertex",
+                        "False"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object or group that is to be selected",
+          "name": "Targets",
+          "type": "objectList"
+        },
+        {
+          "description": "Invert selection?",
+          "longDescription": "Select all object instances outside the selection boundary.",
+          "name": "InvertSelection",
+          "type": "yesorno"
+        },
+        {
+          "description": "Pre-select?",
+          "longDescription": "Don't wait for the shape to be closed or the mouse button/touch to be released.",
+          "name": "PreSelect",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Selection tools is activated.",
+      "fullName": "Selection activated",
+      "functionType": "Condition",
+      "name": "SelectionActivated",
+      "sentence": "Selection tools is activated",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "SceneVariableAsBoolean"
+              },
+              "parameters": [
+                "__SelectionTools.Active",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Current selection type.",
+      "fullName": "Current selection type",
+      "functionType": "Condition",
+      "name": "CurrentSelectionType",
+      "sentence": "Current selection type: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "VarSceneTxt"
+              },
+              "parameters": [
+                "__SelectionTools.SelectionType",
+                "=",
+                "Type"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Selection type",
+          "name": "Type",
+          "supplementaryInformation": "[\"Rectangular\",\"Polygonal\",\"Lasso\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Draw selection (SelectionTools).",
+      "fullName": "Selection painter",
+      "name": "SelectionPainter",
+      "objectType": "PrimitiveDrawing::Drawer",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SceneVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "__SelectionTools.ClearPainter",
+                    "True"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::Drawer::ClearShapes"
+                  },
+                  "parameters": [
+                    "Object"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetSceneVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "__SelectionTools.ClearPainter",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SceneVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "__SelectionTools.Active",
+                    "True"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "folded": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarSceneTxt"
+                      },
+                      "parameters": [
+                        "__SelectionTools.SelectionType",
+                        "=",
+                        "\"Rectangular\""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Draw selection"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__SelectionTools.CanDrawSelection",
+                            "True"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SceneVariableChildCount"
+                          },
+                          "parameters": [
+                            "__SelectionTools.Vertex",
+                            "=",
+                            "4"
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::Drawer::ClearShapes"
+                              },
+                              "parameters": [
+                                "Object"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::BeginFillPath"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Variable(__SelectionTools.Vertex[0])",
+                                "Variable(__SelectionTools.Vertex[1])"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::PathLineTo"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Variable(__SelectionTools.Vertex[2])",
+                                "Variable(__SelectionTools.Vertex[1])"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::PathLineTo"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Variable(__SelectionTools.Vertex[2])",
+                                "Variable(__SelectionTools.Vertex[3])"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::PathLineTo"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Variable(__SelectionTools.Vertex[0])",
+                                "Variable(__SelectionTools.Vertex[3])"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::closePath"
+                              },
+                              "parameters": [
+                                "Object"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "End selection"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "MouseButtonPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__SelectionTools.CanDrawSelection",
+                            "="
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Begin selection. Gain position of origin"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "MouseButtonPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__SelectionTools.CanDrawSelection",
+                            "False"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "VariableClearChildren"
+                          },
+                          "parameters": [
+                            "__SelectionTools.Vertex"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SceneVariablePushNumber"
+                          },
+                          "parameters": [
+                            "__SelectionTools.Vertex",
+                            "round(CursorX())"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SceneVariablePushNumber"
+                          },
+                          "parameters": [
+                            "__SelectionTools.Vertex",
+                            "round(CursorY())"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__SelectionTools.CanDrawSelection",
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Update position of free end (positioned at the cursor)"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "MouseButtonPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "SceneVariableChildCount"
+                              },
+                              "parameters": [
+                                "__SelectionTools.Vertex",
+                                "=",
+                                "4"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Or"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                                  },
+                                  "parameters": [
+                                    "Variable(__SelectionTools.Vertex[2])",
+                                    "!=",
+                                    "round(CursorX())"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                                  },
+                                  "parameters": [
+                                    "Variable(__SelectionTools.Vertex[3])",
+                                    "!=",
+                                    "round(CursorY())"
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SceneVariableRemoveAt"
+                              },
+                              "parameters": [
+                                "__SelectionTools.Vertex",
+                                "3"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SceneVariableRemoveAt"
+                              },
+                              "parameters": [
+                                "__SelectionTools.Vertex",
+                                "2"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SceneVariablePushNumber"
+                              },
+                              "parameters": [
+                                "__SelectionTools.Vertex",
+                                "round(CursorX())"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SceneVariablePushNumber"
+                              },
+                              "parameters": [
+                                "__SelectionTools.Vertex",
+                                "round(CursorY())"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "SceneVariableChildCount"
+                              },
+                              "parameters": [
+                                "__SelectionTools.Vertex",
+                                "=",
+                                "2"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::CompareNumbers"
+                              },
+                              "parameters": [
+                                "DistanceBetweenPositions(Variable(__SelectionTools.Vertex[0]), Variable(__SelectionTools.Vertex[1]), round(CursorX()), round(CursorY()))",
+                                ">",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SceneVariablePushNumber"
+                              },
+                              "parameters": [
+                                "__SelectionTools.Vertex",
+                                "round(CursorX())"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SceneVariablePushNumber"
+                              },
+                              "parameters": [
+                                "__SelectionTools.Vertex",
+                                "round(CursorY())"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarSceneTxt"
+                      },
+                      "parameters": [
+                        "__SelectionTools.SelectionType",
+                        "=",
+                        "\"Polygonal\""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Close selection"
+                    },
+                    {
+                      "folded": true,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "MouseButtonReleased"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "__SelectionTools.VertexCount",
+                            ">",
+                            "2"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                          },
+                          "parameters": [
+                            "DistanceBetweenPositions(Variable(__SelectionTools.Vertices[0][0]), Variable(__SelectionTools.Vertices[0][1]), CursorX(), CursorY())",
+                            "<",
+                            "Variable(__SelectionTools.MergeProximity)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__SelectionTools.CloseSelection",
+                            "True"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::CompareNumbers"
+                              },
+                              "parameters": [
+                                "Variable(__SelectionTools.Vertices[VariableChildCount(__SelectionTools.Vertices)-1][0])",
+                                "=",
+                                "round(CursorX())"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::CompareNumbers"
+                              },
+                              "parameters": [
+                                "Variable(__SelectionTools.Vertices[VariableChildCount(__SelectionTools.Vertices)-1][1])",
+                                "=",
+                                "round(CursorY())"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetSceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "__SelectionTools.PopLastVertex",
+                                "True"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Draw selection"
+                    },
+                    {
+                      "folded": true,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__SelectionTools.CanDrawSelection",
+                            "True"
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::Drawer::ClearShapes"
+                              },
+                              "parameters": [
+                                "Object"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::BeginFillPath"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Variable(__SelectionTools.Vertices[0][0])",
+                                "Variable(__SelectionTools.Vertices[0][1])"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "SceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "__SelectionTools.CloseSelection",
+                                "True"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "MouseButtonPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Left"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "__SelectionTools.PopLastVertex",
+                                "True"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SceneVariableRemoveAt"
+                              },
+                              "parameters": [
+                                "__SelectionTools.Vertices",
+                                "VariableChildCount(__SelectionTools.Vertices) - 1"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::ForEachChildVariable",
+                          "iterableVariableName": "__SelectionTools.Vertices",
+                          "valueIteratorVariableName": "__SelectionTools.ChildVertex",
+                          "keyIteratorVariableName": "",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::PathLineTo"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Variable(__SelectionTools.ChildVertex[0])",
+                                "Variable(__SelectionTools.ChildVertex[1])"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "SceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "__SelectionTools.CloseSelection",
+                                "True"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "MouseButtonPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Left"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::closePath"
+                              },
+                              "parameters": [
+                                "Object"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetSceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "__SelectionTools.CanDrawSelection",
+                                ""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Not"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "SceneVariableAsBoolean"
+                                  },
+                                  "parameters": [
+                                    "__SelectionTools.CloseSelection",
+                                    "True"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "inverted": true,
+                                    "value": "MouseButtonPressed"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Left"
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::PathLineTo"
+                              },
+                              "parameters": [
+                                "Object",
+                                "CursorX()",
+                                "CursorY()"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "End selection"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "MouseButtonPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__SelectionTools.CanDrawSelection",
+                            "False"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__SelectionTools.VertexCount",
+                            "=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "VariableClearChildren"
+                          },
+                          "parameters": [
+                            "__SelectionTools.Vertices"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__SelectionTools.PopLastVertex",
+                            "False"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__SelectionTools.CloseSelection",
+                            "False"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__SelectionTools.CanDrawSelection",
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "If the shape is a true polygon, dragging while the mouse button or touch is down will not place new vertices."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::And"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "SceneVariableAsBoolean"
+                                  },
+                                  "parameters": [
+                                    "__SelectionTools.TruePolygon",
+                                    "False"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "MouseButtonPressed"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Left"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::And"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "SceneVariableAsBoolean"
+                                  },
+                                  "parameters": [
+                                    "__SelectionTools.TruePolygon",
+                                    "True"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::Or"
+                                  },
+                                  "parameters": [],
+                                  "subInstructions": [
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::And"
+                                      },
+                                      "parameters": [],
+                                      "subInstructions": [
+                                        {
+                                          "type": {
+                                            "value": "MouseButtonReleased"
+                                          },
+                                          "parameters": [
+                                            "",
+                                            "Left"
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "VarScene"
+                                          },
+                                          "parameters": [
+                                            "__SelectionTools.VertexCount",
+                                            "!=",
+                                            "0"
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::And"
+                                      },
+                                      "parameters": [],
+                                      "subInstructions": [
+                                        {
+                                          "type": {
+                                            "value": "MouseButtonPressed"
+                                          },
+                                          "parameters": [
+                                            "",
+                                            "Left"
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "VarScene"
+                                          },
+                                          "parameters": [
+                                            "__SelectionTools.VertexCount",
+                                            "=",
+                                            "0"
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Add new vertex. Update vertices"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "SceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "__SelectionTools.CanDrawSelection",
+                                "True"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "VarScene"
+                              },
+                              "parameters": [
+                                "__SelectionTools.VertexCount",
+                                "<",
+                                "Variable(__SelectionTools.MaximumVertexCount)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Or"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                                  },
+                                  "parameters": [
+                                    "DistanceBetweenPositions(Variable(__SelectionTools.Vertex[0]), Variable(__SelectionTools.Vertex[1]), round(CursorX()), round(CursorY()))",
+                                    ">=",
+                                    "Variable(__SelectionTools.SideLength)"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "VarScene"
+                                  },
+                                  "parameters": [
+                                    "__SelectionTools.VertexCount",
+                                    "=",
+                                    "0"
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "VariableClearChildren"
+                              },
+                              "parameters": [
+                                "__SelectionTools.Vertex"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SceneVariablePushNumber"
+                              },
+                              "parameters": [
+                                "__SelectionTools.Vertex",
+                                "round(CursorX())"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SceneVariablePushNumber"
+                              },
+                              "parameters": [
+                                "__SelectionTools.Vertex",
+                                "round(CursorY())"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SceneVariablePush"
+                              },
+                              "parameters": [
+                                "__SelectionTools.Vertices",
+                                "__SelectionTools.Vertex"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "__SelectionTools.VertexCount",
+                                "+",
+                                "1"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "folded": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarSceneTxt"
+                      },
+                      "parameters": [
+                        "__SelectionTools.SelectionType",
+                        "=",
+                        "\"Lasso\""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Draw Selection"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__SelectionTools.CanDrawSelection",
+                            "True"
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::Drawer::ClearShapes"
+                              },
+                              "parameters": [
+                                "Object"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::BeginFillPath"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Variable(__SelectionTools.Vertices[0][0])",
+                                "Variable(__SelectionTools.Vertices[0][1])"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::ForEachChildVariable",
+                          "iterableVariableName": "__SelectionTools.Vertices",
+                          "valueIteratorVariableName": "__SelectionTools.ChildVertex",
+                          "keyIteratorVariableName": "",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::PathLineTo"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Variable(__SelectionTools.ChildVertex[0])",
+                                "Variable(__SelectionTools.ChildVertex[1])"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "MouseButtonPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Left"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "PrimitiveDrawing::closePath"
+                              },
+                              "parameters": [
+                                "Object"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "End selection"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "MouseButtonPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__SelectionTools.CanDrawSelection",
+                            "="
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VarScene"
+                              },
+                              "parameters": [
+                                "__SelectionTools.VertexCount",
+                                "<",
+                                "3"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SelectionTools::ClearSelection"
+                              },
+                              "parameters": [
+                                "",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Begin selection"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "MouseButtonPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__SelectionTools.CanDrawSelection",
+                            "False"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__SelectionTools.VertexCount",
+                            "=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "VariableClearChildren"
+                          },
+                          "parameters": [
+                            "__SelectionTools.Vertices"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__SelectionTools.CanDrawSelection",
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Add new vertex. Update vertices"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "MouseButtonPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "__SelectionTools.VertexCount",
+                            "<",
+                            "Variable(__SelectionTools.MaximumVertexCount)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::CompareNumbers"
+                              },
+                              "parameters": [
+                                "DistanceBetweenPositions(Variable(__SelectionTools.Vertex[0]), Variable(__SelectionTools.Vertex[1]), round(CursorX()), round(CursorY()))",
+                                ">=",
+                                "Variable(__SelectionTools.SideLength)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "VarScene"
+                              },
+                              "parameters": [
+                                "__SelectionTools.VertexCount",
+                                "=",
+                                "0"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "VariableClearChildren"
+                          },
+                          "parameters": [
+                            "__SelectionTools.Vertex"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SceneVariablePushNumber"
+                          },
+                          "parameters": [
+                            "__SelectionTools.Vertex",
+                            "round(CursorX())"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SceneVariablePushNumber"
+                          },
+                          "parameters": [
+                            "__SelectionTools.Vertex",
+                            "round(CursorY())"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SceneVariablePush"
+                          },
+                          "parameters": [
+                            "__SelectionTools.Vertices",
+                            "__SelectionTools.Vertex"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__SelectionTools.VertexCount",
+                            "+",
+                            "1"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PrimitiveDrawing::Drawer",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SelectionTools::SelectionPainter",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

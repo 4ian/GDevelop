@@ -1,0 +1,51 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1",
+    "PEzPAaWHgYgk5UwIPppsL6f2ugp2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Sprite Snapshot",
+  "name": "RenderToSprite",
+  "version": "0.0.4",
+  "url": "https://resources.gdevelop-app.com/extensions/RenderToSprite.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/RenderToSprite-header.json",
+  "tags": "experimental,non-public apis,visual,sprite,viewport,camera,render,texture,pixijs,snapshot",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/camera-enhance.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Capture objects, layers, or scene areas as images into sprite textures.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 4,
+  "helpPath": "/extensions/render-to-sprite",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "RenderObject",
+      "fullName": "Render an object into a sprite",
+      "description": "Renders an object and puts the rendered image into a sprite object.",
+      "functionType": "Action"
+    },
+    {
+      "name": "RenderLayer",
+      "fullName": "Render a layer into a sprite",
+      "description": "Renders a layer and puts the rendered image into a sprite object.",
+      "functionType": "Action"
+    },
+    {
+      "name": "RenderScene",
+      "fullName": "Render a scene into a sprite",
+      "description": "Renders a scene and puts the rendered image into a sprite object.",
+      "functionType": "Action"
+    },
+    {
+      "name": "RenderSceneArea",
+      "fullName": "Render an area of a scene into a sprite",
+      "description": "Renders a defined area of a scene and puts the rendered image into a sprite object.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Allows rendering (creating an image) of objects, layers and the scene to display in a sprite. \nThis allows to make optimizations by transforming the resulting image of a shape painter into a faster sprite, or to make viewports/cameras.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNhbWVyYS1lbmhhbmNlIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTksM0w3LjE3LDVINEEyLDIgMCAwLDAgMiw3VjE5QTIsMiAwIDAsMCA0LDIxSDIwQTIsMiAwIDAsMCAyMiwxOVY3QTIsMiAwIDAsMCAyMCw1SDE2LjgzTDE1LDNNMTIsMThBNSw1IDAgMCwxIDcsMTNBNSw1IDAgMCwxIDEyLDhBNSw1IDAgMCwxIDE3LDEzQTUsNSAwIDAsMSAxMiwxOE0xMiwxN0wxMy4yNSwxNC4yNUwxNiwxM0wxMy4yNSwxMS43NUwxMiw5TDEwLjc1LDExLjc1TDgsMTNMMTAuNzUsMTQuMjUiIC8+PC9zdmc+"
+}

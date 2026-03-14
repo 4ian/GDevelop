@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Navigation mesh pathfinding (experimental)",
+  "name": "NavMeshPathfinding",
+  "version": "0.3.0",
+  "url": "https://resources.gdevelop-app.com/extensions/NavMeshPathfinding.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/NavMeshPathfinding-header.json",
+  "tags": "navmesh,pathfinding,obstacle,solid,path,detour,recast",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Maps and Navigation/Maps and Navigation_map_find_search.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Pathfinding allows to compute an efficient path for objects, avoiding obstacles on the way.",
+  "eventsBasedBehaviorsCount": 3,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/nav-mesh-pathfinding",
+  "description": "In comparison to the built-in pathfinding behavior, this one aims to:\n- better respect obstacle shapes\n- find paths faster if obstacles don't move\n\nThe isometric example shows how to use this extension to move a character to a destination ([open the project online](https://editor.gdevelop.io/?project=example://isometric-game)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMTcsMjYgNSwyNiA1LDQgMjcsNCAyNywyNiAyNSwyNiAiLz4NCjxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjUsMTkgMTYsOCAyNywxOSAiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIxMiIgeTE9IjQiIHgyPSIxOSIgeTI9IjExIi8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMjIiIHkxPSI0IiB4Mj0iMjIiIHkyPSIxNCIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIwLjUsMTcuNWMtMS45LTEuOS01LjEtMS45LTcsMGMtMS45LDEuOS0xLjksNS4xLDAsN2MxLjQsMS41LDMuNiwxLjgsNS40LDEuMWMwLjYtMC4yLDEuMi0wLjYsMS42LTEuMQ0KCUMyMi40LDIyLjYsMjIuNCwxOS41LDIwLjUsMTcuNXoiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yMS41LDIzbDMuOSwzLjZjMC44LDAuOCwwLjgsMiwwLDIuOGwwLDBjLTAuOCwwLjgtMiwwLjgtMi44LDBsLTMuNS0zLjUiLz4NCjwvc3ZnPg0K"
+}

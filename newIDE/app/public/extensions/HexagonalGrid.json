@@ -1,0 +1,337 @@
+{
+  "author": "D8H",
+  "category": "Game mechanic",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Hexagonal 2D grid",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWhleGFnb24tbXVsdGlwbGUtb3V0bGluZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik05LjM3IDRMMTAuNzggNi41TDkuMzcgOUg2LjYzTDUuMjMgNi41TDYuNjMgNEg5LjM3TTEwLjI1IDJINS43NUM1LjU2IDIgNS4zOSAyLjExIDUuMzEgMi4yNkwzLjA5IDYuMjJMMyA2LjVMMy4wOSA2Ljc4TDUuMzEgMTAuNzRDNS4zOSAxMC44OSA1LjU2IDExIDUuNzUgMTFIMTAuMjVDMTAuNDQgMTEgMTAuNjEgMTAuODkgMTAuNjkgMTAuNzRMMTIuOTEgNi43OEwxMyA2LjVMMTIuOTEgNi4yMkwxMC42OSAyLjI2QzEwLjYxIDIuMTEgMTAuNDQgMiAxMC4yNSAyTTE4LjYyIDkuNUwyMCAxMkwxOC42MiAxNC41SDE1Ljg4TDE0LjUgMTJMMTUuODggOS41SDE4LjYyTTE5LjUgNy41SDE1QzE0LjgxIDcuNSAxNC42NCA3LjYxIDE0LjU2IDcuNzZMMTIuMzQgMTEuNzJMMTIuMjUgMTJMMTIuMzQgMTIuMjhMMTQuNTYgMTYuMjRDMTQuNjQgMTYuMzkgMTQuODEgMTYuNSAxNSAxNi41SDE5LjVDMTkuNjkgMTYuNSAxOS44NiAxNi4zOSAxOS45NCAxNi4yNEwyMi4xNiAxMi4yOEwyMi4yNSAxMkwyMi4xNiAxMS43MkwxOS45NCA3Ljc2QzE5Ljg2IDcuNjEgMTkuNjkgNy41IDE5LjUgNy41TTkuMzcgMTVMMTAuNzggMTcuNUw5LjM3IDIwSDYuNjNMNS4yMyAxNy41TDYuNjMgMTVIOS4zN00xMC4yNSAxM0g1Ljc1QzUuNTYgMTMgNS4zOSAxMy4xMSA1LjMxIDEzLjI2TDMuMDkgMTcuMjJMMyAxNy41TDMuMDkgMTcuNzhMNS4zMSAyMS43NEM1LjM5IDIxLjg5IDUuNTYgMjIgNS43NSAyMkgxMC4yNUMxMC40NCAyMiAxMC42MSAyMS44OSAxMC42OSAyMS43NEwxMi45MSAxNy43OEwxMyAxNy41TDEyLjkxIDE3LjIyTDEwLjY5IDEzLjI2QzEwLjYxIDEzLjExIDEwLjQ0IDEzIDEwLjI1IDEzWiIgLz48L3N2Zz4=",
+  "name": "HexagonalGrid",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/hexagon-multiple-outline.svg",
+  "shortDescription": "Snap objects to an hexagonal grid.",
+  "dimension": "2D",
+  "version": "0.0.3",
+  "description": [
+    "It allows to snap objects on a 2D hexagonal grid.",
+    "",
+    "It's useful for:",
+    "- level editors",
+    "- building systems ([open the city builder example online](https://editor.gdevelop.io/?project=example://city-builder))",
+    "",
+    "A [simple example](https://editor.gdevelop.io/?project=example://snap-object-to-grid) shows how to snap objects that are dragged with the mouse."
+  ],
+  "tags": "hexagon,bubble,grid,snap,positioning",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Snap object to a virtual pointy topped hexagonal grid (this is not the grid used in the editor).",
+      "fullName": "Snap objects to a virtual pointy topped hexagonal grid",
+      "functionType": "Action",
+      "name": "SnapObjectToPointyToppedHexagonalGrid",
+      "sentence": "Snap _PARAM1_ to a virtual pointy topped hexagonal grid using cells with width: _PARAM2_px, height _PARAM3_px and an offset position (_PARAM4_; _PARAM5_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// Insired from: https://www.redblobgames.com/grids/hexagons",
+            "",
+            "const cellWidth = eventsFunctionContext.getArgument(\"CellWidth\");",
+            "const cellHeight = eventsFunctionContext.getArgument(\"CellHeight\");",
+            "const offsetX = eventsFunctionContext.getArgument(\"OffsetX\");",
+            "const offsetY = eventsFunctionContext.getArgument(\"OffsetY\");",
+            "",
+            "for (const object of objects)",
+            "{",
+            "    // Find the hexagon cube coordinates for a given position ",
+            "",
+            "    // The following is a simplified version of this:",
+            "    //",
+            "    // const x = (object.getX() - offsetX) * Math.sqrt(3) / cellWidth;",
+            "    // const y = (object.getY() - offsetY) * 2 / cellHeight;",
+            "    //",
+            "    // const cubeX = Math.sqrt(3) / 3 * x  -  1/3 * y;",
+            "    // const cubeZ =                          2/3 * y;",
+            "",
+            "    const x = (object.getX() - offsetX) / cellWidth;",
+            "    const y = (object.getY() - offsetY) / cellHeight;",
+            "",
+            "    const cubeX = x - 2/3 * y;",
+            "    const cubeZ =     4/3 * y;",
+            "    const cubeY = -cubeX - cubeZ;",
+            "",
+            "    let roundX = Math.round(cubeX);",
+            "    let roundY = Math.round(cubeY);",
+            "    let roundZ = Math.round(cubeZ);",
+            "",
+            "    const deltaX = Math.abs(roundX - cubeX);",
+            "    const deltaY = Math.abs(roundY - cubeY);",
+            "    const deltaZ = Math.abs(roundZ - cubeZ);",
+            "",
+            "    if (deltaX > deltaY && deltaX > deltaZ)",
+            "    {",
+            "        roundX = -roundY - roundZ;",
+            "    }",
+            "    else if (deltaY > deltaZ)",
+            "    {",
+            "        roundY = -roundX - roundZ;",
+            "    }",
+            "    else",
+            "    {",
+            "        roundZ = -roundX - roundY;",
+            "    }",
+            "",
+            "    // Hexagon cube coordinates to hexagon position",
+            "",
+            "    // The following is a simplified version of this:",
+            "    //",
+            "    // const positionX = Math.sqrt(3) * roundX  + Math.sqrt(3)/2 * roundZ;",
+            "    // const positionY =                          3/2 * roundZ;",
+            "    //",
+            "    // object.setX(positionX * cellWidth / Math.sqrt(3) + offsetX);",
+            "    // object.setY(positionY * cellHeight / 2 + offsetY);",
+            "",
+            "    const positionX = roundX + 1/2 * roundZ;",
+            "    const positionY =          3/4 * roundZ;",
+            "",
+            "    object.setX(positionX * cellWidth + offsetX);",
+            "    object.setY(positionY * cellHeight + offsetY);",
+            "}"
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Objects to snap to the virtual grid",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Width of a cell of the virtual grid (in pixels)",
+          "name": "CellWidth",
+          "type": "expression"
+        },
+        {
+          "description": "Height of a cell of the virtual grid (in pixels)",
+          "longDescription": "The actual row height will be 3/4 of this.",
+          "name": "CellHeight",
+          "type": "expression"
+        },
+        {
+          "description": "Offset on the X axis of the virtual grid (in pixels)",
+          "name": "OffsetX",
+          "type": "expression"
+        },
+        {
+          "description": "Offset on the Y axis of the virtual grid (in pixels)",
+          "longDescription": "Odd rows are shifted from half a cell, use a \"CellHeight * 3/4\" offset to make it the other way.",
+          "name": "OffsetY",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Snap object to a virtual flat topped hexagonal grid (this is not the grid used in the editor).",
+      "fullName": "Snap objects to a virtual flat topped hexagonal grid",
+      "functionType": "Action",
+      "name": "SnapObjectToFlatToppedHexagonalGrid",
+      "sentence": "Snap _PARAM1_ to a virtual flat topped hexagonal grid using cells with width: _PARAM2_px, height _PARAM3_px and an offset position (_PARAM4_; _PARAM5_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Note: this is the exact same code as for pointy topped hexagonal grid with x and y swapped.",
+          "comment2": ""
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// Insired from: https://www.redblobgames.com/grids/hexagons",
+            "",
+            "const cellHeight = eventsFunctionContext.getArgument(\"CellWidth\");",
+            "const cellWidth = eventsFunctionContext.getArgument(\"CellHeight\");",
+            "const offsetY = eventsFunctionContext.getArgument(\"OffsetX\");",
+            "const offsetX = eventsFunctionContext.getArgument(\"OffsetY\");",
+            "",
+            "for (const object of objects)",
+            "{",
+            "    // Find the hexagon cube coordinates for a given position ",
+            "",
+            "    // The following is a simplified version of this:",
+            "    //",
+            "    // const x = (object.getX() - offsetX) * Math.sqrt(3) / cellWidth;",
+            "    // const y = (object.getY() - offsetY) * 2 / cellHeight;",
+            "    //",
+            "    // const cubeX = Math.sqrt(3) / 3 * x  -  1/3 * y;",
+            "    // const cubeZ =                          2/3 * y;",
+            "",
+            "    const x = (object.getY() - offsetX) / cellWidth;",
+            "    const y = (object.getX() - offsetY) / cellHeight;",
+            "",
+            "    const cubeX = x - 2/3 * y;",
+            "    const cubeZ =     4/3 * y;",
+            "    const cubeY = -cubeX - cubeZ;",
+            "",
+            "    let roundX = Math.round(cubeX);",
+            "    let roundY = Math.round(cubeY);",
+            "    let roundZ = Math.round(cubeZ);",
+            "",
+            "    const deltaX = Math.abs(roundX - cubeX);",
+            "    const deltaY = Math.abs(roundY - cubeY);",
+            "    const deltaZ = Math.abs(roundZ - cubeZ);",
+            "",
+            "    if (deltaX > deltaY && deltaX > deltaZ)",
+            "    {",
+            "        roundX = -roundY - roundZ;",
+            "    }",
+            "    else if (deltaY > deltaZ)",
+            "    {",
+            "        roundY = -roundX - roundZ;",
+            "    }",
+            "    else",
+            "    {",
+            "        roundZ = -roundX - roundY;",
+            "    }",
+            "",
+            "    // Hexagon cube coordinates to hexagon position",
+            "",
+            "    // The following is a simplified version of this:",
+            "    //",
+            "    // const positionX = Math.sqrt(3) * roundX  + Math.sqrt(3)/2 * roundZ;",
+            "    // const positionY =                          3/2 * roundZ;",
+            "    //",
+            "    // object.setX(positionX * cellWidth / Math.sqrt(3) + offsetX);",
+            "    // object.setY(positionY * cellHeight / 2 + offsetY);",
+            "",
+            "    const positionX = roundX + 1/2 * roundZ;",
+            "    const positionY =          3/4 * roundZ;",
+            "",
+            "    object.setY(positionX * cellWidth + offsetX);",
+            "    object.setX(positionY * cellHeight + offsetY);",
+            "}"
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Objects to snap to the virtual grid",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Width of a cell of the virtual grid (in pixels)",
+          "longDescription": "The actual column width will be 3/4 of this.",
+          "name": "CellWidth",
+          "type": "expression"
+        },
+        {
+          "description": "Height of a cell of the virtual grid (in pixels)",
+          "name": "CellHeight",
+          "type": "expression"
+        },
+        {
+          "description": "Offset on the X axis of the virtual grid (in pixels)",
+          "longDescription": "Odd columns are shifted from half a cell, use a \"CellHeight * 3/4\" offset to make it the other way.",
+          "name": "OffsetX",
+          "type": "expression"
+        },
+        {
+          "description": "Offset on the Y axis of the virtual grid (in pixels)",
+          "name": "OffsetY",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Snap object to a virtual bubble grid (this is not the grid used in the editor).",
+      "fullName": "Snap objects to a virtual bubble grid",
+      "functionType": "Action",
+      "name": "SnapObjectToBubbleGrid",
+      "sentence": "Snap _PARAM1_ to a virtual bubble grid using cells with width: _PARAM2_px, height _PARAM3_px and an offset position (_PARAM4_; _PARAM5_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "This grid is like bottles stacking, odd lines are shifted from half a cell. \n\nOn an hexagonal grid a line height is 3/4 of sprite height but with bubbles it is sin(60°) that is around 0.866 which is near 7/8 = 0.875\n(7/6)/(3/4) = 7/6\nUsing this ratio, the cellHeigt gives the 7/8 line height and this allows integer position as assets are often a multiple of 8.",
+          "comment2": ""
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "HexagonalGrid::SnapObjectToPointyToppedHexagonalGrid"
+              },
+              "parameters": [
+                "",
+                "Object",
+                "CellWidth",
+                "CellHeight * 7/6",
+                "OffsetX",
+                "OffsetY",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Objects to snap to the virtual grid",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Width of a cell of the virtual grid (in pixels)",
+          "name": "CellWidth",
+          "type": "expression"
+        },
+        {
+          "description": "Height of a cell of the virtual grid (in pixels)",
+          "longDescription": "The actual row height will be 7/8 of this.",
+          "name": "CellHeight",
+          "type": "expression"
+        },
+        {
+          "description": "Offset on the X axis of the virtual grid (in pixels)",
+          "name": "OffsetX",
+          "type": "expression"
+        },
+        {
+          "description": "Offset on the Y axis of the virtual grid (in pixels)",
+          "longDescription": "Odd rows are shifted from half a cell, use a \"CellHeight * 7/8\" offset to make it the other way",
+          "name": "OffsetY",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

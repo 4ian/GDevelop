@@ -1,0 +1,509 @@
+{
+  "author": "Tristan Rhodes (https://victrisgames.itch.io/)",
+  "category": "Game mechanic",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Rectangular flood fill",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGc+DQoJPHJlY3QgeD0iMTIiIHk9IjIiIHdpZHRoPSI4IiBoZWlnaHQ9IjgiLz4NCgk8cmVjdCB4PSIxMiIgeT0iMTIiIHdpZHRoPSI4IiBoZWlnaHQ9IjgiLz4NCgk8cmVjdCB4PSIyIiB5PSIxMiIgd2lkdGg9IjgiIGhlaWdodD0iOCIvPg0KCTxyZWN0IHg9IjEyIiB5PSIyMiIgd2lkdGg9IjgiIGhlaWdodD0iOCIvPg0KCTxyZWN0IHg9IjIyIiB5PSIxMiIgd2lkdGg9IjgiIGhlaWdodD0iOCIvPg0KCTxwYXRoIGQ9Ik0yMiwyMnY4aDdjMC42LDAsMS0wLjQsMS0xdi03SDIyeiIvPg0KCTxwYXRoIGQ9Ik0xMCwyMkgydjdjMCwwLjYsMC40LDEsMSwxaDdWMjJ6Ii8+DQoJPHBhdGggZD0iTTEwLDEwVjJIM0MyLjQsMiwyLDIuNCwyLDN2N0gxMHoiLz4NCgk8cGF0aCBkPSJNMjIsMTBoOFYzYzAtMC42LTAuNC0xLTEtMWgtN1YxMHoiLz4NCjwvZz4NCjwvc3ZnPg0K",
+  "name": "RectangularFloodFill",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Graphic Design/Graphic Design_grid.svg",
+  "shortDescription": "Create objects as a grid to cover a rectangular area or an other object.",
+  "dimension": "2D",
+  "version": "2.1.0",
+  "description": [
+    "This extension can be used to create multiple copies of an object in a wide variety of 2D arrangements, including:",
+    "- horizontal row(s)",
+    "- vertical column(s)",
+    "- a solid rectangle or square",
+    "- an evenly spaced grid",
+    "- a grid with different spacing between rows and columns",
+    "",
+    "How To Use:",
+    "- Place target objects in the scene in the places you want fill objects to be created",
+    "- This action only needs to be run once (at the beginning of the scene or using \"Trigger Once\")",
+    "",
+    "Object variables (automatically added on Fill objects): ",
+    "- \"CreationID\" (number)",
+    "- \"RowID\" (number)",
+    "- \"ColumnID\" (number)",
+    "",
+    "Tips:",
+    "- Use fill objects that are the same size as the scene editor grid.  This will make sure the fill objects fit exactly inside the target objects.",
+    "- Hide target objects at the beginning of the scene if you don't want them to be visible.",
+    "- Keep the default origin point (top-left corner) on fill objects them to line up exactly with target objects.",
+    "",
+    "Watch this [tutorial video](https://youtu.be/rlGSlNSRR9w) to see examples of how to use this extension."
+  ],
+  "origin": {
+    "identifier": "RectangularFloodFill",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "create,grid",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "changelog": [
+    {
+      "version": "2.0.0",
+      "breaking": [
+        "- The action no longer set \"BatchID\" variables. It can be done on the created objects after calling the action.",
+        "- Spacing parameters have been inverted."
+      ]
+    }
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Create fill objects that cover the rectangular area of target objects.",
+      "fullName": "Create objects to flood fill other objects",
+      "functionType": "Action",
+      "name": "RectangularFloodFill",
+      "sentence": "Create _PARAM2_ to cover _PARAM1_ with  _PARAM3_ pixels between columns and _PARAM4_ pixels between rows on layer: _PARAM5_ at Z-order: _PARAM6_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Create a temp object to determine size of fill object, then delete it"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "Create"
+              },
+              "parameters": [
+                "",
+                "FillObject",
+                "0",
+                "0",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "ObjectWidth",
+                "=",
+                "FillObject.Width()"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "ObjectHeight",
+                "=",
+                "FillObject.Height()"
+              ]
+            },
+            {
+              "type": {
+                "value": "Delete"
+              },
+              "parameters": [
+                "FillObject",
+                "Floor"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Create permanent objects using the Create Multiple Copies of Object extension"
+            },
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "TargetObject",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "RectangularFloodFill::CreateObjectsOverRectangle"
+                  },
+                  "parameters": [
+                    "",
+                    "FillObject",
+                    "floor(TargetObject.Width() / (ObjectWidth + SpaceBetweenColumns))",
+                    "floor(TargetObject.Height() / (ObjectHeight + SpaceBetweenRows))",
+                    "TargetObject.CenterX() - TargetObject.Width() / 2",
+                    "TargetObject.CenterY() - TargetObject.Height() / 2",
+                    "SpaceBetweenColumns",
+                    "SpaceBetweenRows",
+                    "Layer",
+                    "Zorder",
+                    "Zorder"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "ObjectWidth",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "ObjectHeight",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Target object",
+          "longDescription": "Rectangular area that will be covered by fill objects",
+          "name": "TargetObject",
+          "type": "objectList"
+        },
+        {
+          "description": "Fill object",
+          "longDescription": "Object that is created to cover the rectangular area of target objects",
+          "name": "FillObject",
+          "type": "objectListOrEmptyIfJustDeclared"
+        },
+        {
+          "description": "Space between columns (pixels)",
+          "name": "SpaceBetweenColumns",
+          "type": "expression"
+        },
+        {
+          "description": "Space between rows (pixels)",
+          "name": "SpaceBetweenRows",
+          "type": "expression"
+        },
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        },
+        {
+          "description": "Z order",
+          "name": "Zorder",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Create multiple copies of an object.",
+      "fullName": "Create objects to flood fill a rectanglular area",
+      "functionType": "Action",
+      "name": "CreateObjectsOverRectangle",
+      "sentence": "Create _PARAM2_ columns and _PARAM3_ rows of _PARAM1_ with top-left corner at _PARAM4_ ; _PARAM5_ and _PARAM6_ pixels between columns and _PARAM7_ pixels between rows on layer: _PARAM8_ at Z-order: _PARAM9_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Temp object is created to record its width and height (which is needed to calculate spacing)."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "Create"
+              },
+              "parameters": [
+                "",
+                "Object",
+                "0",
+                "0",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "ObjectWidth",
+                "=",
+                "Object.Width()"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "ObjectHeight",
+                "=",
+                "Object.Height()"
+              ]
+            },
+            {
+              "type": {
+                "value": "Delete"
+              },
+              "parameters": [
+                "Object",
+                "Floor"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Starting at top left, create objects in grid."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "NumberOfRows",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "x",
+                    "=",
+                    "0"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Repeat",
+                  "repeatExpression": "NumberOfColumns",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "StartingPositionX + x * (ObjectWidth + ColumnSpacing)",
+                        "StartingPositionY + y * (ObjectHeight + RowSpacing)",
+                        "Layer"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "RowID",
+                        "=",
+                        "y + 1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "ColumnID",
+                        "=",
+                        "x + 1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "CreationID",
+                        "=",
+                        "CreationID"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "x",
+                        "+",
+                        "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "CreationID",
+                        "+",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "Zorder",
+                            "!=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ChangePlan"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "Zorder"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "y",
+                        "+",
+                        "1"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "ObjectWidth",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "ObjectHeight",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "x",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "CreationID",
+              "type": "number",
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object",
+          "name": "Object",
+          "type": "objectListOrEmptyIfJustDeclared"
+        },
+        {
+          "description": "Number of columns (default: 1)",
+          "name": "NumberOfColumns",
+          "type": "expression"
+        },
+        {
+          "description": "Number of rows (default: 1)",
+          "name": "NumberOfRows",
+          "type": "expression"
+        },
+        {
+          "description": "Top-left starting position (X) (default: 0)",
+          "name": "StartingPositionX",
+          "type": "expression"
+        },
+        {
+          "description": "Top-left starting position (Y) (default: 0)",
+          "name": "StartingPositionY",
+          "type": "expression"
+        },
+        {
+          "description": "Amount of space between columns (default: 0)",
+          "name": "ColumnSpacing",
+          "type": "expression"
+        },
+        {
+          "description": "Amount of space between rows (default: 0)",
+          "name": "RowSpacing",
+          "type": "expression"
+        },
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        },
+        {
+          "description": "Z order",
+          "name": "Zorder",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

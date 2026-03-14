@@ -1,0 +1,45 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Variables copier",
+  "name": "ExtendedVariables",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/ExtendedVariables.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ExtendedVariables-header.json",
+  "tags": "",
+  "category": "General",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/variable-box.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Copy structure and array variables.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 3,
+  "helpPath": "/extensions/extended-variables",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "CopyObjectVariable",
+      "fullName": "Copy an object variable",
+      "description": "Copy the object variable from one object to another.",
+      "functionType": "Action"
+    },
+    {
+      "name": "CopyAllObjectVariables",
+      "fullName": "Copy all object variables",
+      "description": "Copy all object variables from one object to another.",
+      "functionType": "Action"
+    },
+    {
+      "name": "CopyVariable",
+      "fullName": "Copy a variable",
+      "description": "Copy all the chidren of a variable into another variable.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Copy all the children of a structure or an array into another variable.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZhcmlhYmxlLWJveCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xOSAzSDVDMy45IDMgMyAzLjkgMyA1VjE5QzMgMjAuMSAzLjkgMjEgNSAyMUgxOUMyMC4xIDIxIDIxIDIwLjEgMjEgMTlWNUMyMSAzLjkgMjAuMSAzIDE5IDNNNy40IDE4QzUuOSAxNi41IDUgMTQuMyA1IDEyUzUuOSA3LjUgNy40IDZMOSA2LjdDNy43IDcuOSA3IDkuOSA3IDEyUzcuNyAxNi4xIDkgMTcuM0w3LjQgMThNMTIuNyAxNUwxMS45IDEzTDEwLjUgMTVIOUwxMS4zIDExLjlMMTAgOUgxMS4zTDEyLjEgMTFMMTMuNSA5SDE1TDEyLjggMTJMMTQuMSAxNUgxMi43TTE2LjYgMThMMTUgMTcuM0MxNi4zIDE2IDE3IDE0LjEgMTcgMTJTMTYuMyA3LjkgMTUgNi43TDE2LjYgNkMxOC4xIDcuNSAxOSA5LjcgMTkgMTJTMTguMSAxNi41IDE2LjYgMThaIiAvPjwvc3ZnPg=="
+}

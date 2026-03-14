@@ -1,0 +1,428 @@
+{
+  "author": "",
+  "category": "Movement",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Platform ledge grabber",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWh1bWFuLWhhbmRzdXAiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNSwxQzUsMy43IDYuNTYsNi4xNiA5LDcuMzJWMjJIMTFWMTVIMTNWMjJIMTVWNy4zMUMxNy40NCw2LjE2IDE5LDMuNyAxOSwxSDE3QTUsNSAwIDAsMSAxMiw2QTUsNSAwIDAsMSA3LDFNMTIsMUMxMC44OSwxIDEwLDEuODkgMTAsM0MxMCw0LjExIDEwLjg5LDUgMTIsNUMxMy4xMSw1IDE0LDQuMTEgMTQsM0MxNCwxLjg5IDEzLjExLDEgMTIsMVoiIC8+PC9zdmc+",
+  "name": "PlatformLedgeGrabber",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/human-handsup.svg",
+  "shortDescription": "Grab platforms ledges within reach automatically.",
+  "version": "0.2.1",
+  "description": [
+    "Platforms ledges are grabbed automatically when they are within reach.",
+    "",
+    "Additional constraints can be added to:",
+    "- make the grabbing range smaller",
+    "- only grab ledges the character is facing"
+  ],
+  "origin": {
+    "identifier": "PlatformLedgeGrabber",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "platform,ledge,climb",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Grab platforms ledges within reach automatically.",
+      "fullName": "Platform ledge grabber",
+      "name": "PlatformLedgeGrabber",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const object = objects[0];",
+                "const behavior = object.getBehavior(behaviorName);",
+                "",
+                "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                "const character = object.getBehavior(behavior._getPlatformerCharacter());",
+                "",
+                "const isUsingLeft = character.isUsingControl(\"Left\");",
+                "const isUsingRight = character.isUsingControl(\"Right\");",
+                "",
+                "behavior.usedLeftLast = (behavior.usedLeftLast || isUsingLeft) && !isUsingRight;",
+                "",
+                "if (!character.isFalling()",
+                "    || (isUsingLeft && !behavior._getIsMovingLeftAutomatically())",
+                "    || (isUsingRight && !behavior._getIsMovingRightAutomatically())) {",
+                "    return;",
+                "}",
+                "const wasMovingRightAutomatically = behavior._getIsMovingRightAutomatically();",
+                "const wasMovingLeftAutomatically = behavior._getIsMovingLeftAutomatically();",
+                "behavior._setIsMovingRightAutomatically(false);",
+                "behavior._setIsMovingLeftAutomatically(false);",
+                "",
+                "/** @type {gdjs.PlatformObjectsManager} */",
+                "const manager = gdjs.PlatformObjectsManager.getManager(runtimeScene);",
+                "/** @type {float} */",
+                "const margin = behavior._getLedgeMarginX();",
+                "/** @type {boolean} */",
+                "const isOnlyGabbingFacingLedges = behavior._getIsOnlyGabbingFacingLedges();",
+                "",
+                "if (!behavior.potentialGabbablePlatforms) {",
+                "    behavior.potentialGabbablePlatforms = [];",
+                "}",
+                "/** @type {gdjs.PlatformRuntimeBehavior[]} */",
+                "const platforms = behavior.potentialGabbablePlatforms;",
+                "manager.getAllPlatformsAround(object, margin, platforms);",
+                "",
+                "// Find the nearest platform that can be grabbed.",
+                "let platformDistanceMin = margin;",
+                "let shouldMoveLeft = false;",
+                "let shouldMoveRight = false;",
+                "const canGrabLeft = !isOnlyGabbingFacingLedges || !behavior.usedLeftLast;",
+                "const canGrabRight = !isOnlyGabbingFacingLedges || behavior.usedLeftLast;",
+                "const aabb = object.getAABB();",
+                "for (const platform of platforms) {",
+                "    /** @type {gdjs.AABB} */",
+                "    const platformAABB = platform.owner.getAABB();",
+                "    const characterIsAtTheLedgeLevel = aabb.max[1] > platformAABB.min[1] && aabb.min[1] <= platformAABB.min[1];",
+                "    if (characterIsAtTheLedgeLevel) {",
+                "        const leftDistance = platformAABB.min[0] - aabb.max[0];",
+                "        if (canGrabLeft && 0 <= leftDistance && leftDistance <= platformDistanceMin) {",
+                "            shouldMoveRight = true;",
+                "            shouldMoveLeft = false;",
+                "            platformDistanceMin = leftDistance;",
+                "        }",
+                "        const rightDistance = aabb.min[0] - platformAABB.max[0];",
+                "        if (canGrabRight && 0 <= rightDistance && rightDistance <= platformDistanceMin) {",
+                "            shouldMoveLeft = true;",
+                "            shouldMoveRight = false;",
+                "            platformDistanceMin = rightDistance;",
+                "        }",
+                "    }",
+                "}",
+                "",
+                "// Don't try to move to a ledge that is too far to be actually grabbed.",
+                "let canReachLedge = false;",
+                "if (shouldMoveLeft || shouldMoveRight) {",
+                "    const alreadyDecided = wasMovingLeftAutomatically || wasMovingRightAutomatically;",
+                "    if (alreadyDecided) {",
+                "        canReachLedge = true;",
+                "    }",
+                "    else {",
+                "        // Check if the ledge is actually reachable",
+                "        const currentSpeedY = Math.abs(character.getCurrentFallSpeed() - character.getCurrentJumpSpeed());",
+                "        const timeDelta = object.getElapsedTime(runtimeScene) / 1000;",
+                "        // Rough approximation of the time frame",
+                "        const t = (aabb.max[0] - aabb.min[0]) / ((currentSpeedY + character.getMaxFallingSpeed()) / 2) - 2 * timeDelta;",
+                "        //console.log(\"time frame: \" + t);",
+                "",
+                "        const accelerationX = character.getAcceleration();",
+                "        const maxSpeedX = character.getMaxSpeed();",
+                "        const currentSpeedX = Math.abs(character.getCurrentSpeed());",
+                "",
+                "        let displacementMaxX = 0;",
+                "        if (currentSpeedX === maxSpeedX) {",
+                "            displacementMaxX = maxSpeedX * t;",
+                "        }",
+                "        else {",
+                "            const maxSpeedXTime = Math.min(0, (maxSpeedX - currentSpeedX) / accelerationX);",
+                "            if (t < maxSpeedXTime) {",
+                "                displacementMaxX = currentSpeedX * t + accelerationX * t * t / 2",
+                "            }",
+                "            else {",
+                "                displacementMaxX = currentSpeedX * maxSpeedXTime",
+                "                    + accelerationX * maxSpeedXTime * maxSpeedXTime / 2",
+                "                    + maxSpeedX * (t - maxSpeedXTime);",
+                "            }",
+                "        }",
+                "        //console.log((platformDistanceMin - character._xGrabTolerance) + \" < \" + displacementMaxX);",
+                "        canReachLedge = platformDistanceMin - character._xGrabTolerance < displacementMaxX;",
+                "    }",
+                "}",
+                "// Move toward the ledge.",
+                "if (canReachLedge) {",
+                "    if (shouldMoveLeft) {",
+                "        //console.log(\"Move left\");",
+                "        behavior._setIsMovingLeftAutomatically(true);",
+                "        character.simulateLeftKey();",
+                "    }",
+                "    else if (shouldMoveRight) {",
+                "        //console.log(\"Move right\");",
+                "        behavior._setIsMovingRightAutomatically(true);",
+                "        character.simulateRightKey();",
+                "    }",
+                "}",
+                "// Need to hold the key one frame after reaching the ledge to grab it.",
+                "if (wasMovingLeftAutomatically && !shouldMoveRight) {",
+                "    character.simulateLeftKey();",
+                "}",
+                "else if (wasMovingRightAutomatically && !shouldMoveLeft) {",
+                "    character.simulateRightKey();",
+                "}",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformLedgeGrabber::PlatformLedgeGrabber",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change whether the character only grabs facing ledges or any ledges at reach.",
+          "fullName": "Only grab facing ledges",
+          "functionType": "Action",
+          "name": "SetIsOnlyGabbingFacingLedges",
+          "sentence": "_PARAM0_ only grabs facing ledges: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsOnlyGabbingFacingLedges",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Value",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsOnlyGabbingFacingLedges",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformLedgeGrabber::PlatformLedgeGrabber",
+              "type": "behavior"
+            },
+            {
+              "description": "Only grab facing ledges",
+              "name": "Value",
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the maximum ledge distance on X axis where the character moves toward the ledge. Note that the character won't move unless it can actually grab the platform.",
+          "fullName": "Maximum ledge distance",
+          "functionType": "Action",
+          "name": "SetLedgeMarginX",
+          "sentence": "Change the maximum ledge distance: _PARAM2_ where _PARAM0_ moves toward the ledge",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "LedgeMarginX",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformLedgeGrabber::PlatformLedgeGrabber",
+              "type": "behavior"
+            },
+            {
+              "description": "Maximum ledge distance on X axis",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the character is moving toward a ledge.",
+          "fullName": "Is moving toward a ledge",
+          "functionType": "Condition",
+          "name": "IsMovingToLedge",
+          "sentence": "_PARAM0_ moves toward a ledge",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsMovingLeftAutomatically",
+                        "True",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsMovingRightAutomatically",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformLedgeGrabber::PlatformLedgeGrabber",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Platformer character behavior",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "PlatformBehavior::PlatformerObjectBehavior"
+          ],
+          "name": "PlatformerCharacter"
+        },
+        {
+          "value": "32",
+          "type": "Number",
+          "label": "Maximum ledge distance on X axis",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "LedgeMarginX"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "Only grab facing ledges",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "IsOnlyGabbingFacingLedges"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "IsMovingLeftAutomatically"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "IsMovingRightAutomatically"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

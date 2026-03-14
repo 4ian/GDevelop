@@ -1,0 +1,45 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "30b1QQoYi1gQQHzIjMlNY8aLyYV2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Camera Zoom",
+  "name": "CameraZoom",
+  "version": "0.2.1",
+  "url": "https://resources.gdevelop-app.com/extensions/CameraZoom.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/CameraZoom-header.json",
+  "tags": "Camera,Layer,Zoom",
+  "category": "Camera",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/UI Essentials/UI Essentials_zoom_in_plus.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Zoom camera smoothly with optional anchor point.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 3,
+  "helpPath": "/extensions/camera-zoom",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "ZoomWithSpeed",
+      "fullName": "Zoom camera with speed",
+      "description": "Change the camera zoom at a given speed (in factor per second).",
+      "functionType": "Action"
+    },
+    {
+      "name": "ZoomWithAnchor",
+      "fullName": "Zoom with anchor",
+      "description": "Change the camera zoom and keep an anchor point fixed on screen (instead of the center).",
+      "functionType": "Action"
+    },
+    {
+      "name": "ZoomWithSpeedAndAnchor",
+      "fullName": "Zoom camera with speed and anchor",
+      "description": "Change the camera zoom at a given speed (in factor per second) and keep an anchor point fixed on screen (instead of the center).",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "This extension allows to zoom a camera on a layer at a given speed. The zoom speed is configurable and allows a constant as well as a variable zoom speed. An anchor point can be defined, for instance, to keep what is under the cursor at the same place on screen.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjEzIiB5MT0iOSIgeDI9IjEzIiB5Mj0iMTciLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSI5IiB5MT0iMTMiIHgyPSIxNyIgeTI9IjEzIi8+DQo8Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSIxMyIgY3k9IjEzIiByPSI5Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTcsMjFsNyw3YzEuMSwxLjEsMi45LDEuMSw0LDBsMCwwYzEuMS0xLjEsMS4xLTIuOSwwLTRsLTctNyIvPg0KPC9zdmc+DQo="
+}

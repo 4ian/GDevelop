@@ -1,0 +1,41 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "onPsboRtDkUHNOsx7OPr8R8G1oj2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Frames per second (FPS)",
+  "name": "FPS",
+  "version": "1.2.1",
+  "url": "https://resources.gdevelop-app.com/extensions/FPS.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/FPS-header.json",
+  "tags": "fps,frames,per,second,performance,speed",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/SEO/SEO_board_performance_profit.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Calculate and display frames per second (FPS).",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/fps",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Makes a text object display the current FPS.",
+      "fullName": "FPS Displayer",
+      "name": "FPSDisplayer",
+      "objectType": "",
+      "eventsFunctions": []
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "name": "FPS",
+      "fullName": "Frames Per Second (FPS)",
+      "description": "Frames per second (FPS) during the last second.",
+      "functionType": "Expression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Provides an expression to get the current FPS and a text object behavior to display the current FPS.\n\nFrames Per Second (FPS) describes how many times in the last second your game logic was executed. \nThis includes running behaviors and events, and then rendering the new game state into the game window. The higher the FPS, the more fluid and performant your game looks.\n\nNote: Use the Performance Profiler (inside in the Debugger) for detailed performance information about your game.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8cGF0aCBkPSJNMzAsM2gtMkg0SDJDMS40LDMsMSwzLjQsMSw0czAuNCwxLDEsMWgxdjE2YzAsMC42LDAuNCwxLDEsMWg5LjhsLTUuNSw2LjNjLTAuNCwwLjQtMC4zLDEsMC4xLDEuNEM4LjUsMjkuOSw4LjgsMzAsOSwzMA0KCWMwLjMsMCwwLjYtMC4xLDAuOC0wLjNsNS4yLTZWMjhjMCwwLjYsMC40LDEsMSwxczEtMC40LDEtMXYtNC4zbDUuMiw2YzAuMiwwLjIsMC41LDAuMywwLjgsMC4zYzAuMiwwLDAuNS0wLjEsMC43LTAuMg0KCWMwLjQtMC40LDAuNS0xLDAuMS0xLjRMMTguMiwyMkgyOGMwLjYsMCwxLTAuNCwxLTFWNWgxYzAuNiwwLDEtMC40LDEtMVMzMC42LDMsMzAsM3ogTTI0LjgsOC42bC00LDZjLTAuMywwLjQtMC44LDAuNi0xLjMsMC4zDQoJTDE1LjgsMTNoLTMuNGwtMy43LDMuN0M4LjUsMTYuOSw4LjMsMTcsOCwxN3MtMC41LTAuMS0wLjctMC4zYy0wLjQtMC40LTAuNC0xLDAtMS40bDQtNGMwLjItMC4yLDAuNC0wLjMsMC43LTAuM2g0DQoJYzAuMiwwLDAuMywwLDAuNCwwLjFsMy4yLDEuNmwzLjUtNS4zYzAuMy0wLjUsMC45LTAuNiwxLjQtMC4zQzI1LDcuNSwyNS4xLDguMSwyNC44LDguNnoiLz4NCjwvc3ZnPg0K"
+}

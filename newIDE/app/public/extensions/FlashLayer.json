@@ -1,0 +1,98 @@
+{
+  "author": "Tristan Rhodes (tristan@victrisgames.com)",
+  "category": "Visual effect",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Flash layer",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZsYXNoLW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNywySDE3TDEzLjUsOUgxN0wxMCwyMlYxNEg3VjJNOSw0VjEySDEyVjE0LjY2TDE0LDExSDEwLjI0TDEzLjc2LDRIOVoiIC8+PC9zdmc+",
+  "name": "FlashLayer",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/flash-outline.svg",
+  "shortDescription": "Show a layer for a set duration then automatically hide it.",
+  "version": "0.3.0",
+  "description": [
+    "Useful to make a temporary effect (flash on hit, flickering lights, lightning flash, show text like Batman and Robin \"Bam!\", etc)",
+    "",
+    "It is recommended to select a layer on the top, and one that is hidden by default."
+  ],
+  "origin": {
+    "identifier": "FlashLayer",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "effect,vfx,layer,flash",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Make a layer visible for a specified duration, and then hide the layer.",
+      "fullName": "Flash layer",
+      "functionType": "Action",
+      "name": "FlashLayer",
+      "sentence": "Make layer _PARAM1_ visible for _PARAM2_ seconds",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "LayerVisible"
+              },
+              "parameters": [
+                "",
+                "Layer"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ShowLayer"
+              },
+              "parameters": [
+                "",
+                "Layer"
+              ]
+            },
+            {
+              "type": {
+                "value": "Wait"
+              },
+              "parameters": [
+                "Duration"
+              ]
+            },
+            {
+              "type": {
+                "value": "HideLayer"
+              },
+              "parameters": [
+                "",
+                "Layer"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        },
+        {
+          "description": "Duration (in seconds)",
+          "name": "Duration",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

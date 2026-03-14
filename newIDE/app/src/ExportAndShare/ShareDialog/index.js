@@ -21,7 +21,7 @@ import type { GamesList } from '../../GameDashboard/UseGamesList';
 import { useGameAndBuildsManager } from '../../Utils/UseGameAndBuildsManager';
 
 export type ShareTab = 'invite' | 'publish';
-export type ExporterSection = 'browser' | 'desktop' | 'android' | 'ios';
+export type ExporterSection = 'browser' | 'desktop' | 'android';
 export type ExporterSubSection = 'online' | 'offline' | 'facebook';
 export type ExporterKey =
   | 'onlinewebexport'
@@ -37,7 +37,7 @@ const exporterSectionMapping: {
   [key: ExporterSection]: { [key: ExporterSubSection]: ?ExporterKey },
 } = {
   browser: {
-    online: 'onlinewebexport',
+    online: null,
     offline: 'webexport',
     facebook: 'facebookinstantgamesexport',
   },
@@ -48,11 +48,6 @@ const exporterSectionMapping: {
   },
   android: {
     online: 'onlinecordovaexport',
-    offline: 'cordovaexport',
-    facebook: null,
-  },
-  ios: {
-    online: 'onlinecordovaiosexport',
     offline: 'cordovaexport',
     facebook: null,
   },
@@ -124,7 +119,10 @@ const ShareDialog = ({
   const [currentTab, setCurrentTab] = React.useState<ShareTab>(
     initialTab || getShareDialogDefaultTab()
   );
-  const showOnlineWebExporterOnly = !automatedExporters && !manualExporters;
+  const isBrowserOnlineExporterEnabled = !!exporterSectionMapping.browser
+    .online;
+  const showOnlineWebExporterOnly =
+    isBrowserOnlineExporterEnabled && !automatedExporters && !manualExporters;
   const [
     chosenExporterSection,
     setChosenExporterSection,

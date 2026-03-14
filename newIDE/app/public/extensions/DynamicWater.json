@@ -1,0 +1,2854 @@
+{
+  "author": "",
+  "category": "Visual effect",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Dynamic Water",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXdhdmVzIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTIwLDEySDIyVjE0SDIwQzE4LjYyLDE0IDE3LjI2LDEzLjY1IDE2LDEzQzEzLjUsMTQuMyAxMC41LDE0LjMgOCwxM0M2Ljc0LDEzLjY1IDUuMzcsMTQgNCwxNEgyVjEySDRDNS4zOSwxMiA2Ljc4LDExLjUzIDgsMTAuNjdDMTAuNDQsMTIuMzggMTMuNTYsMTIuMzggMTYsMTAuNjdDMTcuMjIsMTEuNTMgMTguNjEsMTIgMjAsMTJNMjAsNkgyMlY4SDIwQzE4LjYyLDggMTcuMjYsNy42NSAxNiw3QzEzLjUsOC4zIDEwLjUsOC4zIDgsN0M2Ljc0LDcuNjUgNS4zNyw4IDQsOEgyVjZINEM1LjM5LDYgNi43OCw1LjUzIDgsNC42N0MxMC40NCw2LjM4IDEzLjU2LDYuMzggMTYsNC42N0MxNy4yMiw1LjUzIDE4LjYxLDYgMjAsNk0yMCwxOEgyMlYyMEgyMEMxOC42MiwyMCAxNy4yNiwxOS42NSAxNiwxOUMxMy41LDIwLjMgMTAuNSwyMC4zIDgsMTlDNi43NCwxOS42NSA1LjM3LDIwIDQsMjBIMlYxOEg0QzUuMzksMTggNi43OCwxNy41MyA4LDE2LjY3QzEwLjQ0LDE4LjM4IDEzLjU2LDE4LjM4IDE2LDE2LjY3QzE3LjIyLDE3LjUzIDE4LjYxLDE4IDIwLDE4WiIgLz48L3N2Zz4=",
+  "name": "DynamicWater",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/waves.svg",
+  "shortDescription": "Easily create a realistic liquid surface simulation.",
+  "version": "0.1.0",
+  "description": [
+    "FEATURES",
+    "",
+    "- Fully customizable: by adjusting the liquid properties (tension, damping, spreading), you can simulate different types of liquids such as: water, jelly, lava, etc.",
+    "- Can obtain the height of the surface at any point",
+    "- Allows you to have full control over visual properties such as: color opacity, effects, etc.",
+    "- Can create a force at any point on the surface.",
+    "- Works on all platforms.",
+    ""
+  ],
+  "tags": "DynamicWater,Lava,etc",
+  "authorIds": [
+    "QjE1CI3drHNR9Wklz2gTC5WbEgh1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Easily create a realistic liquid surface simulation.",
+      "fullName": "Dynamic Water Body",
+      "name": "DynamicWaterBody",
+      "objectType": "Sprite",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "DepartScene"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__SetID[Object.ObjectName()]",
+                    "=",
+                    "-1"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__ID__",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__SetID[Object.ObjectName()]",
+                        "+",
+                        "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__ID__",
+                        "=",
+                        "Variable(__SetID[Object.ObjectName()])"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__DownID__",
+                        "True"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__ID__",
+                        "+",
+                        "-1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__DownID__",
+                        "False"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "folded": true,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "__CheckDeleteID[Object.ObjectName()]",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__ID__",
+                        ">",
+                        "Variable(__CheckDeleteID[Object.ObjectName()])"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "VarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__ID__",
+                        "<",
+                        "Variable(__SetID[Object.ObjectName()])"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__DownID__",
+                        "True"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__ID__",
+                        "=",
+                        "Variable(__SetID[Object.ObjectName()])"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__DownID__",
+                        "True"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__SetID[Object.ObjectName()]",
+                        "-",
+                        "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__CheckDeleteID[Object.ObjectName()]",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Component additions (Visual and Surface Collision).",
+          "fullName": "Components",
+          "functionType": "Action",
+          "group": "Create",
+          "name": "WaterBodyAndCollision",
+          "sentence": "Use _PARAM2_ to draw the body and _PARAM3_ for the surface collision : _PARAM0_ ",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Surface collision object management",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "folded": true,
+                  "name": "_Init_",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "DepartScene"
+                          },
+                          "parameters": [
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__DynamicWater.ColumnWidth",
+                            "=",
+                            "Object.Width() / Columns "
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__DW.init_id",
+                            "=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "DrawWaterBody",
+                            "0",
+                            "0",
+                            "Object.Layer()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ChangePlan"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "=",
+                            "Object.ZOrder()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "LinkedObjects::LinkObjects"
+                          },
+                          "parameters": [
+                            "",
+                            "DrawWaterBody",
+                            "Object"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "folded": true,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__DW.init_id",
+                            "<",
+                            "Columns+1"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "folded": true,
+                          "type": "BuiltinCommonInstructions::Repeat",
+                          "repeatExpression": "Columns+1",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.Column[Object.Variable(__DW.init_id)].TargetHeight",
+                                "=",
+                                "Object.Height() "
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.Column[Object.Variable(__DW.init_id)].Height",
+                                "=",
+                                "Object.Height() "
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.Column[Object.Variable(__DW.init_id)].Speed",
+                                "=",
+                                "0"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.LeftDeltas[Object.Variable(__DW.init_id)]",
+                                "=",
+                                "0"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.RightDeltas[Object.Variable(__DW.init_id)]",
+                                "=",
+                                "0"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.Column[Object.Variable(__DW.init_id)].Speed",
+                                "=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "Create"
+                                  },
+                                  "parameters": [
+                                    "ColumnCollisions",
+                                    "ColumnCollisions",
+                                    "Object.BoundingBoxLeft() + (Object.Variable(__DW.init_id)*Object.Variable(__DynamicWater.ColumnWidth))",
+                                    " Object.BoundingBoxTop()",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "SetSize"
+                                  },
+                                  "parameters": [
+                                    "ColumnCollisions",
+                                    "Object.Variable(__DynamicWater.ColumnWidth)",
+                                    "Thickness"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "ModVarObjet"
+                                  },
+                                  "parameters": [
+                                    "ColumnCollisions",
+                                    "__DW.index",
+                                    "=",
+                                    "Object.Variable(__DW.init_id)"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "LinkedObjects::LinkObjects"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Object",
+                                    "ColumnCollisions"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarObjet"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "__DW.init_id",
+                                    "+",
+                                    "1"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "LinkedObjects::PickObjectsLinkedTo"
+                          },
+                          "parameters": [
+                            "",
+                            "DrawWaterBody",
+                            "Object",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "__DW.ID",
+                            "=",
+                            "Object.Variable(__ID__)"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "LinkedObjects::PickObjectsLinkedTo"
+                          },
+                          "parameters": [
+                            "",
+                            "ColumnCollisions",
+                            "Object",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "ColumnCollisions",
+                            "__DW.ID",
+                            "=",
+                            "Object.Variable(__ID__)"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "_Update_",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "folded": true,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__DynamicWater.ColumnWidth",
+                            "=",
+                            "Object.Width() / Columns "
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Cache"
+                          },
+                          "parameters": [
+                            "Object"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Cache"
+                              },
+                              "parameters": [
+                                "ColumnCollisions"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "ColumnCollisions",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "LinkedObjects::PickObjectsLinkedTo"
+                          },
+                          "parameters": [
+                            "",
+                            "ColumnCollisions",
+                            "Object",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].TargetHeight",
+                            "=",
+                            "Object.Height()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "folded": true,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "AutoWave",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "folded": true,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "WaveDirection",
+                                "=",
+                                "\"Left\""
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarScene"
+                                  },
+                                  "parameters": [
+                                    "_Wave_count",
+                                    "+",
+                                    "WavePeriod"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "folded": true,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "WaveDirection",
+                                "=",
+                                "\"Right\""
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarScene"
+                                  },
+                                  "parameters": [
+                                    "_Wave_count",
+                                    "-",
+                                    "WavePeriod"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::ForEach",
+                          "object": "ColumnCollisions",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "LinkedObjects::PickObjectsLinkedTo"
+                              },
+                              "parameters": [
+                                "",
+                                "ColumnCollisions",
+                                "Object",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].TargetHeight",
+                                "=",
+                                "Object.Height() + (sin((ColumnCollisions.Variable(__DW.index) * WaveLength) + Variable(_Wave_count)) * WaveMagnitude)"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "ColumnCollisions",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "LinkedObjects::PickObjectsLinkedTo"
+                          },
+                          "parameters": [
+                            "",
+                            "ColumnCollisions",
+                            "Object",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.Displacement",
+                                "=",
+                                "Object.Variable(__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].TargetHeight) - Object.Variable(__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].Height)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].Speed",
+                                "+",
+                                "(Tension*Object.Variable(__DynamicWater.Displacement)) - (Dampening*Object.Variable(__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].Speed))"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].Height",
+                                "+",
+                                "Object.Variable(__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].Speed)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.X[ColumnCollisions.Variable(__DW.index)]",
+                                "=",
+                                "Object.BoundingBoxLeft() + (ColumnCollisions.Variable(__DW.index)*Object.Variable(__DynamicWater.ColumnWidth))"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.Y[ColumnCollisions.Variable(__DW.index)]",
+                                "=",
+                                "Object.BoundingBoxTop() +(Object.Variable(__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].TargetHeight) - Object.Variable(__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].Height))"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "MettreX"
+                              },
+                              "parameters": [
+                                "ColumnCollisions",
+                                "=",
+                                "Object.Variable(__DynamicWater.X[ColumnCollisions.Variable(__DW.index)])"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetCenterY"
+                              },
+                              "parameters": [
+                                "ColumnCollisions",
+                                "=",
+                                "Object.Variable(__DynamicWater.Y[ColumnCollisions.Variable(__DW.index)])"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetSize"
+                              },
+                              "parameters": [
+                                "ColumnCollisions",
+                                "Object.Variable(__DynamicWater.ColumnWidth)",
+                                "Thickness"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VarObjet"
+                              },
+                              "parameters": [
+                                "ColumnCollisions",
+                                "__DW.index",
+                                ">",
+                                "Columns"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ObjectVariableRemoveAt"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.X",
+                                "ColumnCollisions.Variable(__DW.index)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ObjectVariableRemoveAt"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.Y",
+                                "ColumnCollisions.Variable(__DW.index)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ObjectVariableRemoveAt"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DynamicWater.Column",
+                                "ColumnCollisions.Variable(__DW.index)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__DW.init_id",
+                                "-",
+                                "1"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Delete"
+                              },
+                              "parameters": [
+                                "ColumnCollisions",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Repeat",
+                      "repeatExpression": "4",
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::ForEach",
+                          "object": "ColumnCollisions",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "LinkedObjects::PickObjectsLinkedTo"
+                              },
+                              "parameters": [
+                                "",
+                                "ColumnCollisions",
+                                "Object",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "AutoWave",
+                                    "True",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "VarObjet"
+                                      },
+                                      "parameters": [
+                                        "ColumnCollisions",
+                                        "__DW.index",
+                                        ">",
+                                        "0"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "__DynamicWater.LeftDeltas[ColumnCollisions.Variable(__DW.index)]",
+                                        "=",
+                                        "Spread * (Object.Variable(__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].Height) - Object.Variable(__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)-1].Height))"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)-1].Speed",
+                                        "+",
+                                        "Object.Variable(__DynamicWater.LeftDeltas[ColumnCollisions.Variable(__DW.index)])"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "VarObjet"
+                                      },
+                                      "parameters": [
+                                        "ColumnCollisions",
+                                        "__DW.index",
+                                        "<",
+                                        "Columns"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "__DynamicWater.RightDeltas[ColumnCollisions.Variable(__DW.index)]",
+                                        "=",
+                                        "Spread * (Object.Variable(__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].Height) - Object.Variable(__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)+1].Height))"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)+1].Speed",
+                                        "+",
+                                        "Object.Variable(__DynamicWater.RightDeltas[ColumnCollisions.Variable(__DW.index)])"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "inverted": true,
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "AutoWave",
+                                    "True",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "VarObjet"
+                                      },
+                                      "parameters": [
+                                        "ColumnCollisions",
+                                        "__DW.index",
+                                        ">",
+                                        "1"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "__DynamicWater.LeftDeltas[ColumnCollisions.Variable(__DW.index)]",
+                                        "=",
+                                        "Spread * (Object.Variable(__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].Height) - Object.Variable(__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)-1].Height))"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)-1].Speed",
+                                        "+",
+                                        "Object.Variable(__DynamicWater.LeftDeltas[ColumnCollisions.Variable(__DW.index)])"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "VarObjet"
+                                      },
+                                      "parameters": [
+                                        "ColumnCollisions",
+                                        "__DW.index",
+                                        "<",
+                                        "Columns-1"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "__DynamicWater.RightDeltas[ColumnCollisions.Variable(__DW.index)]",
+                                        "=",
+                                        "Spread * (Object.Variable(__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].Height) - Object.Variable(__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)+1].Height))"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)+1].Speed",
+                                        "+",
+                                        "Object.Variable(__DynamicWater.RightDeltas[ColumnCollisions.Variable(__DW.index)])"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "folded": true,
+              "name": "Draw Water Body",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::ForEach",
+                  "object": "DrawWaterBody",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "LinkedObjects::PickObjectsLinkedTo"
+                      },
+                      "parameters": [
+                        "",
+                        "DrawWaterBody",
+                        "Object",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "ColumnCollisions",
+                            "__DW.ID",
+                            "=",
+                            "DrawWaterBody.Variable(__DW.ID)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "ColumnCollisions",
+                            "__DW.index",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::BeginFillPath"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "ColumnCollisions.X()",
+                            "Object.BoundingBoxBottom()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::PathLineTo"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "ColumnCollisions.X()",
+                            "ColumnCollisions.CenterY()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "ColumnCollisions",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "ColumnCollisions",
+                            "__DW.ID",
+                            "=",
+                            "DrawWaterBody.Variable(__DW.ID)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "ColumnCollisions",
+                            "__DW.index",
+                            ">",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "ColumnCollisions",
+                            "__DW.index",
+                            "<=",
+                            "Columns"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::PathLineTo"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "ColumnCollisions.X()",
+                            "ColumnCollisions.CenterY()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "ColumnCollisions",
+                            "__DW.ID",
+                            "=",
+                            "DrawWaterBody.Variable(__DW.ID)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "ColumnCollisions",
+                            "__DW.index",
+                            "=",
+                            "Columns"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::PathLineTo"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "ColumnCollisions.X()",
+                            "ColumnCollisions.CenterY()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::PathLineTo"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "ColumnCollisions.X()",
+                            "Object.BoundingBoxBottom()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::closePath"
+                          },
+                          "parameters": [
+                            "DrawWaterBody"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::FillOpacity"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "=",
+                            "BodyOpacity"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::FillColor"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "BodyColor"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::OutlineSize"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::ForEach",
+                  "object": "DrawWaterBody",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "LinkedObjects::PickObjectsLinkedTo"
+                      },
+                      "parameters": [
+                        "",
+                        "DrawWaterBody",
+                        "Object",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "ColumnCollisions",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "ColumnCollisions",
+                            "__DW.ID",
+                            "=",
+                            "DrawWaterBody.Variable(__DW.ID)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "ColumnCollisions",
+                            "__DW.index",
+                            ">=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "ColumnCollisions",
+                            "__DW.index",
+                            "<",
+                            "Columns"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::LineV2"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "ColumnCollisions.X()",
+                            "ColumnCollisions.CenterY()",
+                            "Object.Variable(__DynamicWater.X[ColumnCollisions.Variable(__DW.index)+1])",
+                            "Object.Variable(__DynamicWater.Y[ColumnCollisions.Variable(__DW.index)+1])",
+                            "SurfaceSize"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::OutlineColor"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "SurfaceColor"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::OutlineOpacity"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "=",
+                            "SufaceOpacity"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::ForEach",
+                  "object": "DrawWaterBody",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "LinkedObjects::PickObjectsLinkedTo"
+                      },
+                      "parameters": [
+                        "",
+                        "DrawWaterBody",
+                        "Object",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "ShowColumns",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "ColumnCollisions",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "ColumnCollisions",
+                            "__DW.ID",
+                            "=",
+                            "DrawWaterBody.Variable(__DW.ID)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "ColumnCollisions",
+                            "__DW.index",
+                            ">=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "ColumnCollisions",
+                            "__DW.index",
+                            "<",
+                            "Columns"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::Rectangle"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "ColumnCollisions.X()",
+                            "ColumnCollisions.CenterY()",
+                            "ColumnCollisions.BoundingBoxRight()",
+                            "Object.BoundingBoxBottom()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::OutlineColor"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "ColorOfColumns"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::OutlineSize"
+                          },
+                          "parameters": [
+                            "DrawWaterBody",
+                            "=",
+                            "1"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            },
+            {
+              "description": "Body display",
+              "name": "DrawWaterBody",
+              "supplementaryInformation": "PrimitiveDrawing::Drawer",
+              "type": "objectList"
+            },
+            {
+              "description": "Object that will be used to detect the collision on the surface",
+              "name": "ColumnCollisions",
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Apply a force when an object collides with its surface.",
+          "fullName": "Force application",
+          "functionType": "Action",
+          "group": "Interations",
+          "name": "AddForce",
+          "sentence": "Add to the surface of _PARAM0_ a force of _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "ColumnCollisions",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "LinkedObjects::PickObjectsLinkedTo"
+                  },
+                  "parameters": [
+                    "",
+                    "ColumnCollisions",
+                    "Object",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "ColumnCollisions",
+                        "__DynamicWater.CollisionCheck",
+                        "True"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__DynamicWater.Column[ColumnCollisions.Variable(__DW.index)].Speed",
+                        "+",
+                        "ForceApply"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            },
+            {
+              "description": "Apply force",
+              "name": "ForceApply",
+              "type": "expression"
+            },
+            {
+              "description": "Surface collision of the fluid",
+              "name": "ColumnCollisions",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Test the collision between the object and the fluid surface.",
+          "fullName": "Surface collision",
+          "functionType": "Condition",
+          "group": "Interations",
+          "name": "CheckSurfaceCollisions",
+          "sentence": "_PARAM2_ collides with the surface of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "ColumnCollisions",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "LinkedObjects::PickObjectsLinkedTo"
+                  },
+                  "parameters": [
+                    "",
+                    "ColumnCollisions",
+                    "Object",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "ColumnCollisions",
+                        "__DynamicWater.CollisionCheck",
+                        "False"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "Object1",
+                        "ColumnCollisions",
+                        "",
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "ColumnCollisions",
+                        "__DynamicWater.CollisionCheck",
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            },
+            {
+              "description": "Define the (physical) object that can interact with the fluid",
+              "name": "Object1",
+              "type": "objectList"
+            },
+            {
+              "description": "Surface collision of the fluid",
+              "name": "ColumnCollisions",
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Damping.",
+          "fullName": "Damping",
+          "functionType": "Expression",
+          "group": "Column parameter values",
+          "name": "Damping",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Dampening"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Spread.",
+          "fullName": "Spread",
+          "functionType": "Expression",
+          "group": "Column parameter values",
+          "name": "Spread",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Spread"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Tension.",
+          "fullName": "Tension",
+          "functionType": "Expression",
+          "group": "Column parameter values",
+          "name": "Tension",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Tension"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Size of the edge of the surface.",
+          "fullName": "BorderWidth",
+          "functionType": "Expression",
+          "group": "Column parameter values",
+          "name": "SurfaceSize",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "SurfaceSize"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Number of columns.",
+          "fullName": "SpringNumber",
+          "functionType": "Expression",
+          "group": "Column parameter values",
+          "name": "ColumnNumber",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Columns"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Enable automatic waves.",
+          "fullName": "Auto Wave",
+          "functionType": "Action",
+          "group": "Debug",
+          "name": "SetAutoWave",
+          "sentence": "Activate the automatic waves of _PARAM0_ : _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "AutoWave",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "NewValue",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "AutoWave",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            },
+            {
+              "description": "The water spring constant",
+              "name": "NewValue",
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Show the different Column .",
+          "fullName": "Show Columns",
+          "functionType": "Action",
+          "group": "Debug",
+          "name": "SetColumn",
+          "sentence": "Make visible the different joints of _PARAM0_ : _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "ShowColumns",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "NewValue",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "ShowColumns",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            },
+            {
+              "description": "The water spring constant",
+              "name": "NewValue",
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the length of the waves.",
+          "fullName": "Wave Length",
+          "functionType": "Action",
+          "group": "Column parameter values",
+          "name": "SetWaveLength",
+          "sentence": "Change the wave length of _PARAM0_: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "WaveLength",
+                    "=",
+                    "NewValue"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            },
+            {
+              "description": "The water spring constant",
+              "name": "NewValue",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change Period.",
+          "fullName": "Change Period",
+          "functionType": "Action",
+          "group": "Column parameter values",
+          "name": "SetPeriod",
+          "sentence": "Change the period of _PARAM0_: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "WavePeriod",
+                    "=",
+                    "NewValue"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            },
+            {
+              "description": "The water spring constant",
+              "name": "NewValue",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the wave magnitude.",
+          "fullName": "Wave magnitude",
+          "functionType": "Action",
+          "group": "Column parameter values",
+          "name": "SetWaveMagnitude",
+          "sentence": "Change the wave magnitude of _PARAM0_: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "WaveMagnitude",
+                    "=",
+                    "NewValue"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            },
+            {
+              "description": "The water spring constant",
+              "name": "NewValue",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the size of the surface edge.",
+          "fullName": "Surface Size",
+          "functionType": "Action",
+          "group": "Column parameter values",
+          "name": "SetSurfaceSize",
+          "sentence": "Change the border size of _PARAM0_: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SurfaceSize",
+                    "=",
+                    "NewValue"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            },
+            {
+              "description": "The water spring constant",
+              "name": "NewValue",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The number of springs controls the distance between the joints and the number of springs. (between 0 and the object width).\nPS: Change the quality of the waves, the more columns the more they use the performance.",
+          "fullName": "Springs Number",
+          "functionType": "Action",
+          "group": "Column parameter values",
+          "name": "SetColumnNumber",
+          "sentence": "Change the springs number of _PARAM0_: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Columns",
+                    "=",
+                    "NewValue"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            },
+            {
+              "description": "The water spring constant",
+              "name": "NewValue",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The Spread value will dictate how much a wave oscillation will pass pnto their neighboors.(Between 0 and 0.1).",
+          "fullName": "Spread",
+          "functionType": "Action",
+          "group": "Column parameter values",
+          "name": "SetSpread",
+          "sentence": "Change the spread of _PARAM0_: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Spread",
+                    "=",
+                    "NewValue"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            },
+            {
+              "description": "The water spring constant",
+              "name": "NewValue",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The spring dampenig value. (between 0 and 0.1).",
+          "fullName": "Damping(d)",
+          "functionType": "Action",
+          "group": "Column parameter values",
+          "name": "SetDamping",
+          "sentence": "Change the damping of _PARAM0_: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Dampening",
+                    "=",
+                    "NewValue"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            },
+            {
+              "description": "The water spring constant",
+              "name": "NewValue",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Greater values will pull the water with greater force. (between 0 and 0.1).",
+          "fullName": "Tension(k)",
+          "functionType": "Action",
+          "group": "Column parameter values",
+          "name": "SetTension",
+          "sentence": "Change the tension of _PARAM0_: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Tension",
+                    "=",
+                    "NewValue"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            },
+            {
+              "description": "The water spring constant",
+              "name": "NewValue",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the direction of the waves.",
+          "fullName": "Wave horizontal direction",
+          "functionType": "Action",
+          "group": "Column parameter values",
+          "name": "SetWaveDirection",
+          "sentence": "Change the waves direction of _PARAM0_ : _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "WaveDirection",
+                    "=",
+                    "NewValue"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            },
+            {
+              "description": "The water spring constant",
+              "name": "NewValue",
+              "supplementaryInformation": "[\"Right\",\"Left\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onDestroy",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__CheckDeleteID[Object.ObjectName()]",
+                    "=",
+                    "Object.Variable(__ID__)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DynamicWater::DynamicWaterBody",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "0.025",
+          "type": "Number",
+          "label": "The water spring constant. Grater values will pull the water with greater force.",
+          "description": "",
+          "group": "General",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "Tension"
+        },
+        {
+          "value": "0.025",
+          "type": "Number",
+          "label": "The Damping value. Controls how fast the springs will return to their original position",
+          "description": "",
+          "group": "General",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "Dampening"
+        },
+        {
+          "value": "0.1",
+          "type": "Number",
+          "label": "The Spread value will dictacte how much a wave oscilliation wil pass onto their neighboors. BEWARE, super high values may make the water oscilliate forever !",
+          "description": "",
+          "group": "General",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "Spread"
+        },
+        {
+          "value": "50",
+          "type": "Number",
+          "label": "The number of columns (springs) extended on the water surface ",
+          "description": "",
+          "group": "General",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "Columns"
+        },
+        {
+          "value": "8",
+          "type": "Number",
+          "label": "Thickness of the surface collision",
+          "description": "",
+          "group": "Interaction",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "Thickness"
+        },
+        {
+          "value": "107;165;233",
+          "type": "Color",
+          "label": "",
+          "description": "",
+          "group": "Display",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "SurfaceColor"
+        },
+        {
+          "value": "100",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "Display",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "SufaceOpacity"
+        },
+        {
+          "value": "74;144;226",
+          "type": "Color",
+          "label": "",
+          "description": "",
+          "group": "Display",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "BodyColor"
+        },
+        {
+          "value": "100",
+          "type": "Number",
+          "label": "Body opacity",
+          "description": "",
+          "group": "Display",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "BodyOpacity"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "Display",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "SurfaceSize"
+        },
+        {
+          "value": "0.1",
+          "type": "Number",
+          "label": "Wave period. between 0 and 1",
+          "description": "",
+          "group": "Wave parameters",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "WavePeriod"
+        },
+        {
+          "value": "16",
+          "type": "Number",
+          "label": "Wave magnitude, in pixels",
+          "description": "",
+          "group": "Wave parameters",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "WaveMagnitude"
+        },
+        {
+          "value": "0.5",
+          "type": "Number",
+          "label": "Wave length, the smaller the value, the longer the wave",
+          "description": "",
+          "group": "Wave parameters",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "WaveLength"
+        },
+        {
+          "value": "Right",
+          "type": "Choice",
+          "label": "",
+          "description": "",
+          "group": "Wave parameters",
+          "extraInformation": [
+            "Right",
+            "Left"
+          ],
+          "hidden": false,
+          "name": "WaveDirection"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "Auto waves ",
+          "description": "",
+          "group": "Wave parameters",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "AutoWave"
+        },
+        {
+          "value": "255;255;255",
+          "type": "Color",
+          "label": "",
+          "description": "",
+          "group": "Debug",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "ColorOfColumns"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "Show the spring columns",
+          "description": "",
+          "group": "Debug",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "ShowColumns"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

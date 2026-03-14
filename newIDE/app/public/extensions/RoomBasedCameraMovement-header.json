@@ -1,0 +1,52 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3",
+    "dt0tRnf2kHWJnjkrpnzTzNj9Yc63"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Room-based camera movement",
+  "name": "RoomBasedCameraMovement",
+  "version": "1.0.4",
+  "url": "https://resources.gdevelop-app.com/extensions/RoomBasedCameraMovement.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/RoomBasedCameraMovement-header.json",
+  "tags": "camera,follow,room,trigger,zoom,move,smooth",
+  "category": "Camera",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Applications and Programming/Applications and Programming_app_apps_applications_tiles.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Move/zoom camera to frame the room object containing the player.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 4,
+  "helpPath": "https://victrisgames.itch.io/room-based-camera-movement",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "MoveCameraToActiveRoom",
+      "fullName": "Move and zoom camera to the room object that contains the trigger object (player)",
+      "description": "Move and zoom camera to the room object that contains the trigger object (usually the player).",
+      "functionType": "Action"
+    },
+    {
+      "name": "ActiveRoomChanged",
+      "fullName": "Check if trigger object (player) has entered a new room",
+      "description": "Check if trigger object (usually the player) has entered a new room on this frame.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsCameraZooming",
+      "fullName": "Check if camera is zooming",
+      "description": "Check if camera is zooming (requires the use of \"Move and zoom camera\" action in this extension).",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsCameraMoving",
+      "fullName": "Check if camera is moving",
+      "description": "Check if camera is moving (requires the use of \"Move and zoom camera\" action in this extension).",
+      "functionType": "Condition"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Move camera to the room that contains the trigger object (usually the player).  If desired, change zoom to show the entire room or keep zoom static.\n\nHow to use:\n- Place room objects on scene\n- Select camera zoom limits, how fast the camera should move, and the visible buffer around each room\n- Run the \"Move and zoom camera\" action on every frame\n- Move the trigger object (player) between rooms and the camera will center on the room that contains the trigger object.\n\nTips:\n- Use these conditions for custom logic when changing rooms : \"Camera moving\", \"Camera zooming\", and \"Room changed\"\n- Set \"Lerp Speed\" to \"1\" to change the camera instantly",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGc+DQoJPHBhdGggZD0iTTE0LDNINEMzLjQsMywzLDMuNCwzLDR2MTBjMCwwLjYsMC40LDEsMSwxaDEwYzAuNiwwLDEtMC40LDEtMVY0QzE1LDMuNCwxNC42LDMsMTQsM3oiLz4NCgk8cGF0aCBkPSJNMTQsMTdINGMtMC42LDAtMSwwLjQtMSwxdjEwYzAsMC42LDAuNCwxLDEsMWgxMGMwLjYsMCwxLTAuNCwxLTFWMThDMTUsMTcuNCwxNC42LDE3LDE0LDE3eiIvPg0KCTxwYXRoIGQ9Ik0yOCwzSDE4Yy0wLjYsMC0xLDAuNC0xLDF2MTBjMCwwLjYsMC40LDEsMSwxaDEwYzAuNiwwLDEtMC40LDEtMVY0QzI5LDMuNCwyOC42LDMsMjgsM3oiLz4NCgk8cGF0aCBkPSJNMjgsMTdIMThjLTAuNiwwLTEsMC40LTEsMXYxMGMwLDAuNiwwLjQsMSwxLDFoMTBjMC42LDAsMS0wLjQsMS0xVjE4QzI5LDE3LjQsMjguNiwxNywyOCwxN3oiLz4NCjwvZz4NCjwvc3ZnPg0K"
+}

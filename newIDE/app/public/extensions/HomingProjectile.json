@@ -1,0 +1,946 @@
+{
+  "author": "Tristan Rhodes (https://victrisgames.itch.io/)",
+  "category": "Movement",
+  "description": "This extension requires two actions to function correctly:\n1) \"Lock projectile to target\" should be used once per projectile. \n2) \"Move projectile towards target\" should be run every frame.  This will move all projectiles that are locked to targets.\n\nParameters:\n- Rotation Speed: How fast the projectile rotates. This is critical in determining how fast the projectile can turn corners.\n- Initial Speed: Starting speed of the projectile\n- Acceleration: How much speed is added over time\n- Max Speed:  The max speed a projectile can travel (does not apply to physics object)\n- Max Lifetime:  The number of seconds a projectile can exist after locking onto a target.  Once this time is reached the object is deleted.\n\nTips:\n- Make sure to set the angle of the projectile before you use the \"Move\" action.  The projectile will turn towards the target, but you might want the projectile to be facing a certain direction. \n- Since Max Speed is not enforced on the physics object, you can accomplish this by changing Linear Decay on the Physics behavior\n- Use the lifetime parameter to prevent missiles from chasing objects forever",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Homing projectile",
+  "helpPath": "https://victrisgames.itch.io/extension-homing-projectile",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXJvY2tldC1sYXVuY2giIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTMuMTMgMjIuMTlMMTEuNSAxOC4zNkMxMy4wNyAxNy43OCAxNC41NCAxNyAxNS45IDE2LjA5TDEzLjEzIDIyLjE5TTUuNjQgMTIuNUwxLjgxIDEwLjg3TDcuOTEgOC4xQzcgOS40NiA2LjIyIDEwLjkzIDUuNjQgMTIuNU0yMS42MSAyLjM5QzIxLjYxIDIuMzkgMTYuNjYgLjI2OSAxMSA1LjkzQzguODEgOC4xMiA3LjUgMTAuNTMgNi42NSAxMi42NEM2LjM3IDEzLjM5IDYuNTYgMTQuMjEgNy4xMSAxNC43N0w5LjI0IDE2Ljg5QzkuNzkgMTcuNDUgMTAuNjEgMTcuNjMgMTEuMzYgMTcuMzVDMTMuNSAxNi41MyAxNS44OCAxNS4xOSAxOC4wNyAxM0MyMy43MyA3LjM0IDIxLjYxIDIuMzkgMjEuNjEgMi4zOU0xNC41NCA5LjQ2QzEzLjc2IDguNjggMTMuNzYgNy40MSAxNC41NCA2LjYzUzE2LjU5IDUuODUgMTcuMzcgNi42M0MxOC4xNCA3LjQxIDE4LjE1IDguNjggMTcuMzcgOS40NkMxNi41OSAxMC4yNCAxNS4zMiAxMC4yNCAxNC41NCA5LjQ2TTguODggMTYuNTNMNy40NyAxNS4xMkw4Ljg4IDE2LjUzTTYuMjQgMjJMOS44OCAxOC4zNkM5LjU0IDE4LjI3IDkuMjEgMTguMTIgOC45MSAxNy45MUw0LjgzIDIySDYuMjRNMiAyMkgzLjQxTDguMTggMTcuMjRMNi43NiAxNS44M0wyIDIwLjU5VjIyTTIgMTkuMTdMNi4wOSAxNS4wOUM1Ljg4IDE0Ljc5IDUuNzMgMTQuNDcgNS42NCAxNC4xMkwyIDE3Ljc2VjE5LjE3WiIgLz48L3N2Zz4=",
+  "name": "HomingProjectile",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/rocket-launch.svg",
+  "shortDescription": "Make a projectile object move towards a target object.",
+  "dimension": "2D",
+  "version": "0.2.0",
+  "tags": "projectile,homing,target,guided,missile,rocket,autoattack,ranged,attack,fire,shoot",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Lock projectile object to target object.  (This is required for \"Move projectile towards target\").",
+      "fullName": "Lock projectile to target",
+      "functionType": "Action",
+      "name": "LockOnTarget",
+      "private": false,
+      "sentence": "Lock projectile _PARAM1_ to target _PARAM2_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "LinkedObjects::LinkObjects"
+              },
+              "parameters": [
+                "",
+                "ProjectileObject",
+                "TargetObject"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "ResetObjectTimer"
+              },
+              "parameters": [
+                "ProjectileObject",
+                "\"__HomingProjectile_Lifetime\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Projectile object",
+          "longDescription": "",
+          "name": "ProjectileObject",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Target object",
+          "longDescription": "",
+          "name": "TargetObject",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Move physics projectile towards the object that it has been locked to.  This action must be run every frame.",
+      "fullName": "Move physics projectile towards target",
+      "functionType": "Action",
+      "name": "MoveTowardsTargetPhysics",
+      "private": false,
+      "sentence": "Move physics projectile _PARAM1_ towards target _PARAM3_.  Rotate speed: _PARAM4_ Initial speed: _PARAM5_ Acceleration: _PARAM6_ Max Lifetime: _PARAM7_ Delete on collision: _PARAM8_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "ProjectileObject",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "LinkedObjects::PickObjectsLinkedTo"
+              },
+              "parameters": [
+                "",
+                "TargetObject",
+                "ProjectileObject"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Disable gravity on this object",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Physics2::GravityScale"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "PhysicsBehavior",
+                    "!=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Physics2::GravityScale"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "PhysicsBehavior",
+                    "=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Stop rotation forces",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Physics2::AngularVelocity"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "PhysicsBehavior",
+                    "!=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Physics2::AngularVelocity"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "PhysicsBehavior",
+                    "=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Rotate towards the target",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "RotateTowardPosition"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "TargetObject.CenterX()",
+                    "TargetObject.CenterY()",
+                    "RotationSpeed",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Calculate the mass of the object",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "__HomingProjectile.Mass",
+                    "=",
+                    "ProjectileObject.PhysicsBehavior::Density() * ProjectileObject.Width() * ProjectileObject.Height()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Set initial speed (making sure not to divide by 0)",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ObjectVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "__HomingProjectile.InitialBoostCompleted",
+                    "False"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarObjet"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "__HomingProjectile.Mass",
+                    "!=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Physics2::ApplyPolarImpulse"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "PhysicsBehavior",
+                    "ProjectileObject.Angle()",
+                    "10 * InitialSpeed / ProjectileObject.Variable(__HomingProjectile.Mass)",
+                    "ProjectileObject.CenterX()",
+                    "ProjectileObject.CenterY()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetObjectVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "__HomingProjectile.InitialBoostCompleted",
+                    "True"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Add physics force in the direction the projectile is pointing",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarObjet"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "__HomingProjectile.Mass",
+                    "!=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Physics2::ApplyPolarImpulse"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "PhysicsBehavior",
+                    "ProjectileObject.Angle()",
+                    "10 * Acceleration / ProjectileObject.Variable(__HomingProjectile.Mass)",
+                    "ProjectileObject.CenterX()",
+                    "ProjectileObject.CenterY()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Delete object if a lifetime has been set and reached",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "MaxLifetime",
+                    "!=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ObjectTimer"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "\"__HomingProjectile_Lifetime\"",
+                    "MaxLifetime"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Delete if projectile touches target ",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "DeleteOnCollision",
+                    "True",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "TargetObject",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Projectile object",
+          "longDescription": "",
+          "name": "ProjectileObject",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Physics Behavior",
+          "longDescription": "",
+          "name": "PhysicsBehavior",
+          "optional": false,
+          "supplementaryInformation": "Physics2::Physics2Behavior",
+          "type": "behavior"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Target object",
+          "longDescription": "",
+          "name": "TargetObject",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Rotation speed (degrees per second)",
+          "longDescription": "",
+          "name": "RotationSpeed",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Initial speed (pixels per second)",
+          "longDescription": "",
+          "name": "InitialSpeed",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Acceleration (speed increase per second)",
+          "longDescription": "",
+          "name": "Acceleration",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Max lifetime (seconds)",
+          "longDescription": "Projectile will be deleted after this value is reached.",
+          "name": "MaxLifetime",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Delete Projectile if it collides with Target:",
+          "longDescription": "",
+          "name": "DeleteOnCollision",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Move projectile towards the object that it has been locked to.  This action must be run every frame.",
+      "fullName": "Move projectile towards target",
+      "functionType": "Action",
+      "name": "MoveTowardsTarget",
+      "private": false,
+      "sentence": "Move projectile _PARAM1_ towards target _PARAM2_.  Rotate speed: _PARAM3_ Initial speed: _PARAM4_ Acceleration: _PARAM5_ Max speed: _PARAM6_ Max Lifetime: _PARAM7_ Delete on collision: _PARAM8_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "ProjectileObject",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "LinkedObjects::PickObjectsLinkedTo"
+              },
+              "parameters": [
+                "",
+                "TargetObject",
+                "ProjectileObject"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Rotate towards the target",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "RotateTowardPosition"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "TargetObject.CenterX()",
+                    "TargetObject.CenterY()",
+                    "RotationSpeed",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Push object in the direction it is facing (like a rocket propelling it)",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "AddForceAL"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "ProjectileObject.Angle()",
+                    "min(InitialSpeed + (Acceleration * ProjectileObject.ObjectTimerElapsedTime(\"__HomingProjectile_Lifetime\")/TimeDelta()),MaxSpeed)",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Delete object if a lifetime has been set and reached",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "MaxLifetime",
+                    "!=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ObjectTimer"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "\"__HomingProjectile_Lifetime\"",
+                    "MaxLifetime"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Delete if projectile touches target ",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "DeleteOnCollision",
+                    "True",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    "TargetObject",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "ProjectileObject",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Projectile object",
+          "longDescription": "",
+          "name": "ProjectileObject",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Target object",
+          "longDescription": "",
+          "name": "TargetObject",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Rotation speed (degrees per second)",
+          "longDescription": "",
+          "name": "RotationSpeed",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Initial speed (pixels per second)",
+          "longDescription": "",
+          "name": "InitialSpeed",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Acceleration (speed increase per second)",
+          "longDescription": "",
+          "name": "Acceleration",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Max speed",
+          "longDescription": "",
+          "name": "MaxSpeed",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Max lifetime (seconds)",
+          "longDescription": "Projectile will be deleted after this value is reached.",
+          "name": "MaxLifetime",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Delete Projectile if it collides with Target:",
+          "longDescription": "",
+          "name": "DeleteOnCollision",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

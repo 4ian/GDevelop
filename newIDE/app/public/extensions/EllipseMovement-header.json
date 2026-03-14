@@ -1,0 +1,114 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "wWP8BSlAW0UP4NeaHa2LcmmDzmH2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Ellipse movement",
+  "name": "EllipseMovement",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/EllipseMovement.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/EllipseMovement-header.json",
+  "tags": "sine,ellipse,movement,circular,circle,floating,platform,enemy",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/sine-wave.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Move objects in elliptical paths or smooth back-and-forth in one direction.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/ellipse-movement",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Move objects on ellipses or smoothly back and forth in one direction.",
+      "fullName": "Ellipse movement",
+      "name": "EllipseMovement",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "ToggleTurningLeft",
+          "fullName": "Turn the other way",
+          "description": "Change the turning direction (left or right).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetTurningLeft",
+          "fullName": "Turn left or right",
+          "description": "Change the in which side the object is turning (left or right).",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsTurningLeft",
+          "fullName": "Is turning left",
+          "description": "Check if the object is turning left.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "MovementAngle",
+          "fullName": "Movement angle",
+          "description": "Return the movement angle of the object.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "LoopDuration",
+          "fullName": "Loop duration",
+          "description": "Return the loop duration (in seconds).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "RadiusX",
+          "fullName": "Radius X",
+          "description": "Return the ellipse radius on X axis.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "RadiusY",
+          "fullName": "Radius Y",
+          "description": "Return the ellipse radius on X axis.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "CenterX",
+          "fullName": "Movement center X",
+          "description": "Return the movement center position on X axis.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "CenterY",
+          "fullName": "Movement center Y",
+          "description": "Return the movement center position on Y axis.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetRadiusX",
+          "fullName": "Radius X",
+          "description": "Change the radius on X axis of the movement.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetRadiusY",
+          "fullName": "Radius Y",
+          "description": "Change the radius on Y axis of the movement.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetLoopDuration",
+          "fullName": "Loop duration",
+          "description": "Change the loop duration.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetMovementAngle",
+          "fullName": "Teleport at an angle",
+          "description": "Change the movement angle. The object is teleported according to the angle.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "It allows objects to move:\n- on an ellipsis or arcs\n- smoothly vertically or horizontally (by setting one radius to 0)\n- on a sine wave (by adding a force)\n\nInstances will start their movement from their initial position on the scene.\nThe center position will be decided according to the \"initial direction\" angle and the radius.\n\nIt can be used for:\n- Making objects float, such as powerups or coins\n- Moving platforms\n- Enemy movement patterns\n- Making a player constantly turn right or left ([open the project online](https://editor.gdevelop.io/?project=example://star-seeker))",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNpbmUtd2F2ZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xNi41LDIxQzEzLjUsMjEgMTIuMzEsMTYuNzYgMTEuMDUsMTIuMjhDMTAuMTQsOS4wNCA5LDUgNy41LDVDNC4xMSw1IDQsMTEuOTMgNCwxMkgyQzIsMTEuNjMgMi4wNiwzIDcuNSwzQzEwLjUsMyAxMS43MSw3LjI1IDEyLjk3LDExLjc0QzEzLjgzLDE0LjggMTUsMTkgMTYuNSwxOUMxOS45NCwxOSAyMC4wMywxMi4wNyAyMC4wMywxMkgyMi4wM0MyMi4wMywxMi4zNyAyMS45NywyMSAxNi41LDIxWiIgLz48L3N2Zz4="
+}

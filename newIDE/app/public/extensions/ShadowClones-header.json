@@ -1,0 +1,40 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "q8ubdigLvIRXLxsJDDTaokO41mc2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "m4hBMBTUilft4s1V4FQQPakVDGx1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Animate Shadow Clones",
+  "name": "ShadowClones",
+  "version": "0.7.0",
+  "url": "https://resources.gdevelop-app.com/extensions/ShadowClones.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ShadowClones-header.json",
+  "tags": "animate,create,object,shadow,clone,follow,echo",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/vector-arrange-above.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Create fading shadow clone trail.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "https://www.youtube.com/watch?v=2t4ANYgrrak",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "AnimateShadowClones",
+      "fullName": "Animate shadow clones that follow the path of a primary object",
+      "description": "Select the primary object, the shadow clone object, the number of shadow clones, the number of frames between shadow clones, the rate that shadow clones will fade away (if desired), the Z-value of the shadow clones, and the layer the shadow clones will be created on.",
+      "functionType": "Action"
+    },
+    {
+      "name": "DeleteShadowClones",
+      "fullName": "Delete shadow clone objects that are linked to a primary object",
+      "description": "Delete shadow clone objects that are linked to a primary object.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Select the primary object, the shadow clone object, the number of shadow clones, the number of frames between shadow clones, the rate that shadow clones will reduce opacity and size (if desired), the Z-value and the layer the shadow clones will be created on.\n\nThis extension can be used to:\n\n- Make an object look faster, such as during a speed powerup.  \n- Give a 3D-like feel to a character\n- Implement unique time-based elements, like teleporting a character back to a previous location\n- Simulate the movement of a caterpillar or slinky\n- Recreate games like snake or tron\n\nThese object variables are provided to manage the shadow clones:\n\n- ShadowCloneOrder: Shadow clone identifier, where 1 is the shadow clone closest to the primary object\n- FramesBehindPrimary: The number of frames that the shadow clone is behind the primary object\n\nNotes: \n- For shadow clones to work, this action must be run every frame.\n- The ShadowCloneObject cannot be the PrimaryObject, but it can be a duplicate object. \n- For animations to work, the PrimaryObject and ShadowCloneObject must use the same animation numbers.\n\nWatch this [tutorial video](https://youtu.be/2t4ANYgrrak) to see examples of how to use this extension.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZlY3Rvci1hcnJhbmdlLWFib3ZlIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTMsMUMxLjg5LDEgMSwxLjg5IDEsM1YxNEMxLDE1LjExIDEuODksMTYgMywxNkM2LjY3LDE2IDEwLjMzLDE2IDE0LDE2QzE1LjExLDE2IDE2LDE1LjExIDE2LDE0QzE2LDEwLjMzIDE2LDYuNjcgMTYsM0MxNiwxLjg5IDE1LjExLDEgMTQsMUgzTTMsM0gxNFYxNEgzVjNNMTgsN1Y5SDIwVjIwSDlWMThIN1YyMEM3LDIxLjExIDcuODksMjIgOSwyMkgyMEMyMS4xMSwyMiAyMiwyMS4xMSAyMiwyMFY5QzIyLDcuODkgMjEuMTEsNyAyMCw3SDE4WiIgLz48L3N2Zz4="
+}

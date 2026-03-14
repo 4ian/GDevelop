@@ -1,0 +1,24 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "rotBq28wITdtfsrE7McHQri4k2w2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Joint connector",
+  "name": "JointConnector",
+  "version": "1.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/JointConnector.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/JointConnector-header.json",
+  "tags": "joint,ragdoll,physics,spring,rope,weld,revolute,distance",
+  "category": "Movement",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/8834e0c63a962c74f1dab4c8f918c171261597341c4ca6574b300ab35855274b_human.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Create and manage physics joints between two objects.",
+  "eventsBasedBehaviorsCount": 4,
+  "eventsFunctionsCount": 4,
+  "helpPath": "/extensions/joint-connector",
+  "description": "Weld joint\n- Glue two objects together\n- Joint is created at the center of the Joint Connector object\n\nRevolute joint\n- Two objects are connected but can rotate on the joint\n- Angles can be restricted and joints can have motors that spin the objects\n- Joint is created at the center of the Joint Connector object\n\nDistance joint\n- Two objects are forced to stay at set distance from each other\n- Adjust the frequency property to change the stiffness of the spring\n- Center of both objects must be inside the Joint Connector collision mask\n\nRope joint\n- Two objects can get closer to each other but they cannot exceed their starting distance\n- Center of both objects must be inside the Joint Connector collision mask",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWh1bWFuIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTIxLDlIMTVWMjJIMTNWMTZIMTFWMjJIOVY5SDNWN0gyMU0xMiwyQTIsMiAwIDAsMSAxNCw0QTIsMiAwIDAsMSAxMiw2QzEwLjg5LDYgMTAsNS4xIDEwLDRDMTAsMi44OSAxMC44OSwyIDEyLDJaIiAvPjwvc3ZnPg=="
+}

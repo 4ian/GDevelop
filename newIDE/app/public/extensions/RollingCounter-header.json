@@ -1,0 +1,52 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "dt0tRnf2kHWJnjkrpnzTzNj9Yc63"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Rolling counter",
+  "name": "RollingCounter",
+  "version": "1.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/RollingCounter.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/RollingCounter-header.json",
+  "tags": "score,animation,text",
+  "category": "Visual effect",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/e509cccd7fb426978c4a79b639670f624f773a886848d288a12be5c28dd7d380_sort-numeric-variant.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Smoothly change a counter value in a text object.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/rolling-counter",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Smoothly changes a counter value in a text object.",
+      "fullName": "Rolling counter",
+      "name": "RollingCounter",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "Value",
+          "fullName": "Counter value",
+          "description": "Compare the value of the counter.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetValue",
+          "fullName": "Counter value",
+          "description": "Change the value of the counter.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ResetDisplayedValue",
+          "fullName": "Jump to the counter animation end",
+          "description": "Directly display the counter value without playing the animation.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Smoothly change a counter value in a text object.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNvcnQtbnVtZXJpYy12YXJpYW50IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTcuNzgsN0M5LjA4LDcuMDQgMTAsNy41MyAxMC41Nyw4LjQ2QzExLjEzLDkuNCAxMS40MSwxMC41NiAxMS4zOSwxMS45NUMxMS40LDEzLjUgMTEuMDksMTQuNzMgMTAuNSwxNS42MkM5Ljg4LDE2LjUgOC45NSwxNi45NyA3LjcxLDE3QzYuNDUsMTYuOTYgNS41NCwxNi41IDQuOTYsMTUuNTZDNC4zOCwxNC42MyA0LjA5LDEzLjQ1IDQuMDksMTJDNC4wOSwxMC41NSA0LjM5LDkuMzYgNSw4LjQ0QzUuNTksNy41IDYuNSw3LjA0IDcuNzgsN003Ljc1LDguNjNDNy4zMSw4LjYzIDYuOTYsOC45IDYuNyw5LjQ2QzYuNDQsMTAgNi4zMiwxMC44NyA2LjMyLDEyQzYuMzEsMTMuMTUgNi40NCwxNCA2LjY5LDE0LjU0QzYuOTUsMTUuMSA3LjMxLDE1LjM3IDcuNzcsMTUuMzdDOC42OSwxNS4zNyA5LjE2LDE0LjI0IDkuMTcsMTJDOS4xNyw5Ljc3IDguNyw4LjY1IDcuNzUsOC42M00xMy4zMywxN1YxNS4yMkwxMy43NiwxNS4yNEwxNC4zLDE1LjIyTDE1LjM0LDE1LjAzQzE1LjY4LDE0LjkyIDE2LDE0Ljc4IDE2LjI2LDE0LjU4QzE2LjU5LDE0LjM1IDE2Ljg2LDE0LjA4IDE3LjA3LDEzLjc2QzE3LjI5LDEzLjQ1IDE3LjQ0LDEzLjEyIDE3LjUzLDEyLjc4TDE3LjUsMTIuNzdDMTcuMDUsMTMuMTkgMTYuMzgsMTMuNCAxNS40NywxMy40MUMxNC42MiwxMy40IDEzLjkxLDEzLjE1IDEzLjM0LDEyLjY1QzEyLjc3LDEyLjE1IDEyLjUsMTEuNDMgMTIuNDYsMTAuNUMxMi40Nyw5LjUgMTIuODEsOC42OSAxMy40Nyw4LjAzQzE0LjE0LDcuMzcgMTUsNy4wMyAxNi4xMiw3QzE3LjM3LDcuMDQgMTguMjksNy40NSAxOC44OCw4LjI0QzE5LjQ3LDkgMTkuNzYsMTAgMTkuNzYsMTEuMTlDMTkuNzUsMTIuMTUgMTkuNjEsMTMgMTkuMzIsMTMuNzZDMTkuMDMsMTQuNSAxOC42NCwxNS4xMyAxOC4xMiwxNS42NEMxNy42NiwxNi4wNiAxNy4xMSwxNi4zOCAxNi40NywxNi42MUMxNS44MywxNi44MyAxNS4xMiwxNi45NiAxNC4zNCwxN0gxMy4zM00xNi4wNiw4LjYzQzE1LjY1LDguNjQgMTUuMzIsOC44IDE1LjA2LDkuMTFDMTQuODEsOS40MiAxNC42OCw5Ljg0IDE0LjY4LDEwLjM2QzE0LjY4LDEwLjggMTQuOCwxMS4xNiAxNS4wMywxMS40NkMxNS4yNywxMS43NyAxNS42MywxMS45MiAxNi4xMSwxMS45M0MxNi40MywxMS45MyAxNi43LDExLjg2IDE2LjkyLDExLjc0QzE3LjE0LDExLjYxIDE3LjMsMTEuNDYgMTcuNDEsMTEuMjhDMTcuNSwxMS4xNyAxNy41MywxMC45NyAxNy41MywxMC43MUMxNy41NCwxMC4xNiAxNy40Myw5LjY5IDE3LjIsOS4yOEMxNi45Nyw4Ljg3IDE2LjU5LDguNjUgMTYuMDYsOC42M005LjI1LDVMMTIuNSwxLjc1TDE1Ljc1LDVIOS4yNU0xNS43NSwxOUwxMi41LDIyLjI1TDkuMjUsMTlIMTUuNzVaIiAvPjwvc3ZnPg=="
+}

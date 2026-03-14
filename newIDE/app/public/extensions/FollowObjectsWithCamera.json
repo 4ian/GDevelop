@@ -1,0 +1,573 @@
+{
+  "author": "Jeroen Erkens, Tristan Rhodes (https://victrisgames.itch.io/)",
+  "category": "Camera",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Follow multiple 2D objects with the camera",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNhbWVyYS1zd2l0Y2gtb3V0bGluZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0yMCA0SDE2LjhMMTUgMkg5TDcuMiA0SDRDMi45IDQgMiA0LjkgMiA2VjE4QzIgMTkuMSAyLjkgMjAgNCAyMEgyMEMyMS4xIDIwIDIyIDE5LjEgMjIgMThWNkMyMiA0LjkgMjEuMSA0IDIwIDRNOS45IDRIMTQuMUwxNS45IDZIMjBWMThINFY2SDguMU0xNSAxMUg5VjguNUw1LjUgMTJMOSAxNS41VjEzSDE1VjE1LjVMMTguNSAxMkwxNSA4LjVWMTFaIiAvPjwvc3ZnPg==",
+  "name": "FollowObjectsWithCamera",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/camera-switch-outline.svg",
+  "shortDescription": "Auto-zoom and position camera to keep all instances of an object visible.",
+  "dimension": "2D",
+  "version": "1.0.2",
+  "description": [
+    "Use the \"Follow multiple 2D objects with the camera\" action on every frame that you want the camera to move.  ",
+    "If you want to select which object instances are tracked by the camera, add conditions to that event.",
+    "",
+    "- Use an object group to track multiple objects.",
+    "- Only run on one layer at a time.  If multiple layers need to move the same way, create events that copy CameraX, CameraY, and CameraZoom values (or use the \"Copy camera settings\" extension)",
+    "- This action can also be used on a single object instance to move the camera smoothly - though other extensions might be more adapted."
+  ],
+  "origin": {
+    "identifier": "FollowObjectsWithCamera",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "camera,zoom,follow,objects,multiple,group,move,pan",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "6dgsuavVqJgA9oqJ2ypmkXZWuyY2"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Change the zoom and position of the camera to keep all instances of an object (or object group) on the screen.",
+      "fullName": "Follow multiple objects with camera",
+      "functionType": "Action",
+      "group": "Layers and cameras",
+      "name": "FollowMultipleObjectsWithCamera",
+      "sentence": "Move camera to keep instances of _PARAM1_ on the screen. Use a margin of _PARAM2_px horizontally and _PARAM3_px vertically. Max zoom: _PARAM4_.  Move the camera at a speed of _PARAM5_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Set default values if nothing is entered"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__FollowObjects.MaxZoom",
+                "=",
+                "MaxZoom"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Egal"
+              },
+              "parameters": [
+                "MaxZoom",
+                "=",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__FollowObjects.MaxZoom",
+                "=",
+                "1"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Egal"
+              },
+              "parameters": [
+                "LerpSpeed",
+                ">",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__FollowObjects.LerpSpeed",
+                "=",
+                "LerpSpeed"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Egal"
+              },
+              "parameters": [
+                "LerpSpeed",
+                "<=",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__FollowObjects.LerpSpeed",
+                "=",
+                "0.05"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Set initial values based on an object instance.  This is used as a valid starting point for comparisons, so it doesn't matter which instance is used."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__FollowObjects.MinX",
+                "=",
+                "Object.BoundingBoxLeft()"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__FollowObjects.MaxX",
+                "=",
+                "Object.BoundingBoxRight()"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__FollowObjects.MinY",
+                "=",
+                "Object.BoundingBoxTop()"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__FollowObjects.MaxY",
+                "=",
+                "Object.BoundingBoxBottom()"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Loop through every instance of object (or object group) and determine the max position values used for left, right, top and bottom.\nRecord the height and width of the objects that are on the edges.  These values will be used to increase the camera viewport to include the entire object."
+        },
+        {
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "Object",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__FollowObjects.MinX",
+                    "=",
+                    "min(Variable(__FollowObjects.MinX), Object.BoundingBoxLeft())"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__FollowObjects.MaxX",
+                    "=",
+                    "max(Variable(__FollowObjects.MaxX), Object.BoundingBoxRight())"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__FollowObjects.MinY",
+                    "=",
+                    "min(Variable(__FollowObjects.MinY), Object.BoundingBoxTop())"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__FollowObjects.MaxY",
+                    "=",
+                    "max(Variable(__FollowObjects.MaxY), Object.BoundingBoxBottom())"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Move camera to the center location"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetCameraX"
+              },
+              "parameters": [
+                "",
+                "=",
+                "lerp(CameraX(Object.Layer(), 0), (Variable(__FollowObjects.MinX) + Variable(__FollowObjects.MaxX)) / 2, Variable(__FollowObjects.LerpSpeed))",
+                "Object.Layer()",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetCameraY"
+              },
+              "parameters": [
+                "",
+                "=",
+                "lerp(CameraY(Object.Layer(), 0), (Variable(__FollowObjects.MinY) + Variable(__FollowObjects.MaxY)) / 2, Variable(__FollowObjects.LerpSpeed))",
+                "Object.Layer()",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Zoom in or out to keep all object instances on screen"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__FollowObjects.CameraWidth",
+                "=",
+                "abs(Variable(__FollowObjects.MaxX) - Variable(__FollowObjects.MinX)) + HorizontalBuffer * 2"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__FollowObjects.CameraHeight",
+                "=",
+                "abs(Variable(__FollowObjects.MaxY) - Variable(__FollowObjects.MinY)) + VerticalBuffer * 2"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__FollowObjects.CameraZoom",
+                "=",
+                "min(SceneWindowHeight() / Variable(__FollowObjects.CameraHeight), SceneWindowWidth() / Variable(__FollowObjects.CameraWidth))"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Adjust zoom to stay within min/max values"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__FollowObjects.CameraZoom",
+                "=",
+                "min(Variable(__FollowObjects.CameraZoom), Variable(__FollowObjects.MaxZoom))"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Change camera zoom"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ZoomCamera"
+              },
+              "parameters": [
+                "",
+                "lerp(CameraZoom(Object.Layer(), 0), Variable(__FollowObjects.CameraZoom), Variable(__FollowObjects.LerpSpeed))",
+                "Object.Layer()",
+                "0"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object (or Object group)",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Extra space on sides of screen",
+          "longDescription": "Each side will include this buffer",
+          "name": "HorizontalBuffer",
+          "type": "expression"
+        },
+        {
+          "description": "Extra space on top and bottom of screen",
+          "longDescription": "Each side will include this buffer",
+          "name": "VerticalBuffer",
+          "type": "expression"
+        },
+        {
+          "description": "Maximum zoom level (Default: 1)",
+          "longDescription": "Limit how far the camera will zoom in",
+          "name": "MaxZoom",
+          "type": "expression"
+        },
+        {
+          "description": "Camera move speed (Range: 0 to 1) (Default: 0.05)",
+          "longDescription": "Percent of distance to destination that will be travelled each frame (used by lerp function)",
+          "name": "LerpSpeed",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the zoom and position of the camera to keep all instances of an object (or object group) on the screen. (Deprecated)",
+      "fullName": "Follow multiple objects with camera (Deprecated)",
+      "functionType": "Action",
+      "name": "FollowObjectsWithCamera",
+      "private": true,
+      "sentence": "Move camera on layer _PARAM6_ to keep instances of _PARAM1_ on the screen. Use a margin of _PARAM2_px horizontally and _PARAM3_px vertically. Use a zoom between _PARAM4_ and _PARAM5_.  Move the camera at a speed of _PARAM8_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 27,
+            "g": 2,
+            "r": 208,
+            "textB": 255,
+            "textG": 255,
+            "textR": 255
+          },
+          "comment": "DEPRECATED: Use the new function that replaces this one"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "FollowObjectsWithCamera::FollowMultipleObjectsWithCamera"
+              },
+              "parameters": [
+                "",
+                "Object",
+                "HorizontalBuffer",
+                "VerticalBuffer",
+                "MaxZoom",
+                "LerpSpeed",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object (or Object group)",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Extra space on sides of screen",
+          "longDescription": "Each side will include this buffer",
+          "name": "HorizontalBuffer",
+          "type": "expression"
+        },
+        {
+          "description": "Extra space on top and bottom of screen",
+          "longDescription": "Each side will include this buffer",
+          "name": "VerticalBuffer",
+          "type": "expression"
+        },
+        {
+          "description": "Minimum zoom level ",
+          "longDescription": "Limit how far the camera will zoom OUT",
+          "name": "MinZoom",
+          "type": "expression"
+        },
+        {
+          "description": "Maximum zoom level (Default: 1)",
+          "longDescription": "Limit how far the camera will zoom IN",
+          "name": "MaxZoom",
+          "type": "expression"
+        },
+        {
+          "description": "Layer ",
+          "longDescription": "Use \"\" for base layer",
+          "name": "Layer",
+          "type": "layer"
+        },
+        {
+          "description": "Camera",
+          "name": "Camera",
+          "type": "expression"
+        },
+        {
+          "description": "Camera move speed (Range: 0 to 1) (Default: 0.05)",
+          "longDescription": "Percent of distance to destination that will be travelled each frame (used by lerp function)",
+          "name": "LerpSpeed",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

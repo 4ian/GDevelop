@@ -2,7 +2,6 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Chrome from '../../UI/CustomSvgIcons/Chrome';
-import Apple from '../../UI/CustomSvgIcons/Apple';
 import Desktop from '../../UI/CustomSvgIcons/Desktop';
 import {
   ColumnStackLayout,
@@ -26,13 +25,11 @@ import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import TextButton from '../../UI/TextButton';
 import ChevronArrowLeft from '../../UI/CustomSvgIcons/ChevronArrowLeft';
 import Facebook from '../../UI/CustomSvgIcons/Facebook';
-import GdGames from '../../UI/CustomSvgIcons/GdGames';
 import ItchIo from '../../UI/CustomSvgIcons/ItchIo';
 import CloudDownload from '../../UI/CustomSvgIcons/CloudDownload';
 import Wrench from '../../UI/CustomSvgIcons/Wrench';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Android from '../../UI/CustomSvgIcons/Android';
-import { isNativeMobileApp } from '../../Utils/Platform';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { type GameAndBuildsManager } from '../../Utils/UseGameAndBuildsManager';
@@ -82,8 +79,6 @@ const getSectionLabel = ({ section }: {| section: ExporterSection |}) => {
       return <Trans>Desktop</Trans>;
     case 'android':
       return <Trans>Android</Trans>;
-    case 'ios':
-      return <Trans>iOS</Trans>;
     default:
       return null;
   }
@@ -103,8 +98,6 @@ const getSectionIcon = ({
       return <Desktop style={small ? styles.iconSmall : styles.icon} />;
     case 'android':
       return <Android style={small ? styles.iconSmall : styles.icon} />;
-    case 'ios':
-      return <Apple style={small ? styles.iconSmall : styles.icon} />;
     default:
       return null;
   }
@@ -117,8 +110,6 @@ const getSubSectionIcon = (
   switch (section) {
     case 'browser':
       switch (subSection) {
-        case 'online':
-          return <GdGames style={styles.icon} />;
         case 'offline':
           return <ItchIo style={styles.icon} />;
         case 'facebook':
@@ -128,15 +119,6 @@ const getSubSectionIcon = (
       }
     case 'desktop':
     case 'android':
-      switch (subSection) {
-        case 'online':
-          return <CloudDownload style={styles.icon} />;
-        case 'offline':
-          return <Wrench style={styles.iconSmall} />;
-        default:
-          return null;
-      }
-    case 'ios':
       switch (subSection) {
         case 'online':
           return <CloudDownload style={styles.icon} />;
@@ -384,19 +366,6 @@ const PublishHome = ({
       )}
       {!chosenSection && (
         <ColumnStackLayout noMargin>
-          <SectionLine
-            label={<Trans>gd.games</Trans>}
-            icon={getSubSectionIcon('browser', 'online')}
-            description={<Trans>Generate a shareable link to your game.</Trans>}
-            onClick={() => {
-              setHasSkippedSubSectionSelection(true);
-              onChooseSection('browser');
-              onChooseSubSection('online');
-            }}
-            highlighted
-            disabled={!isOnline}
-            id="publish-gd-games"
-          />
           {!showOnlineWebExporterOnly && (
             <SectionLine
               label={getSectionLabel({ section: 'browser' })}
@@ -431,29 +400,10 @@ const PublishHome = ({
               id="publish-mobile"
             />
           )}
-          {!showOnlineWebExporterOnly && !isNativeMobileApp() && (
-            <SectionLine
-              label={getSectionLabel({ section: 'ios' })}
-              icon={getSectionIcon({ section: 'ios' })}
-              description={<Trans>Apple App Store</Trans>}
-              onClick={() => onChooseSection('ios')}
-              disabled={allExportersRequireOnline && !isOnline}
-              id="publish-mobile-ios"
-            />
-          )}
         </ColumnStackLayout>
       )}
       {chosenSection === 'browser' && !chosenSubSection && (
         <ColumnStackLayout noMargin>
-          <SectionLine
-            label={<Trans>gd.games</Trans>}
-            icon={getSubSectionIcon('browser', 'online')}
-            description={<Trans>Generate a shareable link to your game.</Trans>}
-            onClick={() => onChooseSubSection('online')}
-            highlighted
-            disabled={!isOnline}
-            id="publish-gd-games"
-          />
           {!showOnlineWebExporterOnly && (
             <SectionLine
               label={<Trans>HTML5 (external websites)</Trans>}
@@ -517,28 +467,6 @@ const PublishHome = ({
             small
             disabled={allExportersRequireOnline && !isOnline}
             id="publish-mobile-manual"
-          />
-        </ColumnStackLayout>
-      )}
-      {chosenSection === 'ios' && !chosenSubSection && (
-        <ColumnStackLayout noMargin>
-          <SectionLine
-            label={<Trans>One-click packaging</Trans>}
-            icon={getSubSectionIcon('ios', 'online')}
-            description={<Trans>Automated</Trans>}
-            onClick={() => onChooseSubSection('online')}
-            highlighted
-            disabled={!isOnline}
-            id="publish-ios-cloud"
-          />
-          <SectionLine
-            label={<Trans>Manual build</Trans>}
-            icon={getSubSectionIcon('desktop', 'offline')}
-            description={<Trans>Development tools required</Trans>}
-            onClick={() => onChooseSubSection('offline')}
-            small
-            disabled={allExportersRequireOnline && !isOnline}
-            id="publish-ios-manual"
           />
         </ColumnStackLayout>
       )}

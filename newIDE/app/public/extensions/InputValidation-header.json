@@ -1,0 +1,81 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1",
+    "AlZ3D1xkH0QDao7T37VZZUeYNpn1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Input Validation",
+  "name": "InputValidation",
+  "version": "1.0.1",
+  "url": "https://resources.gdevelop-app.com/extensions/InputValidation.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/InputValidation-header.json",
+  "tags": "sanitization,string,string manipulation,input validation",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Education and Learning/Education and Learning_education_book_library_search.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Validate and sanitize strings: check format, length, trim, and normalize.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 9,
+  "helpPath": "/extensions/input-validation",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "IsValidPhoneNumber",
+      "fullName": "Check if a string is a valid phone number",
+      "description": "Check if the string is a valid phone number.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsValidUrl",
+      "fullName": "Check if a string is a valid URL",
+      "description": "Check if the string is a valid URL.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsValidEmail",
+      "fullName": "Check if a string is a valid email",
+      "description": "Check if the string is a valid email.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsValidNumber",
+      "fullName": "Check if a string represents a number",
+      "description": "Check if the string represents a number (potentially with a minus sign and potentially with a decimal point).",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsOnlyLetters",
+      "fullName": "Check if a string has only latin alphabet letters",
+      "description": "Check if the string has only latin alphabet letters.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "RemoveFirstLine",
+      "fullName": "Remove the first line",
+      "description": "Returns the string without the first line.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "CountNewLines",
+      "fullName": "Count lines",
+      "description": "Count the number of lines in a string.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "RemoveNewLines",
+      "fullName": "Replace new lines by a space",
+      "description": "Replaces every new line character with a space.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "ToAlphanumerical",
+      "fullName": "Remove any non-numerical and non A-Z characters",
+      "description": "Remove any non-numerical and non A-Z characters.",
+      "functionType": "StringExpression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Provides conditions to check if a string is a valid phone number, url, email, number, contains only letters. Also provides expressions to manipulate strings (count number of lines, remove new lines, remove non alphanumerical characters).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI2LDNIOUM3LjMsMyw2LDQuMyw2LDZ2MGMwLDEuNywxLjMsMywzLDNoMTd2MTAiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xOCwyOUg5Yy0xLjcsMC0zLTEuMy0zLTN2MFY2Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMjYiIHkxPSI2IiB4Mj0iOSIgeTI9IjYiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIxMCIgeTE9IjkiIHgyPSIxMCIgeTI9IjI5Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjUuNSwxOC41YzEuOSwxLjksMS45LDUuMSwwLDdjLTAuNSwwLjUtMSwwLjgtMS42LDEuMWMtMS44LDAuNy0zLjksMC40LTUuNC0xLjFjLTEuOS0xLjktMS45LTUuMSwwLTcNCglTMjMuNiwxNi42LDI1LjUsMTguNXoiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yNi41LDI0bDMuOSwzLjZjMC44LDAuOCwwLjgsMiwwLDIuOGwwLDBjLTAuOCwwLjgtMiwwLjgtMi44LDBsLTMuNS0zLjUiLz4NCjwvc3ZnPg0K"
+}

@@ -1,0 +1,404 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Array tools",
+  "name": "ArrayTools",
+  "version": "3.0.1",
+  "url": "https://resources.gdevelop-app.com/extensions/ArrayTools.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ArrayTools-header.json",
+  "tags": "array,variable,index,tool,math,string,sort,find,slice,cut,random,copy,combine,concat,append,insert",
+  "category": "General",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Text Editing/9bfb52500e68d0fd164b1e30bc696e40566187245b80c345848379f40bb6fad7_Text Editing_bullet_points_list.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "changelog": [
+    {
+      "version": "3.0.0",
+      "breaking": "- Variables have to be declared"
+    }
+  ],
+  "shortDescription": "Array utilities: search, sort, shuffle, slice, concat, reverse, pop, random element access.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 62,
+  "helpPath": "/extensions/array-tools",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "IndexOf",
+      "fullName": "Index of number",
+      "description": "Compare The index of the first variable that equals to a specific number in an array.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IndexOfStr",
+      "fullName": "Index of text",
+      "description": "Compare The index of the first variable that equals to a specific text in an array.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "LastIndexOf",
+      "fullName": "Last index of number",
+      "description": "Compare The index of the last variable that equals to a specific number in an array.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "LastIndexOfStr",
+      "fullName": "Last index of text",
+      "description": "Compare The index of the last variable that equals to a specific text in an array.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "RandomNumberInArray",
+      "fullName": "Random number in array",
+      "description": "Compare Returns a random number of an array of numbers.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "RandomStringInArray",
+      "fullName": "Random string in array",
+      "description": "Compare a random string of an array of strings.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "PopNumber",
+      "fullName": "Get and remove last variable from array (as number)",
+      "description": "Compare Removes the last array child of an array, and return it as a number.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "PopString",
+      "fullName": "Pop string from array",
+      "description": "Removes the last array child of an array, and return it as a string.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "ShiftNumber",
+      "fullName": "Shift number from array",
+      "description": "Removes the first array child of an array, and return it as a number.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "ShiftString",
+      "fullName": "Shift string from array",
+      "description": "Removes the first array child of an array, and return it as a string.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "HasNumber",
+      "fullName": "Array has number",
+      "description": "Checks if an array contains a specific number.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "HasString",
+      "fullName": "Array has string",
+      "description": "Checks if an array contains a specific string.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "Slice",
+      "fullName": "Slice an array",
+      "description": "Copies a portion of a scene array variable into a new scene array variable.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Splice",
+      "fullName": "Splice an array",
+      "description": "Cuts a portion of an array off.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Concatenate",
+      "fullName": "Combine 2 arrays",
+      "description": "Combines all elements of 2 scene arrays into one new scene array.",
+      "functionType": "Action"
+    },
+    {
+      "name": "AppendAll",
+      "fullName": "Append all variable to another array",
+      "description": "Appends a copy of all variables of one array to another array.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Reverse",
+      "fullName": "Reverse an array",
+      "description": "Reverses children of an array. The first array child becomes the last, and the last array child becomes the first.",
+      "functionType": "Action"
+    },
+    {
+      "name": "FillNumber",
+      "fullName": "Fill array with number",
+      "description": "Fill an element with a number.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Shuffle",
+      "fullName": "Shuffle array",
+      "description": "Shuffles all children of an array.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Flatten",
+      "fullName": "Flatten array",
+      "description": "Replaces all arrays inside of an array with their children. For example, [[1,2], [3,4]] becomes [1,2,3,4].",
+      "functionType": "Action"
+    },
+    {
+      "name": "Pop",
+      "fullName": "Pop array child",
+      "description": "Removes the last array child of an array, and stores it in another variable.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Shift",
+      "fullName": "Shift array child",
+      "description": "Removes the first array child of an array, and stores it in another variable.",
+      "functionType": "Action"
+    },
+    {
+      "name": "InsertAt",
+      "fullName": "Insert variable at",
+      "description": "Insert a variable at a specific index of an array.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SplitString",
+      "fullName": "Split string into array",
+      "description": "Split a string into an array of strings via a separator.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Join",
+      "fullName": "Join all elements of an array together into a string",
+      "description": "Returns a string made from all strings in an array.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "Sum",
+      "fullName": "Sum of array children",
+      "description": "Get the sum of all numbers in an array.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Min",
+      "fullName": "Smallest value",
+      "description": "Gets the smallest number in an array.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Max",
+      "fullName": "Biggest value",
+      "description": "Gets the biggest number in an array.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Mean",
+      "fullName": "Average value",
+      "description": "Gets the average number in an array.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Median",
+      "fullName": "Median value",
+      "description": "Gets the median number in an array.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Sort",
+      "fullName": "Sort an array",
+      "description": "Sort an array of number from smallest to biggest.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ObjectIndexOf",
+      "fullName": "Index of number",
+      "description": "Compare The index of the first variable that equals to a specific number in an array.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ObjectIndexOfStr",
+      "fullName": "Index of text",
+      "description": "Compare The index of the first variable that equals to a specific text in an array.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ObjectLastIndexOf",
+      "fullName": "Last index of number",
+      "description": "Compare The index of the last variable that equals to a specific number in an array.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ObjectLastIndexOfStr",
+      "fullName": "Last index of text",
+      "description": "Compare The index of the last variable that equals to a specific text in an array.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ObjectRandomNumberInArray",
+      "fullName": "Random number in array",
+      "description": "Compare Returns a random number of an array of numbers.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ObjectRandomStringInArray",
+      "fullName": "Random string in array",
+      "description": "Compare a random string of an array of strings.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ObjectPopNumber",
+      "fullName": "Get and remove last variable from array (as number)",
+      "description": "Compare Removes the last array child of an array, and return it as a number.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ObjectPopString",
+      "fullName": "Pop string from array",
+      "description": "Removes the last array child of an array, and return it as a string.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "ObjectShiftNumber",
+      "fullName": "Shift number from array",
+      "description": "Removes the first array child of an array, and return it as a number.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "ObjectShiftString",
+      "fullName": "Shift string from array",
+      "description": "Removes the first array child of an array, and return it as a string.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "ObjectHasNumber",
+      "fullName": "Array has number",
+      "description": "Checks if an array contains a specific number.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ObjectHasString",
+      "fullName": "Array has string",
+      "description": "Checks if an array contains a specific string.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ObjectSlice",
+      "fullName": "Slice an array",
+      "description": "Copies a portion of a scene array variable into a new scene array variable.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ObjectSplice",
+      "fullName": "Splice an array",
+      "description": "Cuts a portion of an array off.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ObjectConcatenate",
+      "fullName": "Combine 2 arrays",
+      "description": "Combines all elements of 2 scene arrays into one new scene array.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ObjectAppendAll",
+      "fullName": "Append all variable to another array",
+      "description": "Appends a copy of all variables of one array to another array.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ObjectReverse",
+      "fullName": "Reverse an array",
+      "description": "Reverses children of an array. The first array child becomes the last, and the last array child becomes the first.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ObjectFillNumber",
+      "fullName": "Fill array with number",
+      "description": "Fill an element with a number.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ObjectShuffle",
+      "fullName": "Shuffle array",
+      "description": "Shuffles all children of an array.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ObjectFlatten",
+      "fullName": "Flatten array",
+      "description": "Replaces all arrays inside of an array with their children. For example, [[1,2], [3,4]] becomes [1,2,3,4].",
+      "functionType": "Action"
+    },
+    {
+      "name": "ObjectPop",
+      "fullName": "Pop array child",
+      "description": "Removes the last array child of an array, and stores it in another variable.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ObjectShift",
+      "fullName": "Shift array child",
+      "description": "Removes the first array child of an array, and stores it in another variable.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ObjectInsertAt",
+      "fullName": "Insert variable at",
+      "description": "Insert a variable at a specific index of an array.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ObjectSplitString",
+      "fullName": "Split string into array",
+      "description": "Split a string into an array of strings via a separator.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ObjectJoin",
+      "fullName": "Join all elements of an array together into a string",
+      "description": "Returns a string made from all strings in an array.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "ObjectSum",
+      "fullName": "Sum of array children",
+      "description": "Get the sum of all numbers in an array.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "ObjectMin",
+      "fullName": "Smallest value",
+      "description": "Gets the smallest number in an array.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "ObjectMax",
+      "fullName": "Biggest value",
+      "description": "Gets the biggest number in an array.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "ObjectMean",
+      "fullName": "Average value",
+      "description": "Gets the average number in an array.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "ObjectMedian",
+      "fullName": "Median value",
+      "description": "Gets the median number in an array.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "ObjectSort",
+      "fullName": "Sort an array",
+      "description": "Sort an array of number from smallest to biggest.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "This extension adds features like:\n- Combining arrays (concatenate into new array, append all children to another array)\n- Finding a value in an array (find index expression, contains condition)\n- Reversing arrays\n- Get a portion of an array (slice)\n- Add and remove lots of children at specific indices at once (fill, splice, shift, pop, add at index)\n- Randomness (shuffle children, get a random child)\n- Mathematical operations using arrays (sum of all numbers, biggest/smallest number, average number, median number)\n- Sort numbers in an array\n- String inter-operation (split string into array, join array array children to string)",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjExIiB5MT0iNyIgeDI9IjI5IiB5Mj0iNyIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjExIiB5MT0iMTYiIHgyPSIyMiIgeTI9IjE2Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMTEiIHkxPSIyNSIgeDI9IjI5IiB5Mj0iMjUiLz4NCjxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjUiIGN5PSI3IiByPSIyIi8+DQo8Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSI1IiBjeT0iMTYiIHI9IjIiLz4NCjxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjUiIGN5PSIyNSIgcj0iMiIvPg0KPC9zdmc+DQo="
+}

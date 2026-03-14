@@ -1,0 +1,64 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "HBp2oDKV87gKFbdd1wyV1jRYRC13",
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Pop-up",
+  "name": "PopUp",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/PopUp.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/PopUp-header.json",
+  "tags": "pop up,alert,message,prompt,confirm,dialog",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/message-alert.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Display pop-ups to alert, ask confirmation, and let user type a response in text box.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 6,
+  "helpPath": "/extensions/pop-up",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "PromptValidResponse",
+      "fullName": "Existing prompt response",
+      "description": "The response to a pop-up message is filled.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "PromptResponse",
+      "fullName": "Response to prompt",
+      "description": "Return the text response by user to prompt.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "Prompt",
+      "fullName": "Prompt",
+      "description": "Displays a prompt in a pop-up that prompts the user for input. This action return the text input or the false boolean if canceled.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Confirm",
+      "fullName": "Confirm",
+      "description": "Ask confirmation of user with a message in a dialog box with an OK button, and a Cancel button.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ConfimationResponse",
+      "fullName": "Pop-up message confirmed",
+      "description": "Check if a confirmation was accepted.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "Alert",
+      "fullName": "Alert",
+      "description": "Displays an alert box with a message and an OK button in a pop-up window.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "This extension adds actions to display three kinds of pop-ups.\n\n## Alert\n - Pops-up a message that will pause the game until dismissed by the player.\n\n## Confirmation\n - Pops-up a dialogue containing a message with the option to either confirm or cancel.\n\n## Prompt\n**Note that this pop-up type is unsupported on previews and PC exports.**\n - Displays a message to the player with a text field to write an answer in. The player will also have the option to either confirm or discard their input.\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLW1lc3NhZ2UtYWxlcnQiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTMgMTFIMTFWNUgxM00xMyAxNUgxMVYxM0gxM00yMCAySDRDMi45IDIgMiAyLjkgMiA0VjIyTDYgMThIMjBDMjEuMSAxOCAyMiAxNy4xIDIyIDE2VjRDMjIgMi45IDIxLjEgMiAyMCAyWiIgLz48L3N2Zz4="
+}

@@ -1,0 +1,967 @@
+{
+  "author": "Entropy, @VictrisGames",
+  "category": "Movement",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Boomerang",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWJvb21lcmFuZyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMCAySDRDMi45IDIgMiAyLjkgMiA0UzIuOSA2IDQgNkg4TDEwIDJNMTggMkMyMC4yIDIgMjIgMy44IDIyIDZWMTJMMTggMTRDMTggOS42IDE0LjQgNiAxMCA2TDEyIDJIMThNMTggMjBWMTZMMjIgMTRWMjBDMjIgMjEuMSAyMS4xIDIyIDIwIDIyUzE4IDIxLjEgMTggMjBaIiAvPjwvc3ZnPg==",
+  "name": "Boomerang",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/boomerang.svg",
+  "shortDescription": "Throw objects that return to thrower after set time or on command.",
+  "dimension": "2D",
+  "version": "1.1.0",
+  "description": [
+    "Throw an object that returns to the thrower after a length of time, or when an action is used to return it.",
+    "",
+    "How to throw a boomerang: ",
+    "- Create a bomerang object that has this behavior",
+    "- Use one of the \"Throw boomerang...\" actions",
+    "- Run the \"Track location of thrower\" action every frame so the boomerang returns correctly",
+    "",
+    "Tips:",
+    "- If you want the boomerang to bounce off objects, check for collisions and then use the action \"Send boomerang back to thrower\""
+  ],
+  "origin": {
+    "identifier": "Boomerang",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "boomerang,throw,attack,projectile,ricochet,rebound,launch",
+  "authorIds": [
+    "q8ubdigLvIRXLxsJDDTaokO41mc2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Throw an object that returns to the thrower like a boomerang.",
+      "fullName": "Boomerang",
+      "name": "Boomerang",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Check if it is time for the boomerang to head back to thrower"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "Boomerang::Boomerang::IsBoomerangReturning"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__Boomerang_ReturnTimeTimer\"",
+                    "ReturnTime"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Boomerang::Boomerang::ReturnBoomerang"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Boomerang should head back toward thrower"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Boomerang::Boomerang::IsBoomerangReturning"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Use an instant force so boomerang can't miss the thrower"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "AddForceVersPos"
+                      },
+                      "parameters": [
+                        "Object",
+                        "ThrowerX",
+                        "ThrowerY",
+                        "ThrowSpeed",
+                        "0"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Always rotate boomerang"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Rotate"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Rotation",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Boomerang::Boomerang",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Throw boomerang toward an angle.",
+          "fullName": "Throw boomerang toward an angle",
+          "functionType": "Action",
+          "name": "ThrowBoomerangAngle",
+          "sentence": "Throw boomerang _PARAM0_ toward angle _PARAM2_ degrees, speed of _PARAM3_ pixels per second, rotating _PARAM5_ degrees per second, and send boomerang back after of _PARAM4_ seconds",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Set properties of boomerang"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ThrowSpeed",
+                    "=",
+                    "NewThrowSpeed"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ReturnTime",
+                    "=",
+                    "NewReturnTime"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Rotation",
+                    "=",
+                    "NewRotationSpeed"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "BoomerangReturning",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Use a permanent force to move boomerang until it is stopped"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "AddForceAL"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Angle",
+                    "NewThrowSpeed",
+                    "1"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Make boomerang appear to travel in a narrow ellipse"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "MettreY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "-",
+                    "Object.Height()/2"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Reset the timer of the boomerang"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ResetObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__Boomerang_ReturnTimeTimer\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Boomerang::Boomerang",
+              "type": "behavior"
+            },
+            {
+              "description": "Angle (degrees)",
+              "name": "Angle",
+              "type": "expression"
+            },
+            {
+              "description": "Throw speed (pixels per second)",
+              "name": "NewThrowSpeed",
+              "type": "expression"
+            },
+            {
+              "description": "Time before changing directions (seconds)",
+              "name": "NewReturnTime",
+              "type": "expression"
+            },
+            {
+              "description": "Rotation (degrees per second)",
+              "name": "NewRotationSpeed",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Throw boomerang toward a position.",
+          "fullName": "Throw boomerang toward a position",
+          "functionType": "Action",
+          "name": "ThrowBoomerangPosition",
+          "sentence": "Throw boomerang _PARAM0_ toward _PARAM2_;_PARAM3_ at a speed of _PARAM4_ pixels per second, rotating _PARAM6_ degrees per second, and send boomerang back after of _PARAM5_ seconds",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Set properties of boomerang"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ThrowSpeed",
+                    "=",
+                    "NewThrowSpeed"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ReturnTime",
+                    "=",
+                    "NewReturnTime"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Rotation",
+                    "=",
+                    "NewRotationSpeed"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "BoomerangReturning",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Use a permanent force to move boomerang until it is stopped"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "AddForceVersPos"
+                  },
+                  "parameters": [
+                    "Object",
+                    "PositionX",
+                    "PositionY",
+                    "NewThrowSpeed",
+                    "1"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Make boomerang appear to travel in a narrow ellipse"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "MettreY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "-",
+                    "Object.Height()/2"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Reset the timer of the boomerang"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ResetObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__Boomerang_ReturnTimeTimer\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Boomerang::Boomerang",
+              "type": "behavior"
+            },
+            {
+              "description": "Target X position",
+              "name": "PositionX",
+              "type": "expression"
+            },
+            {
+              "description": "Target Y position",
+              "name": "PositionY",
+              "type": "expression"
+            },
+            {
+              "description": "Throw speed (pixels per second)",
+              "name": "NewThrowSpeed",
+              "type": "expression"
+            },
+            {
+              "description": "Time before changing directions (seconds)",
+              "name": "NewReturnTime",
+              "type": "expression"
+            },
+            {
+              "description": "Rotation (degrees per second)",
+              "name": "NewRotationSpeed",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Send boomerang back to thrower.",
+          "fullName": "Send boomerang back to thrower",
+          "functionType": "Action",
+          "name": "ReturnBoomerang",
+          "sentence": "Send boomerang _PARAM0_ back to thrower",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "RemoveObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__Boomerang_ReturnTimeTimer\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "BoomerangReturning",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Stop the permanent force that was used to send the boomerang outward"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Arreter"
+                  },
+                  "parameters": [
+                    "Object"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Make boomerang appear to travel in a narrow ellipse"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "MettreY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "+",
+                    "Object.Height()/2"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Boomerang::Boomerang",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set amount of time before boomerang changes directions (seconds).",
+          "fullName": "Set amount of time before boomerang changes directions",
+          "functionType": "Action",
+          "name": "SetReturnTime",
+          "sentence": "Set amount of time before _PARAM0_ changes directions to _PARAM2_ (seconds)",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ReturnTime",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Boomerang::Boomerang",
+              "type": "behavior"
+            },
+            {
+              "description": "Time before boomerange changes direction (seconds)",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Track position of boomerang thrower.",
+          "fullName": "Track position of boomerang thrower",
+          "functionType": "Action",
+          "name": "TrackingThrower",
+          "sentence": "Track position of thrower _PARAM2_ who threw boomerang _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ThrowerX",
+                    "=",
+                    "Thrower.CenterX()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ThrowerY",
+                    "=",
+                    "Thrower.CenterY()"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Boomerang::Boomerang",
+              "type": "behavior"
+            },
+            {
+              "description": "Thrower",
+              "name": "Thrower",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Boomerang is returning to thrower.",
+          "fullName": "Boomerang is returning to thrower",
+          "functionType": "Condition",
+          "name": "IsBoomerangReturning",
+          "sentence": "Boomerang _PARAM0_ is returning to thrower",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "BoomerangReturning",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Boomerang::Boomerang",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onDeActivate",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "RemoveObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__Boomerang_ReturnTimeTimer\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Boomerang::Boomerang",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onActivate",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ResetObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__Boomerang_ReturnTimeTimer\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Boomerang::Boomerang",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "100",
+          "type": "Number",
+          "label": "Throw speed (pixels per second)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "ThrowSpeed"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Time before changing directions (seconds)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "ReturnTime"
+        },
+        {
+          "value": "360",
+          "type": "Number",
+          "label": "Rotation (degrees per second)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "Rotation"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "Thrower X position",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "ThrowerX"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "Thrower Y position",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "ThrowerY"
+        },
+        {
+          "value": "false",
+          "type": "Boolean",
+          "label": "Boomerang is returning",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "BoomerangReturning"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IRIhkkTTl2UHhfjrLTTH5GYwkYu1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Sound volume based on distance",
+  "name": "SoundVolumeBasedOnDistance",
+  "version": "1.0.2",
+  "url": "https://resources.gdevelop-app.com/extensions/SoundVolumeBasedOnDistance.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/SoundVolumeBasedOnDistance-header.json",
+  "tags": "sound,volume,distance",
+  "category": "Audio",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Music/Music_speaker_audio_sound.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Make any sound volume on any channel increase and decrease based on distance.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/sound-volume-based-on-distance",
+  "description": "# User can\n- Set any channel volume based on the distance betwen 2 objects.\n- Use the extension action multi times on different objects.\n- Set the Sound range.\n- Set the maximum volume range.\n\n# Example\n![](https://i.imgur.com/uBgnRU7.png)",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8cmVjdCB4PSI2IiB5PSIzIiBjbGFzcz0ic3QxIiB3aWR0aD0iMjAiIGhlaWdodD0iMjYiLz4NCjxjaXJjbGUgY2xhc3M9InN0MSIgY3g9IjE2IiBjeT0iMTkiIHI9IjciLz4NCjxjaXJjbGUgY2xhc3M9InN0MSIgY3g9IjE2IiBjeT0iMTkiIHI9IjIiLz4NCjxjaXJjbGUgY2xhc3M9InN0MSIgY3g9IjIxIiBjeT0iOCIgcj0iMiIvPg0KPC9zdmc+DQo="
+}

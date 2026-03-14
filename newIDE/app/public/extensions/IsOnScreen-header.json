@@ -1,0 +1,42 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
+    "8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Object \"Is On Screen\" Detection",
+  "name": "IsOnScreen",
+  "version": "1.2.2",
+  "url": "https://resources.gdevelop-app.com/extensions/IsOnScreen.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/IsOnScreen-header.json",
+  "tags": "is on screen,condition,visible,hide,screen",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/monitor-screenshot.svg",
+  "gdevelopVersion": "",
+  "shortDescription": "Condition to check if an object is visible in its layer's camera viewport.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/is-on-screen",
+  "eventsBasedBehaviors": [
+    {
+      "description": "This behavior provides a condition to check if the object is located within the visible portion of its layer's camera. The condition also allows for specifying padding to the virtual screen border.\nNote that object visibility, such as being hidden or 0 opacity, is not considered (but you can use those existing conditions in addition to this behavior).",
+      "fullName": "Is on screen",
+      "name": "InOnScreen",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "IsOnScreen",
+          "fullName": "Is on screen",
+          "description": "Checks if an object position is within the viewport of its layer.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "This extension adds conditions to check if an object is located within the visible portion of its layer's camera. The condition also allows for specifying padding to the virtual screen border.\n\nNote that this does not take into account any object visibility, such as being hidden or 0 opacity, but can be combined with those existing conditions.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLW1vbml0b3Itc2NyZWVuc2hvdCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik05LDZINVYxMEg3VjhIOU0xOSwxMEgxN1YxMkgxNVYxNEgxOU0yMSwxNkgzVjRIMjFNMjEsMkgzQzEuODksMiAxLDIuODkgMSw0VjE2QTIsMiAwIDAsMCAzLDE4SDEwVjIwSDhWMjJIMTZWMjBIMTRWMThIMjFBMiwyIDAgMCwwIDIzLDE2VjRDMjMsMi44OSAyMi4xLDIgMjEsMiIgLz48L3N2Zz4="
+}

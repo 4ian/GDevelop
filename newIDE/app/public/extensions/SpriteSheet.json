@@ -1,0 +1,1879 @@
+{
+  "author": "Maxwell Coffey, Arthur Pacaud (arthuro555)",
+  "category": "Advanced",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Sprite Sheet Animations",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdvb2dsZS1zcHJlYWRzaGVldCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xOSwxMVY5SDExVjVIOVY5SDVWMTFIOVYxOUgxMVYxMUgxOU0xOSwzQzE5LjUsMyAyMCwzLjIgMjAuMzksMy42MUMyMC44LDQgMjEsNC41IDIxLDVWMTlDMjEsMTkuNSAyMC44LDIwIDIwLjM5LDIwLjM5QzIwLDIwLjggMTkuNSwyMSAxOSwyMUg1QzQuNSwyMSA0LDIwLjggMy42MSwyMC4zOUMzLjIsMjAgMywxOS41IDMsMTlWNUMzLDQuNSAzLjIsNCAzLjYxLDMuNjFDNCwzLjIgNC41LDMgNSwzSDE5WiIgLz48L3N2Zz4=",
+  "name": "SpriteSheet",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/google-spreadsheet.svg",
+  "shortDescription": "Animate a tiled sprite from a sprite sheet.",
+  "version": "1.1.0",
+  "description": [
+    "",
+    "Animate images from a sprite sheet by using a tiled sprite.",
+    "",
+    "## How to use",
+    "",
+    "1. Create a tiled sprite object.",
+    "2. Set the tiled sprite image to the sprite sheet image.",
+    "3. Add the behavior (horizontal, vertical, or JSON animator) to the tiled sprite.",
+    "4. Set up the behaviors:",
+    "    - For directional animators: Edit the object \"Default width\" and \"Default height\" to match the size of a frame.",
+    "    - For the JSON animator: Set the sprite sheet JSON data in the behavior properties.",
+    "5. Use the behaviors action to start the animation (only needs to be run once, like sprite animations).",
+    "",
+    "## Vertical and horizontal spritesheet animators",
+    "",
+    "These behaviors will animate a spritesheet with the images distributed from left to right or from top to bottom. Offsets, row/column, animation speed and frame ranges can be specified to target the desired images.",
+    "",
+    "## JSON spritesheet displayer",
+    "",
+    "This behavior allows displaying frames or animations from a more intelligent spritesheet. You can generate a compatible JSON and sprite sheet via TexturePacker using the pixi.js preset. The JSON is formatted like this:",
+    "```json",
+    "{",
+    "  \"frames\": {",
+    "    \"frame1\": {",
+    "      \"frame\": {",
+    "        \"x\": 0,",
+    "        \"y\": 0,",
+    "        \"h\": 10,",
+    "        \"w\": 10,",
+    "      }",
+    "    },",
+    "    \"frame1\": {",
+    "      \"frame\": {",
+    "        \"x\": 10,",
+    "        \"y\": 0,",
+    "        \"h\": 10,",
+    "        \"w\": 10,",
+    "      }",
+    "    },",
+    "    \"frame2\": {",
+    "      \"frame\": {",
+    "        \"x\": 0,",
+    "        \"y\": 10,",
+    "        \"h\": 20,",
+    "        \"w\": 20,",
+    "      }",
+    "    }",
+    "  },",
+    "  \"animations\": {",
+    "    \"animationName1\": [\"frame1\", \"frame2\"],",
+    "    \"animationName2\": [\"frame2\", \"frame3\"]",
+    "  }",
+    "}",
+    "```",
+    "`frames` define each image inside the spritesheet and `animations` are the set of frames that form an animation. For compatibility with the TexturePacker pixi.js preset, the JSON doesn't contain the animation speed, so it has to be specified in the behavior properties."
+  ],
+  "origin": {
+    "identifier": "SpriteSheet",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "sprite,sheet,animation",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Animates a sprite sheet using JSON (see extension description).",
+      "fullName": "JSON sprite sheet animator",
+      "name": "JSONSpriteSheetAnimator",
+      "objectType": "TiledSpriteObject::TiledSprite",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PauseObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SpriteSheet::JSONSpriteSheetAnimator::_LoadJSON"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::JSONSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "TODO: Reseting the timer at every frame change is a big approximation. Also, this event forbid to jump several frames at once."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "CurrentAnimation",
+                    "!=",
+                    "\"__null\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\"",
+                    "AnimationSpeed"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SpriteSheet::JSONSpriteSheetAnimator::_UpdateAnimationFrame"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "CurrentAnimationFrame + 1",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResetObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::JSONSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Loads the JSON data into the behavior",
+          "fullName": "Load the JSON",
+          "functionType": "Action",
+          "name": "_LoadJSON",
+          "private": true,
+          "sentence": "Load the JSON of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "JSONToObjectVariableStructure"
+                  },
+                  "parameters": [
+                    "JSON",
+                    "Object",
+                    "__SpriteSheet_data"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::JSONSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Update the object attached to the behavior using the latest properties values.",
+          "fullName": "Update the object",
+          "functionType": "Action",
+          "name": "_UpdateObject",
+          "private": true,
+          "sentence": "Update object _PARAM0_ with properties of _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TiledSpriteObject::XOffset"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "Object.Variable(__SpriteSheet_data.frames[CurrentFrame].frame.x)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TiledSpriteObject::YOffset"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "Object.Variable(__SpriteSheet_data.frames[CurrentFrame].frame.y)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TiledSpriteObject::Height"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "Object.Variable(__SpriteSheet_data.frames[CurrentFrame].frame.h)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TiledSpriteObject::Width"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "Object.Variable(__SpriteSheet_data.frames[CurrentFrame].frame.w)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::JSONSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Updates the animation frame.",
+          "fullName": "Update the animation frame",
+          "functionType": "Action",
+          "name": "_UpdateAnimationFrame",
+          "private": true,
+          "sentence": "Update the current animation frame of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentAnimationFrame",
+                    "=",
+                    "frame"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "CurrentAnimationFrame",
+                    ">",
+                    "Object.VariableChildCount(__SpriteSheet_data.animations[CurrentAnimation]) - 1"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentAnimationFrame",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "CurrentFrame",
+                    "=",
+                    "Object.VariableString(__SpriteSheet_data.animations[CurrentAnimation][CurrentAnimationFrame])"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SpriteSheet::JSONSpriteSheetAnimator::_UpdateObject"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::JSONSpriteSheetAnimator",
+              "type": "behavior"
+            },
+            {
+              "description": "The frame to set to",
+              "name": "frame",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Loads a new JSON spritesheet data into the behavior.",
+          "fullName": "Load data from a JSON resource",
+          "functionType": "Action",
+          "name": "LoadFromJSON",
+          "sentence": "Load JSON spritesheet data for _PARAM0_ from _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "JSON",
+                    "=",
+                    "Value"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SpriteSheet::JSONSpriteSheetAnimator::_LoadJSON"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::JSONSpriteSheetAnimator",
+              "type": "behavior"
+            },
+            {
+              "description": "The JSON to load",
+              "name": "Value",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Display one frame without animating the object.",
+          "fullName": "Display a frame",
+          "functionType": "Action",
+          "name": "DisplayFrame",
+          "sentence": "Display frame _PARAM2_ of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "CurrentFrame",
+                    "=",
+                    "frame"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "CurrentAnimation",
+                    "=",
+                    "\"__null\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SpriteSheet::JSONSpriteSheetAnimator::_UpdateObject"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::JSONSpriteSheetAnimator",
+              "type": "behavior"
+            },
+            {
+              "description": "The frame to display",
+              "name": "frame",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Play an animation from the sprite sheet.",
+          "fullName": "Play Animation",
+          "functionType": "Action",
+          "name": "PlayAnimation",
+          "sentence": "Play animation _PARAM2_ of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "UnPauseObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResetObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "CurrentAnimation",
+                    "=",
+                    "AnimationName"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SpriteSheet::JSONSpriteSheetAnimator::_UpdateAnimationFrame"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "0",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::JSONSpriteSheetAnimator",
+              "type": "behavior"
+            },
+            {
+              "description": "The name of the animation",
+              "name": "AnimationName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The name of the current animation. __null if no animation is playing.",
+          "fullName": "Current animation",
+          "functionType": "StringExpression",
+          "name": "CurrentAnimation",
+          "sentence": "If Current Frame of _PARAM0_ = _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "CurrentAnimation"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::JSONSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The name of the currently displayed frame.",
+          "fullName": "Current frame",
+          "functionType": "StringExpression",
+          "name": "CurrentFrame",
+          "sentence": "If Current Frame of _PARAM0_ = _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "CurrentFrame"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::JSONSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Pause the animation of a sprite sheet.",
+          "fullName": "Pause animation",
+          "functionType": "Action",
+          "name": "PauseAnimation",
+          "sentence": "Pause the current animation of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PauseObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::JSONSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Resume a paused animation of a sprite sheet.",
+          "fullName": "Resume animation",
+          "functionType": "Action",
+          "name": "ResumeAnimation",
+          "sentence": "Resume the current animation of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "UnPauseObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::JSONSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "String",
+          "label": "JSON formatted text describing the sprite sheet",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "JSON"
+        },
+        {
+          "value": "__null",
+          "type": "String",
+          "label": "Current animation",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "CurrentAnimation"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "Current frame of the animation",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "CurrentAnimationFrame"
+        },
+        {
+          "value": "",
+          "type": "String",
+          "label": "Currently displayed frame name",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "CurrentFrame"
+        },
+        {
+          "value": "0.2",
+          "type": "Number",
+          "label": "Speed of the animation (in seconds)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "AnimationSpeed"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Animates a vertical (top to bottom) sprite sheet.",
+      "fullName": "Vertical sprite sheet animator",
+      "name": "VerticalSpriteSheetAnimator",
+      "objectType": "TiledSpriteObject::TiledSprite",
+      "eventsFunctions": [
+        {
+          "description": "Set the animation frame.",
+          "fullName": "Set the animation frame",
+          "functionType": "Action",
+          "name": "_SetFrame",
+          "private": true,
+          "sentence": "Set the current frame of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentFrame",
+                    "=",
+                    "frame"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentFrame",
+                    ">=",
+                    "(LastFrame-FirstFrame)+1"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentFrame",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TiledSpriteObject::XOffset"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "((AnimationColumn)*(SpriteY))+(((AnimationColumn)*SpriteSpacing)+SpriteSpacing)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TiledSpriteObject::YOffset"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "\n((FirstFrame+CurrentFrame)*SpriteX)+\n\n\n(((FirstFrame+CurrentFrame)*SpriteSpacing)+SpriteSpacing)\n"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::VerticalSpriteSheetAnimator",
+              "type": "behavior"
+            },
+            {
+              "description": "The frame",
+              "name": "frame",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PauseObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "TODO: Reseting the timer at every frame change is a big approximation. Also, this event forbid to jump several frames at once."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\"",
+                    "AnimationSpeed"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SpriteSheet::VerticalSpriteSheetAnimator::_SetFrame"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "CurrentFrame + 1",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResetObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::VerticalSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Play an animation from the sprite sheet.",
+          "fullName": "Play animation",
+          "functionType": "Action",
+          "name": "PlayAnimation",
+          "sentence": "Play animation of _PARAM0_ on column _PARAM5_ from frames _PARAM2_ to _PARAM3_ at speed _PARAM4_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "AnimationColumn",
+                    "=",
+                    "NewAnimationColumn"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "AnimationSpeed",
+                    "=",
+                    "NewAnimationSpeed"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "FirstFrame",
+                    "=",
+                    "NewFirstFrame"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "LastFrame",
+                    "=",
+                    "NewLastFrame"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SpriteSheet::VerticalSpriteSheetAnimator::_SetFrame"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "0",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "UnPauseObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResetObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::VerticalSpriteSheetAnimator",
+              "type": "behavior"
+            },
+            {
+              "description": "First frame of the animation",
+              "name": "NewFirstFrame",
+              "supplementaryInformation": "SpriteSheet::SpriteSheetSingleAnimation",
+              "type": "expression"
+            },
+            {
+              "description": "Last frame of the animation",
+              "name": "NewLastFrame",
+              "type": "expression"
+            },
+            {
+              "description": "Duration for each frame (seconds)",
+              "name": "NewAnimationSpeed",
+              "type": "expression"
+            },
+            {
+              "description": "The column containing the animation",
+              "name": "NewAnimationColumn",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The current frame of the current animation.",
+          "fullName": "Current frame",
+          "functionType": "Expression",
+          "name": "CurrentFrame",
+          "sentence": "If Current Frame of _PARAM0_ = _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "CurrentFrame"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::VerticalSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Pause the animation of a sprite sheet.",
+          "fullName": "Pause animation",
+          "functionType": "Action",
+          "name": "PauseAnimation",
+          "sentence": "Pause the animation of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PauseObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::VerticalSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Resume a paused animation of a sprite sheet.",
+          "fullName": "Resume animation",
+          "functionType": "Action",
+          "name": "ResumeAnimation",
+          "sentence": "Resume the current animation of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "UnPauseObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::VerticalSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "16",
+          "type": "Number",
+          "label": "Horizontal width of sprite (in pixels)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "SpriteX"
+        },
+        {
+          "value": "16",
+          "type": "Number",
+          "label": "Vertical height of sprite (in pixels)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "SpriteY"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "Empty space between each sprite (in pixels)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "SpriteSpacing"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Speed of the animation (in seconds)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "AnimationSpeed"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Column of the animation",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "AnimationColumn"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "First Frame of the animation",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "FirstFrame"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Last Frame of the animation",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "LastFrame"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "Current Frame of the animation",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "CurrentFrame"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Animates a horizontal (left to right) sprite sheet.",
+      "fullName": "Horizontal sprite sheet animator",
+      "name": "HorizontalSpriteSheetAnimator",
+      "objectType": "TiledSpriteObject::TiledSprite",
+      "eventsFunctions": [
+        {
+          "description": "Set the animation frame.",
+          "fullName": "Set the animation frame",
+          "functionType": "Action",
+          "name": "_SetFrame",
+          "private": true,
+          "sentence": "Set the current frame of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentFrame",
+                    "=",
+                    "frame"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentFrame",
+                    ">=",
+                    "(LastFrame-FirstFrame)+1"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentFrame",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TiledSpriteObject::YOffset"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "((AnimationRow)*(SpriteY))+(((AnimationRow)*SpriteSpacing)+SpriteSpacing)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TiledSpriteObject::XOffset"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "\n((FirstFrame+CurrentFrame)*SpriteX)+\n\n\n(((FirstFrame+CurrentFrame)*SpriteSpacing)+SpriteSpacing)\n"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::HorizontalSpriteSheetAnimator",
+              "type": "behavior"
+            },
+            {
+              "description": "The frame",
+              "name": "frame",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PauseObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "TODO: Reseting the timer at every frame change is a big approximation. Also, this event forbid to jump several frames at once."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\"",
+                    "AnimationSpeed"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SpriteSheet::HorizontalSpriteSheetAnimator::_SetFrame"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "CurrentFrame + 1",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResetObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::HorizontalSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Play an animation from the sprite sheet.",
+          "fullName": "Play animation",
+          "functionType": "Action",
+          "name": "PlayAnimation",
+          "sentence": "Play animation of _PARAM0_ on row _PARAM5_ from frames _PARAM2_ to _PARAM3_ at speed _PARAM4_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "AnimationRow",
+                    "=",
+                    "NewAnimationRow"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "AnimationSpeed",
+                    "=",
+                    "NewAnimationSpeed"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "FirstFrame",
+                    "=",
+                    "NewFirstFrame"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "LastFrame",
+                    "=",
+                    "NewLastFrame"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SpriteSheet::HorizontalSpriteSheetAnimator::_SetFrame"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "0",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "UnPauseObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResetObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::HorizontalSpriteSheetAnimator",
+              "type": "behavior"
+            },
+            {
+              "description": "First Frame of the animation",
+              "name": "NewFirstFrame",
+              "supplementaryInformation": "SpriteSheet::SpriteSheetSingleAnimation",
+              "type": "expression"
+            },
+            {
+              "description": "Last Frame of animation",
+              "name": "NewLastFrame",
+              "type": "expression"
+            },
+            {
+              "description": "Duration for each frame (seconds)",
+              "name": "NewAnimationSpeed",
+              "type": "expression"
+            },
+            {
+              "description": "What row is the animation in",
+              "name": "NewAnimationRow",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The current frame of the current animation.",
+          "fullName": "Current frame",
+          "functionType": "Expression",
+          "name": "CurrentFrame",
+          "sentence": "If Current Frame of _PARAM0_ = _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "CurrentFrame"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::HorizontalSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Pause the animation of a sprite sheet.",
+          "fullName": "Pause animation",
+          "functionType": "Action",
+          "name": "PauseAnimation",
+          "sentence": "Pause the current animation of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PauseObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::HorizontalSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Resume a paused animation of a sprite sheet.",
+          "fullName": "Resume animation",
+          "functionType": "Action",
+          "name": "ResumeAnimation",
+          "sentence": "Resume the current animation of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "UnPauseObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__SpriteSheet_Animation\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpriteSheet::HorizontalSpriteSheetAnimator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "16",
+          "type": "Number",
+          "label": "Horizontal width of sprite (in pixels)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "SpriteX"
+        },
+        {
+          "value": "16",
+          "type": "Number",
+          "label": "Vertical height of sprite (in pixels)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "SpriteY"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "Empty space between each sprite (in pixels)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "SpriteSpacing"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Speed of the animation (in seconds)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "AnimationSpeed"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Row of the animation",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "AnimationRow"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "First Frame of the animation",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "FirstFrame"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Last Frame of the animation",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "LastFrame"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "Current Frame of the animation",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "CurrentFrame"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

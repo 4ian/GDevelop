@@ -1,0 +1,142 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "AlZ3D1xkH0QDao7T37VZZUeYNpn1",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Noise generator",
+  "name": "Noise",
+  "version": "2.1.4",
+  "url": "https://resources.gdevelop-app.com/extensions/Noise.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Noise-header.json",
+  "tags": "perlin noise,simplex noise,procedural generation",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/sprinkler.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Generate noise values for procedural generation.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 19,
+  "helpPath": "/tutorials/procedural-generation",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "Noise1d",
+      "fullName": "1D noise",
+      "description": "Generate a number between -1 and 1 from 1 dimensional simplex noise. The \"Map\" expression from Extended Math extension can be used to map values to any chosen bounds.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Noise2d",
+      "fullName": "2D noise",
+      "description": "Generate a number between -1 and 1 from 2 dimensional simplex noise. The \"Map\" expression from Extended Math extension can be used to map values to any chosen bounds.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Noise3d",
+      "fullName": "3D noise",
+      "description": "Generate a number between -1 and 1 from 3 dimensional simplex noise. The \"Map\" expression from Extended Math extension can be used to map values to any chosen bounds.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Noise4d",
+      "fullName": "4D noise",
+      "description": "Generate a number between -1 and 1 from 4 dimensional simplex noise. The \"Map\" expression from Extended Math extension can be used to map values to any chosen bounds.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Create",
+      "fullName": "Create a noise generator",
+      "description": "Create a noise generator with default settings (frequency = 1,  octaves = 1, persistence = 0.5, lacunarity = 2).",
+      "functionType": "Action"
+    },
+    {
+      "name": "Delete",
+      "fullName": "Delete a noise generator",
+      "description": "Delete a noise generators and loose its settings.",
+      "functionType": "Action"
+    },
+    {
+      "name": "DeleteAll",
+      "fullName": "Delete all noise generators",
+      "description": "Delete all noise generators and loose their settings.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetSeed",
+      "fullName": "Noise seed",
+      "description": "The seed is a number used to generate the random noise. Setting the same seed will result in the same random noise generation. It's for example useful to generate the same world, by saving this seed value and reusing it later to generate again a world.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetLoopPeriodX",
+      "fullName": "Noise looping period on X",
+      "description": "Change the looping period on X used for noise generation. The noise will wrap-around on X.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetLoopPeriodY",
+      "fullName": "Noise looping period on Y",
+      "description": "Change the looping period on Y used for noise generation. The noise will wrap-around on Y.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetFrequency",
+      "fullName": "Noise base frequency",
+      "description": "Change the base frequency used for noise generation. A lower frequency will zoom in the noise.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetOctaves",
+      "fullName": "Noise octaves",
+      "description": "Change the number of octaves used for noise generation. It can be seen as layers of noise with different zoom.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetPersistence",
+      "fullName": "Noise persistence",
+      "description": "Change the persistence used for noise generation. At its default value \"0.5\", it halves the noise amplitude at each octave.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetLacunarity",
+      "fullName": "Noise lacunarity",
+      "description": "Change the lacunarity used for noise generation. At its default value \"2\", it doubles the frequency at each octave.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Seed",
+      "fullName": "Noise seed",
+      "description": "The seed used for noise generation.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Frequency",
+      "fullName": "Noise base frequency",
+      "description": "The base frequency used for noise generation.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Octaves",
+      "fullName": "Noise octaves number",
+      "description": "The number of octaves used for noise generation.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Persistence",
+      "fullName": "Noise persistence",
+      "description": "The persistence used for noise generation.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Lacunarity",
+      "fullName": "Noise lacunarity",
+      "description": "The lacunarity used for noise generation.",
+      "functionType": "Expression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Noise can be useful for many procedural generation cases such as:\n- Terrain, top down or side view ([open the project online](https://editor.gdevelop.io/?project=example://marching-squares-island-generator))\n- Object positioning (tree, stars...)\n- Curves (roads, rivers...)\n- Textures (fog, milky way...)\n- Screen shake\n- Many other things\n\nThis extension contains expressions to generate Simplex noise values in 1, 2, 3 and 4 dimensions. A *\"seed\"* allows to generate the same world again later on instead of having to save the whole generated world.\n\nVersion 2.0.0 compatibility break:\n- Seeds doesn't give the same result as with version 1.x.x",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNwcmlua2xlciIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMSA3SDEzVjlIMTFWN001IDIySDlWMTBINVYyMk0xNCAxMUgxNlY5SDE0VjExTTE3IDEwSDE5VjhIMTdWMTBNMTcgNVY3SDE5VjVIMTdNMTQgOEgxNlY2SDE0VjhNMTcgMTNIMTlWMTFIMTdWMTNNNSA3SDUuMzNMNiA5SDhMOC42NyA3SDlWNkg1VjdaIiAvPjwvc3ZnPg=="
+}

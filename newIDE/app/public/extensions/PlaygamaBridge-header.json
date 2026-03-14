@@ -1,0 +1,1064 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "pGl7czfmrbUqIa4ZZkTji4NL9zX2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Playgama Bridge",
+  "name": "PlaygamaBridge",
+  "version": "1.28.0",
+  "url": "https://resources.gdevelop-app.com/extensions/PlaygamaBridge.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/PlaygamaBridge-header.json",
+  "tags": "playgama,bridge,html5,sdk,platform,ads",
+  "category": "Ads",
+  "previewIconUrl": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMTcgMTU0LjM2MlY5Ni4wMDAxSDIyMy4xMjlWNDE2SDExN1YzNTkuMjU0SDE1OC40NFYxNTQuMzYySDExN1oiIGZpbGw9ImJsYWNrIi8+CjxwYXRoIGQ9Ik0zOTUgMTU0LjM2MlY5NkgyODguODcxVjQxNkgzOTVWMzU5LjI1NEgzNTMuNTZWMTU0LjM2MkgzOTVaIiBmaWxsPSJibGFjayIvPgo8L3N2Zz4K",
+  "gdevelopVersion": "",
+  "shortDescription": "Cross-platform HTML5 publishing SDK: ads, payments, social features via Playgama.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 173,
+  "helpPath": "/extensions/playgama-bridge/details",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "AddActionParameter",
+      "fullName": "Add Action Parameter",
+      "description": "Add Action Parameter.",
+      "functionType": "Action"
+    },
+    {
+      "name": "AddBoolActionParameter",
+      "fullName": "Add Bool Action Parameter",
+      "description": "Add Bool Action Parameter.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsInitialized",
+      "fullName": "Is Initialized",
+      "description": "Is Initialized.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "PlatformId",
+      "fullName": "Platform Id",
+      "description": "Platform Id.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PlatformLanguage",
+      "fullName": "Platform Language",
+      "description": "Platform Language.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PlatformPayload",
+      "fullName": "Platform Payload",
+      "description": "Platform Payload.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PlatformTld",
+      "fullName": "Platform Tld",
+      "description": "Platform Tld.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PlatformIsAudioEnabled",
+      "fullName": "Platform Is Audio Enabled",
+      "description": "Platform Is Audio Enabled.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "PlatformIsPaused",
+      "fullName": "Platform Is Paused",
+      "description": "Platform Is Paused.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsGetAllGamesSupported",
+      "fullName": "Is Get All Games Supported",
+      "description": "Is Get All Games Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsGetGameByIdSupported",
+      "fullName": "Is Get Game By Id Supported",
+      "description": "Is Get Game By Id Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnGetAllGamesCompleted",
+      "fullName": "On Get All Games Completed",
+      "description": "On Get All Games Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnGetGameByIdCompleted",
+      "fullName": "On Get Game By Id Completed",
+      "description": "On Get Game By Id Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "PlatformGetAllGames",
+      "fullName": "Platform Get All Games",
+      "description": "Platform Get All Games.",
+      "functionType": "Action"
+    },
+    {
+      "name": "PlatformGetGameById",
+      "fullName": "Platform Get Game By Id",
+      "description": "Platform Get Game By Id.",
+      "functionType": "Action"
+    },
+    {
+      "name": "PlatformAllGamesCount",
+      "fullName": "Platform All Games Count",
+      "description": "Platform All Games Count.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PlatformAllGamePropertiesCount",
+      "fullName": "Platform All Game Properties Count",
+      "description": "Platform All Game Properties Count.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PlatformAllGamesPropertyName",
+      "fullName": "Platform All Games Property Name",
+      "description": "Platform All Games Property Name.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PlatformAllGamesPropertyValue",
+      "fullName": "Platform All Games Property Value",
+      "description": "Platform All Games Property Value.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PlatformGameByIdPropertyValue",
+      "fullName": "Platform Game By Id Property Value",
+      "description": "Platform Game By Id Property Value.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PlatformOnAudioStateChanged",
+      "fullName": "Platform On Audio State Changed",
+      "description": "Platform On Audio State Changed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "PlatformOnPauseStateChanged",
+      "fullName": "Platform On Pause State Changed",
+      "description": "Platform On Pause State Changed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "DeviceType",
+      "fullName": "Device Type",
+      "description": "Device Type.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "IsMobile",
+      "fullName": "Is Mobile",
+      "description": "Is Mobile.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsTablet",
+      "fullName": "Is Tablet",
+      "description": "Is Tablet.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsDesktop",
+      "fullName": "Is Desktop",
+      "description": "Is Desktop.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsTv",
+      "fullName": "Is Tv",
+      "description": "Is Tv.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "PlayerId",
+      "fullName": "Player Id",
+      "description": "Player Id.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PlayerName",
+      "fullName": "Player Name",
+      "description": "Player Name.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PlayerExtraPropertiesCount",
+      "fullName": "Player Extra Properties Count",
+      "description": "Player Extra Properties Count.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PlayerExtraPropertyName",
+      "fullName": "Player Extra Property Name",
+      "description": "Player Extra Property Name.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PlayerExtraPropertyValue",
+      "fullName": "Player Extra Property Value",
+      "description": "Player Extra Property Value.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PlayerPhotosCount",
+      "fullName": "Player Photos Count",
+      "description": "Player Photos Count.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PlayerPhoto",
+      "fullName": "Player Photo",
+      "description": "Player Photo # _PARAM1_.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "VisibilityState",
+      "fullName": "Visibility State",
+      "description": "Visibility State.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "OnVisibilityStateChanged",
+      "fullName": "On Visibility State Changed",
+      "description": "On Visibility State Changed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "DefaultStorageType",
+      "fullName": "Default Storage Type",
+      "description": "Default Storage Type.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "StorageData",
+      "fullName": "Storage Data",
+      "description": "Storage Data.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "StorageDataAsJSON",
+      "fullName": "Storage Data As JSON",
+      "description": "Storage Data As JSON.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "AppendStorageDataGetRequest",
+      "fullName": "Append Parameter to Storage Data Get Request",
+      "description": "Append Parameter to Storage Data Get Request.",
+      "functionType": "Action"
+    },
+    {
+      "name": "AppendStorageDataSetRequest",
+      "fullName": "Append Parameter to Storage Data Set Request",
+      "description": "Append Parameter to Storage Data Set Request.",
+      "functionType": "Action"
+    },
+    {
+      "name": "AppendStorageDataDeleteRequest",
+      "fullName": "Append Parameter to Storage Data Delete Request",
+      "description": "Append Parameter to Storage Data Delete Request.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsLastActionCompletedSuccessfully",
+      "fullName": "Is Last Action Completed Successfully",
+      "description": "Is Last Action Completed Successfully.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "SendStorageDataGetRequest",
+      "fullName": "Send Storage Data Get Request",
+      "description": "Send Storage Data Get Request.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SendStorageDataSetRequest",
+      "fullName": "Send Storage Data Set Request",
+      "description": "Send Storage Data Set Request.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SendStorageDataDeleteRequest",
+      "fullName": "Send Storage Data Delete Request",
+      "description": "Send Storage Data Delete Request.",
+      "functionType": "Action"
+    },
+    {
+      "name": "OnStorageDataGetRequestCompleted",
+      "fullName": "On Storage Data Get Request Completed",
+      "description": "On Storage Data Get Request Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnStorageDataSetRequestCompleted",
+      "fullName": "On Storage Data Set Request Completed",
+      "description": "On Storage Data Set Request Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnStorageDataDeleteRequestCompleted",
+      "fullName": "On Storage Data Delete Request Completed",
+      "description": "On Storage Data Delete Request Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "HasStorageData",
+      "fullName": "Has Storage Data",
+      "description": "Has Storage Data.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsStorageSupported",
+      "fullName": "Is Storage Supported",
+      "description": "Is Storage Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsStorageAvailable",
+      "fullName": "Is Storage Available",
+      "description": "Is Storage Available.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "SetMinimumDelayBetweenInterstitial",
+      "fullName": "Set Minimum Delay Between Interstitial",
+      "description": "Set Minimum Delay Between Interstitial.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ShowBanner",
+      "fullName": "Show Banner",
+      "description": "Show Banner.",
+      "functionType": "Action"
+    },
+    {
+      "name": "HideBanner",
+      "fullName": "Hide Banner",
+      "description": "Hide Banner.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ShowInterstitial",
+      "fullName": "Show Interstitial",
+      "description": "Show Interstitial.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ShowRewarded",
+      "fullName": "Show Rewarded",
+      "description": "Show Rewarded.",
+      "functionType": "Action"
+    },
+    {
+      "name": "CheckAdBlock",
+      "fullName": "Check AdBlock",
+      "description": "Check AdBlock.",
+      "functionType": "Action"
+    },
+    {
+      "name": "MinimumDelayBetweenInterstitial",
+      "fullName": "Minimum Delay Between Interstitial",
+      "description": "Minimum Delay Between Interstitial.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "BannerState",
+      "fullName": "Banner State",
+      "description": "Banner State.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "InterstitialState",
+      "fullName": "Interstitial State",
+      "description": "Interstitial State.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "RewardedState",
+      "fullName": "Rewarded State",
+      "description": "Rewarded State.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "RewardedPlacement",
+      "fullName": "Rewarded Placement",
+      "description": "Rewarded Placement.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "IsBannerSupported",
+      "fullName": "Is Banner Supported",
+      "description": "Is Banner Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsInterstitialSupported",
+      "fullName": "Is Interstitial Supported",
+      "description": "Is Interstitial Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsRewardedSupported",
+      "fullName": "Is Rewarded Supported",
+      "description": "Is Rewarded Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnBannerStateChanged",
+      "fullName": "On Banner State Changed",
+      "description": "On Banner State Changed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnBannerLoading",
+      "fullName": "On Banner Loading",
+      "description": "On Banner Loading.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnBannerShown",
+      "fullName": "On Banner Shown",
+      "description": "On Banner Shown.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnBannerHidden",
+      "fullName": "On Banner Hidden",
+      "description": "On Banner Hidden.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnBannerFailed",
+      "fullName": "On Banner Failed",
+      "description": "On Banner Failed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnInterstitialStateChanged",
+      "fullName": "On Interstitial State Changed",
+      "description": "On Interstitial State Changed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnInterstitialLoading",
+      "fullName": "On Interstitial Loading",
+      "description": "On Interstitial Loading.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnInterstitialOpened",
+      "fullName": "On Interstitial Opened",
+      "description": "On Interstitial Opened.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnInterstitialClosed",
+      "fullName": "On Interstitial Closed",
+      "description": "On Interstitial Closed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnInterstitialFailed",
+      "fullName": "On Interstitial Failed",
+      "description": "On Interstitial Failed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnRewardedStateChanged",
+      "fullName": "On Rewarded State Changed",
+      "description": "On Rewarded State Changed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnRewardedLoading",
+      "fullName": "On Rewarded Loading",
+      "description": "On Rewarded Loading.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnRewardedOpened",
+      "fullName": "On Rewarded Opened",
+      "description": "On Rewarded Opened.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnRewardedClosed",
+      "fullName": "On Rewarded Closed",
+      "description": "On Rewarded Closed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnRewardedRewarded",
+      "fullName": "On Rewarded Rewarded",
+      "description": "On Rewarded Rewarded.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnRewardedFailed",
+      "fullName": "On Rewarded Failed",
+      "description": "On Rewarded Failed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnCheckAdBlockCompleted",
+      "fullName": "On Check AdBlock Completed",
+      "description": "On Check AdBlock Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "SendMessage",
+      "fullName": "Send Message",
+      "description": "Send Message.",
+      "functionType": "Action"
+    },
+    {
+      "name": "GetServerTime",
+      "fullName": "Get Server Time",
+      "description": "Get Server Time.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ServerTime",
+      "fullName": "Server Time",
+      "description": "Server Time.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "OnGetServerTimeCompleted",
+      "fullName": "On Get Server Time Completed",
+      "description": "On Get Server Time Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "HasServerTime",
+      "fullName": "Has Server Time",
+      "description": "Has Server Time.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "AuthorizePlayer",
+      "fullName": "Authorize Player",
+      "description": "Authorize Player.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsPlayerAuthorizationSupported",
+      "fullName": "Is Player Authorization Supported",
+      "description": "Is Player Authorization Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsPlayerAuthorized",
+      "fullName": "Is Player Authorized",
+      "description": "Is Player Authorized.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnAuthorizePlayerCompleted",
+      "fullName": "On Authorize Player Completed",
+      "description": "On Authorize Player Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "DoesPlayerHaveName",
+      "fullName": "Does Player Have Name",
+      "description": "Does Player Have Name.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "DoesPlayerHavePhoto",
+      "fullName": "Does Player Have Photo",
+      "description": "Does Player Have Photo.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "Share",
+      "fullName": "Share",
+      "description": "Share.",
+      "functionType": "Action"
+    },
+    {
+      "name": "InviteFriends",
+      "fullName": "Invite Friends",
+      "description": "Invite Friends.",
+      "functionType": "Action"
+    },
+    {
+      "name": "JoinCommunity",
+      "fullName": "Join Community",
+      "description": "Join Community.",
+      "functionType": "Action"
+    },
+    {
+      "name": "CreatePost",
+      "fullName": "Create Post",
+      "description": "Create Post.",
+      "functionType": "Action"
+    },
+    {
+      "name": "AddToHomeScreen",
+      "fullName": "Add To Home Screen",
+      "description": "Add To Home Screen.",
+      "functionType": "Action"
+    },
+    {
+      "name": "AddToFavorites",
+      "fullName": "Add To Favorites",
+      "description": "Add To Favorites.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Rate",
+      "fullName": "Rate",
+      "description": "Rate.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsShareSupported",
+      "fullName": "Is Share Supported",
+      "description": "Is Share Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnShareCompleted",
+      "fullName": "On Share Completed",
+      "description": "On Share Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsInviteFriendsSupported",
+      "fullName": "Is Invite Friends Supported",
+      "description": "Is Invite Friends Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnInviteFriendsCompleted",
+      "fullName": "On Invite Friends Completed",
+      "description": "On Invite Friends Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsJoinCommunitySupported",
+      "fullName": "Is Join Community Supported",
+      "description": "Is Join Community Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnJoinCommunityCompleted",
+      "fullName": "On Join Community Completed",
+      "description": "On Join Community Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsCreatePostSupported",
+      "fullName": "Is Create Post Supported",
+      "description": "Is Create Post Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnCreatePostCompleted",
+      "fullName": "On Create Post Completed",
+      "description": "On Create Post Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsAddToHomeScreenSupported",
+      "fullName": "Is Add To Home Screen Supported",
+      "description": "Is Add To Home Screen Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnAddToHomeScreenCompleted",
+      "fullName": "On Add To Home Screen Completed",
+      "description": "On Add To Home Screen Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsAddToFavoritesSupported",
+      "fullName": "Is Add To Favorites Supported",
+      "description": "Is Add To Favorites Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnAddToFavoritesCompleted",
+      "fullName": "On Add To Favorites Completed",
+      "description": "On Add To Favorites Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsRateSupported",
+      "fullName": "Is Rate Supported",
+      "description": "Is Rate Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnRateCompleted",
+      "fullName": "On Rate Completed",
+      "description": "On Rate Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsExternalLinksAllowed",
+      "fullName": "Is External Links Allowed",
+      "description": "Is External Links Allowed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "LeaderboardsSetScore",
+      "fullName": "Leaderboards Set Score",
+      "description": "Leaderboards Set Score.",
+      "functionType": "Action"
+    },
+    {
+      "name": "LeaderboardsGetEntries",
+      "fullName": "Leaderboards Get Entries",
+      "description": "Leaderboards Get Entries.",
+      "functionType": "Action"
+    },
+    {
+      "name": "LeaderboardsShowNativePopup",
+      "fullName": "Leaderboards Show Native Popup",
+      "description": "Leaderboards Show Native Popup.",
+      "functionType": "Action"
+    },
+    {
+      "name": "LeaderboardsType",
+      "fullName": "Leaderboards Type",
+      "description": "Leaderboards Type.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "LeaderboardsTypeNotAvailable",
+      "fullName": "The leaderboard is of type Not Available",
+      "description": "The leaderboard is of type Not Available.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "LeaderboardsTypeInGame",
+      "fullName": "The leaderboard is of type In Game",
+      "description": "The leaderboard is of type In Game.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "LeaderboardsTypeNative",
+      "fullName": "The leaderboard is of type Native",
+      "description": "The leaderboard is of type Native.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "LeaderboardsTypeNativePopup",
+      "fullName": "The leaderboard is of type Native Popup",
+      "description": "The leaderboard is of type Native Popup.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnLeaderboardsSetScoreCompleted",
+      "fullName": "On Leaderboards Set Score Completed",
+      "description": "On Leaderboards Set Score Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnLeaderboardsGetEntriesCompleted",
+      "fullName": "On Leaderboards Get Entries Completed",
+      "description": "On Leaderboards Get Entries Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnLeaderboardsShowNativePopupCompleted",
+      "fullName": "On Leaderboards Show Native Popup Completed",
+      "description": "On Leaderboards Show Native Popup Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "LeaderboardEntriesCount",
+      "fullName": "Leaderboard Entries Count",
+      "description": "Leaderboard Entries Count.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "LeaderboardEntryId",
+      "fullName": "Leaderboard Entry Id",
+      "description": "Leaderboard Entry Id.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "LeaderboardEntryName",
+      "fullName": "Leaderboard Entry Name",
+      "description": "Leaderboard Entry Name.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "LeaderboardEntryPhoto",
+      "fullName": "Leaderboard Entry Photo",
+      "description": "Leaderboard Entry Photo.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "LeaderboardEntryRank",
+      "fullName": "Leaderboard Entry Rank",
+      "description": "Leaderboard Entry Rank.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "LeaderboardEntryScore",
+      "fullName": "Leaderboard Entry Score",
+      "description": "Leaderboard Entry Score.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PaymentsPurchase",
+      "fullName": "Payments Purchase",
+      "description": "Payments Purchase.",
+      "functionType": "Action"
+    },
+    {
+      "name": "PaymentsGetPurchases",
+      "fullName": "Payments Get Purchases",
+      "description": "Payments Get Purchases.",
+      "functionType": "Action"
+    },
+    {
+      "name": "PaymentsGetCatalog",
+      "fullName": "Payments Get Catalog",
+      "description": "Payments Get Catalog.",
+      "functionType": "Action"
+    },
+    {
+      "name": "PaymentsConsumePurchase",
+      "fullName": "Payments Consume Purchase",
+      "description": "Payments Consume Purchase.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsPaymentsSupported",
+      "fullName": "Is Payments Supported",
+      "description": "Is Payments Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnPaymentsPurchaseCompleted",
+      "fullName": "On Payments Purchase Completed",
+      "description": "On Payments Purchase Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnPaymentsGetPurchasesCompleted",
+      "fullName": "On Payments Get Purchases Completed",
+      "description": "On Payments Get Purchases Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnPaymentsGetCatalogCompleted",
+      "fullName": "On Payments Get Catalog Completed",
+      "description": "On Payments Get Catalog Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnPaymentsConsumePurchaseCompleted",
+      "fullName": "On Payments Consume Purchase Completed",
+      "description": "On Payments Consume Purchase Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "PaymentsLastPurchasePropertiesCount",
+      "fullName": "Payments Last Purchase Properties Count",
+      "description": "Payments Last Purchase Properties Count.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PaymentsLastPurchasePropertyName",
+      "fullName": "Payments Last Purchase Property Name",
+      "description": "Payments Last Purchase Property Name.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PaymentsLastPurchasePropertyValue",
+      "fullName": "Payments Last Purchase Property Value",
+      "description": "Payments Last Purchase Property Value.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PaymentsPurchasesCount",
+      "fullName": "Payments Purchases Count",
+      "description": "Payments Purchases Count.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PaymentsPurchasePropertiesCount",
+      "fullName": "Payments Purchase Properties Count",
+      "description": "Payments Purchase Properties Count.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PaymentsPurchasePropertyName",
+      "fullName": "Payments Purchase Property Name",
+      "description": "Payments Purchase Property Name.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PaymentsPurchasePropertyValue",
+      "fullName": "Payments Last Purchase Property Value",
+      "description": "Payments Last Purchase Property Value.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PaymentsCatalogItemsCount",
+      "fullName": "Payments Catalog Items Count",
+      "description": "Payments Catalog Items Count.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PaymentsCatalogItemPropertiesCount",
+      "fullName": "Payments Catalog Item Properties Count",
+      "description": "Payments Catalog Item Properties Count.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PaymentsCatalogItemPropertyName",
+      "fullName": "Payments Catalog Item Property Name",
+      "description": "Payments Catalog Item Property Name.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PaymentsCatalogItemPropertyValue",
+      "fullName": "Payments Catalog Item Property Value",
+      "description": "Payments Catalog Item Property Value.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "PaymentsFirstCatalogItemPropertyValue",
+      "fullName": "Payments First Catalog Item Property Value",
+      "description": "Payments First Catalog Item Property Value.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "IsAchievementsSupported",
+      "fullName": "Is Achievements Supported",
+      "description": "Is Achievements Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsAchievementsGetListSupported",
+      "fullName": "Is Achievements Get List Supported",
+      "description": "Is Achievements Get List Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsAchievementsNativePopupSupported",
+      "fullName": "Is Achievements Native Popup Supported",
+      "description": "Is Achievements Native Popup Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnAchievementsUnlockCompleted",
+      "fullName": "On Achievements Unlock Completed",
+      "description": "On Achievements Unlock Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnAchievementsGetListCompleted",
+      "fullName": "On Achievements Get List Completed",
+      "description": "On Achievements Get List Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnAchievementsShowNativePopupCompleted",
+      "fullName": "On Achievements Show Native Popup Completed",
+      "description": "On Achievements Show Native Popup Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "AchievementsCount",
+      "fullName": "Achievements Count",
+      "description": "Achievements Count.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "AchievementPropertiesCount",
+      "fullName": "Achievement Properties Count",
+      "description": "Achievement Properties Count.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "AchievementPropertyName",
+      "fullName": "Achievement Property Name",
+      "description": "Achievement Property Name.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "AchievementPropertyValue",
+      "fullName": "Achievement Property Value",
+      "description": "Achievement Property Value.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "AchievementsUnlock",
+      "fullName": "Achievements Unlock",
+      "description": "Achievements Unlock.",
+      "functionType": "Action"
+    },
+    {
+      "name": "AchievementsGetList",
+      "fullName": "Achievements Get List",
+      "description": "Achievements Get List.",
+      "functionType": "Action"
+    },
+    {
+      "name": "AchievementsShowNativePopup",
+      "fullName": "Achievements Show Native Popup",
+      "description": "Achievements Show Native Popup.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsRemoteConfigSupported",
+      "fullName": "Is Remote Config Supported",
+      "description": "Is Remote Config Supported.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnRemoteConfigGotCompleted",
+      "fullName": "On Remote Config Got Completed",
+      "description": "On Remote Config Got Completed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "HasRemoteConfigValue",
+      "fullName": "Has Remote Config Value",
+      "description": "Has Remote Config Value.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "RemoteConfigValue",
+      "fullName": "Remote Config Value",
+      "description": "Remote Config Value.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "SendRemoteConfigGetRequest",
+      "fullName": "Send Remote Config Get Request",
+      "description": "Send Remote Config Get Request.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsAdBlockDetected",
+      "fullName": "Is Ad Block Detected",
+      "description": "Is Ad Block Detected.",
+      "functionType": "Condition"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "One SDK for cross-platform publishing HTML5 games. \nPlease refer to [Playgama documentation](https://wiki.playgama.com/playgama/sdk/engines/gdevelop) for detailed guidance.",
+  "iconUrl": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiBmaWxsPSIjOTc0N0ZGIi8+CjxwYXRoIGQ9Ik0xMTcgMTU0LjM2MlY5Ni4wMDAxSDIyMy4xMjlWNDE2SDExN1YzNTkuMjU0SDE1OC40NFYxNTQuMzYySDExN1oiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0zOTUgMTU0LjM2MlY5NkgyODguODcxVjQxNkgzOTVWMzU5LjI1NEgzNTMuNTZWMTU0LjM2MkgzOTVaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K"
+}

@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Update checker",
+  "name": "UpdateChecker",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/UpdateChecker.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/UpdateChecker-header.json",
+  "tags": "update,liluo",
+  "category": "Network",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/update.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Checks if the version of the game on liluo is different than the current game version.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 3,
+  "helpPath": "/extensions/update-checker",
+  "description": "With this extension, you can get a very simple update checking mechanism. It will look at the version of your game on liluo, and compare it with the one of the currently running game. If it is different, you can display a message to tell your users they are on an outdated version.\nIf you want your users to see that an update is available, simply change the version in your project properties, and deploy your game to liluo like you would (make an instant build and promote it to the game page's public build).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXVwZGF0ZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0yMSwxMC4xMkgxNC4yMkwxNi45Niw3LjNDMTQuMjMsNC42IDkuODEsNC41IDcuMDgsNy4yQzQuMzUsOS45MSA0LjM1LDE0LjI4IDcuMDgsMTdDOS44MSwxOS43IDE0LjIzLDE5LjcgMTYuOTYsMTdDMTguMzIsMTUuNjUgMTksMTQuMDggMTksMTIuMUgyMUMyMSwxNC4wOCAyMC4xMiwxNi42NSAxOC4zNiwxOC4zOUMxNC44NSwyMS44NyA5LjE1LDIxLjg3IDUuNjQsMTguMzlDMi4xNCwxNC45MiAyLjExLDkuMjggNS42Miw1LjgxQzkuMTMsMi4zNCAxNC43NiwyLjM0IDE4LjI3LDUuODFMMjEsM1YxMC4xMk0xMi41LDhWMTIuMjVMMTYsMTQuMzNMMTUuMjgsMTUuNTRMMTEsMTNWOEgxMi41WiIgLz48L3N2Zz4="
+}

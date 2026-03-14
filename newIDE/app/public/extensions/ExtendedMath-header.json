@@ -1,0 +1,171 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "AlZ3D1xkH0QDao7T37VZZUeYNpn1",
+    "dt0tRnf2kHWJnjkrpnzTzNj9Yc63"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Extended math support",
+  "name": "ExtendedMath",
+  "version": "1.1.1",
+  "url": "https://resources.gdevelop-app.com/extensions/ExtendedMath.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ExtendedMath-header.json",
+  "tags": "math,constants,conversion,coordinates,convert,format,modulus",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/function-variant.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Extra math: clamp, map, lerp, factorial, fibonacci, distance, angle, conversions, constants.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 24,
+  "helpPath": "/extensions/extended-math",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "Fibonacci",
+      "fullName": "Fibonacci numbers",
+      "description": "Returns a term from the Fibonacci sequence.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Slope",
+      "fullName": "Slope",
+      "description": "Calculates the steepness of a line between two points.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Map",
+      "fullName": "Map",
+      "description": "Converts a number of one range e.g. 0-1 to another 0-255.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Hypot",
+      "fullName": "Hypotenuse length",
+      "description": "Returns the value of the length of the hypotenuse.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Gcf",
+      "fullName": "Greatest common factor (gcf)",
+      "description": "Returns the greatest common factor of two numbers.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Lcm",
+      "fullName": "Lowest common multiple (lcm)",
+      "description": "Returns the lowest common multiple of two numbers.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Factorial",
+      "fullName": "Factorial",
+      "description": "Returns the input multiplied by all the previous whole numbers.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PolarToCartesianX",
+      "fullName": "Polar coordinate to Cartesian X value",
+      "description": "Converts a polar coordinate into the Cartesian x value.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PolarToCartesianY",
+      "fullName": "Polar coordinate to Cartesian Y value",
+      "description": "Converts a polar coordinate into the Cartesian y value.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "IsoToCartesianX",
+      "fullName": "Isometric coordinate to Cartesian X value",
+      "description": "Converts a isometric coordinate into the Cartesian x value.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "IisoToCartesianY",
+      "fullName": "Isometric coordinate to Cartesian Y value",
+      "description": "Converts a isometric coordinate into the Cartesian y value.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "GoldenRatio",
+      "fullName": "Golden ratio",
+      "description": "Returns the golden ratio.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Pi",
+      "fullName": "Pi (π)",
+      "description": "Returns Pi (π).",
+      "functionType": "Expression"
+    },
+    {
+      "name": "HalfPi",
+      "fullName": "Half Pi",
+      "description": "Returns half Pi.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "E",
+      "fullName": "Natural logarithm of e",
+      "description": "Returns the natural logarithm of e. (Euler's number).",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Ln2",
+      "fullName": "Natural logarithm of 2",
+      "description": "Returns the natural logarithm of 2.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Ln10",
+      "fullName": "Natural logarithm of 10",
+      "description": "Returns the natural logarithm of 10.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Log2e",
+      "fullName": "Base 2 logarithm of e",
+      "description": "Returns the base 2 logarithm of e. (Euler's number).",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Log10e",
+      "fullName": "Base 10 logarithm of e",
+      "description": "Returns the base 10 logarithm of e. (Euler's number).",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Sqrt2",
+      "fullName": "Square root of 2",
+      "description": "Returns square root of 2.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Sqrt1_2",
+      "fullName": "Square root of 1/2",
+      "description": "Returns square root of 1/2.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "QuarterPi",
+      "fullName": "Quarter Pi",
+      "description": "Returns quarter Pi.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "ToFixedString",
+      "fullName": "ToFixed",
+      "description": "Formats a number to a string with the specified number of decimal places.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "IsEven",
+      "fullName": "Is even?",
+      "description": "Check if the number is even (divisible by 2).  To check for odd numbers, invert this condition.",
+      "functionType": "Condition"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Expressions:\n - Mathematical constants\n - Greatest common factor/Lowest common multiple\n - Factorial\n - Coordinates conversion for polar and isometric systems\n - ToFixedString: Formats a number into a string with the specified number of decimal places\n\nConditions:\n- IsEven: Check if the number is even (divisible by 2).\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZ1bmN0aW9uLXZhcmlhbnQiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIuNDIsNS4yOUMxMS4zMiw1LjE5IDEwLjM1LDYgMTAuMjUsNy4xMUwxMCwxMEgxMi44MlYxMkg5LjgyTDkuMzgsMTcuMDdDOS4xOCwxOS4yNyA3LjI0LDIwLjkgNS4wNCwyMC43QzMuNzksMjAuNTkgMi42NiwxOS45IDIsMTguODNMMy41LDE3LjMzQzMuODMsMTguMzggNC45NiwxOC45NyA2LDE4LjYzQzYuNzgsMTguMzkgNy4zMywxNy43IDcuNCwxNi44OUw3LjgyLDEySDQuODJWMTBIOEw4LjI3LDYuOTNDOC40Niw0LjczIDEwLjM5LDMuMSAxMi42LDMuMjhDMTMuODYsMy4zOSAxNSw0LjA5IDE1LjY2LDUuMTdMMTQuMTYsNi42N0MxMy45MSw1LjkgMTMuMjMsNS4zNiAxMi40Miw1LjI5TTIyLDEzLjY1TDIwLjU5LDEyLjI0TDE3Ljc2LDE1LjA3TDE0LjkzLDEyLjI0TDEzLjUsMTMuNjVMMTYuMzUsMTYuNUwxMy41LDE5LjMxTDE0LjkzLDIwLjcyTDE3Ljc2LDE3Ljg5TDIwLjU5LDIwLjcyTDIyLDE5LjMxTDE5LjE3LDE2LjVMMjIsMTMuNjVaIiAvPjwvc3ZnPg=="
+}

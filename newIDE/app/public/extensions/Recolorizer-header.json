@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Object recolorizer (experimental)",
+  "name": "Recolorizer",
+  "version": "0.1.4",
+  "url": "https://resources.gdevelop-app.com/extensions/Recolorizer.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Recolorizer-header.json",
+  "tags": "color,hue,saturation,lightness,hsl,hsv,rgb",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Graphic Design/Graphic Design_color_colour_palette_paint_brush.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Independently change the colors of a sprite, a tiled sprite or a panel sprite.",
+  "eventsBasedBehaviorsCount": 3,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/recolorizer",
+  "description": "This extension allows to restyle a sprite, a tiled sprite or a panel sprite.\n\nIt can be used to:\n- Change the color of player short according to its team color.\n- Add small color variation to trees of a forest.\n- Restyle objects to match other assets.\n\nAn example shows how to change the 2 main colors of an object ([open the project online](https://editor.gdevelop.io/?project=example://recolorizer)).\n\nThis extension is experimental and might no longer work in future version of GDevelop.\nThe [color map effect](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layer-effects/#color-map) is the prefered way to recolorize 2D objects.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO30NCgkuc3Qye2ZpbGw6bm9uZTtzdHJva2U6IzAwMDAwMDtzdHJva2Utd2lkdGg6MjtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLWRhc2hhcnJheTo2LDY7fQ0KCS5zdDN7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtZGFzaGFycmF5OjQsNDt9DQoJLnN0NHtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7fQ0KCS5zdDV7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1kYXNoYXJyYXk6My4xMDgxLDMuMTA4MTt9DQoJDQoJCS5zdDZ7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDtzdHJva2UtZGFzaGFycmF5OjQsMzt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE2LjksMTRjLTEuOCwwLTMuMywxLjQtMy4zLDMuMXYwLjdjMCwxLjEtMC42LDEuOS0xLjYsMi4ybDAsMGgxLjZsMy4xLDBjMS44LDAsMy40LTEuNCwzLjMtMy4xDQoJQzIwLDE1LjMsMTguNiwxNCwxNi45LDE0eiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIwLjMsMTEuNUMxOC45LDExLjIsMTcuNSwxMSwxNiwxMWMtNy4yLDAtMTMsNC0xMyw5YzAsMSwwLjIsMiwwLjcsMi45YzEsMiwzLjYsMi42LDUuNCwxLjNsMCwwDQoJYzIuNC0xLjcsNS44LDAsNS44LDNWMjljMC40LDAsMC43LDAsMS4xLDBjNy4yLDAsMTMtNCwxMy05YzAtMi4yLTEuMS00LjItMi45LTUuNyIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE3LjQsMTQuMWw5LjgtOC44YzAuNC0wLjQsMS4xLTAuNCwxLjUsMGwwLDBjMC40LDAuNCwwLjQsMSwwLDEuNEwyMCwxNiIvPg0KPC9zdmc+DQo="
+}

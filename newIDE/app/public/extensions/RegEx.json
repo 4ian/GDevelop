@@ -1,0 +1,436 @@
+{
+  "author": "Add00",
+  "category": "Advanced",
+  "description": "Conditions, actions and expressions to use regular expressions with strings, such as:  \n- Find the position of pattern in a string \n- Find a pattern in a string\n- Split a string by a pattern\n- Check if a string matches a pattern\n- Replace patterns in a string with another string",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Regular Expressions",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXJlZ2V4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE2LDE2LjkyQzE1LjY3LDE2Ljk3IDE1LjM0LDE3IDE1LDE3QzE0LjY2LDE3IDE0LjMzLDE2Ljk3IDE0LDE2LjkyVjEzLjQxTDExLjUsMTUuODlDMTEsMTUuNSAxMC41LDE1IDEwLjExLDE0LjVMMTIuNTksMTJIOS4wOEM5LjAzLDExLjY3IDksMTEuMzQgOSwxMUM5LDEwLjY2IDkuMDMsMTAuMzMgOS4wOCwxMEgxMi41OUwxMC4xMSw3LjVDMTAuMyw3LjI1IDEwLjUsNyAxMC43Niw2Ljc2VjYuNzZDMTEsNi41IDExLjI1LDYuMyAxMS41LDYuMTFMMTQsOC41OVY1LjA4QzE0LjMzLDUuMDMgMTQuNjYsNSAxNSw1QzE1LjM0LDUgMTUuNjcsNS4wMyAxNiw1LjA4VjguNTlMMTguNSw2LjExQzE5LDYuNSAxOS41LDcgMTkuODksNy41TDE3LjQxLDEwSDIwLjkyQzIwLjk3LDEwLjMzIDIxLDEwLjY2IDIxLDExQzIxLDExLjM0IDIwLjk3LDExLjY3IDIwLjkyLDEySDE3LjQxTDE5Ljg5LDE0LjVDMTkuNywxNC43NSAxOS41LDE1IDE5LjI0LDE1LjI0VjE1LjI0QzE5LDE1LjUgMTguNzUsMTUuNyAxOC41LDE1Ljg5TDE2LDEzLjQxVjE2LjkySDE2VjE2LjkyTTUsMTlBMiwyIDAgMCwxIDcsMTdBMiwyIDAgMCwxIDksMTlBMiwyIDAgMCwxIDcsMjFBMiwyIDAgMCwxIDUsMTlINVoiIC8+PC9zdmc+",
+  "name": "RegEx",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/regex.svg",
+  "shortDescription": "Manipulates string with regular expressions.",
+  "version": "1.0.0",
+  "tags": "regular,expression,regex,string,pattern,match,find,replace,split",
+  "authorIds": [
+    "AlZ3D1xkH0QDao7T37VZZUeYNpn1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Checks if a string matches a regex pattern.",
+      "fullName": "String matches regex pattern",
+      "functionType": "Condition",
+      "name": "HasPattern",
+      "private": false,
+      "sentence": "_PARAM3_ matches pattern _PARAM1_ (flags: _PARAM2_)",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const re = new RegExp(eventsFunctionContext.getArgument(\"pattern\"), eventsFunctionContext.getArgument(\"flags\"));\n/** @type {string} */\nconst str = eventsFunctionContext.getArgument(\"string\");\n\neventsFunctionContext.returnValue = re.test(str);\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The pattern to check for",
+          "longDescription": "",
+          "name": "pattern",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "RegEx flags",
+          "longDescription": "",
+          "name": "flags",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The string to check for a pattern",
+          "longDescription": "",
+          "name": "string",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Split a string by each part of it that matches a regex pattern and stores each part into an array.",
+      "fullName": "Split a string into an array",
+      "functionType": "Action",
+      "name": "Split",
+      "private": false,
+      "sentence": "Split string _PARAM3_ into array _PARAM4_ by pattern _PARAM1_ (flags: _PARAM2_)",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const re = new RegExp(eventsFunctionContext.getArgument(\"pattern\"), eventsFunctionContext.getArgument(\"flags\"));\n/** @type {string} */\nconst str = eventsFunctionContext.getArgument(\"string\");\nconst variable = runtimeScene.getVariables().get(eventsFunctionContext.getArgument(\"variable\"));\n\nvariable.fromJSObject(str.split(re));\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The pattern to split by",
+          "longDescription": "",
+          "name": "pattern",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "RegEx flags",
+          "longDescription": "",
+          "name": "flags",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The string to split by the pattern",
+          "longDescription": "",
+          "name": "string",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The name of the variable to store the result in",
+          "longDescription": "",
+          "name": "variable",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Builds an array containing all matches for a regex pattern.",
+      "fullName": "Find all matches for a regex pattern",
+      "functionType": "Action",
+      "name": "GetAllMatches",
+      "private": false,
+      "sentence": "Store all matches of _PARAM3_ with pattern _PARAM1_ in _PARAM4_ (flags: _PARAM2_)",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const re = new RegExp(eventsFunctionContext.getArgument(\"pattern\"), eventsFunctionContext.getArgument(\"flags\"));\r\n/** @type {string} */\r\nconst str = eventsFunctionContext.getArgument(\"string\");\r\nconst variable = runtimeScene.getVariables().get(eventsFunctionContext.getArgument(\"variable\"));\r\n\r\nvariable.fromJSObject(str.match(re) || []);\r\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Pattern",
+          "longDescription": "",
+          "name": "pattern",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "RegEx flags",
+          "longDescription": "",
+          "name": "flags",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "String",
+          "longDescription": "",
+          "name": "string",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The name of the variable to store the result in",
+          "longDescription": "",
+          "name": "variable",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Builds an array containing the first match for a regex pattern followed by the regex groups.",
+      "fullName": "Find first match with groups for a regex pattern",
+      "functionType": "Action",
+      "name": "GetFirstMatchAndGroups",
+      "private": false,
+      "sentence": "Store first match and groups of _PARAM3_ with pattern _PARAM1_ in _PARAM4_ (flags: _PARAM2_)",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const re = new RegExp(eventsFunctionContext.getArgument(\"pattern\"), eventsFunctionContext.getArgument(\"flags\"));\n/** @type {string} */\nconst str = eventsFunctionContext.getArgument(\"string\");\nconst variable = runtimeScene.getVariables().get(eventsFunctionContext.getArgument(\"variable\"));\n\nvariable.fromJSObject(re.exec(str) || []);\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Pattern",
+          "longDescription": "",
+          "name": "pattern",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Flags",
+          "longDescription": "",
+          "name": "flags",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "String",
+          "longDescription": "",
+          "name": "string",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Variable name",
+          "longDescription": "",
+          "name": "variable",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Builds an array containing for each regex pattern match an array with the match followed by its regex groups.",
+      "fullName": "Find all matches with their groups for a regex pattern",
+      "functionType": "Action",
+      "name": "GetAllMatchesAndGroups",
+      "private": false,
+      "sentence": "Store all matches and groups of _PARAM3_ with pattern _PARAM1_ in _PARAM4_ (flags: _PARAM2_)",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const re = new RegExp(eventsFunctionContext.getArgument(\"pattern\"), eventsFunctionContext.getArgument(\"flags\"));\r\n/** @type {string} */\r\nconst str = eventsFunctionContext.getArgument(\"string\");\r\nconst variable = runtimeScene.getVariables().get(eventsFunctionContext.getArgument(\"variable\"));\r\n\r\nvariable.fromJSObject(Array.from(str.matchAll(re)));\r\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Pattern",
+          "longDescription": "",
+          "name": "pattern",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "RegEx flags",
+          "longDescription": "",
+          "name": "flags",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "String",
+          "longDescription": "",
+          "name": "string",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The name of the variable to store the result in",
+          "longDescription": "",
+          "name": "variable",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Replaces a part of a string that matches a regex pattern with another string.",
+      "fullName": "Replace pattern matches with a string",
+      "functionType": "StringExpression",
+      "name": "Replace",
+      "private": false,
+      "sentence": "Execute _PARAM1_ with the following _PARAM2_ for a match in _PARAM3_, and store the result in _PARAM4_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const re = new RegExp(eventsFunctionContext.getArgument(\"pattern\"), eventsFunctionContext.getArgument(\"flags\"));\n/** @type {string} */\nconst str = eventsFunctionContext.getArgument(\"string\");\n\neventsFunctionContext.returnValue = str.replace(re, eventsFunctionContext.getArgument(\"newString\"));\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The pattern to check for",
+          "longDescription": "",
+          "name": "pattern",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "RegEx flags",
+          "longDescription": "",
+          "name": "flags",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The string to search for pattern matches in",
+          "longDescription": "",
+          "name": "string",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The string to replace the matching patterns with",
+          "longDescription": "",
+          "name": "newString",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Finds a regex pattern in a string, and returns the index of the position of the match, or -1 if it doesn't match the pattern.",
+      "fullName": "Find a pattern",
+      "functionType": "Expression",
+      "name": "Find",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const re = new RegExp(eventsFunctionContext.getArgument(\"pattern\"), eventsFunctionContext.getArgument(\"flags\"));\r\n/** @type {string} */\r\nconst str = eventsFunctionContext.getArgument(\"string\");\r\n\r\neventsFunctionContext.returnValue = str.search(re);\r\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Pattern",
+          "longDescription": "",
+          "name": "pattern",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "RegEx flags",
+          "longDescription": "",
+          "name": "flags",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "String",
+          "longDescription": "",
+          "name": "string",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

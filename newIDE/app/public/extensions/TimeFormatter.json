@@ -1,0 +1,111 @@
+{
+  "author": "@Bouh",
+  "category": "User interface",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Time formatting",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNsb2NrLWRpZ2l0YWwiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMiw2QTIsMiAwIDAsMCAwLDhWMTZBMiwyIDAgMCwwIDIsMThIMjJBMiwyIDAgMCwwIDI0LDE2VjhBMiwyIDAgMCwwIDIyLDZNMiw4SDIyVjE2SDJNMyw5VjEwLjVINi4yNUwzLDE1SDQuNzVMOCwxMC41VjlNOS4yNSw5VjEwLjVIMTAuNzVWOU0xMiw5VjEwLjVIMTMuNVYxNUgxNVY5TTE3LDlBMSwxIDAgMCwwIDE2LDEwVjE0QTEsMSAwIDAsMCAxNywxNUgyMEExLDEgMCAwLDAgMjEsMTRWMTBBMSwxIDAgMCwwIDIwLDlNMTcuNSwxMC41SDE5LjVWMTMuNUgxNy41TTkuMjUsMTMuNVYxNUgxMC43NVYxMy41IiAvPjwvc3ZnPg==",
+  "name": "TimeFormatter",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/clock-digital.svg",
+  "shortDescription": "Format seconds into HH:MM:SS or HH:MM:SS.000 time display strings.",
+  "version": "0.0.2",
+  "description": [
+    "Ideal for displaying timers on screen.",
+    "",
+    "Formats included:",
+    "* HH:MM:SS",
+    "* HH:MM:SS.000 (displays milliseconds)"
+  ],
+  "origin": {
+    "identifier": "TimeFormatter",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "time,timer,format,hours,minutes,seconds,milliseconds",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Format time in seconds to HH:MM:SS.",
+      "fullName": "Format time in seconds to HH:MM:SS",
+      "functionType": "StringExpression",
+      "name": "SecondsToHHMMSS",
+      "sentence": "Format time _PARAM1_ to HH:MM:SS in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "var format_time = function (time_second) {\r",
+            "    date = new Date(null);\r",
+            "    date.setSeconds(time_second);\r",
+            "    if (time_second >= 3600) {\r",
+            "        return date.toISOString().substr(11, 8); // MM:SS\r",
+            "    } else {\r",
+            "        return date.toISOString().substr(14, 5); // HH:MM:SS\r",
+            "    }\r",
+            "}\r",
+            "\r",
+            "eventsFunctionContext.returnValue = format_time(eventsFunctionContext.getArgument(\"TimeInSeconds\"));"
+          ],
+          "parameterObjects": "",
+          "useStrict": false,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Time, in seconds",
+          "name": "TimeInSeconds",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Format time in seconds to HH:MM:SS.000, including milliseconds.",
+      "fullName": "Format time in seconds to HH:MM:SS.000",
+      "functionType": "StringExpression",
+      "name": "SecondsToHHMMSS000",
+      "sentence": "Format time _PARAM1_ to HH:MM:SS in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "var format_time = function (time_second) {\r",
+            "    date = new Date(null);\r",
+            "    date.setMilliseconds(1000*time_second);\r",
+            "    if (time_second >= 3600) {\r",
+            "        return date.toISOString().substr(11, 12); // MM:SS.000\r",
+            "    } else {\r",
+            "        return date.toISOString().substr(14, 9); // HH:MM:SS.000\r",
+            "    }\r",
+            "}\r",
+            "\r",
+            "eventsFunctionContext.returnValue = format_time(eventsFunctionContext.getArgument(\"TimeInSeconds\"));"
+          ],
+          "parameterObjects": "",
+          "useStrict": false,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Time, in seconds",
+          "name": "TimeInSeconds",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

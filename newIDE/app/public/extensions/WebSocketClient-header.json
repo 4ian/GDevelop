@@ -1,0 +1,89 @@
+{
+  "tier": "reviewed",
+  "extensionNamespace": "",
+  "fullName": "WebSocket client",
+  "name": "WebSocketClient",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/WebSocketClient.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/WebSocketClient-header.json",
+  "tags": "web,socket,networking,multiplayer,server,client,connection",
+  "category": "Network",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Communication/Communication_pc_server_sync_sharing.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "WebSocket client: connect to server, send/receive string messages in real-time.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 11,
+  "helpPath": "/extensions/web-socket-client",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "IsConnecting",
+      "fullName": "Connecting to a server",
+      "description": "Triggers if the client is currently connecting to the WebSocket server.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsConnected",
+      "fullName": "Connected to a server",
+      "description": "Triggers if the client is connected to a WebSocket server.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsClosed",
+      "fullName": "Connection to a server was closed",
+      "description": "Triggers if the connection to a WebSocket server was closed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "Connect",
+      "fullName": "Connect to server",
+      "description": "Connects to a WebSocket server. ",
+      "functionType": "Action"
+    },
+    {
+      "name": "Disconnect",
+      "fullName": "Disconnect from server",
+      "description": "Disconnects from the current WebSocket server.",
+      "functionType": "Action"
+    },
+    {
+      "name": "EventReceived",
+      "fullName": "An event was received",
+      "description": "Triggers when the server has sent the client some data.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "Data",
+      "fullName": "Data from server",
+      "description": "Returns the piece of data from the server that is currently being processed.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "FinalizeEvent",
+      "fullName": "Mark as processed",
+      "description": "Dismisses an event after processing it to allow processing the next one without waiting for the next frame.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Send",
+      "fullName": "Send data to the server",
+      "description": "Sends a string to the server.",
+      "functionType": "Action"
+    },
+    {
+      "name": "OnError",
+      "fullName": "An error occurred",
+      "description": "Triggers when a WebSocket error has occurred.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "LastError",
+      "fullName": "Get last error",
+      "description": "Gets the last error that occurred.",
+      "functionType": "StringExpression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "This extension allows to use WebSocket based networking. \nYou can use it to interact with a WebSocket based API, or a server for your multiplayer game.\n\nFeatures:\n - Connection and disconnection from a server\n - Receiving strings from the server\n - Sending strings to the server\n - Error handling\n - Handling more than 1 event per frame\n\nDoesn't contain:\n - Sending or receiving binary data\n - A WebSocket server",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCgkuc3Qye2ZpbGw6bm9uZTtzdHJva2U6IzAwMDAwMDtzdHJva2Utd2lkdGg6MjtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE2LDI2YzUuNSwwLDEwLTQuNSwxMC0xMGwzLDQiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNiw2QzEwLjUsNiw2LDEwLjUsNiwxNmwtMy00Ii8+DQo8cmVjdCB4PSI1IiB5PSIyMSIgY2xhc3M9InN0MCIgd2lkdGg9IjgiIGhlaWdodD0iNSIvPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSIxNSwyOSAzLDI5IDUsMjYgMTMsMjYgIi8+DQo8cmVjdCB4PSIyMCIgeT0iMyIgY2xhc3M9InN0MCIgd2lkdGg9IjciIGhlaWdodD0iMTAiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyMCIgeTE9IjciIHgyPSIyNyIgeTI9IjciLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyMyIgeTE9IjEwIiB4Mj0iMjUiIHkyPSIxMCIvPg0KPC9zdmc+DQo="
+}

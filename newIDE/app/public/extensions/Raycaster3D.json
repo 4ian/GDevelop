@@ -1,0 +1,684 @@
+{
+  "author": "",
+  "category": "General",
+  "extensionNamespace": "",
+  "fullName": "3D raycast",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXJheS1zdGFydC1hcnJvdyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0yMywxMkwxOSwxNlYxM0g2LjgzQzYuNDIsMTQuMTcgNS4zMSwxNSA0LDE1QTMsMyAwIDAsMSAxLDEyQTMsMyAwIDAsMSA0LDlDNS4zMSw5IDYuNDIsOS44MyA2LjgzLDExSDE5VjhMMjMsMTJaIiAvPjwvc3ZnPg==",
+  "name": "Raycaster3D",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/8419f46b76bce482c14b4c03b4141a64d457e4cdc92686f3470381f5d2694abd_ray-start-arrow.svg",
+  "shortDescription": "Find 3D objects that cross a line.",
+  "version": "0.1.7",
+  "description": [
+    "It can be useful to:",
+    "- Find 3D objects under the pointer",
+    "- Target objects from a 1st person view",
+    "- Make AI that detect objects in their field of view"
+  ],
+  "origin": {
+    "identifier": "Raycaster3D",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "3d,recast,collision",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "Raycaster3D::DefineHelperClasses"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Define helper classes JavaScript code.",
+      "fullName": "Define helper classes",
+      "functionType": "Action",
+      "name": "DefineHelperClasses",
+      "private": true,
+      "sentence": "Define helper classes JavaScript code",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (gdjs.__raycaster3DExtension) {",
+            "    return;",
+            "}",
+            "",
+            "class Raycaster {",
+            "    raycaster = new THREE.Raycaster();",
+            "    pointer = new THREE.Vector2();",
+            "    /** @type {Array<THREE.Intersection>} */",
+            "    raycastResults = [];",
+            "    lastDistance = 0;",
+            "    lastPositionX = 0;",
+            "    lastPositionY = 0;",
+            "    lastPositionZ = 0;",
+            "    lastNormal = new THREE.Vector3();",
+            "",
+            "    /**",
+            "     * @param objectsLists {Hashtable<gdjs.RuntimeObject[]>}",
+            "     * @param objects {gdjs.RuntimeObject[]}",
+            "     * @param pointerX {number}",
+            "     * @param pointerY {number}",
+            "     * @param distanceMax {number}",
+            "     */",
+            "    recastFromCamera(objectsLists, objects, pointerX, pointerY, distanceMax) {",
+            "        if (objects.length === 0) {",
+            "            return false;",
+            "        }",
+            "        const object = objects[0];",
+            "        const layer = object.getInstanceContainer().getLayer(object.getLayer());",
+            "        const camera = layer.getRenderer().getThreeCamera();",
+            "",
+            "        const raycaster = this.raycaster;",
+            "        const pointer = this.pointer;",
+            "        pointer.x = -1 + 2 * pointerX;",
+            "        pointer.y = 1 - 2 * pointerY;",
+            "        raycaster.setFromCamera(pointer, camera);",
+            "        raycaster.far = distanceMax;",
+            "",
+            "        return this._doRecast(objectsLists, objects);",
+            "    }",
+            "",
+            "    /**",
+            "     * @param objectsLists {Hashtable<gdjs.RuntimeObject[]>}",
+            "     * @param objects {gdjs.RuntimeObject[]}",
+            "     * @param originX {number}",
+            "     * @param originY {number}",
+            "     * @param originZ {number}",
+            "     * @param rotationAngle {number}",
+            "     * @param elevationAngle {number}",
+            "     * @param distanceMax {number}",
+            "     */",
+            "    recastWithAngle(",
+            "        objectsLists,",
+            "        objects,",
+            "        originX,",
+            "        originY,",
+            "        originZ,",
+            "        rotationAngle,",
+            "        elevationAngle,",
+            "        distanceMax",
+            "    ) {",
+            "        if (objects.length === 0) {",
+            "            return false;",
+            "        }",
+            "        const raycaster = this.raycaster;",
+            "        raycaster.ray.origin.set(",
+            "            originX,",
+            "            -originY,",
+            "            originZ,",
+            "        );",
+            "        const rotation = rotationAngle * Math.PI / 180;",
+            "        const elevation = elevationAngle * Math.PI / 180;",
+            "        const cosElevation = Math.cos(elevation);",
+            "        raycaster.ray.direction.set(",
+            "            Math.cos(rotation) * cosElevation,",
+            "            -Math.sin(rotation) * cosElevation,",
+            "            Math.sin(elevation),",
+            "        );",
+            "        raycaster.far = distanceMax;",
+            "",
+            "        return this._doRecast(objectsLists, objects);",
+            "    }",
+            "",
+            "    /**",
+            "     * @param objectsLists {Hashtable<gdjs.RuntimeObject[]>}",
+            "     * @param objects {gdjs.RuntimeObject[]}",
+            "     * @param originX {number}",
+            "     * @param originY {number}",
+            "     * @param originZ {number}",
+            "     * @param targetX {number}",
+            "     * @param targetY {number}",
+            "     * @param targetZ {number}",
+            "     * @param distanceMax {number}",
+            "     */",
+            "    recastBetweenPosition(",
+            "        objectsLists,",
+            "        objects,",
+            "        originX,",
+            "        originY,",
+            "        originZ,",
+            "        targetX,",
+            "        targetY,",
+            "        targetZ",
+            "    ) {",
+            "        if (objects.length === 0) {",
+            "            return false;",
+            "        }",
+            "        const raycaster = this.raycaster;",
+            "        raycaster.ray.origin.set(",
+            "            originX,",
+            "            -originY,",
+            "            originZ,",
+            "        );",
+            "        const deltaX = targetX - originX;",
+            "        const deltaY = targetY - originY;",
+            "        const deltaZ = targetZ - originZ;",
+            "        const deltaLength = Math.hypot(deltaX, deltaY, deltaZ);",
+            "        raycaster.ray.direction.set(",
+            "            deltaX / deltaLength,",
+            "            -deltaY / deltaLength,",
+            "            deltaZ / deltaLength,",
+            "        );",
+            "        raycaster.far = deltaLength;",
+            "",
+            "        return this._doRecast(objectsLists, objects);",
+            "    }",
+            "",
+            "    /**",
+            "     * @param objectsLists {Hashtable<gdjs.RuntimeObject[]>}",
+            "     * @param objects {gdjs.RuntimeObject[]}",
+            "     */",
+            "    _doRecast(objectsLists, objects) {",
+            "        const raycastResults = this.raycastResults;",
+            "        let distanceMin = Number.MAX_VALUE;",
+            "        /** @type {gdjs.RuntimeObject | null} */",
+            "        let nearestObject = null;",
+            "        /** @type {THREE.Object3D | null} */",
+            "        let nearestThreeObject = null;",
+            "        for (const object of objects) {",
+            "            raycastResults.length = 0;",
+            "            const threeObject = object.get3DRendererObject();",
+            "            if (!threeObject) {",
+            "                continue;",
+            "            }",
+            "            this.raycaster.intersectObject(threeObject, true, raycastResults);",
+            "            if (raycastResults.length > 0 && raycastResults[0].distance < distanceMin) {",
+            "                const raycastResult = raycastResults[0];",
+            "                distanceMin = raycastResult.distance;",
+            "                nearestObject = object;",
+            "                this.lastDistance = raycastResult.distance;",
+            "                this.lastPositionX = raycastResult.point.x;",
+            "                this.lastPositionY = -raycastResult.point.y;",
+            "                this.lastPositionZ = raycastResult.point.z;",
+            "                this.lastNormal.copy(raycastResult.normal);",
+            "                nearestThreeObject = raycastResult.object;",
+            "            }",
+            "        }",
+            "        if (!nearestObject) {",
+            "            return false;",
+            "        }",
+            "        this.lastNormal.transformDirection(nearestThreeObject.matrixWorld);",
+            "        this.lastNormal.y = -this.lastNormal.y;",
+            "        raycastResults.length = 0;",
+            "        gdjs.evtTools.object.pickOnly(",
+            "            objectsLists,",
+            "            nearestObject",
+            "        );",
+            "        return true;",
+            "    }",
+            "}",
+            "",
+            "gdjs.__raycaster3DExtension = {",
+            "    Raycaster,",
+            "    raycaster: new Raycaster(),",
+            "}",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Sends a ray from the given source position and angle, intersecting the closest object. The intersected object will become the only one taken into account.",
+      "fullName": "Raycast",
+      "functionType": "Condition",
+      "group": "Collision",
+      "name": "RaycastWithAngle",
+      "sentence": "Cast a ray from _PARAM2_; _PARAM3_; _PARAM4_ toward a rotation of _PARAM5_°, an elevation of _PARAM6_° and max distance of _PARAM7_ against _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue =",
+            "    gdjs.__raycaster3DExtension.raycaster.recastWithAngle(",
+            "        eventsFunctionContext.getObjectsLists(\"Object\"),",
+            "        objects,",
+            "        eventsFunctionContext.getArgument(\"OriginX\"),",
+            "        eventsFunctionContext.getArgument(\"OriginY\"),",
+            "        eventsFunctionContext.getArgument(\"OriginZ\"),",
+            "        eventsFunctionContext.getArgument(\"RotationAngle\"),",
+            "        eventsFunctionContext.getArgument(\"ElevationAngle\"),",
+            "        eventsFunctionContext.getArgument(\"DistanceMax\")",
+            "    );",
+            ""
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Objects to test against the ray",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Ray source X position",
+          "name": "OriginX",
+          "type": "expression"
+        },
+        {
+          "description": "Ray source Y position",
+          "name": "OriginY",
+          "type": "expression"
+        },
+        {
+          "description": "Ray source Z position",
+          "name": "OriginZ",
+          "type": "expression"
+        },
+        {
+          "description": "Rotation angle (in degrees)",
+          "name": "RotationAngle",
+          "type": "expression"
+        },
+        {
+          "description": "Elevation angle (in degrees)",
+          "name": "ElevationAngle",
+          "type": "expression"
+        },
+        {
+          "description": "Ray maximum distance (in pixels)",
+          "name": "DistanceMax",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Sends a ray from the given source position to the final point, intersecting the closest object. The intersected object will become the only one taken into account.",
+      "fullName": "Raycast to a position",
+      "functionType": "Condition",
+      "group": "Collision",
+      "name": "RaycastBetweenPosition",
+      "sentence": "Cast a ray from _PARAM2_; _PARAM3_; _PARAM4_ to _PARAM5_; _PARAM6_; _PARAM7_ against _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue =",
+            "    gdjs.__raycaster3DExtension.raycaster.recastBetweenPosition(",
+            "        eventsFunctionContext.getObjectsLists(\"Object\"),",
+            "        objects,",
+            "        eventsFunctionContext.getArgument(\"OriginX\"),",
+            "        eventsFunctionContext.getArgument(\"OriginY\"),",
+            "        eventsFunctionContext.getArgument(\"OriginZ\"),",
+            "        eventsFunctionContext.getArgument(\"TargetX\"),",
+            "        eventsFunctionContext.getArgument(\"TargetY\"),",
+            "        eventsFunctionContext.getArgument(\"TargetZ\")",
+            "    );",
+            ""
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Objects to test against the ray",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Ray source X position",
+          "name": "OriginX",
+          "type": "expression"
+        },
+        {
+          "description": "Ray source Y position",
+          "name": "OriginY",
+          "type": "expression"
+        },
+        {
+          "description": "Ray source Z position",
+          "name": "OriginZ",
+          "type": "expression"
+        },
+        {
+          "description": "Ray target X position",
+          "name": "TargetX",
+          "type": "expression"
+        },
+        {
+          "description": "Ray target Y position",
+          "name": "TargetY",
+          "type": "expression"
+        },
+        {
+          "description": "Ray target Z position",
+          "name": "TargetZ",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Sends a ray from the center of the camera, intersecting the closest object. The intersected object will become the only one taken into account.",
+      "fullName": "Raycast from camera center",
+      "functionType": "Condition",
+      "group": "Collision",
+      "name": "RaycastFromCameraCenter",
+      "sentence": "Cast a ray from the camera center to a maximum distance of _PARAM2_ against _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue =",
+            "    gdjs.__raycaster3DExtension.raycaster.recastFromCamera(",
+            "        eventsFunctionContext.getObjectsLists(\"Object\"),",
+            "        objects,",
+            "        0.5,",
+            "        0.5,",
+            "        eventsFunctionContext.getArgument(\"DistanceMax\")",
+            "    );",
+            ""
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Objects to test against the ray",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Ray maximum distance (in pixels)",
+          "name": "DistanceMax",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Sends a ray from the given source point on the camera screen, intersecting the closest object. The intersected object will become the only one taken into account.",
+      "fullName": "Raycast from a camera point",
+      "functionType": "Condition",
+      "group": "Collision",
+      "name": "RaycastFromCameraPoint",
+      "sentence": "Cast a ray from the camera point _PARAM2_; _PARAM3_ to a maximum distance of _PARAM4_ against _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue =",
+            "    gdjs.__raycaster3DExtension.raycaster.recastFromCamera(",
+            "        eventsFunctionContext.getObjectsLists(\"Object\"),",
+            "        objects,",
+            "        eventsFunctionContext.getArgument(\"PointerX\"),",
+            "        eventsFunctionContext.getArgument(\"PointerY\"),",
+            "        eventsFunctionContext.getArgument(\"DistanceMax\")",
+            "    );",
+            ""
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Objects to test against the ray",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "X position on the screen (from 0 to 1)",
+          "name": "PointerX",
+          "type": "expression"
+        },
+        {
+          "description": "Y position on the screen (from 0 to 1)",
+          "name": "PointerY",
+          "type": "expression"
+        },
+        {
+          "description": "Ray maximum distance (in pixels)",
+          "name": "DistanceMax",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Sends a ray from the cursor on the camera screen, intersecting the closest object. The intersected object will become the only one taken into account.",
+      "fullName": "Raycast from cursor",
+      "functionType": "Condition",
+      "group": "Collision",
+      "name": "RaycastFromCameraCursor",
+      "sentence": "Cast a ray from the cursor on 2D layer: _PARAM2_ to a maximum distance of _PARAM3_ against _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const { camera, input } = gdjs.evtTools;",
+            "",
+            "const layer2D = eventsFunctionContext.getArgument(\"Layer2D\");",
+            "",
+            "const cameraMinX = camera.getCameraBorderLeft(runtimeScene, layer2D, 0);",
+            "const cameraMaxX = camera.getCameraBorderRight(runtimeScene, layer2D, 0);",
+            "const cameraMinY = camera.getCameraBorderTop(runtimeScene, layer2D, 0);",
+            "const cameraMaxY = camera.getCameraBorderBottom(runtimeScene, layer2D, 0);",
+            "",
+            "const cursorX = input.getCursorX(runtimeScene, layer2D, 0);",
+            "const cursorY = input.getCursorY(runtimeScene, layer2D, 0);",
+            "",
+            "eventsFunctionContext.returnValue =",
+            "    gdjs.__raycaster3DExtension.raycaster.recastFromCamera(",
+            "        eventsFunctionContext.getObjectsLists(\"Object\"),",
+            "        objects,",
+            "        (cursorX - cameraMinX) / (cameraMaxX - cameraMinX),",
+            "        (cursorY - cameraMinY) / (cameraMaxY - cameraMinY),",
+            "        eventsFunctionContext.getArgument(\"DistanceMax\")",
+            "    );",
+            ""
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Objects to test against the ray",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "2D layer",
+          "name": "Layer2D",
+          "type": "layer"
+        },
+        {
+          "description": "Ray maximum distance (in pixels)",
+          "name": "DistanceMax",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "the last recast intersection distance.",
+      "fullName": "Last recast distance",
+      "functionType": "ExpressionAndCondition",
+      "name": "Distance",
+      "sentence": "the last recast intersection distance",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs.__raycaster3DExtension.raycaster.lastDistance;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the last recast intersection position on X axis.",
+      "fullName": "Last recast X intersection",
+      "functionType": "Expression",
+      "name": "IntersectionX",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs.__raycaster3DExtension.raycaster.lastPositionX;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the last recast intersection position on Y axis.",
+      "fullName": "Last recast Y intersection",
+      "functionType": "Expression",
+      "name": "IntersectionY",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs.__raycaster3DExtension.raycaster.lastPositionY;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the last recast intersection position on Z axis.",
+      "fullName": "Last recast Z intersection",
+      "functionType": "Expression",
+      "name": "IntersectionZ",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs.__raycaster3DExtension.raycaster.lastPositionZ;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the last recast intersection normal on X axis.",
+      "fullName": "Last recast X normal",
+      "functionType": "Expression",
+      "name": "NormalX",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs.__raycaster3DExtension.raycaster.lastNormal.x;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the last recast intersection normal on X axis.",
+      "fullName": "Last recast X normal",
+      "functionType": "Expression",
+      "name": "NormalY",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs.__raycaster3DExtension.raycaster.lastNormal.y;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the last recast intersection normal on Z axis.",
+      "fullName": "Last recast Z normal",
+      "functionType": "Expression",
+      "name": "NormalZ",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs.__raycaster3DExtension.raycaster.lastNormal.z;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

@@ -1,0 +1,107 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Toggle switch",
+  "name": "SpriteToggleSwitch",
+  "version": "2.0.2",
+  "url": "https://resources.gdevelop-app.com/extensions/SpriteToggleSwitch.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/SpriteToggleSwitch-header.json",
+  "tags": "ui,widget,toggle,switch,check box",
+  "category": "User interface",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Interface Elements/8d0cd8cd0c9318f4f6efde6ee6b4c192bd19306467f80c9970387a259300f895_Interface Elements_interface_ui_toggle_switch_on_off.svg",
+  "gdevelopVersion": ">=5.5.230",
+  "changelog": [
+    {
+      "version": "2.0.0",
+      "breaking": "- Toggle switches now use \"variants\", allowing easy swapping of their visual aspect. You will have to make some adjustments to existing toggle switches in your project. Follow this [migration documentation](https://wiki.gdevelop.io/gdevelop5/objects/custom-objects-prefab-template/migrate-to-variants/) to do these changes."
+    }
+  ],
+  "shortDescription": "Toggle switch that users can click or touch.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/objects/toggle-switch",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [
+    {
+      "description": "A toggle switch that users can click or touch.",
+      "fullName": "Toggle switch",
+      "name": "SpriteToggleSwitch",
+      "defaultName": "ToggleSwitch",
+      "eventsFunctions": [
+        {
+          "name": "IsChecked",
+          "fullName": "Is checked",
+          "description": "Check if the toggle switch is checked.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "HasJustBeenChecked",
+          "fullName": "Has just been checked",
+          "description": "Check if the toggle switch was checked in the current frame.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "HasJustBeenUnchecked",
+          "fullName": "Has just been unchecked",
+          "description": "Check if the toggle switch was unchecked in the current frame.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "HasJustBeenToggled",
+          "fullName": "Has just been toggled",
+          "description": "Check if the toggle switch was checked or unchecked in the current frame.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetChecked",
+          "fullName": "Check (or uncheck)",
+          "description": "Check (or uncheck) the toggle switch.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ToggleChecked",
+          "fullName": "Toggle",
+          "description": "Toggle the switch.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsHovered",
+          "fullName": "Is hovered",
+          "description": "Check if the cursor is hovered over the button.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsPressed",
+          "fullName": "Is pressed",
+          "description": "Check if the button is currently being pressed with mouse or touch.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsPressedOutside",
+          "fullName": "Is held outside",
+          "description": "Check if the button is currently being pressed outside with mouse or touch.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "Activate",
+          "fullName": "De/activate interactions",
+          "description": "De/activate interactions with the button.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsActivated",
+          "fullName": "Interactions activated",
+          "description": "Check if interactions are activated on the button.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "description": "Toggle switch that users can click or touch. The switch can be customized with sprites.\n\nThere are ready-to-use toggle switches in the asset-store [settings UI pack](https://editor.gdevelop.io/?initial-dialog=asset-store&asset-pack=settings-ui-settings-ui).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIzLDIzSDljLTMuOSwwLTctMy4xLTctN3YwYzAtMy45LDMuMS03LDctN2gxNGMzLjksMCw3LDMuMSw3LDd2MEMzMCwxOS45LDI2LjksMjMsMjMsMjN6Ii8+DQo8Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSI5IiBjeT0iMTYiIHI9IjQiLz4NCjwvc3ZnPg0K"
+}

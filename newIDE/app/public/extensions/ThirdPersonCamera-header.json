@@ -1,0 +1,209 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Third person camera",
+  "name": "ThirdPersonCamera",
+  "version": "1.8.0",
+  "url": "https://resources.gdevelop-app.com/extensions/ThirdPersonCamera.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ThirdPersonCamera-header.json",
+  "tags": "3d,camera",
+  "category": "Camera",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Virtual Reality/94e95d2c318e1f3dc7151a351024e13c574e1e44669c6696aa107d60230073f6_Virtual Reality_3d_vision_eye_vr.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Third-person camera orbiting an object at configurable distance, elevation, and rotation.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/third-person-camera",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Smoothly follow an object at a distance.",
+      "fullName": "Third person camera",
+      "name": "ThirdPersonCamera",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "MoveCameraCloser",
+          "fullName": "Move the camera closer",
+          "description": "Move the camera closer to the object. This action must be called after the object has moved for the frame.",
+          "functionType": "Action"
+        },
+        {
+          "name": "JumpToTargetedRotation",
+          "fullName": "Rotate the camera all the way",
+          "description": "Rotate the camera all the way to the targeted angle.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetCameraRotation",
+          "fullName": "Camera rotation",
+          "description": "Change the camera rotation.",
+          "functionType": "Action"
+        },
+        {
+          "name": "RotationHalfwayDuration",
+          "fullName": "Halfway time for rotation",
+          "description": "Compare the halfway time for rotation of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetRotationHalfwayDuration",
+          "fullName": "Halfway time for rotation",
+          "description": "Change the halfway time for rotation of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ElevationHalfwayDuration",
+          "fullName": "Halfway  time for elevation rotation",
+          "description": "Compare the halfway  time for elevation rotation of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetElevationHalfwayDuration",
+          "fullName": "Halfway  time for elevation rotation",
+          "description": "Change the halfway  time for elevation rotation of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "TranslationZHalfwayDuration",
+          "fullName": "Halfway time on Z axis",
+          "description": "Compare the halfway time on Z axis of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetTranslationZHalfwayDuration",
+          "fullName": "Halfway time on Z axis",
+          "description": "Change the halfway time on Z axis of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FollowFreeAreaZMax",
+          "fullName": "Follow free area top border on Z axis",
+          "description": "Compare the follow free area top border on Z axis of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFollowFreeAreaZMax",
+          "fullName": "Follow free area top border on Z axis",
+          "description": "Change the follow free area top border on Z axis of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FollowFreeAreaZMin",
+          "fullName": "Follow free area bottom border on Z axis",
+          "description": "Compare the follow free area bottom border on Z axis of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFollowFreeAreaZMin",
+          "fullName": "Follow free area bottom border on Z axis",
+          "description": "Change the follow free area bottom border on Z axis of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Distance",
+          "fullName": "Camera distance",
+          "description": "Compare the camera distance of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetDistance",
+          "fullName": "Camera distance",
+          "description": "Change the camera distance of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "OffsetX",
+          "fullName": "Lateral distance offset",
+          "description": "Compare the lateral distance offset of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetOffsetX",
+          "fullName": "Lateral distance offset",
+          "description": "Change the lateral distance offset of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "OffsetY",
+          "fullName": "Ahead distance offset",
+          "description": "Compare the ahead distance offset of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetOffsetY",
+          "fullName": "Ahead distance offset",
+          "description": "Change the ahead distance offset of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "OffsetZ",
+          "fullName": "Z offset",
+          "description": "Compare the z offset of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetOffsetZ",
+          "fullName": "Z offset",
+          "description": "Change the z offset of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "RotationAngleOffset",
+          "fullName": "Rotation angle offset",
+          "description": "Compare the rotation angle offset of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetRotationAngleOffset",
+          "fullName": "Rotation angle offset",
+          "description": "Change the rotation angle offset of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ElevationAngleOffset",
+          "fullName": "Elevation angle offset",
+          "description": "Compare the elevation angle offset of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetElevationAngleOffset",
+          "fullName": "Elevation angle offset",
+          "description": "Change the elevation angle offset of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "TargetedRotationAngle",
+          "fullName": "Targeted rotation angle",
+          "description": "Compare the targeted camera rotation angle of the object. When this angle is set, the camera follow this value instead of the object angle.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetTargetedRotationAngle",
+          "fullName": "Targeted rotation angle",
+          "description": "Change the targeted camera rotation angle of the object. When this angle is set, the camera follow this value instead of the object angle.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "name": "LookFromDistanceAtPosition3D",
+      "fullName": "Look at a position from a distance",
+      "description": "Move the camera to look at a position from a distance.",
+      "functionType": "Action"
+    },
+    {
+      "name": "LookFromDistanceAtObject3D",
+      "fullName": "Look at an object from a distance",
+      "description": "Move the camera to look at an object from a distance.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Move the camera  to look at an object from a given distance with a rotation and an elevation angles.\n\nIt can be useful for:\n- 3D platformer games ([open the project online](https://editor.gdevelop.io/?project=example://3d-platformer))\n- 3D racing games ([open the project online](https://editor.gdevelop.io/?project=example://3d-car-coin-hunt))\n- Orbit camera controls ([open the project online](https://editor.gdevelop.io/?project=example://3d-tile-based-city-builder))\n- Isometric-like point of view ([open the project online](https://editor.gdevelop.io/?project=example://3d-road-crosser))",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSI3LDEwIDEsMTMgNywxNiAxMywxMyAiLz4NCjxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjEsMTMgMSwyMCA3LDIzIDEzLDIwIDEzLDEzICIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjciIHkxPSIxNiIgeDI9IjciIHkyPSIyMyIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjMxIiB5MT0iMTYiIHgyPSIyMSIgeTI9IjgiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyMSIgeTE9IjI0IiB4Mj0iMzEiIHkyPSIxNiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIyLjcsMjIuNkMyMCwyMS43LDE4LDE5LjEsMTgsMTZjMC0zLjEsMi01LjcsNC43LTYuNiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE5LjgsMTEuM2MxLjQsMS4xLDIuMiwyLjgsMi4yLDQuN2MwLDEuOS0wLjksMy42LTIuMiw0LjciLz4NCjwvc3ZnPg0K"
+}

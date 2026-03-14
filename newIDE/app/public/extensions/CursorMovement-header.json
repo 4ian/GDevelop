@@ -1,0 +1,38 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Cursor movement conditions",
+  "name": "CursorMovement",
+  "version": "1.0.2",
+  "url": "https://resources.gdevelop-app.com/extensions/CursorMovement.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/CursorMovement-header.json",
+  "tags": "mouse,pointer,cursor",
+  "category": "Input",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Computers and Hardware/Computers and Hardware_mouse_pc.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Conditions to detect if the cursor is currently moving or still.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/cursor-movement",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "CursorStayStill",
+      "fullName": "Cursor stays still",
+      "description": "Check if the cursor has stayed still for the specified time on the default layer.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "CursorIsMoving",
+      "fullName": "Cursor is moving",
+      "description": "Check if the cursor is moving on the default layer.",
+      "functionType": "Condition"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Provides two conditions:\n* The cursor is moving\n* The cursor has stayed still for a given duration",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTEsMjhMMTEsMjhjLTMuMywwLTYtMi43LTYtNnYtNGMwLTMuMywyLjctNiw2LTZoMGMzLjMsMCw2LDIuNyw2LDZ2NEMxNywyNS4zLDE0LjMsMjgsMTEsMjh6Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMTEiIHkxPSIxNSIgeDI9IjExIiB5Mj0iMTkiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yOSw5YzAsMi41LTIsNC41LTQuNSw0LjVTMjAsMTEuNSwyMCw5VjguNUMyMCw2LDE4LDQsMTUuNSw0UzExLDYsMTEsOC41Ii8+DQo8L3N2Zz4NCg=="
+}

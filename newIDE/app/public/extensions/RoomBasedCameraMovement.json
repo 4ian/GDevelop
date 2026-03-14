@@ -1,0 +1,1263 @@
+{
+  "author": "",
+  "category": "Camera",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Room-based camera movement",
+  "helpPath": "https://victrisgames.itch.io/room-based-camera-movement",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGc+DQoJPHBhdGggZD0iTTE0LDNINEMzLjQsMywzLDMuNCwzLDR2MTBjMCwwLjYsMC40LDEsMSwxaDEwYzAuNiwwLDEtMC40LDEtMVY0QzE1LDMuNCwxNC42LDMsMTQsM3oiLz4NCgk8cGF0aCBkPSJNMTQsMTdINGMtMC42LDAtMSwwLjQtMSwxdjEwYzAsMC42LDAuNCwxLDEsMWgxMGMwLjYsMCwxLTAuNCwxLTFWMThDMTUsMTcuNCwxNC42LDE3LDE0LDE3eiIvPg0KCTxwYXRoIGQ9Ik0yOCwzSDE4Yy0wLjYsMC0xLDAuNC0xLDF2MTBjMCwwLjYsMC40LDEsMSwxaDEwYzAuNiwwLDEtMC40LDEtMVY0QzI5LDMuNCwyOC42LDMsMjgsM3oiLz4NCgk8cGF0aCBkPSJNMjgsMTdIMThjLTAuNiwwLTEsMC40LTEsMXYxMGMwLDAuNiwwLjQsMSwxLDFoMTBjMC42LDAsMS0wLjQsMS0xVjE4QzI5LDE3LjQsMjguNiwxNywyOCwxN3oiLz4NCjwvZz4NCjwvc3ZnPg0K",
+  "name": "RoomBasedCameraMovement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Applications and Programming/Applications and Programming_app_apps_applications_tiles.svg",
+  "shortDescription": "Move/zoom camera to frame the room object containing the player.",
+  "dimension": "2D",
+  "version": "1.0.4",
+  "description": [
+    "Move camera to the room that contains the trigger object (usually the player).  If desired, change zoom to show the entire room or keep zoom static.",
+    "",
+    "How to use:",
+    "- Place room objects on scene",
+    "- Select camera zoom limits, how fast the camera should move, and the visible buffer around each room",
+    "- Run the \"Move and zoom camera\" action on every frame",
+    "- Move the trigger object (player) between rooms and the camera will center on the room that contains the trigger object.",
+    "",
+    "Tips:",
+    "- Use these conditions for custom logic when changing rooms : \"Camera moving\", \"Camera zooming\", and \"Room changed\"",
+    "- Set \"Lerp Speed\" to \"1\" to change the camera instantly"
+  ],
+  "origin": {
+    "identifier": "RoomBasedCameraMovement",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "camera,follow,room,trigger,zoom,move,smooth",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3",
+    "dt0tRnf2kHWJnjkrpnzTzNj9Yc63"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Move and zoom camera to the room object that contains the trigger object (usually the player).",
+      "fullName": "Move and zoom camera to the room object that contains the trigger object (player)",
+      "functionType": "Action",
+      "group": "Layers and cameras",
+      "name": "MoveCameraToActiveRoom",
+      "sentence": "Move camera to room object _PARAM1_ that contains trigger object _PARAM2_ (Layer: _PARAM3_, Lerp speed: _PARAM4_, Max zoom: _PARAM5_, Min zoom: _PARAM6_, Border buffer: _PARAM7_px)",
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Initialize",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Save input values"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__RoomBasedCameraMovement.MaxZoom",
+                    "=",
+                    "MaxZoom"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__RoomBasedCameraMovement.LerpSpeed",
+                    "=",
+                    "LerpSpeed"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Set default values if none provided"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "__RoomBasedCameraMovement.MaxZoom",
+                    "<=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__RoomBasedCameraMovement.MaxZoom",
+                    "=",
+                    "1"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "__RoomBasedCameraMovement.LerpSpeed",
+                    "<=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__RoomBasedCameraMovement.LerpSpeed",
+                    "=",
+                    "0.1"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Main",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Identify the current room",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Detect which room is the current one"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "RoomObject",
+                        "TriggerObject.CenterX()",
+                        "TriggerObject.CenterY()"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Room has NOT changed"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "TriggerObject",
+                            "__RoomBasedCameraMovement.CurrentRoomID",
+                            "=",
+                            "RoomObject.Variable(__RoomBasedCameraMovement.RoomID)"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "TriggerObject",
+                            "__RoomBasedCameraMovement.RoomChanged",
+                            "False"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Room has changed"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "TriggerObject",
+                            "__RoomBasedCameraMovement.CurrentRoomID",
+                            "!=",
+                            "RoomObject.Variable(__RoomBasedCameraMovement.RoomID)"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "TriggerObject",
+                            "__RoomBasedCameraMovement.RoomChanged",
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Update CurrentRoomID variable"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "TriggerObject",
+                            "__RoomBasedCameraMovement.CurrentRoomID",
+                            "=",
+                            "RoomObject.Variable(__RoomBasedCameraMovement.RoomID)"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Move camera",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::ForEach",
+                  "object": "RoomObject",
+                  "conditions": [],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Assign each room a unique ID if they don't have one yet"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "RoomObject",
+                            "__RoomBasedCameraMovement.RoomID",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__RoomBasedCameraMovement.MaxRoomID",
+                            "+",
+                            "1"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "RoomObject",
+                            "__RoomBasedCameraMovement.RoomID",
+                            "=",
+                            "Variable(__RoomBasedCameraMovement.MaxRoomID)"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Check if this room is the current room"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "RoomObject",
+                            "__RoomBasedCameraMovement.RoomID",
+                            "=",
+                            "TriggerObject.Variable(__RoomBasedCameraMovement.CurrentRoomID)"
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "colorB": 228,
+                          "colorG": 176,
+                          "colorR": 74,
+                          "creationTime": 0,
+                          "name": "Change zoom",
+                          "source": "",
+                          "type": "BuiltinCommonInstructions::Group",
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Calculate the camera dimensions"
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarScene"
+                                  },
+                                  "parameters": [
+                                    "__RoomBasedCameraMovement.CameraWidth",
+                                    "=",
+                                    "RoomObject.Width()+2*OutsideBuffer"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "ModVarScene"
+                                  },
+                                  "parameters": [
+                                    "__RoomBasedCameraMovement.CameraHeight",
+                                    "=",
+                                    "RoomObject.Height()+2*OutsideBuffer"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "ModVarScene"
+                                  },
+                                  "parameters": [
+                                    "__RoomBasedCameraMovement.CameraZoom",
+                                    "=",
+                                    "min(SceneWindowHeight() / Variable(__RoomBasedCameraMovement.CameraHeight), SceneWindowWidth() / Variable(__RoomBasedCameraMovement.CameraWidth))"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Adjust zoom to stay within min/max values"
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarScene"
+                                  },
+                                  "parameters": [
+                                    "__RoomBasedCameraMovement.CameraZoom",
+                                    "=",
+                                    "clamp(Variable(__RoomBasedCameraMovement.CameraZoom),MinZoom,Variable(__RoomBasedCameraMovement.MaxZoom))"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Change camera zoom"
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ZoomCamera"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "ceil(lerp(CameraZoom(Layer,Camera),Variable(__RoomBasedCameraMovement.CameraZoom),Variable(__RoomBasedCameraMovement.LerpSpeed))*1000)/1000",
+                                    "Layer",
+                                    "Camera"
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "parameters": []
+                        },
+                        {
+                          "colorB": 228,
+                          "colorG": 176,
+                          "colorR": 74,
+                          "creationTime": 0,
+                          "name": "Move camera position",
+                          "source": "",
+                          "type": "BuiltinCommonInstructions::Group",
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "For rooms smaller than the viewable screen, center the camera on the center of the room"
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "VarScene"
+                                  },
+                                  "parameters": [
+                                    "__RoomBasedCameraMovement.CameraWidth",
+                                    "<=",
+                                    "SceneWindowWidth()"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetCameraX"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "=",
+                                    "ceil(lerp(CameraX(Layer,Camera), RoomObject.CenterX(), Variable(__RoomBasedCameraMovement.LerpSpeed))*100)/100",
+                                    "Layer",
+                                    "Camera"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "VarScene"
+                                  },
+                                  "parameters": [
+                                    "__RoomBasedCameraMovement.CameraHeight",
+                                    "<=",
+                                    "SceneWindowHeight()"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetCameraY"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "=",
+                                    "ceil(lerp(CameraY(Layer,Camera), RoomObject.CenterY(), Variable(__RoomBasedCameraMovement.LerpSpeed))*100)/100",
+                                    "Layer",
+                                    "Camera"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "For rooms larger than the viewable screen, center the camera on the TriggerObject and clamp camera so it only shows the room + buffer"
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "VarScene"
+                                  },
+                                  "parameters": [
+                                    "__RoomBasedCameraMovement.CameraWidth",
+                                    ">",
+                                    "SceneWindowWidth()"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetCameraX"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "=",
+                                    "ceil(lerp(CameraX(Layer,Camera), clamp(TriggerObject.CenterX(), \nRoomObject.CenterX() - RoomObject.Width()/2 + SceneWindowWidth()/2 - OutsideBuffer, RoomObject.CenterX() + RoomObject.Width()/2 - SceneWindowWidth()/2 + OutsideBuffer), Variable(__RoomBasedCameraMovement.LerpSpeed))*100)/100",
+                                    "Layer",
+                                    "Camera"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "VarScene"
+                                  },
+                                  "parameters": [
+                                    "__RoomBasedCameraMovement.CameraHeight",
+                                    ">",
+                                    "SceneWindowHeight()"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetCameraY"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "=",
+                                    "ceil(lerp(CameraY(Layer,Camera), clamp(TriggerObject.CenterY(), \nRoomObject.CenterY() - RoomObject.Height()/2 + SceneWindowHeight()/2 - OutsideBuffer, RoomObject.CenterY() + RoomObject.Height()/2 - SceneWindowHeight()/2 + OutsideBuffer), Variable(__RoomBasedCameraMovement.LerpSpeed))*100)/100",
+                                    "Layer",
+                                    "Camera"
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "parameters": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Calculate \"IsCameraMoving\" condition",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Initialize",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "__RoomBasedCameraMovement.PrevCameraX",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "__RoomBasedCameraMovement.PrevCameraY",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__RoomBasedCameraMovement.PrevCameraX",
+                        "=",
+                        "CameraX(Layer, Camera)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__RoomBasedCameraMovement.PrevCameraY",
+                        "=",
+                        "CameraY(Layer, Camera)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Check if camera position changed",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Camera has NOT moved"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "__RoomBasedCameraMovement.PrevCameraX",
+                        "=",
+                        "CameraX(Layer,Camera)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "__RoomBasedCameraMovement.PrevCameraY",
+                        "=",
+                        "CameraY(Layer,Camera)"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "__RoomBasedCameraMovement.CameraMoving",
+                        "False"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Camera has moved"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "__RoomBasedCameraMovement.PrevCameraX",
+                            "!=",
+                            "CameraX(Layer,Camera)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "__RoomBasedCameraMovement.PrevCameraY",
+                            "!=",
+                            "CameraY(Layer,Camera)"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "__RoomBasedCameraMovement.CameraMoving",
+                        "True"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Update with current camera position"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__RoomBasedCameraMovement.PrevCameraX",
+                            "=",
+                            "CameraX(Layer, Camera)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__RoomBasedCameraMovement.PrevCameraY",
+                            "=",
+                            "CameraY(Layer, Camera)"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Calculate \"IsCameraZooming\" condition",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Initialize",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "__RoomBasedCameraMovement.PreviousZoom",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__RoomBasedCameraMovement.PreviousZoom",
+                        "=",
+                        "CameraZoom(Layer, Camera)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Check if camera zoom changed",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Camera zoom has NOT changed"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "__RoomBasedCameraMovement.PreviousZoom",
+                        "=",
+                        "CameraZoom(Layer,Camera)"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "__RoomBasedCameraMovement.CameraZooming",
+                        "False"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Camera zoom has changed"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "__RoomBasedCameraMovement.PreviousZoom",
+                        "!=",
+                        "CameraZoom(Layer,Camera)"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "__RoomBasedCameraMovement.CameraZooming",
+                        "True"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Update with current camera zoom"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__RoomBasedCameraMovement.PreviousZoom",
+                            "=",
+                            "CameraZoom(Layer, Camera)"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Room object",
+          "longDescription": "Room objects are used to mark areas that should be seen by the camera.",
+          "name": "RoomObject",
+          "type": "objectList"
+        },
+        {
+          "description": "Trigger object (player)",
+          "longDescription": "When the Trigger Object touches a new Room Object, the camera will move to the new room",
+          "name": "TriggerObject",
+          "type": "objectList"
+        },
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        },
+        {
+          "description": "Lerp speed",
+          "longDescription": "Range: 0 to 1",
+          "name": "LerpSpeed",
+          "type": "expression"
+        },
+        {
+          "description": "Maximum zoom",
+          "name": "MaxZoom",
+          "type": "expression"
+        },
+        {
+          "description": "Minimum zoom",
+          "name": "MinZoom",
+          "type": "expression"
+        },
+        {
+          "description": "Outside buffer (pixels)",
+          "longDescription": "Minimum extra space displayed around each side the room",
+          "name": "OutsideBuffer",
+          "type": "expression"
+        },
+        {
+          "description": "Camera",
+          "name": "Camera",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if trigger object (usually the player) has entered a new room on this frame.",
+      "fullName": "Check if trigger object (player) has entered a new room",
+      "functionType": "Condition",
+      "name": "ActiveRoomChanged",
+      "sentence": "_PARAM1_ has just entered a new room",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "ObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "TriggerObject",
+                "__RoomBasedCameraMovement.RoomChanged",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Trigger object (player)",
+          "name": "TriggerObject",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if camera is zooming (requires the use of \"Move and zoom camera\" action in this extension).",
+      "fullName": "Check if camera is zooming",
+      "functionType": "Condition",
+      "name": "IsCameraZooming",
+      "sentence": "Camera is zooming",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "SceneVariableAsBoolean"
+              },
+              "parameters": [
+                "__RoomBasedCameraMovement.CameraZooming",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if camera is moving (requires the use of \"Move and zoom camera\" action in this extension).",
+      "fullName": "Check if camera is moving",
+      "functionType": "Condition",
+      "name": "IsCameraMoving",
+      "sentence": "Camera is moving",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "SceneVariableAsBoolean"
+              },
+              "parameters": [
+                "__RoomBasedCameraMovement.CameraMoving",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

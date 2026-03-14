@@ -1,0 +1,4475 @@
+{
+  "author": "@oscuridad6661, Tristan Rhodes (@VictrisGames)",
+  "category": "Game mechanic",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Dungeon generator",
+  "helpPath": "https://victrisgames.itch.io/extension-dungeon-generator",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNpdGVtYXAiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNOSwyVjhIMTFWMTFINUMzLjg5LDExIDMsMTEuODkgMywxM1YxNkgxVjIySDdWMTZINVYxM0gxMVYxNkg5VjIySDE1VjE2SDEzVjEzSDE5VjE2SDE3VjIySDIzVjE2SDIxVjEzQzIxLDExLjg5IDIwLjExLDExIDE5LDExSDEzVjhIMTVWMkg5WiIgLz48L3N2Zz4=",
+  "name": "DungeonGenerator",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/sitemap.svg",
+  "shortDescription": "Create a procedurally generated dungeon.  Includes two layouts: \"rooms and hallways\" and \"dungeon cave\".",
+  "version": "1.2.0",
+  "description": [
+    "How to use:",
+    "- Run the \"Generate Dungeon Cave\" or \"Generate Dungeon with Rooms\" action at the beginning of a scene.",
+    "",
+    "Tips:",
+    "- Keep the amount of space used by room objects to less than ~25% of the total map.  If you add too many rooms, they will not be placed correctly and might collide with other rooms.",
+    "- Try using top-down controls combined with physics behavior (with no gravity) on the player and wall objects",
+    "- Use external layouts to place pre-designed rooms on randomly created room objects",
+    "- Use \"Delete Unused Terrain\" option to reduce resources used",
+    "- Use \"RoomID(object)\" expression to determine the starting and ending room",
+    "- Use \"NeighborCount(object)\" expression to find good places to place treasure.  A high amount of neighbors means that the tile is a nook or cranny.",
+    "- Use \"IsRoomEntrance\" condition to identify hallway objects that are adjacent to a room",
+    "",
+    "An example shows how to procedurally generate dungeons or caves ([open the project online](https://editor.gdevelop.io/?project=example://dungeon-generator))."
+  ],
+  "origin": {
+    "identifier": "DungeonGenerator",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "dungeon,generator,procedural,generation,automatic,build,create,rogue,roguelike,hallway,entrance,floor,room,cave",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "5iOtaj8yEsam4mIj7TEUDk4LSAe2"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Set the size of hallway objects to be placed on the path created by the pathfinding object.",
+      "fullName": "Set size of hallway objects",
+      "functionType": "Action",
+      "name": "AdjustHallwaySizes",
+      "private": true,
+      "sentence": "Set the size of hallway objects _PARAM1_ to be placed on the path created by _PARAM2_ (Tile size: _PARAM4_ pixels, Hallway width: _PARAM5_ tiles)",
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Adjust size of hallway objects",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Set the default size of hallway object to the tilesize",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ChangeHeight"
+                  },
+                  "parameters": [
+                    "HallwayObject",
+                    "=",
+                    "TileSize "
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ChangeWidth"
+                  },
+                  "parameters": [
+                    "HallwayObject",
+                    "=",
+                    "TileSize "
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Skip the first step in the path (so this function doesn't try to evaluate step 0)",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.PathCounter",
+                    ">",
+                    "1"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Vertical move (previous frame)",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Egal"
+                      },
+                      "parameters": [
+                        "PathfinderObject.PathfindingBehavior::GetNodeX(Variable(__DungeonGenerator.PathCounter))",
+                        "=",
+                        "PathfinderObject.PathfindingBehavior::GetNodeX(Variable(__DungeonGenerator.PathCounter)-1)"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ChangeWidth"
+                      },
+                      "parameters": [
+                        "HallwayObject",
+                        "=",
+                        "TileSize * max(1,HallwayWidth)"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Change in direction (this frame)",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Egal"
+                          },
+                          "parameters": [
+                            "PathfinderObject.PathfindingBehavior::GetNodeY(Variable(__DungeonGenerator.PathCounter))",
+                            "=",
+                            "PathfinderObject.PathfindingBehavior::GetNodeY(Variable(__DungeonGenerator.PathCounter)+1)"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ChangeHeight"
+                          },
+                          "parameters": [
+                            "HallwayObject",
+                            "=",
+                            "TileSize * max(1,HallwayWidth)"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Horizontal move (previous frame)",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Egal"
+                      },
+                      "parameters": [
+                        "PathfinderObject.PathfindingBehavior::GetNodeY(Variable(__DungeonGenerator.PathCounter))",
+                        "=",
+                        "PathfinderObject.PathfindingBehavior::GetNodeY(Variable(__DungeonGenerator.PathCounter)-1)"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ChangeHeight"
+                      },
+                      "parameters": [
+                        "HallwayObject",
+                        "=",
+                        "TileSize * max(1,HallwayWidth)"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Change in direction (this frame)",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Egal"
+                          },
+                          "parameters": [
+                            "PathfinderObject.PathfindingBehavior::GetNodeX(Variable(__DungeonGenerator.PathCounter))",
+                            "=",
+                            "PathfinderObject.PathfindingBehavior::GetNodeX(Variable(__DungeonGenerator.PathCounter)+1)"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ChangeWidth"
+                          },
+                          "parameters": [
+                            "HallwayObject",
+                            "=",
+                            "TileSize * max(1,HallwayWidth)"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.PathCounter",
+                    "+",
+                    "1"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Hallway object",
+          "name": "HallwayObject",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "description": "Pathfinder object",
+          "name": "PathfinderObject",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "description": "Pathfinding behavior",
+          "name": "PathfindingBehavior",
+          "supplementaryInformation": "PathfindingBehavior::PathfindingBehavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Tile size (pixels)",
+          "name": "TileSize",
+          "type": "expression"
+        },
+        {
+          "description": "Hallway width (tiles)",
+          "name": "HallwayWidth",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Fill world with terrain",
+      "fullName": "Fill world with terrain",
+      "functionType": "Action",
+      "name": "FillWorld",
+      "private": true,
+      "sentence": "Fill world with terrain (Tile size: _PARAM1_ pixels, Columns: _PARAM2_ tiles, Rows: _PARAM3_ tiles, Fill object: _PARAM4_)",
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Populate map with terrain objects everywhere",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.CounterX",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.CounterY",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "MapHeight",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Repeat",
+                  "repeatExpression": "MapWidth",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "TerrainObject",
+                        "Variable(__DungeonGenerator.CounterX) * TileSize",
+                        "Variable(__DungeonGenerator.CounterY) * TileSize",
+                        "Layer"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangeWidth"
+                      },
+                      "parameters": [
+                        "TerrainObject",
+                        "=",
+                        "TileSize"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangeHeight"
+                      },
+                      "parameters": [
+                        "TerrainObject",
+                        "=",
+                        "TileSize"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__DungeonGenerator.CounterX",
+                        "+",
+                        "1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__DungeonGenerator.CounterX",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__DungeonGenerator.CounterY",
+                        "+",
+                        "1"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Tile size (pixels)",
+          "name": "TileSize",
+          "type": "expression"
+        },
+        {
+          "description": "Map width (number of colums)",
+          "name": "MapWidth",
+          "type": "expression"
+        },
+        {
+          "description": "Map height (number of rows)",
+          "name": "MapHeight",
+          "type": "expression"
+        },
+        {
+          "description": "Terrain object",
+          "name": "TerrainObject",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Generate a dungeon cave using a random walk algorithm.  When the walker touches an edge of the map, it is moved back to the center of map.",
+      "fullName": "Generate a dungeon cave",
+      "functionType": "Action",
+      "name": "GenerateDungeonCave",
+      "sentence": "Generate a dungeon cave that has _PARAM8_ percent floor objects (Tile size: _PARAM1_ pixels, Map width: _PARAM2_ tiles, Map height: _PARAM3_ tiles, Terrain object: _PARAM4_, Floor object: _PARAM5_, Wall object: _PARAM12_, Walker object: _PARAM7_, Walker width/height: _PARAM9_ tiles, Minimum border: _PARAM10_ tiles, Create objects on layer: _PARAM6_, Delete unused terrain: _PARAM11_, Calculate neighbors: _PARAM13_)",
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Random walk",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Calculate the number of floor objects to be created.  Don't include border in calculation.  Multiply border by 2 because it needs to exist on both sides (top+bottom, left+right).",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.FloorGoal",
+                    "=",
+                    "round((MapWidth - 2 * MinBorder) * (MapHeight - 2 * MinBorder) * FloorPercentage)"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Initialize counters",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.StepsTaken",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.FloorCreated",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.WalkerRestarts",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Walk until complete (using a 2D array)",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Start with an empty map (array)",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "VariableRemoveChild"
+                      },
+                      "parameters": [
+                        "__DungeonGenerator",
+                        "\"WalkerMap\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Create walkers",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Initialize walker offsets (these are used to make the walker take up more than one tile)",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__DungeonGenerator.WalkerOffsetX",
+                            "=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__DungeonGenerator.WalkerOffsetY",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Create (WalkerSize^2) quantity of objects (1x1=1, 2x2=4, 3x3=9, etc0",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Repeat",
+                      "repeatExpression": "max(1,WalkerSize)",
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Repeat",
+                          "repeatExpression": "max(1,WalkerSize)",
+                          "conditions": [],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Create virtual walker objects. Walker objects are ONLY used to store variables and to perform ForEach() loops.  Position, size, and appearance DO NOT matter.  \nTODO: These could be replaced by structure variables.",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "Create"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "WalkerObject",
+                                    "0",
+                                    "0",
+                                    "Layer"
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Comment",
+                                  "color": {
+                                    "b": 109,
+                                    "g": 230,
+                                    "r": 255,
+                                    "textB": 0,
+                                    "textG": 0,
+                                    "textR": 0
+                                  },
+                                  "comment": "Calculate the starting position (in the 2D array) and save it so it can be used for restarts",
+                                  "comment2": ""
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "WalkerObject",
+                                        "__DungeonGenerator.Xpos",
+                                        "=",
+                                        "round(MapWidth/2 + Variable(__DungeonGenerator.WalkerOffsetX))"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "WalkerObject",
+                                        "__DungeonGenerator.Ypos",
+                                        "=",
+                                        "round(MapHeight/2 + Variable(__DungeonGenerator.WalkerOffsetY))"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "WalkerObject",
+                                        "__DungeonGenerator.StartXpos",
+                                        "=",
+                                        "WalkerObject.Variable(__DungeonGenerator.Xpos)"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "WalkerObject",
+                                        "__DungeonGenerator.StartYpos",
+                                        "=",
+                                        "WalkerObject.Variable(__DungeonGenerator.Ypos)"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarScene"
+                                  },
+                                  "parameters": [
+                                    "__DungeonGenerator.WalkerOffsetX",
+                                    "+",
+                                    "1"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.WalkerOffsetX",
+                                "=",
+                                "0"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.WalkerOffsetY",
+                                "+",
+                                "1"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Process walker movements",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "infiniteLoopWarning": true,
+                      "type": "BuiltinCommonInstructions::While",
+                      "whileConditions": [
+                        {
+                          "type": {
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "__DungeonGenerator.FloorCreated",
+                            "<",
+                            "Variable(__DungeonGenerator.FloorGoal)"
+                          ]
+                        }
+                      ],
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Reset variables",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetSceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.InitiateRestart",
+                                "False"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Calculate chance to go in each direction based on the ratio of width to height",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.ChanceToGoRight",
+                                "=",
+                                "0.5 * (MapWidth / (MapWidth + MapHeight))"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.ChanceToGoLeft",
+                                "=",
+                                "Variable(__DungeonGenerator.ChanceToGoRight)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.ChanceToGoUp",
+                                "=",
+                                "0.5 * (MapHeight / (MapWidth + MapHeight))"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.ChanceToGoDown",
+                                "=",
+                                "Variable(__DungeonGenerator.ChanceToGoUp)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Generate a random number between 0 and 1",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.RandomNumber",
+                                "=",
+                                "RandomFloatInRange(0,1)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Move LEFT",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.RandomNumber",
+                                ">=",
+                                "0"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "VarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.RandomNumber",
+                                "<",
+                                "Variable(__DungeonGenerator.ChanceToGoLeft)"
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarObjet"
+                                  },
+                                  "parameters": [
+                                    "WalkerObject",
+                                    "__DungeonGenerator.Xpos",
+                                    "-",
+                                    "1"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Move RIGHT",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.RandomNumber",
+                                ">=",
+                                "Variable(__DungeonGenerator.ChanceToGoLeft)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "VarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.RandomNumber",
+                                "<",
+                                "Variable(__DungeonGenerator.ChanceToGoLeft) + Variable(__DungeonGenerator.ChanceToGoRight)"
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarObjet"
+                                  },
+                                  "parameters": [
+                                    "WalkerObject",
+                                    "__DungeonGenerator.Xpos",
+                                    "+",
+                                    "1"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Move UP",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.RandomNumber",
+                                ">=",
+                                "Variable(__DungeonGenerator.ChanceToGoLeft) + Variable(__DungeonGenerator.ChanceToGoRight)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "VarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.RandomNumber",
+                                "<",
+                                "Variable(__DungeonGenerator.ChanceToGoLeft) + Variable(__DungeonGenerator.ChanceToGoRight) + Variable(__DungeonGenerator.ChanceToGoUp)"
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarObjet"
+                                  },
+                                  "parameters": [
+                                    "WalkerObject",
+                                    "__DungeonGenerator.Ypos",
+                                    "-",
+                                    "1"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Move DOWN",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.RandomNumber",
+                                ">=",
+                                "Variable(__DungeonGenerator.ChanceToGoLeft) + Variable(__DungeonGenerator.ChanceToGoRight) + Variable(__DungeonGenerator.ChanceToGoUp)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "VarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.RandomNumber",
+                                "<=",
+                                "1"
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarObjet"
+                                  },
+                                  "parameters": [
+                                    "WalkerObject",
+                                    "__DungeonGenerator.Ypos",
+                                    "+",
+                                    "1"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "If ANY Walker is outside map boundries, reset ALL of them to their starting positions",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Or"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "VarObjet"
+                                  },
+                                  "parameters": [
+                                    "WalkerObject",
+                                    "__DungeonGenerator.Xpos",
+                                    "<",
+                                    "MinBorder"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "VarObjet"
+                                  },
+                                  "parameters": [
+                                    "WalkerObject",
+                                    "__DungeonGenerator.Xpos",
+                                    ">=",
+                                    "MapWidth - MinBorder"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "VarObjet"
+                                  },
+                                  "parameters": [
+                                    "WalkerObject",
+                                    "__DungeonGenerator.Ypos",
+                                    "<",
+                                    "MinBorder"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "VarObjet"
+                                  },
+                                  "parameters": [
+                                    "WalkerObject",
+                                    "__DungeonGenerator.Ypos",
+                                    ">=",
+                                    "MapHeight - MinBorder"
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetSceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.InitiateRestart",
+                                "True"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.WalkerRestarts",
+                                "+",
+                                "1"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Check all Walkers if they are on top of terrain",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::ForEach",
+                          "object": "WalkerObject",
+                          "conditions": [],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "SceneVariableAsBoolean"
+                                  },
+                                  "parameters": [
+                                    "__DungeonGenerator.InitiateRestart",
+                                    "True"
+                                  ]
+                                }
+                              ],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Comment",
+                                  "color": {
+                                    "b": 109,
+                                    "g": 230,
+                                    "r": 255,
+                                    "textB": 0,
+                                    "textG": 0,
+                                    "textR": 0
+                                  },
+                                  "comment": "Move back to starting position",
+                                  "comment2": ""
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "WalkerObject",
+                                        "__DungeonGenerator.Xpos",
+                                        "=",
+                                        "WalkerObject.Variable(__DungeonGenerator.StartXpos)"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "WalkerObject",
+                                        "__DungeonGenerator.Ypos",
+                                        "=",
+                                        "WalkerObject.Variable(__DungeonGenerator.StartYpos)"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "If Walker is on Terrain, delete it",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "VarScene"
+                                  },
+                                  "parameters": [
+                                    "__DungeonGenerator.WalkerMap[WalkerObject.Variable(__DungeonGenerator.Xpos)][WalkerObject.Variable(__DungeonGenerator.Ypos)]",
+                                    "=",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarScene"
+                                  },
+                                  "parameters": [
+                                    "__DungeonGenerator.WalkerMap[WalkerObject.Variable(__DungeonGenerator.Xpos)][WalkerObject.Variable(__DungeonGenerator.Ypos)]",
+                                    "=",
+                                    "1"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "ModVarScene"
+                                  },
+                                  "parameters": [
+                                    "__DungeonGenerator.FloorCreated",
+                                    "+",
+                                    "1"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Track how many steps were taken",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.StepsTaken",
+                                "+",
+                                "1"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Draw map based on 2D array",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__DungeonGenerator.CounterX",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__DungeonGenerator.CounterY",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Loop through every tile in the map",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Repeat",
+                  "repeatExpression": "MapHeight",
+                  "conditions": [],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Repeat",
+                      "repeatExpression": "MapWidth",
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Create terrain objects when array value is 0",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.WalkerMap[Variable(__DungeonGenerator.CounterX)][Variable(__DungeonGenerator.CounterY)]",
+                                "=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "TerrainObject",
+                                "Variable(__DungeonGenerator.CounterX) * TileSize",
+                                "Variable(__DungeonGenerator.CounterY) * TileSize",
+                                "Layer"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ChangeWidth"
+                              },
+                              "parameters": [
+                                "TerrainObject",
+                                "=",
+                                "TileSize"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ChangeHeight"
+                              },
+                              "parameters": [
+                                "TerrainObject",
+                                "=",
+                                "TileSize"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Create floor objects when array value is 1",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.WalkerMap[Variable(__DungeonGenerator.CounterX)][Variable(__DungeonGenerator.CounterY)]",
+                                "=",
+                                "1"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "FloorObject",
+                                "Variable(__DungeonGenerator.CounterX) * TileSize",
+                                "Variable(__DungeonGenerator.CounterY) * TileSize",
+                                "Layer"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ChangeWidth"
+                              },
+                              "parameters": [
+                                "FloorObject",
+                                "=",
+                                "TileSize"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ChangeHeight"
+                              },
+                              "parameters": [
+                                "FloorObject",
+                                "=",
+                                "TileSize"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.CounterX",
+                                "+",
+                                "1"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__DungeonGenerator.CounterX",
+                            "=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__DungeonGenerator.CounterY",
+                            "+",
+                            "1"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Add walls",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Add walls",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "TerrainObject",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Create walls where terrain touches floor",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "TerrainObject",
+                        "FloorObject",
+                        "",
+                        "",
+                        "no"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "WallObject",
+                        "TerrainObject.X()",
+                        "TerrainObject.Y()",
+                        "Layer"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "TerrainObject",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangeWidth"
+                      },
+                      "parameters": [
+                        "WallObject",
+                        "=",
+                        "TileSize"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangeHeight"
+                      },
+                      "parameters": [
+                        "WallObject",
+                        "=",
+                        "TileSize"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Calculate neighbors",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "CalculateNeighbors",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "DungeonGenerator::CalculateGridNeighbors"
+                  },
+                  "parameters": [
+                    "",
+                    "FloorObject",
+                    "WallObject",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Cleanup",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Delete walkers",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "WalkerObject",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Delete unused terrain (if desired)",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "DeleteUnused",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "TerrainObject",
+                    "FloorObject",
+                    "",
+                    "",
+                    "no"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "TerrainObject",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Tile size (pixels)",
+          "longDescription": "All objects are based on this size",
+          "name": "TileSize",
+          "type": "expression"
+        },
+        {
+          "description": "Map width (tiles)",
+          "name": "MapWidth",
+          "type": "expression"
+        },
+        {
+          "description": "Map height (tiles)",
+          "name": "MapHeight",
+          "type": "expression"
+        },
+        {
+          "description": "Terrain object",
+          "longDescription": "Terrain object is used to fill the map that is not covered by floors, hallways, or walls.",
+          "name": "TerrainObject",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "description": "Floor object",
+          "longDescription": "Floor objects are created on every tile that a walker has travelled to.",
+          "name": "FloorObject",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        },
+        {
+          "description": "Walker object",
+          "longDescription": "Use a random walk algorithm to turn terrain objects into floor objects",
+          "name": "WalkerObject",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "description": "Floor percentage (Range: 0-1)",
+          "longDescription": "Percentage of map that will be convered by floor objects",
+          "name": "FloorPercentage",
+          "type": "expression"
+        },
+        {
+          "description": "Size of walker sides (tiles)",
+          "longDescription": "The number of tiles for each side of the square walker object.  For example, 2=2x2, 3=3x3, 4=4x4.",
+          "name": "WalkerSize",
+          "type": "expression"
+        },
+        {
+          "description": "Minimum border",
+          "longDescription": "Can be used to provide a border of terrain around the map",
+          "name": "MinBorder",
+          "type": "expression"
+        },
+        {
+          "description": "Delete unused terrain objects",
+          "name": "DeleteUnused",
+          "type": "trueorfalse"
+        },
+        {
+          "description": "Wall object",
+          "longDescription": "Wall objects are placed between floor and terrain objects.",
+          "name": "WallObject",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "description": "Calculate neighbors",
+          "longDescription": "May take a few seconds to calculate neighbors on a large map, so disable this if you are not using it.",
+          "name": "CalculateNeighbors",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Generate a dungeon by placing rooms in random locations and moving them if they collide with each other.  Rooms are connected with hallways.",
+      "fullName": "Generate a dungeon with room and hallways",
+      "functionType": "Action",
+      "name": "GenerateDungeonRooms",
+      "sentence": "Generate a dungeon with rooms (Room Qty: _PARAM7_, Tile size: _PARAM1_ pixels, Map width: _PARAM2_ tiles, Map height: _PARAM3_ tiles, Terrain object: _PARAM4_, Room object: _PARAM5_, Wall object: _PARAM20_, Hallway object: _PARAM6_, Pathfinding object: _PARAM13_, Min room width: _PARAM9_ tiles, Max room width: _PARAM10_ tiles, Min room height: _PARAM11_ tiles, Max room height: _PARAM12_ tiles, Hallway width: _PARAM17_ tiles, Create objects on layer: _PARAM8_, Max separation attempts: _PARAM15_, Connect rooms in a loop: _PARAM16_, Additional paths: _PARAM18_, Delete unused terrain: _PARAM19_)",
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Populate map with terrain objects everywhere",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "DungeonGenerator::FillWorld"
+                  },
+                  "parameters": [
+                    "",
+                    "TileSize",
+                    "MapWidth",
+                    "MapHeight",
+                    "TerrainObject",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Create rooms at random locations",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "infiniteLoopWarning": true,
+              "type": "BuiltinCommonInstructions::While",
+              "whileConditions": [
+                {
+                  "type": {
+                    "value": "NbObjet"
+                  },
+                  "parameters": [
+                    "RoomObject",
+                    "<",
+                    "RoomQty"
+                  ]
+                }
+              ],
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Create a new room in a random location on map",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "RoomObject",
+                        "RandomInRange(HallwayWidth, MapWidth - MaxRoomWidth - HallwayWidth) * TileSize",
+                        "RandomInRange(HallwayWidth, MapHeight - MaxRoomHeight - HallwayWidth) * TileSize",
+                        "Layer"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Change the room to a random size",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "RoomObject",
+                            "__DungeonGenerator.RoomWidth",
+                            "=",
+                            "RandomInRange(MinRoomWidth,  MaxRoomWidth) * TileSize"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "RoomObject",
+                            "__DungeonGenerator.RoomHeight",
+                            "=",
+                            "RandomInRange(MinRoomHeight,  MaxRoomHeight) * TileSize"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ChangeWidth"
+                          },
+                          "parameters": [
+                            "RoomObject",
+                            "=",
+                            "RoomObject.Variable(__DungeonGenerator.RoomWidth)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ChangeHeight"
+                          },
+                          "parameters": [
+                            "RoomObject",
+                            "=",
+                            "RoomObject.Variable(__DungeonGenerator.RoomHeight)"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Separate rooms",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Estimate starting distance between rooms",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.MinSeparationDistance",
+                    "=",
+                    "ceil((sqrt(pow(MaxRoomWidth,2) + pow(MaxRoomHeight,2)))) * TileSize"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.SeparationCounter",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Set a default value for separation attempts",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "MaxSeparationAttempts",
+                    "!=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.MaxSeparationAttempts",
+                    "=",
+                    "MaxSeparationAttempts"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "MaxSeparationAttempts",
+                    "=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.MaxSeparationAttempts",
+                    "=",
+                    "10000"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "If rooms are close to each other, move them to a new random location",
+              "comment2": ""
+            },
+            {
+              "infiniteLoopWarning": true,
+              "type": "BuiltinCommonInstructions::While",
+              "whileConditions": [
+                {
+                  "type": {
+                    "value": "Distance"
+                  },
+                  "parameters": [
+                    "RoomObject",
+                    "RoomObject",
+                    "Variable(__DungeonGenerator.MinSeparationDistance)",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.SeparationCounter",
+                    "<",
+                    "Variable(__DungeonGenerator.MaxSeparationAttempts)"
+                  ]
+                }
+              ],
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.SeparationCounter",
+                    "+",
+                    "1"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Move in a random direction the distance of a room",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "MettreXY"
+                      },
+                      "parameters": [
+                        "RoomObject",
+                        "+",
+                        "RandomWithStep(-MaxRoomWidth/2,MaxRoomWidth/2,MaxRoomWidth) * TileSize",
+                        "+",
+                        "RandomWithStep(-MaxRoomHeight/2,MaxRoomHeight/2,MaxRoomHeight) * TileSize"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Move object back into the usable part of map",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PosY"
+                      },
+                      "parameters": [
+                        "RoomObject",
+                        ">",
+                        "(MapHeight - MaxRoomWidth - HallwayWidth)*TileSize"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "MettreY"
+                      },
+                      "parameters": [
+                        "RoomObject",
+                        "=",
+                        "(MapHeight - MaxRoomWidth - HallwayWidth)*TileSize"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PosX"
+                      },
+                      "parameters": [
+                        "RoomObject",
+                        ">",
+                        "(MapWidth - MaxRoomWidth - HallwayWidth)*TileSize"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "MettreX"
+                      },
+                      "parameters": [
+                        "RoomObject",
+                        "=",
+                        "(MapWidth - MaxRoomWidth - HallwayWidth)*TileSize"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PosX"
+                      },
+                      "parameters": [
+                        "RoomObject",
+                        "<",
+                        "HallwayWidth*TileSize"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "MettreX"
+                      },
+                      "parameters": [
+                        "RoomObject",
+                        "=",
+                        "HallwayWidth*TileSize"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PosY"
+                      },
+                      "parameters": [
+                        "RoomObject",
+                        "<",
+                        "HallwayWidth*TileSize"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "MettreY"
+                      },
+                      "parameters": [
+                        "RoomObject",
+                        "=",
+                        "HallwayWidth*TileSize"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Draw paths between rooms",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Create pathfinder object if one doesn't exist",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NbObjet"
+                  },
+                  "parameters": [
+                    "PathfinderObject",
+                    "<",
+                    "1"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "PathfinderObject",
+                    "0",
+                    "0",
+                    "Layer"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PathfindingBehavior::AllowDiagonals"
+                  },
+                  "parameters": [
+                    "PathfinderObject",
+                    "PathfindingBehavior",
+                    "no"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ChangeHeight"
+                  },
+                  "parameters": [
+                    "PathfinderObject",
+                    "=",
+                    "TileSize"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ChangeWidth"
+                  },
+                  "parameters": [
+                    "PathfinderObject",
+                    "=",
+                    "TileSize"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ChangePlan"
+                  },
+                  "parameters": [
+                    "PathfinderObject",
+                    "=",
+                    "100"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Make sure pathfinding cell size matches tile size",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PathfindingBehavior::CellWidth"
+                  },
+                  "parameters": [
+                    "PathfinderObject",
+                    "PathfindingBehavior",
+                    "!=",
+                    "TileSize "
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PathfindingBehavior::CellWidth"
+                  },
+                  "parameters": [
+                    "PathfinderObject",
+                    "PathfindingBehavior",
+                    "=",
+                    "TileSize "
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PathfindingBehavior::CellHeight"
+                  },
+                  "parameters": [
+                    "PathfinderObject",
+                    "PathfindingBehavior",
+                    "!=",
+                    "TileSize "
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PathfindingBehavior::CellHeight"
+                  },
+                  "parameters": [
+                    "PathfinderObject",
+                    "PathfindingBehavior",
+                    "=",
+                    "TileSize "
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Move the pathfinder object to a random starting room",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "AjoutHasard"
+                  },
+                  "parameters": [
+                    "",
+                    "RoomObject"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "PathfinderObject",
+                    "=",
+                    "RoomObject.CenterX()",
+                    "=",
+                    "RoomObject.CenterY()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetObjectVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "RoomObject",
+                    "__DungeonGenerator.Visited",
+                    "True"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Reset counter (used to assign RoomID to rooms)",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__DungeonGenerator.CurrentRoomID",
+                        "=",
+                        "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "RoomObject",
+                        "__DungeonGenerator.RoomID",
+                        "=",
+                        "Variable(__DungeonGenerator.CurrentRoomID)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__DungeonGenerator.CurrentRoomID",
+                        "+",
+                        "1"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Cycle through all rooms, always going to the nearest unvisited room",
+              "comment2": ""
+            },
+            {
+              "infiniteLoopWarning": true,
+              "type": "BuiltinCommonInstructions::While",
+              "whileConditions": [
+                {
+                  "type": {
+                    "value": "ObjectVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "RoomObject",
+                    "__DungeonGenerator.Visited",
+                    "False"
+                  ]
+                }
+              ],
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PickNearest"
+                      },
+                      "parameters": [
+                        "RoomObject",
+                        "PathfinderObject.X()",
+                        "PathfinderObject.Y()",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Assign path order if one does not exist",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "RoomObject",
+                            "__DungeonGenerator.RoomID",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "RoomObject",
+                            "__DungeonGenerator.RoomID",
+                            "=",
+                            "Variable(__DungeonGenerator.CurrentRoomID)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__DungeonGenerator.CurrentRoomID",
+                            "+",
+                            "1"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Set the destination of the pathfinder to the next room",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PathfindingBehavior::SetDestination"
+                          },
+                          "parameters": [
+                            "PathfinderObject",
+                            "PathfindingBehavior",
+                            "",
+                            "RoomObject.CenterX()",
+                            "RoomObject.CenterY()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__DungeonGenerator.PathCounter",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Create a hallway object at every cell along the path to the destination",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Repeat",
+                      "repeatExpression": "PathfinderObject.PathfindingBehavior::NodeCount()",
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "HallwayObject",
+                                "PathfinderObject.PathfindingBehavior::GetNodeX(Variable(__DungeonGenerator.PathCounter))",
+                                "PathfinderObject.PathfindingBehavior::GetNodeY(Variable(__DungeonGenerator.PathCounter))",
+                                "Layer"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Adjust size of hallway objects",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "DungeonGenerator::AdjustHallwaySizes"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "HallwayObject",
+                                    "PathfinderObject",
+                                    "PathfindingBehavior",
+                                    "TileSize",
+                                    "HallwayWidth",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Move the pathfinder object to the room that was just connected with a hallway",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "MettreXY"
+                          },
+                          "parameters": [
+                            "PathfinderObject",
+                            "=",
+                            "RoomObject.CenterX()",
+                            "=",
+                            "RoomObject.CenterY()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "RoomObject",
+                            "__DungeonGenerator.Visited",
+                            "True"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Close loop",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "If desired, connect a hallway from the last room to the first room",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "CloseLoop",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Set the destination of the pathfinder to the starting room",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "RoomObject",
+                            "__DungeonGenerator.RoomID",
+                            "=",
+                            "1"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PathfindingBehavior::SetDestination"
+                          },
+                          "parameters": [
+                            "PathfinderObject",
+                            "PathfindingBehavior",
+                            "",
+                            "RoomObject.CenterX()",
+                            "RoomObject.CenterY()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__DungeonGenerator.PathCounter",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Create a hallway object at every cell along the path to the destination",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Repeat",
+                      "repeatExpression": "PathfinderObject.PathfindingBehavior::NodeCount()",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "HallwayObject",
+                            "PathfinderObject.PathfindingBehavior::GetNodeX(Variable(__DungeonGenerator.PathCounter))",
+                            "PathfinderObject.PathfindingBehavior::GetNodeY(Variable(__DungeonGenerator.PathCounter))",
+                            "Layer"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Adjust size of hallway objects",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "DungeonGenerator::AdjustHallwaySizes"
+                              },
+                              "parameters": [
+                                "",
+                                "HallwayObject",
+                                "PathfinderObject",
+                                "PathfindingBehavior",
+                                "TileSize",
+                                "HallwayWidth",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Move the pathfinder object to the room that was just connected with a hallway",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "MettreXY"
+                          },
+                          "parameters": [
+                            "PathfinderObject",
+                            "=",
+                            "RoomObject.CenterX()",
+                            "=",
+                            "RoomObject.CenterY()"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Add additional paths between rooms",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "If desired, make additional random connections between rooms",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__DungeonGenerator.AdditionalPathCounter",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "infiniteLoopWarning": true,
+                  "type": "BuiltinCommonInstructions::While",
+                  "whileConditions": [
+                    {
+                      "type": {
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "__DungeonGenerator.AdditionalPathCounter",
+                        "<",
+                        "AdditionalPaths"
+                      ]
+                    }
+                  ],
+                  "conditions": [],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Set the destination of the pathfinder to the next room (don't select the room that already has the pathfinder)",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "AjoutHasard"
+                          },
+                          "parameters": [
+                            "RoomObject",
+                            "RoomObject"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "CollisionNP"
+                          },
+                          "parameters": [
+                            "PathfinderObject",
+                            "RoomObject",
+                            "",
+                            "",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PathfindingBehavior::SetDestination"
+                          },
+                          "parameters": [
+                            "PathfinderObject",
+                            "PathfindingBehavior",
+                            "",
+                            "RoomObject.CenterX()",
+                            "RoomObject.CenterY()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__DungeonGenerator.PathCounter",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Create a hallway object at every cell along the path to the destination",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Repeat",
+                          "repeatExpression": "PathfinderObject.PathfindingBehavior::NodeCount()",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "HallwayObject",
+                                "PathfinderObject.PathfindingBehavior::GetNodeX(Variable(__DungeonGenerator.PathCounter))",
+                                "PathfinderObject.PathfindingBehavior::GetNodeY(Variable(__DungeonGenerator.PathCounter))",
+                                "Layer"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Adjust size of hallway objects",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "DungeonGenerator::AdjustHallwaySizes"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "HallwayObject",
+                                    "PathfinderObject",
+                                    "PathfindingBehavior",
+                                    "TileSize",
+                                    "HallwayWidth",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Move the pathfinder object to the room that was just connected with a hallway",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "MettreXY"
+                              },
+                              "parameters": [
+                                "PathfinderObject",
+                                "=",
+                                "RoomObject.CenterX()",
+                                "=",
+                                "RoomObject.CenterY()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "__DungeonGenerator.AdditionalPathCounter",
+                                "+",
+                                "1"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Cleanup",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Remove terrain from rooms and hallways.",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Remove terrain from inside rooms and hallways.",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "CollisionNP"
+                          },
+                          "parameters": [
+                            "TerrainObject",
+                            "RoomObject",
+                            "",
+                            "",
+                            "yes"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "CollisionNP"
+                          },
+                          "parameters": [
+                            "TerrainObject",
+                            "HallwayObject",
+                            "",
+                            "",
+                            "yes"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "TerrainObject",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Place walls",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::ForEach",
+                  "object": "TerrainObject",
+                  "conditions": [],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Create walls where terrain touches hallways but not rooms",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "HallwayObject",
+                            "Deleted",
+                            "False"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "CollisionNP"
+                          },
+                          "parameters": [
+                            "TerrainObject",
+                            "HallwayObject",
+                            "",
+                            "",
+                            "yes"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "CollisionNP"
+                          },
+                          "parameters": [
+                            "TerrainObject",
+                            "HallwayObject",
+                            "",
+                            "",
+                            "no"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "CollisionNP"
+                          },
+                          "parameters": [
+                            "TerrainObject",
+                            "RoomObject",
+                            "",
+                            "",
+                            "yes"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "WallObject",
+                            "TerrainObject.X()",
+                            "TerrainObject.Y()",
+                            "Layer"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Delete"
+                          },
+                          "parameters": [
+                            "TerrainObject",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ChangeHeight"
+                          },
+                          "parameters": [
+                            "WallObject",
+                            "=",
+                            "TileSize"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ChangeWidth"
+                          },
+                          "parameters": [
+                            "WallObject",
+                            "=",
+                            "TileSize"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Create walls where terrain touches rooms but not hallways",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "CollisionNP"
+                          },
+                          "parameters": [
+                            "TerrainObject",
+                            "RoomObject",
+                            "",
+                            "",
+                            "yes"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "CollisionNP"
+                          },
+                          "parameters": [
+                            "TerrainObject",
+                            "RoomObject",
+                            "",
+                            "",
+                            "no"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "CollisionNP"
+                          },
+                          "parameters": [
+                            "TerrainObject",
+                            "HallwayObject",
+                            "",
+                            "",
+                            "yes"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "WallObject",
+                            "TerrainObject.X()",
+                            "TerrainObject.Y()",
+                            "Layer"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Delete"
+                          },
+                          "parameters": [
+                            "TerrainObject",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ChangeWidth"
+                          },
+                          "parameters": [
+                            "WallObject",
+                            "=",
+                            "TileSize"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ChangeHeight"
+                          },
+                          "parameters": [
+                            "WallObject",
+                            "=",
+                            "TileSize"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Delete hallways that are at least partially inside of rooms ",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "HallwayObject",
+                        "RoomObject",
+                        "",
+                        "",
+                        "yes"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "HallwayObject",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Set boolean flag for hallways that are doorways (adjacent to room but not touching)",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "HallwayObject",
+                        "RoomObject",
+                        "",
+                        "",
+                        "no"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "HallwayObject",
+                        "__DungeonGenerator.IsRoomEntrance",
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Cleanup",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Remove extra terrain, if needed",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "DeleteUnused",
+                        "True",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "TerrainObject",
+                        "RoomObject",
+                        "",
+                        "",
+                        "no"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "TerrainObject",
+                        "HallwayObject",
+                        "",
+                        "",
+                        "no"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "TerrainObject",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Cleanup pathfinder object",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "PathfinderObject",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Tile size (pixels)",
+          "longDescription": "All objects are based on this size",
+          "name": "TileSize",
+          "type": "expression"
+        },
+        {
+          "description": "Map width (number of colums)",
+          "name": "MapWidth",
+          "type": "expression"
+        },
+        {
+          "description": "Map height (number of rows)",
+          "name": "MapHeight",
+          "type": "expression"
+        },
+        {
+          "description": "Terrain object",
+          "longDescription": "Used to fill the map that is not covered by floors, hallways, or walls.",
+          "name": "TerrainObject",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "description": "Room object",
+          "longDescription": "Rooms are placed in random locations and will try to not overlap with other rooms. ",
+          "name": "RoomObject",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "description": "Hallway object",
+          "longDescription": "Used to connect room objects.  They follow the path made by the pathfinder object.",
+          "name": "HallwayObject",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "description": "Number of rooms",
+          "longDescription": "Rooms should take less than ~25% of map to ensure non-overlapping rooms.  If there are too many rooms, they may end up overlapping each other.",
+          "name": "RoomQty",
+          "type": "expression"
+        },
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        },
+        {
+          "description": "Min room width (tiles)",
+          "name": "MinRoomWidth",
+          "type": "expression"
+        },
+        {
+          "description": "Max room width (tiles)",
+          "name": "MaxRoomWidth",
+          "type": "expression"
+        },
+        {
+          "description": "Min room height (tiles)",
+          "name": "MinRoomHeight",
+          "type": "expression"
+        },
+        {
+          "description": "Max room height (tiles)",
+          "name": "MaxRoomHeight",
+          "type": "expression"
+        },
+        {
+          "description": "Pathfinder object",
+          "longDescription": "Used to identify where hallways are placed between rooms",
+          "name": "PathfinderObject",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "description": "Pathfinding behavior (required)",
+          "name": "PathfindingBehavior",
+          "supplementaryInformation": "PathfindingBehavior::PathfindingBehavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Max separation attempts",
+          "longDescription": "Number of attempts to separate overalapping rooms.  When this number is reached, rooms are left in current position. (Default: 10,000)",
+          "name": "MaxSeparationAttempts",
+          "type": "expression"
+        },
+        {
+          "description": "Connect rooms in a loop",
+          "name": "CloseLoop",
+          "type": "yesorno"
+        },
+        {
+          "description": "Hallway width (tiles)",
+          "name": "HallwayWidth",
+          "type": "expression"
+        },
+        {
+          "description": "Additional paths between connect rooms",
+          "name": "AdditionalPaths",
+          "type": "expression"
+        },
+        {
+          "description": "Delete unused terrain",
+          "name": "DeleteUnused",
+          "type": "trueorfalse"
+        },
+        {
+          "description": "Wall object",
+          "name": "WallObject",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Calculate the number of grid neighbors around an object.  Use \"NeighborCount(Object)\" expression to retrieve this value.",
+      "fullName": "Calculate the number of grid neighbors around an object",
+      "functionType": "Action",
+      "name": "CalculateGridNeighbors",
+      "sentence": "Calculate the number of grid neighbors (_PARAM2_) around _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "Object",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Save center point and size as scene variables (since we can't compare instances of the same object)",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.ThisCenterX",
+                    "=",
+                    "Object.CenterX()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.ThisCenterY",
+                    "=",
+                    "Object.CenterY()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.ThisObjectWidth",
+                    "=",
+                    "Object.Width()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.ThisNeighborCount",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Initiate offset to start looking for the top-left neighbor",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.NeighborOffsetX",
+                    "=",
+                    "-1"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__DungeonGenerator.NeighborOffsetY",
+                    "=",
+                    "-1"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Search for neighbors (but don't consider the center object)",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "3",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Repeat",
+                  "repeatExpression": "3",
+                  "conditions": [],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "CollisionPoint"
+                          },
+                          "parameters": [
+                            "Neighbor",
+                            "Variable(__DungeonGenerator.ThisCenterX) + (Variable(__DungeonGenerator.NeighborOffsetX) * Variable(__DungeonGenerator.ThisObjectWidth))",
+                            "Variable(__DungeonGenerator.ThisCenterY) + (Variable(__DungeonGenerator.NeighborOffsetY) * Variable(__DungeonGenerator.ThisObjectWidth))"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__DungeonGenerator.ThisNeighborCount",
+                            "+",
+                            "1"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__DungeonGenerator.NeighborOffsetX",
+                            "+",
+                            "1"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__DungeonGenerator.NeighborOffsetX",
+                        "=",
+                        "-1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__DungeonGenerator.NeighborOffsetY",
+                        "+",
+                        "1"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Save neighbor count in real object",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Object",
+                    "__DungeonGenerator.Neighbors",
+                    "=",
+                    "Variable(__DungeonGenerator.ThisNeighborCount)"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Primary object (or object group)",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Neighbor object (or object group)",
+          "name": "Neighbor",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The numerical order this room was created.  (Range: 1 to total number of rooms).",
+      "fullName": "Creation order of room",
+      "functionType": "Expression",
+      "name": "RoomID",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "RoomObject.Variable(__DungeonGenerator.RoomID)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Room object",
+          "name": "RoomObject",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Number of grid neighbors of an object.  Requires running the \"CalculateGridNeighbors\" action before using this expression.",
+      "fullName": "Number of grid neighbors of an object",
+      "functionType": "Expression",
+      "name": "NeighborCount",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "Object.Variable(__DungeonGenerator.Neighbors)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Object",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if hallway is a room entrance.",
+      "fullName": "Hallway is a room entrance",
+      "functionType": "Condition",
+      "name": "IsRoomEntrance",
+      "sentence": "_PARAM1_ is a room entrance",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "ObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "Object",
+                "__DungeonGenerator.IsRoomEntrance",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Hallway object",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

@@ -1,0 +1,23 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "PEzPAaWHgYgk5UwIPppsL6f2ugp2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "3D collision",
+  "name": "Collision3D",
+  "version": "0.2.1",
+  "url": "https://resources.gdevelop-app.com/extensions/Collision3D.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Collision3D-header.json",
+  "tags": "3d,collision",
+  "category": "General",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/7a5696a515bf40813692e118147568392a854f65f5b50750c9b9aaa967aba7df_vector-intersection.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Check collision and distance between 3D objects.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 8,
+  "helpPath": "/extensions/collision3d",
+  "description": "Check collision and distance between 3D objects and separate them from each other.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZlY3Rvci1pbnRlcnNlY3Rpb24iIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMy4xNCwxQTIuMTQsMi4xNCAwIDAsMCAxLDMuMTRWNUgzVjNINVYxSDMuMTRNNywxVjNIMTBWMUg3TTEyLDFWM0gxNFY1SDE2VjMuMTRDMTYsMS45NiAxNS4wNCwxIDEzLjg2LDFIMTJNMSw3VjEwSDNWN0gxTTksN0M3Ljg5LDcgNyw3Ljg5IDcsOUM3LDExLjMzIDcsMTYgNywxNkM3LDE2IDExLjU3LDE2IDEzLjg2LDE2QTIuMTQsMi4xNCAwIDAsMCAxNiwxMy44NkMxNiwxMS41NyAxNiw3IDE2LDdDMTYsNyAxMS4zMyw3IDksN00xOCw3VjlIMjBWMTFIMjJWOUMyMiw3Ljg5IDIxLjExLDcgMjAsN0gxOE05LDlIMTRWMTRIOVY5TTEsMTJWMTMuODZDMSwxNS4wNCAxLjk2LDE2IDMuMTQsMTZINVYxNEgzVjEySDFNMjAsMTNWMTZIMjJWMTNIMjBNNywxOFYyMEM3LDIxLjExIDcuODksMjIgOSwyMkgxMVYyMEg5VjE4SDdNMjAsMThWMjBIMThWMjJIMjBDMjEuMTEsMjIgMjIsMjEuMTEgMjIsMjBWMThIMjBNMTMsMjBWMjJIMTZWMjBIMTNaIiAvPjwvc3ZnPg=="
+}

@@ -1,0 +1,44 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Hexagonal 2D grid",
+  "name": "HexagonalGrid",
+  "version": "0.0.3",
+  "url": "https://resources.gdevelop-app.com/extensions/HexagonalGrid.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/HexagonalGrid-header.json",
+  "tags": "hexagon,bubble,grid,snap,positioning",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/hexagon-multiple-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Snap objects to an hexagonal grid.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 3,
+  "helpPath": "/extensions/hexagonal-grid",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "SnapObjectToPointyToppedHexagonalGrid",
+      "fullName": "Snap objects to a virtual pointy topped hexagonal grid",
+      "description": "Snap object to a virtual pointy topped hexagonal grid (this is not the grid used in the editor).",
+      "functionType": "Action"
+    },
+    {
+      "name": "SnapObjectToFlatToppedHexagonalGrid",
+      "fullName": "Snap objects to a virtual flat topped hexagonal grid",
+      "description": "Snap object to a virtual flat topped hexagonal grid (this is not the grid used in the editor).",
+      "functionType": "Action"
+    },
+    {
+      "name": "SnapObjectToBubbleGrid",
+      "fullName": "Snap objects to a virtual bubble grid",
+      "description": "Snap object to a virtual bubble grid (this is not the grid used in the editor).",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "It allows to snap objects on a 2D hexagonal grid.\n\nIt's useful for:\n- level editors\n- building systems ([open the city builder example online](https://editor.gdevelop.io/?project=example://city-builder))\n\nA [simple example](https://editor.gdevelop.io/?project=example://snap-object-to-grid) shows how to snap objects that are dragged with the mouse.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWhleGFnb24tbXVsdGlwbGUtb3V0bGluZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik05LjM3IDRMMTAuNzggNi41TDkuMzcgOUg2LjYzTDUuMjMgNi41TDYuNjMgNEg5LjM3TTEwLjI1IDJINS43NUM1LjU2IDIgNS4zOSAyLjExIDUuMzEgMi4yNkwzLjA5IDYuMjJMMyA2LjVMMy4wOSA2Ljc4TDUuMzEgMTAuNzRDNS4zOSAxMC44OSA1LjU2IDExIDUuNzUgMTFIMTAuMjVDMTAuNDQgMTEgMTAuNjEgMTAuODkgMTAuNjkgMTAuNzRMMTIuOTEgNi43OEwxMyA2LjVMMTIuOTEgNi4yMkwxMC42OSAyLjI2QzEwLjYxIDIuMTEgMTAuNDQgMiAxMC4yNSAyTTE4LjYyIDkuNUwyMCAxMkwxOC42MiAxNC41SDE1Ljg4TDE0LjUgMTJMMTUuODggOS41SDE4LjYyTTE5LjUgNy41SDE1QzE0LjgxIDcuNSAxNC42NCA3LjYxIDE0LjU2IDcuNzZMMTIuMzQgMTEuNzJMMTIuMjUgMTJMMTIuMzQgMTIuMjhMMTQuNTYgMTYuMjRDMTQuNjQgMTYuMzkgMTQuODEgMTYuNSAxNSAxNi41SDE5LjVDMTkuNjkgMTYuNSAxOS44NiAxNi4zOSAxOS45NCAxNi4yNEwyMi4xNiAxMi4yOEwyMi4yNSAxMkwyMi4xNiAxMS43MkwxOS45NCA3Ljc2QzE5Ljg2IDcuNjEgMTkuNjkgNy41IDE5LjUgNy41TTkuMzcgMTVMMTAuNzggMTcuNUw5LjM3IDIwSDYuNjNMNS4yMyAxNy41TDYuNjMgMTVIOS4zN00xMC4yNSAxM0g1Ljc1QzUuNTYgMTMgNS4zOSAxMy4xMSA1LjMxIDEzLjI2TDMuMDkgMTcuMjJMMyAxNy41TDMuMDkgMTcuNzhMNS4zMSAyMS43NEM1LjM5IDIxLjg5IDUuNTYgMjIgNS43NSAyMkgxMC4yNUMxMC40NCAyMiAxMC42MSAyMS44OSAxMC42OSAyMS43NEwxMi45MSAxNy43OEwxMyAxNy41TDEyLjkxIDE3LjIyTDEwLjY5IDEzLjI2QzEwLjYxIDEzLjExIDEwLjQ0IDEzIDEwLjI1IDEzWiIgLz48L3N2Zz4="
+}

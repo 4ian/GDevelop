@@ -1,0 +1,178 @@
+{
+  "author": "Ahnaf30e",
+  "category": "Advanced",
+  "description": "Adds expressions to convert text to a binary representation and back.\nThe `UnicodeConversion::ReverseUnicode(string, range, base)` string expression can be used for basic obfuscation of data.",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Unicode",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWRpY2UtZDEwIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJDMTEuNSAyIDExIDIuMTkgMTAuNTkgMi41OUwyLjU5IDEwLjU5QzEuOCAxMS4zNyAxLjggMTIuNjMgMi41OSAxMy40MUwxMC41OSAyMS40MUMxMS4zNyAyMi4yIDEyLjYzIDIyLjIgMTMuNDEgMjEuNDFMMjEuNDEgMTMuNDFDMjIuMiAxMi42MyAyMi4yIDExLjM3IDIxLjQxIDEwLjU5TDEzLjQxIDIuNTlDMTMgMi4xOSAxMi41IDIgMTIgMk0xNC4wNyA4LjIxQzE1LjUgOC4yMSAxNi42NCA5LjM2IDE2LjY0IDEwLjc4VjEzLjQyQzE2LjY0IDE0Ljg0IDE1LjUgMTYgMTQuMDcgMTZDMTIuNjQgMTYgMTEuNSAxNC44NCAxMS41IDEzLjQyVjEwLjc4QzExLjUgOS4zNiAxMi42NSA4LjIxIDE0LjA3IDguMjFNMTAuMzYgOC40MUgxMC41VjE2SDlWMTAuMjFMNy4yMiAxMC43NlY5LjUzTDEwLjM2IDguNDFNMTQuMDYgOS42NUMxMy40NyA5LjY1IDEzIDEwLjEzIDEzIDEwLjcxVjEzLjVDMTMgMTQuMDcgMTMuNDcgMTQuNTQgMTQuMDYgMTQuNTRDMTQuNjQgMTQuNTQgMTUuMTQgMTQuMDYgMTUuMTQgMTMuNVYxMC43MUMxNS4xNCAxMC4xMiAxNC42NCA5LjY1IDE0LjA2IDkuNjVaIiAvPjwvc3ZnPg==",
+  "name": "UnicodeConversion",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/dice-d10.svg",
+  "shortDescription": "Convert between text and Unicode/binary representations. Basic string obfuscation support.",
+  "version": "1.0.4",
+  "tags": "binary,base,hex,ascii,unicode",
+  "authorIds": [
+    "onPsboRtDkUHNOsx7OPr8R8G1oj2"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Reverses the unicode of a string with a base.",
+      "fullName": "Reverse the unicode of a string",
+      "functionType": "StringExpression",
+      "name": "ReverseUnicode",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const convString = eventsFunctionContext.getArgument(\"String\");\nconst convBase = eventsFunctionContext.getArgument(\"Base\");\nconst convRange = eventsFunctionContext.getArgument(\"Range\");\n\n//This gets the decimal unicode and turns it into the desired base\nlet result = convString.split(\"\").map(function (char) {\n  return char.charCodeAt(0).toString(convBase).padStart(convRange, \"0\");\n}).join(\" \");\n\n//This reverses the unicode representation\nconst joinArray = result.split(\"\").reverse().join(\"\");\n\n//This turns the unicode representation into the decimal unicode representation \n//and turns it into the string using the fromCharCode function\nresult = \"\";\njoinArray.split(\" \").map(function (bin) {\n  result += String.fromCharCode(parseInt(bin, convBase));\n});\n\neventsFunctionContext.returnValue = result;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "String to reverse",
+          "longDescription": "",
+          "name": "String",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Base of the reverse (Default: 2)",
+          "longDescription": "",
+          "name": "Base",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Range of unicode characters (Put 16 here to support the most characters if you put 2 in the base)",
+          "longDescription": "",
+          "name": "Range",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Converts a unicode representation into String with a base.",
+      "fullName": "Unicode to string",
+      "functionType": "StringExpression",
+      "name": "UnicodeToText",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const convString = eventsFunctionContext.getArgument(\"String\");\nconst convBase = eventsFunctionContext.getArgument(\"Base\");\nlet sep = eventsFunctionContext.getArgument(\"Sep\");\n\n//Checks if the Sperator text is empty. If it is , this sets the value of the sep variable with \" \"\nif (sep == \"\") {\n  sep = \" \";\n};\n\nlet result = \"\";\n\n//This turns the unicode representation into decimal unicode representation and turns it into the string using the fromCharCode function\nconvString.split(sep).map(function (bin) {\n  result += String.fromCharCode(parseInt(bin, convBase));\n});\n\neventsFunctionContext.returnValue = result;\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The unicode to convert to String",
+          "longDescription": "",
+          "name": "String",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Base",
+          "longDescription": "",
+          "name": "Base",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Seperator text (Optional)",
+          "longDescription": "",
+          "name": "Sep",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Converts a string into unicode representation with a base.",
+      "fullName": "String to unicode conversion",
+      "functionType": "StringExpression",
+      "name": "TextToUnicode",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const convString = eventsFunctionContext.getArgument(\"String\");\nconst convBase = eventsFunctionContext.getArgument(\"Base\");\nlet sep = eventsFunctionContext.getArgument(\"Sep\");\n\n//Checks if the Sperator text is empty. If it is , this sets the value of the sep variable with \" \"\nif (sep == \"\") {\n  sep = \" \";\n};\n\n//This gets the decimal code and turns it into the desired base\nconst result = convString.split('').map(function (char) {\n  return char.charCodeAt(0).toString(convBase);\n}).join(sep);\n\neventsFunctionContext.returnValue = result;\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The string to convert to unicode",
+          "longDescription": "",
+          "name": "String",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Base",
+          "longDescription": "",
+          "name": "Base",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Seperator text (Optional)",
+          "longDescription": "",
+          "name": "Sep",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

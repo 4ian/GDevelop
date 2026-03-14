@@ -1,0 +1,154 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Advanced projectile",
+  "name": "AdvancedProjectile",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/AdvancedProjectile.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/AdvancedProjectile-header.json",
+  "tags": "projectile,movement,acceleration,speed,distance",
+  "category": "Movement",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/4ab6bb9f91ea1110c0c2aabd7fe17e320c1d0ebbb44f56d01885307d7d2e723b_arrow-decision-auto.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Projectile behavior with speed, acceleration, max distance, and lifetime controls.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/advanced-projectile/details",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Control how a projectile object moves including lifetime, distance, speed, and acceleration.",
+      "fullName": "Advanced projectile",
+      "name": "AdvancedProjectile",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "IsMaxDistanceExceeded",
+          "fullName": "Max distance from starting position has been exceeded",
+          "description": "Check if max distance from starting position has been exceeded (object will be deleted next frame).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsLifetimeExceeded",
+          "fullName": "Lifetime has been exceeded",
+          "description": "Check if lifetime has been exceeded (object will be deleted next frame).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "MaxLifetime",
+          "fullName": "Lifetime",
+          "description": "Compare the lifetime of the object. Object is deleted after property has been exceeded. Use \"0\" to ignore this property.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetMaxLifetime",
+          "fullName": "Lifetime",
+          "description": "Change the lifetime of the object. Object is deleted after property has been exceeded. Use \"0\" to ignore this property.",
+          "functionType": "Action"
+        },
+        {
+          "name": "RestartLifetimeTimer",
+          "fullName": "Restart lifetime timer",
+          "description": "Restart lifetime timer of object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MaxDistanceFromStart",
+          "fullName": "Max distance from starting position",
+          "description": "Compare the max distance from starting position of the object. Object is deleted after property has been exceeded. Use \"0\" to ignore this property.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetMaxDistanceFromStart",
+          "fullName": "Max distance from starting position",
+          "description": "Change the max distance from starting position of the object. Object is deleted after property has been exceeded. Use \"0\" to ignore this property.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetStartingPositionToCurrentPosition",
+          "fullName": "Change starting position to the current position",
+          "description": "Change the starting position of object to it's current position.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MaxSpeed",
+          "fullName": "Max speed",
+          "description": "Compare the max speed of the object. Object forces cannot exceed this value. Use \"0\" to ignore this property.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetMaxSpeed",
+          "fullName": "Max speed",
+          "description": "Change the max speed of the object. Object forces cannot exceed this value. Use \"0\" to ignore this property.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MinSpeed",
+          "fullName": "MinSpeed",
+          "description": "Compare the minSpeed of the object. Object forces cannot go below this value. Use \"0\" to ignore this property.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetMinSpeed",
+          "fullName": "MinSpeed",
+          "description": "Change the minSpeed of the object. Object forces cannot go below this value. Use \"0\" to ignore this property.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Acceleration",
+          "fullName": "Acceleration",
+          "description": "Compare the acceleration of the object. Use a negative number to slow down.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetAcceleration",
+          "fullName": "Acceleration",
+          "description": "Change the acceleration of the object. Use a negative number to slow down.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StartingSpeed",
+          "fullName": "Starting speed",
+          "description": "Compare the starting speed of the object. Object will move in the direction it is facing when it is created. Use \"0\" to ignore this property.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetStartingSpeed",
+          "fullName": "Starting speed",
+          "description": "Change the starting speed of the object. Object will move in the direction it is facing when it is created. Use \"0\" to ignore this property.",
+          "functionType": "Action"
+        },
+        {
+          "name": "DeleteWhenLifetimeExceeded",
+          "fullName": "Automatic deletion is enabled when lifetime is exceeded",
+          "description": "Check if automatic deletion is enabled when lifetime is exceeded.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetDeleteWhenLifetimeExceeded",
+          "fullName": "Change automatic deletion when lifetime is exceeded",
+          "description": "Change automatic deletion of object when lifetime is exceeded.",
+          "functionType": "Action"
+        },
+        {
+          "name": "DeleteWhenDistanceExceeded",
+          "fullName": "Automatic deletion is enabled when distance from starting position is exceeded",
+          "description": "Check if automatic deletion is enabled when distance from starting position is exceeded.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetDeleteWhenDistanceExceeded",
+          "fullName": "Change automatic deletion when distance from starting position is exceeded",
+          "description": "Change automatic deletion when distance from starting position is exceeded.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Control how a projectile moves including speed, acceleration, distance, and lifetime.\n\nTips:\n- To simulate a rocket, use a starting speed of 0 and a positive acceleration (max speed may also be used)\n- To simulate a hand grenade, use a high starting speed, a negative acceleration, and a non-zero lifetime\n- If the object is not moving, acceleration will be towards the direction it is facing\n- If the object is moving, acceleration will be in the direction the object is moving\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWFycm93LWRlY2lzaW9uLWF1dG8iIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIsNUg5TDEzLDFMMTcsNUgxNFY5LjQzQzEzLjI1LDkuODkgMTIuNTgsMTAuNDYgMTIsMTEuMTJWNU0xMC40LDE1SDguNUw3LjgsMTNINC42TDMuOSwxNUgyTDUuMiw2SDcuMkwxMC40LDE1TTcuMzUsMTEuNjVMNi4yLDhMNS4wNSwxMS42NUg3LjM1TTIzLDExTDE5LDdWMTBDMTUuMzksOS44NSAxMi4zMSwxMi41NyAxMiwxNi4xN0MxMC40NCwxNi43MiA5LjYyLDE4LjQ0IDEwLjE3LDIwQzEwLjcyLDIxLjU2IDEyLjQ0LDIyLjM4IDE0LDIxLjgzQzE1LjU2LDIxLjI3IDE2LjM4LDE5LjU2IDE1LjgzLDE4QzE1LjUzLDE3LjE0IDE0Ljg1LDE2LjQ3IDE0LDE2LjE3QzE0LjQ3LDEyLjE3IDE4LjQ3LDExLjk3IDE4Ljk1LDExLjk3VjE0Ljk3TDIzLDExWiIgLz48L3N2Zz4="
+}

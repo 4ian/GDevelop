@@ -1,0 +1,32 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Make object travel to random positions",
+  "name": "TravelToRandomPositions",
+  "version": "0.4.2",
+  "url": "https://resources.gdevelop-app.com/extensions/TravelToRandomPositions.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/TravelToRandomPositions-header.json",
+  "tags": "random,move,pathfinding,travel,object,direction,angle",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/axis-arrow.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Move objects to random nearby positions using Pathfinding. Optional direction bias.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/travel-to-random-positions",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "TravelToRandomPositions",
+      "fullName": "Make object travel to a random position, with optional direction",
+      "description": "Make object travel to a random position around the object current position. The movement is initiated only when the object is not moving already (its Pathfinding behavior speed is 0).  Move towards a specified angle, if desired.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "When the action is used, the object(s) will select a random nearby 2D location and begin moving towards it (using the 2D Pathfinding behavior). \n\nIf desired, choose a direction and how closely you want the object to follow it.  This can be used to make objects chase (or run away from) the player, or to make objects cross the screen using a meandering path.\n\nIf you keep using the action, once the object reaches a destination, it will select a new random location and begin moving towards it.\n\nIf you want to modify the speed of the object, edit the Pathfinding behavior of the object.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWF4aXMtYXJyb3ciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIsMkwxNiw2SDEzVjEzLjg1TDE5LjUzLDE3LjYxTDIxLDE1LjAzTDIyLjUsMjAuNUwxNywyMS45NkwxOC41MywxOS4zNUwxMiwxNS41OEw1LjQ3LDE5LjM1TDcsMjEuOTZMMS41LDIwLjVMMywxNS4wM0w0LjQ3LDE3LjYxTDExLDEzLjg1VjZIOEwxMiwyWiIgLz48L3N2Zz4="
+}

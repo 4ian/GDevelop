@@ -1,0 +1,907 @@
+{
+  "author": "",
+  "category": "Movement",
+  "description": "Checks if the object has landed on a floor with the given settings.",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "HasLanded",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdub21lIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE4LjQyLDJDMTQuMjYsMiAxMy41LDcuOTMgMTUuODIsNy45M0MxOC4xNiw3LjkzIDIyLjU4LDIgMTguNDIsMk0xMiwyLjczQzExLjkyLDIuNzMgMTEuODUsMi43MyAxMS43OCwyLjc0QzkuNDQsMy4wNCAxMC4yNiw3LjEyIDExLjUsNy4xOUMxMi43Miw3LjI3IDE0LjA0LDIuNzMgMTIsMi43M003LjkzLDQuMzRDNy44MSw0LjM0IDcuNjcsNC4zNyA3LjUzLDQuNDNDNS42NSw1LjIxIDcuMjQsOC40MSA4LjMsOC4yQzkuMjcsOCA5LjM5LDQuMyA3LjkzLDQuMzRNNC45Myw2Ljg1QzQuNzcsNi44NCA0LjU5LDYuOSA0LjQxLDcuMDNDMi45LDguMDcgNC45MSwxMC41OCA1LjgsMTAuMTlDNi41Nyw5Ljg1IDYuMDgsNi44OSA0LjkzLDYuODVNMTMuMjksOC43N0MxMC4xLDguOCA2LjAzLDEwLjQyIDUuMzIsMTMuNTlDNC41MywxNy4xMSA4LjU2LDIyIDEyLjc2LDIyQzE0LjgzLDIyIDE3LjIxLDIwLjEzIDE3LjY2LDE3Ljc3QzE4LDE1Ljk3IDEzLjY1LDE2LjY5IDEzLjgxLDE3Ljg4QzE0LDE5LjMxIDEyLjc2LDIwIDExLjU1LDE5LjFDNy42OSwxNi4xNiAxNy45MywxNC43IDE3LjI1LDEwLjY5QzE3LjAzLDkuMzkgMTUuMzQsOC43NiAxMy4yOSw4Ljc3WiIgLz48L3N2Zz4=",
+  "name": "HasLanded",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/gnome.svg",
+  "shortDescription": "Checks if the object has landed on a given floor.",
+  "version": "1.0.1",
+  "tags": "Floor,Landed",
+  "authorIds": [
+    "JD2xwvKWgodlqsGiL1GCH3tDEwq1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Checks if the object has landed on a given floor.",
+      "fullName": "HasLandedOnGivenFloor",
+      "functionType": "Condition",
+      "group": "",
+      "name": "LandedOnGivenFloor",
+      "private": false,
+      "sentence": "_PARAM1_ Has landed,On _PARAM6_, At fall distance _PARAM4_, And fall speed _PARAM5_,At _PARAM3_ type",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Resets if not on floor",
+          "comment2": ""
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "PlatformBehavior::IsObjectOnGivenFloor"
+              },
+              "parameters": [
+                "MainObject",
+                "MainObjectBehavior",
+                "GivenFloor",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "False"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "MainObject",
+                "___HasLandedOnGivenFloor.Jumped",
+                "False"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "MainObject",
+                "___HasLandedOnGivenFloor.Fell",
+                "False"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Checks if object has jumped or fell",
+          "comment2": ""
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "PlatformBehavior::IsJumping"
+              },
+              "parameters": [
+                "MainObject",
+                "MainObjectBehavior"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "MainObject",
+                "___HasLandedOnGivenFloor.Jumped",
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "PlatformBehavior::IsFalling"
+              },
+              "parameters": [
+                "MainObject",
+                "MainObjectBehavior"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "MainObject",
+                "___HasLandedOnGivenFloor.Fell",
+                "True"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarObjet"
+              },
+              "parameters": [
+                "MainObject",
+                "___HasLandedOnGivenFloor.FellSpeed",
+                "=",
+                "MainObject.MainObjectBehavior::CurrentFallSpeed()"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 255,
+                "g": 255,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "if starts falling store object Y",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "MainObject",
+                    "___HasLandedOnGivenFloor.FellFromY",
+                    "=",
+                    "MainObject.Y()"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "checks if object has landed on floor",
+          "comment2": ""
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "PlatformBehavior::IsObjectOnGivenFloor"
+              },
+              "parameters": [
+                "MainObject",
+                "MainObjectBehavior",
+                "GivenFloor",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PosY"
+                  },
+                  "parameters": [
+                    "MainObject",
+                    ">",
+                    "MainObject.Variable(___HasLandedOnGivenFloor.FellFromY)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "DistanceBetweenPositions(MainObject.Variable(___HasLandedOnGivenFloor.FellFromY), MainObject.Variable(___HasLandedOnGivenFloor.FellFromY), MainObject.Y(), MainObject.Y())",
+                    ">=",
+                    "FallDistance"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "MainObject.Variable(___HasLandedOnGivenFloor.FellSpeed)",
+                    ">=",
+                    "FallSpeed"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "VarObjet"
+                  },
+                  "parameters": [
+                    "MainObject",
+                    "___HasLandedOnGivenFloor.FellFromY",
+                    "!=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "MainObject",
+                        "___HasLandedOnGivenFloor.Fell",
+                        "True"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StrEqual"
+                          },
+                          "parameters": [
+                            "CheckFor",
+                            "=",
+                            "\"Any\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnBoolean"
+                          },
+                          "parameters": [
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StrEqual"
+                          },
+                          "parameters": [
+                            "CheckFor",
+                            "=",
+                            "\"Must have jump\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "MainObject",
+                            "___HasLandedOnGivenFloor.Jumped",
+                            "True"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnBoolean"
+                          },
+                          "parameters": [
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StrEqual"
+                          },
+                          "parameters": [
+                            "CheckFor",
+                            "=",
+                            "\"Cant have jump\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "MainObject",
+                            "___HasLandedOnGivenFloor.Jumped",
+                            "False"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnBoolean"
+                          },
+                          "parameters": [
+                            "True"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object",
+          "longDescription": "",
+          "name": "MainObject",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Behavior",
+          "longDescription": "",
+          "name": "MainObjectBehavior",
+          "optional": false,
+          "supplementaryInformation": "PlatformBehavior::PlatformerObjectBehavior",
+          "type": "behavior"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Type",
+          "longDescription": "",
+          "name": "CheckFor",
+          "optional": false,
+          "supplementaryInformation": "[\"Must have jump\",\"Cant have jump\",\"Any\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Fall distance",
+          "longDescription": "Based of orgin point Y axie and The number will mean the lowest ammount until true so anything thats the number or higher will be true",
+          "name": "FallDistance",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Fall speed",
+          "longDescription": "The number will mean the lowest ammount until true so anything thats the number or higher will be true",
+          "name": "FallSpeed",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Given Floor",
+          "longDescription": "",
+          "name": "GivenFloor",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if the object has landed on floor.",
+      "fullName": "HasLanded",
+      "functionType": "Condition",
+      "group": "",
+      "name": "Landed",
+      "private": false,
+      "sentence": "_PARAM1_ Has landed, At fall distance _PARAM4_, And fall speed _PARAM5_,At _PARAM3_ type",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Resets if not on floor",
+          "comment2": ""
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "PlatformBehavior::IsOnFloor"
+              },
+              "parameters": [
+                "MainObject",
+                "MainObjectBehavior"
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "False"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "MainObject",
+                "___HasLanded.Jumped",
+                "False"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "MainObject",
+                "___HasLanded.Fell",
+                "False"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Checks if object has jumped or fell",
+          "comment2": ""
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "PlatformBehavior::IsJumping"
+              },
+              "parameters": [
+                "MainObject",
+                "MainObjectBehavior"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "MainObject",
+                "___HasLanded.Jumped",
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "PlatformBehavior::IsFalling"
+              },
+              "parameters": [
+                "MainObject",
+                "MainObjectBehavior"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "MainObject",
+                "___HasLanded.Fell",
+                "True"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarObjet"
+              },
+              "parameters": [
+                "MainObject",
+                "___HasLanded.FellSpeed",
+                "=",
+                "MainObject.MainObjectBehavior::CurrentFallSpeed()"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 255,
+                "g": 255,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "if starts falling store object Y",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "MainObject",
+                    "___HasLanded.FellFromY",
+                    "=",
+                    "MainObject.Y()"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "checks if object has landed on floor",
+          "comment2": ""
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "PlatformBehavior::IsOnFloor"
+              },
+              "parameters": [
+                "MainObject",
+                "MainObjectBehavior"
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PosY"
+                  },
+                  "parameters": [
+                    "MainObject",
+                    ">",
+                    "MainObject.Variable(___HasLanded.FellFromY)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "DistanceBetweenPositions(MainObject.Variable(___HasLanded.FellFromY), MainObject.Variable(___HasLanded.FellFromY), MainObject.Y(), MainObject.Y())",
+                    ">=",
+                    "FallDistance"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "MainObject.Variable(___HasLanded.FellSpeed)",
+                    ">=",
+                    "FallSpeed"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "VarObjet"
+                  },
+                  "parameters": [
+                    "MainObject",
+                    "___HasLanded.FellFromY",
+                    "!=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "MainObject",
+                        "___HasLanded.Fell",
+                        "True"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StrEqual"
+                          },
+                          "parameters": [
+                            "CheckFor",
+                            "=",
+                            "\"Any\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnBoolean"
+                          },
+                          "parameters": [
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StrEqual"
+                          },
+                          "parameters": [
+                            "CheckFor",
+                            "=",
+                            "\"Must have jump\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "MainObject",
+                            "___HasLanded.Jumped",
+                            "True"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnBoolean"
+                          },
+                          "parameters": [
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StrEqual"
+                          },
+                          "parameters": [
+                            "CheckFor",
+                            "=",
+                            "\"Cant have jump\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "MainObject",
+                            "___HasLanded.Jumped",
+                            "False"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnBoolean"
+                          },
+                          "parameters": [
+                            "True"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object",
+          "longDescription": "",
+          "name": "MainObject",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Behavior",
+          "longDescription": "",
+          "name": "MainObjectBehavior",
+          "optional": false,
+          "supplementaryInformation": "PlatformBehavior::PlatformerObjectBehavior",
+          "type": "behavior"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Type",
+          "longDescription": "",
+          "name": "CheckFor",
+          "optional": false,
+          "supplementaryInformation": "[\"Must have jump\",\"Cant have jump\",\"Any\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Fall distance",
+          "longDescription": "Based of orgin point Y axie and The number will mean the lowest ammount until true so anything thats the number or higher will be true",
+          "name": "FallDistance",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Fall speed",
+          "longDescription": "The number will mean the lowest ammount until true so anything thats the number or higher will be true",
+          "name": "FallSpeed",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

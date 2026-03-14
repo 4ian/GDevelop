@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IRIhkkTTl2UHhfjrLTTH5GYwkYu1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Record Movements",
+  "name": "RecordMovements",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/RecordMovements.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/RecordMovements-header.json",
+  "tags": "record,movements",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/record-rec.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Allow the user to record object movements and recall them to make reverse time mechanic.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 6,
+  "helpPath": "/extensions/record-movements",
+  "description": "# Actions\n**Record Movements:** to record the object movements,  \nsuch as (Xposition, Yposition, AnimationID, FrameID, HorziontalFlip, VerticalFlip, Angle,Width, Height, Visibility, Opacity).  \n**•** Ability to set the recording speed.  \n**Clear all object records:** to clear all previous records for the object.  \n**Load Movements:** to load the recorded movements of an object.  \n# Conditions\n**Condition Recorded frames has finished loading:** to check if the loaded frames has finished (= to 0).  \n**Condition Record limit is (below) number:** to check if the number of recorded frames is below number.  \n**Condition Record limit is (above) number:** to check if the number of recorded frames is above number.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXJlY29yZC1yZWMiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIuNSw1QTcuNSw3LjUgMCAwLDAgNSwxMi41QTcuNSw3LjUgMCAwLDAgMTIuNSwyMEE3LjUsNy41IDAgMCwwIDIwLDEyLjVBNy41LDcuNSAwIDAsMCAxMi41LDVNNywxMEg5QTEsMSAwIDAsMSAxMCwxMVYxMkMxMCwxMi41IDkuNjIsMTIuOSA5LjE0LDEyLjk3TDEwLjMxLDE1SDkuMTVMOCwxM1YxNUg3TTEyLDEwSDE0VjExSDEyVjEySDE0VjEzSDEyVjE0SDE0VjE1SDEyQTEsMSAwIDAsMSAxMSwxNFYxMUExLDEgMCAwLDEgMTIsMTBNMTYsMTBIMThWMTFIMTZWMTRIMThWMTVIMTZBMSwxIDAgMCwxIDE1LDE0VjExQTEsMSAwIDAsMSAxNiwxME04LDExVjEySDlWMTEiIC8+PC9zdmc+"
+}

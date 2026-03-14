@@ -1,0 +1,716 @@
+{
+  "author": "",
+  "category": "Visual effect",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Sway",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXN3YXAtaG9yaXpvbnRhbC12YXJpYW50IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTQsNkw4LDEwVjdIMTZBMiwyIDAgMCwxIDE4LDlBMiwyIDAgMCwxIDE2LDExSDhBNCw0IDAgMCwwIDQsMTVBNCw0IDAgMCwwIDgsMTlIMTZWMjJMMjAsMThMMTYsMTRWMTdIOEEyLDIgMCAwLDEgNiwxNUEyLDIgMCAwLDEgOCwxM0gxNkE0LDQgMCAwLDAgMjAsOUE0LDQgMCAwLDAgMTYsNUg4VjJMNCw2WiIgLz48L3N2Zz4=",
+  "name": "Sway",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/swap-horizontal-variant.svg",
+  "shortDescription": "Sway objects like grass in wind with configurable amplitude, frequency, and phase.",
+  "dimension": "2D",
+  "version": "1.1.0",
+  "description": [
+    "This extension makes objects sway at different times.",
+    "",
+    "It can be used to:",
+    "- Simulate grass and plant movement swaying in the wind",
+    "- Animate seaweed in an underwater environment",
+    "- Give flames a flickering look ",
+    "",
+    "Set *Center* and *Origin* points to the center base of the object for best results.",
+    "",
+    "Check out [this demo](https://gd.games/bubble/swayexamples) to see what this extension can do.",
+    ""
+  ],
+  "origin": {
+    "identifier": "Sway",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "tween,sway,wobble,shake,grass,plant,snake,flame,fire,candle",
+  "authorIds": [
+    "d3W2ZbWOpKRw2rXfBTscZztY7GH2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Sway multiple instances of an object at different times - useful for random grass swaying.",
+      "fullName": "Sway",
+      "name": "Sway",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 102,
+                "g": 210,
+                "r": 233,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Start the tweens"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Angle the object to the right"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Increase the y scale of the object"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween::AddObjectScaleYTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TweenBehavior",
+                    "\"YScaleMax\"",
+                    "YScaleMax",
+                    "\"easeInOutSine\"",
+                    "RandomInRange(YScaleMin * 1000,YScaleTimeMax * 1000)",
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween::AddObjectAngleTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TweenBehavior",
+                    "\"AngleRight\"",
+                    "AngleRight",
+                    "\"easeInOutSine\"",
+                    "RandomInRange(AngleTimeMin * 1000,AngleTimeMax * 1000)",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Sway::Sway",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Angle the object to the left"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Tween::HasFinished"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TweenBehavior",
+                    "\"AngleRight\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween::RemoveTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TweenBehavior",
+                    "\"AngleRight\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween::AddObjectAngleTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TweenBehavior",
+                    "\"AngleLeft\"",
+                    "AngleLeft",
+                    "\"easeInOutSine\"",
+                    "RandomInRange(AngleTimeMin * 1000,AngleTimeMax * 1000)",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Angle the object to the right"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Tween::HasFinished"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TweenBehavior",
+                    "\"AngleLeft\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween::RemoveTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TweenBehavior",
+                    "\"AngleLeft\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween::AddObjectAngleTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TweenBehavior",
+                    "\"AngleRight\"",
+                    "AngleRight",
+                    "\"easeInOutSine\"",
+                    "RandomInRange(AngleTimeMin * 1000,AngleTimeMax * 1000)",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Decrease the y scale of the object"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Tween::HasFinished"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TweenBehavior",
+                    "\"YScaleMax\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween::RemoveTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TweenBehavior",
+                    "\"YScaleMax\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween::AddObjectScaleYTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TweenBehavior",
+                    "\"YScaleMin\"",
+                    "YScaleMin",
+                    "\"easeInOutSine\"",
+                    "RandomInRange(YScaleTimeMin * 1000,YScaleTimeMax * 1000)",
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Increase the y scale of the object"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Tween::HasFinished"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TweenBehavior",
+                    "\"YScaleMin\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween::RemoveTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TweenBehavior",
+                    "\"YScaleMin\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween::AddObjectScaleYTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TweenBehavior",
+                    "\"YScaleMax\"",
+                    "YScaleMax",
+                    "\"easeInOutSine\"",
+                    "RandomInRange(YScaleTimeMin * 1000,YScaleTimeMax * 1000)",
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Sway::Sway",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set sway angle left and right.",
+          "fullName": "Set sway angle left and right",
+          "functionType": "Action",
+          "group": "Sway angle",
+          "name": "ChangeSwayAngle",
+          "sentence": "Sway the angle of _PARAM0_ to _PARAM2_° to the left and to _PARAM3_° to the right",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "AngleLeft",
+                    "=",
+                    "AngleLeftChanged"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "AngleRight",
+                    "=",
+                    "AngleRightChanged"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Sway::Sway",
+              "type": "behavior"
+            },
+            {
+              "description": "Angle to the left (degrees) - Use negative number",
+              "name": "AngleLeftChanged",
+              "type": "expression"
+            },
+            {
+              "description": "Angle to the right (degrees) - Use positive number",
+              "name": "AngleRightChanged",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set sway angle time range.",
+          "fullName": "Set sway angle time range",
+          "functionType": "Action",
+          "group": "Sway angle",
+          "name": "ChangeSwayAngleTime",
+          "sentence": "Tween angle time range for _PARAM0_, set minimum to _PARAM2_ seconds and maximum to _PARAM3_ seconds",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "AngleTimeMin",
+                    "=",
+                    "AngleTimeMinChanged"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "AngleTimeMax",
+                    "=",
+                    "AngleTimeMaxChanged"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Sway::Sway",
+              "type": "behavior"
+            },
+            {
+              "description": "Angle tween time minimum (seconds)",
+              "name": "AngleTimeMinChanged",
+              "type": "expression"
+            },
+            {
+              "description": "Angle tween time maximum (seconds)",
+              "name": "AngleTimeMaxChanged",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set sway Y scale mininum and maximum.",
+          "fullName": "Set sway Y scale mininum and maximum",
+          "functionType": "Action",
+          "group": "Sway Y scale",
+          "name": "ChangeSwayYScale",
+          "sentence": "Sway the Y scale of _PARAM0_ from _PARAM2_ to _PARAM3_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "YScaleMin",
+                    "=",
+                    "YScaleMinChanged"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "YScaleMax",
+                    "=",
+                    "YScaleMaxChanged"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Sway::Sway",
+              "type": "behavior"
+            },
+            {
+              "description": "Minimum Y scale",
+              "name": "YScaleMinChanged",
+              "type": "expression"
+            },
+            {
+              "description": "Maximum Y scale",
+              "name": "YScaleMaxChanged",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set Y scale time range.",
+          "fullName": "Set sway Y scale time range",
+          "functionType": "Action",
+          "group": "Sway Y scale",
+          "name": "ChangeSwayYScaleTime",
+          "sentence": "Tween Y scale time range for _PARAM0_, set minimum to _PARAM2_ seconds and maximum to _PARAM3_ seconds",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "YScaleTimeMax",
+                    "=",
+                    "YScaleTimeMaxChanged"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "YScaleTimeMin",
+                    "=",
+                    "YScaleTimeMinChanged"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Sway::Sway",
+              "type": "behavior"
+            },
+            {
+              "description": "Y scale tween time minimum (seconds)",
+              "name": "YScaleTimeMinChanged",
+              "type": "expression"
+            },
+            {
+              "description": "Y scale tween time maximum (seconds)",
+              "name": "YScaleTimeMaxChanged",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Scalable capability",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "ScalableCapability::ScalableBehavior"
+          ],
+          "name": "Scale"
+        },
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Sway uses the tween behavior",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "Tween::TweenBehavior"
+          ],
+          "name": "TweenBehavior"
+        },
+        {
+          "value": "-5",
+          "type": "Number",
+          "label": "Maximum angle to the left (in degrees) - Use a negative number",
+          "description": "",
+          "group": "Angle",
+          "extraInformation": [],
+          "name": "AngleLeft"
+        },
+        {
+          "value": "5",
+          "type": "Number",
+          "label": "Maximum angle to the right (in degrees) - Use a positive number",
+          "description": "",
+          "group": "Angle",
+          "extraInformation": [],
+          "name": "AngleRight"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Mininum value for random tween time range for angle (seconds)",
+          "description": "",
+          "group": "Angle",
+          "extraInformation": [],
+          "name": "AngleTimeMin"
+        },
+        {
+          "value": "3",
+          "type": "Number",
+          "label": "Maximum value for random tween time range for angle (seconds)",
+          "description": "",
+          "group": "Angle",
+          "extraInformation": [],
+          "name": "AngleTimeMax"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Minimum Y scale amount",
+          "description": "",
+          "group": "Y scale",
+          "extraInformation": [],
+          "name": "YScaleMin"
+        },
+        {
+          "value": "1.2",
+          "type": "Number",
+          "label": "Maximum Y scale amount",
+          "description": "",
+          "group": "Y scale",
+          "extraInformation": [],
+          "name": "YScaleMax"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Mininum value for random tween time range for Y scale (seconds)",
+          "description": "",
+          "group": "Y scale",
+          "extraInformation": [],
+          "name": "YScaleTimeMin"
+        },
+        {
+          "value": "3",
+          "type": "Number",
+          "label": "Maximum value for random tween time range for Y scale (seconds)",
+          "description": "",
+          "group": "Y scale",
+          "extraInformation": [],
+          "name": "YScaleTimeMax"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

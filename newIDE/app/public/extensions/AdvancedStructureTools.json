@@ -1,0 +1,286 @@
+{
+  "author": "",
+  "category": "General",
+  "extensionNamespace": "",
+  "fullName": "Advanced structure tools",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "",
+  "iconUrl": "",
+  "name": "AdvancedStructureTools",
+  "previewIconUrl": "",
+  "shortDescription": "Tools for working with structures and arrays of structures.",
+  "version": "1.0.0",
+  "description": [
+    "This extension adds structure-oriented tools:",
+    "- Copy variable: deep copy of a structure or array",
+    "- Filter array: filter arrays of numbers, strings, or structures by field path and condition",
+    "- Sort structures by field: sort an array of structures by a field or nested path"
+  ],
+  "origin": {
+    "identifier": "AdvancedStructureTools",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "structure,array,variable,copy,filter,sort,field,nested",
+  "authorIds": [
+    "awmVXXKRprgezDutmfKXAinqtbO2"
+  ],
+  "changelog": [],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Copies a variable (structure or array) completely with all nested fields. Creates a real deep copy without any links.",
+      "fullName": "Copy variable",
+      "functionType": "Action",
+      "name": "CopyVariable",
+      "sentence": "Copy variable _PARAM1_ to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const sourceVariable = eventsFunctionContext.getArgument(\"SourceVariable\");",
+            "const targetVariable = eventsFunctionContext.getArgument(\"TargetVariable\");",
+            "if (targetVariable.getChildrenCount() !== 0) {",
+            "    targetVariable.clearChildren();",
+            "}",
+            "gdjs.Variable.copy(sourceVariable, targetVariable, true);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Source variable (structure or array) to copy from",
+          "name": "SourceVariable",
+          "type": "variable"
+        },
+        {
+          "description": "Target variable (structure or array) to copy to",
+          "name": "TargetVariable",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Filters an array based on a comparison condition. Can filter arrays of numbers, strings, or structures. If OutputArray is not specified, the input array is mutated.",
+      "fullName": "Filter array",
+      "functionType": "Action",
+      "name": "Filter",
+      "sentence": "Filter array _PARAM1_ where _PARAM2_ _PARAM3_ _PARAM4_ into _PARAM5_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const sourceArray = eventsFunctionContext.getArgument(\"SourceArray\");",
+            "const outputArray = eventsFunctionContext.getArgument(\"OutputArray\");",
+            "const fieldName = eventsFunctionContext.getArgument(\"FieldPath\");",
+            "const operator = eventsFunctionContext.getArgument(\"Operator\");",
+            "const rawValue = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "sourceArray.castTo(\"array\");",
+            "",
+            "const fieldPath = fieldName ? fieldName.split(\".\") : null;",
+            "",
+            "const getField = (variable) => {",
+            "    if (!fieldPath) return variable;",
+            "",
+            "    let current = variable;",
+            "    for (const part of fieldPath) {",
+            "        if (!current.isStructure() || !current.hasChild(part)) return null;",
+            "        current = current.getChild(part);",
+            "    }",
+            "    return current || null;",
+            "};",
+            "",
+            "const OPERATORS = new Map([",
+            "    [\"==\", (a, b) => a === b],",
+            "    [\"!=\", (a, b) => a !== b],",
+            "    [\">\", (a, b) => a > b],",
+            "    [\"<\", (a, b) => a < b],",
+            "    [\">=\", (a, b) => a >= b],",
+            "    [\"<=\", (a, b) => a <= b],",
+            "]);",
+            "",
+            "",
+            "const parsedValue = (() => {",
+            "    const v = rawValue.trim();",
+            "",
+            "    if (!isNaN(v) && v !== \"\") {",
+            "        return { type: \"number\", value: Number(v) };",
+            "    }",
+            "",
+            "    if (v === \"true\" || v === \"false\") {",
+            "        return { type: \"boolean\", value: v === \"true\" };",
+            "    }",
+            "",
+            "    if (v.startsWith(\"/\") && v.endsWith(\"/\") && v.length > 2) {",
+            "        try {",
+            "            return {",
+            "                type: \"regex\",",
+            "                value: new RegExp(v.slice(1, -1)),",
+            "            };",
+            "        } catch (_) { }",
+            "    }",
+            "",
+            "    return { type: \"string\", value: rawValue };",
+            "})();",
+            "",
+            "const compare = (variable) => {",
+            "    if (!variable) return false;",
+            "",
+            "    switch (parsedValue.type) {",
+            "        case \"number\":",
+            "            return OPERATORS.get(operator)(variable.getAsNumber(), parsedValue.value);",
+            "",
+            "        case \"boolean\":",
+            "            return OPERATORS.get(operator)(variable.getAsBool(), parsedValue.value);",
+            "",
+            "        case \"regex\": {",
+            "            if (operator === \"==\") {",
+            "                return parsedValue.value.test(variable.getAsString());",
+            "            } else {",
+            "                return !parsedValue.value.test(variable.getAsString());",
+            "            }",
+            "        }",
+            "",
+            "        case \"string\":",
+            "            return OPERATORS.get(operator)(variable.getAsString(), parsedValue.value);",
+            "        default:",
+            "            return false;",
+            "    }",
+            "",
+            "    return false;",
+            "};",
+            "",
+            "const filtered = sourceArray.getAllChildrenArray().filter((variable) =>",
+            "    compare(getField(variable))",
+            ");",
+            "",
+            "const resultArray = outputArray.getValue() ? outputArray : sourceArray;",
+            "",
+            "resultArray.castTo(\"array\");",
+            "resultArray.clearChildren();",
+            "for (const child of filtered) {",
+            "    resultArray.pushVariableCopy(child);",
+            "}",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Array to filter",
+          "name": "SourceArray",
+          "type": "variable"
+        },
+        {
+          "description": "Field name or path to check for structures (supports nested fields like \"player.score\")",
+          "longDescription": "Leave empty to compare the array element directly. For structures, use dot notation to access nested fields (e.g., \"player.score\").",
+          "name": "FieldPath",
+          "optional": true,
+          "type": "string"
+        },
+        {
+          "description": "Comparison operator",
+          "name": "Operator",
+          "supplementaryInformation": "[\"==\",\"!=\",\">\",\"<\",\">=\",\"<=\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Value to compare against (can be regex like /pattern/, number, boolean, or text)",
+          "longDescription": "For regex matching, use format /pattern/ (e.g., /^test/). For numbers, enter the number. For booleans, use \"true\" or \"false\". For strings, enter the text.",
+          "name": "Value",
+          "type": "string"
+        },
+        {
+          "description": "Output array (leave empty to mutate input array)",
+          "longDescription": "If specified, filtered results will be stored in this array. If left empty, the source array will be modified in place.",
+          "name": "OutputArray",
+          "optional": true,
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Sorts an array of structures by a specified field or path. Automatically detects if the value is a number or string and sorts accordingly.",
+      "fullName": "Sort structures by field",
+      "functionType": "Action",
+      "name": "SortStructuresByField",
+      "sentence": "Sort array _PARAM1_ by field _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const fieldName = eventsFunctionContext.getArgument(\"FieldPath\");",
+            "",
+            "array.castTo(\"array\");",
+            "",
+            "const fieldPath = fieldName ? fieldName.split(\".\") : null;",
+            "",
+            "const getValue = (variable) => {",
+            "  let current = variable;",
+            "",
+            "  if (fieldPath) {",
+            "    for (const part of fieldPath) {",
+            "      if (!current.isStructure() || !current.hasChild(part)) return null;",
+            "      current = current.getChild(part);",
+            "      if (!current) return null;",
+            "    }",
+            "  }",
+            "",
+            "  const type = current.getType();",
+            "  return type === \"number\"",
+            "    ? current.getAsNumber()",
+            "    : current.getAsString();",
+            "};",
+            "",
+            "array.getAllChildrenArray().sort((a, b) => {",
+            "  const av = getValue(a);",
+            "  const bv = getValue(b);",
+            "",
+            "  const aIsNum = typeof av === \"number\";",
+            "  const bIsNum = typeof bv === \"number\";",
+            "",
+            "  if (aIsNum !== bIsNum) return aIsNum ? -1 : 1;",
+            "  if (av < bv) return -1;",
+            "  if (av > bv) return 1;",
+            "  return 0;",
+            "});",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Array of structures to sort",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "Field name or path to sort by (supports nested fields like \"player.score\")",
+          "longDescription": "For structures, use dot notation to access nested fields (e.g., \"player.score\").",
+          "name": "FieldPath",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

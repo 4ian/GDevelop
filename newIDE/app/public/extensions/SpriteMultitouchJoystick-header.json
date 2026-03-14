@@ -1,0 +1,366 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "1OgYzWp5UeVPbiWGJwI6vqfgZLC3",
+    "v0YRpdAnIucZFgiRCCecqVnGKno2",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Multitouch joystick and buttons (sprite)",
+  "name": "SpriteMultitouchJoystick",
+  "version": "1.9.0",
+  "url": "https://resources.gdevelop-app.com/extensions/SpriteMultitouchJoystick.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/SpriteMultitouchJoystick-header.json",
+  "tags": "multitouch,joystick,thumbstick,controller,touchscreen,twin stick,shooter,virtual,platformer,platform,top-down",
+  "category": "Input",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Videogames/Videogames_controller_joystick_arrows_direction.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "On-screen multitouch joystick and buttons.",
+  "eventsBasedBehaviorsCount": 7,
+  "eventsFunctionsCount": 10,
+  "helpPath": "/objects/multitouch-joystick",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Detect presses made on a touchscreen on the object so it acts like a button and automatically trigger the button having the same identifier for the mapper behaviors.",
+      "fullName": "Multitouch button",
+      "name": "MultitouchButton",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "IsJustPressed",
+          "fullName": "Button just pressed",
+          "description": "Check if the button was just pressed.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsPressed",
+          "fullName": "Button pressed",
+          "description": "Check if the button is pressed.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsReleased",
+          "fullName": "Button released",
+          "description": "Check if the button is released.",
+          "functionType": "Condition"
+        }
+      ]
+    },
+    {
+      "description": "Control a platformer character with a multitouch controller.",
+      "fullName": "Platformer multitouch controller mapper",
+      "name": "PlatformerMultitouchMapper",
+      "objectType": "",
+      "eventsFunctions": []
+    },
+    {
+      "description": "Control a 3D physics character with a multitouch controller.",
+      "fullName": "3D platformer multitouch controller mapper",
+      "name": "Platformer3DMultitouchMapper",
+      "objectType": "",
+      "eventsFunctions": []
+    },
+    {
+      "description": "Control a 3D physics character with a multitouch controller.",
+      "fullName": "3D shooter multitouch controller mapper",
+      "name": "Shooter3DMultitouchMapper",
+      "objectType": "",
+      "eventsFunctions": []
+    },
+    {
+      "description": "Control camera rotations with a multitouch controller.",
+      "fullName": "First person camera multitouch controller mapper",
+      "name": "FirstPersonMultitouchMapper",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "HorizontalRotationSpeedMax",
+          "fullName": "Maximum horizontal rotation speed",
+          "description": "Compare the maximum horizontal rotation speed of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHorizontalRotationSpeedMax",
+          "fullName": "Maximum horizontal rotation speed",
+          "description": "Change the maximum horizontal rotation speed of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HorizontalRotationAcceleration",
+          "fullName": "Horizontal rotation acceleration",
+          "description": "Compare the horizontal rotation acceleration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHorizontalRotationAcceleration",
+          "fullName": "Horizontal rotation acceleration",
+          "description": "Change the horizontal rotation acceleration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HorizontalRotationDeceleration",
+          "fullName": "Horizontal rotation deceleration",
+          "description": "Compare the horizontal rotation deceleration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHorizontalRotationDeceleration",
+          "fullName": "Horizontal rotation deceleration",
+          "description": "Change the horizontal rotation deceleration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "VerticalRotationSpeedMax",
+          "fullName": "Maximum vertical rotation speed",
+          "description": "Compare the maximum vertical rotation speed of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetVerticalRotationSpeedMax",
+          "fullName": "Maximum vertical rotation speed",
+          "description": "Change the maximum vertical rotation speed of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "VerticalRotationAcceleration",
+          "fullName": "Vertical rotation acceleration",
+          "description": "Compare the vertical rotation acceleration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetVerticalRotationAcceleration",
+          "fullName": "Vertical rotation acceleration",
+          "description": "Change the vertical rotation acceleration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "VerticalRotationDeceleration",
+          "fullName": "Vertical rotation deceleration",
+          "description": "Compare the vertical rotation deceleration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetVerticalRotationDeceleration",
+          "fullName": "Vertical rotation deceleration",
+          "description": "Change the vertical rotation deceleration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "VerticalAngleMin",
+          "fullName": "Minimum vertical camera angle",
+          "description": "Compare the minimum vertical camera angle of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetVerticalAngleMin",
+          "fullName": "Minimum vertical camera angle",
+          "description": "Change the minimum vertical camera angle of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "VerticalAngleMax",
+          "fullName": "Maximum vertical camera angle",
+          "description": "Compare the maximum vertical camera angle of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetVerticalAngleMax",
+          "fullName": "Maximum vertical camera angle",
+          "description": "Change the maximum vertical camera angle of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "OffsetZ",
+          "fullName": "Z position offset",
+          "description": "Compare the z position offset of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetOffsetZ",
+          "fullName": "Z position offset",
+          "description": "Change the z position offset of the object.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Control a 3D physics car with a multitouch controller.",
+      "fullName": "3D car multitouch controller mapper",
+      "name": "PhysicsCar3DMultitouchMapper",
+      "objectType": "",
+      "eventsFunctions": []
+    },
+    {
+      "description": "Control a top-down character with a multitouch controller.",
+      "fullName": "Top-down multitouch controller mapper",
+      "name": "TopDownMultitouchMapper",
+      "objectType": "",
+      "eventsFunctions": []
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "name": "IsButtonJustPressed",
+      "fullName": "Multitouch controller button just pressed",
+      "description": "Check if a button was just pressed on a multitouch controller.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsButtonPressed",
+      "fullName": "Multitouch controller button pressed",
+      "description": "Check if a button is pressed on a multitouch controller.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsButtonReleased",
+      "fullName": "Multitouch controller button released",
+      "description": "Check if a button is released on a multitouch controller.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsDirectionPushed4Way",
+      "fullName": "Joystick pushed in a direction (4-way)",
+      "description": "Check if joystick is pushed in a given direction.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsDirectionPushed8Way",
+      "fullName": "Joystick pushed in a direction (8-way)",
+      "description": "Check if joystick is pushed in a given direction.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "StickForce",
+      "fullName": "Stick force",
+      "description": "Compare the force of multitouch contoller stick (from 0 to 1).",
+      "functionType": "Condition"
+    },
+    {
+      "name": "StickAngle",
+      "fullName": "Stick angle",
+      "description": "Return the angle the multitouch controller stick is pointing towards (Range: -180 to 180).",
+      "functionType": "Expression"
+    },
+    {
+      "name": "StickForceX",
+      "fullName": "Stick X force",
+      "description": "Return the multitouch contoller stick force on X axis (from -1 at the left to 1 at the right).",
+      "functionType": "Expression"
+    },
+    {
+      "name": "StickForceY",
+      "fullName": "Stick Y force",
+      "description": "Return the multitouch contoller stick force on Y axis (from -1 at the top to 1 at the bottom).",
+      "functionType": "Expression"
+    },
+    {
+      "name": "HasTouchStartedOnScreenSide",
+      "fullName": "New touch on a screen side",
+      "description": "Check if a new touch has started on the right or left side of the screen.",
+      "functionType": "Condition"
+    }
+  ],
+  "eventsBasedObjects": [
+    {
+      "description": "Joystick for touchscreens.",
+      "fullName": "Multitouch Joystick",
+      "name": "SpriteMultitouchJoystick",
+      "defaultName": "Joystick",
+      "eventsFunctions": [
+        {
+          "name": "TeleportAndPress",
+          "fullName": "Show and start pressing",
+          "description": "Show the joystick until it is released.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ActivateControl",
+          "fullName": "De/activate control",
+          "description": "De/activate control of the joystick.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsPressed",
+          "fullName": "Stick pressed",
+          "description": "Check if a stick is pressed.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "StickForce",
+          "fullName": "Stick force",
+          "description": "Compare the strick force (from 0 to 1).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "StickForceX",
+          "fullName": "Stick X force",
+          "description": "Compare the stick force on X axis (from -1 at the left to 1 at the right).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "StickForceY",
+          "fullName": "Stick Y force",
+          "description": "Compare the stick force on Y axis (from -1 at the top to 1 at the bottom).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "StickAngle",
+          "fullName": "Stick angle",
+          "description": "Return the angle the stick is pointing towards (from -180 to 180).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "IsDirectionPushed4Way",
+          "fullName": "Joystick pushed in a direction (4-way movement)",
+          "description": "Check if joystick is pushed in a given direction.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsDirectionPushed8Way",
+          "fullName": "Joystick pushed in a direction (8-way movement)",
+          "description": "Check if joystick is pushed in a given direction.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "ControllerIdentifier",
+          "fullName": "Multitouch controller identifier",
+          "description": "Compare the multitouch controller identifier (1, 2, 3, 4...).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetControllerIdentifier",
+          "fullName": "Multitouch controller identifier",
+          "description": "Change the multitouch controller identifier (1, 2, 3, 4...).",
+          "functionType": "Action"
+        },
+        {
+          "name": "JoystickIdentifier",
+          "fullName": "Joystick name",
+          "description": "Compare the joystick name of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetJoystickIdentifier",
+          "fullName": "Joystick name",
+          "description": "Change the joystick name of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "DeadZoneRadius",
+          "fullName": "Dead zone radius",
+          "description": "Compare the dead zone radius of the joystick (range: 0 to 1). The deadzone is an area for which movement on sticks won't be taken into account (instead, the stick will be considered as not moved).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetDeadZoneRadius",
+          "fullName": "Dead zone radius",
+          "description": "Change the dead zone radius of the joystick (range: 0 to 1). The deadzone is an area for which movement on sticks won't be taken into account (instead, the stick will be considered as not moved).",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "description": "Multitouch joysticks are objects showing a joystick on the screen, useful for mobile. They work like a physical gamepad:\n- 4 or 8 directions\n- Analogus pads\n- Player selection\n- Automatic \"mapper\" behaviors for 2D and 3D movement behaviors (platformer characters, top-down movement, 3D character etc...). Add one of these to the object with the movement behavior (i.e: the player most of the time) and the behavior will then be controlled automatically by the virtual joystick (it works by reading the multitouch joystick state and simulating controls). No need for additional events to make it work once the behaviors are set up.\n\nThere are ready-to-use joysticks in the asset-store [multitouch joysticks pack](https://editor.gdevelop.io/?initial-dialog=asset-store&asset-pack=multitouch-joysticks-multitouch-joysticks).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMTYiIGN5PSIxNiIgcj0iMTMiLz4NCjxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjI4LjQsMTIgMjAsMTIgMjAsMy42ICIvPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMjAsMjguNCAyMCwyMCAyOC40LDIwICIvPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMy42LDIwIDEyLDIwIDEyLDI4LjQgIi8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSIxMiwzLjYgMTIsMTIgMy42LDEyICIvPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSIxNiw2IDE2LjcsNyAxNS4zLDcgIi8+DQo8cG9seWdvbiBjbGFzcz0ic3QwIiBwb2ludHM9IjE2LDI2IDE1LjMsMjUgMTYuNywyNSAiLz4NCjxwb2x5Z29uIGNsYXNzPSJzdDAiIHBvaW50cz0iNiwxNiA3LDE1LjMgNywxNi43ICIvPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSIyNiwxNiAyNSwxNi43IDI1LDE1LjMgIi8+DQo8L3N2Zz4NCg=="
+}

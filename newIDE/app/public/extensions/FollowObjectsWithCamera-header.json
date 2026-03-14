@@ -1,0 +1,33 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "6dgsuavVqJgA9oqJ2ypmkXZWuyY2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Follow multiple 2D objects with the camera",
+  "name": "FollowObjectsWithCamera",
+  "version": "1.0.2",
+  "url": "https://resources.gdevelop-app.com/extensions/FollowObjectsWithCamera.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/FollowObjectsWithCamera-header.json",
+  "tags": "camera,zoom,follow,objects,multiple,group,move,pan",
+  "category": "Camera",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/camera-switch-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Auto-zoom and position camera to keep all instances of an object visible.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/follow-objects-with-camera",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "FollowMultipleObjectsWithCamera",
+      "fullName": "Follow multiple objects with camera",
+      "description": "Change the zoom and position of the camera to keep all instances of an object (or object group) on the screen.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Use the \"Follow multiple 2D objects with the camera\" action on every frame that you want the camera to move.  \nIf you want to select which object instances are tracked by the camera, add conditions to that event.\n\n- Use an object group to track multiple objects.\n- Only run on one layer at a time.  If multiple layers need to move the same way, create events that copy CameraX, CameraY, and CameraZoom values (or use the \"Copy camera settings\" extension)\n- This action can also be used on a single object instance to move the camera smoothly - though other extensions might be more adapted.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNhbWVyYS1zd2l0Y2gtb3V0bGluZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0yMCA0SDE2LjhMMTUgMkg5TDcuMiA0SDRDMi45IDQgMiA0LjkgMiA2VjE4QzIgMTkuMSAyLjkgMjAgNCAyMEgyMEMyMS4xIDIwIDIyIDE5LjEgMjIgMThWNkMyMiA0LjkgMjEuMSA0IDIwIDRNOS45IDRIMTQuMUwxNS45IDZIMjBWMThINFY2SDguMU0xNSAxMUg5VjguNUw1LjUgMTJMOSAxNS41VjEzSDE1VjE1LjVMMTguNSAxMkwxNSA4LjVWMTFaIiAvPjwvc3ZnPg=="
+}

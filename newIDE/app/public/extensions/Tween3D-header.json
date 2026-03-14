@@ -1,0 +1,29 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "dt0tRnf2kHWJnjkrpnzTzNj9Yc63"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Advanced 3D tween",
+  "name": "Tween3D",
+  "version": "0.3.1",
+  "url": "https://resources.gdevelop-app.com/extensions/Tween3D.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Tween3D-header.json",
+  "tags": "3d,tween,smooth,interpolation,wobble,color",
+  "category": "Visual effect",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/30bc03f9cf5f2f42960246a605352a6937ae6b603f0177396a83193849a4724a_tennis-ball.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "changelog": [
+    {
+      "version": "0.1.0",
+      "breaking": "- The Tween behavior is now required by the 3D Tween behavior. Add the Tween behavior on any object that uses the 3D Tween behavior."
+    }
+  ],
+  "shortDescription": "Smoothly squash, strentch, tint and wobble 3D models.",
+  "eventsBasedBehaviorsCount": 2,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/tween3d",
+  "description": "Change 3D models proportions over time to make smooth animations like wobbling.\n\nIt's used in this example:\n* a 3D Bomberman-like game ([open the project online](https://editor.gdevelop.io/?project=example://3d-bomber-bunny))",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXRlbm5pcy1iYWxsIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLDJDMTQuNSwyIDE2Ljc1LDIuOSAxOC41LDQuNEMxNi4zNiw2LjIzIDE1LDguOTYgMTUsMTJDMTUsMTUuMDQgMTYuMzYsMTcuNzcgMTguNSwxOS42QzE2Ljc1LDIxLjEgMTQuNSwyMiAxMiwyMkM5LjUsMjIgNy4yNSwyMS4xIDUuNSwxOS42QzcuNjQsMTcuNzcgOSwxNS4wNCA5LDEyQzksOC45NiA3LjY0LDYuMjMgNS41LDQuNEM3LjI1LDIuOSA5LjUsMiAxMiwyTTIyLDEyQzIyLDE0LjMyIDIxLjIxLDE2LjQ1IDE5Ljg4LDE4LjE1QzE4LjEyLDE2LjY4IDE3LDE0LjQ3IDE3LDEyQzE3LDkuNTMgMTguMTIsNy4zMiAxOS44OCw1Ljg1QzIxLjIxLDcuNTUgMjIsOS42OCAyMiwxMk0yLDEyQzIsOS42OCAyLjc5LDcuNTUgNC4xMiw1Ljg1QzUuODgsNy4zMiA3LDkuNTMgNywxMkM3LDE0LjQ3IDUuODgsMTYuNjggNC4xMiwxOC4xNUMyLjc5LDE2LjQ1IDIsMTQuMzIgMiwxMloiIC8+PC9zdmc+"
+}

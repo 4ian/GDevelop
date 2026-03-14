@@ -209,7 +209,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
           onClick={onShareClick}
           disabled={!isSharingEnabled}
           icon={<PublishIcon />}
-          label={<Trans>Share</Trans>}
+          label={<Trans>Build</Trans>}
           // This ID is used for guided lessons, let's keep it stable.
           id="toolbar-publish-button"
         />

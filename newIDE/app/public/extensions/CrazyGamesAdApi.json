@@ -1,0 +1,2339 @@
+{
+  "author": "",
+  "category": "Third-party",
+  "extensionNamespace": "",
+  "fullName": "CrazyGames SDK v3",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "/extensions/crazy-games-ad-api/details",
+  "iconUrl": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODkiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgODkgMTAwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTg0LjkwMzQgMjUuODkyOUM4NS4wNzI3IDE4LjY4MjQgODQuNjQ5NCA2LjExNjk0IDgwLjA3NzYgMC44NzQ4NTlDNzcuNTcyOSAtMS45OTY2NCA3MS42MTgzIDIuODA4MDEgNjcuNzY2MSA2LjUxOTA5QzYxLjM4MSAzLjQwNzcxIDUzLjUzNTUgMS44NzY3MSA0My45OTY4IDEuODc2NzFDMzQuNDU4IDEuODc2NzEgMjYuNjE5NiAzLjQxNDc2IDIwLjI0MTYgNi41MTkwOUMxNi4zODI0IDIuODA4MDEgMTAuNDM0OCAtMS45ODk1OSA3LjkzMDE0IDAuODgxOTE1QzMuMzY1MzcgNi4xMTY5NCAyLjkzNSAxOC42NDAxIDMuMTA0MzIgMjUuODU3NkMxLjA1MTIzIDMxLjUwMTkgMCAzOC4wOTE1IDAgNDUuNjEyNUMwIDYxLjQzMDQgNC41Mjk1IDczLjE0MjIgMTMuNDU0NCA4MC40NzI3QzE5LjQ2NTYgODUuMzk3MyAyNy4zMTgxIDg4LjIzMzUgMzcuMzIyNSA4OS4wODcyQzM2Ljg2MDcgODkuMzE4MSAzNi4zOTIzIDg5LjU0NjggMzUuOTE3NyA4OS43Nzg1TDM1LjkxNjMgODkuNzc5MkwzNS45MTU5IDg5Ljc3OTRDMzUuMTg3NSA5MC4xMzUgMzQuNDQ0NyA5MC40OTc3IDMzLjY4OSA5MC44ODYzTDMwLjA2MjYgOTIuNjY0MkwyOC4wMDI1IDkzLjY3MzFDMjcuNDEwMiA5My45ODI5IDI2LjgxMjMgOTQuMjgyIDI2LjIwNjUgOTQuNTg1MkwyNi4yMDYyIDk0LjU4NTRDMjQuNzY5NyA5NS4zMDQyIDIzLjI4ODQgOTYuMDQ1NSAyMS43MzAzIDk3LjAwMzJMMjEuMTg3IDk3LjI5MjVDMjEuMDMxOCA5Ny40MDU0IDIwLjg4MzcgOTcuNTk1OSAyMC44NTU0IDk3LjgwNzVDMjAuNzg0OSA5OC4yMDk3IDIxLjA2MDEgOTguNTkwNyAyMS40NjIyIDk4LjY0NzFDMjIuMDU4NyA5OC43MzY4IDIyLjY1MzMgOTguODM0NSAyMy4yNDggOTguOTMyMkwyMy4yNDgzIDk4LjkzMjJDMjQuNjY1IDk5LjE2NSAyNi4wODE2IDk5LjM5NzcgMjcuNTIyNyA5OS41MjE5TDI5LjA0NjYgOTkuNjkxM0MyOS41NDc2IDk5Ljc0NzcgMzAuMDU1NSA5OS43OSAzMC41NzA2IDk5LjgxODNMMzMuNjMyNiA5OS45ODc2QzM3LjczMTcgMTAwLjA1OCA0MS44NTkxIDk5LjgzMjQgNDUuOTUxMSA5OS4xOTAzQzUwLjAzNjEgOTguNTc2NSA1NC4wNTA2IDk3LjQzMzYgNTcuOTA5OCA5NS44NDYxQzYxLjc1NSA5NC4yNTg3IDY1LjQyMzcgOTIuMTkxNSA2OC43NDY4IDg5LjY3MjhDNzUuMzM2NCA4NC41NTc3IDgwLjUxNSA3Ny42NzE3IDgzLjU5ODEgNjkuOTk1NkM4NC43MjcgNjcuMjE1OCA4NS41NjY2IDY0LjMzMDIgODYuMTczMyA2MS40MDIyQzg3LjM5MzkgNTYuNzAzNCA4OC4wMTQ4IDUxLjQ0MDEgODguMDE0OCA0NS42MTI1Qzg4LjAxNDggMzguMTEyNyA4Ni45NzA2IDMxLjUzNzIgODQuOTI0NSAyNS45TDg0LjkwMzQgMjUuODkyOVpNNDMuOTg5NyA3My41MjMyQzI3LjEyNzYgNzMuNTIzMiAxNS45MDI2IDY4Ljc4MiAxNS45MDI2IDQ1LjYwNTRDMTUuOTAyNiAzNC42NzY4IDE4LjQwNzMgMjcuMjc1OCAyMy41NzE3IDIzLjAyODVDMjcuOTMxOSAxOS40MzAzIDM0LjYyMDMgMTcuNjg3NiA0My45ODk3IDE3LjY4NzZDNTMuMzU5MiAxNy42ODc2IDYwLjA0NzYgMTkuNDQ0NCA2NC40MDc4IDIzLjAyODVDNjkuNTU4MSAyNy4yNjg3IDcyLjA3NjkgMzQuNjU1NiA3Mi4wNzY5IDQ1LjYwNTRDNzIuMDc2OSA2OC43ODIgNjAuODUxOSA3My41MjMyIDQzLjk4OTcgNzMuNTIzMlpNMzUuMDI5NiAzOS42NzE5QzM1LjAyOTYgMzcuNTkwNiAzNi40MTI0IDM1LjgyNjggMzguMzEwMyAzNS4yMzQxQzM3LjI2NjEgMzQuMjY3NiAzNS44NjkxIDMzLjY3NDkgMzQuMzMxMSAzMy42NzQ5QzMxLjEwNjggMzMuNjc0OSAyOC40NjgxIDM2LjI5OTUgMjguNDY4MSAzOS41MDI2VjUxLjE1NzlDMjguNDY4MSA1NC4zNjEgMzEuMTA2OCA1Ni45ODU2IDM0LjMzMTEgNTYuOTg1NkMzNy41NTU0IDU2Ljk4NTYgNDAuMTk0IDU0LjM2ODEgNDAuMTk0IDUxLjE1NzlWNDQuMzAwMkM0MC4wMzE4IDQ0LjMxNDMgMzkuODY5NSA0NC4zMjg0IDM5LjcwNzIgNDQuMzI4NEMzNy4xMTc5IDQ0LjMyODQgMzUuMDIyNSA0Mi4yNDcxIDM1LjAyMjUgMzkuNjc5TDM1LjAyOTYgMzkuNjcxOVpNNTcuMjExNCAzNC44ODg0QzU1LjQxMjMgMzUuNTM3NSA1NC4xMjgyIDM3LjI0NDkgNTQuMTI4MiAzOS4yNTU3VjM5LjI2MjdDNTQuMTI4MiA0MS44MzA4IDU2LjIyMzYgNDMuOTEyMSA1OC44MTI5IDQzLjkxMjFDNTkuMDUyOCA0My45MTIxIDU5LjI4NTYgNDMuODkxIDU5LjUxMTQgNDMuODU1N1Y1MS4xNTc5QzU5LjUxMTQgNTQuMzY4MSA1Ni44NzI3IDU2Ljk4NTYgNTMuNjQ4NCA1Ni45ODU2QzUwLjQyNDIgNTYuOTg1NiA0Ny43ODU1IDU0LjM2MSA0Ny43ODU1IDUxLjE1NzlWMzkuNTAyNkM0Ny43ODU1IDM2LjI5OTUgNTAuNDI0MiAzMy42NzQ5IDUzLjY0ODQgMzMuNjc0OUM1NC45ODg5IDMzLjY3NDkgNTYuMjIzNiAzNC4xMzM1IDU3LjIxMTQgMzQuODg4NFoiIGZpbGw9IiMwQzBEMTQiLz4KPC9zdmc+Cg==",
+  "name": "CrazyGamesAdApi",
+  "previewIconUrl": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODkiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgODkgMTAwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTg0LjkwMzQgMjUuODkyOUM4NS4wNzI3IDE4LjY4MjQgODQuNjQ5NCA2LjExNjk0IDgwLjA3NzYgMC44NzQ4NTlDNzcuNTcyOSAtMS45OTY2NCA3MS42MTgzIDIuODA4MDEgNjcuNzY2MSA2LjUxOTA5QzYxLjM4MSAzLjQwNzcxIDUzLjUzNTUgMS44NzY3MSA0My45OTY4IDEuODc2NzFDMzQuNDU4IDEuODc2NzEgMjYuNjE5NiAzLjQxNDc2IDIwLjI0MTYgNi41MTkwOUMxNi4zODI0IDIuODA4MDEgMTAuNDM0OCAtMS45ODk1OSA3LjkzMDE0IDAuODgxOTE1QzMuMzY1MzcgNi4xMTY5NCAyLjkzNSAxOC42NDAxIDMuMTA0MzIgMjUuODU3NkMxLjA1MTIzIDMxLjUwMTkgMCAzOC4wOTE1IDAgNDUuNjEyNUMwIDYxLjQzMDQgNC41Mjk1IDczLjE0MjIgMTMuNDU0NCA4MC40NzI3QzE5LjQ2NTYgODUuMzk3MyAyNy4zMTgxIDg4LjIzMzUgMzcuMzIyNSA4OS4wODcyQzM2Ljg2MDcgODkuMzE4MSAzNi4zOTIzIDg5LjU0NjggMzUuOTE3NyA4OS43Nzg1TDM1LjkxNjMgODkuNzc5MkwzNS45MTU5IDg5Ljc3OTRDMzUuMTg3NSA5MC4xMzUgMzQuNDQ0NyA5MC40OTc3IDMzLjY4OSA5MC44ODYzTDMwLjA2MjYgOTIuNjY0MkwyOC4wMDI1IDkzLjY3MzFDMjcuNDEwMiA5My45ODI5IDI2LjgxMjMgOTQuMjgyIDI2LjIwNjUgOTQuNTg1MkwyNi4yMDYyIDk0LjU4NTRDMjQuNzY5NyA5NS4zMDQyIDIzLjI4ODQgOTYuMDQ1NSAyMS43MzAzIDk3LjAwMzJMMjEuMTg3IDk3LjI5MjVDMjEuMDMxOCA5Ny40MDU0IDIwLjg4MzcgOTcuNTk1OSAyMC44NTU0IDk3LjgwNzVDMjAuNzg0OSA5OC4yMDk3IDIxLjA2MDEgOTguNTkwNyAyMS40NjIyIDk4LjY0NzFDMjIuMDU4NyA5OC43MzY4IDIyLjY1MzMgOTguODM0NSAyMy4yNDggOTguOTMyMkwyMy4yNDgzIDk4LjkzMjJDMjQuNjY1IDk5LjE2NSAyNi4wODE2IDk5LjM5NzcgMjcuNTIyNyA5OS41MjE5TDI5LjA0NjYgOTkuNjkxM0MyOS41NDc2IDk5Ljc0NzcgMzAuMDU1NSA5OS43OSAzMC41NzA2IDk5LjgxODNMMzMuNjMyNiA5OS45ODc2QzM3LjczMTcgMTAwLjA1OCA0MS44NTkxIDk5LjgzMjQgNDUuOTUxMSA5OS4xOTAzQzUwLjAzNjEgOTguNTc2NSA1NC4wNTA2IDk3LjQzMzYgNTcuOTA5OCA5NS44NDYxQzYxLjc1NSA5NC4yNTg3IDY1LjQyMzcgOTIuMTkxNSA2OC43NDY4IDg5LjY3MjhDNzUuMzM2NCA4NC41NTc3IDgwLjUxNSA3Ny42NzE3IDgzLjU5ODEgNjkuOTk1NkM4NC43MjcgNjcuMjE1OCA4NS41NjY2IDY0LjMzMDIgODYuMTczMyA2MS40MDIyQzg3LjM5MzkgNTYuNzAzNCA4OC4wMTQ4IDUxLjQ0MDEgODguMDE0OCA0NS42MTI1Qzg4LjAxNDggMzguMTEyNyA4Ni45NzA2IDMxLjUzNzIgODQuOTI0NSAyNS45TDg0LjkwMzQgMjUuODkyOVpNNDMuOTg5NyA3My41MjMyQzI3LjEyNzYgNzMuNTIzMiAxNS45MDI2IDY4Ljc4MiAxNS45MDI2IDQ1LjYwNTRDMTUuOTAyNiAzNC42NzY4IDE4LjQwNzMgMjcuMjc1OCAyMy41NzE3IDIzLjAyODVDMjcuOTMxOSAxOS40MzAzIDM0LjYyMDMgMTcuNjg3NiA0My45ODk3IDE3LjY4NzZDNTMuMzU5MiAxNy42ODc2IDYwLjA0NzYgMTkuNDQ0NCA2NC40MDc4IDIzLjAyODVDNjkuNTU4MSAyNy4yNjg3IDcyLjA3NjkgMzQuNjU1NiA3Mi4wNzY5IDQ1LjYwNTRDNzIuMDc2OSA2OC43ODIgNjAuODUxOSA3My41MjMyIDQzLjk4OTcgNzMuNTIzMlpNMzUuMDI5NiAzOS42NzE5QzM1LjAyOTYgMzcuNTkwNiAzNi40MTI0IDM1LjgyNjggMzguMzEwMyAzNS4yMzQxQzM3LjI2NjEgMzQuMjY3NiAzNS44NjkxIDMzLjY3NDkgMzQuMzMxMSAzMy42NzQ5QzMxLjEwNjggMzMuNjc0OSAyOC40NjgxIDM2LjI5OTUgMjguNDY4MSAzOS41MDI2VjUxLjE1NzlDMjguNDY4MSA1NC4zNjEgMzEuMTA2OCA1Ni45ODU2IDM0LjMzMTEgNTYuOTg1NkMzNy41NTU0IDU2Ljk4NTYgNDAuMTk0IDU0LjM2ODEgNDAuMTk0IDUxLjE1NzlWNDQuMzAwMkM0MC4wMzE4IDQ0LjMxNDMgMzkuODY5NSA0NC4zMjg0IDM5LjcwNzIgNDQuMzI4NEMzNy4xMTc5IDQ0LjMyODQgMzUuMDIyNSA0Mi4yNDcxIDM1LjAyMjUgMzkuNjc5TDM1LjAyOTYgMzkuNjcxOVpNNTcuMjExNCAzNC44ODg0QzU1LjQxMjMgMzUuNTM3NSA1NC4xMjgyIDM3LjI0NDkgNTQuMTI4MiAzOS4yNTU3VjM5LjI2MjdDNTQuMTI4MiA0MS44MzA4IDU2LjIyMzYgNDMuOTEyMSA1OC44MTI5IDQzLjkxMjFDNTkuMDUyOCA0My45MTIxIDU5LjI4NTYgNDMuODkxIDU5LjUxMTQgNDMuODU1N1Y1MS4xNTc5QzU5LjUxMTQgNTQuMzY4MSA1Ni44NzI3IDU2Ljk4NTYgNTMuNjQ4NCA1Ni45ODU2QzUwLjQyNDIgNTYuOTg1NiA0Ny43ODU1IDU0LjM2MSA0Ny43ODU1IDUxLjE1NzlWMzkuNTAyNkM0Ny43ODU1IDM2LjI5OTUgNTAuNDI0MiAzMy42NzQ5IDUzLjY0ODQgMzMuNjc0OUM1NC45ODg5IDMzLjY3NDkgNTYuMjIzNiAzNC4xMzM1IDU3LjIxMTQgMzQuODg4NFoiIGZpbGw9IiMwQzBEMTQiLz4KPC9zdmc+Cg==",
+  "shortDescription": "CrazyGames SDK: display ads, user accounts, game events for CrazyGames hosting.",
+  "version": "3.1.0",
+  "description": "Refer to the [CrazyGames guide](https://docs.crazygames.com/sdk/intro/) for a full overview of the CrazyGames SDK, and to [this guide](https://wiki.gdevelop.io/gdevelop5/extensions/crazy-games-ad-api/details/) for using this SDK inside your GDevelop game.",
+  "origin": {
+    "identifier": "CrazyGamesAdApi",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "api,crazygames,ads,authentication,monetization",
+  "authorIds": [
+    "rotBq28wITdtfsrE7McHQri4k2w2",
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
+    "mnImQKdn8nQxwzkS5D6a1JB27V23",
+    "taRwmWxwAFYFL9yyBwB3cwBw0BO2",
+    "dt0tRnf2kHWJnjkrpnzTzNj9Yc63"
+  ],
+  "changelog": [
+    {
+      "version": "3.1.0",
+      "breaking": "- The expression Get user session data, is changing to get and return a string, or \"null\" is returned if no data."
+    }
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "gdjs._crazyGamesExtension = {",
+            "    isSdkReady: false,",
+            "    isPlayingVideoAd: false,",
+            "    hasVideoAdJustFinishedPlaying: false,",
+            "    adHadAnError: false,",
+            "    lastErrorDescription: \"\",",
+            "    linkAccountResponse: \"\",",
+            "    isAdBlockerDetected: false,",
+            "    links: new Map(),",
+            "    userChanged: false,",
+            "    userId: null,",
+            "    userSignedIn: false,",
+            "    userToken: null,",
+            "    xsollaToken: null,",
+            "};"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Get link account response.",
+      "fullName": "Link account response",
+      "functionType": "StringExpression",
+      "group": "User",
+      "name": "LinkAccountResponse",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._crazyGamesExtension.linkAccountResponse;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "the last error from the CrazyGames API.",
+      "fullName": "Get last error",
+      "functionType": "ExpressionAndCondition",
+      "group": "General",
+      "name": "LastError",
+      "sentence": "CrazyGames API last error is",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._crazyGamesExtension.lastErrorDescription",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Check if an user is signed into CrazyGames. If signed in, retrieves username and profile picture.",
+      "fullName": "Check and load if an user is signed in CrazyGames",
+      "functionType": "Action",
+      "group": "User",
+      "name": "UserSignIn",
+      "sentence": "Check if user is signed in CrazyGames",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "console.log(\"Checking if the user is signed in start\");",
+                "",
+                "async function getUser() {",
+                "    const isAvailable = CrazyGames.SDK.user.isUserAccountAvailable;",
+                "    console.log(\"User account system available:\", isAvailable);",
+                "",
+                "    try {",
+                "        const user = await CrazyGames.SDK.user.getUser();",
+                "        if (user) {",
+                "            console.log(\"User info:\", user);",
+                "            // Example: Display the user's username in the game",
+                "            gdjs._crazyGamesExtension.userSignedIn = true;",
+                "            gdjs._crazyGamesExtension.username = user.username;",
+                "            gdjs._crazyGamesExtension.profilePictureUrl = user.profilePictureUrl;",
+                "            eventsFunctionContext.task.resolve();",
+                "            console.log(\"Checking user is signed in done\");",
+                "        } else {",
+                "            console.log(\"No user is signed in.\");",
+                "            // Optionally, prompt the user to sign in",
+                "            gdjs._crazyGamesExtension.userSignedIn = false;",
+                "            gdjs._crazyGamesExtension.username = null;",
+                "            gdjs._crazyGamesExtension.profilePictureUrl = null;",
+                "            eventsFunctionContext.task.resolve();",
+                "            console.log(\"Checking user is signed in done\");",
+                "        }",
+                "    } catch (error) {",
+                "        console.error(\"Error retrieving user info:\", error);",
+                "        gdjs._crazyGamesExtension.lastErrorDescription = JSON.stringify(error);",
+                "        eventsFunctionContext.task.resolve();",
+                "        console.log(\"Checking user is signed in done\");",
+                "    }",
+                "}",
+                "",
+                "getUser();"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the user is signed in.",
+      "fullName": "User is signed in",
+      "functionType": "Condition",
+      "group": "User",
+      "name": "UserSignedIn",
+      "sentence": "User is signed in",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._crazyGamesExtension.userSignedIn;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return an invite link.",
+      "fullName": "Invite link",
+      "functionType": "StringExpression",
+      "group": "Game",
+      "name": "InviteLink",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const roomId = eventsFunctionContext.getArgument(\"RoomId\");\r",
+                "eventsFunctionContext.returnValue = gdjs._crazyGamesExtension.links.get(roomId) || \"\";"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Room id",
+          "name": "RoomId",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Display an invite button.",
+      "fullName": "Display invite button",
+      "functionType": "Action",
+      "group": "Game",
+      "name": "InviteButton",
+      "sentence": "Display an invite button for the room id: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const logger = new gdjs.Logger(\"CrazyGames SDK\");",
+                "",
+                "const roomId = eventsFunctionContext.getArgument(\"RoomId\");",
+                "",
+                "CrazyGames.SDK.game.showInviteButton({",
+                "    roomId,",
+                "    //param2: \"value\",",
+                "    //param3: \"value\"",
+                "}, (error, result) => {",
+                "    if (error) {",
+                "        logger.error(\"Invite button link error\", error);",
+                "        gdjs._crazyGamesExtension.lastErrorDescription = JSON.stringify(error);",
+                "    } else {",
+                "        logger.log(\"Invite button link\", result);",
+                "    }",
+                "});"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Room id",
+          "name": "RoomId",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onScenePostEvents",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "gdjs._crazyGamesExtension.hasVideoAdJustFinishedPlaying = false;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Load CrazyGames SDK.",
+      "fullName": "Load SDK",
+      "functionType": "Action",
+      "group": "General",
+      "name": "LoadSDK",
+      "sentence": "Load CrazyGames SDK",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const logger = new gdjs.Logger(\"CrazyGames SDK\");\r",
+            "\r",
+            "if (!window['CrazyGamesSingleton']) {\r",
+            "    window.CrazyGamesSingleton = (function () {\r",
+            "        let isInitializing = false;\r",
+            "        let isInitialized = false;\r",
+            "        let initPromise = null;\r",
+            "\r",
+            "        async function initialize() {\r",
+            "            if (isInitialized) {\r",
+            "                console.log(\"CrazyGames SDK is already initialized.\");\r",
+            "                return Promise.resolve();\r",
+            "            }\r",
+            "            if (isInitializing) {\r",
+            "                console.log(\"CrazyGames SDK initialization is in progress...\");\r",
+            "                return initPromise; // Return the same promise to avoid duplicate calls\r",
+            "            }\r",
+            "\r",
+            "            isInitializing = true;\r",
+            "            initPromise = new Promise(async (resolve, reject) => {\r",
+            "                try {\r",
+            "                    await CrazyGames.SDK.init();\r",
+            "                    if (CrazyGames.SDK.environment == 'disabled') {\r",
+            "                        throw new Error('not in local or crazy game environment');\r",
+            "                    }\r",
+            "                    console.log(\"CrazyGames SDK initialized successfully.\");\r",
+            "                    isInitialized = true;\r",
+            "                    resolve();\r",
+            "                } catch (error) {\r",
+            "                    console.error(\"Failed to initialize CrazyGames SDK:\", error);\r",
+            "                    gdjs._crazyGamesExtension.lastErrorDescription = error.toString();\r",
+            "                    reject(error);\r",
+            "                } finally {\r",
+            "                    isInitializing = false;\r",
+            "                }\r",
+            "            });\r",
+            "\r",
+            "            return initPromise;\r",
+            "        }\r",
+            "\r",
+            "        return { initialize };\r",
+            "    })();\r",
+            "}\r",
+            "\r",
+            "// Function to check if CrazyGames SDK is already loaded\r",
+            "function isCrazyGamesLoaded() {\r",
+            "    return window.CrazyGames && window.CrazyGames.SDK;\r",
+            "}\r",
+            "\r",
+            "// Function to initialize CrazyGames SDK safely\r",
+            "async function initializeGame() {\r",
+            "    gdjs._crazyGamesExtension.isSdkReady = true;\r",
+            "\r",
+            "    // Add user listener\r",
+            "    const listener = (user) => {\r",
+            "        gdjs._crazyGamesExtension.userChanged = true;\r",
+            "        gdjs._crazyGamesExtension.username = user.username;\r",
+            "        gdjs._crazyGamesExtension.profilePictureUrl = user.profilePictureUrl;\r",
+            "    };\r",
+            "\r",
+            "    CrazyGames.SDK.user.addAuthListener(listener);\r",
+            "\r",
+            "    eventsFunctionContext.task.resolve();\r",
+            "}\r",
+            "\r",
+            "// Load SDK only if it's missing\r",
+            "if (!isCrazyGamesLoaded()) {\r",
+            "    const scriptElement = document.createElement('script');\r",
+            "    scriptElement.src = 'https://sdk.crazygames.com/crazygames-sdk-v3.js';\r",
+            "\r",
+            "    scriptElement.onload = async () => {\r",
+            "        console.log(\"CrazyGames SDK script loaded.\");\r",
+            "        await CrazyGamesSingleton.initialize();\r",
+            "        if (CrazyGames.SDK.environment != 'disabled') {\r",
+            "            initializeGame();\r",
+            "        }\r",
+            "        eventsFunctionContext.task.resolve();\r",
+            "    };\r",
+            "\r",
+            "    document.body.appendChild(scriptElement);\r",
+            "} else {\r",
+            "    console.log(\"CrazyGames SDK already loaded.\");\r",
+            "\r",
+            "    (async function () {\r",
+            "        await CrazyGamesSingleton.initialize();\r",
+            "        if (CrazyGames.SDK.environment != 'disabled') {\r",
+            "            initializeGame();\r",
+            "        }\r",
+            "        eventsFunctionContext.task.resolve();\r",
+            "    })();\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the CrazyGames SDK is ready to be used.",
+      "fullName": "CrazyGames SDK is ready",
+      "functionType": "Condition",
+      "group": "General",
+      "name": "IsSDKLoaded",
+      "sentence": "CrazyGames SDK is ready",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._crazyGamesExtension.isSdkReady;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Let CrazyGames know gameplay started.",
+      "fullName": "Gameplay started",
+      "functionType": "Action",
+      "group": "Game",
+      "name": "SetGameplayStarted",
+      "sentence": "Let CrazyGames know gameplay started",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "CrazyGames.SDK.game.gameplayStart();",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Let CrazyGames know gameplay stopped.",
+      "fullName": "Gameplay stopped",
+      "functionType": "Action",
+      "group": "Game",
+      "name": "SetGameplayStopped",
+      "sentence": "Let CrazyGames know gameplay stopped",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "CrazyGames.SDK.game.gameplayStop();",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Let CrazyGames know loading started.",
+      "fullName": "Loading started",
+      "functionType": "Action",
+      "group": "Game",
+      "name": "SetLoadingStarted",
+      "sentence": "Let CrazyGames know loading started",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "CrazyGames.SDK.game.loadingStart();",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Let CrazyGames know loading stopped.",
+      "fullName": "Loading stopped",
+      "functionType": "Action",
+      "group": "Game",
+      "name": "SetLoadingStopped",
+      "sentence": "Let CrazyGames know loading stopped",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "CrazyGames.SDK.game.loadingStop();",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Display a video ad. The game is automatically muted while the video is playing.",
+      "fullName": "Display video ad",
+      "functionType": "Action",
+      "group": "Video Ads",
+      "name": "DisplayCrazyGamesAd",
+      "sentence": "Display _PARAM1_ video ad",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const logger = new gdjs.Logger(\"CrazyGames SDK\");",
+                "const adType = eventsFunctionContext.getArgument(\"AdType\");",
+                "const volume = runtimeScene.getSoundManager().getGlobalVolume();",
+                "",
+                "try {",
+                "    CrazyGames.SDK.ad.requestAd(adType, {",
+                "        adStarted: () => {",
+                "            gdjs._crazyGamesExtension.isPlayingVideoAd = true;",
+                "            runtimeScene.getSoundManager().setGlobalVolume(0);",
+                "            gdjs._crazyGamesExtension.adHadAnError = false;",
+                "        },",
+                "        adFinished: () => {",
+                "            gdjs._crazyGamesExtension.hasVideoAdJustFinishedPlaying = true;",
+                "            gdjs._crazyGamesExtension.isPlayingVideoAd = false;",
+                "            gdjs._crazyGamesExtension.adHadAnError = false;",
+                "            if (runtimeScene.getSoundManager().getGlobalVolume() === 0) {",
+                "                runtimeScene.getSoundManager().setGlobalVolume(volume);",
+                "            }",
+                "            eventsFunctionContext.task.resolve();",
+                "        },",
+                "        adError: (error, errorData) => {",
+                "            gdjs._crazyGamesExtension.isPlayingVideoAd = false;",
+                "            gdjs._crazyGamesExtension.hasVideoAdJustFinishedPlaying = true;",
+                "            gdjs._crazyGamesExtension.adHadAnError = true;",
+                "            gdjs._crazyGamesExtension.lastErrorDescription = JSON.stringify(error);",
+                "            if (runtimeScene.getSoundManager().getGlobalVolume() === 0) {",
+                "                runtimeScene.getSoundManager().setGlobalVolume(volume);",
+                "            }",
+                "            //logger.error(`Error ${adType} ad (callback): `, JSON.stringify(error), errorData); // causes a blocker error",
+                "            eventsFunctionContext.task.resolve();",
+                "        },",
+                "    });",
+                "",
+                "} catch (e) {",
+                "    console.error(\"Unexpected error displaying ad:\", e);",
+                "    eventsFunctionContext.task.resolve();",
+                "}"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Ad Type",
+          "name": "AdType",
+          "supplementaryInformation": "[\"midgame\",\"rewarded\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if a video ad just finished playing successfully.",
+      "fullName": "Video ad just finished playing",
+      "functionType": "Condition",
+      "group": "Video Ads",
+      "name": "AdFinishedPlaying",
+      "sentence": "Video ad just finished playing",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "eventsFunctionContext.returnValue = gdjs._crazyGamesExtension.hasVideoAdJustFinishedPlaying;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if a video ad is playing.",
+      "fullName": "Video ad is playing",
+      "functionType": "Condition",
+      "group": "Video Ads",
+      "name": "IsVideoAdPlaying",
+      "sentence": "Video ad is playing",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "eventsFunctionContext.returnValue = gdjs._crazyGamesExtension.isPlayingVideoAd;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the user changed.",
+      "fullName": "User changed",
+      "functionType": "Condition",
+      "group": "User",
+      "name": "UserChanged",
+      "sentence": "User changed",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "if (gdjs._crazyGamesExtension.userChanged) {\r",
+                "    eventsFunctionContext.returnValue = true;\r",
+                "}\r",
+                "\r",
+                "gdjs._crazyGamesExtension.userChanged = false;"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a video ad had an error.",
+      "fullName": "Video ad had an error",
+      "functionType": "Condition",
+      "group": "Video Ads",
+      "name": "AdHadAnError",
+      "sentence": "Video ad had an error",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "eventsFunctionContext.returnValue = gdjs._crazyGamesExtension.adHadAnError;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Generate an invite link to invite friends to join your game sessions. This URL can be added to the clipboard or displayed in the game to let the user select it.",
+      "fullName": "Generate an invite link",
+      "functionType": "Action",
+      "group": "Game",
+      "name": "GenerateInviteLink",
+      "sentence": "Generate an invite link for _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const roomId = eventsFunctionContext.getArgument(\"RoomId\");",
+                "",
+                "const logger = new gdjs.Logger(\"CrazyGames SDK\");",
+                "const link = CrazyGames.SDK.game.inviteLink({",
+                "    roomId: roomId,",
+                "});",
+                "",
+                "gdjs._crazyGamesExtension.links.set(roomId, link);",
+                "logger.info(link);",
+                "eventsFunctionContext.task.resolve();"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Room id",
+          "name": "RoomId",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Display an happy time by emitting sparkling confetti. The celebration should remain a special moment.",
+      "fullName": "Display happy time",
+      "functionType": "Action",
+      "group": "Game",
+      "name": "DisplayHappyTime",
+      "sentence": "Display happy time",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "CrazyGames.SDK.game.happytime();",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Scan for ad blockers.",
+      "fullName": "Scan for ad blockers",
+      "functionType": "Action",
+      "group": "Video Ads",
+      "name": "ScanForAdBlockers",
+      "sentence": "Scan for ad blockers",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const logger = new gdjs.Logger(\"CrazyGames SDK\");",
+                "",
+                "// Detecting Ad Blockers",
+                "async function checkAdBlocker() {",
+                "    try {",
+                "        const isAdBlocked = await CrazyGames.SDK.ad.hasAdblock();",
+                "        if (isAdBlocked) {",
+                "            console.log(\"Ad blocker detected.\", result);",
+                "            gdjs._crazyGamesExtension.isAdBlockerDetected = true;",
+                "",
+                "            // Handle ad blocker scenario",
+                "        } else {",
+                "            console.log(\"No ad blocker detected.\");",
+                "            gdjs._crazyGamesExtension.isAdBlockerDetected = false;",
+                "        }",
+                "",
+                "    } catch (error) {",
+                "        console.error(\"Error checking for ad blocker:\", error);",
+                "        logger.error(\"Unable to scan adblockers.\", error);",
+                "        gdjs._crazyGamesExtension.lastErrorDescription = JSON.stringify(error);",
+                "    }",
+                "",
+                "    eventsFunctionContext.task.resolve();",
+                "}",
+                "",
+                "checkAdBlocker();"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if user is using an ad blocker. This condition is always false before the \"Scan for ad blockers\" is called.",
+      "fullName": "Ad blocker is detected",
+      "functionType": "Condition",
+      "group": "Video Ads",
+      "name": "IsAdBlocked",
+      "sentence": "Ad blocker is detected",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "eventsFunctionContext.returnValue = gdjs._crazyGamesExtension.isAdBlockerDetected;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Display a banner that can be called once per 60 seconds.",
+      "fullName": "Display a banner",
+      "functionType": "Action",
+      "group": "Banners",
+      "name": "DisplayBanner",
+      "sentence": "Display a banner: _PARAM1_ at position _PARAM3_ ; _PARAM4_ with size _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const logger = new gdjs.Logger(\"CrazyGames SDK\");",
+                "const bannerName = eventsFunctionContext.getArgument(\"BannerName\");",
+                "const positionX = eventsFunctionContext.getArgument(\"PositionX\");",
+                "const positionY = eventsFunctionContext.getArgument(\"PositionY\");",
+                "const adDimension = eventsFunctionContext.getArgument(\"Size\").split(\"x\");",
+                "const size = {",
+                "    width: Number(adDimension[0]) || 0,",
+                "    height: Number(adDimension[1]) || 0",
+                "}",
+                "",
+                "// Create a container for the banner if needed",
+                "if (document.getElementById(bannerName) === null) {",
+                "    const div = document.createElement('div');",
+                "    div.id = bannerName;",
+                "    div.setAttribute(\"style\", \"pointer-events: none; position:fixed; z-index:1; width: \" + size.width + \"px; height: \" + size.height + \"px;left:\" + positionX + \"px; top:\" + positionY + \"px;\");",
+                "",
+                "    const body = document.getElementsByTagName(\"body\")[0];",
+                "    // Insert the new container in first position in the body",
+                "    body.insertBefore(div, body.firstChild);",
+                "}",
+                "",
+                "",
+                "// Available sizes:",
+                "// 970x90",
+                "// 320x50",
+                "// 160x600",
+                "// 336x280",
+                "// 728x90",
+                "// 300x600",
+                "// 468x60",
+                "// 970x250",
+                "// 300x250",
+                "// 250x250",
+                "// 120x600",
+                "// x, y coordinates are from the top left of the screen",
+                "CrazyGames.SDK.banner.requestBanner({",
+                "    id: bannerName,",
+                "    width: size.width,",
+                "    height: size.height,",
+                "}, (error, result) => {",
+                "    if (error) {",
+                "        logger.error(\"Error on request banner.\", error);",
+                "    } else {",
+                "        // Result is always undefined when requesting banners",
+                "        logger.log(\"End request banner\", result === undefined ? \"Requesting banners\" : result);",
+                "        eventsFunctionContext.task.resolve();",
+                "    }",
+                "});"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Banner name",
+          "name": "BannerName",
+          "type": "string"
+        },
+        {
+          "description": "Ad size",
+          "name": "Size",
+          "supplementaryInformation": "[\"970x90\",\"320x50\",\"160x600\",\"336x280\",\"728x90\",\"300x600\",\"468x60\",\"970x250\",\"300x250\",\"250x250\",\"120x600\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Position X",
+          "name": "PositionX",
+          "type": "expression"
+        },
+        {
+          "description": "Position Y",
+          "name": "PositionY",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Hide a banner.",
+      "fullName": "Hide a banner",
+      "functionType": "Action",
+      "group": "Banners",
+      "name": "HideBanner",
+      "sentence": "Hide the banner: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const bannerName = eventsFunctionContext.getArgument(\"BannerName\");\r",
+                "CrazyGames.SDK.banner.clearBanner(bannerName);\r",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Banner name",
+          "name": "BannerName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Hide all banners.",
+      "fullName": "Hide all banners",
+      "functionType": "Action",
+      "group": "Banners",
+      "name": "HideAllBanners",
+      "sentence": "Hide all the banners",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "CrazyGames.SDK.banner.clearAllBanners();\r",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Hide the invite button.",
+      "fullName": "Hide invite button",
+      "functionType": "Action",
+      "group": "Game",
+      "name": "HideInviteButton",
+      "sentence": "Hide invite button",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "CrazyGames.SDK.game.hideInviteButton();",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the environment.",
+      "fullName": "Get the environment",
+      "functionType": "StringExpression",
+      "group": "General",
+      "name": "Environment",
+      "sentence": "display environment into _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "eventsFunctionContext.returnValue = CrazyGames.SDK.environment;",
+              "parameterObjects": "TextObject",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Retrieve user data.",
+      "fullName": "Retrieve user data",
+      "functionType": "Action",
+      "group": "User",
+      "name": "AuthenticateUser",
+      "sentence": "Retrieve user data",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "console.log(\"Retrieving user start\");",
+                "async function authenticate() {",
+                "    const isAvailable = CrazyGames.SDK.user.isUserAccountAvailable;",
+                "    console.log(\"User account system available:\", isAvailable);",
+                "",
+                "    try {",
+                "        const user = await CrazyGames.SDK.user.getUser();",
+                "        if (user) {",
+                "            console.log(\"User info:\", user);",
+                "",
+                "            const data = await getUserSession();",
+                "            gdjs._crazyGamesExtension.userId = data.userId;",
+                "            gdjs._crazyGamesExtension.username = user.username;",
+                "            gdjs._crazyGamesExtension.profilePictureUrl = user.profilePictureUrl;",
+                "            gdjs._crazyGamesExtension.userToken = await CrazyGames.SDK.user.getUserToken();",
+                "",
+                "            eventsFunctionContext.task.resolve();",
+                "            console.log(\"Retrieving user done\");",
+                "        } else {",
+                "            console.log(\"No user is signed in.\");",
+                "            // Optionally, prompt the user to sign in",
+                "            await showAuthPrompt();",
+                "",
+                "        }",
+                "    } catch (error) {",
+                "        console.error(\"Error retrieving user info:\", error);",
+                "        gdjs._crazyGamesExtension.lastErrorDescription = JSON.stringify(error);",
+                "        eventsFunctionContext.task.resolve();",
+                "        console.log(\"Retrieving user done\");",
+                "    }",
+                "}",
+                "",
+                "async function showAuthPrompt() {",
+                "    try {",
+                "        const user = await CrazyGames.SDK.user.showAuthPrompt();",
+                "        if (user) {",
+                "            console.log(\"User signed in:\", user);",
+                "            // Proceed with authenticated user",
+                "            const data = await getUserSession();",
+                "            gdjs._crazyGamesExtension.userId = data.userId;",
+                "            gdjs._crazyGamesExtension.username = user.username;",
+                "            gdjs._crazyGamesExtension.profilePictureUrl = user.profilePictureUrl;",
+                "            eventsFunctionContext.task.resolve();",
+                "        } else {",
+                "            console.log(\"User dismissed the auth prompt.\");",
+                "            // Handle the case where the user cancels the sign-in process",
+                "            eventsFunctionContext.task.resolve();",
+                "        }",
+                "    } catch (error) {",
+                "        console.error(\"Error during auth prompt:\", error);",
+                "        gdjs._crazyGamesExtension.lastErrorDescription = JSON.stringify(error);",
+                "        eventsFunctionContext.task.resolve();",
+                "    }",
+                "}",
+                "",
+                "",
+                "async function getUserSession() {",
+                "    let token = null;",
+                "",
+                "    try {",
+                "        console.log(\"Requesting a user token.\");",
+                "        token = await CrazyGames.SDK.user.getUserToken();",
+                "",
+                "    } catch (error) {",
+                "        console.error(\"Error retrieving new user token:\", error);",
+                "        gdjs._crazyGamesExtension.lastErrorDescription = JSON.stringify(error);",
+                "        return null;",
+                "    }",
+                "",
+                "    return decodeJWT(token);",
+                "}",
+                "",
+                "// Decode in a lambda or server if you have one as decoding in clientside is not secure",
+                "function decodeJWT(token) {",
+                "",
+                "    const parts = token.split('.');",
+                "    if (parts.length !== 3) {",
+                "        throw new Error('Invalid JWT format');",
+                "    }",
+                "",
+                "    const base64Url = parts[1];",
+                "    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');",
+                "    const jsonPayload = decodeURIComponent(atob(base64).split('').map((char) => {",
+                "        return '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2);",
+                "    }).join(''));",
+                "",
+                "    return JSON.parse(jsonPayload);",
+                "}",
+                "",
+                "async function handleLoggedInUser(user) {",
+                "    const userToken = await CrazyGames.getUserToken();",
+                "",
+                "    // Check if the CrazyGames account is linked to an in-game account",
+                "    const isLinked = await checkIfAccountIsLinked(userToken);",
+                "",
+                "    if (isLinked) {",
+                "        // Case: There is a game account linked to this CrazyGames account",
+                "        const gameData = await fetchGameData(userToken);",
+                "        startGameWithData(gameData);",
+                "    } else {",
+                "        // Check if the user is logged into your in-game account",
+                "        const isLoggedIntoGameAccount = await checkIfLoggedIntoGameAccount();",
+                "",
+                "        if (isLoggedIntoGameAccount) {",
+                "            // Case: User is logged into in-game account but not linked to CrazyGames",
+                "            showLinkAccountButton();",
+                "        } else {",
+                "            // Case: No in-game account exists, create a new one linked to CrazyGames",
+                "            const newGameData = await createNewGameAccount(userToken);",
+                "            startGameWithData(newGameData);",
+                "        }",
+                "    }",
+                "}",
+                "",
+                "authenticate();"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Show CrazyGames login window.",
+      "fullName": "Show CrazyGames login window",
+      "functionType": "Action",
+      "group": "User",
+      "name": "ShowAuthWindow",
+      "sentence": "Show CrazyGames login window",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "async function showAuthPrompt() {",
+                "    try {",
+                "        const user = await CrazyGames.SDK.user.showAuthPrompt();",
+                "        if (user) {",
+                "            console.log(\"User signed in:\", user);",
+                "            // Proceed with authenticated user",
+                "            await getUserData();",
+                "            const data = await getUserSession();",
+                "            gdjs._crazyGamesExtension.userId = data.userId;",
+                "            gdjs._crazyGamesExtension.username = user.username;",
+                "            gdjs._crazyGamesExtension.profilePictureUrl = user.profilePictureUrl;",
+                "            eventsFunctionContext.task.resolve();",
+                "        } else {",
+                "            console.log(\"User dismissed the auth prompt.\");",
+                "            // Handle the case where the user cancels the sign-in process",
+                "            eventsFunctionContext.task.resolve();",
+                "        }",
+                "    } catch (error) {",
+                "        console.error(\"Error during auth prompt:\", error);",
+                "        gdjs._crazyGamesExtension.lastErrorDescription = JSON.stringify(error);",
+                "        eventsFunctionContext.task.resolve();",
+                "    }",
+                "}",
+                "",
+                "async function getUserData() {",
+                "    const userData = await getUserSession();",
+                "    console.log(\"Decoded user data:\", userData);",
+                "",
+                "}",
+                "",
+                "async function getUserSession() {",
+                "    let token = null;",
+                "",
+                "    try {",
+                "        console.log(\"Requesting a user token.\");",
+                "        token = await CrazyGames.SDK.user.getUserToken();",
+                "    } catch (error) {",
+                "        console.error(\"Error retrieving new user token:\", error);",
+                "        gdjs._crazyGamesExtension.lastErrorDescription = JSON.stringify(error);",
+                "        return null;",
+                "    }",
+                "",
+                "    return decodeJWT(token);",
+                "}",
+                "",
+                "function decodeJWT(token) {",
+                "    const parts = token.split('.');",
+                "    if (parts.length !== 3) {",
+                "        throw new Error('Invalid JWT format');",
+                "    }",
+                "",
+                "    const base64Url = parts[1];",
+                "    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');",
+                "    const jsonPayload = decodeURIComponent(atob(base64).split('').map((char) => {",
+                "        return '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2);",
+                "    }).join(''));",
+                "",
+                "    return JSON.parse(jsonPayload);",
+                "}",
+                "",
+                "showAuthPrompt();"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Show account link prompt.",
+      "fullName": "Show account link prompt",
+      "functionType": "Action",
+      "group": "User",
+      "name": "LinkAccount",
+      "sentence": "Show account link prompt",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "async function linkAccount() {",
+                "    try {",
+                "        const response = await CrazyGames.SDK.user.showAccountLinkPrompt();",
+                "        console.log(\"Link account response\", response);",
+                "        gdjs._crazyGamesExtension.linkAccountResponse = response.response;",
+                "    } catch (error) {",
+                "        console.log(\"Error:\", error);",
+                "        gdjs._crazyGamesExtension.lastErrorDescription = JSON.stringify(error);",
+                "    }",
+                "",
+                "    eventsFunctionContext.task.resolve();",
+                "}",
+                "",
+                "linkAccount();"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "the username.",
+      "fullName": "Username",
+      "functionType": "ExpressionAndCondition",
+      "group": "User",
+      "name": "UserName",
+      "sentence": "Username is",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "eventsFunctionContext.returnValue = gdjs._crazyGamesExtension.username;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "the CrazyGames User ID.",
+      "fullName": "CrazyGames User ID",
+      "functionType": "ExpressionAndCondition",
+      "group": "User",
+      "name": "CrazyGamesUserID",
+      "sentence": "CrazyGames user ID is",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._crazyGamesExtension.userId;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the signed-in user's profile picture URL.",
+      "fullName": "Gets the signed-in user's profile picture URL",
+      "functionType": "StringExpression",
+      "group": "User",
+      "name": "ProfilePic",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "eventsFunctionContext.returnValue = gdjs._crazyGamesExtension.profilePictureUrl;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return true when the user prefers to instantly join a lobby.",
+      "fullName": "Is instantly joining a lobby",
+      "functionType": "StringExpression",
+      "group": "Game",
+      "name": "IsInstantMultiplayer",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "eventsFunctionContext.returnValue = CrazyGames.SDK.game.isInstantMultiplayer;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return true if the user prefers the chat disabled.",
+      "fullName": "Is the user chat disabled",
+      "functionType": "StringExpression",
+      "group": "Game",
+      "name": "IsDisableChat",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "eventsFunctionContext.returnValue = CrazyGames.SDK.game.settings.disableChat;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Retrieves user system info, browser, version and device.",
+      "fullName": "Retrieves user system info",
+      "functionType": "StringExpression",
+      "group": "User",
+      "name": "SystemInfo",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "eventsFunctionContext.returnValue = JSON.stringify(CrazyGames.SDK.user.systemInfo);",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Get invite parameters if user is invited to this game.",
+      "fullName": "Get invite parameters",
+      "functionType": "StringExpression",
+      "group": "Game",
+      "name": "InviteParam",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const param = eventsFunctionContext.getArgument(\"Param\").toString();\r",
+                "eventsFunctionContext.returnValue = CrazyGames.SDK.game.getInviteParam(param);"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Param",
+          "name": "Param",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Save the session data.",
+      "fullName": "Save session data",
+      "functionType": "Action",
+      "group": "Data",
+      "name": "SaveSessionData",
+      "sentence": "Save session data, with the id: _PARAM1_ to: _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "// Storing Persistent User Data",
+                "async function saveUserData(key, value) {",
+                "    try {",
+                "        await CrazyGames.SDK.data.setItem(key, value);",
+                "        console.log(`Data saved: ${key} = ${value}`);",
+                "    } catch (error) {",
+                "        console.error(\"Error saving user data:\", error);",
+                "        gdjs._crazyGamesExtension.lastErrorDescription = JSON.stringify(error);",
+                "    }",
+                "}",
+                "",
+                "const key = eventsFunctionContext.getArgument('Id').toString();",
+                "const value = eventsFunctionContext.getArgument('Value').valueOf();",
+                "",
+                "saveUserData(key, value);"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Id",
+          "name": "Id",
+          "type": "string"
+        },
+        {
+          "description": "Value",
+          "name": "Value",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Get user session data, if there is no saved data, \"null\" will be returned.",
+      "fullName": "Get user session data",
+      "functionType": "StringExpression",
+      "group": "Data",
+      "name": "SessionData",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const key = eventsFunctionContext.getArgument('Id').toString();\r",
+                "\r",
+                "eventsFunctionContext.returnValue = CrazyGames.SDK.data.getItem(key);"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Id",
+          "name": "Id",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "the availability of the user's account.",
+      "fullName": "Is user account available",
+      "functionType": "ExpressionAndCondition",
+      "group": "User",
+      "name": "IsUserAccountAvailable",
+      "sentence": "The CrazyGames user account is available",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = window.CrazyGames.SDK.user.isUserAccountAvailable;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Retrieve the user's session token for authentication.",
+      "fullName": "Get User Token",
+      "functionType": "StringExpression",
+      "group": "User",
+      "name": "UserToken",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._crazyGamesExtension.userToken;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Retrieve the authentication token from Xsolla.",
+      "fullName": "Get Xsolla Token",
+      "functionType": "StringExpression",
+      "group": "User",
+      "name": "XsollaToken",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._crazyGamesExtension.xsollaToken;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Generate Xsolla token.",
+      "fullName": "Generate Xsolla token",
+      "functionType": "Action",
+      "group": "User",
+      "name": "GenerateXsollaToken",
+      "sentence": "Generate Xsolla token",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CrazyGamesAdApi::IsSDKLoaded"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "(async () => {",
+                "    try {",
+                "        const token = await window.CrazyGames.SDK.user.getXsollaUserToken();",
+                "        gdjs._crazyGamesExtension.xsollaToken = token;",
+                "        console.log(\"Get Xsolla token result\", token);",
+                "        eventsFunctionContext.task.resolve();",
+                "    } catch (error) {",
+                "        console.log(\"Error:\", error);",
+                "        gdjs._crazyGamesExtension.lastErrorDescription = JSON.stringify(error);",
+                "        eventsFunctionContext.task.resolve();",
+                "    }",
+                "})();"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

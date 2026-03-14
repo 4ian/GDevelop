@@ -1,0 +1,32 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Advanced p2p event handling",
+  "name": "AdvancedP2PEventHandling",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/AdvancedP2PEventHandling.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/AdvancedP2PEventHandling-header.json",
+  "tags": "p2p,performance,advanced",
+  "category": "Network",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Applications and Programming/Applications and Programming_sitemap_map_ux_application.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Handle all received P2P events at once per frame for better performance.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/advanced-p2pevent-handling",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "DissmissEvent",
+      "fullName": "Dismiss event",
+      "description": "Marks the event as handled, to go on to the next.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Allows handling all events at once instead of one per frame. \n\n### Usage:\n![Screenshot of the way to use the extension](https://i.imgur.com/DkYfM7W.png)",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjMsMTVIOWMtMS4xLDAtMi0wLjktMi0yVjRjMC0xLjEsMC45LTIsMi0yaDE0YzEuMSwwLDIsMC45LDIsMnY5QzI1LDE0LjEsMjQuMSwxNSwyMywxNXoiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSI3IiB5MT0iNiIgeDI9IjI1IiB5Mj0iNiIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjExIiB5MT0iNSIgeDI9IjExIiB5Mj0iMiIvPg0KPHJlY3QgeD0iMyIgeT0iMjMiIGNsYXNzPSJzdDAiIHdpZHRoPSI2IiBoZWlnaHQ9IjYiLz4NCjxyZWN0IHg9IjEzIiB5PSIyMyIgY2xhc3M9InN0MCIgd2lkdGg9IjYiIGhlaWdodD0iNiIvPg0KPHJlY3QgeD0iMjMiIHk9IjIzIiBjbGFzcz0ic3QwIiB3aWR0aD0iNiIgaGVpZ2h0PSI2Ii8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSI2LDIzIDYsMTkgMjYsMTkgMjYsMjMgIi8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMTYiIHkxPSIxNSIgeDI9IjE2IiB5Mj0iMjMiLz4NCjwvc3ZnPg0K"
+}

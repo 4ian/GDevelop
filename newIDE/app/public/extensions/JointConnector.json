@@ -1,0 +1,2017 @@
+{
+  "author": "",
+  "category": "Movement",
+  "extensionNamespace": "",
+  "fullName": "Joint connector",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWh1bWFuIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTIxLDlIMTVWMjJIMTNWMTZIMTFWMjJIOVY5SDNWN0gyMU0xMiwyQTIsMiAwIDAsMSAxNCw0QTIsMiAwIDAsMSAxMiw2QzEwLjg5LDYgMTAsNS4xIDEwLDRDMTAsMi44OSAxMC44OSwyIDEyLDJaIiAvPjwvc3ZnPg==",
+  "name": "JointConnector",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/8834e0c63a962c74f1dab4c8f918c171261597341c4ca6574b300ab35855274b_human.svg",
+  "shortDescription": "Create and manage physics joints between two objects.",
+  "version": "1.2.0",
+  "description": [
+    "Weld joint",
+    "- Glue two objects together",
+    "- Joint is created at the center of the Joint Connector object",
+    "",
+    "Revolute joint",
+    "- Two objects are connected but can rotate on the joint",
+    "- Angles can be restricted and joints can have motors that spin the objects",
+    "- Joint is created at the center of the Joint Connector object",
+    "",
+    "Distance joint",
+    "- Two objects are forced to stay at set distance from each other",
+    "- Adjust the frequency property to change the stiffness of the spring",
+    "- Center of both objects must be inside the Joint Connector collision mask",
+    "",
+    "Rope joint",
+    "- Two objects can get closer to each other but they cannot exceed their starting distance",
+    "- Center of both objects must be inside the Joint Connector collision mask"
+  ],
+  "origin": {
+    "identifier": "JointConnector",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "joint,ragdoll,physics,spring,rope,weld,revolute,distance",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "rotBq28wITdtfsrE7McHQri4k2w2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Connect overlapping physics objects with a revolute joint.",
+      "fullName": "Connect overlapping objects with a revolute joint",
+      "functionType": "Action",
+      "name": "CreateRevoluteJoints",
+      "sentence": "Connect overlapping _PARAM1_ with a revolute joint located at the center of _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "",
+            "const physicsBehaviorName = eventsFunctionContext.getBehaviorName(\"Physics\");",
+            "const jointObjects = eventsFunctionContext.getObjects(\"Joint\");",
+            "const jointBehaviorBehaviorName = eventsFunctionContext.getBehaviorName(\"RevoluteJoint\");",
+            "const linkManager = gdjs.LinksManager.getManager(runtimeScene);",
+            "",
+            "for (const jointObject of jointObjects) {",
+            "    // Save properties of each joint",
+            "    const jointBehavior = jointObject.getBehavior(jointBehaviorBehaviorName);",
+            "    const enableLimit = jointBehavior._getAngleLimitsEnabled();",
+            "    const lowerAngle = jointBehavior._getCounterClockwiseAngleLimit();",
+            "    const upperAngle = jointBehavior._getClockwiseAngleLimit();",
+            "    const enableMotor = jointBehavior._getMotorEnabled();",
+            "    const motorSpeed = jointBehavior._getMotorSpeed();",
+            "    const maxMotorTorque = jointBehavior._getMotorTorque();",
+            "    const collideConnected = false;",
+            "",
+            "    // Save center point of each joint",
+            "    const x = jointObject.getAABBCenterX();",
+            "    const y = jointObject.getAABBCenterY();",
+            "",
+            "    /** @type {gdjs.RuntimeObject} */",
+            "    let firstObject = null;",
+            "    for (const object of objects) {",
+            "        if (object.isCollidingWithPoint(x, y)) {",
+            "            if (!firstObject) {",
+            "                firstObject = object;",
+            "                linkManager.linkObjects(object, jointObject);",
+            "            }",
+            "            else {",
+            "                /** @type {gdjs.Physics2RuntimeBehavior} */",
+            "                const physicsBehavior = firstObject.getBehavior(physicsBehaviorName);",
+            "                const referenceAngle = object.angle - firstObject.angle;",
+            "                physicsBehavior.addRevoluteJointBetweenTwoBodies(",
+            "                    x,",
+            "                    y,",
+            "                    object,",
+            "                    x,",
+            "                    y,",
+            "                    enableLimit,",
+            "                    referenceAngle,",
+            "                    lowerAngle,",
+            "                    upperAngle,",
+            "                    enableMotor,",
+            "                    motorSpeed,",
+            "                    maxMotorTorque,",
+            "                    collideConnected,",
+            "                    jointObject.getVariables().get('JointID'));",
+            "                linkManager.linkObjects(object, jointObject);",
+            "                break;",
+            "            }",
+            "        }",
+            "    }",
+            "}",
+            ""
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object to connect",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Physics Behavior",
+          "name": "Physics",
+          "supplementaryInformation": "Physics2::Physics2Behavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Joint connector (center of this object is used to create the joint)",
+          "name": "Joint",
+          "type": "objectList"
+        },
+        {
+          "description": "Revolute joint connector",
+          "name": "RevoluteJoint",
+          "supplementaryInformation": "JointConnector::RevoluteJoint",
+          "type": "behavior"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Connect overlapping physics objects with a weld joint.",
+      "fullName": "Connect overlapping objects with a weld joint",
+      "functionType": "Action",
+      "name": "CreateWeldJoints",
+      "sentence": "Connect overlapping _PARAM1_ with a weld joint located at the center of _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "",
+            "const physicsBehaviorName = eventsFunctionContext.getBehaviorName(\"Physics\");",
+            "const jointObjects = eventsFunctionContext.getObjects(\"Joint\");",
+            "const jointBehaviorBehaviorName = eventsFunctionContext.getBehaviorName(\"WeldJoint\");",
+            "const linkManager = gdjs.LinksManager.getManager(runtimeScene);",
+            "",
+            "for (const jointObject of jointObjects) {",
+            "    // Save properties of each joint",
+            "    const jointBehavior = jointObject.getBehavior(jointBehaviorBehaviorName);",
+            "    const frequency = jointBehavior._getFrequency();",
+            "    const dampingRatio = jointBehavior._getDampingRatio();",
+            "    const collideConnected = false;",
+            "",
+            "    // Save center point of each joint",
+            "    const x = jointObject.getAABBCenterX();",
+            "    const y = jointObject.getAABBCenterY();",
+            "",
+            "    /** @type {gdjs.RuntimeObject} */",
+            "    let firstObject = null;",
+            "    for (const object of objects) {",
+            "        if (object.isCollidingWithPoint(x, y)) {",
+            "            if (!firstObject) {",
+            "                firstObject = object;",
+            "                linkManager.linkObjects(object, jointObject);",
+            "            }",
+            "            else {",
+            "                /** @type {gdjs.Physics2RuntimeBehavior} */",
+            "                const physicsBehavior = firstObject.getBehavior(physicsBehaviorName);",
+            "                const referenceAngle = object.angle - firstObject.angle;",
+            "                const frequency = 30;",
+            "                const dampingRatio = 1;",
+            "                physicsBehavior.addWeldJoint(",
+            "                    x,",
+            "                    y,",
+            "                    object,",
+            "                    x,",
+            "                    y,",
+            "                    referenceAngle,",
+            "                    frequency,",
+            "                    dampingRatio,",
+            "                    collideConnected,",
+            "                    jointObject.getVariables().get('JointID'));",
+            "                linkManager.linkObjects(object, jointObject);",
+            "                break;",
+            "            }",
+            "        }",
+            "    }",
+            "}",
+            ""
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object to connect",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Physics Behavior",
+          "name": "Physics",
+          "supplementaryInformation": "Physics2::Physics2Behavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Joint connector (center of this object is used to create the joint)",
+          "name": "Joint",
+          "type": "objectList"
+        },
+        {
+          "description": "Weld joint connector",
+          "name": "RevoluteJoint",
+          "supplementaryInformation": "JointConnector::WeldJoint",
+          "type": "behavior"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Connect physics objects with a distance joint if the joint connector covers the center point of both objects.",
+      "fullName": "Connect objects with a distance joint",
+      "functionType": "Action",
+      "name": "CreateDistanceJoints",
+      "sentence": "Connect _PARAM1_ with a distance joint when _PARAM3_ covers the center point of both objects",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "",
+            "const physicsBehaviorName = eventsFunctionContext.getBehaviorName(\"Physics\");",
+            "const jointObjects = eventsFunctionContext.getObjects(\"Joint\");",
+            "const jointBehaviorBehaviorName = eventsFunctionContext.getBehaviorName(\"DistanceJoint\");",
+            "const linkManager = gdjs.LinksManager.getManager(runtimeScene);",
+            "",
+            "for (const jointObject of jointObjects) {",
+            "    // Save properties of each joint",
+            "    const jointBehavior = jointObject.getBehavior(jointBehaviorBehaviorName);",
+            "    const length = jointBehavior._getDistance();",
+            "    const frequency = jointBehavior._getFrequency();",
+            "    const dampingRatio = jointBehavior._getDampingRatio();",
+            "    const collideConnected = false;",
+            "",
+            "    /** @type {gdjs.RuntimeObject} */",
+            "    let firstObject = null;",
+            "    for (const object of objects) {",
+            "        if (!firstObject) {",
+            "            var x1 = object.getAABBCenterX();",
+            "            var y1 = object.getAABBCenterY();",
+            "            if (jointObject.isCollidingWithPoint(x1, y1)) {",
+            "                firstObject = object;",
+            "                linkManager.linkObjects(object, jointObject);",
+            "            }",
+            "        }",
+            "        else {",
+            "            var x2 = object.getAABBCenterX();",
+            "            var y2 = object.getAABBCenterY();",
+            "            if (jointObject.isCollidingWithPoint(x2, y2)) {",
+            "                /** @type {gdjs.Physics2RuntimeBehavior} */",
+            "                const physicsBehavior = firstObject.getBehavior(physicsBehaviorName);",
+            "                physicsBehavior.addDistanceJoint(",
+            "                    x1,",
+            "                    y1,",
+            "                    object,",
+            "                    x2,",
+            "                    y2,",
+            "                    length,",
+            "                    frequency,",
+            "                    dampingRatio,",
+            "                    collideConnected,",
+            "                    jointObject.getVariables().get('JointID'));",
+            "                linkManager.linkObjects(object, jointObject);",
+            "                break;",
+            "            }",
+            "        }",
+            "    }",
+            "}",
+            ""
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object to connect",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Physics Behavior",
+          "name": "Physics",
+          "supplementaryInformation": "Physics2::Physics2Behavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Joint connector (center of this object is used to create the joint)",
+          "name": "Joint",
+          "type": "objectList"
+        },
+        {
+          "description": "Distance joint connector",
+          "name": "RevoluteJoint",
+          "supplementaryInformation": "JointConnector::DistanceJoint",
+          "type": "behavior"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Connect physics objects with a rope joint if the joint connector covers the center point of both objects.",
+      "fullName": "Connect objects with a rope joint",
+      "functionType": "Action",
+      "name": "CreateRopeJoints",
+      "sentence": "Connect _PARAM1_ with a rope joint when _PARAM3_ covers the center point of both objects",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "",
+            "const physicsBehaviorName = eventsFunctionContext.getBehaviorName(\"Physics\");",
+            "const jointObjects = eventsFunctionContext.getObjects(\"Joint\");",
+            "const jointBehaviorBehaviorName = eventsFunctionContext.getBehaviorName(\"RopeJoint\");",
+            "const linkManager = gdjs.LinksManager.getManager(runtimeScene);",
+            "",
+            "for (const jointObject of jointObjects) {",
+            "    // Save properties of each joint",
+            "    const jointBehavior = jointObject.getBehavior(jointBehaviorBehaviorName);",
+            "    const maxlength = jointBehavior._getMaxDistance();",
+            "    const collideConnected = false;",
+            "",
+            "    /** @type {gdjs.RuntimeObject} */",
+            "    let firstObject = null;",
+            "    for (const object of objects) {",
+            "        if (!firstObject) {",
+            "            var x1 = object.getAABBCenterX();",
+            "            var y1 = object.getAABBCenterY();",
+            "            if (jointObject.isCollidingWithPoint(x1, y1)) {",
+            "                firstObject = object;",
+            "                linkManager.linkObjects(object, jointObject);",
+            "            }",
+            "        }",
+            "        else {",
+            "            var x2 = object.getAABBCenterX();",
+            "            var y2 = object.getAABBCenterY();",
+            "            if (jointObject.isCollidingWithPoint(x2, y2)) {",
+            "                /** @type {gdjs.Physics2RuntimeBehavior} */",
+            "                const physicsBehavior = firstObject.getBehavior(physicsBehaviorName);",
+            "                physicsBehavior.addRopeJoint(",
+            "                    x1,",
+            "                    y1,",
+            "                    object,",
+            "                    x2,",
+            "                    y2,",
+            "                    maxlength,",
+            "                    collideConnected,",
+            "                    jointObject.getVariables().get('JointID'));",
+            "                linkManager.linkObjects(object, jointObject);",
+            "                break;",
+            "            }",
+            "        }",
+            "    }",
+            "}",
+            ""
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object to connect",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Physics Behavior",
+          "name": "Physics",
+          "supplementaryInformation": "Physics2::Physics2Behavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Joint connector (center of this object is used to create the joint)",
+          "name": "Joint",
+          "type": "objectList"
+        },
+        {
+          "description": "Rope joint connector",
+          "name": "RopeJoint",
+          "supplementaryInformation": "JointConnector::RopeJoint",
+          "type": "behavior"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Create and manage revolute joints between two objects.\nAlso known as a hinge joint because the objects act like they are connected with a hinge that pivots.",
+      "fullName": "Revolute joint connector",
+      "name": "RevoluteJoint",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "description": "Set the breaking force of a joint.",
+          "fullName": "Set the breaking force of a joint",
+          "functionType": "Action",
+          "group": "Breaking",
+          "name": "SetBreakingForce",
+          "sentence": "Set the breaking force of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "BreakingForce",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RevoluteJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Breaking force",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Break revolute joint if it exceeds breaking force.",
+          "fullName": "Break revolute joint if it exceeds breaking force",
+          "functionType": "Action",
+          "group": "Breaking",
+          "name": "BreakJointIfNeeded",
+          "sentence": "Break revolute joint on _PARAM2_ (that was created by _PARAM0_) if it exceeds breaking force",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "LinkedObjects::PickObjectsLinkedTo"
+                  },
+                  "parameters": [
+                    "",
+                    "ObjectWithJoint",
+                    "Object",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Physics2::JointReactionForce"
+                      },
+                      "parameters": [
+                        "ObjectWithJoint",
+                        "PhysicsBehavior",
+                        "Object.Variable(JointID)",
+                        ">=",
+                        "BreakingForce"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "ObjectWithJoint",
+                        "PhysicsBehavior",
+                        "Object.Variable(JointID)"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RevoluteJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Object with joint",
+              "name": "ObjectWithJoint",
+              "type": "objectList"
+            },
+            {
+              "description": "Physics behavior",
+              "name": "PhysicsBehavior",
+              "supplementaryInformation": "Physics2::Physics2Behavior",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Enable (or disable) motor of joint.",
+          "fullName": "Enable (or disable) motor of joint",
+          "functionType": "Action",
+          "group": "Motor",
+          "name": "SetEnableMotor",
+          "sentence": "Enable motor of _PARAM0_: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "MotorEnabled",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Value",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "MotorEnabled",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RevoluteJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Enable motor",
+              "name": "Value",
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set motor strength (torque) of joint.",
+          "fullName": "Set motor strength of joint",
+          "functionType": "Action",
+          "group": "Motor",
+          "name": "SetMotorStrength",
+          "sentence": "Set motor strength of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "MotorTorque",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RevoluteJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Motor strength",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set motor rotation speed of joint.",
+          "fullName": "Set motor rotation speed of joint",
+          "functionType": "Action",
+          "group": "Motor",
+          "name": "SetMotorSpeed",
+          "sentence": "Set motor rotation speed of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "MotorSpeed",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RevoluteJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Motor rotation speed",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Enable (or disable) angle limits on joint.",
+          "fullName": "Enable (or disable) angle limits on joint",
+          "functionType": "Action",
+          "group": "Angles",
+          "name": "SetEnableAngleLimits",
+          "sentence": "Enable angle limits of _PARAM0_: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "AngleLimitsEnabled",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Value",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "AngleLimitsEnabled",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RevoluteJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Enable angle limits",
+              "name": "Value",
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set clockwise angle limit of joint.",
+          "fullName": "Set clockwise angle limit of joint",
+          "functionType": "Action",
+          "group": "Angles",
+          "name": "SetClockwiseAngleLimit",
+          "sentence": "Set clockwise angle limit of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ClockwiseAngleLimit",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RevoluteJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Clockwise angle limit (degrees)",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set counter-clockwise angle limit of joint.",
+          "fullName": "Set counter-clockwise angle limit of joint",
+          "functionType": "Action",
+          "group": "Angles",
+          "name": "SetCounterClockwiseAngleLimit",
+          "sentence": "Set counter-clockwise angle limit of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CounterClockwiseAngleLimit",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RevoluteJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Couter-clockwise angle limit (degrees)",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if motor enabled (or disabled) on joint.",
+          "fullName": "Motor enabled (or disabled) on joint",
+          "functionType": "Condition",
+          "group": "Revolute joint connector motor configuration",
+          "name": "MotorEnabled",
+          "sentence": "_PARAM0_ motor enabled (or disabled) on joint",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "MotorEnabled",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RevoluteJoint",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change if motor enabled (or disabled) on joint.",
+          "fullName": "Motor enabled (or disabled) on joint",
+          "functionType": "Action",
+          "group": "Revolute joint connector motor configuration",
+          "name": "SetMotorEnabled",
+          "sentence": "_PARAM0_ motor enabled (or disabled) on joint: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Value",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "MotorEnabled",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Value",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "MotorEnabled",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RevoluteJoint",
+              "type": "behavior"
+            },
+            {
+              "defaultValue": "yes",
+              "description": "MotorEnabled",
+              "name": "Value",
+              "optional": true,
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "JointID"
+        },
+        {
+          "value": "false",
+          "type": "Boolean",
+          "label": "Motor enabled (or disabled) on joint",
+          "description": "",
+          "group": "Motor",
+          "extraInformation": [],
+          "name": "MotorEnabled"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "Motor strength (torque) of joint",
+          "description": "If motor speed is 0, then the motor will try to prevent rotation based on motor torque.",
+          "group": "Motor",
+          "extraInformation": [],
+          "name": "MotorTorque"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "Motor rotation speed of joint",
+          "description": "Use negative values to rotate in the opposite direction.",
+          "group": "Motor",
+          "extraInformation": [],
+          "name": "MotorSpeed"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "Enable (or disable) angle limits on joint",
+          "description": "",
+          "group": "Angle",
+          "extraInformation": [],
+          "name": "AngleLimitsEnabled"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "Angle movement allowed in clockwise direction (degrees)",
+          "description": "",
+          "group": "Angle",
+          "extraInformation": [],
+          "name": "ClockwiseAngleLimit"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "Angle movement allowed in counter-clockwise direction (degrees)",
+          "description": "",
+          "group": "Angle",
+          "extraInformation": [],
+          "name": "CounterClockwiseAngleLimit"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "Breaking force",
+          "description": "Force required to break joint apart",
+          "group": "Breaking joint",
+          "extraInformation": [],
+          "name": "BreakingForce"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Create and manage weld joints between two objects.\nAlso known as a static joint because the objects stay glued in the same relative position to each other.",
+      "fullName": "Weld joint connector",
+      "name": "WeldJoint",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "description": "Break weld joint if it exceeds breaking force.",
+          "fullName": "Break weld joint if it exceeds breaking force",
+          "functionType": "Action",
+          "group": "Breaking",
+          "name": "BreakJointIfNeeded",
+          "sentence": "Break weld joint on _PARAM2_ (that was created by _PARAM0_) if it exceeds breaking force",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "LinkedObjects::PickObjectsLinkedTo"
+                  },
+                  "parameters": [
+                    "",
+                    "ObjectWithJoint",
+                    "Object",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Physics2::JointReactionForce"
+                      },
+                      "parameters": [
+                        "ObjectWithJoint",
+                        "PhysicsBehavior",
+                        "Object.Variable(JointID)",
+                        ">=",
+                        "BreakingForce"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "ObjectWithJoint",
+                        "PhysicsBehavior",
+                        "Object.Variable(JointID)"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::WeldJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Object with joint",
+              "name": "ObjectWithJoint",
+              "type": "objectList"
+            },
+            {
+              "description": "Physics behavior",
+              "name": "PhysicsBehavior",
+              "supplementaryInformation": "Physics2::Physics2Behavior",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set the breaking force of a joint.",
+          "fullName": "Set the breaking force of a joint",
+          "functionType": "Action",
+          "group": "Breaking",
+          "name": "SetBreakingForce",
+          "sentence": "Set the breaking force of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "BreakingForce",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::WeldJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Breaking force",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set frequency of joint.  Range: 0 to 60 (or the maximum FPS of game).",
+          "fullName": "Set frequency of joint",
+          "functionType": "Action",
+          "name": "SetFrequency",
+          "sentence": "Set joint frequency of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Frequency",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::WeldJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Frequency",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "30",
+          "type": "Number",
+          "label": "Frequency",
+          "description": "Set a number between 0 and 60. Higher numbers represent a stronger bond.",
+          "group": "",
+          "extraInformation": [],
+          "name": "Frequency"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Damping ratio",
+          "description": "Set a number between 0 and 1.",
+          "group": "",
+          "extraInformation": [],
+          "name": "DampingRatio"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Newton",
+          "label": "Breaking force",
+          "description": "Force required to break joint apart",
+          "group": "Breaking joint",
+          "extraInformation": [],
+          "name": "BreakingForce"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Create and manage distance joints between two objects. \nActs like a spring because the objects try to stay the same distance apart.",
+      "fullName": "Distance joint connector",
+      "name": "DistanceJoint",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "description": "Break distance joint if it exceeds breaking force.",
+          "fullName": "Break distance joint if it exceeds breaking force",
+          "functionType": "Action",
+          "group": "Breaking",
+          "name": "BreakJointIfNeeded",
+          "sentence": "Break distance joint on _PARAM2_ (that was created by _PARAM0_) if it exceeds breaking force",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "LinkedObjects::PickObjectsLinkedTo"
+                  },
+                  "parameters": [
+                    "",
+                    "ObjectWithJoint",
+                    "Object",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Physics2::JointReactionForce"
+                      },
+                      "parameters": [
+                        "ObjectWithJoint",
+                        "PhysicsBehavior",
+                        "Object.Variable(JointID)",
+                        ">=",
+                        "BreakingForce"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "ObjectWithJoint",
+                        "PhysicsBehavior",
+                        "Object.Variable(JointID)"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::DistanceJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Object with joint",
+              "name": "ObjectWithJoint",
+              "type": "objectList"
+            },
+            {
+              "description": "Physics behavior",
+              "name": "PhysicsBehavior",
+              "supplementaryInformation": "Physics2::Physics2Behavior",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set the breaking force of a joint.",
+          "fullName": "Set the breaking force of a joint",
+          "functionType": "Action",
+          "group": "Breaking",
+          "name": "SetBreakingForce",
+          "sentence": "Set the breaking force of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "BreakingForce",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::DistanceJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Breaking force",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set frequency of joint.  Range: 0 to 60 (or the maximum FPS of game).",
+          "fullName": "Set frequency of joint",
+          "functionType": "Action",
+          "name": "SetFrequency",
+          "sentence": "Set joint frequency of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Frequency",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::DistanceJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Frequency",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set dampting ratio of joint.  Range: 0 to 1.",
+          "fullName": "Set damping ratio of joint",
+          "functionType": "Action",
+          "name": "SetDampingRatio",
+          "sentence": "Set damping ratio of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "DampingRatio",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::DistanceJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Damping ratio",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "Distance between objects",
+          "description": "Joint will attempt to keep objects at this distance apart from each other. Initial value is the starting distance of the two objects.",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "Distance"
+        },
+        {
+          "value": "20",
+          "type": "Number",
+          "label": "Frequency",
+          "description": "Set a number between 0 and 60. Higher numbers represent a stiffer spring.",
+          "group": "",
+          "extraInformation": [],
+          "name": "Frequency"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Damping ratio",
+          "description": "Set a number between 0 and 1.",
+          "group": "",
+          "extraInformation": [],
+          "name": "DampingRatio"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Newton",
+          "label": "Breaking force",
+          "description": "Force required to break joint apart",
+          "group": "Breaking joint",
+          "extraInformation": [],
+          "name": "BreakingForce"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Create and manage rope joints between two objects. \nObjects can get closer, but they cannot exceed the starting distance from each other.\n",
+      "fullName": "Rope joint connector",
+      "name": "RopeJoint",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "description": "Break rope joint if it exceeds breaking force.",
+          "fullName": "Break rope joint if it exceeds breaking force",
+          "functionType": "Action",
+          "group": "Breaking",
+          "name": "BreakJointIfNeeded",
+          "sentence": "Break rope joint on _PARAM2_ (that was created by _PARAM0_) if it exceeds breaking force",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "LinkedObjects::PickObjectsLinkedTo"
+                  },
+                  "parameters": [
+                    "",
+                    "ObjectWithJoint",
+                    "Object",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Physics2::JointReactionForce"
+                      },
+                      "parameters": [
+                        "ObjectWithJoint",
+                        "PhysicsBehavior",
+                        "Object.Variable(JointID)",
+                        ">=",
+                        "BreakingForce"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "ObjectWithJoint",
+                        "PhysicsBehavior",
+                        "Object.Variable(JointID)"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RopeJoint",
+              "type": "behavior"
+            },
+            {
+              "description": "Object with joint",
+              "name": "ObjectWithJoint",
+              "type": "objectList"
+            },
+            {
+              "description": "Physics behavior",
+              "name": "PhysicsBehavior",
+              "supplementaryInformation": "Physics2::Physics2Behavior",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the frequency of the object. Set a number between 0 and 60. Higher numbers represent a stiffer spring.",
+          "fullName": "Frequency",
+          "functionType": "ExpressionAndCondition",
+          "group": "Rope joint configuration",
+          "name": "Frequency",
+          "sentence": "the frequency",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Frequency"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RopeJoint",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "Frequency",
+          "name": "SetFrequency",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Frequency",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RopeJoint",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the damping ratio of the object. Set a number between 0 and 1.",
+          "fullName": "Damping ratio",
+          "functionType": "ExpressionAndCondition",
+          "group": "Rope joint configuration",
+          "name": "DampingRatio",
+          "sentence": "the damping ratio",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "DampingRatio"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RopeJoint",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "DampingRatio",
+          "name": "SetDampingRatio",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "DampingRatio",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RopeJoint",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the force required to break joint apart.",
+          "fullName": "Breaking force",
+          "functionType": "ExpressionAndCondition",
+          "group": "Rope Joint configuration",
+          "name": "BreakingForce",
+          "sentence": "the breaking force",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "BreakingForce"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RopeJoint",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "BreakingForce",
+          "name": "SetBreakingForce",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "BreakingForce",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RopeJoint",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the max distance between objects.",
+          "fullName": "Max distance between objects",
+          "functionType": "ExpressionAndCondition",
+          "group": "Rope joint configuration",
+          "name": "MaxDistance",
+          "sentence": "the max distance between objects",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "MaxDistance"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RopeJoint",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "MaxDistance",
+          "name": "SetMaxDistance",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "MaxDistance",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "JointConnector::RopeJoint",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "Max distance between objects",
+          "description": "Objects can come nearer to each other, but they will not exceed this distance. Initial value is the starting distance of the two objects.",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "MaxDistance"
+        },
+        {
+          "value": "20",
+          "type": "Number",
+          "label": "Frequency",
+          "description": "Set a number between 0 and 60. Higher numbers represent a stiffer spring.",
+          "group": "",
+          "extraInformation": [],
+          "name": "Frequency"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Damping ratio",
+          "description": "Set a number between 0 and 1.",
+          "group": "",
+          "extraInformation": [],
+          "name": "DampingRatio"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Newton",
+          "label": "Breaking force",
+          "description": "Force required to break joint apart",
+          "group": "Breaking joint",
+          "extraInformation": [],
+          "name": "BreakingForce"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

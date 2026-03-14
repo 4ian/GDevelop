@@ -1,0 +1,1154 @@
+{
+  "author": "D8H",
+  "category": "Game mechanic",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Object Stack",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE4LDI5SDhjLTIuMiwwLTQtMS44LTQtNFY3YzAtMi4yLDEuOC00LDQtNGgxMGMyLjIsMCw0LDEuOCw0LDR2MThDMjIsMjcuMiwyMC4yLDI5LDE4LDI5eiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIyLDYuNGw1LDNjMS45LDEuMSwyLjUsMy42LDEuMyw1LjVMMjIsMjUuNSIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI4LDE2bDAuNSwwLjdjMS4zLDEuOCwwLjgsNC4zLTEsNS42bC01LjcsNCIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjgiIHkxPSI3IiB4Mj0iOCIgeTI9IjkiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIxOCIgeTE9IjIzIiB4Mj0iMTgiIHkyPSIyNSIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTEwLjQsMTYuNmMwLjUsMC41LDEuMywwLjUsMS44LDBsMC44LTAuOGwwLjgsMC44YzAuNSwwLjUsMS4zLDAuNSwxLjgsMGMwLjUtMC41LDAuNS0xLjQsMC0xLjlsLTAuOC0wLjhMMTMsMTINCglsLTEuOCwxLjlsLTAuOCwwLjhDOS45LDE1LjIsOS45LDE2LjEsMTAuNCwxNi42eiIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjEyIiB5MT0iMjAiIHgyPSIxNCIgeTI9IjIwIi8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMTMiIHkxPSIxNyIgeDI9IjEzIiB5Mj0iMTkiLz4NCjwvc3ZnPg0K",
+  "name": "ObjectStack",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Videogames/Videogames_cards_game_solitaire_poker_blackjack_casino.svg",
+  "shortDescription": "An ordered list of objects and a shuffle action.",
+  "version": "0.2.1",
+  "description": [
+    "This keep in memory a stack of object instances, with:",
+    "* Actions to modify the stack,",
+    "* Conditions to access the objects of a stack,",
+    "* A shuffle action.",
+    "",
+    "It can be helpful for:",
+    "* Card games",
+    "* Fair randomness (for instance, to create a stack of predetermined bonus and randomize the order they appear)",
+    "",
+    "3 examples use it:",
+    "* a card system demonstration ([open the project online](https://editor.gdevelop.io/?project=example://card-system))",
+    "* a Klondike solitaire ([open the project online](https://editor.gdevelop.io/?project=example://klondike-solitaire))",
+    "* a Zuma-like ([open the project online](https://editor.gdevelop.io/?project=example://smoothy))"
+  ],
+  "origin": {
+    "identifier": "ObjectStack",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "card,stack,pick,list,queue",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Define helper classes JavaScript code.",
+      "fullName": "Define helper classes",
+      "functionType": "Action",
+      "name": "DefineHelperClasses",
+      "private": true,
+      "sentence": "Define helper classes JavaScript code",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (gdjs._objectStackExtension) {",
+            "    return;",
+            "}",
+            "",
+            "// Remove from deleted objects from stacks.",
+            "gdjs.registerObjectDeletedFromSceneCallback(function (runtimeScene, obj) {",
+            "    const extension = runtimeScene._objectStackExtension;",
+            "    if (!extension) {",
+            "        return;",
+            "    }",
+            "    if (extension.allUsedObjects.has(obj)) {",
+            "        extension.allUsedObjects.delete(obj);",
+            "        for (const objectStack of extension.allObjectStacks) {",
+            "            objectStack.remove(obj);",
+            "        }",
+            "    }",
+            "});",
+            "",
+            "class ObjectStack {",
+            "    /**",
+            "     * @type {Array<gdjs.RuntimeObject>}",
+            "     */",
+            "    stack = [];",
+            "",
+            "    /**",
+            "     * Make contains(), remove() and unicity checks more efficients.",
+            "     * @type {Set<gdjs.RuntimeObject>}",
+            "     */",
+            "    objectSet = new Set();",
+            "",
+            "    /**",
+            "     * @param {gdjs.RuntimeObject} object",
+            "     */",
+            "    addOnTop(object) {",
+            "        if (this.objectSet.has(object)) {",
+            "            return false;",
+            "        }",
+            "        this.stack.push(object);",
+            "        this.objectSet.add(object);",
+            "        return true;",
+            "    }",
+            "",
+            "    /**",
+            "     * @param {gdjs.RuntimeObject} object",
+            "     * @param {number} height",
+            "     */",
+            "    insert(object, height) {",
+            "        if (this.objectSet.has(object)) {",
+            "            return false;",
+            "        }",
+            "        this.stack.splice(height, 0, object);",
+            "        this.objectSet.add(object);",
+            "        return true;",
+            "    }",
+            "",
+            "    /**",
+            "     * @param {gdjs.RuntimeObject} object",
+            "     */",
+            "    remove(object) {",
+            "        if (this.objectSet.has(object)) {",
+            "            // The top element is likely to be removed from the stack.",
+            "            // Make its removal O(1)",
+            "            if (object === this.stack[this.stack.length - 1]) {",
+            "                this.stack.pop();",
+            "            }",
+            "            else {",
+            "                const index = this.stack.indexOf(object);",
+            "                if (index >= 0) {",
+            "                    this.stack.splice(index, 1);",
+            "                }",
+            "            }",
+            "            this.objectSet.delete(object);",
+            "        }",
+            "    }",
+            "",
+            "    clear() {",
+            "        this.stack.length = 0;",
+            "        this.objectSet.clear();",
+            "    }",
+            "",
+            "    /**",
+            "     * @param {number} insertHeight",
+            "     * @param {ObjectStack} other",
+            "     * @param {number} lowerBound",
+            "     * @param {number} upperBound",
+            "     */",
+            "    takeInto(insertHeight, other, lowerBound, upperBound) {",
+            "        upperBound = Math.min(upperBound, other.stack.length - 1);",
+            "        for (let height = lowerBound; height <= upperBound; height++) {",
+            "            const insertedObject = other.stack[height];",
+            "            this.stack.splice(insertHeight, 0, insertedObject);",
+            "            this.objectSet.add(insertedObject);",
+            "            insertHeight++;",
+            "        }",
+            "        if (lowerBound <= upperBound) {",
+            "            for (let height = lowerBound; height <= upperBound; height++) {",
+            "                other.objectSet.delete(other.stack[height]);",
+            "            }",
+            "            other.stack.splice(lowerBound, upperBound - lowerBound + 1);",
+            "        }",
+            "    }",
+            "",
+            "    shuffle() {",
+            "        // Fisher–Yates shuffle",
+            "        for (let i = this.stack.length - 1; i >= 1; i--) {",
+            "            // TODO use a seed",
+            "            const j = Math.floor(Math.random() * (i + 1));",
+            "            const swap = this.stack[i];",
+            "            this.stack[i] = this.stack[j]",
+            "            this.stack[j] = swap;",
+            "        }",
+            "    }",
+            "",
+            "    /**",
+            "     * @param {gdjs.RuntimeObject} object",
+            "     */",
+            "    heightOf(object) {",
+            "        return this.stack.indexOf(object);",
+            "    }",
+            "",
+            "    height() {",
+            "        return this.stack.length;",
+            "    }",
+            "",
+            "    isEmpty() {",
+            "        return this.stack.length === 0;",
+            "    }",
+            "",
+            "    /**",
+            "     * @param {gdjs.RuntimeObject} object",
+            "     * @param {number} lowerBound",
+            "     * @param {number} upperBound",
+            "     */",
+            "    containsBetween(object, lowerBound, upperBound) {",
+            "        upperBound = Math.min(upperBound, this.stack.length - 1);",
+            "        for (let i = lowerBound; i <= upperBound; i++) {",
+            "            if (this.stack[i] === object) {",
+            "                return true;",
+            "            }",
+            "        }",
+            "        return false;",
+            "    }",
+            "",
+            "    /**",
+            "     * @param {gdjs.RuntimeObject} object",
+            "     * @param {number} height",
+            "     */",
+            "    containsAt(object, height) {",
+            "        return this.stack[height] === object;",
+            "    }",
+            "",
+            "    /**",
+            "     * @param {gdjs.RuntimeObject} object",
+            "     */",
+            "    hasOnTop(object) {",
+            "        return this.stack.length > 0 && this.stack[this.stack.length - 1] === object;",
+            "    }",
+            "",
+            "    /**",
+            "     * @param {gdjs.RuntimeObject} object",
+            "     */",
+            "    contains(object) {",
+            "        return this.objectSet.has(object);",
+            "    }",
+            "}",
+            "",
+            "gdjs._objectStackExtension = {",
+            "    ObjectStack",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the stack contains the object between a range. The lower and upper bounds are included.",
+      "fullName": "Contain between a range",
+      "functionType": "Condition",
+      "group": "Object Stack",
+      "name": "ContainsBetween",
+      "sentence": "_PARAM3_ is into the stack of _PARAM1_ between _PARAM4_ and _PARAM5_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const stackBehaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+            "/** @type {Hashtable<gdjs.RuntimeObject[]>} */",
+            "const stackObjectsLists = eventsFunctionContext.getObjectsLists(\"Object\");",
+            "/** @type {Hashtable<gdjs.RuntimeObject[]>} */",
+            "const elementObjectsLists = eventsFunctionContext.getObjectsLists(\"Element\");",
+            "const lowerBound = Math.max(0, eventsFunctionContext.getArgument(\"LowerBound\"));",
+            "let upperBound = eventsFunctionContext.getArgument(\"UpperBound\");",
+            "",
+            "eventsFunctionContext.returnValue = gdjs.evtTools.object.twoListsTest(",
+            "  (stackObject, element) => {",
+            "    const behavior = stackObject.getBehavior(stackBehaviorName);",
+            "    return behavior.objectStack.containsBetween(element, lowerBound, upperBound);",
+            "  },",
+            "  stackObjectsLists,",
+            "  elementObjectsLists,",
+            "  false",
+            ");"
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Stack",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Stack behavior",
+          "name": "Behavior",
+          "supplementaryInformation": "ObjectStack::ObjectStack",
+          "type": "behavior"
+        },
+        {
+          "description": "Element",
+          "name": "Element",
+          "type": "objectList"
+        },
+        {
+          "description": "Lower bound",
+          "name": "LowerBound",
+          "type": "expression"
+        },
+        {
+          "description": "Upper bound",
+          "name": "UpperBound",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the stack contains the object at a height.",
+      "fullName": "Contain at",
+      "functionType": "Condition",
+      "group": "Object Stack",
+      "name": "ContainsAt",
+      "sentence": "_PARAM3_ is into the stack of _PARAM1_ at _PARAM4_ ",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const stackBehaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+            "/** @type {Hashtable<gdjs.RuntimeObject[]>} */",
+            "const stackObjectsLists = eventsFunctionContext.getObjectsLists(\"Object\");",
+            "/** @type {Hashtable<gdjs.RuntimeObject[]>} */",
+            "const elementObjectsLists = eventsFunctionContext.getObjectsLists(\"Element\");",
+            "",
+            "const height = eventsFunctionContext.getArgument(\"Height\");",
+            "",
+            "// This code is duplicated from ContainsBetween because the picking wouldn't pass from one function to the other.",
+            "eventsFunctionContext.returnValue = gdjs.evtTools.object.twoListsTest(",
+            "  (stackObject, element) => {",
+            "    const behavior = stackObject.getBehavior(stackBehaviorName);",
+            "    return behavior.objectStack.containsAt(element, height);",
+            "  },",
+            "  stackObjectsLists,",
+            "  elementObjectsLists,",
+            "  false",
+            ");",
+            ""
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Stack",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Stack behavior",
+          "name": "Behavior",
+          "supplementaryInformation": "ObjectStack::ObjectStack",
+          "type": "behavior"
+        },
+        {
+          "description": "Element",
+          "name": "Element",
+          "type": "objectList"
+        },
+        {
+          "description": "Height",
+          "name": "Height",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if an object is on the stack top.",
+      "fullName": "Stack top",
+      "functionType": "Condition",
+      "group": "Object Stack",
+      "name": "HasOnTop",
+      "sentence": "_PARAM3_ is on top of the stack of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const stackBehaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+            "/** @type {Hashtable<gdjs.RuntimeObject[]>} */",
+            "const stackObjectsLists = eventsFunctionContext.getObjectsLists(\"Object\");",
+            "/** @type {Hashtable<gdjs.RuntimeObject[]>} */",
+            "const elementObjectsLists = eventsFunctionContext.getObjectsLists(\"Element\");",
+            "",
+            "eventsFunctionContext.returnValue = gdjs.evtTools.object.twoListsTest(",
+            "  (stackObject, element) => {",
+            "    const behavior = stackObject.getBehavior(stackBehaviorName);",
+            "    return behavior.objectStack.hasOnTop(element);",
+            "  },",
+            "  stackObjectsLists,",
+            "  elementObjectsLists,",
+            "  false",
+            ");"
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Stack",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Stack behavior",
+          "name": "Behavior",
+          "supplementaryInformation": "ObjectStack::ObjectStack",
+          "type": "behavior"
+        },
+        {
+          "description": "Element",
+          "name": "Element",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the stack contains the object.",
+      "fullName": "Contain",
+      "functionType": "Condition",
+      "group": "Object Stack",
+      "name": "Contains",
+      "sentence": "_PARAM3_ is into the stack of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const stackBehaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+            "/** @type {Hashtable<gdjs.RuntimeObject[]>} */",
+            "const stackObjectsLists = eventsFunctionContext.getObjectsLists(\"Object\");",
+            "/** @type {Hashtable<gdjs.RuntimeObject[]>} */",
+            "const elementObjectsLists = eventsFunctionContext.getObjectsLists(\"Element\");",
+            "",
+            "eventsFunctionContext.returnValue = gdjs.evtTools.object.twoListsTest(",
+            "  (stackObject, element) => {",
+            "    const behavior = stackObject.getBehavior(stackBehaviorName);",
+            "    return behavior.objectStack.contains(element);",
+            "  },",
+            "  stackObjectsLists,",
+            "  elementObjectsLists,",
+            "  false",
+            ");"
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Stack",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Stack behavior",
+          "name": "Behavior",
+          "supplementaryInformation": "ObjectStack::ObjectStack",
+          "type": "behavior"
+        },
+        {
+          "description": "Element",
+          "name": "Element",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Hold an ordered list of objects.",
+      "fullName": "Object Stack",
+      "name": "ObjectStack",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ObjectStack::DefineHelperClasses"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const ObjectStack = gdjs._objectStackExtension.ObjectStack;",
+                "",
+                "const object = objects[0];",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = object.getBehavior(behaviorName);",
+                "",
+                "behavior.objectStack = new ObjectStack();",
+                "",
+                "if (!runtimeScene._objectStackExtension) {",
+                "  runtimeScene._objectStackExtension = {",
+                "    allObjectStacks: new Set(),",
+                "    // Its only use is to have a O(1) check for",
+                "    // deleted objects that have never been in a stack.",
+                "    allUsedObjects: new Set()",
+                "  };",
+                "}",
+                "runtimeScene._objectStackExtension.allObjectStacks.add(behavior.objectStack);",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onDestroy",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const object = objects[0];",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = object.getBehavior(behaviorName);",
+                "",
+                "runtimeScene._objectStackExtension.allObjectStacks.delete(behavior);",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Add the object on the top of the stack.",
+          "fullName": "Add on top",
+          "functionType": "Action",
+          "name": "AddOnTop",
+          "sentence": "Add _PARAM2_ on top of the stack of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const object = objects[0];",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = object.getBehavior(behaviorName);",
+                "const elements = eventsFunctionContext.getObjects(\"Elements\");",
+                "",
+                "const stack = behavior.objectStack;",
+                "for (const element of elements) {",
+                "  const isAdded = stack.addOnTop(element);",
+                "  if (isAdded) {",
+                "    runtimeScene._objectStackExtension.allUsedObjects.add(object);",
+                "  }",
+                "}"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Object",
+              "name": "Elements",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Insert the object into the stack.",
+          "fullName": "Insert into the stack",
+          "functionType": "Action",
+          "name": "Insert",
+          "sentence": "Insert _PARAM2_ into the stack of _PARAM0_ at height: _PARAM3_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const object = objects[0];",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = object.getBehavior(behaviorName);",
+                "const elements = eventsFunctionContext.getObjects(\"Elements\");",
+                "let height = eventsFunctionContext.getArgument(\"Height\");",
+                "",
+                "const stack = behavior.objectStack;",
+                "",
+                "if (height < 0 || height > stack.height()) {",
+                "  console.error(`Tried to insert in the stack at ${height} where the stack is ${stack.length} height.`);",
+                "  height = Math.min(0, Math.max(stack.height(), height))",
+                "}",
+                "",
+                "for (const element of elements) {",
+                "  const isAdded = stack.insert(element, height);",
+                "  if (isAdded) {",
+                "    runtimeScene._objectStackExtension.allUsedObjects.add(object);",
+                "  }",
+                "}"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Object",
+              "name": "Elements",
+              "type": "objectList"
+            },
+            {
+              "description": "Height",
+              "name": "Height",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Remove the object from the stack.",
+          "fullName": "Remove from the stack",
+          "functionType": "Action",
+          "name": "Remove",
+          "sentence": "Remove _PARAM2_ from the stack of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const object = objects[0];",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = object.getBehavior(behaviorName);",
+                "const elements = eventsFunctionContext.getObjects(\"Elements\");",
+                "",
+                "const stack = behavior.objectStack;",
+                "for (const element of elements) {",
+                "  const isAdded = stack.remove(element);",
+                "}"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Object",
+              "name": "Elements",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Remove any object from the stack.",
+          "fullName": "Clear",
+          "functionType": "Action",
+          "name": "Clear",
+          "sentence": "Remove every object of the stack of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const object = objects[0];",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = object.getBehavior(behaviorName);",
+                "",
+                "behavior.objectStack.clear();"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Move the objects from a stack into another.",
+          "fullName": "Move into the stack",
+          "functionType": "Action",
+          "name": "MoveInto",
+          "sentence": "Move the objects of the stack of _PARAM3_ from:_PARAM5_ to:_PARAM6_ into the stack of _PARAM0_ at height: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const object = objects[0];",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = object.getBehavior(behaviorName);",
+                "const otherStacks = eventsFunctionContext.getObjects(\"Stack\");",
+                "const otherStackBehaviorName = eventsFunctionContext.getBehaviorName(\"StackBehavior\");",
+                "const insertHeight = eventsFunctionContext.getArgument(\"Height\");",
+                "const lowerBound = Math.max(0, eventsFunctionContext.getArgument(\"LowerBound\"));",
+                "const upperBound = eventsFunctionContext.getArgument(\"UpperBound\");",
+                "",
+                "for (const otherStack of otherStacks) {",
+                "    const otherObjectStack = otherStack.getBehavior(otherStackBehaviorName).objectStack;",
+                "    behavior.objectStack.takeInto(insertHeight, otherObjectStack, lowerBound, upperBound);",
+                "}"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Height",
+              "name": "Height",
+              "type": "expression"
+            },
+            {
+              "description": "Stack",
+              "name": "Stack",
+              "type": "objectList"
+            },
+            {
+              "description": "Stack behavior",
+              "name": "StackBehavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Lower bound",
+              "name": "LowerBound",
+              "type": "expression"
+            },
+            {
+              "description": "Upper bound",
+              "name": "UpperBound",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Move all the object from a stack into another.",
+          "fullName": "Move all into the stack",
+          "functionType": "Action",
+          "name": "MoveAllInto",
+          "sentence": "Move all the objects of the stack of _PARAM3_ into the stack of _PARAM0_ at height: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ObjectStack::ObjectStack::MoveInto"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "Height",
+                    "Stack",
+                    "StackBehavior",
+                    "0",
+                    "Stack.StackBehavior::Height() - 1",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Height",
+              "name": "Height",
+              "type": "expression"
+            },
+            {
+              "description": "Stack",
+              "name": "Stack",
+              "type": "objectList"
+            },
+            {
+              "description": "Stack behavior",
+              "name": "StackBehavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Move all the object from a stack into another one at the top.",
+          "fullName": "Move all on top of the stack",
+          "functionType": "Action",
+          "name": "MoveAllOnTop",
+          "sentence": "Move all the objects of the stack of _PARAM2_ on the top of the stack of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ObjectStack::ObjectStack::MoveInto"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "Object.Behavior::Height()",
+                    "Stack",
+                    "StackBehavior",
+                    "0",
+                    "Stack.StackBehavior::Height() - 1",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Stack",
+              "name": "Stack",
+              "type": "objectList"
+            },
+            {
+              "description": "Stack behavior",
+              "name": "StackBehavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Shuffle the stack.",
+          "fullName": "Shuffle",
+          "functionType": "Action",
+          "name": "Shuffle",
+          "sentence": "Shuffle the stack of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const object = objects[0];",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = object.getBehavior(behaviorName);",
+                "",
+                "behavior.objectStack.shuffle();"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The height of an element in the stack.",
+          "fullName": "Height of a stack element",
+          "functionType": "Expression",
+          "name": "HeightOf",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = objects[0].getBehavior(behaviorName);",
+                "const elements = eventsFunctionContext.getObjects(\"Elements\");",
+                "",
+                "eventsFunctionContext.returnValue = behavior.objectStack.heightOf(elements[0]);"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Object",
+              "name": "Elements",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the number of objects in the stack.",
+          "fullName": "Stack height",
+          "functionType": "ExpressionAndCondition",
+          "name": "Height",
+          "sentence": "the number of objects in the stack",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = objects[0].getBehavior(behaviorName);",
+                "",
+                "eventsFunctionContext.returnValue = behavior.objectStack.height();",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Compare the number of objects in the stack.",
+          "fullName": "Stack height (deprecated)",
+          "functionType": "Condition",
+          "name": "CheckHeight",
+          "private": true,
+          "sentence": "_PARAM0_ has _PARAM2_ objects in its stack",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ObjectStack::ObjectStack::Height"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "=",
+                    "Height",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Stack height",
+              "name": "Height",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the stack is empty.",
+          "fullName": "Is empty",
+          "functionType": "Condition",
+          "name": "IsEmpty",
+          "sentence": "The stack of _PARAM0_ is empty",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const object = objects[0];",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = object.getBehavior(behaviorName);",
+                "",
+                "eventsFunctionContext.returnValue = behavior.objectStack.isEmpty();"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

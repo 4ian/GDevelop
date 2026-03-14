@@ -1,0 +1,1216 @@
+{
+  "author": "",
+  "category": "Camera",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Edge scroll camera",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNhbWVyYS1tZXRlcmluZy1tYXRyaXgiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCw0SDIwQTIsMiAwIDAsMSAyMiw2VjE4QTIsMiAwIDAsMSAyMCwyMEg0QTIsMiAwIDAsMSAyLDE4VjZBMiwyIDAgMCwxIDQsNE00LDZWMThIMjBWNkg0TTUuNSw3LjVIMTFWOS4xN0MxMC4xNSw5LjQ3IDkuNDcsMTAuMTUgOS4xNywxMUg1LjVWNy41TTE4LjUsNy41VjExSDE0LjgzQzE0LjUzLDEwLjE1IDEzLjg1LDkuNDcgMTMsOS4xN1Y3LjVIMTguNU0xOC41LDE2LjVIMTNWMTQuODNDMTMuODUsMTQuNTMgMTQuNTMsMTMuODUgMTQuODMsMTNIMTguNVYxNi41TTUuNSwxNi41VjEzSDkuMTdDOS40NywxMy44NSAxMC4xNSwxNC41MyAxMSwxNC44M1YxNi41SDUuNU0xMiwxMC41QTEuNSwxLjUgMCAwLDEgMTMuNSwxMkExLjUsMS41IDAgMCwxIDEyLDEzLjVBMS41LDEuNSAwIDAsMSAxMC41LDEyQTEuNSwxLjUgMCAwLDEgMTIsMTAuNVoiIC8+PC9zdmc+",
+  "name": "EdgeScrollCamera",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/camera-metering-matrix.svg",
+  "shortDescription": "Scroll camera when cursor is near screen edges.",
+  "dimension": "2D",
+  "version": "1.2.0",
+  "description": [
+    "Edge scroll camera allows the player to move around the scene simply by moving the cursor near the edge they want the camera to move towards.  This is common in RTS games.",
+    "",
+    "How to use:",
+    "- Run the action \"Enable (or disable) edge camera scrolling\" at the beginning of scene",
+    "- Run the action \"Configure edge camera scrolling\" at the beginning of scene",
+    "",
+    "Tips:",
+    "- \"Progressive speed\" makes the camera scroll faster the closer the cursor gets to the edge of screen",
+    "- Use the action \"Enable (or disable) edge camera scrolling\" to turn the scrolling ON or OFF",
+    "- Use the action \"Enforce camera boundaries\" to restrict what the player can see",
+    "- Use the extension \"Copy camera settings\" if you want multiple layers to move",
+    ""
+  ],
+  "origin": {
+    "identifier": "EdgeScrollCamera",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "camera,scroll,edge,screen,pan",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [
+    {
+      "name": "Enabled",
+      "type": "boolean",
+      "value": false
+    },
+    {
+      "name": "Style",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "name": "Layer",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "name": "Camera",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "ScrollSpeed",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "ScreenMargin",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "CursorMoved",
+      "type": "boolean",
+      "value": false
+    },
+    {
+      "name": "CurrentScrollSpeedX",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "CurrentScrollSpeedY",
+      "type": "number",
+      "value": 0
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Set default values"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "EdgeScrollCamera::ConfigureEdgeScrollCamera"
+              },
+              "parameters": [
+                "",
+                "32",
+                "300",
+                "\"\"",
+                "0",
+                "\"Progressive speed\"",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onScenePreEvents",
+      "sentence": "",
+      "events": [
+        {
+          "colorB": 224,
+          "colorG": 16,
+          "colorR": 189,
+          "creationTime": 0,
+          "name": "Edge Scroll Camera",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Enabled",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Prevent camera movement until cursor has moved (cursor starts at 0,0 which triggers scrolling)"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "CursorX"
+                          },
+                          "parameters": [
+                            "",
+                            "!=",
+                            "0",
+                            "Layer",
+                            "Camera"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "CursorY"
+                          },
+                          "parameters": [
+                            "",
+                            "!=",
+                            "0",
+                            "Layer",
+                            "Camera"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "CursorMoved",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "CursorMoved",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "CurrentScrollSpeedX",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "CurrentScrollSpeedY",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Detect edge scrolling",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Only move camera while mouse is inside game window"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "IsMouseInsideCanvas"
+                              },
+                              "parameters": [
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Up"
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "CursorY"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "<=",
+                                    "CameraBorderTop(Layer, Camera) + ScreenMargin",
+                                    "Layer",
+                                    "Camera"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetNumberVariable"
+                                  },
+                                  "parameters": [
+                                    "CurrentScrollSpeedY",
+                                    "=",
+                                    "-EdgeScrollCamera::AbsoluteScrollSpeed(CameraBorderTop(Layer, Camera) - CursorY(Layer, Camera))"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Down"
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "CursorY"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    ">=",
+                                    "CameraBorderBottom(Layer, Camera) - ScreenMargin",
+                                    "Layer",
+                                    "Camera"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetNumberVariable"
+                                  },
+                                  "parameters": [
+                                    "CurrentScrollSpeedY",
+                                    "=",
+                                    "EdgeScrollCamera::AbsoluteScrollSpeed(CameraBorderBottom(Layer, Camera) - CursorY(Layer, Camera))"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Left"
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "CursorX"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "<=",
+                                    "CameraBorderLeft(Layer, Camera) + ScreenMargin",
+                                    "Layer",
+                                    "Camera"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetNumberVariable"
+                                  },
+                                  "parameters": [
+                                    "CurrentScrollSpeedX",
+                                    "=",
+                                    "-EdgeScrollCamera::AbsoluteScrollSpeed(CameraBorderLeft(Layer, Camera) - CursorX(Layer, Camera))"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Right"
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "CursorX"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    ">=",
+                                    "CameraBorderRight(Layer, Camera) - ScreenMargin",
+                                    "VariableString(Layer)",
+                                    "Camera"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetNumberVariable"
+                                  },
+                                  "parameters": [
+                                    "CurrentScrollSpeedX",
+                                    "=",
+                                    "EdgeScrollCamera::AbsoluteScrollSpeed(CameraBorderRight(Layer, Camera) - CursorX(Layer, Camera))"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "parameters": []
+                    },
+                    {
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Perform edge scrolling",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "CurrentScrollSpeedX",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetCameraCenterX"
+                              },
+                              "parameters": [
+                                "",
+                                "+",
+                                "CurrentScrollSpeedX * TimeDelta()",
+                                "Layer",
+                                "Camera"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "CurrentScrollSpeedY",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetCameraCenterY"
+                              },
+                              "parameters": [
+                                "",
+                                "+",
+                                "CurrentScrollSpeedY * TimeDelta()",
+                                "Layer",
+                                "Camera"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "parameters": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Enable (or disable) camera edge scrolling .  Use \"Configure camera edge scrolling\" to adjust settings.",
+      "fullName": "Enable (or disable) camera edge scrolling",
+      "functionType": "Action",
+      "name": "EnableEdgeScrollCamera",
+      "sentence": "Enable camera edge scrolling: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetBooleanVariable"
+              },
+              "parameters": [
+                "Enabled",
+                "False",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "EnableEdgeScrolling",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetBooleanVariable"
+              },
+              "parameters": [
+                "Enabled",
+                "True",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "defaultValue": "yes",
+          "description": "Enable camera edge scrolling",
+          "name": "EnableEdgeScrolling",
+          "optional": true,
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Configure camera edge scrolling that moves when mouse is near an edge of the screen.",
+      "fullName": "Configure camera edge scrolling",
+      "functionType": "Action",
+      "name": "ConfigureEdgeScrollCamera",
+      "sentence": "Configure camera edge scrolling (layer: _PARAM3_, screen margin: _PARAM1_, scroll speed: _PARAM2_, style: _PARAM5_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Save values to use in the pre-events lifecycle function"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::CompareStrings"
+              },
+              "parameters": [
+                "NewStyle",
+                "!=",
+                "\"\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "Style",
+                "=",
+                "NewStyle"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "Layer",
+                "=",
+                "NewLayer"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Camera",
+                "=",
+                "NewCamera"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "ScrollSpeed",
+                "=",
+                "NewScrollSpeed"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "ScreenMargin",
+                "=",
+                "max(1, NewScreenMargin)"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Screen margin (pixels)",
+          "name": "NewScreenMargin",
+          "type": "expression"
+        },
+        {
+          "description": "Scroll speed (in pixels per second)",
+          "name": "NewScrollSpeed",
+          "type": "expression"
+        },
+        {
+          "description": "Layer",
+          "name": "NewLayer",
+          "type": "layer"
+        },
+        {
+          "description": "Camera",
+          "name": "NewCamera",
+          "type": "expression"
+        },
+        {
+          "description": "Scroll style",
+          "name": "NewStyle",
+          "supplementaryInformation": "[\"Progressive speed\",\"Constant speed\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the camera is scrolling.",
+      "fullName": "Camera is scrolling",
+      "functionType": "Condition",
+      "name": "IsCameraScrolling",
+      "sentence": "Camera is scrolling",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "CurrentScrollSpeedX",
+                "=",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "CurrentScrollSpeedY",
+                "=",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "False"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the camera is scrolling up.",
+      "fullName": "Camera is scrolling up",
+      "functionType": "Condition",
+      "name": "IsCameraScrollingUp",
+      "sentence": "Camera is scrolling up",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "CurrentScrollSpeedY",
+                "<",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the camera is scrolling down.",
+      "fullName": "Camera is scrolling down",
+      "functionType": "Condition",
+      "name": "IsCameraScrollingDown",
+      "sentence": "Camera is scrolling down",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "CurrentScrollSpeedY",
+                ">",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the camera is scrolling left.",
+      "fullName": "Camera is scrolling left",
+      "functionType": "Condition",
+      "name": "IsCameraScrollingLeft",
+      "sentence": "Camera is scrolling left",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "CurrentScrollSpeedX",
+                "<",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the camera is scrolling right.",
+      "fullName": "Camera is scrolling right",
+      "functionType": "Condition",
+      "name": "IsCameraScrollingRight",
+      "sentence": "Camera is scrolling right",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "CurrentScrollSpeedX",
+                ">",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Draw a rectangle that shows where edge scrolling will be triggered.",
+      "fullName": "Draw edge scrolling screen margin",
+      "functionType": "Action",
+      "name": "DrawEdgeScrollingBorder",
+      "sentence": "Draw edge scrolling screen margin with _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Enabled",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SceneInstancesCount"
+                  },
+                  "parameters": [
+                    "",
+                    "ShapePainter",
+                    "<",
+                    "1"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "ShapePainter",
+                    "0",
+                    "0",
+                    "Layer"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::FillOpacity"
+                  },
+                  "parameters": [
+                    "ShapePainter",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::UseRelativeCoordinates"
+                  },
+                  "parameters": [
+                    "ShapePainter",
+                    "no"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::ClearBetweenFrames"
+                  },
+                  "parameters": [
+                    "ShapePainter",
+                    "yes"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::Rectangle"
+                  },
+                  "parameters": [
+                    "ShapePainter",
+                    "CameraBorderLeft(ShapePainter.Layer()) + ScreenMargin",
+                    "CameraBorderTop(ShapePainter.Layer()) + ScreenMargin",
+                    "CameraBorderRight(ShapePainter.Layer()) - ScreenMargin",
+                    "CameraBorderBottom(ShapePainter.Layer()) - ScreenMargin"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Shape painter",
+          "name": "ShapePainter",
+          "supplementaryInformation": "PrimitiveDrawing::Drawer",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the speed the camera is currently scrolling in horizontal direction (in pixels per second).",
+      "fullName": "Horizontal edge scroll speed",
+      "functionType": "Expression",
+      "name": "SpeedX",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "CurrentScrollSpeedX"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the speed the camera is currently scrolling in vertical direction (in pixels per second).",
+      "fullName": "Vertical edge scroll speed",
+      "functionType": "Expression",
+      "name": "SpeedY",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "CurrentScrollSpeedY"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the absolute scroll speed according to the mouse distance from the border.",
+      "fullName": "Absolute scroll speed",
+      "functionType": "Expression",
+      "name": "AbsoluteScrollSpeed",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Progressive style increases speed the closer the cursor is to the edge of screen"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Style",
+                "=",
+                "\"Progressive speed\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "(1 - abs(BorderDistance) / ScreenMargin) * ScrollSpeed"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "The camera borders can have rounding errors, make sure the max speed can be reached."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Or"
+              },
+              "parameters": [],
+              "subInstructions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Style",
+                    "=",
+                    "\"Constant speed\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "abs(BorderDistance)",
+                    "<=",
+                    "1"
+                  ]
+                }
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "ScrollSpeed"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Border distance",
+          "name": "BorderDistance",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

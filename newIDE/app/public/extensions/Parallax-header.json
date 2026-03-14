@@ -1,0 +1,47 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "wWP8BSlAW0UP4NeaHa2LcmmDzmH2",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Parallax for Tiled Sprite",
+  "name": "Parallax",
+  "version": "2.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/Parallax.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Parallax-header.json",
+  "tags": "parallax,tiled,background",
+  "category": "Camera",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/image-move.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "changelog": [
+    {
+      "version": "2.0.0",
+      "breaking": "- The parallax now starts with an offset of 0."
+    }
+  ],
+  "shortDescription": "Parallax scrolling for Tiled Sprite backgrounds.",
+  "eventsBasedBehaviorsCount": 2,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/parallax",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Move the image of a Tiled Sprite to follow the camera horizontally with a parallax effect. After adding this to an object, put the object on a layer that is not moving, behind the layer that is followed (for example, a layer called \"Background\").",
+      "fullName": "Horizontal Parallax for a Tiled Sprite",
+      "name": "HorizontalTiledSpriteParallax",
+      "objectType": "TiledSpriteObject::TiledSprite",
+      "eventsFunctions": []
+    },
+    {
+      "description": "Move the image of a Tiled Sprite to follow the camera vertically with a parallax effect. After adding this to an object, put the object on a layer that is not moving, behind the layer that is followed (for example, a layer called \"Background\").",
+      "fullName": "Vertical Parallax for a Tiled Sprite",
+      "name": "VerticalTiledSpriteParallax",
+      "objectType": "TiledSpriteObject::TiledSprite",
+      "eventsFunctions": []
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Behaviors to animate Tiled Sprite objects in the background, following the camera with a parallax effect.\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWltYWdlLW1vdmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTUsM0gxOVYwTDI0LDVMMTksMTBWN0gxNVYzTTIxLDExLjk0VjE5QTIsMiAwIDAsMSAxOSwyMUg1QTIsMiAwIDAsMSAzLDE5VjVBMiwyIDAgMCwxIDUsM0gxMi4wNkMxMiwzLjMzIDEyLDMuNjcgMTIsNEE4LDggMCAwLDAgMjAsMTJDMjAuMzMsMTIgMjAuNjcsMTIgMjEsMTEuOTRNMTksMThMMTQuNSwxMkwxMSwxNi41TDguNSwxMy41TDUsMThIMTlaIiAvPjwvc3ZnPg=="
+}

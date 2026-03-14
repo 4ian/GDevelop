@@ -1,0 +1,38 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "mETnDt21g4Mdq3sEASKkqjFOpDq2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Text-to-Speech",
+  "name": "TextToSpeech",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/TextToSpeech.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/TextToSpeech-header.json",
+  "tags": "string,text,sound,tts,speech,speak,read",
+  "category": "Audio",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Users/Users_user_chat_talk.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Read text aloud using system Text-to-Speech. Configurable voice and speed.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/text-to-speech",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "Speak",
+      "fullName": "Speak out a message",
+      "description": "Speaks a text message aloud through the system text-to-speech.",
+      "functionType": "Action"
+    },
+    {
+      "name": "StopSpeaking",
+      "fullName": "Force stop speaking",
+      "description": "Forces all Text-to-Speech to be stopped.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Use the system's Text-to-Speech features to read any text aloud.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjEsNGMtMi4yLDAtNCwxLjgtNCw0djZ2NGw2LTNoM2MyLjIsMCw0LTEuOCw0LTRWOGMwLTIuMi0xLjgtNC00LTRIMjF6Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMjEiIHkxPSI4IiB4Mj0iMjQiIHkyPSI4Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMjEiIHkxPSIxMSIgeDI9IjIyIiB5Mj0iMTEiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNyw4LjhjLTAuNi0wLjQtMS4zLTAuNy0yLTAuOGMtMS42LTAuMi0zLDAuNS0zLjksMS43QzEwLjQsOS41LDkuOCw5LjYsOSwxMC4yYy0wLjgsMC42LTEuMywxLjYtMS4zLDIuNg0KCWwwLDAuOHYxLjJ2MWMwLDEuOCwwLjksMy41LDIuNCw0LjRsMCwwYzAsMS44LTEuMywzLjQtMywzLjhDNSwyNC43LDMuNCwyNi4zLDMsMjguNUMzLDI4LjcsMy4yLDI5LDMuNCwyOWgxOC4xDQoJYzAuMywwLDAuNS0wLjMsMC40LTAuNWMtMC40LTIuMS0yLTMuOC00LjEtNC40Yy0xLjctMC40LTMtMi0zLTMuOCIvPg0KPC9zdmc+DQo="
+}

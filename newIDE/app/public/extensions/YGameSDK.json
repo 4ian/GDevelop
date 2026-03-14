@@ -1,0 +1,963 @@
+{
+  "author": "",
+  "category": "Third-party",
+  "description": "YGameSDK.",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Yandex Games SDK for GDevelop",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLW51bWVyaWMtMy1jaXJjbGUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTUsMTVWMTMuNUExLjUsMS41IDAgMCwwIDEzLjUsMTJBMS41LDEuNSAwIDAsMCAxNSwxMC41VjlDMTUsNy44OSAxNC4xLDcgMTMsN0g5VjlIMTNWMTFIMTFWMTNIMTNWMTVIOVYxN0gxM0EyLDIgMCAwLDAgMTUsMTVNMTIsMkExMCwxMCAwIDAsMSAyMiwxMkExMCwxMCAwIDAsMSAxMiwyMkExMCwxMCAwIDAsMSAyLDEyQTEwLDEwIDAgMCwxIDEyLDJaIiAvPjwvc3ZnPg==",
+  "name": "YGameSDK",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/numeric-3-circle.svg",
+  "shortDescription": "Yandex Games SDK allows to interact with Yandex APIs for games distributed on this platform.",
+  "version": "1.0.2",
+  "tags": "yandex",
+  "authorIds": [
+    "HfLOrWRS2WQkP2Dc5dEZOM9vVg93"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Init SDK.",
+      "fullName": "InitSDK",
+      "functionType": "Action",
+      "group": "",
+      "name": "InitSDK",
+      "private": false,
+      "sentence": "_PARAM1_,_PARAM2_,_PARAM3_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "\nvar isInitVar = runtimeScene.getGame().getVariables().get(\"YGSDK_IsInit\");\nisInitVar.setBoolean(false);\n\nvar options = {\n    fullscreen: eventsFunctionContext.getArgument(\"fullscreen\"),\n    orientation: {\n        value: eventsFunctionContext.getArgument(\"orientation\") || \"portrait\",\n        lock: eventsFunctionContext.getArgument(\"lock\")\n    }\n};\n\n(function(d) {\n        var t = d.getElementsByTagName('script')[0];\n        var s = d.createElement('script');\n        s.src = 'https://yandex.ru/games/sdk/v2';\n        s.async = true;\n        t.parentNode.insertBefore(s, t);\n        s.onload = function () {\n            YaGames\n    .init(options)\n    .then(ysdk => {\n        window.ysdk = ysdk;\n        isInitVar.setBoolean(true);\n         console.warn('Yandex SDK initialized');\n    });\n    };\n    })(document);",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Fullscreen",
+          "longDescription": "",
+          "name": "fullscreen",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "yesorno"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Screen orientation",
+          "longDescription": "",
+          "name": "orientation",
+          "optional": false,
+          "supplementaryInformation": "[\"portrait\",\"landscape\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Lock screen",
+          "longDescription": "",
+          "name": "lock",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "IsInit SDK.",
+      "fullName": "IsInit",
+      "functionType": "Condition",
+      "group": "",
+      "name": "IsInit",
+      "private": false,
+      "sentence": "IsInit",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "GlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "YGSDK_IsInit",
+                "True"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "GetLang.",
+      "fullName": "GetLang",
+      "functionType": "Action",
+      "group": "",
+      "name": "GetLang",
+      "private": false,
+      "sentence": "_PARAM1_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "var lang_variable = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"lang\"));\nvar l = window.ysdk.environment;\nconsole.log(l.i18n.lang);\nlang_variable.setString(l.i18n.lang);",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Global variable (string)",
+          "longDescription": "",
+          "name": "lang",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "InitPlayer.",
+      "fullName": "InitPlayer",
+      "functionType": "Action",
+      "group": "",
+      "name": "InitPlayer",
+      "private": false,
+      "sentence": "InitPlayer",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "\nvar isInitPlayer = runtimeScene.getGame().getVariables().get(\"YGSDK_Player_IsInit\");\nvar player;\nfunction initPlayer() {\n    return window.ysdk.getPlayer().then(_player => {\n            window.player_ysdk = _player;\n            isInitPlayer.setBoolean(true);\n            console.warn('init user');\n        });\n}\ninitPlayer().catch(err => {\n        window.ysdk.auth.openAuthDialog().then(() => {\n\n                initPlayer();\n            }).catch(() => {\n                isInitPlayer.setBoolean(false);\n                console.warn('no init user');\n\n            });\n});\n\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "IsInitPlayer.",
+      "fullName": "IsInitPlayer",
+      "functionType": "Condition",
+      "group": "",
+      "name": "IsInitPlayer",
+      "private": false,
+      "sentence": "IsInitPlayer",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "YGameSDK::IsInit"
+              },
+              "parameters": [
+                "",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "GlobalVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "YGSDK_Player_IsInit",
+                    "True"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "GetPlayerName.",
+      "fullName": "GetPlayerName",
+      "functionType": "Action",
+      "group": "",
+      "name": "GetPlayerName",
+      "private": false,
+      "sentence": "_PARAM1_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "YGameSDK::IsInitPlayer"
+              },
+              "parameters": [
+                "",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "var playerName = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"PlayerName\"));\nvar name = window.player_ysdk.getName();\nplayerName.setString(name);",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Global variable (string)",
+          "longDescription": "",
+          "name": "PlayerName",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "ShowBanner.",
+      "fullName": "ShowBanner",
+      "functionType": "Action",
+      "group": "",
+      "name": "ShowBanner",
+      "private": false,
+      "sentence": "ShowBanner",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "YGameSDK::IsInit"
+              },
+              "parameters": [
+                "",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "\r\ntry {\r\n   window.ysdk.adv.showFullscreenAdv({\r\n        callbacks: {\r\n            onOpen: function () {\r\n                console.warn(\"show a fullscreen ad\");\r\n            },\r\n            onClose: function (wasShown) {\r\n                console.warn(\"close a fullscreen\");\r\n            },\r\n            onError: function (err) {\r\n                console.warn(\"Error trying to show a fullscreen ad\", err);\r\n            },\r\n            onOffline: function () {\r\n                console.warn(\"offline\");\r\n            }\r\n        }\r\n    });\r\n} catch (err) {\r\n       console.warn(err);\r\n};\r\n",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": []
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "ShowVideo.",
+      "fullName": "ShowVideo",
+      "functionType": "Action",
+      "group": "",
+      "name": "ShowVideo",
+      "private": false,
+      "sentence": "ShowVideo",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "YGameSDK::IsInit"
+              },
+              "parameters": [
+                "",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "var vid = runtimeScene.getGame().getVariables().get(\"YGameSDK_RewardedVideoResult\"); \r\n\r\nvid.setString(\"start\");\r\ntry {\r\n    window.ysdk.adv.showRewardedVideo({\r\n        callbacks: {\r\n            onOpen: function () {\r\n                vid.setString(\"open\");\r\n                console.warn(\"video open\");\r\n            },\r\n            onRewarded: function () {\r\n                vid.setString(\"rewarded\");\r\n                console.warn(\"video rewarded\");\r\n            },\r\n            onClose: function () {\r\n                vid.setString(\"closed\");\r\n                console.warn(\"video closed\");\r\n            },\r\n            onError: function (err) {\r\n                vid.setString(\"error\");\r\n                console.warn(err);\r\n            }\r\n        }\r\n    });\r\n} catch (err) {\r\n    vid.setString(\"error\");\r\n    console.warn(\"Error while showing a rewarded video\", err);\r\n};\r\n",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": []
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "IsVideoOpen.",
+      "fullName": "IsVideoOpen",
+      "functionType": "Condition",
+      "group": "",
+      "name": "IsVideoOpen",
+      "private": false,
+      "sentence": "IsVideoOpen",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "VarGlobalTxt"
+              },
+              "parameters": [
+                "YGameSDK_RewardedVideoResult",
+                "=",
+                "\"open\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "IsVideoRewarded.",
+      "fullName": "IsVideoRewarded",
+      "functionType": "Condition",
+      "group": "",
+      "name": "IsVideoRewarded",
+      "private": false,
+      "sentence": "IsVideoRewarded",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "VarGlobalTxt"
+              },
+              "parameters": [
+                "YGameSDK_RewardedVideoResult",
+                "=",
+                "\"rewarded\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "IsVideoClosed.",
+      "fullName": "IsVideoClosed",
+      "functionType": "Condition",
+      "group": "",
+      "name": "IsVideoClosed",
+      "private": false,
+      "sentence": "IsVideoClosed",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "VarGlobalTxt"
+              },
+              "parameters": [
+                "YGameSDK_RewardedVideoResult",
+                "=",
+                "\"closed\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "IsVideoFailed.",
+      "fullName": "IsVideoFailed",
+      "functionType": "Condition",
+      "group": "",
+      "name": "IsVideoFailed",
+      "private": false,
+      "sentence": "IsVideoFailed",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "VarGlobalTxt"
+              },
+              "parameters": [
+                "YGameSDK_RewardedVideoResult",
+                "=",
+                "\"error\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "LoadLeaderboardByName.",
+      "fullName": "LoadLeaderboardByName",
+      "functionType": "Action",
+      "group": "",
+      "name": "LoadLeaderboardByName",
+      "private": false,
+      "sentence": "_PARAM1_,_PARAM2_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "var isInitVar = runtimeScene.getGame().getVariables().get(\"YGSDK_IsInit_Leaderboard\");\nisInitVar.setBoolean(false);\n\nvar variableName = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"VariableName\"));\nvar tableName = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"TableName\"))\n\ntry {\nwindow.ysdk.getLeaderboards()\n  .then(lb => {\n    lb.getLeaderboardEntries(tableName, { quantityTop: 10, includeUser: true, quantityAround: 3 })\n        .then(res => {\n        var arr = res.entries;\n        var table = \"\";\n        arr.forEach(function(item, i, arr) {\n        table += item.rank+\". \"+item.player.publicName + \" - \"+ item.score+\" очков !\\n\";      \n}\n);\nvariableName.setString(table);\nisInitVar.setBoolean(true);\nconsole.warn('liderboards load');\n      });\n  });\n } catch (err) {\n    console.warn(err);\n};\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "TableNameYandex",
+          "longDescription": "",
+          "name": "TableName",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "GlobalVariableName",
+          "longDescription": "",
+          "name": "VariableName",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "IsInitLeaderboard.",
+      "fullName": "IsInitLeaderboard",
+      "functionType": "Condition",
+      "group": "",
+      "name": "IsInitLeaderboard",
+      "private": false,
+      "sentence": "IsInitLeaderboard",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "YGameSDK::IsInit"
+              },
+              "parameters": [
+                "",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "GlobalVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "YGSDK_IsInit_Leaderboard",
+                    "True"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "SetScoreLeaderboard.",
+      "fullName": "SetScoreLeaderboard",
+      "functionType": "Action",
+      "group": "",
+      "name": "SetScoreLeaderboard",
+      "private": false,
+      "sentence": "_PARAM1_,_PARAM2_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "var variableName = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"VariableName\"));\nvar tableName = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"TableName\"))\nfunction setScore() {\nwindow.ysdk.getLeaderboards()\n  .then(lb => {\n    lb.setLeaderboardScore(tableName, variableName);\n    console.warn('score save');\n  });\n}\nsetScore();\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "GlobalVariableName",
+          "longDescription": "",
+          "name": "VariableName",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "TableNameYandex",
+          "longDescription": "",
+          "name": "TableName",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "InitPayments.",
+      "fullName": "InitPayments",
+      "functionType": "Action",
+      "group": "",
+      "name": "InitPayments",
+      "private": false,
+      "sentence": "InitPayments",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "YGameSDK::IsInit"
+              },
+              "parameters": [
+                "",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "YGameSDK::IsInitPlayer"
+              },
+              "parameters": [
+                "",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "var isInitPayment = runtimeScene.getGame().getVariables().get(\"YGSDK_Payment_IsInit\");\nisInitPayment.setBoolean(false);\nvar payments = null;\nwindow.ysdk.getPayments({ signed: true }).then(payments => {\n        window.payments_ysdk = payments;\n        isInitPayment.setBoolean(true);\n        console.warn(\"payments init\");\n    }).catch(err => {\n        console.warn(err);\n    })\n\n",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "IsInitPayments.",
+      "fullName": "IsInitPayments",
+      "functionType": "Condition",
+      "group": "",
+      "name": "IsInitPayments",
+      "private": false,
+      "sentence": "IsInitPayments",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "YGameSDK::IsInit"
+              },
+              "parameters": [
+                "",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "YGameSDK::IsInitPlayer"
+              },
+              "parameters": [
+                "",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "GlobalVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "YGSDK_Payment_IsInit",
+                    "True"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "LoadPurchaseByID.",
+      "fullName": "LoadPurchaseByID",
+      "functionType": "Action",
+      "group": "",
+      "name": "LoadPurchaseByID",
+      "private": false,
+      "sentence": "ID: _PARAM1_,ResultVariableName: _PARAM2_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "YGameSDK::IsInitPayments"
+              },
+              "parameters": [
+                "",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "var purchaseID = eventsFunctionContext.getArgument(\"ID\");\n\nvar variableName = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"ResultVariableName\"));\n\nwindow.payments_ysdk.getPurchases().then(purchases => {\n        if (purchases.some(purchase => purchase.productID === purchaseID)) {\nconsole.warn('buy');\nvariableName.setBoolean(true);\n        } else {\n    console.warn('no-buy');\nvariableName.setBoolean(false);\n        }\n    }).catch(err => {\n   console.warn('error');\nvariableName.setBoolean(false);\n    })\n",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "product ID",
+          "longDescription": "",
+          "name": "ID",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Glodal variable result true/false",
+          "longDescription": "",
+          "name": "ResultVariableName",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "PurchaseByID.",
+      "fullName": "PurchaseByID",
+      "functionType": "Action",
+      "group": "",
+      "name": "PurchaseByID",
+      "private": false,
+      "sentence": "_PARAM1_,_PARAM2_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "var purchaseID = eventsFunctionContext.getArgument(\"PurchaseID\");\nvar resultVariableName = eventsFunctionContext.getArgument(\"ResultVariableName\");\n\nvar isresultVariableName = runtimeScene.getGame().getVariables().get(resultVariableName);\n\nwindow.payments_ysdk.purchase({ id: purchaseID }).then(purchase => {\n        isresultVariableName.setBoolean(true);\n        console.warn('purchase ok');\n    }).catch(err => {\n        console.warn(err);\n        isresultVariableName.setBoolean(false);\n})\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "product ID",
+          "longDescription": "",
+          "name": "ID",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Global variable true/false",
+          "longDescription": "",
+          "name": "ResultVariableName",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

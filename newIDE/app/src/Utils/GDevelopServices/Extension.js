@@ -12,6 +12,21 @@ const gd: libGDevelop = global.gd;
 
 type ExtensionTier = 'experimental' | 'reviewed' | 'installed';
 
+const USE_LOCAL_EXTENSIONS_REGISTRY = true;
+const LOCAL_EXTENSIONS_DATABASE_URL =
+  '/extensions-database/extensions-database.json';
+const LOCAL_EXTENSIONS_BASE_URL = '/extensions';
+
+const getLocalExtensionUrls = (extensionName: string) => ({
+  url: `${LOCAL_EXTENSIONS_BASE_URL}/${extensionName}.json`,
+  headerUrl: `${LOCAL_EXTENSIONS_BASE_URL}/${extensionName}-header.json`,
+});
+
+const loadLocalExtensionsDatabase = async () => {
+  const response = await cdnClient.get(LOCAL_EXTENSIONS_DATABASE_URL);
+  return response.data;
+};
+
 export type ExtensionDependency = {
   extensionName: string,
   extensionVersion: string,
@@ -21,6 +36,7 @@ export type ExtensionRegistryItemHeader = {
   tier: ExtensionTier,
   authorIds: Array<string>,
   authors?: Array<UserPublicProfile>,
+  author?: string,
   extensionNamespace: string,
   fullName: string,
   name: string,
@@ -127,6 +143,7 @@ export type ObjectShortHeader = {
 export type SerializedExtension = {
   name: string,
   requiredExtensions?: Array<ExtensionDependency>,
+  author?: string,
   // This type is inexact because the typing is not complete.
 };
 
@@ -208,7 +225,56 @@ export const client: Axios = axios.create({
 // $FlowFixMe[cannot-resolve-name]
 export const cdnClient: Axios = axios.create();
 
+const extensionAuthorCache: { [string]: ?string } = {};
+const extensionAuthorPromiseCache: { [string]: Promise<?string> } = {};
+
+const normalizeAuthorName = (author: ?string): ?string => {
+  if (!author) return null;
+  const trimmedAuthor = author.trim();
+  return trimmedAuthor.length > 0 ? trimmedAuthor : null;
+};
+
 export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
+  if (USE_LOCAL_EXTENSIONS_REGISTRY) {
+    const extensionsRegistry: ExtensionsRegistry = await loadLocalExtensionsDatabase();
+
+    if (!extensionsRegistry) {
+      throw new Error(
+        'Unexpected response from the local extensions database.'
+      );
+    }
+    if (!extensionsRegistry.headers) {
+      extensionsRegistry.headers = extensionsRegistry.extensionShortHeaders;
+    }
+    if (
+      !extensionsRegistry.views ||
+      !extensionsRegistry.views.default ||
+      !extensionsRegistry.views.default.firstIds
+    ) {
+      extensionsRegistry.views = extensionsRegistry.views || {};
+      extensionsRegistry.views.default = extensionsRegistry.views.default || {};
+      extensionsRegistry.views.default.firstIds =
+        extensionsRegistry.views.default.firstExtensionIds;
+    }
+    for (const header of extensionsRegistry.headers) {
+      if ((header.tier: string) === 'community') {
+        header.tier = 'experimental';
+      }
+    }
+
+    return {
+      ...extensionsRegistry,
+      // TODO: move this to backend endpoint
+      // $FlowFixMe[incompatible-type]
+      headers: extensionsRegistry.headers
+        .map(transformTagsAsStringToTagsAsArray)
+        .map(header => ({
+          ...header,
+          ...getLocalExtensionUrls(header.name),
+        })),
+    };
+  }
+
   const response = await client.get(`/extension`, {
     params: {
       // Could be changed according to the editor environment, but keep
@@ -247,6 +313,26 @@ export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
 };
 
 export const getBehaviorsRegistry = async (): Promise<BehaviorsRegistry> => {
+  if (USE_LOCAL_EXTENSIONS_REGISTRY) {
+    const extensionsDatabase = await loadLocalExtensionsDatabase();
+    const behaviorsRegistry: BehaviorsRegistry = extensionsDatabase.behavior;
+
+    if (!behaviorsRegistry) {
+      throw new Error('Unexpected local behaviors registry.');
+    }
+
+    return {
+      ...behaviorsRegistry,
+      headers: behaviorsRegistry.headers.map(header => {
+        const adaptedHeader = adaptBehaviorHeader(header);
+        return {
+          ...adaptedHeader,
+          ...getLocalExtensionUrls(adaptedHeader.extensionName),
+        };
+      }),
+    };
+  }
+
   const response = await client.get(`/behavior`, {
     params: {
       // Could be changed according to the editor environment, but keep
@@ -286,6 +372,26 @@ const adaptBehaviorHeader = (
 };
 
 export const getObjectsRegistry = async (): Promise<ObjectsRegistry> => {
+  if (USE_LOCAL_EXTENSIONS_REGISTRY) {
+    const extensionsDatabase = await loadLocalExtensionsDatabase();
+    const objectsRegistry: ObjectsRegistry = extensionsDatabase.object;
+
+    if (!objectsRegistry) {
+      throw new Error('Unexpected local objects registry.');
+    }
+
+    return {
+      ...objectsRegistry,
+      headers: objectsRegistry.headers.map(header => {
+        const adaptedHeader = adaptObjectHeader(header);
+        return {
+          ...adaptedHeader,
+          ...getLocalExtensionUrls(adaptedHeader.extensionName),
+        };
+      }),
+    };
+  }
+
   const response = await client.get(`/object`, {
     params: {
       // Could be changed according to the editor environment, but keep
@@ -328,7 +434,13 @@ export const getExtensionHeader = (
     | BehaviorShortHeader
     | ObjectShortHeader
 ): Promise<ExtensionHeader> => {
-  return cdnClient.get(extensionShortHeader.headerUrl).then(response => {
+  const extensionName =
+    extensionShortHeader.extensionName || extensionShortHeader.name;
+  const headerUrl = USE_LOCAL_EXTENSIONS_REGISTRY
+    ? getLocalExtensionUrls(extensionName).headerUrl
+    : extensionShortHeader.headerUrl;
+
+  return cdnClient.get(headerUrl).then(response => {
     const data: ExtensionHeaderWithTagsAsString = response.data;
     const transformedData: ExtensionHeader = transformTagsAsStringToTagsAsArray(
       // $FlowFixMe[incompatible-type]
@@ -344,7 +456,12 @@ export const getExtensionHeader = (
 export const getExtension = (
   extensionHeader: ExtensionShortHeader | BehaviorShortHeader
 ): Promise<SerializedExtension> => {
-  return cdnClient.get(extensionHeader.url).then(response => {
+  const extensionName = extensionHeader.extensionName || extensionHeader.name;
+  const extensionUrl = USE_LOCAL_EXTENSIONS_REGISTRY
+    ? getLocalExtensionUrls(extensionName).url
+    : extensionHeader.url;
+
+  return cdnClient.get(extensionUrl).then(response => {
     const data: SerializedExtensionWithTagsAsString = response.data;
     // $FlowFixMe[incompatible-type]
     const transformedData: SerializedExtension = transformTagsAsStringToTagsAsArray(
@@ -353,6 +470,43 @@ export const getExtension = (
     );
     return transformedData;
   });
+};
+
+export const getExtensionAuthor = async (
+  extensionShortHeader: ExtensionShortHeader | BehaviorShortHeader
+): Promise<?string> => {
+  const extensionName =
+    extensionShortHeader.extensionName || extensionShortHeader.name;
+
+  if (
+    Object.prototype.hasOwnProperty.call(extensionAuthorCache, extensionName)
+  ) {
+    return extensionAuthorCache[extensionName];
+  }
+
+  if (extensionAuthorPromiseCache[extensionName]) {
+    return extensionAuthorPromiseCache[extensionName];
+  }
+
+  const requestPromise = getExtension(extensionShortHeader)
+    .then(extension => {
+      const authorName = normalizeAuthorName(extension.author);
+      extensionAuthorCache[extensionName] = authorName;
+      delete extensionAuthorPromiseCache[extensionName];
+      return authorName;
+    })
+    .catch(error => {
+      console.warn(
+        `Unable to load author for extension ${extensionName}.`,
+        error
+      );
+      extensionAuthorCache[extensionName] = null;
+      delete extensionAuthorPromiseCache[extensionName];
+      return null;
+    });
+
+  extensionAuthorPromiseCache[extensionName] = requestPromise;
+  return requestPromise;
 };
 
 export const getUserExtensionShortHeaders = async (

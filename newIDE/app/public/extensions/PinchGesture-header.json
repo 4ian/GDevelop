@@ -1,0 +1,149 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Pinching gesture",
+  "name": "PinchGesture",
+  "version": "1.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/PinchGesture.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/PinchGesture-header.json",
+  "tags": "touch,pinch,gesture,zoom,rotate,camera,puzzle",
+  "category": "Input",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/gesture-pinch.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Move the camera or objects with pinching gestures.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 17,
+  "helpPath": "/extensions/pinch-gesture",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Move objects by holding 2 touches on them.",
+      "fullName": "Pinchable object",
+      "name": "Pichable",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "IsPinched",
+          "fullName": "Is being pinched",
+          "description": "Check if the object is being pinched.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "AbortPinching",
+          "fullName": "Abort pinching",
+          "description": "Abort the pinching of this object.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "name": "EnableCameraPinch",
+      "fullName": "Enable or disable camera pinch",
+      "description": "Enable or disable camera pinch.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsCameraPinchEnabled",
+      "fullName": "Camera pinch is enabled",
+      "description": "Check if camera pinch is enabled.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "SetCameraPinchLayer",
+      "fullName": "Camera pinch layer",
+      "description": "Choose the layer to move with pinch gestures.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetCameraPinchConstraint",
+      "fullName": "Camera pinch constraints",
+      "description": "Change the camera pinch constraint.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsPinching",
+      "fullName": "Touch is pinching",
+      "description": "Check if a touch is pinching, if 2 touches are pressed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "Scaling",
+      "fullName": "Pinch scaling",
+      "description": "Return the scaling of the pinch gesture from its beginning.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "Rotation",
+      "fullName": "Pinch rotation",
+      "description": "Return the rotation of the pinch gesture from its beginning (in degrees).",
+      "functionType": "Expression"
+    },
+    {
+      "name": "BeginningCenterX",
+      "fullName": "Pinch beginning center X",
+      "description": "Return the X position of the pinch center at the beginning of the gesture.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "BeginningCenterY",
+      "fullName": "Pinch beginning center Y",
+      "description": "Return the Y position of the pinch center at the beginning of the gesture.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "CurrentCenterX",
+      "fullName": "Pinch center X",
+      "description": "Return the X position of the pinch center.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "CurrentCenterY",
+      "fullName": "Pinch center Y",
+      "description": "Return the Y position of the pinch center.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "TranslationX",
+      "fullName": "Pinch translation X",
+      "description": "Return the horizontal translation of the pinch gesture from its beginning.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "TranslationY",
+      "fullName": "Pinch translation Y",
+      "description": "Return the vertical translation of the pinch gesture from its beginning.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "TransformedX",
+      "fullName": "Transform X position",
+      "description": "Return the new X position of a point after the pinch gesture.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "TransformedY",
+      "fullName": "Transform Y position",
+      "description": "Return the new Y position of a point after the pinch gesture.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "InversedX",
+      "fullName": "Inversed transform X position",
+      "description": "Return the original X position of a point before the pinch gesture.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "InversedY",
+      "fullName": "Inversed transform Y position",
+      "description": "Return the new position on the Y axis of a point after the pinch gesture.",
+      "functionType": "Expression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "This extension allows to:\n- Move, rotate and/or zoom the camera according to pinch gestures\n- Move, rotate and optionally scale objects according to pinch gestures\n- Handle more specific needs with various expressions\n\nLimitations:\n- Only one pinching gesture is detected at a time",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdlc3R1cmUtcGluY2giIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTMsOUExLDEgMCAwLDEgMTQsOEExLDEgMCAwLDEgMTUsOVYxMy40N0wxNi4yMSwxMy42TDIxLjE1LDE1LjhDMjEuNjcsMTYuMDQgMjIsMTYuNTYgMjIsMTcuMTRWMjEuNUMyMS45NywyMi4zMiAyMS4zMiwyMi45NyAyMC41LDIzSDE0QzEzLjYyLDIzIDEzLjI2LDIyLjg1IDEzLDIyLjU3TDguMSwxOC4zN0w4Ljg0LDE3LjZDOS4wMywxNy4zOSA5LjMsMTcuMjggOS41OCwxNy4yOEg5LjhMMTMsMTlWOU0xNCw1QzE1LjQyLDUgMTYuNzQsNS43NiAxNy40NSw3QzE4LjU2LDguOSAxNy45MSwxMS4zNSAxNiwxMi40NlYxMS4yM0MxNi42NCwxMC42NyAxNyw5Ljg1IDE3LDlBMywzIDAgMCwwIDE0LDZBMywzIDAgMCwwIDExLDlDMTEsOS44NSAxMS4zNiwxMC42NyAxMiwxMS4yM1YxMi40NkMxMC43NywxMS43NSAxMCwxMC40MyAxMCw5QTQsNCAwIDAsMSAxNCw1TTQsOUw3LDEySDVWMTVIM1YxMkgxTDQsOU00LDdMMSw0SDNWMUg1VjRIN0w0LDdNOSwxNEM5LjczLDE0IDEwLjQxLDE0LjE5IDExLDE0LjU0VjE1Ljc2QzEwLjQ3LDE1LjI5IDkuNzcsMTUgOSwxNUEzLDMgMCAwLDAgNiwxOEM2LDE5IDYuNSwxOS44NyA3LjIyLDIwLjQyTDkuMzEsMjJIOUE0LDQgMCAwLDEgNSwxOEE0LDQgMCAwLDEgOSwxNFoiIC8+PC9zdmc+"
+}

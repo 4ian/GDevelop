@@ -1,0 +1,65 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IRIhkkTTl2UHhfjrLTTH5GYwkYu1",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "3D-like Flip for 2D Sprites",
+  "name": "ThreeDFlip",
+  "version": "1.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/ThreeDFlip.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ThreeDFlip-header.json",
+  "tags": "flip,card",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/flip-horizontal.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Flip sprites with a 3D rotation visual effect (card flip style).",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/three-dflip",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Flip a Sprite with a 3D effect.",
+      "fullName": "3D Flip",
+      "name": "ThreeDFlip",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "FlipSecond",
+          "fullName": "Flip the object",
+          "description": "Start a flipping animation on the object. The X origin point must be set at the object center.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StopFlip",
+          "fullName": "Jump to flipping end",
+          "description": "Jump to the end of the flipping animation.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsFlipping",
+          "fullName": "Flipping is playing",
+          "description": "Checks if a flipping animation is currently playing.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsFlipped",
+          "fullName": "Is flipped",
+          "description": "Checks if the object is flipped or will be flipped.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "FlipToSecond",
+          "fullName": "Flip to a side",
+          "description": "Flips the object to one specific side. The X origin point must be set at the object center.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Flip sprites with a 3D-like rotation effect.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZsaXAtaG9yaXpvbnRhbCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xNSAyMUgxN1YxOUgxNU0xOSA5SDIxVjdIMTlNMyA1VjE5QzMgMjAuMSAzLjkgMjEgNSAyMUg5VjE5SDVWNUg5VjNINUMzLjkgMyAzIDMuOSAzIDVNMTkgM1Y1SDIxQzIxIDMuOSAyMC4xIDMgMTkgM00xMSAyM0gxM1YxSDExTTE5IDE3SDIxVjE1SDE5TTE1IDVIMTdWM0gxNU0xOSAxM0gyMVYxMUgxOU0xOSAyMUMyMC4xIDIxIDIxIDIwLjEgMjEgMTlIMTlaIiAvPjwvc3ZnPg=="
+}

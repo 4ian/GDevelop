@@ -1,0 +1,268 @@
+{
+  "author": "",
+  "category": "Third-party",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "GamePix SDK",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdhbWVwYWQtdmFyaWFudC1vdXRsaW5lIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTYsOUg4VjExSDEwVjEzSDhWMTVINlYxM0g0VjExSDZWOU0xOC41LDlBMS41LDEuNSAwIDAsMSAyMCwxMC41QTEuNSwxLjUgMCAwLDEgMTguNSwxMkExLjUsMS41IDAgMCwxIDE3LDEwLjVBMS41LDEuNSAwIDAsMSAxOC41LDlNMTUuNSwxMkExLjUsMS41IDAgMCwxIDE3LDEzLjVBMS41LDEuNSAwIDAsMSAxNS41LDE1QTEuNSwxLjUgMCAwLDEgMTQsMTMuNUExLjUsMS41IDAgMCwxIDE1LjUsMTJNMTcsNUE3LDcgMCAwLDEgMjQsMTJBNyw3IDAgMCwxIDE3LDE5QzE1LjA0LDE5IDEzLjI3LDE4LjIgMTIsMTYuOUMxMC43MywxOC4yIDguOTYsMTkgNywxOUE3LDcgMCAwLDEgMCwxMkE3LDcgMCAwLDEgNyw1SDE3TTcsN0E1LDUgMCAwLDAgMiwxMkE1LDUgMCAwLDAgNywxN0M4LjY0LDE3IDEwLjA5LDE2LjIxIDExLDE1SDEzQzEzLjkxLDE2LjIxIDE1LjM2LDE3IDE3LDE3QTUsNSAwIDAsMCAyMiwxMkE1LDUgMCAwLDAgMTcsN0g3WiIgLz48L3N2Zz4=",
+  "name": "GamePixSDK",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/61baa8834b0d9487f3e61ff92262e69581d7d4bed684b5016dcc4c9a0ba75db4_gamepad-variant-outline.svg",
+  "shortDescription": "The GamePix game SDK provides a series of utility methods needed for running your game in the GamePix ecosystem.\nThey enhance the user experience of your game and complete the integration with our ads network and revenues system.",
+  "version": "1.0.0",
+  "description": [
+    "The GamePix game SDK provides a series of utility methods needed for running your game in the GamePix ecosystem.",
+    "They enhance the user experience of your game and complete the integration with our ads network and revenues system.",
+    "",
+    "This SDK provides a set of actions and conditions to display advertising on the GamePix publishing platform. You can use them without initialisation (initialisation is handled by the extension itself). If you run your build locally, you will get a warning that the GamePix player is not found, don't worry, it's OK, it means you are using the test SDK, which is ideal for debugging.",
+    "",
+    "Events sheet for the **interstitial ad**:",
+    "",
+    "* Please add \"Show the interstitial ad\" action whenever you want to show this ad.",
+    "* Add a condition \"Check if interstitial has ended\", it will be set to true when player closes the interstitial ad. When this condition is read, the status will be immediately reset to false.",
+    "",
+    "",
+    "Events sheet for **reward ad**:",
+    "",
+    "* Add a \"Show the reward ad\" action whenever you want to show this ad.",
+    "* Add a condition \"Check that the reward ad has ended\", it will be set to true when the player closes the reward ad. When this condition is read, the status is immediately reset to false.",
+    "* Add a condition \"Check if player should be rewarded\" as a subevent of \"Check that the reward ad has ended\". It will be set to true if the player should be rewarded, otherwise it will be false. (This condition will always track the last result of the reward ad and will never reset.)",
+    "",
+    "The **\"Language\"** expression can be used to retrieve the preferred language on the GamePix platform. It will only be available after the SDK has been initialised.",
+    "",
+    "The **\"GamePix SDK is being initialised\"** condition can be used to check the status of SDK initialisation. It is set to true immediately after successful initialisation.",
+    "",
+    "Events sheet example of GamePix SDK integration:",
+    "",
+    "![Events sheet](https://gpx-porting.s3.eu-central-1.amazonaws.com/docs/gamepix-sdk-gdevelop.png)",
+    "",
+    "**Advanced Usage**",
+    "",
+    "GamePix SDK provides following javascript API:",
+    "",
+    "* gdjs._gamePixSdkExtension.lang() - gets the current preferred language by the player",
+    "* gdjs._gamePixSdkExtension().langSync() - same as lang(), but will return null if SDK is not yet initialized",
+    "* gdjs._gamePixSdkExtension.updateScore(score) - should be called immediately every time the current score is updated",
+    "* gdjs._gamePixSdkExtension.updateLevel(level) - should be called to send the score after the player passed the level",
+    "* gdjs._gamePixSdkExtension.happyMoment() - should be called when Happy Moment just happened",
+    "* gdjs._gamePixSdkExtension.setItem(key, value) - persistently stores the value. The value must be a string",
+    "* gdjs._gamePixSdkExtension.getItem(key) - read value from storage",
+    "* gdjs._gamePixSdkExtension.getItemSync(key) - same as getItem(), but will return null if SDK is not yet initialized",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "tags": "gamepix,sdk,publishing,integration,ads,DOM apis",
+  "authorIds": [
+    "dwbZksrvMPefb8YKJaHMDqvp9M53"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Check if GamePix SDK is ready to use.",
+      "fullName": "GamePix SDK is initialised",
+      "functionType": "Condition",
+      "name": "Initialized",
+      "sentence": "Check if GamePix SDK is ready to use",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = typeof window.GamePix !== \"undefined\";",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Player's preferred language.",
+      "fullName": "Language",
+      "functionType": "StringExpression",
+      "name": "Language",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._gamePixSdkExtension.langSync() || \"\";",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Show the interstitial ad (full screen).",
+      "fullName": "Show the interstitial ad",
+      "functionType": "Action",
+      "name": "InterstitialAd",
+      "sentence": "Show the interstitial ad (full screen)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "gdjs._gamePixSdkExtension._interstitialAdEnded = false;\r",
+            "gdjs._gamePixSdkExtension\r",
+            "    .interstitialAd()\r",
+            "    .finally(() => {\r",
+            "        gdjs._gamePixSdkExtension._interstitialAdEnded = true;\r",
+            "    });\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if interstitial has ended.",
+      "fullName": "Check if interstitial has ended",
+      "functionType": "Condition",
+      "name": "InterstitialAdEnded",
+      "sentence": "Check if interstitial has ended",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._gamePixSdkExtension._interstitialAdEnded;",
+            "gdjs._gamePixSdkExtension._interstitialAdEnded = false;",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const gpxPromise = new Promise((resolve, reject) => {",
+            "    const script = document.createElement(\"script\");",
+            "    script.src = \"https://integration.gamepix.com/sdk/v3/gamepix.sdk.js\";",
+            "    script.async = true;",
+            "    script.onload = () => {",
+            "        const intervalId = setInterval(() => {",
+            "            if (window.GamePix) {",
+            "                resolve(GamePix);",
+            "                clearInterval(intervalId);",
+            "            }",
+            "        }, 100);",
+            "    };",
+            "    script.onerror = () => reject(new Error(\"Unable to load GamePix sdk, please check logs.\"));",
+            "    document.head.appendChild(script);",
+            "});",
+            "",
+            "gdjs._gamePixSdkExtension = {",
+            "    lang: async () => (await gpxPromise).lang(),",
+            "    langSync: () => window.GamePix ? window.GamePix.lang() : null,",
+            "    interstitialAd: async () => (await gpxPromise).interstitialAd(),",
+            "    rewardAd: async () => (await gpxPromise).rewardAd(),",
+            "    updateScore: async (score) => (await gpxPromise).updateScore(score),",
+            "    updateLevel: async (level) => (await gpxPromise).updateLevel(level),",
+            "    happyMoment: async () => (await gpxPromise).happyMoment(),",
+            "    setItem: async (key, value) => (await gpxPromise).localStorage.setItem(key, value),",
+            "    getItem: async (key) => (await gpxPromise).localStorage.getItem(key),",
+            "    getItemSync: (key) => window.GamePix ? window.GamePix.localStorage.getItem(key) : null,",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Show the reward ad (full screen).",
+      "fullName": "Show the reward ad",
+      "functionType": "Action",
+      "name": "RewardAd",
+      "sentence": "Show the reward ad (full screen)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "gdjs._gamePixSdkExtension._rewardAdEnded = false;",
+            "gdjs._gamePixSdkExtension._rewardAdRewardPlayer = false;",
+            "gdjs._gamePixSdkExtension",
+            "    .rewardAd()",
+            "    .then((res) => {",
+            "        gdjs._gamePixSdkExtension._rewardAdRewardPlayer = res.success;",
+            "    })",
+            "    .finally(() => {",
+            "        gdjs._gamePixSdkExtension._rewardAdEnded = true;",
+            "    });",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check that the reward ad has ended.",
+      "fullName": "Check that the reward ad has ended",
+      "functionType": "Condition",
+      "name": "RewardAdEnded",
+      "sentence": "Check that the reward ad has ended",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._gamePixSdkExtension._rewardAdEnded;",
+            "gdjs._gamePixSdkExtension._rewardAdEnded = false;",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if player should be rewarded.",
+      "fullName": "Check if player should be rewarded",
+      "functionType": "Condition",
+      "name": "RewardAdRewardPlayer",
+      "sentence": "Check if player should be rewarded",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._gamePixSdkExtension._rewardAdRewardPlayer;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

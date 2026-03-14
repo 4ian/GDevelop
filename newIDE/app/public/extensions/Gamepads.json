@@ -1,0 +1,5242 @@
+{
+  "author": "Bouh",
+  "category": "Input",
+  "extensionNamespace": "",
+  "fullName": "Gamepads (controllers)",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "/all-features/gamepad",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdhbWVwYWQtdmFyaWFudC1vdXRsaW5lIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTYsOUg4VjExSDEwVjEzSDhWMTVINlYxM0g0VjExSDZWOU0xOC41LDlBMS41LDEuNSAwIDAsMSAyMCwxMC41QTEuNSwxLjUgMCAwLDEgMTguNSwxMkExLjUsMS41IDAgMCwxIDE3LDEwLjVBMS41LDEuNSAwIDAsMSAxOC41LDlNMTUuNSwxMkExLjUsMS41IDAgMCwxIDE3LDEzLjVBMS41LDEuNSAwIDAsMSAxNS41LDE1QTEuNSwxLjUgMCAwLDEgMTQsMTMuNUExLjUsMS41IDAgMCwxIDE1LjUsMTJNMTcsNUE3LDcgMCAwLDEgMjQsMTJBNyw3IDAgMCwxIDE3LDE5QzE1LjA0LDE5IDEzLjI3LDE4LjIgMTIsMTYuOUMxMC43MywxOC4yIDguOTYsMTkgNywxOUE3LDcgMCAwLDEgMCwxMkE3LDcgMCAwLDEgNyw1SDE3TTcsN0E1LDUgMCAwLDAgMiwxMkE1LDUgMCAwLDAgNywxN0M4LjY0LDE3IDEwLjA5LDE2LjIxIDExLDE1SDEzQzEzLjkxLDE2LjIxIDE1LjM2LDE3IDE3LDE3QTUsNSAwIDAsMCAyMiwxMkE1LDUgMCAwLDAgMTcsN0g3WiIgLz48L3N2Zz4=",
+  "name": "Gamepads",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/gamepad-variant-outline.svg",
+  "shortDescription": "Gamepad/controller support: buttons, sticks, triggers, vibration. Mapper behaviors for 2D/3D.",
+  "version": "0.9.1",
+  "description": [
+    "Add support for gamepads (or other physical controllers).",
+    "",
+    "It gives access to:",
+    "- button presses,",
+    "- axis positions and force,",
+    "- trigger pressure,",
+    "- configurable deadzone,",
+    "- vibration,",
+    "- automatic \"gamepad mapper\" behaviors for 2D and 3D movement behaviors (platformer characters, top-down movement, 3D character etc...). Add one of these to the object with the movement behavior (i.e: the player most of the time) and the behavior will then be controlled automatically by the gamepad (it works by reading the gamepad state and simulating controls). No need for additional events to make it work once the behaviors are set up.",
+    "",
+    "The Bomberman-like example handles 4 players with gamepads ([open the project online](https://editor.gdevelop.io/?project=example://goose-bomberman))."
+  ],
+  "origin": {
+    "identifier": "Gamepads",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "controllers,gamepads,joysticks,axis,xbox,ps4,platformer,platform,top-down",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
+    "taRwmWxwAFYFL9yyBwB3cwBw0BO2",
+    "mnImQKdn8nQxwzkS5D6a1JB27V23",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [
+    {
+      "name": "Buttons",
+      "type": "structure",
+      "children": [
+        {
+          "name": "A or Cross",
+          "type": "string",
+          "value": "A"
+        },
+        {
+          "name": "B or Circle",
+          "type": "string",
+          "value": "B"
+        },
+        {
+          "name": "LB or L1",
+          "type": "string",
+          "value": "LB"
+        },
+        {
+          "name": "LT or L2",
+          "type": "string",
+          "value": "LT"
+        },
+        {
+          "name": "RB or R1",
+          "type": "string",
+          "value": "RB"
+        },
+        {
+          "name": "RT or R2",
+          "type": "string",
+          "value": "RT"
+        },
+        {
+          "name": "X or Square",
+          "type": "string",
+          "value": "X"
+        },
+        {
+          "name": "Y or Triangle",
+          "type": "string",
+          "value": "Y"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (gdjs._extensionController) {\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "/**\r",
+            " *  Associate controller button ids to button names\r",
+            " */\r",
+            "const controllerButtonNames = {\r",
+            "    \"XBOX\": {\r",
+            "        0: \"A\",\r",
+            "        1: \"B\",\r",
+            "        2: \"X\",\r",
+            "        3: \"Y\",\r",
+            "        4: \"LB\",\r",
+            "        5: \"RB\",\r",
+            "        6: \"LT\",\r",
+            "        7: \"RT\",\r",
+            "        8: \"BACK\",\r",
+            "        9: \"START\",\r",
+            "        10: \"CLICK_STICK_LEFT\",\r",
+            "        11: \"CLICK_STICK_RIGHT\",\r",
+            "        12: \"UP\",\r",
+            "        13: \"DOWN\",\r",
+            "        14: \"LEFT\",\r",
+            "        15: \"RIGHT\",\r",
+            "        16: \"NONE\",\r",
+            "        17: \"NONE\"\r",
+            "    },\r",
+            "    \"PS4\": {\r",
+            "        0: \"CROSS\",\r",
+            "        1: \"CIRCLE\",\r",
+            "        2: \"SQUARE\",\r",
+            "        3: \"TRIANGLE\",\r",
+            "        4: \"L1\",\r",
+            "        5: \"R1\",\r",
+            "        6: \"L2\",\r",
+            "        7: \"R2\",\r",
+            "        8: \"SHARE\",\r",
+            "        9: \"OPTIONS\",\r",
+            "        10: \"CLICK_STICK_LEFT\",\r",
+            "        11: \"CLICK_STICK_RIGHT\",\r",
+            "        12: \"UP\",\r",
+            "        13: \"DOWN\",\r",
+            "        14: \"LEFT\",\r",
+            "        15: \"RIGHT\",\r",
+            "        16: \"PS_BUTTON\",\r",
+            "        17: \"CLICK_TOUCHPAD\"\r",
+            "    }\r",
+            "};\r",
+            "\r",
+            "/**\r",
+            " * @param {number} playerId\r",
+            " */\r",
+            "function getGamepad(playerId) {\r",
+            "    /** @type {Gamepad[]} */\r",
+            "    const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];\r",
+            "    return gamepads[playerId];\r",
+            "}\r",
+            "\r",
+            "/** @type {{[playerId: number]: Player}} */\r",
+            "const players = {};\r",
+            "\r",
+            "/**\r",
+            " * @param {number} playerId\r",
+            " */\r",
+            "function getPlayer(playerId) {\r",
+            "    let player = players[playerId];\r",
+            "    if (!player) {\r",
+            "        player = new Player(playerId);\r",
+            "        players[playerId] = player;\r",
+            "    }\r",
+            "    return player;\r",
+            "}\r",
+            "\r",
+            "class Player {\r",
+            "    /** @type {number} */\r",
+            "    playerId;\r",
+            "    mapping = 'DEFAULT';\r",
+            "    lastButtonUsed = -1;\r",
+            "    deadzone = 0.2;\r",
+            "    /** @type {{[buttonId: number]: ButtonState}} */\r",
+            "    buttonStates = {};\r",
+            "    rumble = { elapsedTime: 0, duration: 0, weakMagnitude: 0, strongMagnitude: 0 };\r",
+            "\r",
+            "    /**\r",
+            "     * @param {number} playerId\r",
+            "     */\r",
+            "    constructor(playerId) {\r",
+            "        this.playerId = playerId;\r",
+            "    }\r",
+            "\r",
+            "    /**\r",
+            "     * @param {number} buttonId\r",
+            "     */\r",
+            "    getButtonState(buttonId) {\r",
+            "        let buttonState = this.buttonStates[buttonId];\r",
+            "        if (!buttonState) {\r",
+            "            buttonState = new ButtonState();\r",
+            "            this.buttonStates[buttonId] = buttonState;\r",
+            "        }\r",
+            "        return buttonState;\r",
+            "    }\r",
+            "\r",
+            "    /**\r",
+            "     * @param {number} buttonId\r",
+            "     */\r",
+            "    isButtonPressed(buttonId) {\r",
+            "        return this.getButtonState(buttonId).isPressed;\r",
+            "    }\r",
+            "\r",
+            "    /**\r",
+            "     * @param {number} buttonId\r",
+            "     */\r",
+            "    isButtonJustPressed(buttonId) {\r",
+            "        return this.getButtonState(buttonId).isJustPressed();\r",
+            "    }\r",
+            "\r",
+            "    /**\r",
+            "     * @param {number} buttonId\r",
+            "     */\r",
+            "    isButtonReleased(buttonId) {\r",
+            "        return this.getButtonState(buttonId).isReleased();\r",
+            "    }\r",
+            "\r",
+            "    isAnyButtonReleased() {\r",
+            "        for (const buttonId in this.buttonStates) {\r",
+            "            const buttonState = this.buttonStates[buttonId];\r",
+            "            if (buttonState.isReleased()) {\r",
+            "                return true;\r",
+            "            }\r",
+            "        }\r",
+            "        return false;\r",
+            "    }\r",
+            "\r",
+            "    isAnyButtonPressed() {\r",
+            "        for (const buttonId in this.buttonStates) {\r",
+            "            const buttonState = this.buttonStates[buttonId];\r",
+            "            if (buttonState.isPressed) {\r",
+            "                return true;\r",
+            "            }\r",
+            "        }\r",
+            "        return false;\r",
+            "    }\r",
+            "}\r",
+            "\r",
+            "class ButtonState {\r",
+            "    wasPressed = false;\r",
+            "    isPressed = false;\r",
+            "\r",
+            "    isReleased() {\r",
+            "        return this.wasPressed && !this.isPressed;\r",
+            "    }\r",
+            "\r",
+            "    isJustPressed() {\r",
+            "        return !this.wasPressed && this.isPressed;\r",
+            "    }\r",
+            "}\r",
+            "\r",
+            "// Async tasks are run before everything.\r",
+            "// This is a hack to make sure that button states are updated\r",
+            "// before mapping behavior events.\r",
+            "const frameBeginningTask = new class extends gdjs.AsyncTask {\r",
+            "    update() {\r",
+            "        /** @type {Gamepad[]} */\r",
+            "        const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];\r",
+            "        for (let playerId = 0; playerId < gamepads.length; playerId++) {\r",
+            "            const gamepad = gamepads[playerId];\r",
+            "            if (gamepad == null) {\r",
+            "                // The gamepad is not connected.\r",
+            "                continue;\r",
+            "            }\r",
+            "            const player = getPlayer(playerId);\r",
+            "\r",
+            "            for (let buttonId = 0; buttonId < Object.keys(gamepad.buttons).length; buttonId++) {\r",
+            "                const buttonState = player.getButtonState(buttonId);\r",
+            "                buttonState.wasPressed = buttonState.isPressed;\r",
+            "                buttonState.isPressed = gamepad.buttons[buttonId].pressed;\r",
+            "                if (buttonState.isJustPressed()) {\r",
+            "                    player.lastButtonUsed = buttonId;\r",
+            "                }\r",
+            "            }\r",
+            "        }\r",
+            "        return false;\r",
+            "    }\r",
+            "}();\r",
+            "\r",
+            "/**\r",
+            " * @param {gdjs.RuntimeScene} runtimeScene\r",
+            " */\r",
+            "function addFrameBeginningTaskIfNeeded(runtimeScene) {\r",
+            "    const taskManager = runtimeScene.getAsyncTasksManager();\r",
+            "    for (const taskWithCallback of taskManager.tasksWithCallback) {\r",
+            "        if (taskWithCallback.asyncTask === frameBeginningTask) {\r",
+            "            return;\r",
+            "        }\r",
+            "    }\r",
+            "    // Async tasks are run before everything.\r",
+            "    // This is a hack to make sure that button states are updated\r",
+            "    // before mapping behavior events.\r",
+            "    taskManager.addTask(frameBeginningTask);\r",
+            "}\r",
+            "\r",
+            "/**\r",
+            " * @param {gdjs.RuntimeScene} runtimeScene\r",
+            " */\r",
+            "function onScenePostEvents(runtimeScene) {\r",
+            "    addFrameBeginningTaskIfNeeded(runtimeScene);\r",
+            "    /** @type {Gamepad[]} */\r",
+            "    const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];\r",
+            "    for (let playerId = 0; playerId < gamepads.length; playerId++) {\r",
+            "        let gamepad = gamepads[playerId];\r",
+            "        if (gamepad == null) {\r",
+            "            // The gamepad is not connected.\r",
+            "            continue;\r",
+            "        }\r",
+            "        const player = getPlayer(playerId);\r",
+            "        const rumble = player.rumble;\r",
+            "        rumble.elapsedTime += runtimeScene.getElapsedTime(runtimeScene) / 1000;\r",
+            "        if (rumble.duration - rumble.elapsedTime <= 0 &&\r",
+            "            (rumble.weakMagnitude || rumble.strongMagnitude)\r",
+            "        ) {\r",
+            "            rumble.weakMagnitude = 0;\r",
+            "            rumble.strongMagnitude = 0;\r",
+            "        }\r",
+            "    }\r",
+            "}\r",
+            "\r",
+            "/**\r",
+            " * @param {string} type\r",
+            " * @param {number} buttonId\r",
+            " */\r",
+            "function getInputString(type, buttonId) {\r",
+            "    if (!controllerButtonNames[type]) {\r",
+            "        return \"UNKNOWN_BUTTON\";\r",
+            "    }\r",
+            "    return controllerButtonNames[type][buttonId];\r",
+            "}\r",
+            "\r",
+            "function getButtonId(buttonName) {\r",
+            "    switch (buttonName) {\r",
+            "        case 'A':\r",
+            "        case 'CROSS':\r",
+            "            return 0;\r",
+            "        case 'B':\r",
+            "        case 'CIRCLE':\r",
+            "            return 1;\r",
+            "        case 'X':\r",
+            "        case 'SQUARE':\r",
+            "            return 2;\r",
+            "        case 'Y':\r",
+            "        case 'TRIANGLE':\r",
+            "            return 3;\r",
+            "        case 'LB':\r",
+            "        case 'L1':\r",
+            "            return 4;\r",
+            "        case 'RB':\r",
+            "        case 'R1':\r",
+            "            return 5;\r",
+            "        case 'LT':\r",
+            "        case 'L2':\r",
+            "            return 6;\r",
+            "        case 'RT':\r",
+            "        case 'R2':\r",
+            "            return 7;\r",
+            "        case 'UP':\r",
+            "            return 12;\r",
+            "        case 'DOWN':\r",
+            "            return 13;\r",
+            "        case 'LEFT':\r",
+            "            return 14;\r",
+            "        case 'RIGHT':\r",
+            "            return 15;\r",
+            "        case 'BACK':\r",
+            "        case 'SHARE':\r",
+            "            return 8;\r",
+            "        case 'START':\r",
+            "        case 'OPTIONS':\r",
+            "            return 9;\r",
+            "        case 'CLICK_STICK_LEFT':\r",
+            "            return 10;\r",
+            "        case 'CLICK_STICK_RIGHT':\r",
+            "            return 11;\r",
+            "        //PS4\r",
+            "        case 'PS_BUTTON':\r",
+            "            return 16;\r",
+            "        case 'CLICK_TOUCHPAD':\r",
+            "            return 17;\r",
+            "        default:\r",
+            "            console.error('The gamepad button: ' + buttonName + ' is not valid.');\r",
+            "            return null;\r",
+            "    }\r",
+            "}\r",
+            "\r",
+            "/**\r",
+            " * @param {number} playerId\r",
+            " * @param {string} directionName\r",
+            " * @param {number} axisValueX\r",
+            " * @param {number} axisValueY\r",
+            " */\r",
+            "function isAxisPushed(playerId, directionName, axisValueX, axisValueY) {\r",
+            "    switch (directionName) {\r",
+            "        case 'LEFT':\r",
+            "            return getNormalizedAxisValue(axisValueX, playerId) < 0;\r",
+            "        case 'RIGHT':\r",
+            "            return getNormalizedAxisValue(axisValueX, playerId) > 0;\r",
+            "        case 'UP':\r",
+            "            return getNormalizedAxisValue(axisValueY, playerId) < 0;\r",
+            "        case 'DOWN':\r",
+            "            return getNormalizedAxisValue(axisValueY, playerId) > 0;\r",
+            "        case 'ANY':\r",
+            "            return getNormalizedAxisValue(axisValueX, playerId) < 0\r",
+            "                || getNormalizedAxisValue(axisValueX, playerId) > 0\r",
+            "                || getNormalizedAxisValue(axisValueY, playerId) < 0\r",
+            "                || getNormalizedAxisValue(axisValueY, playerId) > 0\r",
+            "        default:\r",
+            "            console.error('The value stick direction is not valid.');\r",
+            "            return false;\r",
+            "    }\r",
+            "}\r",
+            "\r",
+            "/**\r",
+            " * @param {number} deltaX\r",
+            " * @param {number} deltaY\r",
+            " */\r",
+            "function axisToAngle(deltaX, deltaY) {\r",
+            "    const rad = Math.atan2(deltaY, deltaX);\r",
+            "    const deg = rad * (180 / Math.PI);\r",
+            "    return deg;\r",
+            "}\r",
+            "\r",
+            "/**\r",
+            " * @param {{id: string}} gamepad\r",
+            " */\r",
+            "function isXbox(gamepad) {\r",
+            "    return (gamepad ? (\r",
+            "        gamepad.id.toUpperCase().indexOf(\"XBOX\") !== -1\r",
+            "        // \"XINPUT\" cannot be used to check if it is a xbox controller is just a generic\r",
+            "        // name reported in Firefox corresponding to the driver being used by the controller\r",
+            "        // https://gamefaqs.gamespot.com/boards/916373-pc/73341312?page=1\r",
+            "    ) : false);\r",
+            "}\r",
+            "\r",
+            "/**\r",
+            " * Returns the new value taking into account the dead zone for the player_ID given\r",
+            " * @param {number} value\r",
+            " * @param {number} playerID\r",
+            " */\r",
+            "function getNormalizedAxisValue(value, playerID) {\r",
+            "    //    gdjs._extensionController = gdjs._extensionController || { deadzone: 0.2 };\r",
+            "\r",
+            "    // Anything smaller than this is assumed to be 0,0\r",
+            "    const deadzone = getPlayer(playerID).deadzone;\r",
+            "\r",
+            "    if (Math.abs(value) < deadzone) {\r",
+            "        return 0;\r",
+            "    } else {\r",
+            "        // We're outside the dead zone, but we'd like to smooth\r",
+            "        // this value out so it still runs nicely between 0..1.\r",
+            "        // That is, we don't want it to jump suddenly from 0 to\r",
+            "        // deadzone.\r",
+            "\r",
+            "        // Remap value from\r",
+            "        //    deadzone..1 to 0..(1-deadzone)\r",
+            "        // or from\r",
+            "        //    -1..-deadzone to -(1-deadzone)..0\r",
+            "        value = value - Math.sign(value) * deadzone;\r",
+            "\r",
+            "        // Remap value from\r",
+            "        //    0..(1-deadzone) to 0..1\r",
+            "        // or from\r",
+            "        //    -(1-deadzone)..0 to -1..0\r",
+            "        return value / (1 - deadzone);\r",
+            "    }\r",
+            "}\r",
+            "\r",
+            "gdjs._extensionController = {\r",
+            "    getPlayer,\r",
+            "    controllerButtonNames,\r",
+            "    getInputString,\r",
+            "    getButtonId,\r",
+            "    axisToAngle,\r",
+            "    isXbox,\r",
+            "    getNormalizedAxisValue,\r",
+            "    isAxisPushed,\r",
+            "    getGamepad,\r",
+            "    onScenePostEvents,\r",
+            "    frameBeginningTask,\r",
+            "    addFrameBeginningTaskIfNeeded,\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "gdjs._extensionController.addFrameBeginningTaskIfNeeded(runtimeScene);",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onScenePostEvents",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "gdjs._extensionController.onScenePostEvents(runtimeScene);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "Accelerated speed",
+      "functionType": "Expression",
+      "name": "AcceleratedSpeed",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "AcceleratedSpeed",
+                "=",
+                "CurrentSpeed"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TargetedSpeed",
+                    "<",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Reduce the speed to match the stick force."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "CurrentSpeed",
+                        "<",
+                        "TargetedSpeed"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "AcceleratedSpeed",
+                        "=",
+                        "min(TargetedSpeed, CurrentSpeed + Acceleration * TimeDelta())"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "CurrentSpeed",
+                        ">",
+                        "TargetedSpeed"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "CurrentSpeed",
+                        "<",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "AcceleratedSpeed",
+                        "-",
+                        "Acceleration * TimeDelta()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Turn back at least as fast as it would stop."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "CurrentSpeed",
+                        ">=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "AcceleratedSpeed",
+                        "=",
+                        "max(TargetedSpeed, CurrentSpeed - max(Acceleration , Deceleration) * TimeDelta())"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TargetedSpeed",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Reduce the speed to match the stick force."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "CurrentSpeed",
+                        ">",
+                        "TargetedSpeed"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "AcceleratedSpeed",
+                        "=",
+                        "max(TargetedSpeed, CurrentSpeed - Acceleration * TimeDelta())"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "CurrentSpeed",
+                        "<",
+                        "TargetedSpeed"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "CurrentSpeed",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "AcceleratedSpeed",
+                        "+",
+                        "Acceleration * TimeDelta()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Turn back at least as fast as it would stop."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "CurrentSpeed",
+                        "<=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "AcceleratedSpeed",
+                        "=",
+                        "min(TargetedSpeed, CurrentSpeed + max(Acceleration , Deceleration) * TimeDelta())"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TargetedSpeed",
+                    "=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "CurrentSpeed",
+                        "<",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "AcceleratedSpeed",
+                        "=",
+                        "min(0, CurrentSpeed + Acceleration * TimeDelta())"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "CurrentSpeed",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "AcceleratedSpeed",
+                        "=",
+                        "max(0, CurrentSpeed - Acceleration * TimeDelta())"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "clamp(AcceleratedSpeed, -SpeedMax, SpeedMax)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "AcceleratedSpeed",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Current speed",
+          "name": "CurrentSpeed",
+          "type": "expression"
+        },
+        {
+          "description": "Targeted speed",
+          "name": "TargetedSpeed",
+          "type": "expression"
+        },
+        {
+          "description": "Max speed",
+          "name": "SpeedMax",
+          "type": "expression"
+        },
+        {
+          "description": "Acceleration",
+          "name": "Acceleration",
+          "type": "expression"
+        },
+        {
+          "description": "Deceleration",
+          "name": "Deceleration",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the value of the pressure on a gamepad trigger.",
+      "fullName": "Pressure on a gamepad trigger",
+      "functionType": "Expression",
+      "name": "TriggerPressure",
+      "sentence": "Player _PARAM1_ push axis _PARAM2_ to _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "const trigger = eventsFunctionContext.getArgument(\"Trigger\").toUpperCase();\r",
+            "\r",
+            "if (trigger != \"LT\" && trigger != \"RT\" && trigger != \"L2\" && trigger != \"R2\") {\r",
+            "    console.error('Parameter trigger is not valid in expression: \"Pressure on a gamepad trigger\"');\r",
+            "    return;\r",
+            "}\r",
+            "/** @type {Gamepad} */\r",
+            "const gamepad = gdjs._extensionController.getGamepad(playerId);\r",
+            "if (!gamepad) {\r",
+            "    // The gamepad is not connected.\r",
+            "    return;\r",
+            "}\r",
+            "switch (trigger) {\r",
+            "    case 'LT':\r",
+            "    case 'L2':\r",
+            "        eventsFunctionContext.returnValue = gamepad.buttons[6].value;\r",
+            "        break;\r",
+            "\r",
+            "    case 'RT':\r",
+            "    case 'R2':\r",
+            "        eventsFunctionContext.returnValue = gamepad.buttons[7].value;\r",
+            "        break;\r",
+            "\r",
+            "    default:\r",
+            "        eventsFunctionContext.returnValue = -1;\r",
+            "        break;\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Trigger button",
+          "name": "Trigger",
+          "supplementaryInformation": "[\"LT\",\"RT\",\"L2\",\"R2\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "the force of gamepad stick (from 0 to 1).",
+      "fullName": "Stick force",
+      "functionType": "ExpressionAndCondition",
+      "name": "StickForce",
+      "sentence": "the gamepad _PARAM1_ _PARAM2_ stick force",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const { getNormalizedAxisValue } = gdjs._extensionController;\r",
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "const stick = eventsFunctionContext.getArgument(\"Stick\").toUpperCase();\r",
+            "\r",
+            "if (stick !== \"LEFT\" && stick !== \"RIGHT\") {\r",
+            "    console.error('Parameter stick is not valid in expression: \"Value of a stick force\"');\r",
+            "    return;\r",
+            "}\r",
+            "/** @type {Gamepad} */\r",
+            "const gamepad = gdjs._extensionController.getGamepad(playerId);\r",
+            "if (!gamepad) {\r",
+            "    // The gamepad is not connected.\r",
+            "    return;\r",
+            "}\r",
+            "const axisValueX = stick === 'RIGHT' ? gamepad.axes[2] : gamepad.axes[0];\r",
+            "const axisValueY = stick === 'RIGHT' ? gamepad.axes[3] : gamepad.axes[1];\r",
+            "\r",
+            "eventsFunctionContext.returnValue = gdjs.evtTools.common.clamp(\r",
+            "    Math.abs(getNormalizedAxisValue(axisValueX, playerId)) +\r",
+            "    Math.abs(getNormalizedAxisValue(axisValueY, playerId)), 0, 1);\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Stick: \"Left\" or \"Right\"",
+          "name": "Stick",
+          "supplementaryInformation": "[\"Left\",\"Right\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the rotation value of a gamepad stick.\nIf the deadzone value is high, the angle value is rounded to main axes, left, left, up, down.\nAn zero deadzone value give a total freedom on the angle value.",
+      "fullName": "Value of a stick rotation (deprecated)",
+      "functionType": "Expression",
+      "name": "StickRotationValue",
+      "private": true,
+      "sentence": "Player _PARAM1_ push axis _PARAM2_ to _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "Gamepads::StickAngle(PlayerId, Stick)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Stick: \"Left\" or \"Right\"",
+          "name": "Stick",
+          "supplementaryInformation": "[\"Left\",\"Right\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the angle of a gamepad stick.\nIf the deadzone value is high, the angle value is rounded to main axes, left, left, up, down.\nAn zero deadzone value give a total freedom on the angle value.",
+      "fullName": "Stick angle",
+      "functionType": "Expression",
+      "name": "StickAngle",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const { getNormalizedAxisValue } = gdjs._extensionController;\r",
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "const stick = eventsFunctionContext.getArgument(\"Stick\").toUpperCase();\r",
+            "\r",
+            "if (stick !== \"LEFT\" && stick !== \"RIGHT\") {\r",
+            "    console.error('Parameter stick is not valid in expression: \"Value of a stick rotation\"');\r",
+            "    return;\r",
+            "}\r",
+            "/** @type {Gamepad} */\r",
+            "const gamepad = gdjs._extensionController.getGamepad(playerId);\r",
+            "if (!gamepad) {\r",
+            "    // The gamepad is not connected.\r",
+            "    return;\r",
+            "}\r",
+            "const axisValueX = stick === 'RIGHT' ? gamepad.axes[2] : gamepad.axes[0];\r",
+            "const axisValueY = stick === 'RIGHT' ? gamepad.axes[3] : gamepad.axes[1];\r",
+            "\r",
+            "eventsFunctionContext.returnValue = gdjs._extensionController.axisToAngle(\r",
+            "    getNormalizedAxisValue(axisValueX, playerId),\r",
+            "    getNormalizedAxisValue(axisValueY, playerId));"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Stick: \"Left\" or \"Right\"",
+          "name": "Stick",
+          "supplementaryInformation": "[\"Left\",\"Right\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the value of axis of a gamepad stick.",
+      "fullName": "Value of a gamepad axis (deprecated)",
+      "functionType": "Expression",
+      "name": "AxisValue",
+      "private": true,
+      "sentence": "Player _PARAM1_ push axis _PARAM2_ to _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "const stick = eventsFunctionContext.getArgument(\"stick\").toUpperCase();\r",
+            "const direction = eventsFunctionContext.getArgument(\"direction\").toUpperCase();\r",
+            "\r",
+            "if (stick != \"LEFT\" && stick != \"RIGHT\") {\r",
+            "    console.error('Parameter stick is not valid in expression: \"Value of a gamepad axis\"');\r",
+            "    return;\r",
+            "}\r",
+            "if (direction != \"UP\" && direction != \"DOWN\" && direction != \"LEFT\" && direction != \"RIGHT\" && direction != \"HORIZONTAL\" && direction != \"VERTICAL\") {\r",
+            "    console.error('Parameter direction is not valid in expression: \"Value of a gamepad axis\"');\r",
+            "    return;\r",
+            "}\r",
+            "/** @type {Gamepad} */\r",
+            "const gamepad = gdjs._extensionController.getGamepad(playerId);\r",
+            "if (!gamepad) {\r",
+            "    // The gamepad is not connected.\r",
+            "    return;\r",
+            "}\r",
+            "let parameterError = false;\r",
+            "switch (stick) {\r",
+            "    case 'LEFT':\r",
+            "        switch (direction) {\r",
+            "            case 'LEFT':\r",
+            "                if (gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[0], playerId) < 0) {\r",
+            "                    eventsFunctionContext.returnValue = -gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[0], playerId);\r",
+            "                }\r",
+            "                break;\r",
+            "\r",
+            "            case 'RIGHT':\r",
+            "                if (gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[0], playerId) > 0) {\r",
+            "                    eventsFunctionContext.returnValue = gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[0], playerId);\r",
+            "                }\r",
+            "                break;\r",
+            "\r",
+            "            case 'UP':\r",
+            "                if (gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[1], playerId) < 0) {\r",
+            "                    eventsFunctionContext.returnValue = -gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[1], playerId);\r",
+            "                }\r",
+            "                break;\r",
+            "\r",
+            "            case 'DOWN':\r",
+            "                if (gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[1], playerId) > 0) {\r",
+            "                    eventsFunctionContext.returnValue = gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[1], playerId);\r",
+            "                }\r",
+            "                break;\r",
+            "\r",
+            "            case \"HORIZONTAL\":\r",
+            "                eventsFunctionContext.returnValue = gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[0], playerId);\r",
+            "                break;\r",
+            "\r",
+            "            case \"VERTICAL\":\r",
+            "                eventsFunctionContext.returnValue = gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[1], playerId);\r",
+            "                break;\r",
+            "\r",
+            "            default:\r",
+            "                break;\r",
+            "        }\r",
+            "        break;\r",
+            "\r",
+            "    case 'RIGHT':\r",
+            "        switch (direction) {\r",
+            "            case 'LEFT':\r",
+            "                if (gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[2], playerId) < 0) {\r",
+            "                    eventsFunctionContext.returnValue = -gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[2], playerId);\r",
+            "                }\r",
+            "                break;\r",
+            "\r",
+            "            case 'RIGHT':\r",
+            "                if (gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[2], playerId) > 0) {\r",
+            "                    eventsFunctionContext.returnValue = gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[2], playerId);\r",
+            "                }\r",
+            "                break;\r",
+            "\r",
+            "            case 'UP':\r",
+            "                if (gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[3], playerId) < 0) {\r",
+            "                    eventsFunctionContext.returnValue = -gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[3], playerId);\r",
+            "                }\r",
+            "                break;\r",
+            "\r",
+            "            case 'DOWN':\r",
+            "                if (gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[3], playerId) > 0) {\r",
+            "                    eventsFunctionContext.returnValue = gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[3], playerId);\r",
+            "                }\r",
+            "                break;\r",
+            "\r",
+            "            case \"HORIZONTAL\":\r",
+            "                eventsFunctionContext.returnValue = gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[2], playerId);\r",
+            "                break;\r",
+            "\r",
+            "            case \"VERTICAL\":\r",
+            "                eventsFunctionContext.returnValue = gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[3], playerId);\r",
+            "                break;\r",
+            "\r",
+            "            default:\r",
+            "                break;\r",
+            "        }\r",
+            "        break;\r",
+            "\r",
+            "    default:\r",
+            "        break;\r",
+            "}\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Stick: \"Left\" or \"Right\"",
+          "name": "stick",
+          "supplementaryInformation": "[\"Left\",\"Right\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Direction",
+          "name": "direction",
+          "supplementaryInformation": "[\"Up\",\"Down\",\"Left\",\"Right\",\"Horizontal\",\"Vertical\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the gamepad stick force on X axis (from -1 at the left to 1 at the right).",
+      "fullName": "Stick X force",
+      "functionType": "Expression",
+      "name": "StickForceX",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"Gamepad\") - 1;\r",
+            "const stick = eventsFunctionContext.getArgument(\"Stick\").toLowerCase();\r",
+            "\r",
+            "if (stick != \"left\" && stick != \"right\") {\r",
+            "    console.error('Parameter stick is not valid in expression: \"Value of a gamepad axis\"');\r",
+            "    return;\r",
+            "}\r",
+            "/** @type {Gamepad} */\r",
+            "const gamepad = gdjs._extensionController.getGamepad(playerId);\r",
+            "if (!gamepad) {\r",
+            "    // The gamepad is not connected.\r",
+            "    return;\r",
+            "}\r",
+            "const axisIndex = stick === 'right' ? 2 : 0;\r",
+            "eventsFunctionContext.returnValue = gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[axisIndex], playerId);\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "Gamepad",
+          "type": "expression"
+        },
+        {
+          "description": "Stick: \"Left\" or \"Right\"",
+          "name": "Stick",
+          "supplementaryInformation": "[\"Left\",\"Right\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the gamepad stick force on Y axis (from -1 at the top to 1 at the bottom).",
+      "fullName": "Stick Y force",
+      "functionType": "Expression",
+      "name": "StickForceY",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"Gamepad\") - 1;\r",
+            "const stick = eventsFunctionContext.getArgument(\"Stick\").toLowerCase();\r",
+            "\r",
+            "if (stick != \"left\" && stick != \"right\") {\r",
+            "    console.error('Parameter stick is not valid in expression: \"Value of a gamepad axis\"');\r",
+            "    return;\r",
+            "}\r",
+            "/** @type {Gamepad} */\r",
+            "const gamepad = gdjs._extensionController.getGamepad(playerId);\r",
+            "if (!gamepad) {\r",
+            "    // The gamepad is not connected.\r",
+            "    return;\r",
+            "}\r",
+            "const axisIndex = stick === 'right' ? 3 : 1;\r",
+            "eventsFunctionContext.returnValue = gdjs._extensionController.getNormalizedAxisValue(gamepad.axes[axisIndex], playerId);\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "Gamepad",
+          "type": "expression"
+        },
+        {
+          "description": "Stick: \"Left\" or \"Right\"",
+          "name": "Stick",
+          "supplementaryInformation": "[\"Left\",\"Right\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Test if a button is released on a gamepad. Buttons can be:\n* Xbox: \"A\", \"B\", \"X\", \"Y\", \"LB\", \"RB\", \"LT\", \"RT\", \"BACK\", \"START\",\n* PS4: \"CROSS\", \"SQUARE\", \"CIRCLE\", \"TRIANGLE\", \"L1\", \"L2\", \"R1\", \"R2\", \"SHARE\", \"OPTIONS\", \"PS_BUTTON\", \"CLICK_TOUCHPAD\",\n* Other: \"UP\", \"DOWN\", \"LEFT\", \"RIGHT\", \"CLICK_STICK_LEFT\", \"CLICK_STICK_RIGHT\".",
+      "fullName": "Gamepad button released",
+      "functionType": "Condition",
+      "name": "C_Button_released",
+      "sentence": "Button _PARAM2_ of gamepad _PARAM1_ is released",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "const button = eventsFunctionContext.getArgument(\"Button\").toUpperCase();\r",
+            "\r",
+            "let buttonId = gdjs._extensionController.getButtonId(button);\r",
+            "if (buttonId === null) {\r",
+            "    return;\r",
+            "}\r",
+            "const player = gdjs._extensionController.getPlayer(playerId)\r",
+            "eventsFunctionContext.returnValue = player.isButtonReleased(buttonId);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Name of the button",
+          "name": "Button",
+          "supplementaryInformation": "[\"A\",\"Cross\",\"B\",\"Circle\",\"X\",\"Square\",\"Y\",\"Triangle\",\"LB\",\"L1\",\"RB\",\"R1\",\"LT\",\"L2\",\"RT\",\"R2\",\"Up\",\"Down\",\"Left\",\"Right\",\"Back\",\"Share\",\"Start\",\"Options\",\"Click_Stick_Left\",\"Click_Stick_Right\",\"PS_Button\",\"Click_Touchpad\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a button was just pressed on a gamepad. Buttons can be:\n* Xbox: \"A\", \"B\", \"X\", \"Y\", \"LB\", \"RB\", \"LT\", \"RT\", \"BACK\", \"START\",\n* PS4: \"CROSS\", \"SQUARE\", \"CIRCLE\", \"TRIANGLE\", \"L1\", \"L2\", \"R1\", \"R2\", \"SHARE\", \"OPTIONS\", \"PS_BUTTON\", \"CLICK_TOUCHPAD\",\n* Other: \"UP\", \"DOWN\", \"LEFT\", \"RIGHT\", \"CLICK_STICK_LEFT\", \"CLICK_STICK_RIGHT\".",
+      "fullName": "Gamepad button just pressed",
+      "functionType": "Condition",
+      "name": "IsButtonJustPressed",
+      "sentence": "Button _PARAM2_ of gamepad _PARAM1_ was just pressed",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "const button = eventsFunctionContext.getArgument(\"Button\").toUpperCase();\r",
+            "\r",
+            "let buttonId = gdjs._extensionController.getButtonId(button);\r",
+            "if (buttonId === null) {\r",
+            "    return;\r",
+            "}\r",
+            "const player = gdjs._extensionController.getPlayer(playerId)\r",
+            "eventsFunctionContext.returnValue = player.isButtonJustPressed(buttonId);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Name of the button",
+          "name": "Button",
+          "supplementaryInformation": "[\"A\",\"Cross\",\"B\",\"Circle\",\"X\",\"Square\",\"Y\",\"Triangle\",\"LB\",\"L1\",\"RB\",\"R1\",\"LT\",\"L2\",\"RT\",\"R2\",\"Up\",\"Down\",\"Left\",\"Right\",\"Back\",\"Share\",\"Start\",\"Options\",\"Click_Stick_Left\",\"Click_Stick_Right\",\"PS_Button\",\"Click_Touchpad\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the index of the last pressed button of a gamepad.",
+      "fullName": "Last pressed button (id)",
+      "functionType": "Expression",
+      "name": "LastButtonID",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "eventsFunctionContext.returnValue = gdjs._extensionController.getPlayer(playerId).lastButtonUsed;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if any button is pressed on a gamepad.",
+      "fullName": "Any gamepad button pressed",
+      "functionType": "Condition",
+      "name": "C_Any_Button_pressed",
+      "sentence": "Any button of gamepad _PARAM1_ is pressed",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "const player = gdjs._extensionController.getPlayer(playerId)\r",
+            "eventsFunctionContext.returnValue = player.isAnyButtonPressed();\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the last button pressed. \nButtons for Xbox and PS4 can be:\n* Xbox: \"A\", \"B\", \"X\", \"Y\", \"LB\", \"RB\", \"LT\", \"RT\", \"BACK\", \"START\",\n* PS4: \"CROSS\", \"SQUARE\", \"CIRCLE\", \"TRIANGLE\", \"L1\", \"L2\", \"R1\", \"R2\", \"SHARE\", \"OPTIONS\", \"PS_BUTTON\", \"CLICK_TOUCHPAD\",\n* Both: \"UP\", \"DOWN\", \"LEFT\", \"RIGHT\", \"CLICK_STICK_LEFT\", \"CLICK_STICK_RIGHT\".",
+      "fullName": "Last pressed button (string)",
+      "functionType": "StringExpression",
+      "name": "LastButtonString",
+      "sentence": "Button _PARAM2_ of gamepad _PARAM1_ is pressed",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "const controllerType = eventsFunctionContext.getArgument(\"controller_type\").toUpperCase();\r",
+            "/** @type {Gamepad} */\r",
+            "const gamepad = gdjs._extensionController.getGamepad(playerId);\r",
+            "if (!gamepad) {\r",
+            "    // The gamepad is not connected.\r",
+            "    return;\r",
+            "}\r",
+            "const lastButtonUsedID = gdjs._extensionController.getPlayer(playerId).lastButtonUsed;\r",
+            "eventsFunctionContext.returnValue = gdjs._extensionController.getInputString(controllerType, lastButtonUsedID);\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Controller type",
+          "name": "controller_type",
+          "supplementaryInformation": "[\"Xbox\",\"PS4\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the number of gamepads.",
+      "fullName": "Gamepad count",
+      "functionType": "Expression",
+      "name": "GamepadCount",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];\r",
+            "let lastGamepadIndex = -1;\r",
+            "for (let playerId = 0; playerId < gamepads.length; playerId++) {\r",
+            "    // Gamepads can be disconnected and become null\r",
+            "    if (gamepads[playerId]) {\r",
+            "        lastGamepadIndex = playerId\r",
+            "    }\r",
+            "}\r",
+            "eventsFunctionContext.returnValue = lastGamepadIndex + 1;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a button is pressed on a gamepad. \nButtons can be:\n* Xbox: \"A\", \"B\", \"X\", \"Y\", \"LB\", \"RB\", \"LT\", \"RT\", \"BACK\", \"START\",\n* PS4: \"CROSS\", \"SQUARE\", \"CIRCLE\", \"TRIANGLE\", \"L1\", \"L2\", \"R1\", \"R2\", \"SHARE\", \"OPTIONS\", \"PS_BUTTON\", \"CLICK_TOUCHPAD\",\n* Other: \"UP\", \"DOWN\", \"LEFT\", \"RIGHT\", \"CLICK_STICK_LEFT\", \"CLICK_STICK_RIGHT\".",
+      "fullName": "Gamepad button pressed",
+      "functionType": "Condition",
+      "name": "C_Button_pressed",
+      "sentence": "Button _PARAM2_ of gamepad _PARAM1_ is pressed",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "const button = eventsFunctionContext.getArgument(\"button\").toUpperCase();\r",
+            "\r",
+            "const buttonId = gdjs._extensionController.getButtonId(button);\r",
+            "if (buttonId === null) {\r",
+            "    return;\r",
+            "}\r",
+            "const player = gdjs._extensionController.getPlayer(playerId)\r",
+            "eventsFunctionContext.returnValue = player.isButtonPressed(buttonId);\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Name of the button",
+          "name": "button",
+          "supplementaryInformation": "[\"A\",\"Cross\",\"B\",\"Circle\",\"X\",\"Square\",\"Y\",\"Triangle\",\"LB\",\"L1\",\"RB\",\"R1\",\"LT\",\"L2\",\"RT\",\"R2\",\"Up\",\"Down\",\"Left\",\"Right\",\"Back\",\"Share\",\"Start\",\"Options\",\"Click_Stick_Left\",\"Click_Stick_Right\",\"PS_Button\",\"Click_Touchpad\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the value of the deadzone applied to a gamepad sticks, between 0 and 1.",
+      "fullName": "Gamepad deadzone for sticks",
+      "functionType": "Expression",
+      "name": "Deadzone",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "eventsFunctionContext.returnValue = gdjs._extensionController.getPlayer(playerId).deadzone;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Set the deadzone for sticks of the gamepad. The deadzone is an area for which movement on sticks won't be taken into account (instead, the stick will be considered as not moved). Deadzone is between 0 and 1, and is by default 0.2.",
+      "fullName": "Set gamepad deadzone for sticks",
+      "functionType": "Action",
+      "name": "A_Set_deadzone",
+      "sentence": "Set deadzone for sticks on gamepad: _PARAM1_ to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "const newDeadzone = eventsFunctionContext.getArgument(\"deadzone\");\r",
+            "\r",
+            "// https://github.com/4ian/GDevelop-extensions/pull/33#issuecomment-618224857\r",
+            "gdjs._extensionController.getPlayer(playerId).deadzone = gdjs.evtTools.common.clamp(newDeadzone, 0, 1);\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Deadzone for sticks, 0.2 by default (0 to 1)",
+          "name": "deadzone",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a stick of a gamepad is pushed in a given direction.",
+      "fullName": "Gamepad stick pushed (axis)",
+      "functionType": "Condition",
+      "name": "C_Axis_pushed",
+      "sentence": "_PARAM2_ stick of gamepad _PARAM1_ is pushed in direction _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "const stick = eventsFunctionContext.getArgument(\"stick\").toUpperCase();\r",
+            "const direction = eventsFunctionContext.getArgument(\"direction\").toUpperCase();\r",
+            "\r",
+            "if (stick != \"LEFT\" && stick != \"RIGHT\") {\r",
+            "    console.error('Parameter stick in condition: \"Gamepad stick pushed (axis)\", is not valid, must be LEFT or RIGHT');\r",
+            "    return;\r",
+            "}\r",
+            "if (direction != \"UP\" && direction != \"DOWN\" && direction != \"LEFT\" && direction != \"RIGHT\" && direction != \"ANY\") {\r",
+            "    console.error('Parameter direction in condition: \"Gamepad stick pushed (axis)\", is not valid, must be UP, DOWN, LEFT or RIGHT');\r",
+            "    return;\r",
+            "}\r",
+            "/** @type {Gamepad} */\r",
+            "const gamepad = gdjs._extensionController.getGamepad(playerId);\r",
+            "if (!gamepad) {\r",
+            "    // The gamepad is not connected.\r",
+            "    return;\r",
+            "}\r",
+            "const axisValueX = stick === 'RIGHT' ? gamepad.axes[2] : gamepad.axes[0];\r",
+            "const axisValueY = stick === 'RIGHT' ? gamepad.axes[3] : gamepad.axes[1];\r",
+            "eventsFunctionContext.returnValue = gdjs._extensionController.isAxisPushed(playerId, direction, axisValueX, axisValueY);\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Stick: \"Left\" or \"Right\"",
+          "name": "stick",
+          "supplementaryInformation": "[\"Left\",\"Right\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Direction",
+          "name": "direction",
+          "supplementaryInformation": "[\"Up\",\"Down\",\"Left\",\"Right\",\"Any\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the number of connected gamepads.",
+      "fullName": "Connected gamepads count",
+      "functionType": "Expression",
+      "name": "ConnectedGamepadsCount",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];\r",
+            "let connectedGamepadCount = 0;\r",
+            "for (let playerId = 0; playerId < gamepads.length; playerId++) {\r",
+            "    // Gamepads can be disconnected and become null\r",
+            "    if (gamepads[playerId]) {\r",
+            "        connectedGamepadCount++;\r",
+            "    }\r",
+            "}\r",
+            "eventsFunctionContext.returnValue = connectedGamepadCount;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return a string containing informations about the specified gamepad.",
+      "fullName": "Gamepad type",
+      "functionType": "StringExpression",
+      "name": "GamepadType",
+      "sentence": "Player _PARAM1_ use _PARAM2_ controller",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;",
+            "/** @type {Gamepad} */",
+            "const gamepad = gdjs._extensionController.getGamepad(playerId);",
+            "if (!gamepad) {",
+            "    // The gamepad is not connected.",
+            "    return;",
+            "}",
+            "eventsFunctionContext.returnValue = (gamepad && gamepad.id) ? gamepad.id : \"No information for player \" + (playerId + 1)",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the specified gamepad has the specified information in its description. Useful to know if the gamepad is a Xbox or PS4 controller.",
+      "fullName": "Gamepad type",
+      "functionType": "Condition",
+      "name": "C_Controller_type",
+      "sentence": "Gamepad _PARAM1_ is a _PARAM2_ controller",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;",
+            "const controllerType = eventsFunctionContext.getArgument(\"controller_type\").toUpperCase();",
+            "/** @type {Gamepad} */",
+            "const gamepad = gdjs._extensionController.getGamepad(playerId);",
+            "if (!gamepad) {",
+            "    // The gamepad is not connected.",
+            "    return;",
+            "}",
+            "if (controllerType == \"XBOX\") {",
+            "    eventsFunctionContext.returnValue = gdjs._extensionController.isXbox(gamepad);",
+            "} else {",
+            "    eventsFunctionContext.returnValue = gamepad ? gamepad.id.toUpperCase().indexOf(controllerType) !== -1 : false;",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Type: \"Xbox\", \"PS4\", \"Steam\" or \"PS3\" (among other)",
+          "name": "controller_type",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a gamepad is connected.",
+      "fullName": "Gamepad connected",
+      "functionType": "Condition",
+      "name": "C_Controller_X_is_connected",
+      "sentence": "Gamepad _PARAM1_ is plugged and connected",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;",
+            "/** @type {Gamepad[]} */",
+            "const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];",
+            "// If gamepad was disconnected it will be null (so this will return false)",
+            "// If gamepad was never connected it will be undefined (so this will return false)",
+            "eventsFunctionContext.returnValue = !!gamepads[playerId];"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Generate a vibration on the specified controller. Might only work if the game is running in a recent web browser.",
+      "fullName": "Gamepad vibration",
+      "functionType": "Action",
+      "name": "A_Vibrate_controller",
+      "sentence": "Make gamepad _PARAM1_ vibrate for _PARAM2_ seconds",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;",
+            "const duration = eventsFunctionContext.getArgument(\"Duration\") || 1;",
+            "/** @type {Gamepad} */",
+            "const gamepad = gdjs._extensionController.getGamepad(playerId);",
+            "if (!gamepad) {",
+            "    // The gamepad is not connected.",
+            "    return;",
+            "}",
+            "//Vibration work only on game in browser.",
+            "if (gamepad.vibrationActuator) {",
+            "  gamepad.vibrationActuator.playEffect(\"dual-rumble\", {",
+            "    startDelay: 0,",
+            "    duration: duration * 1000,",
+            "    weakMagnitude: 1.0,",
+            "    strongMagnitude: 1.0",
+            "  });",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Time of the vibration, in seconds (optional, default value is 1)",
+          "name": "Duration",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Generate an advanced vibration on the specified controller. Incompatible with Firefox.",
+      "fullName": "Advanced gamepad vibration",
+      "functionType": "Action",
+      "name": "A_Advanced_Vibration_Controller",
+      "sentence": "Make gamepad _PARAM1_ vibrate for _PARAM2_ seconds with the vibration magnitude of _PARAM3_ and _PARAM4_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const { clamp } = gdjs.evtTools.common;",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;",
+            "const duration = eventsFunctionContext.getArgument(\"Duration\") || 1;",
+            "const strongRumbleMagnitude = clamp(eventsFunctionContext.getArgument(\"StrongMagnitude\"), 0, 1);",
+            "const weakRumbleMagnitude = clamp(eventsFunctionContext.getArgument(\"WeakMagnitude\"), 0, 1);",
+            "/** @type {Gamepad} */",
+            "const gamepad = gdjs._extensionController.getGamepad(playerId);",
+            "if (!gamepad) {",
+            "    // The gamepad is not connected.",
+            "    return;",
+            "}",
+            "//Vibration work only on game in browser.",
+            "if (gamepad.vibrationActuator) {",
+            "  gamepad.vibrationActuator.playEffect(\"dual-rumble\", {",
+            "    startDelay: 0,",
+            "    duration: duration * 1000,",
+            "    weakMagnitude: weakRumbleMagnitude,",
+            "    strongMagnitude: strongRumbleMagnitude",
+            "  });",
+            "}",
+            "const player = gdjs._extensionController.getPlayer(playerId)",
+            "player.rumble.duration = duration;",
+            "player.rumble.elapsedTime = 0;",
+            "player.rumble.weakMagnitude = weakRumbleMagnitude;",
+            "player.rumble.strongMagnitude = strongRumbleMagnitude;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Time of the vibration, in seconds (optional, default value is 1)",
+          "name": "Duration",
+          "type": "expression"
+        },
+        {
+          "description": "Strong rumble magnitude (from 0 to 1)",
+          "name": "StrongMagnitude",
+          "type": "expression"
+        },
+        {
+          "description": "Weak rumble magnitude (from 0 to 1)",
+          "name": "WeakMagnitude",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change a vibration on the specified controller. Incompatible with Firefox.",
+      "fullName": "Change gamepad active vibration",
+      "functionType": "Action",
+      "name": "A_Change_Vibration_Magnitude",
+      "sentence": "Change the vibration magnitude of _PARAM2_ & _PARAM3_ on gamepad _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const { clamp } = gdjs.evtTools.common;",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;",
+            "const player = gdjs._extensionController.getPlayer(playerId);",
+            "const elapsedTime = player.rumble.elapsedTime || 0;",
+            "const originalDuration = player.rumble.duration || 1;",
+            "const strongRumbleMagnitude = clamp(eventsFunctionContext.getArgument(\"StrongMagnitude\"), 0, 1);",
+            "const weakRumbleMagnitude = clamp(eventsFunctionContext.getArgument(\"WeakMagnitude\"), 0, 1);",
+            "/** @type {Gamepad} */",
+            "const gamepad = gdjs._extensionController.getGamepad(playerId);",
+            "if (!gamepad) {",
+            "    // The gamepad is not connected.",
+            "    return;",
+            "}",
+            "if (originalDuration - elapsedTime <= 0) return;",
+            "//Vibration work only on game in browser.",
+            "if (gamepad.vibrationActuator) {",
+            "  gamepad.vibrationActuator.playEffect(\"dual-rumble\", {",
+            "    startDelay: 0,",
+            "    duration: 1000 * (originalDuration - elapsedTime),",
+            "    weakMagnitude: weakRumbleMagnitude,",
+            "    strongMagnitude: strongRumbleMagnitude",
+            "  });",
+            "}",
+            "",
+            "player.rumble.weakMagnitude = weakRumbleMagnitude;",
+            "player.rumble.strongMagnitude = strongRumbleMagnitude;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        },
+        {
+          "description": "Strong rumble magnitude (from 0 to 1)",
+          "name": "StrongMagnitude",
+          "type": "expression"
+        },
+        {
+          "description": "Weak rumble magnitude (from 0 to 1)",
+          "name": "WeakMagnitude",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if any button is released on a gamepad.",
+      "fullName": "Any gamepad button released",
+      "functionType": "Condition",
+      "name": "C_any_button_released",
+      "sentence": "Any button of gamepad _PARAM1_ is released",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "const player = gdjs._extensionController.getPlayer(playerId)\r",
+            "eventsFunctionContext.returnValue = player.isAnyButtonReleased();"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the strength of the weak vibration motor on the gamepad of a player.",
+      "fullName": "Weak rumble magnitude",
+      "functionType": "Expression",
+      "name": "WeakVibrationMagnitude",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "eventsFunctionContext.returnValue = gdjs._extensionController.getPlayer(playerId).rumble.weakMagnitude;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the strength of the strong vibration motor on the gamepad of a player.",
+      "fullName": "Strong rumble magnitude",
+      "functionType": "Expression",
+      "name": "StrongVibrationMagnitude",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const playerId = eventsFunctionContext.getArgument(\"PlayerId\") - 1;\r",
+            "eventsFunctionContext.returnValue = gdjs._extensionController.getPlayer(playerId).rumble.strongMagnitude;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The gamepad identifier: 1, 2, 3 or 4",
+          "name": "PlayerId",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Control a platformer character with a gamepad.",
+      "fullName": "Platformer gamepad mapper",
+      "name": "PlatformerGamepadMapper",
+      "objectType": "",
+      "quickCustomizationVisibility": "hidden",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Gamepads::C_Controller_X_is_connected"
+                  },
+                  "parameters": [
+                    "",
+                    "GamepadIdentifier",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "UseArrows",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Button_pressed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Left\"",
+                            "\"Left\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateLeftKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Button_pressed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Right\"",
+                            "\"Left\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateRightKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Button_pressed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Up\"",
+                            "\"Left\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateUpKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateLadderKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Button_pressed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Down\"",
+                            "\"Left\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateDownKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "UseLeftStick",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Axis_pushed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Left\"",
+                            "\"Left\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateLeftKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Axis_pushed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Left\"",
+                            "\"Right\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateRightKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Axis_pushed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Left\"",
+                            "\"Up\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateUpKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateLadderKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Axis_pushed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Left\"",
+                            "\"Down\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateDownKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "UseRightStick",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Axis_pushed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Right\"",
+                            "\"Left\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateLeftKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Axis_pushed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Right\"",
+                            "\"Right\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateRightKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Axis_pushed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Right\"",
+                            "\"Up\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateUpKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateLadderKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Axis_pushed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Right\"",
+                            "\"Down\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateDownKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PlatformerCharacter"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Gamepads::C_Button_pressed"
+                      },
+                      "parameters": [
+                        "",
+                        "GamepadIdentifier",
+                        "Buttons[JumpButton]",
+                        "\"Left\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlatformBehavior::SimulateJumpKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PlatformerCharacter"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::PlatformerGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Platformer character behavior",
+          "extraInformation": [
+            "PlatformBehavior::PlatformerObjectBehavior"
+          ],
+          "choices": [],
+          "name": "PlatformerCharacter"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Gamepad identifier (1, 2, 3 or 4)",
+          "name": "GamepadIdentifier"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Use directional pad",
+          "group": "Controls",
+          "name": "UseArrows"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Use left stick",
+          "group": "Controls",
+          "name": "UseLeftStick"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "Use right stick",
+          "group": "Controls",
+          "name": "UseRightStick"
+        },
+        {
+          "value": "A or Cross",
+          "type": "Choice",
+          "label": "Jump button",
+          "group": "Controls",
+          "choices": [
+            {
+              "label": "A or Cross",
+              "value": "A or Cross"
+            },
+            {
+              "label": "B or Circle",
+              "value": "B or Circle"
+            },
+            {
+              "label": "X or Square",
+              "value": "X or Square"
+            },
+            {
+              "label": "Y or Triangle",
+              "value": "Y or Triangle"
+            },
+            {
+              "label": "LB or L1",
+              "value": "LB or L1"
+            },
+            {
+              "label": "RB or R1",
+              "value": "RB or R1"
+            },
+            {
+              "label": "LT or L2",
+              "value": "LT or L2"
+            },
+            {
+              "label": "RT or R2",
+              "value": "RT or R2"
+            }
+          ],
+          "name": "JumpButton"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Control a 3D physics character with a gamepad.",
+      "fullName": "3D platformer gamepad mapper",
+      "name": "Platformer3DGamepadMapper",
+      "objectType": "",
+      "quickCustomizationVisibility": "hidden",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Gamepads::C_Controller_X_is_connected"
+                  },
+                  "parameters": [
+                    "",
+                    "GamepadIdentifier",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Gamepads::StickForce"
+                      },
+                      "parameters": [
+                        "",
+                        ">",
+                        "0",
+                        "GamepadIdentifier",
+                        "JoystickIdentifier",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics3D::PhysicsCharacter3D::SetForwardAngle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PhysicsCharacter3D",
+                        "=",
+                        "Gamepads::StickAngle(GamepadIdentifier, JoystickIdentifier) + CameraAngle(Object.Layer())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Physics3D::PhysicsCharacter3D::SimulateStick"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PhysicsCharacter3D",
+                        "-90",
+                        "Gamepads::StickForce(GamepadIdentifier, JoystickIdentifier)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Gamepads::C_Button_pressed"
+                      },
+                      "parameters": [
+                        "",
+                        "GamepadIdentifier",
+                        "Buttons[JumpButton]",
+                        "\"Left\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics3D::PhysicsCharacter3D::SimulateJumpKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PhysicsCharacter3D"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::Platformer3DGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "3D physics character",
+          "extraInformation": [
+            "Physics3D::PhysicsCharacter3D"
+          ],
+          "choices": [],
+          "name": "PhysicsCharacter3D"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Gamepad identifier (1, 2, 3 or 4)",
+          "name": "GamepadIdentifier"
+        },
+        {
+          "value": "Left",
+          "type": "Choice",
+          "label": "Walk joystick",
+          "group": "Controls",
+          "choices": [
+            {
+              "label": "Left",
+              "value": "Left"
+            },
+            {
+              "label": "Right",
+              "value": "Right"
+            }
+          ],
+          "name": "JoystickIdentifier"
+        },
+        {
+          "value": "A or Cross",
+          "type": "Choice",
+          "label": "Jump button",
+          "group": "Controls",
+          "choices": [
+            {
+              "label": "A or Cross",
+              "value": "A or Cross"
+            },
+            {
+              "label": "B or Circle",
+              "value": "B or Circle"
+            },
+            {
+              "label": "X or Square",
+              "value": "X or Square"
+            },
+            {
+              "label": "Y or Triangle",
+              "value": "Y or Triangle"
+            },
+            {
+              "label": "LB or L1",
+              "value": "LB or L1"
+            },
+            {
+              "label": "RB or R1",
+              "value": "RB or R1"
+            },
+            {
+              "label": "LT or L2",
+              "value": "LT or L2"
+            },
+            {
+              "label": "RT or R2",
+              "value": "RT or R2"
+            }
+          ],
+          "name": "JumpButton"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Control a 3D physics character with a gamepad.",
+      "fullName": "3D shooter gamepad mapper",
+      "name": "Shooter3DGamepadMapper",
+      "objectType": "",
+      "quickCustomizationVisibility": "hidden",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Gamepads::C_Controller_X_is_connected"
+                  },
+                  "parameters": [
+                    "",
+                    "GamepadIdentifier",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Gamepads::StickForce"
+                      },
+                      "parameters": [
+                        "",
+                        ">",
+                        "0",
+                        "GamepadIdentifier",
+                        "WalkStick",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics3D::PhysicsCharacter3D::SimulateStick"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PhysicsCharacter3D",
+                        "Gamepads::StickAngle(GamepadIdentifier, WalkStick)",
+                        "Gamepads::StickForce(GamepadIdentifier, WalkStick)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Gamepads::C_Button_pressed"
+                      },
+                      "parameters": [
+                        "",
+                        "GamepadIdentifier",
+                        "Buttons[JumpButton]",
+                        "\"Left\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics3D::PhysicsCharacter3D::SimulateJumpKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PhysicsCharacter3D"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::Shooter3DGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "3D physics character",
+          "extraInformation": [
+            "Physics3D::PhysicsCharacter3D"
+          ],
+          "choices": [],
+          "name": "PhysicsCharacter3D"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Gamepad identifier (1, 2, 3 or 4)",
+          "name": "GamepadIdentifier"
+        },
+        {
+          "value": "Left",
+          "type": "Choice",
+          "label": "Walk joystick",
+          "group": "Controls",
+          "choices": [
+            {
+              "label": "Left",
+              "value": "Left"
+            },
+            {
+              "label": "Right",
+              "value": "Right"
+            }
+          ],
+          "name": "WalkStick"
+        },
+        {
+          "value": "Right",
+          "type": "Choice",
+          "label": "Camera joystick",
+          "group": "Controls",
+          "choices": [
+            {
+              "label": "Left",
+              "value": "Left"
+            },
+            {
+              "label": "Right",
+              "value": "Right"
+            }
+          ],
+          "name": "CameraStick"
+        },
+        {
+          "value": "A or Cross",
+          "type": "Choice",
+          "label": "Jump button",
+          "group": "Controls",
+          "choices": [
+            {
+              "label": "A or Cross",
+              "value": "A or Cross"
+            },
+            {
+              "label": "B or Circle",
+              "value": "B or Circle"
+            },
+            {
+              "label": "X or Square",
+              "value": "X or Square"
+            },
+            {
+              "label": "Y or Triangle",
+              "value": "Y or Triangle"
+            },
+            {
+              "label": "LB or L1",
+              "value": "LB or L1"
+            },
+            {
+              "label": "RB or R1",
+              "value": "RB or R1"
+            },
+            {
+              "label": "LT or L2",
+              "value": "LT or L2"
+            },
+            {
+              "label": "RT or R2",
+              "value": "RT or R2"
+            }
+          ],
+          "name": "JumpButton"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Control camera rotations with a gamepad.",
+      "fullName": "First person camera gamepad mapper",
+      "name": "FirstPersonGamepadMapper",
+      "objectType": "",
+      "quickCustomizationVisibility": "hidden",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "TODO It's probably a bad idea to rotate the object around Y."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentRotationSpeedZ",
+                    "=",
+                    "Gamepads::AcceleratedSpeed(CurrentRotationSpeedZ, Gamepads::StickForceX(GamepadIdentifier, CameraStick) * HorizontalRotationSpeedMax, HorizontalRotationSpeedMax, HorizontalRotationAcceleration, HorizontalRotationDeceleration)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "Object",
+                    "+",
+                    "CurrentRotationSpeedZ * TimeDelta()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentRotationSpeedY",
+                    "=",
+                    "Gamepads::AcceleratedSpeed(CurrentRotationSpeedY, Gamepads::StickForceY(GamepadIdentifier, CameraStick) * VerticalRotationSpeedMax, VerticalRotationSpeedMax, VerticalRotationAcceleration, VerticalRotationDeceleration)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetRotationY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Object3D",
+                    "+",
+                    "CurrentRotationSpeedY * TimeDelta()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetRotationY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Object3D",
+                    "=",
+                    "clamp(Object.Object3D::RotationY(), VerticalAngleMin, VerticalAngleMax)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Gamepads::FirstPersonGamepadMapper::LookFromObjectEyes"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Move the camera to look though _PARAM1_ eyes. The object must look to the right when all its angles are 0 and the top of its head be toward Z+.",
+          "fullName": "Look through object eyes",
+          "functionType": "Action",
+          "group": "Layers and cameras",
+          "name": "LookFromObjectEyes",
+          "private": true,
+          "sentence": "Move the camera to look though _PARAM0_ eyes",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "CentreCamera"
+                  },
+                  "parameters": [
+                    "",
+                    "Object",
+                    "",
+                    "Object.Layer()",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::SetCameraZ"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "Object.Object3D::Z() + Object.Object3D::Depth() + OffsetZ",
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::SetCameraRotationX"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "- Object.Object3D::RotationY() + 90",
+                    "GetArgumentAsString(\"Layer\")",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::SetCameraRotationY"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "Object.Object3D::RotationX()",
+                    "GetArgumentAsString(\"Layer\")",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetCameraAngle"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "Object.Angle() + 90",
+                    "Object.Layer()",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the maximum horizontal rotation speed of the object.",
+          "fullName": "Maximum horizontal rotation speed",
+          "functionType": "ExpressionAndCondition",
+          "group": "First person camera gamepad mapper horizontal rotation configuration",
+          "name": "HorizontalRotationSpeedMax",
+          "sentence": "the maximum horizontal rotation speed",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "HorizontalRotationSpeedMax"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "HorizontalRotationSpeedMax",
+          "name": "SetHorizontalRotationSpeedMax",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "HorizontalRotationSpeedMax",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the horizontal rotation acceleration of the object.",
+          "fullName": "Horizontal rotation acceleration",
+          "functionType": "ExpressionAndCondition",
+          "group": "First person camera gamepad mapper horizontal rotation configuration",
+          "name": "HorizontalRotationAcceleration",
+          "sentence": "the horizontal rotation acceleration",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "HorizontalRotationAcceleration"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "HorizontalRotationAcceleration",
+          "name": "SetHorizontalRotationAcceleration",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "HorizontalRotationAcceleration",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the horizontal rotation deceleration of the object.",
+          "fullName": "Horizontal rotation deceleration",
+          "functionType": "ExpressionAndCondition",
+          "group": "First person camera gamepad mapper horizontal rotation configuration",
+          "name": "HorizontalRotationDeceleration",
+          "sentence": "the horizontal rotation deceleration",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "HorizontalRotationDeceleration"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "HorizontalRotationDeceleration",
+          "name": "SetHorizontalRotationDeceleration",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "HorizontalRotationDeceleration",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the maximum vertical rotation speed of the object.",
+          "fullName": "Maximum vertical rotation speed",
+          "functionType": "ExpressionAndCondition",
+          "group": "First person camera gamepad mapper vertical rotation configuration",
+          "name": "VerticalRotationSpeedMax",
+          "sentence": "the maximum vertical rotation speed",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "VerticalRotationSpeedMax"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "VerticalRotationSpeedMax",
+          "name": "SetVerticalRotationSpeedMax",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "VerticalRotationSpeedMax",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the vertical rotation acceleration of the object.",
+          "fullName": "Vertical rotation acceleration",
+          "functionType": "ExpressionAndCondition",
+          "group": "First person camera gamepad mapper vertical rotation configuration",
+          "name": "VerticalRotationAcceleration",
+          "sentence": "the vertical rotation acceleration",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "VerticalRotationAcceleration"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "VerticalRotationAcceleration",
+          "name": "SetVerticalRotationAcceleration",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "VerticalRotationAcceleration",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the vertical rotation deceleration of the object.",
+          "fullName": "Vertical rotation deceleration",
+          "functionType": "ExpressionAndCondition",
+          "group": "First person camera gamepad mapper vertical rotation configuration",
+          "name": "VerticalRotationDeceleration",
+          "sentence": "the vertical rotation deceleration",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "VerticalRotationDeceleration"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "VerticalRotationDeceleration",
+          "name": "SetVerticalRotationDeceleration",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "VerticalRotationDeceleration",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the minimum vertical camera angle of the object.",
+          "fullName": "Minimum vertical camera angle",
+          "functionType": "ExpressionAndCondition",
+          "group": "First person camera gamepad mapper vertical rotation configuration",
+          "name": "VerticalAngleMin",
+          "sentence": "the minimum vertical camera angle",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "VerticalAngleMin"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "VerticalAngleMin",
+          "name": "SetVerticalAngleMin",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "VerticalAngleMin",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the maximum vertical camera angle of the object.",
+          "fullName": "Maximum vertical camera angle",
+          "functionType": "ExpressionAndCondition",
+          "group": "First person camera gamepad mapper vertical rotation configuration",
+          "name": "VerticalAngleMax",
+          "sentence": "the maximum vertical camera angle",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "VerticalAngleMax"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "VerticalAngleMax",
+          "name": "SetVerticalAngleMax",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "VerticalAngleMax",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the z position offset of the object.",
+          "fullName": "Z position offset",
+          "functionType": "ExpressionAndCondition",
+          "group": "First person camera gamepad mapper position configuration",
+          "name": "OffsetZ",
+          "sentence": "the z position offset",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "OffsetZ"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "OffsetZ",
+          "name": "SetOffsetZ",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "OffsetZ",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::FirstPersonGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "3D capability",
+          "extraInformation": [
+            "Scene3D::Base3DBehavior"
+          ],
+          "choices": [],
+          "name": "Object3D"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Gamepad identifier (1, 2, 3 or 4)",
+          "name": "GamepadIdentifier"
+        },
+        {
+          "value": "Right",
+          "type": "Choice",
+          "label": "Camera joystick",
+          "choices": [
+            {
+              "label": "Left",
+              "value": "Left"
+            },
+            {
+              "label": "Right",
+              "value": "Right"
+            }
+          ],
+          "name": "CameraStick"
+        },
+        {
+          "value": "180",
+          "type": "Number",
+          "unit": "AngularSpeed",
+          "label": "Maximum rotation speed",
+          "group": "Horizontal rotation",
+          "name": "HorizontalRotationSpeedMax"
+        },
+        {
+          "value": "360",
+          "type": "Number",
+          "label": "Rotation acceleration",
+          "group": "Horizontal rotation",
+          "name": "HorizontalRotationAcceleration"
+        },
+        {
+          "value": "720",
+          "type": "Number",
+          "label": "Rotation deceleration",
+          "group": "Horizontal rotation",
+          "name": "HorizontalRotationDeceleration"
+        },
+        {
+          "value": "120",
+          "type": "Number",
+          "unit": "AngularSpeed",
+          "label": "Maximum rotation speed",
+          "group": "Vertical rotation",
+          "name": "VerticalRotationSpeedMax"
+        },
+        {
+          "value": "240",
+          "type": "Number",
+          "label": "Rotation acceleration",
+          "group": "Vertical rotation",
+          "name": "VerticalRotationAcceleration"
+        },
+        {
+          "value": "480",
+          "type": "Number",
+          "label": "Rotation deceleration",
+          "group": "Vertical rotation",
+          "name": "VerticalRotationDeceleration"
+        },
+        {
+          "value": "-90",
+          "type": "Number",
+          "unit": "DegreeAngle",
+          "label": "Minimum angle",
+          "group": "Vertical rotation",
+          "name": "VerticalAngleMin"
+        },
+        {
+          "value": "90",
+          "type": "Number",
+          "unit": "DegreeAngle",
+          "label": "Maximum angle",
+          "group": "Vertical rotation",
+          "name": "VerticalAngleMax"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "Z position offset",
+          "group": "Position",
+          "name": "OffsetZ"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "AngularSpeed",
+          "label": "Current rotation speed Z",
+          "hidden": true,
+          "name": "CurrentRotationSpeedZ"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "AngularSpeed",
+          "label": "Current rotation speed Y",
+          "hidden": true,
+          "name": "CurrentRotationSpeedY"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Control a 3D physics car with a gamepad.",
+      "fullName": "3D car gamepad mapper",
+      "name": "PhysicsCar3DGamepadMapper",
+      "objectType": "",
+      "quickCustomizationVisibility": "hidden",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Gamepads::C_Controller_X_is_connected"
+                  },
+                  "parameters": [
+                    "",
+                    "GamepadIdentifier",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "UseArrows",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Button_pressed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Left\"",
+                            "\"Left\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::PhysicsCar3D::SimulateLeftKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PhysicsCar3D"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Button_pressed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Right\"",
+                            "\"Left\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::PhysicsCar3D::SimulateRightKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PhysicsCar3D"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "UseLeftStick",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Axis_pushed"
+                          },
+                          "parameters": [
+                            "",
+                            "1",
+                            "\"Left\"",
+                            "\"Any\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::PhysicsCar3D::SimulateSteeringStick"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PhysicsCar3D",
+                            "Gamepads::StickForceX(GamepadIdentifier, \"Left\")"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "UseRightStick",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Axis_pushed"
+                          },
+                          "parameters": [
+                            "",
+                            "1",
+                            "\"Right\"",
+                            "\"Any\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::PhysicsCar3D::SimulateSteeringStick"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PhysicsCar3D",
+                            "Gamepads::StickForceX(GamepadIdentifier, \"Right\")"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Button_pressed"
+                          },
+                          "parameters": [
+                            "",
+                            "1",
+                            "\"LT\"",
+                            "\"Up\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Button_pressed"
+                          },
+                          "parameters": [
+                            "",
+                            "1",
+                            "\"RT\"",
+                            "\"Up\""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics3D::PhysicsCar3D::SimulateAcceleratorStick"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PhysicsCar3D",
+                        "Gamepads::TriggerPressure(GamepadIdentifier, \"RT\") - Gamepads::TriggerPressure(GamepadIdentifier, \"LT\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Gamepads::C_Button_pressed"
+                      },
+                      "parameters": [
+                        "",
+                        "GamepadIdentifier",
+                        "Buttons[HandBrakeButton]",
+                        "\"Left\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics3D::PhysicsCar3D::SimulateHandBrakeKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PhysicsCar3D"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::PhysicsCar3DGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "3D physics car",
+          "extraInformation": [
+            "Physics3D::PhysicsCar3D"
+          ],
+          "choices": [],
+          "name": "PhysicsCar3D"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Gamepad identifier (1, 2, 3 or 4)",
+          "name": "GamepadIdentifier"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Use directional pad",
+          "group": "Controls",
+          "name": "UseArrows"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Use left stick",
+          "group": "Controls",
+          "name": "UseLeftStick"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "Use right stick",
+          "group": "Controls",
+          "name": "UseRightStick"
+        },
+        {
+          "value": "B or Circle",
+          "type": "Choice",
+          "label": "Hand brake button",
+          "group": "Controls",
+          "choices": [
+            {
+              "label": "A or Cross",
+              "value": "A or Cross"
+            },
+            {
+              "label": "B or Circle",
+              "value": "B or Circle"
+            },
+            {
+              "label": "X or Square",
+              "value": "X or Square"
+            },
+            {
+              "label": "Y or Triangle",
+              "value": "Y or Triangle"
+            },
+            {
+              "label": "LB or L1",
+              "value": "LB or L1"
+            },
+            {
+              "label": "RB or R1",
+              "value": "RB or R1"
+            },
+            {
+              "label": "LT or L2",
+              "value": "LT or L2"
+            },
+            {
+              "label": "RT or R2",
+              "value": "RT or R2"
+            }
+          ],
+          "name": "HandBrakeButton"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Control a top-down character with a gamepad.",
+      "fullName": "Top-down gamepad mapper",
+      "name": "TopDownGamepadMapper",
+      "objectType": "",
+      "quickCustomizationVisibility": "hidden",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Gamepads::C_Controller_X_is_connected"
+                  },
+                  "parameters": [
+                    "",
+                    "GamepadIdentifier",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "UseArrows",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Button_pressed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Left\"",
+                            "\"Left\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementBehavior::SimulateLeftKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "TopDownMovement"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Button_pressed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Right\"",
+                            "\"Left\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementBehavior::SimulateRightKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "TopDownMovement"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Button_pressed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Up\"",
+                            "\"Left\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementBehavior::SimulateUpKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "TopDownMovement"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Button_pressed"
+                          },
+                          "parameters": [
+                            "",
+                            "GamepadIdentifier",
+                            "\"Down\"",
+                            "\"Left\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementBehavior::SimulateDownKey"
+                          },
+                          "parameters": [
+                            "Object",
+                            "TopDownMovement"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "UseLeftStick",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "StickMode",
+                            "=",
+                            "\"Analog\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementBehavior::SimulateStick"
+                          },
+                          "parameters": [
+                            "Object",
+                            "TopDownMovement",
+                            "Gamepads::StickRotationValue(GamepadIdentifier, \"Left\")",
+                            "Gamepads::StickForce(GamepadIdentifier, \"Left\")"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "StickMode",
+                            "=",
+                            "\"360°\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementBehavior::SimulateStick"
+                          },
+                          "parameters": [
+                            "Object",
+                            "TopDownMovement",
+                            "Gamepads::StickRotationValue(GamepadIdentifier, \"Left\")",
+                            "sign(Gamepads::StickForce(GamepadIdentifier, \"Left\"))"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "StickMode",
+                            "=",
+                            "\"8 Directions\""
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Axis_pushed"
+                              },
+                              "parameters": [
+                                "",
+                                "GamepadIdentifier",
+                                "\"Left\"",
+                                "\"Left\"",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "TopDownMovementBehavior::SimulateLeftKey"
+                              },
+                              "parameters": [
+                                "Object",
+                                "TopDownMovement"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Axis_pushed"
+                              },
+                              "parameters": [
+                                "",
+                                "GamepadIdentifier",
+                                "\"Left\"",
+                                "\"Right\"",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "TopDownMovementBehavior::SimulateRightKey"
+                              },
+                              "parameters": [
+                                "Object",
+                                "TopDownMovement"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Axis_pushed"
+                              },
+                              "parameters": [
+                                "",
+                                "GamepadIdentifier",
+                                "\"Left\"",
+                                "\"Up\"",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "TopDownMovementBehavior::SimulateUpKey"
+                              },
+                              "parameters": [
+                                "Object",
+                                "TopDownMovement"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Axis_pushed"
+                              },
+                              "parameters": [
+                                "",
+                                "GamepadIdentifier",
+                                "\"Left\"",
+                                "\"Down\"",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "TopDownMovementBehavior::SimulateDownKey"
+                              },
+                              "parameters": [
+                                "Object",
+                                "TopDownMovement"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "UseRightStick",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "StickMode",
+                            "=",
+                            "\"Analog\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementBehavior::SimulateStick"
+                          },
+                          "parameters": [
+                            "Object",
+                            "TopDownMovement",
+                            "Gamepads::StickRotationValue(GamepadIdentifier, \"Right\")",
+                            "Gamepads::StickForce(GamepadIdentifier, \"Right\")"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "StickMode",
+                            "=",
+                            "\"360°\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementBehavior::SimulateStick"
+                          },
+                          "parameters": [
+                            "Object",
+                            "TopDownMovement",
+                            "sign(Gamepads::StickForce(GamepadIdentifier, \"Right\"))",
+                            "1"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "StickMode",
+                            "=",
+                            "\"8 Directions\""
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Axis_pushed"
+                              },
+                              "parameters": [
+                                "",
+                                "GamepadIdentifier",
+                                "\"Right\"",
+                                "\"Left\"",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "TopDownMovementBehavior::SimulateLeftKey"
+                              },
+                              "parameters": [
+                                "Object",
+                                "TopDownMovement"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Axis_pushed"
+                              },
+                              "parameters": [
+                                "",
+                                "GamepadIdentifier",
+                                "\"Right\"",
+                                "\"Right\"",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "TopDownMovementBehavior::SimulateRightKey"
+                              },
+                              "parameters": [
+                                "Object",
+                                "TopDownMovement"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Axis_pushed"
+                              },
+                              "parameters": [
+                                "",
+                                "GamepadIdentifier",
+                                "\"Right\"",
+                                "\"Up\"",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "TopDownMovementBehavior::SimulateUpKey"
+                              },
+                              "parameters": [
+                                "Object",
+                                "TopDownMovement"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Axis_pushed"
+                              },
+                              "parameters": [
+                                "",
+                                "GamepadIdentifier",
+                                "\"Right\"",
+                                "\"Down\"",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "TopDownMovementBehavior::SimulateDownKey"
+                              },
+                              "parameters": [
+                                "Object",
+                                "TopDownMovement"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Gamepads::TopDownGamepadMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Top-down movement behavior",
+          "extraInformation": [
+            "TopDownMovementBehavior::TopDownMovementBehavior"
+          ],
+          "choices": [],
+          "name": "TopDownMovement"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Gamepad identifier (1, 2, 3 or 4)",
+          "name": "GamepadIdentifier"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Use directional pad",
+          "group": "Controls",
+          "name": "UseArrows"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Use left stick",
+          "group": "Controls",
+          "name": "UseLeftStick"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "Use right stick",
+          "group": "Controls",
+          "name": "UseRightStick"
+        },
+        {
+          "value": "Analog",
+          "type": "Choice",
+          "label": "Stick mode",
+          "group": "Controls",
+          "choices": [
+            {
+              "label": "Analog",
+              "value": "Analog"
+            },
+            {
+              "label": "360°",
+              "value": "360°"
+            },
+            {
+              "label": "8 Directions",
+              "value": "8 Directions"
+            }
+          ],
+          "name": "StickMode"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

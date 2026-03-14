@@ -1,0 +1,285 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "JD2xwvKWgodlqsGiL1GCH3tDEwq1",
+    "q8ubdigLvIRXLxsJDDTaokO41mc2",
+    "UMcf9dzu8pVV84ZSLaGAtUB8PyF2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Advanced platformer movements",
+  "name": "AdvancedJump",
+  "version": "0.2.4",
+  "url": "https://resources.gdevelop-app.com/extensions/AdvancedJump.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/AdvancedJump-header.json",
+  "tags": "platformer,platform,jump,ledge tolerance,coyote time,air jump,wall jump,wall sliding,dash,dive",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Sports and Fitness/Sports and Fitness_training_running_run.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Platformer air jump, wall jump/slide, coyote time, horizontal dash, and dive dash.",
+  "eventsBasedBehaviorsCount": 5,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/advanced-jump",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Let platformer characters jump shortly after leaving a platform and also jump in mid-air.",
+      "fullName": "Coyote time and air jump",
+      "name": "AdvancedJump",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "SetCoyoteTime",
+          "fullName": "Coyote timeframe",
+          "description": "Change the coyote time duration of an object (in seconds).",
+          "functionType": "Action"
+        },
+        {
+          "name": "CanCoyoteJump",
+          "fullName": "Can coyote jump",
+          "description": "Check if a coyote jump can currently happen.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "AirJumpsMax",
+          "fullName": "Maximal jump number",
+          "description": "Number of jumps in mid-air that are allowed.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "RemainingAirJumps",
+          "fullName": "Remaining jump",
+          "description": "Number of jumps in mid-air that are still allowed.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetAirJumpCountMaximum",
+          "fullName": "Air jumps",
+          "description": "Change the number of times the character can jump in mid-air.",
+          "functionType": "Action"
+        },
+        {
+          "name": "RemoveOneRemainingAirJump",
+          "fullName": "Remove a remaining air jump",
+          "description": "Remove one of the remaining air jumps of a character.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ResetAirJumpCounter",
+          "fullName": "Reset air jumps",
+          "description": "Allow back all air jumps of a character.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AreFloorJumpCountedAsAirJump",
+          "fullName": "Floor jumps count as air jumps",
+          "description": "Check if floor jumps are counted as air jumps for an object.",
+          "functionType": "Condition"
+        }
+      ]
+    },
+    {
+      "description": "Let platformer characters jump and slide against walls.",
+      "fullName": "Wall jump",
+      "name": "WallJump",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "HasJustWallJumped",
+          "fullName": "Has just wall jumped",
+          "description": "Check if the object has just wall jumped.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsWallJumping",
+          "fullName": "Is wall jumping",
+          "description": "Check if the object is wall jumping.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsAgaintWall",
+          "fullName": "Against a wall",
+          "description": "Check if the object is against a wall.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "JumpTimeFrame",
+          "fullName": "Jump time frame",
+          "description": "The wall jump detection time frame of an object (in seconds).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetJumpTimeFrame",
+          "fullName": "Jump time frame",
+          "description": "Change the wall jump detection time frame of an object (in seconds).",
+          "functionType": "Action"
+        },
+        {
+          "name": "WallJumpSpeedX",
+          "fullName": "Side speed",
+          "description": "The side speed of wall jumps of an object (in pixels per second).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetWallJumpSpeedX",
+          "fullName": "Side speed",
+          "description": "Change the side speed of wall jumps of an object (in pixels per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "WallJumpAccelerationX",
+          "fullName": "Side acceleration",
+          "description": "The side acceleration of wall jumps of an object (in pixels per second per second).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetWallJumpAccelerationX",
+          "fullName": "Side acceleration",
+          "description": "Change the side acceleration of wall jumps of an object (in pixels per second per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "WallSlidingGravity",
+          "fullName": "Gravity",
+          "description": "The wall sliding gravity of an object (in pixels per second per second).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetWallSlidingGravity",
+          "fullName": "Gravity",
+          "description": "Change the wall sliding gravity of an object (in pixels per second per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "WallSlidingMaxFallingSpeed",
+          "fullName": "Maximum falling speed",
+          "description": "The wall sliding maximum falling speed of an object (in pixels per second).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetWallSlidingMaxFallingSpeed",
+          "fullName": "Maximum falling speed",
+          "description": "Change the wall sliding maximum falling speed of an object (in pixels per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "WallSlidingSpeedAbsorption",
+          "fullName": "Impact speed absorption",
+          "description": "Change the impact speed absorption of an object.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetWallSlidingSpeedAbsorption",
+          "fullName": "Impact speed absorption",
+          "description": "Change the impact speed absorption of an object.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Make platformer characters dash toward the floor.",
+      "fullName": "Dive dash",
+      "name": "DiveDash",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "SimulateDiveKey",
+          "fullName": "Simulate dive key",
+          "description": "Simulate a press of dive key to make the object dives to the floor if it can dive.",
+          "functionType": "Action"
+        },
+        {
+          "name": "CanDive",
+          "fullName": "Can dive",
+          "description": "Check if the object can dive.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsDiving",
+          "fullName": "Is diving",
+          "description": "Check if the object is diving.",
+          "functionType": "Condition"
+        }
+      ]
+    },
+    {
+      "description": "Make platformer characters dash horizontally.",
+      "fullName": "Horizontal dash",
+      "name": "HorizontalDash",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "SimulateDashKey",
+          "fullName": "Simulate dash key",
+          "description": "Simulate a press of dash key.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsDashing",
+          "fullName": "Is dashing",
+          "description": "Check if the object is dashing.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "AbortDash",
+          "fullName": "Abort dash",
+          "description": "Abort the current dash and set the object to its usual horizontal speed.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Resolve conflict between platformer character configuration changes.",
+      "fullName": "Platformer character configuration stack",
+      "name": "PlatformerConfigurationStack",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "RevertConfiguration",
+          "fullName": "Revert configuration",
+          "description": "Revert configuration changes for one identifier and update the character configuration to use the most recent ones.",
+          "functionType": "Action"
+        },
+        {
+          "name": "UsualMaxSpeed",
+          "fullName": "Usual maximum horizontal speed",
+          "description": "Return the usual maximum horizontal speed when no configuration change applies on it.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "ConfigureGravity",
+          "fullName": "Configure gravity",
+          "description": "Configure character gravity for a given configuration layer and move this layer on top.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ConfigureDeceleration",
+          "fullName": "Configure horizontal deceleration",
+          "description": "Configure character deceleration for a given configuration layer and move this layer on top.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ConfigureMaxSpeed",
+          "fullName": "Configure maximum horizontal speed",
+          "description": "Configure character maximum speed for a given configuration layer and move this layer on top.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ConfigureAcceleration",
+          "fullName": "Configure horizontal acceleration",
+          "description": "Configure character acceleration for a given configuration layer and move this layer on top.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ConfigureMaxFallSpeed",
+          "fullName": "Configure maximum falling speed",
+          "description": "Configure character maximum falling speed for a given configuration layer and move this layer on top.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "This extension provides behaviors to:\n\n* Jump in mid-air\n* Jump and slide against walls\n* Dash horizontally\n* Dash toward the floor\n* Do coyote time, also known as \"ledge tolerance\". It lets players jumping even after their character is no longer touching the ground for a given amount of time. It aims to give players a feeling of control and reduce frustration.\n\nAn example allows to check it out ([open the project online](https://editor.gdevelop.io/?project=example://platformer-moves)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMjMiIGN5PSI3IiByPSIzIi8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNOCwxMGwyLjgtMi44QzEyLDYsMTQsNiwxNS4yLDcuMmw3LjksNy45YzEuMSwxLjEsMi44LDEuMiw0LjEsMC4yTDMwLDEzIi8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTcsMTBsLTQuNyw0LjdjLTEuNSwxLjUtMSw0LjIsMSw1bDMuOSwxLjVjMS4xLDAuNCwxLjksMS41LDEuOSwyLjd2NiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE0LDIwbC0yLjYsMi42Yy0wLjgsMC44LTIuMSwwLjgtMi44LDBMNSwxOSIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjE2IiB5MT0iMTgiIHgyPSIyMSIgeTI9IjEzIi8+DQo8L3N2Zz4NCg=="
+}

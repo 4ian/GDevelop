@@ -1,0 +1,553 @@
+{
+  "author": "VegeTato",
+  "category": "Visual effect",
+  "description": "Reflection extension is useful when it comes to reflecting objects, like a player walking on water/glass/beach.\nAn action let you set the reflection for specific objects with a lot of options:\n\n- The reflection opacity\n- Reflective surface object\n- Z order of the reflection\n- An option to turn ON/OFF to delete the reflection when it touch the original object\n- Touch distance to delete the reflection\n- Layer to create the reflection on",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Reflection",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXJlZmxlY3QtdmVydGljYWwiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTgsMjNINkM1LjYxLDIzIDUuMjYsMjIuNzkgNS4wOSwyMi40NUM0LjkyLDIyLjExIDQuOTYsMjEuNyA1LjE5LDIxLjRMMTEuMiwxMy4zOEMxMS41OCwxMi44NyAxMi40MiwxMi44NyAxMi44LDEzLjM4TDE4LjgxLDIxLjRDMTkuMDQsMjEuNyAxOS4wOCwyMi4xMSAxOC45MSwyMi40NUMxOC43NCwyMi43OSAxOC4zOSwyMyAxOCwyM00xOCwxQzE4LjM5LDEgMTguNzQsMS4yMSAxOC45MSwxLjU1QzE5LjA4LDEuODkgMTkuMDQsMi4zIDE4LjgxLDIuNkwxMi44LDEwLjYyQzEyLjQyLDExLjEzIDExLjU4LDExLjEzIDExLjIsMTAuNjJMNS4xOSwyLjZDNC45NiwyLjMgNC45MiwxLjg5IDUuMDksMS41NUM1LjI2LDEuMjEgNS42MSwxIDYsMUgxOE04LDNMMTIsOC4zNUwxNiwzSDhaIiAvPjwvc3ZnPg==",
+  "name": "Reflection",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/reflect-vertical.svg",
+  "shortDescription": "Add a reflection to a selected object.",
+  "version": "0.1.0",
+  "tags": "reflection,reflect,water",
+  "authorIds": [
+    "IRIhkkTTl2UHhfjrLTTH5GYwkYu1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Reflect your object.",
+      "fullName": "Add reflection to object",
+      "functionType": "Action",
+      "name": "Reflect",
+      "private": false,
+      "sentence": "Create reflection _PARAM1_ of _PARAM2_ at distance _PARAM3_ and _PARAM4_ opacity on the floor _PARAM5_ at Zorder _PARAM6_ and layer _PARAM7_ delete on touch _PARAM8_ touch distance _PARAM9_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Create"
+              },
+              "parameters": [
+                "",
+                "ReflectionObject",
+                "PrimaryObject.X()",
+                "PrimaryObject.Y()",
+                "Layer"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "FlipY"
+              },
+              "parameters": [
+                "ReflectionObject",
+                "yes"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Opacity"
+              },
+              "parameters": [
+                "ReflectionObject",
+                "=",
+                "Opacity"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "ChangePlan"
+              },
+              "parameters": [
+                "ReflectionObject",
+                "=",
+                "PrimaryObject.ZOrder()-1"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": false,
+          "name": "Each frame",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreX"
+                  },
+                  "parameters": [
+                    "ReflectionObject",
+                    "=",
+                    "PrimaryObject.X()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ChangeAnimation"
+                  },
+                  "parameters": [
+                    "ReflectionObject",
+                    "=",
+                    "PrimaryObject.Animation()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ChangeSprite"
+                  },
+                  "parameters": [
+                    "ReflectionObject",
+                    "=",
+                    "PrimaryObject.Sprite()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ChangeWidth"
+                  },
+                  "parameters": [
+                    "ReflectionObject",
+                    "=",
+                    "PrimaryObject.Width()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ChangeHeight"
+                  },
+                  "parameters": [
+                    "ReflectionObject",
+                    "=",
+                    "PrimaryObject.Height()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "ReflectionObject",
+                    "=",
+                    "-PrimaryObject.Angle()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Visible"
+                  },
+                  "parameters": [
+                    "PrimaryObject"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Montre"
+                  },
+                  "parameters": [
+                    "ReflectionObject",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "Visible"
+                  },
+                  "parameters": [
+                    "PrimaryObject"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "ReflectionObject"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "FlippedX"
+                  },
+                  "parameters": [
+                    "PrimaryObject"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "FlipX"
+                  },
+                  "parameters": [
+                    "ReflectionObject",
+                    "yes"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "FlippedX"
+                  },
+                  "parameters": [
+                    "PrimaryObject"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "FlipX"
+                  },
+                  "parameters": [
+                    "ReflectionObject",
+                    "no"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "Distance",
+                    ">=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreY"
+                  },
+                  "parameters": [
+                    "ReflectionObject",
+                    "=",
+                    "ReflectiveSurface.Y()-(PrimaryObject.Y()-ReflectiveSurface.Y())-PrimaryObject.Height()+Distance"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "ReflectionObject.Y()",
+                    ">=",
+                    "PrimaryObject.Y()+DeleteDistance"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Montre"
+                  },
+                  "parameters": [
+                    "ReflectionObject",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "ReflectionObject.Y()",
+                    "<=",
+                    "PrimaryObject.Y()+DeleteDistance"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "ReflectionObject"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "Remove",
+                        "True",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "ReflectionObject",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Reflection object",
+          "longDescription": "A different object than the original object",
+          "name": "ReflectionObject",
+          "optional": false,
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Original object",
+          "longDescription": "",
+          "name": "PrimaryObject",
+          "optional": false,
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "(Optional) Distance offset",
+          "longDescription": "Distance in pixel, default: 0px",
+          "name": "Distance",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "(Optional) Reflection opacity",
+          "longDescription": "Between 0 transparent to 255 opaque",
+          "name": "Opacity",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Reflective surface object",
+          "longDescription": "",
+          "name": "ReflectiveSurface",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Reflection object Z order",
+          "longDescription": "",
+          "name": "Zorder",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Layer to create the reflection (Base layer by default)",
+          "longDescription": "",
+          "name": "Layer",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "layer"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Delete reflection when it collides with the original object (default: no)",
+          "longDescription": "",
+          "name": "Remove",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "yesorno"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Distance before removing the reflection",
+          "longDescription": "Distance between the reflection and the original object before deleting the reflection (0 by default for immediate delete when touch)",
+          "name": "DeleteDistance",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "(Optional) Between 0 transparent to 255 opaque",
+          "longDescription": "",
+          "name": "FloorOpacity",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

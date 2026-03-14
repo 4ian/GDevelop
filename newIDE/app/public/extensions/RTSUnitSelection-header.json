@@ -1,0 +1,99 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "jZp7TS5D4NeOcwG8NCSu2vIzVWI2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "RTS-like unit selection",
+  "name": "RTSUnitSelection",
+  "version": "2.4.0",
+  "url": "https://resources.gdevelop-app.com/extensions/RTSUnitSelection.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/RTSUnitSelection-header.json",
+  "tags": "mouse,cursor,pointer,rts,unit,select,selector,selection,multi-select,control group",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/pencil-box-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Select units by clicking on them or dragging a selection box.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 12,
+  "helpPath": "https://victrisgames.itch.io/rts-like-unit-selection",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "RTSUnitSelection",
+      "fullName": "Allow player to select units by clicking on them or dragging a selection box",
+      "description": "Allow player to select units by clicking on them or dragging a selection box.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsPreSelected",
+      "fullName": "Is unit \"Preselected\"",
+      "description": "Check if the unit is \"Preselected\".",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsSelected",
+      "fullName": "Is unit \"Selected\"",
+      "description": "Check if the unit is \"Selected\".",
+      "functionType": "Condition"
+    },
+    {
+      "name": "SetPreSelected",
+      "fullName": "Set unit as \"Preselected\"",
+      "description": "Set unit as \"Preselected\".",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetSelected",
+      "fullName": "Set unit as \"Selected\"",
+      "description": "Set unit as \"Selected\".",
+      "functionType": "Action"
+    },
+    {
+      "name": "AssignUnitID",
+      "fullName": "Assign a unique ID to each \"Selected\" unit",
+      "description": "Assign a unique ID to each \"Selected\" unit.  This should be ran every time there is a change in the number of \"Selected\" units.",
+      "functionType": "Action"
+    },
+    {
+      "name": "TotalSelectedUnits",
+      "fullName": "Total number of \"Selected\" units",
+      "description": "Provides the total number of _PARAM1_ that are currently \"Selected\".",
+      "functionType": "Expression"
+    },
+    {
+      "name": "RTSControlGroups",
+      "fullName": "Enable control groups using default controls",
+      "description": "Enable control groups using default controls.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ControlGroupID",
+      "fullName": "Control group this unit is assigned to",
+      "description": "Control group this unit is assigned to.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "IsAssignedToControlGroup",
+      "fullName": "Check if a unit is assigned to a control group",
+      "description": "Check if a unit is assigned to a control group.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "AssignControlGroup",
+      "fullName": "Assign unit to a control group",
+      "description": "Assign unit to a control group.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SelectedUnitID",
+      "fullName": "Unit ID of a selected unit",
+      "description": "Unit ID of a selected unit.",
+      "functionType": "Expression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "How To Use:\n- The \"Allow player to select units\" action must run every frame to work properly\n- When a drag is in progress, all units inside the selection box will be \"PreSelected\"\n- When the drag is released, all \"PreSelected\" units will be changed to \"Selected\"\n- Hold the additive select key to add units to selection\n- Hold the subtractive select key to remove units from selection\n\nControl Group controls:\n- Ctrl + (1,2,3,4,5,6,7,9,0) assigns that Control Group to Selected units\n- (1,2,3,4,5,6,7,9,0) selects all units that are assigned to that Control Group\n\nSelection box:\n- When dragging, the selection area will be drawn by a Shape Painter object. \n- If a Shape Painter instance has not been added in the scene, it will be created automatically.\n- To change the appearance of the selection area, change the Shape Painter properties.\n- Reduce the fill opacity of the SelectionBox (shape painter object) so that units and terrain can be seen behind it.\n\nTips:\n- Use the \"Preselected\" and \"Selected\" conditions to highlight units that are being interacted with\n- Create an object group (i.e. \"SelectableUnits\") to control which types of objects can be selected\n- Use conditions to restrict which object instances can be selected. \n- Use the \"SelectedUnitID\" to design formations of units.\n- Shape painter object should be on the same layer as the units being selected\n- Always use ForEach() events when using the conditions in this extension because extension conditions do not currently perform object picking.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXBlbmNpbC1ib3gtb3V0bGluZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xOSwxOVY1SDVWMTlIMTlNMTksM0EyLDIgMCAwLDEgMjEsNVYxOUMyMSwyMC4xMSAyMC4xLDIxIDE5LDIxSDVBMiwyIDAgMCwxIDMsMTlWNUEyLDIgMCAwLDEgNSwzSDE5TTE2LjcsOS4zNUwxNS43LDEwLjM1TDEzLjY1LDguM0wxNC42NSw3LjNDMTQuODYsNy4wOCAxNS4yMSw3LjA4IDE1LjQyLDcuM0wxNi43LDguNThDMTYuOTIsOC43OSAxNi45Miw5LjE0IDE2LjcsOS4zNU03LDE0Ljk0TDEzLjA2LDguODhMMTUuMTIsMTAuOTRMOS4wNiwxN0g3VjE0Ljk0WiIgLz48L3N2Zz4="
+}

@@ -1,0 +1,144 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "Zu55H5hcb9YmZTltIVOTAFDJQyB2",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Mouse Pointer Lock",
+  "name": "MousePointerLock",
+  "version": "0.3.0",
+  "url": "https://resources.gdevelop-app.com/extensions/MousePointerLock.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/MousePointerLock-header.json",
+  "tags": "mouse,lock,cursor,pointer",
+  "category": "Input",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Virtual Reality/Virtual Reality_360_rotate_vr_movement.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Lock and hide mouse pointer for unlimited movement (e.g., FPS mouse look).",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 8,
+  "helpPath": "/extensions/mouse-pointer-lock",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Control camera rotations with a mouse.",
+      "fullName": "First person camera mouse mapper",
+      "name": "FirstPersonPointerMapper",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "HorizontalSpeed",
+          "fullName": "Horizontal rotation speed factor",
+          "description": "Compare the horizontal rotation speed factor of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHorizontalSpeed",
+          "fullName": "Horizontal rotation speed factor",
+          "description": "Change the horizontal rotation speed factor of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "VerticalSpeed",
+          "fullName": "Vertical rotation speed factor",
+          "description": "Compare the vertical rotation speed factor of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetVerticalSpeed",
+          "fullName": "Vertical rotation speed factor",
+          "description": "Change the vertical rotation speed factor of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "VerticalAngleMin",
+          "fullName": "Minimum vertical camera angle",
+          "description": "Compare the minimum vertical camera angle of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetVerticalAngleMin",
+          "fullName": "Minimum vertical camera angle",
+          "description": "Change the minimum vertical camera angle of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "VerticalAngleMax",
+          "fullName": "Maximum vertical camera angle",
+          "description": "Compare the maximum vertical camera angle of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetVerticalAngleMax",
+          "fullName": "Maximum vertical camera angle",
+          "description": "Change the maximum vertical camera angle of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "OffsetZ",
+          "fullName": "Z position offset",
+          "description": "Compare the z position offset of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetOffsetZ",
+          "fullName": "Z position offset",
+          "description": "Change the z position offset of the object.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "name": "RequestPointerLock",
+      "fullName": "Request Pointer Lock",
+      "description": "Lock the mouse pointer to hide it.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ExitPointerLock",
+      "fullName": "Exit pointer lock",
+      "description": "Unlocks the mouse pointer and show it.",
+      "functionType": "Action"
+    },
+    {
+      "name": "isPointerLocked",
+      "fullName": "Pointer is locked",
+      "description": "Check if the mouse pointer is locked.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsMoving",
+      "fullName": "Locked pointer is moving",
+      "description": "Check if the locked pointer is moving.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "MovementX",
+      "fullName": "Pointer X movement",
+      "description": "Compare the movement of the locked pointer on the X axis.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "MovementY",
+      "fullName": "Pointer Y movement",
+      "description": "Compare the movement of the pointer on the Y axis.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "TouchSpeedFactor",
+      "fullName": "Speed factor for touch movement",
+      "description": "Compare the speed factor for touch movement.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "SetTouchSpeedFactor",
+      "fullName": "Speed factor for touch movement",
+      "description": "Change the speed factor for touch movement.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "This behavior removes the limit on the distance the mouse can move and hides the cursor.\n\nFor example, a user can rotate or continue to manipulate an object by moving the mouse endlessly ([open the project online](https://editor.gdevelop.io/?project=example://mouse-pointer-lock)).\nWithout the pointer lock, the rotation or operation will stop the moment the pointer reaches the edge of the browser or screen.\n\nGame players don't have to worry about leaving the gameplay area or accidentally clicking on another application that moves the mouse focus away from the game.\n\nLocking the pointer locks `CursorX()` and `CursorY()` expressions.\nUse `MovementX()` and `MovementY()` instead.\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMTksMTkgMjQsMTkgMjQsMjQgIi8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSI2LDIzIDExLDIzIDExLDE4ICIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI0LDE5LjRjLTAuNywwLjgtMS40LDEuNi0yLjIsMi40Yy03LDctMTUuMywxMC4yLTE4LjUsN3MtMC4xLTExLjUsNy0xOC41czE1LjMtMTAuMiwxOC41LTcNCgljMS40LDEuNCwxLjYsMy42LDAuOCw2LjMiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMSwyMi41Yy0wLjMtMC4yLTAuNS0wLjUtMC44LTAuOGMtNy03LTEwLjItMTUuMy03LTE4LjVzMTEuNS0wLjEsMTguNSw3czEwLjIsMTUuMyw3LDE4LjUNCgljLTEuNywxLjctNC44LDEuNi04LjQsMC4xIi8+DQo8L3N2Zz4NCg=="
+}

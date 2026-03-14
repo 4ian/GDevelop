@@ -1,0 +1,6647 @@
+{
+  "author": "",
+  "category": "Third-party",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Gamejolt",
+  "helpPath": "https://gamejolt.com/game-api/doc",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggZD0iTTI2LjksMi41QzI2LjcsMi4yLDI2LjQsMiwyNiwySDE0Yy0wLjQsMC0wLjcsMC4yLTAuOSwwLjVsLTcsMTNjLTAuMiwwLjMtMC4yLDAuNywwLDFDNi4zLDE2LjgsNi42LDE3LDcsMTdoNC40TDYuMSwyOC42DQoJQzUuOSwyOSw2LDI5LjUsNi40LDI5LjhDNi41LDI5LjksNi44LDMwLDcsMzBjMC4yLDAsMC40LTAuMSwwLjYtMC4ybDE4LTEzYzAuNC0wLjMsMC41LTAuNywwLjQtMS4xYy0wLjEtMC40LTAuNS0wLjctMS0wLjdoLTQuMw0KCWw2LjItMTEuNUMyNywzLjIsMjcsMi44LDI2LjksMi41eiIvPg0KPC9zdmc+DQo=",
+  "name": "GamejoltAPI",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Glyphster Pack/Master/SVG/Graphic Design/7e88b8d233e2643ac7abf20c1c7373e93ab9d8b42236b431709fa910883c818a_Graphic Design_flash_light_on_bolt_lightning.svg",
+  "shortDescription": "Support the complete Gamejolt API.",
+  "version": "2.2.0",
+  "description": [
+    "Support for Gamejolt API.",
+    "",
+    "It features the complete API:",
+    "",
+    "* Trophies and leaderboards",
+    "* Sessions and server time",
+    "* User connection and friends",
+    "* Data storage",
+    "* Test user",
+    "",
+    "Be careful: most of the actions are Asynchronous !",
+    "",
+    "The request result is stored in a Scene variable of your choice that you can use later."
+  ],
+  "tags": "gamejolt,api,game services,leaderboard,trophies",
+  "authorIds": [
+    "vJeYciaE9tW37HzSPOyo9MLOI5E3"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Check if the user is authenticated on Gamejolt.",
+      "fullName": "Player is authenticated",
+      "functionType": "Condition",
+      "group": "Users",
+      "name": "Authenticated",
+      "sentence": "Player is authenticated on Gamejolt",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.IsAuthenticated",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.IsAuthenticated",
+                "False"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "False"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the last request is successful.",
+      "fullName": "Last request is successful",
+      "functionType": "Condition",
+      "group": "URL",
+      "name": "LastSuccess",
+      "sentence": "The last request is successful",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.Success",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.Success",
+                "False"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "False"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a specific request is successful.",
+      "fullName": "Request is successful",
+      "functionType": "Condition",
+      "group": "URL",
+      "name": "RequestSuccess",
+      "sentence": "The request _PARAM1_ is successful",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "False"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "RequestName",
+                "!=",
+                "\"\""
+              ]
+            },
+            {
+              "type": {
+                "value": "GlobalVariableChildExists"
+              },
+              "parameters": [
+                "__GamejoltAPI.CompleteStack",
+                "RequestName"
+              ]
+            },
+            {
+              "type": {
+                "value": "GlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.CompleteStack[RequestName].Success",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request name",
+          "name": "RequestName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the API is in test mode.",
+      "fullName": "Is in test mode",
+      "functionType": "Condition",
+      "group": "API",
+      "name": "TestMode",
+      "sentence": "Test mode is activated",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.TestMode",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.TestMode",
+                "False"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "False"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the user session is active.",
+      "fullName": "Session is active",
+      "functionType": "Condition",
+      "group": "API",
+      "name": "Session",
+      "sentence": "The user session is active ",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.Session",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.Session",
+                "False"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "False"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "The named request is finished. You can read its content.",
+      "fullName": "The request is finished",
+      "functionType": "Condition",
+      "group": "API",
+      "name": "Finished",
+      "sentence": "The request _PARAM1_ is finished",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "False"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GlobalVariableChildExists"
+              },
+              "parameters": [
+                "__GamejoltAPI.CompleteStack",
+                "RequestName"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request name",
+          "name": "RequestName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Authenticated username used for requests.",
+      "fullName": "Username",
+      "functionType": "ExpressionAndCondition",
+      "group": "Users",
+      "name": "Username",
+      "sentence": "Username",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__GamejoltAPI.Username)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Authenticated user game token used for requests.",
+      "fullName": "User game token",
+      "functionType": "ExpressionAndCondition",
+      "group": "Users",
+      "name": "UserToken",
+      "sentence": "User game token",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__GamejoltAPI.UserToken)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Error message from the last request.",
+      "fullName": "Last error message",
+      "functionType": "ExpressionAndCondition",
+      "group": "API",
+      "name": "LastErrorMessage",
+      "sentence": "Last error message",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__GamejoltAPI.ErrorMessage)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Error message from a specific request.",
+      "fullName": "Request error message",
+      "functionType": "ExpressionAndCondition",
+      "group": "API",
+      "name": "RequestErrorMessage",
+      "sentence": "The request's _PARAM1_ error message",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "\"\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "RequestName",
+                "!=",
+                "\"\""
+              ]
+            },
+            {
+              "type": {
+                "value": "GlobalVariableChildExists"
+              },
+              "parameters": [
+                "__GamejoltAPI.CompleteStack",
+                "RequestName"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__GamejoltAPI.CompleteStack[RequestName].ErrorMessage)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Request name",
+          "name": "RequestName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "JSON response from the last request.",
+      "fullName": "Last JSON response",
+      "functionType": "StringExpression",
+      "group": "API",
+      "name": "LastResponse",
+      "sentence": "The request's _PARAM1_ error message",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__GamejoltAPI.Response)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "JSON response from a specific request.",
+      "fullName": "Request JSON response",
+      "functionType": "StringExpression",
+      "group": "API",
+      "name": "RequestResponse",
+      "sentence": "The request's _PARAM1_ JSON response",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "\"\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "RequestName",
+                "!=",
+                "\"\""
+              ]
+            },
+            {
+              "type": {
+                "value": "GlobalVariableChildExists"
+              },
+              "parameters": [
+                "__GamejoltAPI.CompleteStack",
+                "RequestName"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__GamejoltAPI.CompleteStack[RequestName].Response)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Request name",
+          "name": "RequestName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Setup a game before using the Gamejolt API.",
+      "fullName": "Register Gamejolt game",
+      "functionType": "Action",
+      "group": "API",
+      "name": "RegisterGame",
+      "sentence": "Register a game with identifier _PARAM1_ and secret key _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__GamejoltAPI.GameID",
+                "=",
+                "GameIdentifier"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__GamejoltAPI.GameKey",
+                "=",
+                "GameSecretKey"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__GamejoltAPI.Url",
+                "=",
+                "\"\""
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__GamejoltAPI.Response",
+                "=",
+                "\"\""
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__GamejoltAPI.Username",
+                "=",
+                "\"\""
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__GamejoltAPI.UserToken",
+                "=",
+                "\"\""
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__GamejoltAPI.ErrorMessage",
+                "=",
+                "\"\""
+              ]
+            },
+            {
+              "type": {
+                "value": "SetGlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.Success",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "SetGlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.TestMode",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "SetGlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.Session",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "SetGlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.IsAuthenticated",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Gamejolt game identifier",
+          "name": "GameIdentifier",
+          "type": "string"
+        },
+        {
+          "description": "Gamejolt game secret key",
+          "longDescription": "You can find all these informations in the Gamejolt API Settings of your game.",
+          "name": "GameSecretKey",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Activate a test user for the Gamejolt API.",
+      "fullName": "Activate test user",
+      "functionType": "Action",
+      "group": "API",
+      "name": "SetTestUser",
+      "sentence": "Activate tests with the user _PARAM1_ : _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::SetUsername"
+              },
+              "parameters": [
+                "",
+                "=",
+                "Username",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetUserToken"
+              },
+              "parameters": [
+                "",
+                "=",
+                "UserToken",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetTestMode"
+              },
+              "parameters": [
+                "",
+                "yes",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Test username",
+          "name": "Username",
+          "type": "string"
+        },
+        {
+          "description": "Test user game token",
+          "name": "UserToken",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Fetch complete user data from Gamejolt.",
+      "fullName": "Fetch user data",
+      "functionType": "Action",
+      "group": "Users",
+      "name": "FetchUser",
+      "sentence": "Send request _PARAM1_ and fetch _PARAM2_ user data using identifier: _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::TestMode"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"username\"",
+                "GamejoltAPI::Username()",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "GamejoltAPI::TestMode"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "WithIdentifier",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddURLParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"user_id\"",
+                    "Username",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "WithIdentifier",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddURLParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"username\"",
+                    "Username",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"users\"",
+                "RequestName",
+                "Storage"
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request name (default: empty)",
+          "longDescription": "**Result format** - \nArray named **``users``** of elements having the following structure:\n* **``id``** (number): the identifier of the user\n* **``type``** (string): the type of user. Can be ``User``, ``Developer``, ``Moderator``, or ``Administrator``\n* **``username``** (string): the user's username\n* **``avatar_url``** (string): the URL of the user's avatar\n* **``signed_up``** (string): how long ago the user signed up\n* **``signed_up_timestamp``** (number): the timestamp (in seconds) of when the user signed up\n* **``last_logged_in``** (string): how long ago the user was last logged in\n* **``last_logged_in_timestamp``** (number): the timestamp (in seconds) of when the user was last logged in\n* **``status``** (string): ``Active`` if the user is still a member of the site. ``Banned`` if they've been banned\n* **``developer_name``** (string): the user's display name\n* **``developer_website``** (string): the user's website (or empty string if not specified) \n* **``developer_description``** (string): the user's profile markdown description",
+          "name": "RequestName",
+          "supplementaryInformation": "sceneStorage",
+          "type": "string"
+        },
+        {
+          "description": "Username or identifier",
+          "longDescription": "You can use comma-separated list to find multiple users\nExample 1: gdevelop,player123,snailmaster\nExample 2: 321123,505050,778899",
+          "name": "Username",
+          "type": "string"
+        },
+        {
+          "description": "Use identifier instead of username",
+          "name": "WithIdentifier",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Authenticate Gamejolt user before using the account functionalities.",
+      "fullName": "Gamejolt authentication",
+      "functionType": "Action",
+      "group": "Users",
+      "name": "AuthenticateUser",
+      "sentence": "Authenticate user _PARAM1_ / _PARAM2_ on Gamejolt",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::TestMode"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"username\"",
+                "GamejoltAPI::Username()",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"user_token\"",
+                "GamejoltAPI::UserToken()",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "GamejoltAPI::TestMode"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"username\"",
+                "Username",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"user_token\"",
+                "UserToken",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::SetAuthenticated"
+              },
+              "parameters": [
+                "",
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"users/auth\"",
+                "\"\"",
+                "\"\""
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::LastSuccess"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetAuthenticated"
+                  },
+                  "parameters": [
+                    "",
+                    "yes",
+                    ""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "GamejoltAPI::TestMode"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::SetUsername"
+                      },
+                      "parameters": [
+                        "",
+                        "=",
+                        "Username",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::SetUserToken"
+                      },
+                      "parameters": [
+                        "",
+                        "=",
+                        "UserToken",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Gamejolt Username",
+          "name": "Username",
+          "type": "string"
+        },
+        {
+          "description": "Gamejolt user secret game token",
+          "name": "UserToken",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Fetch the connected user friend list.",
+      "fullName": "Fetch user friends",
+      "functionType": "Action",
+      "group": "Users",
+      "name": "FetchUserFriends",
+      "sentence": "Send request _PARAM1_ and fetch friends from connected user",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddConnectedUser"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"friends\"",
+                "RequestName",
+                "Storage"
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::SetErrorMessage"
+              },
+              "parameters": [
+                "",
+                "=",
+                "\"User is not connected\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetSuccess"
+              },
+              "parameters": [
+                "",
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request name (default: empty)",
+          "longDescription": "**Result format** - \nArray named **``friends``** of elements having the following structure:\n* **``friend_id``** (number): the friend's user identifier",
+          "name": "RequestName",
+          "supplementaryInformation": "sceneStorage",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Retrieve the server time.",
+      "fullName": "Get the server time",
+      "functionType": "Action",
+      "group": "API",
+      "name": "FetchServerTime",
+      "sentence": "Send request _PARAM1_ and get the server time",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"time\"",
+                "RequestName",
+                "Storage"
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request name (default: empty)",
+          "longDescription": "**Result format** - \nStructure of elements:\n* **``timestamp``** (number): the UNIX time stamp (in seconds) representing the server's time\n* **``timezone``** (string): the timezone of the server - Example: ``America/New_York``\n* **``year``** (number): the current year\n* **``month``** (number): the current month\n* **``day``** (number): the day of the month\n* **``hour``** (number): the hour of the day\n* **``minute``** (number): the minute of the hour\n* **``second``** (number): the seconds of the minute",
+          "name": "RequestName",
+          "supplementaryInformation": "sceneStorage",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Open a game session for the connected user.",
+      "fullName": "Open a game session",
+      "functionType": "Action",
+      "group": "Session",
+      "name": "OpenSession",
+      "sentence": "Open a session for the connected user",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::SetErrorMessage"
+              },
+              "parameters": [
+                "",
+                "=",
+                "\"User is not connected\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetSuccess"
+              },
+              "parameters": [
+                "",
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "RemoveTimer"
+              },
+              "parameters": [
+                "",
+                "\"__GamejoltAPI_Session\""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetSession"
+              },
+              "parameters": [
+                "",
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::AddConnectedUser"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"sessions/open\"",
+                "\"\"",
+                "\"\"",
+                ""
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::LastSuccess"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetSession"
+                  },
+                  "parameters": [
+                    "",
+                    "yes",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResetTimer"
+                  },
+                  "parameters": [
+                    "",
+                    "\"__GamejoltAPI_Session\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Close a game session for the connected user.",
+      "fullName": "Close a game session",
+      "functionType": "Action",
+      "group": "Session",
+      "name": "CloseSession",
+      "sentence": "Close a session for the connected user",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::SetErrorMessage"
+              },
+              "parameters": [
+                "",
+                "=",
+                "\"User is not connected\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetSuccess"
+              },
+              "parameters": [
+                "",
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddConnectedUser"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"sessions/close\"",
+                "\"\"",
+                "\"\""
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::LastSuccess"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "RemoveTimer"
+                  },
+                  "parameters": [
+                    "",
+                    "\"__GamejoltAPI_Session\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetSession"
+                  },
+                  "parameters": [
+                    "",
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Check on the server the session status.",
+      "fullName": "Check a game session",
+      "functionType": "Action",
+      "group": "Session",
+      "name": "CheckSession",
+      "sentence": "Check if the user game session is still running",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::SetErrorMessage"
+              },
+              "parameters": [
+                "",
+                "=",
+                "\"User is not connected\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetSuccess"
+              },
+              "parameters": [
+                "",
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddConnectedUser"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"sessions/check\"",
+                "\"\"",
+                "\"\"",
+                ""
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "GamejoltAPI::LastSuccess"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "RemoveTimer"
+                  },
+                  "parameters": [
+                    "",
+                    "\"__GamejoltAPI_Session\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetSession"
+                  },
+                  "parameters": [
+                    "",
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::LastSuccess"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetSession"
+                  },
+                  "parameters": [
+                    "",
+                    "yes",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResetTimer"
+                  },
+                  "parameters": [
+                    "",
+                    "\"__GamejoltAPI_Session\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Change the game session status on the server.",
+      "fullName": "Change the session status",
+      "functionType": "Action",
+      "group": "Session",
+      "name": "UpdateSession",
+      "sentence": "Change the game session status to _PARAM1_ and reset the timer ",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::SetErrorMessage"
+              },
+              "parameters": [
+                "",
+                "=",
+                "\"User is not connected\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetSuccess"
+              },
+              "parameters": [
+                "",
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::Session"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Or"
+              },
+              "parameters": [],
+              "subInstructions": [
+                {
+                  "type": {
+                    "value": "CompareArgumentAsString"
+                  },
+                  "parameters": [
+                    "\"Status\"",
+                    "!=",
+                    "\"keep\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "CompareTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"__GamejoltAPI_Session\"",
+                    ">=",
+                    "30"
+                  ]
+                }
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddConnectedUser"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Status",
+                    "!=",
+                    "\"keep\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddURLParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"status\"",
+                    "Status",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ResetTimer"
+                  },
+                  "parameters": [
+                    "",
+                    "\"__GamejoltAPI_Session\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::CallGamejolt"
+                  },
+                  "parameters": [
+                    "",
+                    "\"sessions/ping\"",
+                    "\"\"",
+                    "\"\"",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Not"
+              },
+              "parameters": [],
+              "subInstructions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::Session"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "value": "CompareArgumentAsString"
+                      },
+                      "parameters": [
+                        "\"Status\"",
+                        "!=",
+                        "\"keep\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CompareTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"__GamejoltAPI_Session\"",
+                        ">=",
+                        "30"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Session status",
+          "longDescription": "Status role : \n- keep : keep the same status as before\n- active : set that the player is playing the game\n- idle : set that the player is waiting\n\nWarning : \"keep\" will only be sent every 30s to the server. The others are always sent. Be careful.",
+          "name": "Status",
+          "supplementaryInformation": "[\"keep\",\"active\",\"idle\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Add score to the Gamejolt leaderboard.",
+      "fullName": "Add score to the leaderboard",
+      "functionType": "Action",
+      "group": "Leaderboard",
+      "name": "AddScore",
+      "sentence": "Send user or guest _PARAM2_ (force guest: _PARAM1_) score _PARAM3_ _PARAM4_ with extra _PARAM5_ on board _PARAM6_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"score\"",
+                "Score+Unit",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"sort\"",
+                "Score",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Extra",
+                "!=",
+                "\"\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"extra_data\"",
+                "Extra",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Board",
+                "!=",
+                "\"\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"table_id\"",
+                "Board",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "ForceGuest",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "GuestName",
+                    "!=",
+                    "\"\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddURLParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"guest\"",
+                    "GuestName",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "GuestName",
+                    "=",
+                    "\"\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddURLParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"guest\"",
+                    "\"Unknown\"",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "ForceGuest",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::Authenticated"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddConnectedUser"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "GamejoltAPI::Authenticated"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "GuestName",
+                        "!=",
+                        "\"\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::AddURLParameter"
+                      },
+                      "parameters": [
+                        "",
+                        "\"guest\"",
+                        "GuestName",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "GuestName",
+                        "=",
+                        "\"\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::AddURLParameter"
+                      },
+                      "parameters": [
+                        "",
+                        "\"guest\"",
+                        "\"Unknown\"",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"scores/add\"",
+                "\"\"",
+                "\"\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Force guest record",
+          "name": "ForceGuest",
+          "type": "yesorno"
+        },
+        {
+          "description": "Guest username (fallback if the player is not connected)",
+          "name": "GuestName",
+          "type": "string"
+        },
+        {
+          "description": "Score to send",
+          "longDescription": "Example: 120 for 120km.",
+          "name": "Score",
+          "type": "expression"
+        },
+        {
+          "description": "Score unit (km, points, seconds...)",
+          "longDescription": "Example: \"km\" for 120km.",
+          "name": "Unit",
+          "type": "string"
+        },
+        {
+          "description": "(optional) Extra data you want to save with the score record",
+          "name": "Extra",
+          "type": "string"
+        },
+        {
+          "description": "Leaderboard identifier (keep empty for default)",
+          "name": "Board",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Add a labelled score in the leaderboard.",
+      "fullName": "Add score with label to the leaderboard",
+      "functionType": "Action",
+      "group": "Leaderboard",
+      "name": "AddScoreWithLabel",
+      "sentence": "Send user or guest _PARAM2_ (force guest: _PARAM1_) score _PARAM3_ labelled _PARAM4_ with extra _PARAM5_ on board _PARAM6_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"score\"",
+                "Label",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"sort\"",
+                "Score",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Extra",
+                "!=",
+                "\"\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"extra_data\"",
+                "Extra",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Board",
+                "!=",
+                "\"\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"table_id\"",
+                "Board",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "ForceGuest",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "GuestName",
+                    "!=",
+                    "\"\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddURLParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"guest\"",
+                    "GuestName",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "GuestName",
+                    "=",
+                    "\"\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddURLParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"guest\"",
+                    "\"Unknown\"",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "ForceGuest",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::Authenticated"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddConnectedUser"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "GamejoltAPI::Authenticated"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "GuestName",
+                        "!=",
+                        "\"\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::AddURLParameter"
+                      },
+                      "parameters": [
+                        "",
+                        "\"guest\"",
+                        "GuestName",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "GuestName",
+                        "=",
+                        "\"\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::AddURLParameter"
+                      },
+                      "parameters": [
+                        "",
+                        "\"guest\"",
+                        "\"Unknown\"",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"scores/add\"",
+                "\"\"",
+                "\"\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Force guest record",
+          "name": "ForceGuest",
+          "type": "yesorno"
+        },
+        {
+          "description": "Guest username (fallback if the player is not connected)",
+          "name": "GuestName",
+          "type": "string"
+        },
+        {
+          "description": "Score to send",
+          "longDescription": "Example: 80 for 80s.",
+          "name": "Score",
+          "type": "expression"
+        },
+        {
+          "description": "Label of the score",
+          "longDescription": "Example: \"01:20\" for 80s.",
+          "name": "Label",
+          "type": "string"
+        },
+        {
+          "description": "(optional) Extra data you want to save with the score record",
+          "name": "Extra",
+          "type": "string"
+        },
+        {
+          "description": "Leaderboard identifier (keep empty for default)",
+          "name": "Board",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Fetch user's scores on the leaderboard.",
+      "fullName": "Fetch scores of a user",
+      "functionType": "Action",
+      "group": "Leaderboard",
+      "name": "FetchScoreFromUser",
+      "sentence": "Send request _PARAM1_ and fetch user or guest _PARAM3_ (force guest: _PARAM2_ ) _PARAM4_ scores from the board _PARAM5_ filtered _PARAM6_ _PARAM7_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "Limit",
+                "!=",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"limit\"",
+                "ToString(clamp(Limit, 1, 100))",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "Limit",
+                "=",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"limit\"",
+                "\"10\"",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Board",
+                "!=",
+                "\"\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"table_id\"",
+                "Board",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Filter",
+                "!=",
+                "\"none\""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Filter",
+                    "=",
+                    "\"better_than\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddURLParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"better_than\"",
+                    "FilterScore",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Filter",
+                    "!=",
+                    "\"better_than\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddURLParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"worse_than\"",
+                    "FilterScore",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "GuestRecord",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "GuestName",
+                    "!=",
+                    "\"\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddURLParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"guest\"",
+                    "GuestName",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::CallGamejolt"
+                  },
+                  "parameters": [
+                    "",
+                    "\"scores\"",
+                    "RequestName",
+                    "Storage"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "GuestName",
+                    "=",
+                    "\"\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetErrorMessage"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "\"No guest name specified\"",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetSuccess"
+                  },
+                  "parameters": [
+                    "",
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "GuestRecord",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::Authenticated"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddConnectedUser"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::CallGamejolt"
+                  },
+                  "parameters": [
+                    "",
+                    "\"scores\"",
+                    "RequestName",
+                    "Storage"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "GamejoltAPI::Authenticated"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "GuestName",
+                        "!=",
+                        "\"\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::AddURLParameter"
+                      },
+                      "parameters": [
+                        "",
+                        "\"guest\"",
+                        "GuestName",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::CallGamejolt"
+                      },
+                      "parameters": [
+                        "",
+                        "\"scores\"",
+                        "RequestName",
+                        "Storage",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "GuestName",
+                        "=",
+                        "\"\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::SetErrorMessage"
+                      },
+                      "parameters": [
+                        "",
+                        "=",
+                        "\"No guest name specified\"",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::SetSuccess"
+                      },
+                      "parameters": [
+                        "",
+                        "",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request name (default: empty)",
+          "longDescription": "**Result format** - \nArray named **``scores``** of elements having the following structure:\n* **``score``** (number): the score string\n* **``sort``** (number): the score's numerical sort value\n* **``extra_data``** (string): any extra data associated with the score\n* **``user``** (string): if this is a user score, this is the display name for the user\n* **``user_id``** (number): if this is a user score, this is the user's identifier\n* **``guest``** (string): if this is a guest score, this is the guest's submitted name\n* **``stored``** (string): when the score was logged by the user - Example: \"1 week ago\"\n* **``stored_timestamp``** (number): returns the timestamp (in seconds) of when the score was logged by the user",
+          "name": "RequestName",
+          "supplementaryInformation": "sceneStorage",
+          "type": "string"
+        },
+        {
+          "description": "Search in guest records",
+          "name": "GuestRecord",
+          "type": "yesorno"
+        },
+        {
+          "description": "Guest username (fallback if the player is not connected)",
+          "name": "GuestName",
+          "type": "string"
+        },
+        {
+          "description": "Result limit (between 1 and 100, default : 10)",
+          "name": "Limit",
+          "type": "expression"
+        },
+        {
+          "description": "Leaderboard identifier (keep empty for default)",
+          "name": "Board",
+          "type": "string"
+        },
+        {
+          "description": "Score filter (optional, default : none)",
+          "name": "Filter",
+          "supplementaryInformation": "[\"none\",\"better_than\",\"worse_than\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "(optional) If a filter is selected, set the score basis to use",
+          "name": "FilterScore",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Fetch the best scores on the leaderboard.",
+      "fullName": "Fetch the best scores",
+      "functionType": "Action",
+      "group": "Leaderboard",
+      "name": "FetchScore",
+      "sentence": "Send request _PARAM1_ and fetch _PARAM2_ best scores from the board _PARAM3_ filtered _PARAM4_ _PARAM5_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "Limit",
+                "!=",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"limit\"",
+                "ToString(clamp(Limit, 1, 100))",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "Limit",
+                "=",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"limit\"",
+                "\"10\"",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Board",
+                "!=",
+                "\"\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"table_id\"",
+                "Board",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Filter",
+                "!=",
+                "\"none\""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Filter",
+                    "=",
+                    "\"better_than\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddURLParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"better_than\"",
+                    "FilterScore",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Filter",
+                    "!=",
+                    "\"better_than\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddURLParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"worse_than\"",
+                    "FilterScore",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"scores\"",
+                "RequestName",
+                "Storage",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request name (default: empty)",
+          "longDescription": "**Result format** - \nArray named **``scores``** of elements having the following structure:\n* **``score``** (number): the score string\n* **``sort``** (number): the score's numerical sort value\n* **``extra_data``** (string): any extra data associated with the score\n* **``user``** (string): if this is a user score, this is the display name for the user\n* **``user_id``** (number): if this is a user score, this is the user's identifier\n* **``guest``** (string): if this is a guest score, this is the guest's submitted name\n* **``stored``** (string): when the score was logged by the user - Example: \"1 week ago\"\n* **``stored_timestamp``** (number): returns the timestamp (in seconds) of when the score was logged by the user",
+          "name": "RequestName",
+          "supplementaryInformation": "sceneStorage",
+          "type": "string"
+        },
+        {
+          "description": "Result limit (between 1 and 100, default : 10)",
+          "name": "Limit",
+          "type": "expression"
+        },
+        {
+          "description": "Leaderboard identifier (keep empty for default)",
+          "name": "Board",
+          "type": "string"
+        },
+        {
+          "description": "Score filter (optional, default : none)",
+          "name": "Filter",
+          "supplementaryInformation": "[\"none\",\"better_than\",\"worse_than\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "(optional) If a filter is selected, set the score basis to use",
+          "name": "FilterScore",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Fetch the score rank in the leaderboard.",
+      "fullName": "Fetch leaderboard rank",
+      "functionType": "Action",
+      "group": "Leaderboard",
+      "name": "FetchScoreRank",
+      "sentence": "Send request _PARAM1_ and fetch rank of _PARAM2_ score in the board _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"sort\"",
+                "Score",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Board",
+                "!=",
+                "\"\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"table_id\"",
+                "Board",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"scores/get-rank\"",
+                "RequestName",
+                "Storage"
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request name (default: empty)",
+          "longDescription": "**Result format** - \nStructure of elements:\n* **``rank``** (number): the rank of the score on the score table",
+          "name": "RequestName",
+          "supplementaryInformation": "sceneStorage",
+          "type": "string"
+        },
+        {
+          "description": "Score to evaluate",
+          "name": "Score",
+          "type": "expression"
+        },
+        {
+          "description": "Leaderboard identifier (keep empty for default)",
+          "name": "Board",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Fetch all the leaderboard informations (without scores).",
+      "fullName": "Fetch all leaderboard's informations",
+      "functionType": "Action",
+      "group": "Leaderboard",
+      "name": "FetchScoreTables",
+      "sentence": "Send request _PARAM1_ and fetch leaderboards informations",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"scores/tables\"",
+                "RequestName",
+                "Storage"
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request name (default: empty)",
+          "longDescription": "**Result format** - \nArray named **``tables``** of elements having the following structure:\n* **``id``** (number): the identifier of the table\n* **``name``** (string): the name of the score table\n* **``description``** (string): the description of the score table\n* **``primary``** (number): 1 if the table is the primary/default one, 0 instead",
+          "name": "RequestName",
+          "supplementaryInformation": "sceneStorage",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Fetch trophies informations of the connected user.",
+      "fullName": "Fetch the user trophies",
+      "functionType": "Action",
+      "group": "Trophies",
+      "name": "FetchTrophies",
+      "sentence": "Send request _PARAM1_ and fetch user trophies with filter: _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::SetErrorMessage"
+              },
+              "parameters": [
+                "",
+                "=",
+                "\"User is not connected\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetSuccess"
+              },
+              "parameters": [
+                "",
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddConnectedUser"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Filter",
+                    "!=",
+                    "\"none\""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Filter",
+                        "=",
+                        "\"achieved\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::AddURLParameter"
+                      },
+                      "parameters": [
+                        "",
+                        "\"achieved\"",
+                        "\"true\"",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Filter",
+                        "!=",
+                        "\"achieved\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::AddURLParameter"
+                      },
+                      "parameters": [
+                        "",
+                        "\"achieved\"",
+                        "\"false\"",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::CallGamejolt"
+                  },
+                  "parameters": [
+                    "",
+                    "\"trophies\"",
+                    "RequestName",
+                    "Storage"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request name (default: empty)",
+          "longDescription": "**Result format** - \nArray named **``trophies``** of elements having the following structure:\n* **``id``** (number): the identifier of the table\n* **``title``** (number): the title of the trophy on Gamejolt\n* **``description``** (string): the trophy description text\n* **``difficulty``** (string): ``Bronze``, ``Silver``, ``Gold``, or ``Platinum``\n* **``image_url``** (string): the URL of the trophy thumbnail image\n* **``achieved``** (string): the date when the trophy was achieved, \"false\" instead - Example: \"5 days ago\"",
+          "name": "RequestName",
+          "supplementaryInformation": "sceneStorage",
+          "type": "string"
+        },
+        {
+          "description": "Filter the trophies (default: none)",
+          "name": "Filter",
+          "supplementaryInformation": "[\"none\",\"achieved\",\"not_achieved\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Fetch trophies (by identifier) informations of the connected user.",
+      "fullName": "Fetch the user trophies (by identifier)",
+      "functionType": "Action",
+      "group": "Trophies",
+      "name": "FetchTrophiesByIdentifier",
+      "sentence": "Send request _PARAM1_ and fetch user trophies with identifier: _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::SetErrorMessage"
+              },
+              "parameters": [
+                "",
+                "=",
+                "\"User is not connected\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetSuccess"
+              },
+              "parameters": [
+                "",
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddConnectedUser"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"trophy_id\"",
+                "Trophy",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"trophies\"",
+                "RequestName",
+                "Storage"
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request name (default: empty)",
+          "longDescription": "**Result format** - \nArray named **``trophies``** of elements having the following structure:\n* **``id``** (number): the identifier of the table\n* **``title``** (number): the title of the trophy on Gamejolt\n* **``description``** (string): the trophy description text\n* **``difficulty``** (string): ``Bronze``, ``Silver``, ``Gold``, or ``Platinum``\n* **``image_url``** (string): the URL of the trophy thumbnail image\n* **``achieved``** (string): the date when the trophy was achieved, \"false\" instead - Example: \"5 days ago\"",
+          "name": "RequestName",
+          "supplementaryInformation": "sceneStorage",
+          "type": "string"
+        },
+        {
+          "description": "Trophy identifier",
+          "longDescription": "You can use a comma-separated list to fetch multiple trophies.\nExample: 123123,505050,98700",
+          "name": "Trophy",
+          "supplementaryInformation": "[\"none\",\"achieved\",\"not_achieved\"]",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Set that a trophy has been obtained by the player.",
+      "fullName": "Achieve a trophy",
+      "functionType": "Action",
+      "group": "Trophies",
+      "name": "AddTrophies",
+      "sentence": "Achieve the trophy _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::SetErrorMessage"
+              },
+              "parameters": [
+                "",
+                "=",
+                "\"User is not connected\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetSuccess"
+              },
+              "parameters": [
+                "",
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddConnectedUser"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"trophy_id\"",
+                "Trophy",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"trophies/add-achieved\"",
+                "\"\"",
+                "\"\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Trophy identifier",
+          "name": "Trophy",
+          "supplementaryInformation": "[\"none\",\"achieved\",\"not_achieved\"]",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Remove a trophy from the player achievements.",
+      "fullName": "Remove a trophy",
+      "functionType": "Action",
+      "group": "Trophies",
+      "name": "RemoveTrophies",
+      "sentence": "Remove the trophy _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::SetErrorMessage"
+              },
+              "parameters": [
+                "",
+                "=",
+                "\"User is not connected\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetSuccess"
+              },
+              "parameters": [
+                "",
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddConnectedUser"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"trophy_id\"",
+                "Trophy",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"trophies/remove-achieved\"",
+                "\"\"",
+                "\"\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Trophy identifier",
+          "name": "Trophy",
+          "supplementaryInformation": "[\"none\",\"achieved\",\"not_achieved\"]",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Fetch cloud game data from Gamejolt.",
+      "fullName": "Fetch stored data",
+      "functionType": "Action",
+      "group": "Storage",
+      "name": "FetchData",
+      "sentence": "Send request _PARAM1_ to fetch data with key _PARAM3_ in the global (_PARAM2_) or user storage",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"key\"",
+                "Key",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "IsGlobal",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "GamejoltAPI::Authenticated"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetErrorMessage"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "\"User is not connected\"",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetSuccess"
+                  },
+                  "parameters": [
+                    "",
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::Authenticated"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddConnectedUser"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::CallGamejolt"
+                  },
+                  "parameters": [
+                    "",
+                    "\"data-store\"",
+                    "RequestName",
+                    "Storage"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "IsGlobal",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"data-store\"",
+                "RequestName",
+                "Storage"
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request name (default: empty)",
+          "longDescription": "**Result format** - \nStructure of elements:\n* **``data``** (string): the content of the storage for the specified key",
+          "name": "RequestName",
+          "type": "string"
+        },
+        {
+          "description": "Use global storage (instead of user storage)",
+          "name": "IsGlobal",
+          "type": "yesorno"
+        },
+        {
+          "description": "Storage key",
+          "name": "Key",
+          "supplementaryInformation": "[\"none\",\"achieved\",\"not_achieved\"]",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Save game data in the Gamejolt cloud storage.",
+      "fullName": "Store data",
+      "functionType": "Action",
+      "group": "Storage",
+      "name": "StoreData",
+      "sentence": "Store _PARAM3_ with _PARAM2_ key in the global (_PARAM1_) or user storage",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"key\"",
+                "Key",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "IsGlobal",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "GamejoltAPI::Authenticated"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetErrorMessage"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "\"User is not connected\"",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetSuccess"
+                  },
+                  "parameters": [
+                    "",
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::Authenticated"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddConnectedUser"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::CallGamejolt"
+                  },
+                  "parameters": [
+                    "",
+                    "\"data-store/set\"",
+                    "\"\"",
+                    "\"\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "IsGlobal",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"data-store/set\"",
+                "\"\"",
+                "\"\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Use global storage (instead of user storage)",
+          "name": "IsGlobal",
+          "type": "yesorno"
+        },
+        {
+          "description": "Storage key",
+          "name": "Key",
+          "supplementaryInformation": "[\"none\",\"achieved\",\"not_achieved\"]",
+          "type": "string"
+        },
+        {
+          "description": "Data to save",
+          "name": "DataSet",
+          "supplementaryInformation": "sceneStorage",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Update a numerical value in the cloud storage.",
+      "fullName": "Change number",
+      "functionType": "Action",
+      "group": "Storage",
+      "name": "DoDataOperation",
+      "sentence": "Changes the value of _PARAM2_ key from the global (_PARAM1_) or user storage: _PARAM3_ _PARAM4_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Or"
+              },
+              "parameters": [],
+              "subInstructions": [
+                {
+                  "type": {
+                    "value": "CompareArgumentAsString"
+                  },
+                  "parameters": [
+                    "\"Operator\"",
+                    "!=",
+                    "\"divide\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "CompareArgumentAsNumber"
+                  },
+                  "parameters": [
+                    "\"Value\"",
+                    "!=",
+                    "0"
+                  ]
+                }
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"key\"",
+                "Key",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"operation\"",
+                "Operator",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"value\"",
+                "Value",
+                ""
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsGlobal",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "GamejoltAPI::Authenticated"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::SetErrorMessage"
+                      },
+                      "parameters": [
+                        "",
+                        "=",
+                        "\"User is not connected\"",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::SetSuccess"
+                      },
+                      "parameters": [
+                        "",
+                        "",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::Authenticated"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::AddConnectedUser"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::CallGamejolt"
+                      },
+                      "parameters": [
+                        "",
+                        "\"data-store/update\"",
+                        "\"\"",
+                        "\"\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsGlobal",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::CallGamejolt"
+                  },
+                  "parameters": [
+                    "",
+                    "\"data-store/update\"",
+                    "\"\"",
+                    "\"\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Not"
+              },
+              "parameters": [],
+              "subInstructions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "value": "CompareArgumentAsString"
+                      },
+                      "parameters": [
+                        "\"Operator\"",
+                        "!=",
+                        "\"divide\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CompareArgumentAsNumber"
+                      },
+                      "parameters": [
+                        "\"Value\"",
+                        "!=",
+                        "0"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::SetErrorMessage"
+              },
+              "parameters": [
+                "",
+                "=",
+                "\"Divide by 0\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetSuccess"
+              },
+              "parameters": [
+                "",
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Use global storage (instead of user storage)",
+          "name": "IsGlobal",
+          "type": "yesorno"
+        },
+        {
+          "description": "Storage key",
+          "name": "Key",
+          "supplementaryInformation": "[\"none\",\"achieved\",\"not_achieved\"]",
+          "type": "string"
+        },
+        {
+          "description": "Operation to do on the data",
+          "name": "Operator",
+          "supplementaryInformation": "[\"add\",\"subtract\",\"multiply\",\"divide\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Operation value",
+          "name": "Value",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Update a text value in the cloud storage.",
+      "fullName": "Change text",
+      "functionType": "Action",
+      "group": "Storage",
+      "name": "DoDataOperationText",
+      "sentence": "Changes the text of _PARAM2_ key from the global (_PARAM1_) or user storage: _PARAM3_ _PARAM4_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"key\"",
+                "Key",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"operation\"",
+                "Operator",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"value\"",
+                "Value",
+                ""
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsGlobal",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "GamejoltAPI::Authenticated"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::SetErrorMessage"
+                      },
+                      "parameters": [
+                        "",
+                        "=",
+                        "\"User is not connected\"",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::SetSuccess"
+                      },
+                      "parameters": [
+                        "",
+                        "",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::Authenticated"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::AddConnectedUser"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "GamejoltAPI::CallGamejolt"
+                      },
+                      "parameters": [
+                        "",
+                        "\"data-store/update\"",
+                        "\"\"",
+                        "\"\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsGlobal",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::CallGamejolt"
+                  },
+                  "parameters": [
+                    "",
+                    "\"data-store/update\"",
+                    "\"\"",
+                    "\"\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Use global storage (instead of user storage)",
+          "name": "IsGlobal",
+          "type": "yesorno"
+        },
+        {
+          "description": "Storage key",
+          "name": "Key",
+          "supplementaryInformation": "[\"none\",\"achieved\",\"not_achieved\"]",
+          "type": "string"
+        },
+        {
+          "description": "Operation to do on the data",
+          "name": "Operator",
+          "supplementaryInformation": "[\"append\",\"prepend\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Operation value",
+          "name": "Value",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Remove cloud game data from Gamejolt.",
+      "fullName": "Remove stored data",
+      "functionType": "Action",
+      "group": "Storage",
+      "name": "RemoveData",
+      "sentence": "Remove data with _PARAM2_ key from the global (_PARAM1_) or user storage ",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"key\"",
+                "Key",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "IsGlobal",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "GamejoltAPI::Authenticated"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetErrorMessage"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "\"User is not connected\"",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetSuccess"
+                  },
+                  "parameters": [
+                    "",
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::Authenticated"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddConnectedUser"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::CallGamejolt"
+                  },
+                  "parameters": [
+                    "",
+                    "\"data-store/remove\"",
+                    "\"\"",
+                    "\"\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "IsGlobal",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"data-store/remove\"",
+                "\"\"",
+                "\"\""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Use global storage (instead of user storage)",
+          "name": "IsGlobal",
+          "type": "yesorno"
+        },
+        {
+          "description": "Storage key",
+          "name": "Key",
+          "supplementaryInformation": "[\"none\",\"achieved\",\"not_achieved\"]",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Fetch all the data keys.",
+      "fullName": "Fetch data keys",
+      "functionType": "Action",
+      "group": "Storage",
+      "name": "FetchDataKeys",
+      "sentence": "Send request _PARAM1_ to fetch keys in the global (_PARAM2_) or user storage filtered with _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Pattern",
+                "!=",
+                "\"\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"pattern\"",
+                "Pattern",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "IsGlobal",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "GamejoltAPI::Authenticated"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetErrorMessage"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "\"User is not connected\"",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::SetSuccess"
+                  },
+                  "parameters": [
+                    "",
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::Authenticated"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GamejoltAPI::AddConnectedUser"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::CallGamejolt"
+                  },
+                  "parameters": [
+                    "",
+                    "\"data-store/get-keys\"",
+                    "RequestName",
+                    "Storage"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "IsGlobal",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::CallGamejolt"
+              },
+              "parameters": [
+                "",
+                "\"data-store/get-keys\"",
+                "RequestName",
+                "Storage"
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request name (default: empty)",
+          "longDescription": "**Result format** - \nArray named **``keys``** of elements having the following structure:\n* **``key``** (string): the key of the data",
+          "name": "RequestName",
+          "supplementaryInformation": "sceneStorage",
+          "type": "string"
+        },
+        {
+          "description": "Use global storage (instead of user storage)",
+          "name": "IsGlobal",
+          "type": "yesorno"
+        },
+        {
+          "description": "(optional) Pattern to filter keys",
+          "longDescription": "How to use patterns : \n- write the part of the key you know, for example \"room\"\n- then put a * where the key can change\n\nExample \"room*\" will retrieve \"room_123\" \"room_456\" \"roomABC\" etc.",
+          "name": "Pattern",
+          "supplementaryInformation": "[\"none\",\"achieved\",\"not_achieved\"]",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Secret game key from Gamejolt. Don't display it.",
+      "fullName": "Secret game key",
+      "functionType": "StringExpression",
+      "group": "API",
+      "name": "GameKey",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__GamejoltAPI.GameKey)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Game identifier from Gamejolt.",
+      "fullName": "Game identifier",
+      "functionType": "StringExpression",
+      "group": "API",
+      "name": "GameIdentifier",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__GamejoltAPI.GameID)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "URL to call.",
+      "fullName": "URL",
+      "functionType": "ExpressionAndCondition",
+      "group": "URL",
+      "name": "URL",
+      "private": true,
+      "sentence": "Request URL",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__GamejoltAPI.Url)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "ActionWithOperator",
+      "getterName": "URL",
+      "name": "SetURL",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__GamejoltAPI.Url",
+                "=",
+                "Value"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "ActionWithOperator",
+      "getterName": "LastErrorMessage",
+      "name": "SetErrorMessage",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__GamejoltAPI.ErrorMessage",
+                "=",
+                "Value"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "ActionWithOperator",
+      "getterName": "Username",
+      "name": "SetUsername",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__GamejoltAPI.Username",
+                "=",
+                "Value"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "ActionWithOperator",
+      "getterName": "UserToken",
+      "name": "SetUserToken",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__GamejoltAPI.UserToken",
+                "=",
+                "Value"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the player authentication status.",
+      "fullName": "Set authentication",
+      "functionType": "Action",
+      "getterName": "CurrentUserToken",
+      "group": "Users",
+      "name": "SetAuthenticated",
+      "private": true,
+      "sentence": "Set the player authentication to: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Value",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetGlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.IsAuthenticated",
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Value",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetGlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__GamejoltAPI.IsAuthenticated",
+                "="
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The player is authenticated",
+          "name": "Value",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the API test mode status.",
+      "fullName": "Change test mode",
+      "functionType": "Action",
+      "getterName": "CurrentUserToken",
+      "group": "API",
+      "name": "SetTestMode",
+      "private": true,
+      "sentence": "Set the test mode to: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Value",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetGlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__Gamejolt.TestMode",
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Value",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetGlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__Gamejolt.TestMode",
+                "False"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The API is in test mode",
+          "name": "Value",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the user session status.",
+      "fullName": "Change session status",
+      "functionType": "Action",
+      "getterName": "CurrentUserToken",
+      "group": "Session",
+      "name": "SetSession",
+      "private": true,
+      "sentence": "Change the active session to: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Value",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetGlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__Gamejolt.Session",
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Value",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetGlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__Gamejolt.Session",
+                "False"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The session is open",
+          "name": "Value",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Set if the last request came back without any error.",
+      "fullName": "Set the last request success",
+      "functionType": "Action",
+      "getterName": "CurrentUserToken",
+      "group": "API",
+      "name": "SetSuccess",
+      "private": true,
+      "sentence": "Set the request success to: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Value",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetGlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__Gamejolt.Success",
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Value",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetGlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__Gamejolt.Success",
+                "False"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The request is successful",
+          "name": "Value",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Call the Gamejolt API with the prepared URL.",
+      "fullName": "Call Gamejolt API",
+      "functionType": "Action",
+      "group": "API",
+      "name": "CallGamejolt",
+      "private": true,
+      "sentence": "Send a prepared URL to the endpoint _PARAM1_ with the callback name: _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::PrepareURL"
+              },
+              "parameters": [
+                "",
+                "Endpoint",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetURL"
+              },
+              "parameters": [
+                "",
+                "+",
+                "\"&signature=\" + GamejoltAPI::SHA1(GamejoltAPI::URL() + GamejoltAPI::GameKey()) + \"#\" + ToString(RandomFloat(9999))",
+                ""
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SystemInfo::IsPreview"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GamejoltAPI::TestMode"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "DebuggerTools::ConsoleLog"
+                  },
+                  "parameters": [
+                    "GamejoltAPI::URL()",
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "    let global = runtimeScene.getGame().getVariables().get(\"__GamejoltAPI\");",
+            "",
+            "    let url = global.getChild(\"Url\").getAsString();",
+            "    let callback = eventsFunctionContext.getArgument(\"Callback\");",
+            "    let http = new XMLHttpRequest();",
+            "",
+            "    http.addEventListener(\"load\", onComplete);",
+            "    http.addEventListener(\"error\", onFail);",
+            "",
+            "    http.open(\"GET\", url, true);",
+            "",
+            "    global.getChild(\"Success\").setBoolean(false);",
+            "    global.getChild(\"ErrorMessage\").setString(\"\");",
+            "    global.getChild(\"Response\").setString(\"\");",
+            "    global.getChild(\"Parameters\").clearChildren();",
+            "    ",
+            "    http.send(null);",
+            "",
+            "    function onComplete(evt)",
+            "    {",
+            "        let json = JSON.parse(http.responseText);",
+            "        let success = json.response.success == \"true\";",
+            "",
+            "        changeStatus(global, callback, success, ",
+            "        json.response.hasOwnProperty('message') ? json.response.message : \"\", ",
+            "        JSON.stringify(json.response));",
+            "",
+            "        eventsFunctionContext.task.resolve();",
+            "    }",
+            "",
+            "    function onFail(evt)",
+            "    {",
+            "        changeStatus(global, callback, false, \"Unknown error\", \"\");",
+            "        ",
+            "        eventsFunctionContext.task.resolve();",
+            "    }",
+            "",
+            "    function changeStatus(global, callback, success, message, response)",
+            "    {",
+            "        // save last content for Async behavior",
+            "        global.getChild(\"Success\").setBoolean(success);",
+            "        if (success)",
+            "        {",
+            "            global.getChild(\"Response\").setString(response);",
+            "        }",
+            "        else",
+            "        {",
+            "            global.getChild(\"ErrorMessage\").setString(message);",
+            "        }",
+            "",
+            "        // if callback set, for later use",
+            "        if (callback.length > 0)",
+            "        {",
+            "            let stack = global.getChild(\"CompleteStack\").getChild(callback);",
+            "            stack.getChild(\"Success\").setBoolean(success);",
+            "",
+            "            if (success)",
+            "            {",
+            "                stack.getChild(\"Response\").setString(response);",
+            "            }",
+            "            else",
+            "            {",
+            "                stack.getChild(\"ErrorMessage\").setString(message);",
+            "            }",
+            "        }",
+            "    }",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "API endpoint",
+          "name": "Endpoint",
+          "type": "string"
+        },
+        {
+          "description": "Request name identifier",
+          "name": "Callback",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Add a new parameter in the request.",
+      "fullName": "Add a parameter in the URL request",
+      "functionType": "Action",
+      "group": "URL",
+      "name": "AddURLParameter",
+      "private": true,
+      "sentence": "Add the parameter _PARAM1_: _PARAM2_ to the request",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GlobalVariablePushString"
+              },
+              "parameters": [
+                "__GamejoltAPI.Parameters",
+                "Identifier+\"=\"+Value"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Parameter identifier",
+          "name": "Identifier",
+          "type": "string"
+        },
+        {
+          "description": "Parameter value",
+          "name": "Value",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Add the connected user in the request URL parameters.",
+      "fullName": "Use connected user",
+      "functionType": "Action",
+      "group": "URL",
+      "name": "AddConnectedUser",
+      "private": true,
+      "sentence": "Use the connected user in the request",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::Authenticated"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"username\"",
+                "GamejoltAPI::Username()",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::AddURLParameter"
+              },
+              "parameters": [
+                "",
+                "\"user_token\"",
+                "GamejoltAPI::UserToken()",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Prepare the URL including the API endpoint and all the parameters.",
+      "fullName": "Prepare the URL",
+      "functionType": "Action",
+      "group": "URL",
+      "name": "PrepareURL",
+      "private": true,
+      "sentence": "Prepare the URL for _PARAM1_ endpoint",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::SetURL"
+              },
+              "parameters": [
+                "",
+                "=",
+                "\"https://api.gamejolt.com/api/game/v1_2/\"+Endpoint+\"/\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GamejoltAPI::SetURL"
+              },
+              "parameters": [
+                "",
+                "+",
+                "\"?game_id=\"+GamejoltAPI::GameIdentifier()",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Repeat",
+          "repeatExpression": "GlobalVariableChildCount(__GamejoltAPI.Parameters)",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::SetURL"
+              },
+              "parameters": [
+                "",
+                "+",
+                "\"&\"+GlobalVariableFirstString(__GamejoltAPI.Parameters)",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "GlobalVariableRemoveAt"
+              },
+              "parameters": [
+                "__GamejoltAPI.Parameters",
+                "0"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "API endpoint",
+          "name": "Endpoint",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Convert text to SHA1.",
+      "fullName": "Convert to SHA1",
+      "functionType": "StringExpression",
+      "group": "URL",
+      "name": "SHA1",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = sha1(eventsFunctionContext.getArgument(\"Text\").toString());",
+            "",
+            "",
+            "",
+            "function sha1(msg) {",
+            " function rotate_left(n,s) {",
+            " var t4 = ( n<<s ) | (n>>>(32-s));",
+            " return t4;",
+            " };",
+            " function lsb_hex(val) {",
+            " var str='';",
+            " var i;",
+            " var vh;",
+            " var vl;",
+            " for( i=0; i<=6; i+=2 ) {",
+            " vh = (val>>>(i*4+4))&0x0f;",
+            " vl = (val>>>(i*4))&0x0f;",
+            " str += vh.toString(16) + vl.toString(16);",
+            " }",
+            " return str;",
+            " };",
+            " function cvt_hex(val) {",
+            " var str='';",
+            " var i;",
+            " var v;",
+            " for( i=7; i>=0; i-- ) {",
+            " v = (val>>>(i*4))&0x0f;",
+            " str += v.toString(16);",
+            " }",
+            " return str;",
+            " };",
+            " function Utf8Encode(string) {",
+            " string = string.replace(/\\r\\n/g,'\\n');",
+            " var utftext = '';",
+            " for (var n = 0; n < string.length; n++) {",
+            " var c = string.charCodeAt(n);",
+            " if (c < 128) {",
+            " utftext += String.fromCharCode(c);",
+            " }",
+            " else if((c > 127) && (c < 2048)) {",
+            " utftext += String.fromCharCode((c >> 6) | 192);",
+            " utftext += String.fromCharCode((c & 63) | 128);",
+            " }",
+            " else {",
+            " utftext += String.fromCharCode((c >> 12) | 224);",
+            " utftext += String.fromCharCode(((c >> 6) & 63) | 128);",
+            " utftext += String.fromCharCode((c & 63) | 128);",
+            " }",
+            " }",
+            " return utftext;",
+            " };",
+            " var blockstart;",
+            " var i, j;",
+            " var W = new Array(80);",
+            " var H0 = 0x67452301;",
+            " var H1 = 0xEFCDAB89;",
+            " var H2 = 0x98BADCFE;",
+            " var H3 = 0x10325476;",
+            " var H4 = 0xC3D2E1F0;",
+            " var A, B, C, D, E;",
+            " var temp;",
+            " msg = Utf8Encode(msg);",
+            " var msg_len = msg.length;",
+            " var word_array = new Array();",
+            " for( i=0; i<msg_len-3; i+=4 ) {",
+            " j = msg.charCodeAt(i)<<24 | msg.charCodeAt(i+1)<<16 |",
+            " msg.charCodeAt(i+2)<<8 | msg.charCodeAt(i+3);",
+            " word_array.push( j );",
+            " }",
+            " switch( msg_len % 4 ) {",
+            " case 0:",
+            " i = 0x080000000;",
+            " break;",
+            " case 1:",
+            " i = msg.charCodeAt(msg_len-1)<<24 | 0x0800000;",
+            " break;",
+            " case 2:",
+            " i = msg.charCodeAt(msg_len-2)<<24 | msg.charCodeAt(msg_len-1)<<16 | 0x08000;",
+            " break;",
+            " case 3:",
+            " i = msg.charCodeAt(msg_len-3)<<24 | msg.charCodeAt(msg_len-2)<<16 | msg.charCodeAt(msg_len-1)<<8 | 0x80;",
+            " break;",
+            " }",
+            " word_array.push( i );",
+            " while( (word_array.length % 16) != 14 ) word_array.push( 0 );",
+            " word_array.push( msg_len>>>29 );",
+            " word_array.push( (msg_len<<3)&0x0ffffffff );",
+            " for ( blockstart=0; blockstart<word_array.length; blockstart+=16 ) {",
+            " for( i=0; i<16; i++ ) W[i] = word_array[blockstart+i];",
+            " for( i=16; i<=79; i++ ) W[i] = rotate_left(W[i-3] ^ W[i-8] ^ W[i-14] ^ W[i-16], 1);",
+            " A = H0;",
+            " B = H1;",
+            " C = H2;",
+            " D = H3;",
+            " E = H4;",
+            " for( i= 0; i<=19; i++ ) {",
+            " temp = (rotate_left(A,5) + ((B&C) | (~B&D)) + E + W[i] + 0x5A827999) & 0x0ffffffff;",
+            " E = D;",
+            " D = C;",
+            " C = rotate_left(B,30);",
+            " B = A;",
+            " A = temp;",
+            " }",
+            " for( i=20; i<=39; i++ ) {",
+            " temp = (rotate_left(A,5) + (B ^ C ^ D) + E + W[i] + 0x6ED9EBA1) & 0x0ffffffff;",
+            " E = D;",
+            " D = C;",
+            " C = rotate_left(B,30);",
+            " B = A;",
+            " A = temp;",
+            " }",
+            " for( i=40; i<=59; i++ ) {",
+            " temp = (rotate_left(A,5) + ((B&C) | (B&D) | (C&D)) + E + W[i] + 0x8F1BBCDC) & 0x0ffffffff;",
+            " E = D;",
+            " D = C;",
+            " C = rotate_left(B,30);",
+            " B = A;",
+            " A = temp;",
+            " }",
+            " for( i=60; i<=79; i++ ) {",
+            " temp = (rotate_left(A,5) + (B ^ C ^ D) + E + W[i] + 0xCA62C1D6) & 0x0ffffffff;",
+            " E = D;",
+            " D = C;",
+            " C = rotate_left(B,30);",
+            " B = A;",
+            " A = temp;",
+            " }",
+            " H0 = (H0 + A) & 0x0ffffffff;",
+            " H1 = (H1 + B) & 0x0ffffffff;",
+            " H2 = (H2 + C) & 0x0ffffffff;",
+            " H3 = (H3 + D) & 0x0ffffffff;",
+            " H4 = (H4 + E) & 0x0ffffffff;",
+            " }",
+            " var temp = cvt_hex(H0) + cvt_hex(H1) + cvt_hex(H2) + cvt_hex(H3) + cvt_hex(H4);",
+            "",
+            " return temp.toLowerCase();",
+            "}",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Text to convert",
+          "name": "Text",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onScenePostEvents",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GlobalVariableClearChildren"
+              },
+              "parameters": [
+                "__GamejoltAPI.CompleteStack"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GamejoltAPI::Session"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ResetTimer"
+              },
+              "parameters": [
+                "",
+                "\"__GamejoltAPI_Session\""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

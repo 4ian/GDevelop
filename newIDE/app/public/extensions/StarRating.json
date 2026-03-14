@@ -1,0 +1,658 @@
+{
+  "author": "Entropy",
+  "category": "User interface",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Star Rating",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8cGF0aCBkPSJNMjkuMywxMi43Yy0wLjEtMC40LTAuNS0wLjctMS0wLjdoLTguN0wxNywzLjdjLTAuMS0wLjQtMC41LTAuNy0xLTAuN3MtMC44LDAuMy0xLDAuN0wxMi40LDEySDMuN2MtMC40LDAtMC44LDAuMy0xLDAuNw0KCWMtMC4xLDAuNCwwLDAuOSwwLjQsMS4xbDcsNS4xbC0yLjcsOC4zYy0wLjEsMC40LDAsMC45LDAuNCwxLjFjMC40LDAuMywwLjgsMC4zLDEuMiwwbDctNS4xbDcsNS4xYzAuMiwwLjEsMC40LDAuMiwwLjYsMC4yDQoJczAuNC0wLjEsMC42LTAuMmMwLjQtMC4zLDAuNS0wLjcsMC40LTEuMWwtMi43LTguM2w3LTUuMUMyOS4yLDEzLjYsMjkuNCwxMy4xLDI5LjMsMTIuN3oiLz4NCjwvc3ZnPg0K",
+  "name": "StarRating",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/UI Essentials/UI Essentials_star.svg",
+  "shortDescription": "A rating system indicated by stars using the shape painter.",
+  "version": "0.1.0",
+  "description": "A behavior to turn a shape painter into a rating system indicated by stars.",
+  "origin": {
+    "identifier": "StarRating",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "star,rating,shape painter",
+  "authorIds": [
+    "q8ubdigLvIRXLxsJDDTaokO41mc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "A rating system indicated by stars using the shape painter.",
+      "fullName": "Star Rating",
+      "name": "StarRating",
+      "objectType": "PrimitiveDrawing::Drawer",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Object",
+                    "__StarRating_.PositionX",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Object",
+                    "__StarRating_.Count",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Full Stars"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "StarsValue",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::FillColor"
+                  },
+                  "parameters": [
+                    "Object",
+                    "StarFillColor"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::OutlineColor"
+                  },
+                  "parameters": [
+                    "Object",
+                    "StarOutlineColor"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Object",
+                    "__StarRating_.Count",
+                    "+",
+                    "1"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__StarRating_.Count",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__StarRating_.PositionX",
+                        "=",
+                        "StarSize"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__StarRating_.Count",
+                        ">",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__StarRating_.PositionX",
+                        "+",
+                        "StarSize*2+StarSpacing"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PrimitiveDrawing::Star"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Object.Variable(__StarRating_.PositionX)",
+                        "StarSize",
+                        "StarPoints",
+                        "StarSize",
+                        "StarSize/2",
+                        "StarRotation"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Empty Stars"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "TotalStars - StarsValue",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::FillColor"
+                  },
+                  "parameters": [
+                    "Object",
+                    "EmptyStarFillColor"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::OutlineColor"
+                  },
+                  "parameters": [
+                    "Object",
+                    "EmptyStarOutlineColor"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Object",
+                    "__StarRating_.Count",
+                    "+",
+                    "1"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__StarRating_.Count",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__StarRating_.PositionX",
+                        "=",
+                        "StarSize"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__StarRating_.Count",
+                        ">",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__StarRating_.PositionX",
+                        "+",
+                        "StarSize*2+StarSpacing"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PrimitiveDrawing::Star"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Object.Variable(__StarRating_.PositionX)",
+                        "StarSize",
+                        "StarPoints",
+                        "StarSize",
+                        "StarSize/2",
+                        "StarRotation"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PrimitiveDrawing::Drawer",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "StarRating::StarRating",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Sets the rating to a new value.",
+          "fullName": "Set the rating",
+          "functionType": "Action",
+          "name": "SetRating",
+          "sentence": "Set rating of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "StarsValue",
+                    "=",
+                    "round(clamp(Value, 0, TotalStars))"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PrimitiveDrawing::Drawer",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "StarRating::StarRating",
+              "type": "behavior"
+            },
+            {
+              "description": "New rating",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Sets a new total stars count.",
+          "fullName": "Set total star count",
+          "functionType": "Action",
+          "name": "SetTotalStarCount",
+          "sentence": "Set total star count of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "TotalStars",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Set to max vaule if over the max vaule"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "StarsValue",
+                    ">",
+                    "Value"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "StarsValue",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PrimitiveDrawing::Drawer",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "StarRating::StarRating",
+              "type": "behavior"
+            },
+            {
+              "description": "Total star count",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Gets the current rating.",
+          "fullName": "Current rating",
+          "functionType": "Expression",
+          "name": "Rating",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "StarsValue"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PrimitiveDrawing::Drawer",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "StarRating::StarRating",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Get the total amount of stars.",
+          "fullName": "Total stars",
+          "functionType": "Expression",
+          "name": "TotalStars",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "TotalStars"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PrimitiveDrawing::Drawer",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "StarRating::StarRating",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "5",
+          "type": "Number",
+          "label": "Total Stars",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "TotalStars"
+        },
+        {
+          "value": "3",
+          "type": "Number",
+          "label": "Stars",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "StarsValue"
+        },
+        {
+          "value": "32",
+          "type": "Number",
+          "label": "Size",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "StarSize"
+        },
+        {
+          "value": "6",
+          "type": "Number",
+          "label": "Spacing",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "StarSpacing"
+        },
+        {
+          "value": "248;231;28",
+          "type": "String",
+          "label": "Star Fill Color",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "StarFillColor"
+        },
+        {
+          "value": "248;231;28",
+          "type": "String",
+          "label": "Star Outline Color",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "StarOutlineColor"
+        },
+        {
+          "value": "155;155;155",
+          "type": "String",
+          "label": "Empty Star Fill Color",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "EmptyStarFillColor"
+        },
+        {
+          "value": "155;155;155",
+          "type": "String",
+          "label": "Empty Star Outline Color",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "EmptyStarOutlineColor"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "Star Rotation",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "StarRotation"
+        },
+        {
+          "value": "5",
+          "type": "Number",
+          "label": "Number of Points on Star",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "StarPoints"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "Internal X position temporary variable",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "PositionX"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

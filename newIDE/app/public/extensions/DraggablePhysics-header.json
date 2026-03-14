@@ -1,0 +1,112 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Draggable (for physics objects)",
+  "name": "DraggablePhysics",
+  "version": "1.3.0",
+  "url": "https://resources.gdevelop-app.com/extensions/DraggablePhysics.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/DraggablePhysics-header.json",
+  "tags": "physics,drag,mouse,pointer,cursor,touch,physics,object,joint,fling",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Virtual Reality/Virtual Reality_hand_vr_ar_360.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Drag Physics 2D objects with mouse or touch input.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/draggable-physics",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Drag a physics object with the mouse (or touch).",
+      "fullName": "Draggable (for physics objects)",
+      "name": "DraggablePhysics",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "StartDragging",
+          "fullName": "Start dragging object",
+          "description": "Start dragging object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ReleaseDrag",
+          "fullName": "Release dragged object",
+          "description": "Release dragged object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsBeingDragged",
+          "fullName": "Is being dragged",
+          "description": "Check if object is being dragged.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "MouseButton",
+          "fullName": "Mouse button",
+          "description": "Compare the mouse button used to move the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetMouseButton",
+          "fullName": "Mouse button",
+          "description": "Change the mouse button used to move the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MaxForce",
+          "fullName": "Maximum force",
+          "description": "Compare the maximum joint force (in Newtons) of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetMaxForce",
+          "fullName": "Maximum force",
+          "description": "Change the maximum joint force (in Newtons) of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Frequency",
+          "fullName": "Frequency",
+          "description": "Compare the joint frequency (per second) of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFrequency",
+          "fullName": "Frequency",
+          "description": "Change the joint frequency (per second) of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Damping",
+          "fullName": "Damping ratio",
+          "description": "Compare the joint damping ratio (range: 0 to 1) of the object. ",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetDamping",
+          "fullName": "Damping ratio",
+          "description": "Change the joint damping ratio (range: 0 to 1) of the object. ",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsAutomaticDraggingEnabled",
+          "fullName": "Automatic dragging",
+          "description": "Check if automatic dragging is enabled.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEnableAutomaticDragging",
+          "fullName": "Enable (or disable) automatic dragging",
+          "description": "Enable (or disable) automatic dragging with the mouse or touch.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Enables players to click and drag on physics objects to move them.  The object retains velocity when the click is released, allowing players to fling objects across the screen.\n\nNote:\n- The default \"draggable\" behavior will not work on objects with the physics behavior. This extension should be used instead.\n- This extension will only work on objects that have the physics behavior.\n- Kinematic physics mode is incompatible with this extension. The object will be changed to dynamic mode.\n\nThe Parking Jam example uses this extension ([open the project online](https://editor.gdevelop.io/?project=example://parking-jam)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8cGF0aCBkPSJNMjcsMTFjMC0yLTIuMi0zLjYtNS42LTQuNEMyMC42LDMuMiwxOSwxLDE3LDFzLTMuNiwyLjItNC40LDUuNkM5LjIsNy40LDcsOSw3LDExYzAsMiwyLjIsMy42LDUuNiw0LjQNCgljMC4zLDEuMiwwLjYsMi4yLDEuMSwzLjFjMC4zLDAuNSwwLjksMC43LDEuNCwwLjRjMC41LTAuMywwLjctMC45LDAuNC0xLjRjLTAuMy0wLjUtMC41LTEuMS0wLjctMS44YzAuNywwLjEsMS41LDAuMSwyLjIsMC4xDQoJYzAuOCwwLDEuNSwwLDIuMi0wLjFjLTAuMywxLTAuNywxLjktMS4xLDIuNWMtMC4zLDAuNC0wLjIsMS4xLDAuMiwxLjRjMC4yLDAuMSwwLjQsMC4yLDAuNiwwLjJjMC4zLDAsMC42LTAuMSwwLjgtMC40DQoJYzAuNy0xLDEuMy0yLjQsMS43LTRDMjQuOCwxNC42LDI3LDEzLDI3LDExeiBNMTcsM2MwLjcsMCwxLjYsMS4yLDIuMiwzLjNjLTAuNy0wLjEtMS41LTAuMS0yLjItMC4xcy0xLjUsMC0yLjIsMC4xDQoJQzE1LjQsNC4yLDE2LjMsMywxNywzeiBNOSwxMWMwLTAuNywxLjItMS42LDMuMy0yLjJjLTAuMSwwLjctMC4xLDEuNS0wLjEsMi4yYzAsMC44LDAsMS41LDAuMSwyLjJDMTAuMiwxMi42LDksMTEuNyw5LDExeiBNMTcsMTMuOQ0KCWMtMSwwLTEuOS0wLjEtMi43LTAuMmMtMC4xLTAuOC0wLjItMS43LTAuMi0yLjdjMC0xLDAuMS0xLjksMC4yLTIuN0MxNS4xLDguMiwxNiw4LjEsMTcsOC4xczEuOSwwLjEsMi43LDAuMg0KCWMwLjEsMC44LDAuMiwxLjcsMC4yLDIuN2MwLDAuOS0wLjEsMS44LTAuMiwyLjdDMTguOSwxMy44LDE4LDEzLjksMTcsMTMuOXogTTIxLjcsMTMuMmMwLjEtMC43LDAuMS0xLjUsMC4xLTIuMg0KCWMwLTAuOCwwLTEuNS0wLjEtMi4yQzIzLjgsOS40LDI1LDEwLjMsMjUsMTFDMjUsMTEuNywyMy44LDEyLjYsMjEuNywxMy4yeiIvPg0KPHBhdGggZD0iTTI5LjksMTcuNUMyOS43LDE3LjIsMjkuNCwxNywyOSwxN2MtMi4yLDAtNC4zLDEtNS42LDIuOEwyMi41LDIxYy0xLjEsMS4zLTIuOCwyLTQuNSwyaC0zYy0wLjYsMC0xLTAuNC0xLTFzMC40LTEsMS0xaDEuOQ0KCWMxLjYsMCwzLjEtMS4zLDMuMS0yLjljMCwwLDAtMC4xLDAtMC4xYzAtMC41LTAuNS0xLTEtMWwtNi4xLDBjLTMuNiwwLTYuNSwxLjYtOC4xLDQuMmwtMi43LDQuMmMtMC4yLDAuMy0wLjIsMC43LDAsMWwzLDUNCgljMC4xLDAuMiwwLjQsMC40LDAuNiwwLjVjMC4xLDAsMC4xLDAsMC4yLDBjMC4yLDAsMC40LTAuMSwwLjYtMC4yYzMuOC0yLjUsOC4yLTMuOCwxMi43LTMuOGMzLjMsMCw2LjMtMS44LDcuOS00LjdsMi43LTQuOA0KCUMzMCwxOC4yLDMwLDE3LjgsMjkuOSwxNy41eiIvPg0KPC9zdmc+DQo="
+}

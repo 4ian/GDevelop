@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "JD2xwvKWgodlqsGiL1GCH3tDEwq1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "HasLanded",
+  "name": "HasLanded",
+  "version": "1.0.1",
+  "url": "https://resources.gdevelop-app.com/extensions/HasLanded.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/HasLanded-header.json",
+  "tags": "Floor,Landed",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/gnome.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Checks if the object has landed on a given floor.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/has-landed",
+  "description": "Checks if the object has landed on a floor with the given settings.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdub21lIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE4LjQyLDJDMTQuMjYsMiAxMy41LDcuOTMgMTUuODIsNy45M0MxOC4xNiw3LjkzIDIyLjU4LDIgMTguNDIsMk0xMiwyLjczQzExLjkyLDIuNzMgMTEuODUsMi43MyAxMS43OCwyLjc0QzkuNDQsMy4wNCAxMC4yNiw3LjEyIDExLjUsNy4xOUMxMi43Miw3LjI3IDE0LjA0LDIuNzMgMTIsMi43M003LjkzLDQuMzRDNy44MSw0LjM0IDcuNjcsNC4zNyA3LjUzLDQuNDNDNS42NSw1LjIxIDcuMjQsOC40MSA4LjMsOC4yQzkuMjcsOCA5LjM5LDQuMyA3LjkzLDQuMzRNNC45Myw2Ljg1QzQuNzcsNi44NCA0LjU5LDYuOSA0LjQxLDcuMDNDMi45LDguMDcgNC45MSwxMC41OCA1LjgsMTAuMTlDNi41Nyw5Ljg1IDYuMDgsNi44OSA0LjkzLDYuODVNMTMuMjksOC43N0MxMC4xLDguOCA2LjAzLDEwLjQyIDUuMzIsMTMuNTlDNC41MywxNy4xMSA4LjU2LDIyIDEyLjc2LDIyQzE0LjgzLDIyIDE3LjIxLDIwLjEzIDE3LjY2LDE3Ljc3QzE4LDE1Ljk3IDEzLjY1LDE2LjY5IDEzLjgxLDE3Ljg4QzE0LDE5LjMxIDEyLjc2LDIwIDExLjU1LDE5LjFDNy42OSwxNi4xNiAxNy45MywxNC43IDE3LjI1LDEwLjY5QzE3LjAzLDkuMzkgMTUuMzQsOC43NiAxMy4yOSw4Ljc3WiIgLz48L3N2Zz4="
+}

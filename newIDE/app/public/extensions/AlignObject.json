@@ -1,0 +1,642 @@
+{
+  "author": "grymmjack",
+  "category": "User interface",
+  "description": "Align objects on the scene relatively to the window (or screen size).\n\n**Be sure to put your object on a layer for which the camera position was not moved.**\n\nActions provided are:\n\n* ToSceneCentered: horizontally and vertically centered in scene\n* ToSceneTop: vertically to the top in scene\n* ToSceneMiddle: vertically to the middle in scene\n* ToSceneBottom: vertically to the bottom in scene\n* ToSceneLeft: horizontally to the left in scene\n* ToSceneRight: horizontally to the right in scene\n* ToSceneCenter: horizontally to the center in scene\n* ToScreenCentered: horizontally and vertically centered in screen\n* ToScreenTop: vertically to the top in screen\n* ToScreenMiddle: vertically to the middle in screen\n* ToScreenBottom: vertically to the bottom in screen\n* ToScreenLeft: horizontally to the left in screen\n* ToScreenRight: horizontally to the right in screen\n* ToScreenCenter: horizontally to the center in screen",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Align object on the screen",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZvcm1hdC12ZXJ0aWNhbC1hbGlnbi1jZW50ZXIiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNOCwxOUgxMVYyM0gxM1YxOUgxNkwxMiwxNUw4LDE5TTE2LDVIMTNWMUgxMVY1SDhMMTIsOUwxNiw1TTQsMTFWMTNIMjBWMTFINFoiIC8+PC9zdmc+",
+  "name": "AlignObject",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/format-vertical-align-center.svg",
+  "shortDescription": "Align objects on the scene relatively to the window (or screen size).",
+  "version": "1.0.0",
+  "tags": "align,alignment,center",
+  "authorIds": [
+    "I0kdjvsICFML0APq45CZjZ6PyEQ2"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Align object to horizontal center in screen.",
+      "fullName": "Align object to horizontal center in screen",
+      "functionType": "Action",
+      "name": "ToScreenCenter",
+      "private": false,
+      "sentence": "Align _PARAM1_ horizontally center on the screen",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreX"
+              },
+              "parameters": [
+                "ObjectToAlign",
+                "=",
+                "ScreenWidth()/2 - ObjectToAlign.Width()/2"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to align",
+          "longDescription": "",
+          "name": "ObjectToAlign",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Align object to horizontal center in scene.",
+      "fullName": "Align object to horizontal center in scene",
+      "functionType": "Action",
+      "name": "ToSceneCenter",
+      "private": false,
+      "sentence": "Align _PARAM1_ horizontally center in the scene",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreX"
+              },
+              "parameters": [
+                "ObjectToAlign",
+                "=",
+                "SceneWindowWidth()/2 - ObjectToAlign.Width()/2"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to align",
+          "longDescription": "",
+          "name": "ObjectToAlign",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Align object to horizontal right in screen.",
+      "fullName": "Align object to horizontal right in screen",
+      "functionType": "Action",
+      "name": "ToScreenRight",
+      "private": false,
+      "sentence": "Align _PARAM1_ horizontally right in the screen",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreX"
+              },
+              "parameters": [
+                "ObjectToAlign",
+                "=",
+                "ScreenWidth() - ObjectToAlign.Width()"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to align",
+          "longDescription": "",
+          "name": "ObjectToAlign",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Align object to horizontal right in scene.",
+      "fullName": "Align object to horizontal right in scene",
+      "functionType": "Action",
+      "name": "ToSceneRight",
+      "private": false,
+      "sentence": "Align _PARAM1_ horizontally right in the scene",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreX"
+              },
+              "parameters": [
+                "ObjectToAlign",
+                "=",
+                "SceneWindowWidth() - ObjectToAlign.Width()"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to align",
+          "longDescription": "",
+          "name": "ObjectToAlign",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Align object to horizontal left in screen.",
+      "fullName": "Align object to horizontal left in screen",
+      "functionType": "Action",
+      "name": "ToScreenLeft",
+      "private": false,
+      "sentence": "Align _PARAM1_ horizontally left in screen",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreX"
+              },
+              "parameters": [
+                "ObjectToAlign",
+                "=",
+                "0"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to align",
+          "longDescription": "",
+          "name": "ObjectToAlign",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Align object to horizontal left in scene.",
+      "fullName": "Align object to horizontal left in scene",
+      "functionType": "Action",
+      "name": "ToSceneLeft",
+      "private": false,
+      "sentence": "Align _PARAM1_ horizontally left in scene",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreX"
+              },
+              "parameters": [
+                "ObjectToAlign",
+                "=",
+                "0"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to align",
+          "longDescription": "",
+          "name": "ObjectToAlign",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Center object in screen horizontally and vertically.",
+      "fullName": "Center object in screen horizontally and vertically",
+      "functionType": "Action",
+      "name": "ToScreenCentered",
+      "private": false,
+      "sentence": "Center _PARAM1_ in screen horizontally and vertically",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreXY"
+              },
+              "parameters": [
+                "ObjectToCenter",
+                "=",
+                "ScreenWidth()/2 - ObjectToCenter.Width()/2",
+                "=",
+                "ScreenHeight()/2 - ObjectToCenter.Height()/2"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to align",
+          "longDescription": "",
+          "name": "ObjectToCenter",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Center object in scene horizontally and vertically.",
+      "fullName": "Center object in scene horizontally and vertically",
+      "functionType": "Action",
+      "name": "ToSceneCentered",
+      "private": false,
+      "sentence": "Center _PARAM1_ in scene horizontally and vertically",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreXY"
+              },
+              "parameters": [
+                "ObjectToCenter",
+                "=",
+                "SceneWindowWidth()/2 - ObjectToCenter.Width()/2",
+                "=",
+                "SceneWindowHeight()/2 - ObjectToCenter.Height()/2"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to align",
+          "longDescription": "",
+          "name": "ObjectToCenter",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Align object to vertical bottom of screen.",
+      "fullName": "Align object to bottom of screen",
+      "functionType": "Action",
+      "name": "ToScreenBottom",
+      "private": false,
+      "sentence": "Align _PARAM1_ to vertical bottom of screen",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreY"
+              },
+              "parameters": [
+                "ObjectToAlign",
+                "=",
+                "ScreenHeight() - ObjectToAlign.Height()"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to align",
+          "longDescription": "",
+          "name": "ObjectToAlign",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Align object to vertical bottom of scene.",
+      "fullName": "Align object to bottom of scene",
+      "functionType": "Action",
+      "name": "ToSceneBottom",
+      "private": false,
+      "sentence": "Align _PARAM1_ to vertical bottom of scene",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreY"
+              },
+              "parameters": [
+                "ObjectToAlign",
+                "=",
+                "SceneWindowHeight() - ObjectToAlign.Height()"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to align",
+          "longDescription": "",
+          "name": "ObjectToAlign",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Align object to vertical middle of screen.",
+      "fullName": "Align object to vertical middle of screen",
+      "functionType": "Action",
+      "name": "ToScreenMiddle",
+      "private": false,
+      "sentence": "Align _PARAM1_ to vertical middle of screen",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreY"
+              },
+              "parameters": [
+                "ObjectToAlign",
+                "=",
+                "ScreenHeight()/2 - ObjectToAlign.Height()/2"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to align",
+          "longDescription": "",
+          "name": "ObjectToAlign",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Align object to vertical middle of scene.",
+      "fullName": "Align object to vertical middle of scene",
+      "functionType": "Action",
+      "name": "ToSceneMiddle",
+      "private": false,
+      "sentence": "Align _PARAM1_ to vertical middle of scene",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreY"
+              },
+              "parameters": [
+                "ObjectToAlign",
+                "=",
+                "SceneWindowHeight()/2 - ObjectToAlign.Height()/2"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to align",
+          "longDescription": "",
+          "name": "ObjectToAlign",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Align object to vertical top of screen.",
+      "fullName": "Align object to vertical top of screen",
+      "functionType": "Action",
+      "name": "ToScreenTop",
+      "private": false,
+      "sentence": "Align _PARAM1_ to top of screen",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreY"
+              },
+              "parameters": [
+                "ObjectToAlign",
+                "=",
+                "0"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to align",
+          "longDescription": "",
+          "name": "ObjectToAlign",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Align object to vertical top of scene.",
+      "fullName": "Align object to vertical top of scene",
+      "functionType": "Action",
+      "name": "ToSceneTop",
+      "private": false,
+      "sentence": "Align _PARAM1_ to top of scene",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreY"
+              },
+              "parameters": [
+                "ObjectToAlign",
+                "=",
+                "0"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to align",
+          "longDescription": "",
+          "name": "ObjectToAlign",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

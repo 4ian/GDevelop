@@ -1,0 +1,1060 @@
+{
+  "author": "",
+  "category": "Movement",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Draggable (for physics objects)",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8cGF0aCBkPSJNMjcsMTFjMC0yLTIuMi0zLjYtNS42LTQuNEMyMC42LDMuMiwxOSwxLDE3LDFzLTMuNiwyLjItNC40LDUuNkM5LjIsNy40LDcsOSw3LDExYzAsMiwyLjIsMy42LDUuNiw0LjQNCgljMC4zLDEuMiwwLjYsMi4yLDEuMSwzLjFjMC4zLDAuNSwwLjksMC43LDEuNCwwLjRjMC41LTAuMywwLjctMC45LDAuNC0xLjRjLTAuMy0wLjUtMC41LTEuMS0wLjctMS44YzAuNywwLjEsMS41LDAuMSwyLjIsMC4xDQoJYzAuOCwwLDEuNSwwLDIuMi0wLjFjLTAuMywxLTAuNywxLjktMS4xLDIuNWMtMC4zLDAuNC0wLjIsMS4xLDAuMiwxLjRjMC4yLDAuMSwwLjQsMC4yLDAuNiwwLjJjMC4zLDAsMC42LTAuMSwwLjgtMC40DQoJYzAuNy0xLDEuMy0yLjQsMS43LTRDMjQuOCwxNC42LDI3LDEzLDI3LDExeiBNMTcsM2MwLjcsMCwxLjYsMS4yLDIuMiwzLjNjLTAuNy0wLjEtMS41LTAuMS0yLjItMC4xcy0xLjUsMC0yLjIsMC4xDQoJQzE1LjQsNC4yLDE2LjMsMywxNywzeiBNOSwxMWMwLTAuNywxLjItMS42LDMuMy0yLjJjLTAuMSwwLjctMC4xLDEuNS0wLjEsMi4yYzAsMC44LDAsMS41LDAuMSwyLjJDMTAuMiwxMi42LDksMTEuNyw5LDExeiBNMTcsMTMuOQ0KCWMtMSwwLTEuOS0wLjEtMi43LTAuMmMtMC4xLTAuOC0wLjItMS43LTAuMi0yLjdjMC0xLDAuMS0xLjksMC4yLTIuN0MxNS4xLDguMiwxNiw4LjEsMTcsOC4xczEuOSwwLjEsMi43LDAuMg0KCWMwLjEsMC44LDAuMiwxLjcsMC4yLDIuN2MwLDAuOS0wLjEsMS44LTAuMiwyLjdDMTguOSwxMy44LDE4LDEzLjksMTcsMTMuOXogTTIxLjcsMTMuMmMwLjEtMC43LDAuMS0xLjUsMC4xLTIuMg0KCWMwLTAuOCwwLTEuNS0wLjEtMi4yQzIzLjgsOS40LDI1LDEwLjMsMjUsMTFDMjUsMTEuNywyMy44LDEyLjYsMjEuNywxMy4yeiIvPg0KPHBhdGggZD0iTTI5LjksMTcuNUMyOS43LDE3LjIsMjkuNCwxNywyOSwxN2MtMi4yLDAtNC4zLDEtNS42LDIuOEwyMi41LDIxYy0xLjEsMS4zLTIuOCwyLTQuNSwyaC0zYy0wLjYsMC0xLTAuNC0xLTFzMC40LTEsMS0xaDEuOQ0KCWMxLjYsMCwzLjEtMS4zLDMuMS0yLjljMCwwLDAtMC4xLDAtMC4xYzAtMC41LTAuNS0xLTEtMWwtNi4xLDBjLTMuNiwwLTYuNSwxLjYtOC4xLDQuMmwtMi43LDQuMmMtMC4yLDAuMy0wLjIsMC43LDAsMWwzLDUNCgljMC4xLDAuMiwwLjQsMC40LDAuNiwwLjVjMC4xLDAsMC4xLDAsMC4yLDBjMC4yLDAsMC40LTAuMSwwLjYtMC4yYzMuOC0yLjUsOC4yLTMuOCwxMi43LTMuOGMzLjMsMCw2LjMtMS44LDcuOS00LjdsMi43LTQuOA0KCUMzMCwxOC4yLDMwLDE3LjgsMjkuOSwxNy41eiIvPg0KPC9zdmc+DQo=",
+  "name": "DraggablePhysics",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Virtual Reality/Virtual Reality_hand_vr_ar_360.svg",
+  "shortDescription": "Drag Physics 2D objects with mouse or touch input.",
+  "dimension": "2D",
+  "version": "1.3.0",
+  "description": [
+    "Enables players to click and drag on physics objects to move them.  The object retains velocity when the click is released, allowing players to fling objects across the screen.",
+    "",
+    "Note:",
+    "- The default \"draggable\" behavior will not work on objects with the physics behavior. This extension should be used instead.",
+    "- This extension will only work on objects that have the physics behavior.",
+    "- Kinematic physics mode is incompatible with this extension. The object will be changed to dynamic mode.",
+    "",
+    "The Parking Jam example uses this extension ([open the project online](https://editor.gdevelop.io/?project=example://parking-jam))."
+  ],
+  "origin": {
+    "identifier": "DraggablePhysics",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "physics,drag,mouse,pointer,cursor,touch,physics,object,joint,fling",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Drag a physics object with the mouse (or touch).",
+      "fullName": "Draggable (for physics objects)",
+      "name": "DraggablePhysics",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Change \"kinematic\" to \"dynamic\" to prevent crash",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Physics2::IsKinematic"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PhysicsBehavior"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics2::SetDynamic"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PhysicsBehavior"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Mouse",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Create mouse joints and save the joint ID"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "EnableAutomaticDragging",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "MouseButtonFromTextPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "MouseButton"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "DraggablePhysics::DraggablePhysics::IsBeingDragged"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SourisSurObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "",
+                                "",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Physics2::AddMouseJoint"
+                              },
+                              "parameters": [
+                                "Object",
+                                "PhysicsBehavior",
+                                "MouseX(Object.Layer(),0)",
+                                "MouseY(Object.Layer(),0)",
+                                "MaxForce",
+                                "Frequency",
+                                "Damping",
+                                "__DraggablePhysics.MouseJointID"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "MouseJointID",
+                                "=",
+                                "Variable(__DraggablePhysics.MouseJointID)"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Delete the mouse joint"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "EnableAutomaticDragging",
+                        "True",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "MouseButtonFromTextReleased"
+                      },
+                      "parameters": [
+                        "",
+                        "MouseButton"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "DraggablePhysics::DraggablePhysics::ReleaseDrag"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Update the position of the mouse joint to follow the mouse"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "DraggablePhysics::DraggablePhysics::IsBeingDragged"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics2::MouseJointTarget"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PhysicsBehavior",
+                        "MouseJointID",
+                        "MouseX(Object.Layer(),0)",
+                        "MouseY(Object.Layer(),0)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Start dragging object.",
+          "fullName": "Start dragging object",
+          "functionType": "Action",
+          "name": "StartDragging",
+          "sentence": "Start dragging (physics) _PARAM0_ ",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "DraggablePhysics::DraggablePhysics::IsBeingDragged"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Physics2::AddMouseJoint"
+                  },
+                  "parameters": [
+                    "Object",
+                    "PhysicsBehavior",
+                    "MouseX(Object.Layer(),0)",
+                    "MouseY(Object.Layer(),0)",
+                    "MaxForce",
+                    "Frequency",
+                    "Damping",
+                    "__DraggablePhysics.MouseJointID"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "MouseJointID",
+                    "=",
+                    "Variable(__DraggablePhysics.MouseJointID)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Release dragged object.",
+          "fullName": "Release dragged object",
+          "functionType": "Action",
+          "name": "ReleaseDrag",
+          "sentence": "Release _PARAM0_ from being dragged (physics)",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "DraggablePhysics::DraggablePhysics::IsBeingDragged"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Physics2::Remove joint"
+                  },
+                  "parameters": [
+                    "Object",
+                    "PhysicsBehavior",
+                    "MouseJointID"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "MouseJointID",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if object is being dragged.",
+          "fullName": "Is being dragged",
+          "functionType": "Condition",
+          "name": "IsBeingDragged",
+          "sentence": "_PARAM0_ is being dragged (physics)",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "MouseJointID",
+                    "!=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onDeActivate",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "DraggablePhysics::DraggablePhysics::ReleaseDrag"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the mouse button used to move the object.",
+          "fullName": "Mouse button",
+          "functionType": "ExpressionAndCondition",
+          "group": "Draggable (for physics objects) configuration",
+          "name": "MouseButton",
+          "sentence": "the dragging mouse button",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "MouseButton"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "supplementaryInformation": "[\"Left\",\"Right\",\"Middle\"]",
+            "type": "stringWithSelector"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "MouseButton",
+          "name": "SetMouseButton",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "MouseButton",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the maximum joint force (in Newtons) of the object.",
+          "fullName": "Maximum force",
+          "functionType": "ExpressionAndCondition",
+          "group": "Draggable configuration",
+          "name": "MaxForce",
+          "sentence": "the maximum force",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "MaxForce"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "MaxForce",
+          "name": "SetMaxForce",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "MaxForce",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the joint frequency (per second) of the object.",
+          "fullName": "Frequency",
+          "functionType": "ExpressionAndCondition",
+          "group": "Draggable configuration",
+          "name": "Frequency",
+          "sentence": "the frequency",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Frequency"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "Frequency",
+          "name": "SetFrequency",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Frequency",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the joint damping ratio (range: 0 to 1) of the object. ",
+          "fullName": "Damping ratio",
+          "functionType": "ExpressionAndCondition",
+          "group": "Draggable configuration",
+          "name": "Damping",
+          "sentence": "the damping ratio (range: 0 to 1)",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Damping"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "Damping",
+          "name": "SetDamping",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Damping",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if automatic dragging is enabled.",
+          "fullName": "Automatic dragging",
+          "functionType": "Condition",
+          "group": "Draggable (for physics objects) configuration",
+          "name": "IsAutomaticDraggingEnabled",
+          "sentence": "Automatic dragging is enabled on _PARAM0_ ",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "EnableAutomaticDragging",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Enable (or disable) automatic dragging with the mouse or touch.",
+          "fullName": "Enable (or disable) automatic dragging",
+          "functionType": "Action",
+          "group": "Draggable (for physics objects) configuration",
+          "name": "SetEnableAutomaticDragging",
+          "sentence": "Enable automatic dragging on _PARAM0_: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Value",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "EnableAutomaticDragging",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Value",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "EnableAutomaticDragging",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "DraggablePhysics::DraggablePhysics",
+              "type": "behavior"
+            },
+            {
+              "defaultValue": "yes",
+              "description": "EnableAutomaticDragging",
+              "name": "Value",
+              "optional": true,
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Physics behavior",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "Physics2::Physics2Behavior"
+          ],
+          "hidden": false,
+          "name": "PhysicsBehavior"
+        },
+        {
+          "value": "Left",
+          "type": "Choice",
+          "label": "Mouse button",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "Left",
+            "Right",
+            "Middle"
+          ],
+          "hidden": false,
+          "name": "MouseButton"
+        },
+        {
+          "value": "500",
+          "type": "Number",
+          "unit": "Newton",
+          "label": "Maximum force",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "MaxForce"
+        },
+        {
+          "value": "10",
+          "type": "Number",
+          "label": "Frequency (Hz) ",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "Frequency"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Damping ratio (Range: 0 to 1)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "Damping"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "MouseJointID"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Enable automatic dragging",
+          "description": "If automatic dragging is disabled, use the \"Start drag\" and \"Release drag\" actions.",
+          "group": "",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "EnableAutomaticDragging"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

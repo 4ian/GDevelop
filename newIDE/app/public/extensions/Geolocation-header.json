@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "GPS",
+  "name": "Geolocation",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/Geolocation.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Geolocation-header.json",
+  "tags": "geolocation,gps,position,location,locate,where,place",
+  "category": "Device",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/crosshairs-gps.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Adds a way to locate the player.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 3,
+  "helpPath": "/extensions/geolocation",
+  "description": "Adds an action to locate the player using the built-in GPS, or other techniques if unavailable. \nYou can also track whether or not you've gotten the permission to use the GPS sensor, and track realtime player movement.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNyb3NzaGFpcnMtZ3BzIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLDhBNCw0IDAgMCwxIDE2LDEyQTQsNCAwIDAsMSAxMiwxNkE0LDQgMCAwLDEgOCwxMkE0LDQgMCAwLDEgMTIsOE0zLjA1LDEzSDFWMTFIMy4wNUMzLjUsNi44MyA2LjgzLDMuNSAxMSwzLjA1VjFIMTNWMy4wNUMxNy4xNywzLjUgMjAuNSw2LjgzIDIwLjk1LDExSDIzVjEzSDIwLjk1QzIwLjUsMTcuMTcgMTcuMTcsMjAuNSAxMywyMC45NVYyM0gxMVYyMC45NUM2LjgzLDIwLjUgMy41LDE3LjE3IDMuMDUsMTNNMTIsNUE3LDcgMCAwLDAgNSwxMkE3LDcgMCAwLDAgMTIsMTlBNyw3IDAgMCwwIDE5LDEyQTcsNyAwIDAsMCAxMiw1WiIgLz48L3N2Zz4="
+}

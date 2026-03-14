@@ -1,0 +1,60 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "9MGDlUQAh8QUilno4JPycekjRCJ3"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Volume settings",
+  "name": "CollapsibleVolumeControl",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/CollapsibleVolumeControl.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/CollapsibleVolumeControl-header.json",
+  "tags": "sound",
+  "category": "User interface",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/7447548d05f2c067f0403c5eb2fcf1c36756dc7e9540a418e7f14040fa20ac6f_volume-high.svg",
+  "gdevelopVersion": "",
+  "shortDescription": "Collapsible volume menu object with slider and mute button.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/collapsible-volume-control",
+  "requiredExtensions": [
+    {
+      "extensionName": "ButtonStates",
+      "extensionVersion": "1.4.1"
+    },
+    {
+      "extensionName": "PanelSpriteSlider",
+      "extensionVersion": "2.0.1"
+    },
+    {
+      "extensionName": "TweenIntoView",
+      "extensionVersion": "1.0.0"
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [
+    {
+      "description": "Collapsible volume setting menu.",
+      "fullName": "Volume settings",
+      "name": "CollapsibleVolumeControl",
+      "defaultName": "VolumeSettings",
+      "eventsFunctions": [
+        {
+          "name": "TweenOpen",
+          "fullName": "Open volum controls",
+          "description": "Show the volum controls.",
+          "functionType": "Action"
+        },
+        {
+          "name": "TweenClose",
+          "fullName": "Close volum controls",
+          "description": "Hide the volum controls.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "description": "A collapsible volume setting menu. The main button can be pressed to open the collapsable menu, consisting of a volume slider and mute button.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZvbHVtZS1oaWdoIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE0LDMuMjNWNS4yOUMxNi44OSw2LjE1IDE5LDguODMgMTksMTJDMTksMTUuMTcgMTYuODksMTcuODQgMTQsMTguN1YyMC43N0MxOCwxOS44NiAyMSwxNi4yOCAyMSwxMkMyMSw3LjcyIDE4LDQuMTQgMTQsMy4yM00xNi41LDEyQzE2LjUsMTAuMjMgMTUuNSw4LjcxIDE0LDcuOTdWMTZDMTUuNSwxNS4yOSAxNi41LDEzLjc2IDE2LjUsMTJNMyw5VjE1SDdMMTIsMjBWNEw3LDlIM1oiIC8+PC9zdmc+"
+}

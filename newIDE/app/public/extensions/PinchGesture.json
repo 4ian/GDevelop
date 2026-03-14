@@ -1,0 +1,2784 @@
+{
+  "author": "",
+  "category": "Input",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Pinching gesture",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdlc3R1cmUtcGluY2giIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTMsOUExLDEgMCAwLDEgMTQsOEExLDEgMCAwLDEgMTUsOVYxMy40N0wxNi4yMSwxMy42TDIxLjE1LDE1LjhDMjEuNjcsMTYuMDQgMjIsMTYuNTYgMjIsMTcuMTRWMjEuNUMyMS45NywyMi4zMiAyMS4zMiwyMi45NyAyMC41LDIzSDE0QzEzLjYyLDIzIDEzLjI2LDIyLjg1IDEzLDIyLjU3TDguMSwxOC4zN0w4Ljg0LDE3LjZDOS4wMywxNy4zOSA5LjMsMTcuMjggOS41OCwxNy4yOEg5LjhMMTMsMTlWOU0xNCw1QzE1LjQyLDUgMTYuNzQsNS43NiAxNy40NSw3QzE4LjU2LDguOSAxNy45MSwxMS4zNSAxNiwxMi40NlYxMS4yM0MxNi42NCwxMC42NyAxNyw5Ljg1IDE3LDlBMywzIDAgMCwwIDE0LDZBMywzIDAgMCwwIDExLDlDMTEsOS44NSAxMS4zNiwxMC42NyAxMiwxMS4yM1YxMi40NkMxMC43NywxMS43NSAxMCwxMC40MyAxMCw5QTQsNCAwIDAsMSAxNCw1TTQsOUw3LDEySDVWMTVIM1YxMkgxTDQsOU00LDdMMSw0SDNWMUg1VjRIN0w0LDdNOSwxNEM5LjczLDE0IDEwLjQxLDE0LjE5IDExLDE0LjU0VjE1Ljc2QzEwLjQ3LDE1LjI5IDkuNzcsMTUgOSwxNUEzLDMgMCAwLDAgNiwxOEM2LDE5IDYuNSwxOS44NyA3LjIyLDIwLjQyTDkuMzEsMjJIOUE0LDQgMCAwLDEgNSwxOEE0LDQgMCAwLDEgOSwxNFoiIC8+PC9zdmc+",
+  "name": "PinchGesture",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/gesture-pinch.svg",
+  "shortDescription": "Move the camera or objects with pinching gestures.",
+  "dimension": "2D",
+  "version": "1.2.0",
+  "description": [
+    "This extension allows to:",
+    "- Move, rotate and/or zoom the camera according to pinch gestures",
+    "- Move, rotate and optionally scale objects according to pinch gestures",
+    "- Handle more specific needs with various expressions",
+    "",
+    "Limitations:",
+    "- Only one pinching gesture is detected at a time"
+  ],
+  "origin": {
+    "identifier": "PinchGesture",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "touch,pinch,gesture,zoom,rotate,camera,puzzle",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [
+    {
+      "folded": true,
+      "name": "IsCameraPinchEnabled",
+      "type": "boolean",
+      "value": false
+    },
+    {
+      "folded": true,
+      "name": "CameraPinchLayer",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "folded": true,
+      "name": "CameraPinchConstraint",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "folded": true,
+      "name": "BeginningCameraCenterX",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "folded": true,
+      "name": "BeginningCameraCenterY",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "folded": true,
+      "name": "BeginningCameraAngle",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "BeginningCameraZoom",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "BeginningDistance",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "BeginningAngle",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "BeginningCenterX",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "folded": true,
+      "name": "BeginningCenterY",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "folded": true,
+      "name": "CurrentAngle",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "CurrentDistance",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "folded": true,
+      "name": "CurrentCenterX",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "folded": true,
+      "name": "CurrentCenterY",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "TouchCount",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "folded": true,
+      "name": "FirstTouchId",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "SecondTouchId",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "FirstTouchX",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "FirstTouchY",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "SecondTouchX",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "SecondTouchY",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "ZOrderMaximum",
+      "type": "number",
+      "value": 0
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "PinchGesture::SetCameraPinchLayer"
+              },
+              "parameters": [
+                "",
+                "\"\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "PinchGesture::SetCameraPinchConstraint"
+              },
+              "parameters": [
+                "",
+                "\"No constraint\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "PinchGesture::EnableCameraPinch"
+              },
+              "parameters": [
+                "",
+                "no",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Enable or disable camera pinch.",
+      "fullName": "Enable or disable camera pinch",
+      "functionType": "Action",
+      "group": "Camera pinch",
+      "name": "EnableCameraPinch",
+      "sentence": "Enable camera pinch: _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetBooleanVariable"
+              },
+              "parameters": [
+                "IsCameraPinchEnabled",
+                "False",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Enable",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetBooleanVariable"
+              },
+              "parameters": [
+                "IsCameraPinchEnabled",
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Enable camera pinch",
+          "name": "Enable",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if camera pinch is enabled.",
+      "fullName": "Camera pinch is enabled",
+      "functionType": "Condition",
+      "group": "Camera pinch",
+      "name": "IsCameraPinchEnabled",
+      "sentence": "Camera pinch is enabled",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "IsCameraPinchEnabled",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Choose the layer to move with pinch gestures.",
+      "fullName": "Camera pinch layer",
+      "functionType": "Action",
+      "group": "Camera pinch",
+      "name": "SetCameraPinchLayer",
+      "sentence": "Choose the layer _PARAM1_ to move with pinch gestures",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "CameraPinchLayer",
+                "=",
+                "Layer"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the camera pinch constraint.",
+      "fullName": "Camera pinch constraints",
+      "functionType": "Action",
+      "group": "Camera pinch",
+      "name": "SetCameraPinchConstraint",
+      "sentence": "Change the camera pinch constraint to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "CameraPinchConstraint",
+                "=",
+                "Constraint"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Constraint",
+          "name": "Constraint",
+          "supplementaryInformation": "[\"No constraint\",\"Zoom only\",\"Rotation only\",\"Zoom and rotation only\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Pinch the camera of a layer.",
+      "fullName": "Pinch camera",
+      "functionType": "Action",
+      "group": "Camera pinch",
+      "name": "PinchCamera",
+      "private": true,
+      "sentence": "Pinch the camera of layer: _PARAM1_ with constraint: _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "PinchGesture::IsPinching"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Save the initial state because the pinch is calculated from here."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "BeginningCameraCenterX",
+                    "=",
+                    "CameraCenterX(Layer)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "BeginningCameraCenterY",
+                    "=",
+                    "CameraCenterY(Layer)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "BeginningCameraAngle",
+                    "=",
+                    "CameraAngle(Layer)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "BeginningCameraZoom",
+                    "=",
+                    "CameraZoom(Layer)"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Backup the camera state to revert pinch effect according to constraints."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "BackupCameraCenterX",
+                    "=",
+                    "CameraCenterX(Layer)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "BackupCameraCenterY",
+                    "=",
+                    "CameraCenterY(Layer)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "BackupCameraAngle",
+                    "=",
+                    "CameraAngle(Layer)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "BackupCameraZoom",
+                    "=",
+                    "CameraZoom(Layer)"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Pinch the camera",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetCameraCenterX"
+                          },
+                          "parameters": [
+                            "",
+                            "=",
+                            "BeginningCameraCenterX",
+                            "Layer",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetCameraCenterY"
+                          },
+                          "parameters": [
+                            "",
+                            "=",
+                            "BeginningCameraCenterY",
+                            "Layer",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetCameraAngle"
+                          },
+                          "parameters": [
+                            "",
+                            "=",
+                            "BeginningCameraAngle",
+                            "Layer",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ZoomCamera"
+                          },
+                          "parameters": [
+                            "",
+                            "BeginningCameraZoom",
+                            "Layer",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "DeltaX",
+                            "=",
+                            "PinchGesture::InversedX(BeginningCameraCenterX, BeginningCameraCenterY, Layer) - BeginningCameraCenterX"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "DeltaY",
+                            "=",
+                            "PinchGesture::InversedY(BeginningCameraCenterX, BeginningCameraCenterY, Layer) - BeginningCameraCenterY"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetCameraCenterX"
+                          },
+                          "parameters": [
+                            "",
+                            "=",
+                            "BeginningCameraCenterX + DeltaX",
+                            "Layer",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetCameraCenterY"
+                          },
+                          "parameters": [
+                            "",
+                            "=",
+                            "BeginningCameraCenterY + DeltaY",
+                            "Layer",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetCameraAngle"
+                          },
+                          "parameters": [
+                            "",
+                            "=",
+                            "BeginningCameraAngle - PinchGesture::Rotation()",
+                            "Layer",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ZoomCamera"
+                          },
+                          "parameters": [
+                            "",
+                            "BeginningCameraZoom * PinchGesture::Scaling()",
+                            "Layer",
+                            ""
+                          ]
+                        }
+                      ],
+                      "variables": [
+                        {
+                          "folded": true,
+                          "name": "DeltaX",
+                          "type": "number",
+                          "value": 0
+                        },
+                        {
+                          "folded": true,
+                          "name": "DeltaY",
+                          "type": "number",
+                          "value": 0
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Apply constraints",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::CompareStrings"
+                          },
+                          "parameters": [
+                            "Constraint",
+                            "!=",
+                            "\"No constraint\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetCameraCenterX"
+                          },
+                          "parameters": [
+                            "",
+                            "=",
+                            "BackupCameraCenterX",
+                            "Layer",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetCameraCenterY"
+                          },
+                          "parameters": [
+                            "",
+                            "=",
+                            "BackupCameraCenterY",
+                            "Layer",
+                            ""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::CompareStrings"
+                              },
+                              "parameters": [
+                                "Constraint",
+                                "=",
+                                "\"Zoom only\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetCameraAngle"
+                              },
+                              "parameters": [
+                                "",
+                                "=",
+                                "BackupCameraAngle",
+                                "Layer",
+                                ""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::CompareStrings"
+                              },
+                              "parameters": [
+                                "Constraint",
+                                "=",
+                                "\"Rotation only\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ZoomCamera"
+                              },
+                              "parameters": [
+                                "",
+                                "BackupCameraZoom",
+                                "Layer",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                }
+              ],
+              "variables": [
+                {
+                  "folded": true,
+                  "name": "BackupCameraCenterX",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "folded": true,
+                  "name": "BackupCameraCenterY",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "folded": true,
+                  "name": "BackupCameraAngle",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "folded": true,
+                  "name": "BackupCameraZoom",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        },
+        {
+          "description": "Constraint",
+          "name": "Constraint",
+          "supplementaryInformation": "[\"No constraint\",\"Zoom only\",\"Rotation only\",\"Zoom and rotation only\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onScenePreEvents",
+      "sentence": "",
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Touch end",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TouchCount",
+                    "=",
+                    "1"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "HasTouchEnded"
+                  },
+                  "parameters": [
+                    "",
+                    "FirstTouchId"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "TouchCount",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TouchCount",
+                    "=",
+                    "2"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "HasTouchEnded"
+                      },
+                      "parameters": [
+                        "",
+                        "SecondTouchId"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "TouchCount",
+                        "-",
+                        "1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "HasTouchEnded"
+                      },
+                      "parameters": [
+                        "",
+                        "FirstTouchId"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "TouchCount",
+                        "-",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "The 2nd touch becomes the 1st one."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "TouchCount",
+                            "=",
+                            "1"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "FirstTouchId",
+                            "=",
+                            "SecondTouchId"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Touch start",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Pinch with more than 2 touches is not handled."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "HasAnyTouchStarted"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TouchCount",
+                    "<",
+                    "2"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "Index",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Repeat",
+                      "repeatExpression": "StartedTouchCount()",
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "2nd touch started: save the 2 touches locations"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "TouchCount",
+                                "=",
+                                "1"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "TouchCount",
+                                "=",
+                                "2"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "SecondTouchId",
+                                "=",
+                                "StartedTouchId(Index)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "SecondTouchX",
+                                "=",
+                                "PinchGesture::TouchCanvasX(StartedTouchId(Index))"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "SecondTouchY",
+                                "=",
+                                "PinchGesture::TouchCanvasY(StartedTouchId(Index))"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "FirstTouchX",
+                                "=",
+                                "PinchGesture::TouchCanvasX(FirstTouchId)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "FirstTouchY",
+                                "=",
+                                "PinchGesture::TouchCanvasY(FirstTouchId)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "BeginningAngle",
+                                "=",
+                                "AngleBetweenPositions\n(\n  FirstTouchX,\n  FirstTouchY,\n  SecondTouchX,\n  SecondTouchY\n)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "BeginningDistance",
+                                "=",
+                                "DistanceBetweenPositions\n(\n  FirstTouchX,\n  FirstTouchY,\n  SecondTouchX,\n  SecondTouchY\n)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "BeginningCenterX",
+                                "=",
+                                "(FirstTouchX + SecondTouchX) / 2"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "BeginningCenterY",
+                                "=",
+                                "(FirstTouchY + SecondTouchY) / 2"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "disabled": true,
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "DebuggerTools::ConsoleLog"
+                                  },
+                                  "parameters": [
+                                    "\"distance: \" + BeginningDistance",
+                                    "",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "It's important to do this case after because TouchCount is incremented in this loop (0 to 1 and 1 to 2 must not happen with the same touch event)."
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "TouchCount",
+                                "=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "FirstTouchId",
+                                "=",
+                                "StartedTouchId(Index)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "TouchCount",
+                                "=",
+                                "1"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Index",
+                                "+",
+                                "1"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "variables": [
+                    {
+                      "folded": true,
+                      "name": "Index",
+                      "type": "number",
+                      "value": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Pinching",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TouchCount",
+                    "=",
+                    "2"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentAngle",
+                    "=",
+                    "AngleBetweenPositions\n(\n  PinchGesture::TouchCanvasX(FirstTouchId),\n  PinchGesture::TouchCanvasY(FirstTouchId),\n  PinchGesture::TouchCanvasX(SecondTouchId),\n  PinchGesture::TouchCanvasY(SecondTouchId)\n)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentDistance",
+                    "=",
+                    "DistanceBetweenPositions\n(\n  PinchGesture::TouchCanvasX(FirstTouchId),\n  PinchGesture::TouchCanvasY(FirstTouchId),\n  PinchGesture::TouchCanvasX(SecondTouchId),\n  PinchGesture::TouchCanvasY(SecondTouchId)\n)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentCenterX",
+                    "=",
+                    "(PinchGesture::TouchCanvasX(FirstTouchId) + PinchGesture::TouchCanvasX(SecondTouchId)) / 2"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentCenterY",
+                    "=",
+                    "(PinchGesture::TouchCanvasY(FirstTouchId) + PinchGesture::TouchCanvasY(SecondTouchId)) / 2"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "PinchGesture::IsCameraPinchEnabled"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "PinchGesture::PinchCamera"
+              },
+              "parameters": [
+                "",
+                "CameraPinchLayer",
+                "CameraPinchConstraint",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a touch is pinching, if 2 touches are pressed.",
+      "fullName": "Touch is pinching",
+      "functionType": "Condition",
+      "name": "IsPinching",
+      "sentence": "Touch is pinching",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "TouchCount",
+                "=",
+                "2"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the scaling of the pinch gesture from its beginning.",
+      "fullName": "Pinch scaling",
+      "functionType": "Expression",
+      "name": "Scaling",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "CurrentDistance / BeginningDistance"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the rotation of the pinch gesture from its beginning (in degrees).",
+      "fullName": "Pinch rotation",
+      "functionType": "Expression",
+      "name": "Rotation",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "CurrentAngle - BeginningAngle"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the X position of the pinch center at the beginning of the gesture.",
+      "fullName": "Pinch beginning center X",
+      "functionType": "Expression",
+      "name": "BeginningCenterX",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "PinchGesture::TransformToSceneX(BeginningCenterX, BeginningCenterY, Layer)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the Y position of the pinch center at the beginning of the gesture.",
+      "fullName": "Pinch beginning center Y",
+      "functionType": "Expression",
+      "name": "BeginningCenterY",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "PinchGesture::TransformToSceneY(BeginningCenterX, BeginningCenterY, Layer)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the X position of the pinch center.",
+      "fullName": "Pinch center X",
+      "functionType": "Expression",
+      "name": "CurrentCenterX",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "PinchGesture::TransformToSceneX(CurrentCenterX, CurrentCenterY, Layer)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the Y position of the pinch center.",
+      "fullName": "Pinch center Y",
+      "functionType": "Expression",
+      "name": "CurrentCenterY",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "PinchGesture::TransformToSceneY(CurrentCenterX, CurrentCenterY, Layer)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the horizontal translation of the pinch gesture from its beginning.",
+      "fullName": "Pinch translation X",
+      "functionType": "Expression",
+      "name": "TranslationX",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "PinchGesture::CurrentCenterX(Layer) - PinchGesture::BeginningCenterX(Layer)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the vertical translation of the pinch gesture from its beginning.",
+      "fullName": "Pinch translation Y",
+      "functionType": "Expression",
+      "name": "TranslationY",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "PinchGesture::CurrentCenterY(Layer) - PinchGesture::BeginningCenterY(Layer)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the new X position of a point after the pinch gesture.",
+      "fullName": "Transform X position",
+      "functionType": "Expression",
+      "name": "TransformedX",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "PinchGesture::CurrentCenterX(Layer) + PinchGesture::Scaling() * PinchGesture::RotatedVectorX(\n  PositionX - PinchGesture::BeginningCenterX(Layer),\n  PositionY - PinchGesture::BeginningCenterY(Layer),\n  PinchGesture::Rotation()\n)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Position X before the pinch",
+          "name": "PositionX",
+          "type": "expression"
+        },
+        {
+          "description": "Position Y before the pinch",
+          "name": "PositionY",
+          "type": "expression"
+        },
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the new Y position of a point after the pinch gesture.",
+      "fullName": "Transform Y position",
+      "functionType": "Expression",
+      "name": "TransformedY",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "PinchGesture::CurrentCenterY(Layer) + PinchGesture::Scaling() * PinchGesture::RotatedVectorY(\n  PositionX - PinchGesture::BeginningCenterX(Layer),\n  PositionY - PinchGesture::BeginningCenterY(Layer),\n  PinchGesture::Rotation()\n)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Position X before the pinch",
+          "name": "PositionX",
+          "type": "expression"
+        },
+        {
+          "description": "Position Y before the pinch",
+          "name": "PositionY",
+          "type": "expression"
+        },
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the original X position of a point before the pinch gesture.",
+      "fullName": "Inversed transform X position",
+      "functionType": "Expression",
+      "name": "InversedX",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "PinchGesture::BeginningCenterX(Layer) + PinchGesture::RotatedVectorX(\n  PositionX - PinchGesture::CurrentCenterX(Layer),\n  PositionY - PinchGesture::CurrentCenterY(Layer),\n  -PinchGesture::Rotation()\n) / PinchGesture::Scaling()"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Position X after the pinch",
+          "name": "PositionX",
+          "type": "expression"
+        },
+        {
+          "description": "Position Y after the pinch",
+          "name": "PositionY",
+          "type": "expression"
+        },
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the new position on the Y axis of a point after the pinch gesture.",
+      "fullName": "Inversed transform Y position",
+      "functionType": "Expression",
+      "name": "InversedY",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "PinchGesture::BeginningCenterY(Layer) + PinchGesture::RotatedVectorY(\n  PositionX - PinchGesture::CurrentCenterX(Layer),\n  PositionY - PinchGesture::CurrentCenterY(Layer),\n  -PinchGesture::Rotation()\n) / PinchGesture::Scaling()"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Position X after the pinch",
+          "name": "PositionX",
+          "type": "expression"
+        },
+        {
+          "description": "Position Y after the pinch",
+          "name": "PositionY",
+          "type": "expression"
+        },
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the X coordinate of a position transformed from the scene to the canvas according to a layer.",
+      "fullName": "Transform X to canvas",
+      "functionType": "Expression",
+      "name": "TransformToCanvasX",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const x = eventsFunctionContext.getArgument(\"PositionX\");\r",
+            "const y = eventsFunctionContext.getArgument(\"PositionY\");\r",
+            "const layer = runtimeScene.getLayer(eventsFunctionContext.getArgument(\"Layer\"));\r",
+            "\r",
+            "eventsFunctionContext.returnValue = layer.convertInverseCoords(x, y)[0];"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Position X",
+          "name": "PositionX",
+          "type": "expression"
+        },
+        {
+          "description": "Position Y",
+          "name": "PositionY",
+          "type": "expression"
+        },
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the Y coordinate of a position transformed from the scene to the canvas according to a layer.",
+      "fullName": "Transform Y to canvas",
+      "functionType": "Expression",
+      "name": "TransformToCanvasY",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const x = eventsFunctionContext.getArgument(\"PositionX\");\r",
+            "const y = eventsFunctionContext.getArgument(\"PositionY\");\r",
+            "const layer = runtimeScene.getLayer(eventsFunctionContext.getArgument(\"Layer\"));\r",
+            "\r",
+            "eventsFunctionContext.returnValue = layer.convertInverseCoords(x, y)[1];"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Position X",
+          "name": "PositionX",
+          "type": "expression"
+        },
+        {
+          "description": "Position Y",
+          "name": "PositionY",
+          "type": "expression"
+        },
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the X coordinate of a position transformed from the canvas to the scene according to a layer.",
+      "fullName": "Transform X to scene",
+      "functionType": "Expression",
+      "name": "TransformToSceneX",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const x = eventsFunctionContext.getArgument(\"PositionX\");\r",
+            "const y = eventsFunctionContext.getArgument(\"PositionY\");\r",
+            "const layer = runtimeScene.getLayer(eventsFunctionContext.getArgument(\"Layer\"));\r",
+            "\r",
+            "eventsFunctionContext.returnValue = layer.convertCoords(x, y)[0];"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Position X",
+          "name": "PositionX",
+          "type": "expression"
+        },
+        {
+          "description": "Position Y",
+          "name": "PositionY",
+          "type": "expression"
+        },
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the Y coordinate of a position transformed from the canvas to the scene according to a layer.",
+      "fullName": "Transform Y to scene",
+      "functionType": "Expression",
+      "name": "TransformToSceneY",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const x = eventsFunctionContext.getArgument(\"PositionX\");\r",
+            "const y = eventsFunctionContext.getArgument(\"PositionY\");\r",
+            "const layer = runtimeScene.getLayer(eventsFunctionContext.getArgument(\"Layer\"));\r",
+            "\r",
+            "eventsFunctionContext.returnValue = layer.convertCoords(x, y)[1];"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Position X",
+          "name": "PositionX",
+          "type": "expression"
+        },
+        {
+          "description": "Position Y",
+          "name": "PositionY",
+          "type": "expression"
+        },
+        {
+          "description": "Layer",
+          "name": "Layer",
+          "type": "layer"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the touch X on the canvas.",
+      "fullName": "Touch X on canvas",
+      "functionType": "Expression",
+      "name": "TouchCanvasX",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "PinchGesture::TransformToCanvasX(TouchX(TouchId), TouchY(TouchId), \"\")"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Touch identifier",
+          "name": "TouchId",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the touch Y on the canvas.",
+      "fullName": "Touch Y on canvas",
+      "functionType": "Expression",
+      "name": "TouchCanvasY",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "PinchGesture::TransformToCanvasY(TouchX(TouchId), TouchY(TouchId), \"\")"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Touch identifier",
+          "name": "TouchId",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the X coordinate of a vector after a rotation",
+      "fullName": "Rotated vector X",
+      "functionType": "Expression",
+      "name": "RotatedVectorX",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "cos(ToRad(Angle)) * VectorX - sin(ToRad(Angle)) * VectorY"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Vector X",
+          "name": "VectorX",
+          "type": "expression"
+        },
+        {
+          "description": "Vector Y",
+          "name": "VectorY",
+          "type": "expression"
+        },
+        {
+          "description": "Angle (in degrees)",
+          "name": "Angle",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the Y coordinate of a vector after a rotation",
+      "fullName": "Rotated vector Y",
+      "functionType": "Expression",
+      "name": "RotatedVectorY",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "sin(ToRad(Angle)) * VectorX + cos(ToRad(Angle)) * VectorY"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Vector X",
+          "name": "VectorX",
+          "type": "expression"
+        },
+        {
+          "description": "Vector Y",
+          "name": "VectorY",
+          "type": "expression"
+        },
+        {
+          "description": "Angle (in degrees)",
+          "name": "Angle",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Move objects by holding 2 touches on them.",
+      "fullName": "Pinchable object",
+      "name": "Pichable",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PinchGesture::IsPinching"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Only the objects with the highest Z-Order will be actually pinched (see doStepPostEvents)."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PinchGesture::CurrentCenterX(Object.Layer())",
+                        "PinchGesture::CurrentCenterY(Object.Layer())"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "IsCandidate",
+                        "True",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "ZOrderMaximum",
+                        "=",
+                        "max(ZOrderMaximum, Object.ZOrder())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PinchGesture::Pichable::SetPropertyBeginningCenterX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.CenterX()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PinchGesture::Pichable::SetPropertyBeginningCenterY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.CenterY()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PinchGesture::Pichable::SetPropertyBeginningAngle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.Angle()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "BeginningWidth",
+                        "=",
+                        "Object.Width()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "BeginningHeight",
+                        "=",
+                        "Object.Height()"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Move the object according to the pinch gesture."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsPinched",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetCenterX"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "PinchGesture::TransformedX(BeginningCenterX, BeginningCenterY, Object.Layer())"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetCenterY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "PinchGesture::TransformedY(BeginningCenterX, BeginningCenterY, Object.Layer())"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "BeginningAngle + PinchGesture::Rotation()"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "LockSize",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ResizableCapability::ResizableBehavior::SetWidth"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Resizable",
+                        "=",
+                        "BeginningWidth * PinchGesture::Scaling()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ResizableCapability::ResizableBehavior::SetHeight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Resizable",
+                        "=",
+                        "BeginningHeight * PinchGesture::Scaling()"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "PinchGesture::IsPinching"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsPinched",
+                    "False",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ZOrderMaximum",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PinchGesture::Pichable",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Only the objects with the highest Z-Order are actually pinched.\nIf all objects have the same Z-Order, they can all be picked at once."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsCandidate",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Plan"
+                  },
+                  "parameters": [
+                    "Object",
+                    ">=",
+                    "ZOrderMaximum"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsPinched",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsCandidate",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PinchGesture::Pichable",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the object is being pinched.",
+          "fullName": "Is being pinched",
+          "functionType": "Condition",
+          "name": "IsPinched",
+          "sentence": "_PARAM0_ is being pinched",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsPinched",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PinchGesture::Pichable",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Abort the pinching of this object.",
+          "fullName": "Abort pinching",
+          "functionType": "Action",
+          "name": "AbortPinching",
+          "sentence": "Abort the pinching of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsPinched",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PinchGesture::Pichable",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Resizable capability",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "ResizableCapability::ResizableBehavior"
+          ],
+          "name": "Resizable"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "Lock object size",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "LockSize"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "IsCandidate"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "IsPinched"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "BeginningCenterX"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "BeginningCenterY"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "BeginningAngle"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "BeginningWidth"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "BeginningHeight"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

@@ -1,0 +1,95 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "AlZ3D1xkH0QDao7T37VZZUeYNpn1",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "onPsboRtDkUHNOsx7OPr8R8G1oj2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Color Conversion",
+  "name": "ColorConversion",
+  "version": "1.3.1",
+  "url": "https://resources.gdevelop-app.com/extensions/ColorConversion.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ColorConversion-header.json",
+  "tags": "color,conversion,hexadecimal,rgb,hsl,hsv,hsb,luminance,wcag,blend",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/invert-colors.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Convert colors between RGB, HSV, HSL, hex, named. Blend and WCAG luminance.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 11,
+  "helpPath": "/extensions/color-conversion",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "HexToRgb",
+      "fullName": "Hexadecimal to RGB",
+      "description": "Converts a hexadecimal string into a RGB string.  Example input: \"0459AF\".",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "RgbToLuminance",
+      "fullName": "Luminance from RGB",
+      "description": "Calculate luminance of a RGB color.  Example input: \"0;128;255\".",
+      "functionType": "Expression"
+    },
+    {
+      "name": "HexToLuminance",
+      "fullName": "Luminance from hexadecimal",
+      "description": "Calculate luminance of a hexadecimal color.  Example input: \"0459AF\".",
+      "functionType": "Expression"
+    },
+    {
+      "name": "RgbMean",
+      "fullName": "Blend RGB colors",
+      "description": "Blend two RGB colors by applying a weighted mean.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "RgbToHex",
+      "fullName": "RGB to hexadecimal",
+      "description": "Converts a RGB string into a hexadecimal string.  Example input: \"0;128;255\".",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "RgbToHsl",
+      "fullName": "RGB to HSL",
+      "description": "Converts a RGB string into a HSL string.  Example input: \"0;128;255\"\".",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "HsvToRgb",
+      "fullName": "HSV to RGB",
+      "description": "Converts HSV color values into a RGB string.  Valid input ranges:  H(0 to 360), S(0 to 100), V(0 to 100).",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "RgbToHsv",
+      "fullName": "RGB to HSV",
+      "description": "Converts a RGB string into a HSV string.  Example input: \"0;128;255\".",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "NameToRgb",
+      "fullName": "Color name to RGB",
+      "description": "Converts a color name into a RGB string.  (Examples: black, gray, white, red, purple, green, yellow, blue)  \nFull list of colors: https://www.w3schools.com/colors/colors_names.asp.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "HslToRgb",
+      "fullName": "HSL to RGB",
+      "description": "Converts HSL color values into a RGB string.  Valid input ranges:  H(0 to 360), S(0 to 100), L(0 to 100).",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "HueToRgb",
+      "fullName": "Hue to RGB",
+      "description": "Converts a color hue (range: 0 to 360) into an RGB color string with 100% saturation and 50% lightness.",
+      "functionType": "StringExpression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Expressions to convert color values between various formats (RGB, HSV, HSL, named colors), calculate luminance according to WCAG 2.0 standards, and to blend two colors.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWludmVydC1jb2xvcnMiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIsMTkuNThWMTkuNThDMTAuNCwxOS41OCA4Ljg5LDE4Ljk2IDcuNzYsMTcuODNDNi42MiwxNi42OSA2LDE1LjE5IDYsMTMuNThDNiwxMiA2LjYyLDEwLjQ3IDcuNzYsOS4zNEwxMiw1LjFNMTcuNjYsNy45M0wxMiwyLjI3VjIuMjdMNi4zNCw3LjkzQzMuMjIsMTEuMDUgMy4yMiwxNi4xMiA2LjM0LDE5LjI0QzcuOSwyMC44IDkuOTUsMjEuNTggMTIsMjEuNThDMTQuMDUsMjEuNTggMTYuMSwyMC44IDE3LjY2LDE5LjI0QzIwLjc4LDE2LjEyIDIwLjc4LDExLjA1IDE3LjY2LDcuOTNaIiAvPjwvc3ZnPg=="
+}

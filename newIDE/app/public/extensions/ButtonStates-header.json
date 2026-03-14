@@ -1,0 +1,459 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Button states and effects",
+  "name": "ButtonStates",
+  "version": "1.4.1",
+  "url": "https://resources.gdevelop-app.com/extensions/ButtonStates.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ButtonStates-header.json",
+  "tags": "ui,button",
+  "category": "User interface",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/753a9a794bd885058159b7509f06f5a8f67f72decfccb9a1b0efee26f41c3c4c_gesture-tap-button.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Use any object as a button and change appearance according to user interactions.",
+  "eventsBasedBehaviorsCount": 6,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/objects/button",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Use objects as buttons.",
+      "fullName": "Button states",
+      "name": "ButtonFSM",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "IsIdle",
+          "fullName": "Is idle",
+          "description": "Check if the button is not used.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsClicked",
+          "fullName": "Is clicked",
+          "description": "Check if the button was just clicked.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsHovered",
+          "fullName": "Is hovered",
+          "description": "Check if the cursor is hovered over the button.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsFocused",
+          "fullName": "Is focused",
+          "description": "Check if the button is either hovered or pressed but not hovered.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsPressed",
+          "fullName": "Is pressed",
+          "description": "Check if the button is currently being pressed with mouse or touch.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsPressedOutside",
+          "fullName": "Is held outside",
+          "description": "Check if the button is currently being pressed outside with mouse or touch.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "TouchId",
+          "fullName": "Touch id",
+          "description": "Compare the touch id that is using the button or 0 if none.",
+          "functionType": "Condition"
+        }
+      ]
+    },
+    {
+      "description": "Enable effects on buttons based on their state.",
+      "fullName": "Button object effects",
+      "name": "ButtonObjectEffects",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "IdleEffect",
+          "fullName": "Idle state effect",
+          "description": "Compare the idle state effect of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetIdleEffect",
+          "fullName": "Idle state effect",
+          "description": "Change the idle state effect of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FocusedEffect",
+          "fullName": "Focused state effect",
+          "description": "Compare the focused state effect of the object. The state is Focused when the button is hovered or held outside.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFocusedEffect",
+          "fullName": "Focused state effect",
+          "description": "Change the focused state effect of the object. The state is Focused when the button is hovered or held outside.",
+          "functionType": "Action"
+        },
+        {
+          "name": "PressedEffect",
+          "fullName": "Pressed state effect",
+          "description": "Compare the pressed state effect of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetPressedEffect",
+          "fullName": "Pressed state effect",
+          "description": "Change the pressed state effect of the object.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Change the animation of buttons according to their state.",
+      "fullName": "Button animation",
+      "name": "ButtonAnimationName",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "IdleAnimationName",
+          "fullName": "Idle state animation name",
+          "description": "Compare the idle state animation name of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetIdleAnimationName",
+          "fullName": "Idle state animation name",
+          "description": "Change the idle state animation name of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FocusedAnimationName",
+          "fullName": "Focused state animation name",
+          "description": "Compare the focused state animation name of the object. The state is Focused when the button is hovered or held outside.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFocusedAnimationName",
+          "fullName": "Focused state animation name",
+          "description": "Change the focused state animation name of the object. The state is Focused when the button is hovered or held outside.",
+          "functionType": "Action"
+        },
+        {
+          "name": "PressedAnimationName",
+          "fullName": "Pressed state animation name",
+          "description": "Compare the pressed state animation name of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetPressedAnimationName",
+          "fullName": "Pressed state animation name",
+          "description": "Change the pressed state animation name of the object.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Smoothly change an effect on buttons according to their state.",
+      "fullName": "Button object effect tween",
+      "name": "ButtonObjectEffectTween",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "EffectName",
+          "fullName": "Effect name",
+          "description": "Compare the effect name of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "EffectProperty",
+          "fullName": "Effect parameter",
+          "description": "Compare the effect parameter of the object. The effect parameter names can be found in the effects tab with the \"Show parameter names\" action of the drop down menu.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEffectProperty",
+          "fullName": "Effect parameter",
+          "description": "Change the effect parameter of the object. The effect parameter names can be found in the effects tab with the \"Show parameter names\" action of the drop down menu.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IdleValue",
+          "fullName": "Idle effect parameter value",
+          "description": "Compare the idle effect parameter value of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetIdleValue",
+          "fullName": "Idle effect parameter value",
+          "description": "Change the idle effect parameter value of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FocusedValue",
+          "fullName": "Focused effect parameter value",
+          "description": "Compare the focused effect parameter value of the object. The state is Focused when the button is hovered or held outside.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFocusedValue",
+          "fullName": "Focused effect parameter value",
+          "description": "Change the focused effect parameter value of the object. The state is Focused when the button is hovered or held outside.",
+          "functionType": "Action"
+        },
+        {
+          "name": "PressedValue",
+          "fullName": "Pressed effect parameter value",
+          "description": "Compare the pressed effect parameter value of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetPressedValue",
+          "fullName": "Pressed effect parameter value",
+          "description": "Change the pressed effect parameter value of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FadeInEasing",
+          "fullName": "Fade-in easing",
+          "description": "Compare the fade-in easing of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFadeInEasing",
+          "fullName": "Fade-in easing",
+          "description": "Change the fade-in easing of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FadeOutEasing",
+          "fullName": "Fade-out easing",
+          "description": "Compare the fade-out easing of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFadeOutEasing",
+          "fullName": "Fade-out easing",
+          "description": "Change the fade-out easing of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FadeInDuration",
+          "fullName": "Fade-in duration",
+          "description": "Compare the fade-in duration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFadeInDuration",
+          "fullName": "Fade-in duration",
+          "description": "Change the fade-in duration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FadeOutDuration",
+          "fullName": "Fade-out duration",
+          "description": "Compare the fade-out duration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFadeOutDuration",
+          "fullName": "Fade-out duration",
+          "description": "Change the fade-out duration of the object.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Smoothly resize buttons according to their state.",
+      "fullName": "Button scale tween",
+      "name": "ButtonScaleTween",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "IdleScale",
+          "fullName": "Idle state size scale",
+          "description": "Compare the idle state size scale of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetIdleScale",
+          "fullName": "Idle state size scale",
+          "description": "Change the idle state size scale of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FocusedScale",
+          "fullName": "Focused state size scale",
+          "description": "Compare the focused state size scale of the object. The state is Focused when the button is hovered or held outside.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFocusedScale",
+          "fullName": "Focused state size scale",
+          "description": "Change the focused state size scale of the object. The state is Focused when the button is hovered or held outside.",
+          "functionType": "Action"
+        },
+        {
+          "name": "PressedScale",
+          "fullName": "Pressed state size scale",
+          "description": "Compare the pressed state size scale of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetPressedScale",
+          "fullName": "Pressed state size scale",
+          "description": "Change the pressed state size scale of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FadeInDuration",
+          "fullName": "Fade-in duration",
+          "description": "Compare the fade-in duration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFadeInDuration",
+          "fullName": "Fade-in duration",
+          "description": "Change the fade-in duration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FadeOutDuration",
+          "fullName": "Fade-out duration",
+          "description": "Compare the fade-out duration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFadeOutDuration",
+          "fullName": "Fade-out duration",
+          "description": "Change the fade-out duration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FadeInEasing",
+          "fullName": "Fade-in easing",
+          "description": "Compare the fade-in easing of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFadeInEasing",
+          "fullName": "Fade-in easing",
+          "description": "Change the fade-in easing of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FadeOutEasing",
+          "fullName": "Fade-out easing",
+          "description": "Compare the fade-out easing of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFadeOutEasing",
+          "fullName": "Fade-out easing",
+          "description": "Change the fade-out easing of the object.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Smoothly change the color tint of buttons according to their state.",
+      "fullName": "Button color tint tween",
+      "name": "ButtonColorTintTween",
+      "objectType": "Sprite",
+      "eventsFunctions": [
+        {
+          "name": "IdleColorTint",
+          "fullName": "Idle state color tint",
+          "description": "Compare the idle state color tint of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetIdleColorTint",
+          "fullName": "Idle state color tint",
+          "description": "Change the idle state color tint of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FocusedColorTint",
+          "fullName": "Focused state color tint",
+          "description": "Compare the focused state color tint of the object. The state is Focused when the button is hovered or held outside.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFocusedColorTint",
+          "fullName": "Focused state color tint",
+          "description": "Change the focused state color tint of the object. The state is Focused when the button is hovered or held outside.",
+          "functionType": "Action"
+        },
+        {
+          "name": "PressedColorTint",
+          "fullName": "Pressed state color tint",
+          "description": "Compare the pressed state color tint of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetPressedColorTint",
+          "fullName": "Pressed state color tint",
+          "description": "Change the pressed state color tint of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FadeInDuration",
+          "fullName": "Fade-in duration",
+          "description": "Compare the fade-in duration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFadeInDuration",
+          "fullName": "Fade-in duration",
+          "description": "Change the fade-in duration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FadeOutDuration",
+          "fullName": "Fade-out duration",
+          "description": "Compare the fade-out duration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFadeOutDuration",
+          "fullName": "Fade-out duration",
+          "description": "Change the fade-out duration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FadeInEasing",
+          "fullName": "Fade-in easing",
+          "description": "Compare the fade-in easing of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFadeInEasing",
+          "fullName": "Fade-in easing",
+          "description": "Change the fade-in easing of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FadeOutEasing",
+          "fullName": "Fade-out easing",
+          "description": "Compare the fade-out easing of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFadeOutEasing",
+          "fullName": "Fade-out easing",
+          "description": "Change the fade-out easing of the object.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Use the \"Button states\" behavior to track user interactions with an object, including:\n\n- Hovered\n- Pressed\n- Clicked\n- Idle\n\nAdd additional behaviors to make juicy buttons with animated responses to user input:\n\n- Size\n- Color\n- Animation\n- Object effects",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdlc3R1cmUtdGFwLWJ1dHRvbiIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMyA1QzE1LjIxIDUgMTcgNi43OSAxNyA5QzE3IDEwLjUgMTYuMiAxMS43NyAxNSAxMi40NlYxMS4yNEMxNS42MSAxMC42OSAxNiA5Ljg5IDE2IDlDMTYgNy4zNCAxNC42NiA2IDEzIDZTMTAgNy4zNCAxMCA5QzEwIDkuODkgMTAuMzkgMTAuNjkgMTEgMTEuMjRWMTIuNDZDOS44IDExLjc3IDkgMTAuNSA5IDlDOSA2Ljc5IDEwLjc5IDUgMTMgNU0yMCAyMC41QzE5Ljk3IDIxLjMyIDE5LjMyIDIxLjk3IDE4LjUgMjJIMTNDMTIuNjIgMjIgMTIuMjYgMjEuODUgMTIgMjEuNTdMOCAxNy4zN0w4Ljc0IDE2LjZDOC45MyAxNi4zOSA5LjIgMTYuMjggOS41IDE2LjI4SDkuN0wxMiAxOFY5QzEyIDguNDUgMTIuNDUgOCAxMyA4UzE0IDguNDUgMTQgOVYxMy40N0wxNS4yMSAxMy42TDE5LjE1IDE1Ljc5QzE5LjY4IDE2LjAzIDIwIDE2LjU2IDIwIDE3LjE0VjIwLjVNMjAgMkg0QzIuOSAyIDIgMi45IDIgNFYxMkMyIDEzLjExIDIuOSAxNCA0IDE0SDhWMTJMNCAxMkw0IDRIMjBMMjAgMTJIMThWMTRIMjBWMTMuOTZMMjAuMDQgMTRDMjEuMTMgMTQgMjIgMTMuMDkgMjIgMTJWNEMyMiAyLjkgMjEuMTEgMiAyMCAyWiIgLz48L3N2Zz4="
+}

@@ -1,0 +1,23 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "5iOtaj8yEsam4mIj7TEUDk4LSAe2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Dungeon generator",
+  "name": "DungeonGenerator",
+  "version": "1.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/DungeonGenerator.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/DungeonGenerator-header.json",
+  "tags": "dungeon,generator,procedural,generation,automatic,build,create,rogue,roguelike,hallway,entrance,floor,room,cave",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/sitemap.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Create a procedurally generated dungeon.  Includes two layouts: \"rooms and hallways\" and \"dungeon cave\".",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 6,
+  "helpPath": "https://victrisgames.itch.io/extension-dungeon-generator",
+  "description": "How to use:\n- Run the \"Generate Dungeon Cave\" or \"Generate Dungeon with Rooms\" action at the beginning of a scene.\n\nTips:\n- Keep the amount of space used by room objects to less than ~25% of the total map.  If you add too many rooms, they will not be placed correctly and might collide with other rooms.\n- Try using top-down controls combined with physics behavior (with no gravity) on the player and wall objects\n- Use external layouts to place pre-designed rooms on randomly created room objects\n- Use \"Delete Unused Terrain\" option to reduce resources used\n- Use \"RoomID(object)\" expression to determine the starting and ending room\n- Use \"NeighborCount(object)\" expression to find good places to place treasure.  A high amount of neighbors means that the tile is a nook or cranny.\n- Use \"IsRoomEntrance\" condition to identify hallway objects that are adjacent to a room\n\nAn example shows how to procedurally generate dungeons or caves ([open the project online](https://editor.gdevelop.io/?project=example://dungeon-generator)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNpdGVtYXAiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNOSwyVjhIMTFWMTFINUMzLjg5LDExIDMsMTEuODkgMywxM1YxNkgxVjIySDdWMTZINVYxM0gxMVYxNkg5VjIySDE1VjE2SDEzVjEzSDE5VjE2SDE3VjIySDIzVjE2SDIxVjEzQzIxLDExLjg5IDIwLjExLDExIDE5LDExSDEzVjhIMTVWMkg5WiIgLz48L3N2Zz4="
+}

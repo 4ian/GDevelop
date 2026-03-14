@@ -1,0 +1,31 @@
+{
+  "tier": "reviewed",
+  "authorIds": [],
+  "extensionNamespace": "",
+  "fullName": "YSort",
+  "name": "YSort",
+  "version": "0.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/YSort.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/YSort-header.json",
+  "tags": "z-order,y-sort,depth,fake-depth,isometric,rpg",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/sort-ascending.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Set Z-order from Y position for depth illusion in top-down/isometric views.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/ysort",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Set the depth (Z-order) of the instance to the value of its Y position in the scene, creating an illusion of depth. The origin point of the object is used to determine the Z-order.",
+      "fullName": "YSort",
+      "name": "YSort",
+      "objectType": "",
+      "eventsFunctions": []
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Set the depth (Z-order) of the instance to the value of its Y position in the scene, creating an illusion of depth. The origin point of the object is used to determine the Z-order.\n\nThis is useful for:\n- isometric games ([open the project online](https://editor.gdevelop.io/?project=example://isometric-game))\n- top-down games ([open the project online](https://editor.gdevelop.io/?project=example://top-down-grid-movement))",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNvcnQtYXNjZW5kaW5nIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE5IDE3SDIyTDE4IDIxTDE0IDE3SDE3VjNIMTlNMiAxN0gxMlYxOUgyTTYgNVY3SDJWNU0yIDExSDlWMTNIMlYxMVoiIC8+PC9zdmc+"
+}

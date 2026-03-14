@@ -1,0 +1,1965 @@
+{
+  "author": "",
+  "category": "Game mechanic",
+  "extensionNamespace": "",
+  "fullName": "3D height map",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "/extensions/height-map3d/details",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXRlcnJhaW4iIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTQsNkwxMC4yNSwxMUwxMy4xLDE0LjhMMTEuNSwxNkM5LjgxLDEzLjc1IDcsMTAgNywxMEwxLDE4SDIzTDE0LDZaIiAvPjwvc3ZnPg==",
+  "name": "HeightMap3D",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/10e0a26c0d500830dfe23b94138beb0ef61607ba62bca05a5aa5c849777f1b06_terrain.svg",
+  "shortDescription": "A terrain with hills where 3D physics objects can stand.",
+  "version": "1.0.2",
+  "description": [
+    "A terrain with hills where objects with the 3D physics behavior can stand.",
+    "",
+    "A terrain can be built from:",
+    "- an image file",
+    "- noise function ([open the project online](https://editor.gdevelop.io/?project=example://3d-endless-terrain))",
+    ""
+  ],
+  "origin": {
+    "identifier": "HeightMap3D",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "3d,field,physics",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Define helper classes JavaScript code.",
+      "fullName": "Define helper classes",
+      "functionType": "Action",
+      "name": "DefineHelperClasses",
+      "private": true,
+      "sentence": "Define helper classes JavaScript code",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (gdjs.__heightMap3DExtension) {",
+            "    return;",
+            "}",
+            "",
+            "const defaultWidth = 64;",
+            "const defaultHeight = 64;",
+            "const defaultDepth = 64;",
+            "",
+            "class HeightMap {",
+            "    /** @type {gdjs.CustomRuntimeObject3D} */",
+            "    object;",
+            "    /** @type {THREE.Mesh} */",
+            "    mesh;",
+            "",
+            "    /** @type {THREE.TypedArray} */",
+            "    vertices;",
+            "",
+            "    /** @type {integer} */",
+            "    dimX;",
+            "    /** @type {integer} */",
+            "    dimY;",
+            "",
+            "    hasChangedThisFrame = false;",
+            "    isDirty = false;",
+            "",
+            "    /**",
+            "     * @param object {gdjs.CustomRuntimeObject}",
+            "     * @param dimX {integer}",
+            "     * @param dimY {integer}",
+            "     * @param color {string}",
+            "     * @param wireframe {boolean}",
+            "     */",
+            "    constructor(object, dimX, dimY, color, wireframe) {",
+            "        this.object = object;",
+            "        this.dimX = dimX;",
+            "        this.dimY = dimY;",
+            "",
+            "        this.rebuildPlane();",
+            "        this.setColor(color);",
+            "        this.setWireframe(wireframe);",
+            "    }",
+            "",
+            "    /**",
+            "     * @param dimX {integer}",
+            "     * @param dimY {integer}",
+            "     */",
+            "    clearAndResize(dimX, dimY) {",
+            "        this.dimX = dimX;",
+            "        this.dimY = dimY;",
+            "        this.rebuildPlane();",
+            "    }",
+            "",
+            "    rebuildPlane() {",
+            "        const material = this.mesh ? this.mesh.material : new THREE.MeshStandardMaterial();",
+            "        if (this.mesh) {",
+            "            this.mesh.removeFromParent();",
+            "        }",
+            "        const geometry = new THREE.PlaneGeometry(64, 64, this.dimX - 1, this.dimY - 1);",
+            "        this.vertices = geometry.attributes.position.array;",
+            "        this.mesh = new THREE.Mesh(geometry, material);",
+            "        this.mesh.rotation.order = 'ZYX';",
+            "        this.mesh.position.x = defaultWidth / 2;",
+            "        this.mesh.position.y = defaultHeight / 2;",
+            "        this.mesh.scale.y = -1;",
+            "        this.object.get3DRendererObject().add(this.mesh);",
+            "        this.hasChangedThisFrame = true;",
+            "    }",
+            "",
+            "    forceUpdate() {",
+            "        if (this.isDirty) {",
+            "            this.isDirty = false;",
+            "            this.mesh.geometry.attributes.position.needsUpdate = true;",
+            "            this.mesh.geometry.computeVertexNormals();",
+            "        }",
+            "    }",
+            "",
+            "    updateIfNeeded() {",
+            "        if (this.isDirty && !this.object.isHidden()) {",
+            "            this.isDirty = false;",
+            "            this.mesh.geometry.attributes.position.needsUpdate = true;",
+            "            this.mesh.geometry.computeVertexNormals();",
+            "        }",
+            "        this.hasChangedThisFrame = false;",
+            "    }",
+            "",
+            "    setAsDirty() {",
+            "        this.hasChangedThisFrame = true;",
+            "        this.isDirty = true;",
+            "    }",
+            "",
+            "    /**",
+            "     * @param indexX {integer}",
+            "     * @param indexY {integer}",
+            "     * @param value {float} a value between 0 and 1",
+            "     */",
+            "    setGridValue(indexX, indexY, value) {",
+            "        this.vertices[this.getVerticeZIndex(indexX, indexY)] =",
+            "            defaultDepth * gdjs.evtTools.common.clamp(0, 1, value);",
+            "        this.setAsDirty();",
+            "    }",
+            "",
+            "    /**",
+            "     * @param indexX {integer}",
+            "     * @param indexY {integer}",
+            "     * @returns {float} a value between 0 and 1",
+            "     */",
+            "    getGridValue(indexX, indexY) {",
+            "        return this.vertices[this.getVerticeZIndex(indexX, indexY)] / defaultDepth;",
+            "    }",
+            "",
+            "    /**",
+            "     * @param indexX {integer}",
+            "     * @param indexY {integer}",
+            "     * @returns {integer}",
+            "     */",
+            "    getVerticeZIndex(indexX, indexY) {",
+            "        return 2 + 3 * (indexX + indexY * this.dimX);",
+            "    }",
+            "",
+            "    /**",
+            "     * @param pointX {float} position in the scene",
+            "     * @param pointY {float} position in the scene",
+            "     * @return {float} the Z coordinate of the field point",
+            "     */",
+            "    getFieldZ(pointX, pointY) {",
+            "        const objectX = this.object.getX();",
+            "        const objectY = this.object.getY();",
+            "        const objectWidth = this.object.getWidth();",
+            "        const objectHeight = this.object.getHeight();",
+            "        if (pointX < objectX || pointX > objectX + objectWidth ||",
+            "            pointY < objectY || pointY > objectY + objectHeight) {",
+            "            return 0;",
+            "        }",
+            "        const x = (this.dimX - 1) * (pointX - objectX) / objectWidth;",
+            "        const y = (this.dimY - 1) * (pointY - objectY) / objectHeight;",
+            "        const integerPartX = Math.floor(x);",
+            "        const integerPartY = Math.floor(y);",
+            "        const floatPartX = x - integerPartX;",
+            "        const floatPartY = y - integerPartY;",
+            "        const bottomLeft = this.getGridValue(integerPartX, integerPartY + 1);",
+            "        const topRight = this.getGridValue(integerPartX + 1, integerPartY);",
+            "        let fieldValue = 0;",
+            "        if (floatPartX + floatPartY > 1) {",
+            "            // Bottom right triangle",
+            "            const bottomRight = this.getGridValue(integerPartX + 1, integerPartY + 1);",
+            "            fieldValue = (floatPartX + floatPartY - 1) * bottomRight +",
+            "                (1 - floatPartX) * bottomLeft + (1 - floatPartY) * topRight;",
+            "        }",
+            "        else {",
+            "            // Top left triangle",
+            "            const topLeft = this.getGridValue(integerPartX, integerPartY);",
+            "            fieldValue = (1 - floatPartX - floatPartY) * topLeft +",
+            "                floatPartX * topRight + floatPartY * bottomLeft;",
+            "        }",
+            "        return this.object.getZ() + fieldValue * this.object.getDepth();",
+            "    }",
+            "",
+            "    /**",
+            "     * @param texture {PIXI.Texture}",
+            "     * @param offsetX {integer}",
+            "     * @param offsetY {integer}",
+            "     */",
+            "    loadHeightMapFromTexture(texture, offsetX, offsetY) {",
+            "        const imageData = getImageData(texture, offsetX, offsetY, this.dimX, this.dimY);",
+            "        const size = this.dimX * this.dimY;",
+            "        const colorRange = 0xffff;",
+            "        const colorScale = defaultDepth / colorRange;",
+            "",
+            "        for (",
+            "            let verticeIndex = 0, colorIndex = 0;",
+            "            verticeIndex < 3 * size;",
+            "            verticeIndex += 3, colorIndex += 4) {",
+            "            // Read red and green channel to workaround canvas being 8 bits.",
+            "            // Users need to convert their 16 bits grayscale images into 8 bits RGB.",
+            "            const color = 256 * imageData.data[colorIndex] + imageData.data[colorIndex + 1];",
+            "            this.vertices[verticeIndex + 2] = color * colorScale;",
+            "        }",
+            "        this.setAsDirty(true);",
+            "    }",
+            "",
+            "    /**",
+            "     * @param color {string}",
+            "     */",
+            "    setColor(color) {",
+            "        /** @type {THREE.MeshStandardMaterial} */",
+            "        const material = this.mesh.material;",
+            "        material.color.set(gdjs.rgbOrHexStringToNumber(color));",
+            "    }",
+            "",
+            "    /**",
+            "     * @param wireframe {boolean}",
+            "     */",
+            "    setWireframe(wireframe) {",
+            "        /** @type {THREE.MeshStandardMaterial} */",
+            "        const material = this.mesh.material;",
+            "        material.wireframe = wireframe;",
+            "    }",
+            "}",
+            "",
+            "/**",
+            " * @implements {gdjs.Physics3DRuntimeBehavior.BodyUpdater}",
+            " */",
+            "class PhysicsHeightMap {",
+            "    /** @type {gdjs.Physics3DRuntimeBehavior} */",
+            "    physics;",
+            "    /** @type {HeightMap} */",
+            "    heightMap;",
+            "",
+            "    /**",
+            "     * @param physics {gdjs.Physics3DRuntimeBehavior}",
+            "     * @param heightMap {HeightMap}",
+            "     */",
+            "    constructor(physics, heightMap) {",
+            "        this.physics = physics;",
+            "        this.heightMap = heightMap;",
+            "",
+            "        this.physicsBodyUpdater = physics.bodyUpdater;",
+            "        physics.bodyUpdater = this;",
+            "        // Calling `recreateBody` directly doesn't work.",
+            "        this.heightMap.hasChangedThisFrame = true;",
+            "    }",
+            "",
+            "    updateIfNeeded() {",
+            "        if (this.heightMap.hasChangedThisFrame) {",
+            "            this.physics.recreateBody();",
+            "        }",
+            "    }",
+            "",
+            "    /**",
+            "     * @returns {Jolt.Body | null}",
+            "     */",
+            "    createAndAddBody() {",
+            "        const { physics } = this;",
+            "        const { _sharedData } = physics;",
+            "        const { dimX, dimY, vertices, object } = this.heightMap;",
+            "",
+            "        const shapeSettings = new Jolt.HeightFieldShapeSettings();",
+            "        const width = object.getWidth() * _sharedData.worldInvScale;",
+            "        const height = object.getHeight() * _sharedData.worldInvScale;",
+            "        const depth = object.getDepth() * _sharedData.worldInvScale;",
+            "        shapeSettings.mOffset.Set(-width / 2, -depth / 2, -height / 2);",
+            "        shapeSettings.mScale.Set(",
+            "            width / (dimX - 1),",
+            "            object.getDepth() / defaultDepth,",
+            "            height / (dimY - 1),",
+            "        );",
+            "        shapeSettings.mSampleCount = dimX;",
+            "        const totalSize = dimX * dimY;",
+            "        shapeSettings.mHeightSamples.resize(totalSize);",
+            "        const heightSamples = new Float32Array(",
+            "            Jolt.HEAPF32.buffer,",
+            "            Jolt.getPointer(shapeSettings.mHeightSamples.data()),",
+            "            totalSize);",
+            "        for (let index = 0; index < heightSamples.length; index++) {",
+            "            heightSamples[index] = vertices[2 + 3 * index] * _sharedData.worldInvScale;",
+            "            // TODO Handle holes",
+            "            // Jolt.HeightFieldShapeConstantValues.prototype.cNoCollisionValue;",
+            "        }",
+            "        const shape = shapeSettings.Create().Get();",
+            "        Jolt.destroy(shapeSettings);",
+            "        const scaledShape = shape.ScaleShape(_sharedData.getVec3(1, 1, -1)).Get();",
+            "",
+            "        const position = physics._getPhysicsPosition(_sharedData.getRVec3(0, 0, 0));",
+            "        const rotation = this._getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1));",
+            "",
+            "        const creationSettings = new Jolt.BodyCreationSettings(",
+            "            scaledShape, position, rotation, Jolt.EMotionType_Static, physics.getBodyLayer());",
+            "        const body = _sharedData.bodyInterface.CreateBody(creationSettings);",
+            "        Jolt.destroy(creationSettings);",
+            "        _sharedData.bodyInterface.AddBody(",
+            "            body.GetID(),",
+            "            Jolt.EActivation_Activate",
+            "        );",
+            "        return body;",
+            "    }",
+            "",
+            "    /**",
+            "     * @param result {Jolt.Quat}",
+            "     */",
+            "    _getPhysicsRotation(result) {",
+            "        const threeObject = this.heightMap.object.get3DRendererObject();",
+            "        // TODO Use a static variable for the quaternion.",
+            "        // It's not great to use the object rotation directly.",
+            "        threeObject.rotation.x += Math.PI / 2;",
+            "        result.Set(",
+            "            threeObject.quaternion.x,",
+            "            threeObject.quaternion.y,",
+            "            threeObject.quaternion.z,",
+            "            threeObject.quaternion.w",
+            "        );",
+            "        threeObject.rotation.x -= Math.PI / 2;",
+            "        return result;",
+            "    }",
+            "",
+            "    updateObjectFromBody() {",
+            "        const { physics } = this;",
+            "        const { _body } = physics;",
+            "        // Copy transform from body to the GD object.",
+            "        // The body is null when the behavior was either deactivated or the object deleted.",
+            "        // It would be useless to try to recreate it as updateBodyFromObject already does it.",
+            "        // If the body is null, we just don't do anything",
+            "        // (but still run the physics simulation - this is independent).",
+            "        if (_body !== null && _body.IsActive()) {",
+            "            physics._moveObjectToPhysicsPosition(_body.GetPosition());",
+            "            this._moveObjectToPhysicsRotation(_body.GetRotation());",
+            "        }",
+            "    }",
+            "",
+            "    /**",
+            "     * @param physicsRotation {Jolt.Quad}",
+            "     */",
+            "    _moveObjectToPhysicsRotation(physicsRotation) {",
+            "        const { object } = this.heightMap;",
+            "",
+            "        const threeObject = object.get3DRendererObject();",
+            "        threeObject.quaternion.x = physicsRotation.GetX();",
+            "        threeObject.quaternion.y = physicsRotation.GetY();",
+            "        threeObject.quaternion.z = physicsRotation.GetZ();",
+            "        threeObject.quaternion.w = physicsRotation.GetW();",
+            "        // TODO Avoid this instantiation",
+            "        const euler = new THREE.Euler(0, 0, 0, 'ZYX');",
+            "        euler.setFromQuaternion(threeObject.quaternion);",
+            "        object.setRotationX(gdjs.toDegrees(euler.x) - 90);",
+            "        object.setRotationY(gdjs.toDegrees(euler.y));",
+            "        object.setAngle(gdjs.toDegrees(euler.z));",
+            "    }",
+            "",
+            "    updateBodyFromObject() {",
+            "        const { object } = this.heightMap;",
+            "        const { physics } = this;",
+            "        const { _sharedData } = physics;",
+            "        if (physics._body === null) {",
+            "            if (!physics._createBody()) return;",
+            "        }",
+            "        const body = physics._body;",
+            "",
+            "        if (",
+            "            physics._objectOldX !== object.getX() ||",
+            "            physics._objectOldY !== object.getY() ||",
+            "            physics._objectOldZ !== object.getZ() ||",
+            "            physics._objectOldRotationX !== object.getRotationX() ||",
+            "            physics._objectOldRotationY !== object.getRotationY() ||",
+            "            physics._objectOldRotationZ !== object.getAngle()",
+            "        ) {",
+            "            _sharedData.bodyInterface.SetPositionAndRotationWhenChanged(",
+            "                body.GetID(),",
+            "                physics._getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),",
+            "                this._getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),",
+            "                Jolt.EActivation_Activate",
+            "            );",
+            "        }",
+            "    }",
+            "",
+            "    recreateShape() {",
+            "        this.physicsBodyUpdater.recreateShape();",
+            "    }",
+            "",
+            "    destroyBody() {",
+            "        this.physicsBodyUpdater.destroyBody();",
+            "    }",
+            "}",
+            "",
+            "/**",
+            " * @param texture {PIXI.Texture}",
+            " * @param offsetX {integer}",
+            " * @param offsetY {integer}",
+            " * @param width {integer}",
+            " * @param height {integer}",
+            " */",
+            "function getImageData(texture, offsetX, offsetY, width, height) {",
+            "    const canvas = document.createElement('canvas');",
+            "    const context = canvas.getContext('2d');",
+            "    /** @type {PIXI.Rectangle} */",
+            "    const crop = texture._frame.clone();",
+            "",
+            "    crop.x += offsetX;",
+            "    crop.y += offsetY;",
+            "    crop.width = Math.min(crop.width, width);",
+            "    crop.height = Math.min(crop.height, height);",
+            "",
+            "    // TODO Should the resolution be taken into account?",
+            "    // /** @type {number} */",
+            "    // const resolution = texture.baseTexture.resolution;",
+            "    // crop.x *= resolution;",
+            "    // crop.y *= resolution;",
+            "    // crop.width *= resolution;",
+            "    // crop.height *= resolution;",
+            "",
+            "    canvas.width = width;",
+            "    canvas.height = height;",
+            "",
+            "    context.save();",
+            "    context.globalCompositeOperation = 'copy';",
+            "    context.drawImage(",
+            "        texture.baseTexture.getDrawableSource(),",
+            "        crop.x,",
+            "        crop.y,",
+            "        crop.width,",
+            "        crop.height,",
+            "        0,",
+            "        0,",
+            "        crop.width,",
+            "        crop.height",
+            "    );",
+            "    context.restore();",
+            "",
+            "    return context.getImageData(0, 0, width, height);",
+            "}",
+            "",
+            "gdjs.__heightMap3DExtension = {",
+            "    HeightMap,",
+            "    PhysicsHeightMap,",
+            "};",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the events are running for the editor.",
+      "fullName": "Editor is running",
+      "functionType": "Condition",
+      "name": "IsInGameEdition",
+      "private": true,
+      "sentence": "Events are running for the editor",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const game = runtimeScene.getGame();\r",
+            "eventsFunctionContext.returnValue = game.isInGameEdition && game.isInGameEdition();"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [
+    {
+      "description": "A terrain with hills where 3D physics objects can stand.",
+      "fullName": "3D physics height map",
+      "name": "PhysicsHeightMap3D",
+      "objectType": "HeightMap3D::HeightMap3D",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "HeightMap3D::DefineHelperClasses"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "HeightMap3D::IsInGameEdition"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "/** @type {gdjs.CustomRuntimeObject} */\r",
+                    "const object = objects[0];\r",
+                    "\r",
+                    "const physics = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Physics3D\"));\r",
+                    "\r",
+                    "object.__heightMap3DExtension.physicsHeightMap = new gdjs.__heightMap3DExtension.PhysicsHeightMap(physics, object.__heightMap3DExtension.heightMap);\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "HeightMap3D::PhysicsHeightMap3D",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "HeightMap3D::IsInGameEdition"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "/** @type {gdjs.CustomRuntimeObject} */\r",
+                    "const object = objects[0];\r",
+                    "\r",
+                    "object.__heightMap3DExtension.physicsHeightMap.updateIfNeeded();\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "HeightMap3D::PhysicsHeightMap3D",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "3D physics engine",
+          "extraInformation": [
+            "Physics3D::Physics3DBehavior"
+          ],
+          "choices": [],
+          "name": "Physics3D"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": [
+    {
+      "areaMaxX": 64,
+      "areaMaxY": 64,
+      "areaMaxZ": 64,
+      "areaMinX": 0,
+      "areaMinY": 0,
+      "areaMinZ": 0,
+      "defaultName": "",
+      "description": "A terrain with hills in 3D.",
+      "fullName": "3D height map",
+      "is3D": true,
+      "isUsingLegacyInstancesRenderer": true,
+      "name": "HeightMap3D",
+      "objects": [
+        {
+          "assetStoreId": "",
+          "name": "Placeholder",
+          "type": "Scene3D::Cube3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "width": 64,
+            "height": 64,
+            "depth": 64,
+            "enableTextureTransparency": false,
+            "facesOrientation": "Y",
+            "frontFaceResourceName": "",
+            "backFaceResourceName": "",
+            "backFaceUpThroughWhichAxisRotation": "X",
+            "leftFaceResourceName": "",
+            "rightFaceResourceName": "",
+            "topFaceResourceName": "",
+            "bottomFaceResourceName": "",
+            "frontFaceVisible": true,
+            "backFaceVisible": true,
+            "leftFaceVisible": true,
+            "rightFaceVisible": true,
+            "topFaceVisible": true,
+            "bottomFaceVisible": true,
+            "frontFaceResourceRepeat": false,
+            "backFaceResourceRepeat": false,
+            "leftFaceResourceRepeat": false,
+            "rightFaceResourceRepeat": false,
+            "topFaceResourceRepeat": false,
+            "bottomFaceResourceRepeat": false,
+            "materialType": "Basic",
+            "tint": "255;255;255"
+          }
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "Placeholder"
+          }
+        ]
+      },
+      "objectsGroups": [],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 64,
+          "height": 64,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Placeholder",
+          "persistentUuid": "fc9b8b2b-f491-40ae-a136-ad0a5165a09d",
+          "width": 64,
+          "x": 0,
+          "y": 0,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "editionSettings": {},
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "HeightMap3D::DefineHelperClasses"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "HeightMapImage",
+                        "!=",
+                        "\"\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "HeightMap3D::IsInGameEdition"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "Placeholder"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/** @type {gdjs.CustomRuntimeObject} */\r",
+                "const object = objects[0];\r",
+                "const dimX = object._getGridDimensionX();\r",
+                "const dimY = object._getGridDimensionY();\r",
+                "const color = object._getColor();\r",
+                "const wireframe = object._getWireframe();\r",
+                "object.__heightMap3DExtension = {\r",
+                "    heightMap: new gdjs.__heightMap3DExtension.HeightMap(object, dimX, dimY, color, wireframe)\r",
+                "};"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "HeightMapImage",
+                    "!=",
+                    "\"\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "HeightMap3D::HeightMap3D::SetHeightMapImage"
+                  },
+                  "parameters": [
+                    "Object",
+                    "HeightMapImage",
+                    "ImageOffsetX",
+                    "ImageOffsetY",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/** @type {gdjs.CustomRuntimeObject} */\r",
+                "const object = objects[0];\r",
+                "\r",
+                "object.__heightMap3DExtension.heightMap.updateIfNeeded();\r",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onHotReloading",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "HeightMap3D::HeightMap3D::SetColor"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "Color",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Wireframe",
+                    "!=",
+                    "InitialColor"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "HeightMap3D::HeightMap3D::SetWireframe"
+                  },
+                  "parameters": [
+                    "Object",
+                    "no",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Wireframe",
+                    "True",
+                    "InitialColor"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "HeightMap3D::HeightMap3D::SetWireframe"
+                  },
+                  "parameters": [
+                    "Object",
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "GridDimensionX",
+                            "!=",
+                            "InitialGridDimensionX"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "GridDimensionY",
+                            "!=",
+                            "InitialGridDimensionY"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "HeightMap3D::HeightMap3D::ClearAndResize"
+                      },
+                      "parameters": [
+                        "Object",
+                        "GridDimensionX",
+                        "GridDimensionY",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "InitialGridDimensionX",
+                        "=",
+                        "GridDimensionX"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "InitialGridDimensionY",
+                        "=",
+                        "GridDimensionY"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "HasResized",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "HeightMapImage",
+                            "!=",
+                            "InitialHeightMapImage"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "ImageOffsetX",
+                            "!=",
+                            "InitialHeightMapImage"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "ImageOffsetY",
+                            "!=",
+                            "InitialHeightMapImage"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "HasResized",
+                            "True",
+                            "InitialHeightMapImage"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetStringVariable"
+                      },
+                      "parameters": [
+                        "InitialHeightMapImage",
+                        "=",
+                        "HeightMapImage"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "InitialImageOffsetX",
+                        "=",
+                        "ImageOffsetX"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "InitialImageOffsetY",
+                        "=",
+                        "ImageOffsetY"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "HeightMap3D::HeightMap3D::SetHeightMapImage"
+                      },
+                      "parameters": [
+                        "Object",
+                        "HeightMapImage",
+                        "ImageOffsetX",
+                        "ImageOffsetY",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "variables": [
+                {
+                  "name": "HasResized",
+                  "type": "boolean",
+                  "value": false
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Load a height map from an image file.",
+          "fullName": "Load height map",
+          "functionType": "Action",
+          "name": "LoadFromImage",
+          "sentence": "Load the height map of _PARAM0_ from _PARAM1_ offseted by _PARAM2_ ; _PARAM3_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/** @type {gdjs.CustomRuntimeObject} */",
+                "const object = objects[0];",
+                "",
+                "const imageResourceName = eventsFunctionContext.getArgument(\"Image\");",
+                "const offsetX = eventsFunctionContext.getArgument(\"OffsetX\");",
+                "const offsetY = eventsFunctionContext.getArgument(\"OffsetY\");",
+                "",
+                "const texture = runtimeScene",
+                "    .getGame()",
+                "    .getImageManager()",
+                "    .getPIXITexture(imageResourceName);",
+                "object.__heightMap3DExtension.heightMap.loadHeightMapFromTexture(texture, offsetX, offsetY);",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            },
+            {
+              "description": "Image",
+              "name": "Image",
+              "type": "imageResource"
+            },
+            {
+              "description": "Image cropping offset on X",
+              "name": "OffsetX",
+              "type": "expression"
+            },
+            {
+              "description": "Image cropping offset on Y",
+              "name": "OffsetY",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set a height map from an image file.",
+          "fullName": "Height map image",
+          "functionType": "Action",
+          "name": "SetHeightMapImage",
+          "private": true,
+          "sentence": "Set the height map of _PARAM0_ from _PARAM1_ offseted by _PARAM2_ ; _PARAM3_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "HeightMapImage",
+                    "=",
+                    "HeightMapImage"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ImageOffsetX",
+                    "=",
+                    "OffsetX"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ImageOffsetY",
+                    "=",
+                    "OffsetY"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/** @type {gdjs.CustomRuntimeObject} */",
+                "const object = objects[0];",
+                "",
+                "const imageResourceName = eventsFunctionContext.getArgument(\"Image\");",
+                "const offsetX = eventsFunctionContext.getArgument(\"OffsetX\");",
+                "const offsetY = eventsFunctionContext.getArgument(\"OffsetY\");",
+                "",
+                "const texture = runtimeScene",
+                "    .getGame()",
+                "    .getImageManager()",
+                "    .getPIXITexture(imageResourceName);",
+                "object.__heightMap3DExtension.heightMap.loadHeightMapFromTexture(texture, offsetX, offsetY);",
+                "",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            },
+            {
+              "description": "Image",
+              "name": "Image",
+              "type": "string"
+            },
+            {
+              "description": "Image cropping offset on X",
+              "name": "OffsetX",
+              "type": "expression"
+            },
+            {
+              "description": "Image cropping offset on Y",
+              "name": "OffsetY",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the dimensions of the height map.",
+          "fullName": "Clear and resize",
+          "functionType": "Action",
+          "name": "ClearAndResize",
+          "private": true,
+          "sentence": "Clear and resize _PARAM0_ to _PARAM1_ ; _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "GridDimensionX",
+                    "=",
+                    "NewDimensionX"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "GridDimensionY",
+                    "=",
+                    "NewDimensionY"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/** @type {gdjs.CustomRuntimeObject} */",
+                "const object = objects[0];",
+                "",
+                "const dimensionX = eventsFunctionContext.getArgument(\"NewDimensionX\");",
+                "const dimensionY = eventsFunctionContext.getArgument(\"NewDimensionY\");",
+                "",
+                "object.__heightMap3DExtension.heightMap.clearAndResize(dimensionX, dimensionY);",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            },
+            {
+              "description": "Dimension X",
+              "name": "NewDimensionX",
+              "type": "expression"
+            },
+            {
+              "description": "Dimension Y",
+              "name": "NewDimensionY",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Update the height map. This is done automatically at the  end of every frame, but it can be used manually to avoid a 1-frame delay.",
+          "fullName": "Update height map",
+          "functionType": "Action",
+          "name": "ForceUpdate",
+          "sentence": "Update the height map of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/** @type {gdjs.CustomRuntimeObject} */",
+                "const object = objects[0];",
+                "",
+                "eventsFunctionContext.returnValue = object.__heightMap3DExtension.heightMap.forceUpdate();",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the field value at a grid index. The value is bewteen 0 and 1.",
+          "fullName": "Grid value",
+          "functionType": "ExpressionAndCondition",
+          "name": "GridValue",
+          "sentence": "the grid value at index _PARAM1_ ; _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/** @type {gdjs.CustomRuntimeObject} */",
+                "const object = objects[0];",
+                "",
+                "const indexX = eventsFunctionContext.getArgument(\"IndexX\");",
+                "const indexY = eventsFunctionContext.getArgument(\"IndexY\");",
+                "",
+                "eventsFunctionContext.returnValue = object.__heightMap3DExtension.heightMap.getGridValue(indexX, indexY);",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            },
+            {
+              "description": "X grid index",
+              "name": "IndexX",
+              "type": "expression"
+            },
+            {
+              "description": "Y grid index",
+              "name": "IndexY",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "GridValue",
+          "name": "SetGridValue",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/** @type {gdjs.CustomRuntimeObject} */",
+                "const object = objects[0];",
+                "",
+                "const indexX = eventsFunctionContext.getArgument(\"IndexX\");",
+                "const indexY = eventsFunctionContext.getArgument(\"IndexY\");",
+                "const value = eventsFunctionContext.getArgument(\"Value\");",
+                "",
+                "object.__heightMap3DExtension.heightMap.setGridValue(indexX, indexY, value);",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            },
+            {
+              "description": "X grid index",
+              "name": "IndexX",
+              "type": "expression"
+            },
+            {
+              "description": "Y grid index",
+              "name": "IndexY",
+              "type": "expression"
+            },
+            {
+              "description": "Field value",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the number of points in the grid on X axis.",
+          "fullName": "Grid dimension X",
+          "functionType": "ExpressionAndCondition",
+          "name": "GridDimensionX",
+          "sentence": "the grid dimension on X axis",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "GridDimensionX"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the number of points in the grid on Y axis.",
+          "fullName": "Grid dimension Y",
+          "functionType": "ExpressionAndCondition",
+          "name": "GridDimensionY",
+          "sentence": "the grid dimension on Y axis",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "GridDimensionY"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the field Z for a given position in the scene.",
+          "fullName": "Field point Z",
+          "functionType": "ExpressionAndCondition",
+          "name": "FieldZ",
+          "sentence": "the field Z for position _PARAM1_ ; _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/** @type {gdjs.CustomRuntimeObject} */",
+                "const object = objects[0];",
+                "",
+                "const pointX = eventsFunctionContext.getArgument(\"PointX\");",
+                "const pointY = eventsFunctionContext.getArgument(\"PointY\");",
+                "",
+                "eventsFunctionContext.returnValue = object.__heightMap3DExtension.heightMap.getFieldZ(pointX, pointY);"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            },
+            {
+              "description": "X position in the scene",
+              "name": "PointX",
+              "type": "expression"
+            },
+            {
+              "description": "Y position in the scene",
+              "name": "PointY",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the color of the object.",
+          "fullName": "Color",
+          "functionType": "ExpressionAndCondition",
+          "group": "3D height map style configuration",
+          "name": "Color",
+          "private": true,
+          "sentence": "the color",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "Color"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "color"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "Color",
+          "name": "SetColor",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "Color",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/** @type {gdjs.CustomRuntimeObject} */",
+                "const object = objects[0];",
+                "",
+                "const value = eventsFunctionContext.getArgument(\"Value\");",
+                "",
+                "object.__heightMap3DExtension.heightMap.setColor(value);",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if wireframe.",
+          "fullName": "Wireframe",
+          "functionType": "Condition",
+          "group": "3D height map style configuration",
+          "name": "IsWireframe",
+          "private": true,
+          "sentence": "_PARAM0_ wireframe",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Wireframe",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change if wireframe.",
+          "fullName": "Wireframe",
+          "functionType": "Action",
+          "group": "3D height map style configuration",
+          "name": "SetWireframe",
+          "private": true,
+          "sentence": "_PARAM0_ wireframe: _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Value",
+                    "False",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "Wireframe",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Value",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "Wireframe",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/** @type {gdjs.CustomRuntimeObject} */",
+                "const object = objects[0];",
+                "",
+                "const value = eventsFunctionContext.getArgument(\"Value\");",
+                "",
+                "object.__heightMap3DExtension.heightMap.setWireframe(value);",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "object"
+            },
+            {
+              "defaultValue": "yes",
+              "description": "Wireframe",
+              "name": "Value",
+              "optional": true,
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "65",
+          "type": "Number",
+          "label": "Grid dimension X",
+          "name": "GridDimensionX"
+        },
+        {
+          "value": "65",
+          "type": "Number",
+          "label": "",
+          "hidden": true,
+          "name": "InitialGridDimensionX"
+        },
+        {
+          "value": "65",
+          "type": "Number",
+          "label": "Grid dimension Y",
+          "name": "GridDimensionY"
+        },
+        {
+          "value": "65",
+          "type": "Number",
+          "label": "",
+          "hidden": true,
+          "name": "InitialGridDimensionY"
+        },
+        {
+          "value": "255;255;255",
+          "type": "Color",
+          "label": "Color",
+          "group": "Style",
+          "name": "Color"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "Wireframe",
+          "group": "Style",
+          "name": "Wireframe"
+        },
+        {
+          "value": "",
+          "type": "Resource",
+          "label": "Height map (optional)",
+          "group": "Image",
+          "extraInformation": [
+            "image"
+          ],
+          "choices": [],
+          "name": "HeightMapImage"
+        },
+        {
+          "value": "",
+          "type": "Resource",
+          "label": "",
+          "extraInformation": [
+            "image"
+          ],
+          "choices": [],
+          "hidden": true,
+          "name": "InitialHeightMapImage"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "Image offset X",
+          "group": "Image",
+          "name": "ImageOffsetX"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "",
+          "hidden": true,
+          "name": "InitialImageOffsetX"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "Image offset Y",
+          "group": "Image",
+          "name": "ImageOffsetY"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "",
+          "hidden": true,
+          "name": "InitialImageOffsetY"
+        }
+      ]
+    }
+  ]
+}

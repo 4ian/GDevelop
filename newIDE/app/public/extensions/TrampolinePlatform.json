@@ -1,0 +1,502 @@
+{
+  "author": "",
+  "category": "Movement",
+  "description": "# User can\n- Use the extension action multi times on multi objects.\n- Set the trampoline force.\n- Set multi forces for each trampoline.\n- Set which object can jump on that trampoline.\n- Set group of objects to jump on the trampoline.\n- Set the boolean (On/Off) to trigger the trampoline:\n    1. On: Trigger if player is on top of it.\n    2. Off: Trigger if player collided with it.\n- Check if a trampoline has been triggered (for animations).\n\n# Actions\n- Extension action.\n\n# Conditions\n- Check if a trampoline has been triggered.\n\n# Example\n![](https://i.imgur.com/XIYBQB9.png)\n- *Recommended to use platform behavior (Jump through) on the trampoline.*  \n- *Extension action must run in every frame.*",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Trampoline Platform",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTcsMTJIM1Y1YzAtMS4xLDAuOS0yLDItMmgwYzEuMSwwLDIsMC45LDIsMlYxMnoiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yOSwyMmgtNHYtN2MwLTEuMSwwLjktMiwyLTJoMGMxLjEsMCwyLDAuOSwyLDJWMjJ6Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNSwxMnYzYzAsMy45LDMuMSw3LDcsN2gwYzMuOSwwLDctMy4xLDctN1Y4YzAtMi4yLTEuOC00LTQtNGgwYy0yLjIsMC00LDEuOC00LDR2MTBjMCw1LjUsNC41LDEwLDEwLDEwaDANCgljMy4zLDAsNi0yLjcsNi02djAiLz4NCjwvc3ZnPg0K",
+  "name": "TrampolinePlatform",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Sports and Fitness/Sports and Fitness_skipping_training_jump_rope.svg",
+  "shortDescription": "Convert object to trampoline platform.",
+  "version": "1.1.0",
+  "origin": {
+    "identifier": "TrampolinePlatform",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "trampoline,platform,jump,bounce",
+  "authorIds": [
+    "IRIhkkTTl2UHhfjrLTTH5GYwkYu1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Convert object to trampoline platform.",
+      "fullName": "Trampoline Platform",
+      "functionType": "Action",
+      "group": "",
+      "name": "Trampoline",
+      "private": false,
+      "sentence": "Make _PARAM3_ work as trampoline, _PARAM1_ can jump on it, at _PARAM4_ trampoline force",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Save the player original jump speed",
+          "comment2": ""
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarObjet"
+              },
+              "parameters": [
+                "Player",
+                "__TrampolinePlatform.PlayerOriginalJumpSpeed",
+                "=",
+                "Player.PlatformerCharacterBehavior::JumpSpeed()"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "OnTouchOrOnTop",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "player must be on the top",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "Player",
+                        "Trampoline",
+                        "",
+                        "",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BoundingBoxBottom"
+                      },
+                      "parameters": [
+                        "Player",
+                        "=",
+                        "Trampoline.BoundingBoxTop()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Player",
+                        "__TrampolinePlatform.IsOnTrampoline",
+                        "False"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlatformBehavior::JumpSpeed"
+                      },
+                      "parameters": [
+                        "Player",
+                        "PlatformerCharacterBehavior",
+                        "=",
+                        "JumpSpeed"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PlatformBehavior::SimulateJumpKey"
+                      },
+                      "parameters": [
+                        "Player",
+                        "PlatformerCharacterBehavior"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Player",
+                        "__TrampolinePlatform.IsOnTrampoline",
+                        "True"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Trampoline",
+                        "__TrampolinePlatform.JumpedOnTrampoline",
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "OnTouchOrOnTop",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "start on touch",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "Player",
+                        "Trampoline",
+                        "",
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlatformBehavior::SetCanJump"
+                      },
+                      "parameters": [
+                        "Player",
+                        "PlatformerCharacterBehavior"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PlatformBehavior::JumpSpeed"
+                      },
+                      "parameters": [
+                        "Player",
+                        "PlatformerCharacterBehavior",
+                        "=",
+                        "JumpSpeed"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PlatformBehavior::SimulateJumpKey"
+                      },
+                      "parameters": [
+                        "Player",
+                        "PlatformerCharacterBehavior"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Player",
+                        "__TrampolinePlatform.IsOnTrampoline",
+                        "True"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Trampoline",
+                        "__TrampolinePlatform.JumpedOnTrampoline",
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "ObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "Player",
+                "__TrampolinePlatform.IsOnTrampoline",
+                "True"
+              ]
+            },
+            {
+              "type": {
+                "value": "PlatformBehavior::IsFalling"
+              },
+              "parameters": [
+                "Player",
+                "PlatformerCharacterBehavior"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "Player",
+                "__TrampolinePlatform.IsOnTrampoline",
+                "False"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "CollisionNP"
+              },
+              "parameters": [
+                "Player",
+                "Trampoline",
+                "",
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "PlatformBehavior::IsOnFloor"
+              },
+              "parameters": [
+                "Player",
+                "PlatformerCharacterBehavior"
+              ]
+            },
+            {
+              "type": {
+                "value": "ObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "Player",
+                "__TrampolinePlatform.IsOnTrampoline",
+                "False"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "PlatformBehavior::JumpSpeed"
+              },
+              "parameters": [
+                "Player",
+                "PlatformerCharacterBehavior",
+                "=",
+                "Player.Variable(__TrampolinePlatform.PlayerOriginalJumpSpeed)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "CollisionNP"
+              },
+              "parameters": [
+                "Player",
+                "Trampoline",
+                "",
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "Trampoline",
+                "__TrampolinePlatform.JumpedOnTrampoline",
+                "False"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Platformer character object (player)",
+          "longDescription": "",
+          "name": "Player",
+          "optional": false,
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Platformer character behavior",
+          "longDescription": "",
+          "name": "PlatformerCharacterBehavior",
+          "optional": false,
+          "supplementaryInformation": "PlatformBehavior::PlatformerObjectBehavior",
+          "type": "behavior"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Trampoline object",
+          "longDescription": "",
+          "name": "Trampoline",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Trampoline force (in pixels per second)",
+          "longDescription": "",
+          "name": "JumpSpeed",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "yes",
+          "description": "Player must be on top of the trampoline in order to start the force",
+          "longDescription": "**Yes:** Insert platform behavior (jump through) on trampoline object.  \n**No:** No need for platform behavior.",
+          "name": "OnTouchOrOnTop",
+          "optional": true,
+          "supplementaryInformation": "",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a trampoline has been triggered.",
+      "fullName": "Trampoline has been triggered",
+      "functionType": "Condition",
+      "group": "",
+      "name": "Jumped",
+      "private": false,
+      "sentence": "_PARAM1_ has been triggered",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "ObjectVariableAsBoolean"
+              },
+              "parameters": [
+                "Trampoline",
+                "__TrampolinePlatform.JumpedOnTrampoline",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Trampoline object",
+          "longDescription": "",
+          "name": "Trampoline",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

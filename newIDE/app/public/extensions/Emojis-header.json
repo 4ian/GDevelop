@@ -1,0 +1,38 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "AlZ3D1xkH0QDao7T37VZZUeYNpn1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Emojis",
+  "name": "Emojis",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/Emojis.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Emojis-header.json",
+  "tags": "emojis,unicode,text",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/sticker-emoji.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Display emoji characters in text objects using shortcodes or emoji expressions.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/emojis",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "Name",
+      "fullName": "Returns the specified emoji (name)",
+      "description": "Returns the specified emoji, from the provided name.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "Hex",
+      "fullName": "Returns the specified emoji (hex)",
+      "description": "Returns the specified emoji, from a hexadecimal value.",
+      "functionType": "StringExpression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Display emoji characters in text objects and store them in strings. Emojis will look different deppending on the platform/device due do default font faces.\n\nThis extension provide:\n- An string expression for get the emoji by name\n- An string expression for get the emoji by hexadecimal code\n\nSee the description of these expressions for get the list available emoji.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXN0aWNrZXItZW1vamkiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNS41LDJDMy41NiwyIDIsMy41NiAyLDUuNVYxOC41QzIsMjAuNDQgMy41NiwyMiA1LjUsMjJIMTZMMjIsMTZWNS41QzIyLDMuNTYgMjAuNDQsMiAxOC41LDJINS41TTUuNzUsNEgxOC4yNUExLjc1LDEuNzUgMCAwLDEgMjAsNS43NVYxNUgxOC41QzE2LjU2LDE1IDE1LDE2LjU2IDE1LDE4LjVWMjBINS43NUExLjc1LDEuNzUgMCAwLDEgNCwxOC4yNVY1Ljc1QTEuNzUsMS43NSAwIDAsMSA1Ljc1LDRNMTQuNDQsNi43N0MxNC4yOCw2Ljc3IDE0LjEyLDYuNzkgMTMuOTcsNi44M0MxMy4wMyw3LjA5IDEyLjUsOC4wNSAxMi43NCw5QzEyLjc5LDkuMTUgMTIuODYsOS4zIDEyLjk1LDkuNDRMMTYuMTgsOC41NkMxNi4xOCw4LjM5IDE2LjE2LDguMjIgMTYuMTIsOC4wNUMxNS45MSw3LjMgMTUuMjIsNi43NyAxNC40NCw2Ljc3TTguMTcsOC41QzgsOC41IDcuODUsOC41IDcuNyw4LjU1QzYuNzcsOC44MSA2LjIyLDkuNzcgNi40NywxMC43QzYuNSwxMC44NiA2LjU5LDExIDYuNjgsMTEuMTZMOS45MSwxMC4yOEM5LjkxLDEwLjExIDkuODksOS45NCA5Ljg1LDkuNzhDOS42NCw5IDguOTUsOC41IDguMTcsOC41TTE2LjcyLDExLjI2TDcuNTksMTMuNzdDOC45MSwxNS4zIDExLDE1Ljk0IDEyLjk1LDE1LjQxQzE0LjksMTQuODcgMTYuMzYsMTMuMjUgMTYuNzIsMTEuMjZaIiAvPjwvc3ZnPg=="
+}

@@ -1,0 +1,68 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "AlZ3D1xkH0QDao7T37VZZUeYNpn1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Regular Expressions",
+  "name": "RegEx",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/RegEx.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/RegEx-header.json",
+  "tags": "regular,expression,regex,string,pattern,match,find,replace,split",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/regex.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Manipulates string with regular expressions.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 7,
+  "helpPath": "/extensions/reg-ex",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "HasPattern",
+      "fullName": "String matches regex pattern",
+      "description": "Checks if a string matches a regex pattern.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "Split",
+      "fullName": "Split a string into an array",
+      "description": "Split a string by each part of it that matches a regex pattern and stores each part into an array.",
+      "functionType": "Action"
+    },
+    {
+      "name": "GetAllMatches",
+      "fullName": "Find all matches for a regex pattern",
+      "description": "Builds an array containing all matches for a regex pattern.",
+      "functionType": "Action"
+    },
+    {
+      "name": "GetFirstMatchAndGroups",
+      "fullName": "Find first match with groups for a regex pattern",
+      "description": "Builds an array containing the first match for a regex pattern followed by the regex groups.",
+      "functionType": "Action"
+    },
+    {
+      "name": "GetAllMatchesAndGroups",
+      "fullName": "Find all matches with their groups for a regex pattern",
+      "description": "Builds an array containing for each regex pattern match an array with the match followed by its regex groups.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Replace",
+      "fullName": "Replace pattern matches with a string",
+      "description": "Replaces a part of a string that matches a regex pattern with another string.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "Find",
+      "fullName": "Find a pattern",
+      "description": "Finds a regex pattern in a string, and returns the index of the position of the match, or -1 if it doesn't match the pattern.",
+      "functionType": "Expression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Conditions, actions and expressions to use regular expressions with strings, such as:  \n- Find the position of pattern in a string \n- Find a pattern in a string\n- Split a string by a pattern\n- Check if a string matches a pattern\n- Replace patterns in a string with another string",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXJlZ2V4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE2LDE2LjkyQzE1LjY3LDE2Ljk3IDE1LjM0LDE3IDE1LDE3QzE0LjY2LDE3IDE0LjMzLDE2Ljk3IDE0LDE2LjkyVjEzLjQxTDExLjUsMTUuODlDMTEsMTUuNSAxMC41LDE1IDEwLjExLDE0LjVMMTIuNTksMTJIOS4wOEM5LjAzLDExLjY3IDksMTEuMzQgOSwxMUM5LDEwLjY2IDkuMDMsMTAuMzMgOS4wOCwxMEgxMi41OUwxMC4xMSw3LjVDMTAuMyw3LjI1IDEwLjUsNyAxMC43Niw2Ljc2VjYuNzZDMTEsNi41IDExLjI1LDYuMyAxMS41LDYuMTFMMTQsOC41OVY1LjA4QzE0LjMzLDUuMDMgMTQuNjYsNSAxNSw1QzE1LjM0LDUgMTUuNjcsNS4wMyAxNiw1LjA4VjguNTlMMTguNSw2LjExQzE5LDYuNSAxOS41LDcgMTkuODksNy41TDE3LjQxLDEwSDIwLjkyQzIwLjk3LDEwLjMzIDIxLDEwLjY2IDIxLDExQzIxLDExLjM0IDIwLjk3LDExLjY3IDIwLjkyLDEySDE3LjQxTDE5Ljg5LDE0LjVDMTkuNywxNC43NSAxOS41LDE1IDE5LjI0LDE1LjI0VjE1LjI0QzE5LDE1LjUgMTguNzUsMTUuNyAxOC41LDE1Ljg5TDE2LDEzLjQxVjE2LjkySDE2VjE2LjkyTTUsMTlBMiwyIDAgMCwxIDcsMTdBMiwyIDAgMCwxIDksMTlBMiwyIDAgMCwxIDcsMjFBMiwyIDAgMCwxIDUsMTlINVoiIC8+PC9zdmc+"
+}

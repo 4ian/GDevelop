@@ -1,0 +1,20 @@
+{
+  "tier": "community",
+  "authorIds": [],
+  "extensionNamespace": "",
+  "fullName": "OllamaAI",
+  "name": "OllamaAI",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/OllamaAI.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/OllamaAI-header.json",
+  "tags": "ollama,ai,llama,llama2,llama3,chat,bot",
+  "category": "Third-party",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/17afc029e0ccfc314f5b7f5f53632ca24b3e6082d0cc87c0777dcfa79fd56e0b_chat-processing-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "This extension adds the functionality to your project to easily send requests to the \"Ollama\" AI, and get responses from it.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/ollama-ai",
+  "description": "Create a simple action to send the following data to a Ollama AI server:\n\n- URL (The server's URL with port)\n- Model (The model you want to generate the response)\n- Prompt (The prompt you send to the server to reply to)",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNoYXQtcHJvY2Vzc2luZy1vdXRsaW5lIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDNDNi41IDMgMiA2LjU4IDIgMTFDMi4wNSAxMy4xNSAzLjA2IDE1LjE3IDQuNzUgMTYuNUM0Ljc1IDE3LjEgNC4zMyAxOC42NyAyIDIxQzQuMzcgMjAuODkgNi42NCAyMCA4LjQ3IDE4LjVDOS42MSAxOC44MyAxMC44MSAxOSAxMiAxOUMxNy41IDE5IDIyIDE1LjQyIDIyIDExUzE3LjUgMyAxMiAzTTEyIDE3QzcuNTggMTcgNCAxNC4zMSA0IDExUzcuNTggNSAxMiA1IDIwIDcuNjkgMjAgMTEgMTYuNDIgMTcgMTIgMTdNMTcgMTJWMTBIMTVWMTJIMTdNMTMgMTJWMTBIMTFWMTJIMTNNOSAxMlYxMEg3VjEySDlaIiAvPjwvc3ZnPg=="
+}

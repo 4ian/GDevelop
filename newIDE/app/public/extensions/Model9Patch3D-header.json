@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "3D model 9-patch",
+  "name": "Model9Patch3D",
+  "version": "0.3.0",
+  "url": "https://resources.gdevelop-app.com/extensions/Model9Patch3D.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Model9Patch3D-header.json",
+  "tags": "3d,platform,wall",
+  "category": "General",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/ff2624a18972ac70bedc9ef990d9ddbc894c3a7b6e46a75ace8e9572c9aa5a50_select-group.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "3D platforms and walls.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/model9patch3d",
+  "description": "3D platforms and walls that resize as 9-patch. Corners don't stretch and sides can be tiled.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNlbGVjdC1ncm91cCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik01IDNBMiAyIDAgMCAwIDMgNUg1TTcgM1Y1SDlWM00xMSAzVjVIMTNWM00xNSAzVjVIMTdWM00xOSAzVjVIMjFBMiAyIDAgMCAwIDE5IDNNMyA3VjlINVY3TTcgN1YxMUgxMVY3TTEzIDdWMTFIMTdWN00xOSA3VjlIMjFWN00zIDExVjEzSDVWMTFNMTkgMTFWMTNIMjFWMTFNNyAxM1YxN0gxMVYxM00xMyAxM1YxN0gxN1YxM00zIDE1VjE3SDVWMTVNMTkgMTVWMTdIMjFWMTVNMyAxOUEyIDIgMCAwIDAgNSAyMVYxOU03IDE5VjIxSDlWMTlNMTEgMTlWMjFIMTNWMTlNMTUgMTlWMjFIMTdWMTlNMTkgMTlWMjFBMiAyIDAgMCAwIDIxIDE5WiIgLz48L3N2Zz4="
+}

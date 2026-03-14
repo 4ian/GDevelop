@@ -1,0 +1,702 @@
+{
+  "author": "",
+  "category": "Audio",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Audio Context",
+  "helpPath": "https://aliustaoglu.itch.io/audiocontext-gdevelop-extension",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8Y2lyY2xlIGN4PSIxNiIgY3k9IjE5IiByPSIzIi8+DQoJPHBhdGggZD0iTTI2LDJINkM1LjQsMiw1LDIuNCw1LDN2MjZjMCwwLjYsMC40LDEsMSwxaDIwYzAuNiwwLDEtMC40LDEtMVYzQzI3LDIuNCwyNi42LDIsMjYsMnogTTE2LDI3Yy00LjQsMC04LTMuNi04LThzMy42LTgsOC04DQoJCXM4LDMuNiw4LDhTMjAuNCwyNywxNiwyN3ogTTIxLDExYy0xLjcsMC0zLTEuMy0zLTNzMS4zLTMsMy0zczMsMS4zLDMsM1MyMi43LDExLDIxLDExeiIvPg0KPC9nPg0KPC9zdmc+DQo=",
+  "name": "AudioContext",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Glyphster Pack/Master/SVG/Music/308ee40b08fc7798832654e3ab95d1df6a66bfb8e7aae0a19697e120449931d0_Music_speaker_audio_sound.svg",
+  "shortDescription": "Create procedural audio.",
+  "version": "0.1.0",
+  "description": [
+    "This extension enables you to create your own sounds in real time without using any wav, mp3 or ogg files. It procedurally creates sounds using the Web Audio API and AudioContext.",
+    "",
+    "The Web Audio API provides a powerful and versatile system for controlling audio on the Web, allowing developers to choose audio sources, add effects to audio, create audio visualizations, apply spatial effects (such as panning) and much more.",
+    "",
+    "This extension can easily create chiptunes."
+  ],
+  "tags": "audio,sound,music,volume",
+  "authorIds": [
+    "KLN0u3Yk4CgE5TVVllYPti8TNRf1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "folded": true,
+          "name": "Declarations",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const notes = {",
+                "  \"C\": [16.35, 32.7, 65.41, 130.8, 261.6, 523.3, 1047, 2093, 4186],",
+                "  \"C#\": [17.32, 34.65, 69.3, 138.6, 277.2, 554.4, 1109, 2217, 4435],",
+                "  \"Db\": [17.32, 34.65, 69.3, 138.6, 277.2, 554.4, 1109, 2217, 4435],",
+                "  \"D\": [18.35, 36.71, 73.42, 146.8, 293.7, 587.3, 1175, 2349, 4699],",
+                "  \"D#\": [19.45, 38.89, 77.78, 155.6, 311.1, 622.3, 1245, 2489, 4978],",
+                "  \"Eb\": [19.45, 38.89, 77.78, 155.6, 311.1, 622.3, 1245, 2489, 4978],",
+                "  \"E\": [20.6, 41.2, 82.41, 164.8, 329.6, 659.3, 1319, 2637, 5274],",
+                "  \"F\": [21.83, 43.65, 87.31, 174.6, 349.2, 698.5, 1397, 2794, 5588],",
+                "  \"F#\": [23.12, 46.25, 92.5, 185, 370, 740, 1480, 2960, 5920],",
+                "  \"Gb\": [23.12, 46.25, 92.5, 185, 370, 740, 1480, 2960, 5920],",
+                "  \"G\": [24.5, 49, 98, 196, 392, 784, 1568, 3136, 6272],",
+                "  \"G#\": [25.96, 51.91, 103.8, 207.7, 415.3, 830.6, 1661, 3322, 6645],",
+                "  \"Ab\": [25.96, 51.91, 103.8, 207.7, 415.3, 830.6, 1661, 3322, 6645],",
+                "  \"A\": [27.5, 55, 110, 220, 440, 880, 1760, 3520, 7040],",
+                "  \"A#\": [29.14, 58.27, 116.5, 233.1, 466.2, 932.3, 1865, 3729, 7459],",
+                "  \"Bb\": [29.14, 58.27, 116.5, 233.1, 466.2, 932.3, 1865, 3729, 7459],",
+                "  \"B\": [30.87, 61.74, 123.5, 246.9, 493.9, 987.8, 1976, 3951, 7902],",
+                "};",
+                "",
+                "gdjs.__audioContextExtension = {",
+                "    contexts: {},",
+                "    gains: {},",
+                "    filters: {},",
+                "    synths: {},",
+                "    activeSynths: {},",
+                "    notes,",
+                "    chords: {}",
+                "}"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Functions",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const stopSynth = (synthName) => {",
+                "    const synth = gdjs.__audioContextExtension.synths[synthName]",
+                "    const contextName = synth.contextName",
+                "    const context = gdjs.__audioContextExtension.contexts[contextName];",
+                "    synth.oscillators.forEach(oscillator => {",
+                "        ",
+                "        const releaseEndTime = context.currentTime + synth.release",
+                "        synth.gainNode.gain.setValueAtTime(synth.gainNode.gain.value, context.currentTime)",
+                "        synth.gainNode.gain.linearRampToValueAtTime(0, releaseEndTime)",
+                "        setTimeout(()=>{",
+                "            oscillator.stop()",
+                "        }, synth.release*1000 )",
+                "    })",
+                "}",
+                "",
+                "const playFrequency = (synthName, frequency, duration) => {",
+                "    const synth = gdjs.__audioContextExtension.synths[synthName]",
+                "    const contextName = synth.contextName",
+                "    const context = gdjs.__audioContextExtension.contexts[contextName];",
+                "    const detunes = gdjs.__audioContextExtension.synths[synthName].detunes",
+                "    if (detunes.length===0) detunes.push(0)",
+                "",
+                "    const gainNode = context.createGain()",
+                "    synth.gainNode = gainNode",
+                "    gainNode.connect(context.destination);",
+                "    let oscillators = []",
+                "    detunes.forEach(detune => {",
+                "        const oscillator = context.createOscillator();",
+                "        oscillators.push(oscillator)",
+                "        oscillator.frequency.value = frequency;",
+                "        oscillator.detune.value = detune;",
+                "        oscillator.type = synth.waveType",
+                "        ",
+                "        if (synth.filter) {",
+                "            const filter = context.createBiquadFilter();",
+                "            filter.type = synth.filter.filterType",
+                "            filter.frequency.value = synth.filter.frequency",
+                "            filter.Q.value = synth.filter.q",
+                "            oscillator.connect(filter);",
+                "            filter.connect(gainNode)",
+                "            synth.filter.node = filter",
+                "        } else {",
+                "            oscillator.connect(gainNode);",
+                "        }",
+                "        ",
+                "",
+                "        // ADSR",
+                "        const attackEndTime = context.currentTime + synth.attack",
+                "        gainNode.gain.setValueAtTime(0, context.currentTime)",
+                "        gainNode.gain.linearRampToValueAtTime(0.3, attackEndTime)",
+                "        gainNode.gain.setTargetAtTime(synth.sustain, attackEndTime, synth.decay)",
+                "",
+                "        oscillator.start(0);",
+                "        if (duration>0) {",
+                "            setTimeout(()=>{",
+                "                gainNode.gain.cancelScheduledValues(context.currentTime)",
+                "                gainNode.gain.setValueAtTime(gainNode.gain.value, context.currentTime)",
+                "                gainNode.gain.linearRampToValueAtTime(0, context.currentTime + synth.release)",
+                "            }, duration*1000)",
+                "        }",
+                "    })",
+                "    gdjs.__audioContextExtension.synths[synthName].oscillators = oscillators",
+                "        ",
+                "}",
+                "",
+                "const suspend = (contextName) => {",
+                "    gdjs.__audioContextExtension.contexts[contextName].suspend()",
+                "}",
+                "",
+                "gdjs.__audioContextExtension.playFrequency = playFrequency",
+                "gdjs.__audioContextExtension.stopSynth = stopSynth",
+                "gdjs.__audioContextExtension.suspend = suspend"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Create a new audio context (In most cases you only need one context and reuse it with the name).",
+      "fullName": "Create an Audio Context",
+      "functionType": "Action",
+      "name": "CreateContext",
+      "sentence": "Create a new audio context with name _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const contextName = eventsFunctionContext.getArgument(\"contextName\")",
+            "const context = new AudioContext()",
+            "",
+            "gdjs.__audioContextExtension.contexts[contextName] = context",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Context name",
+          "name": "contextName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Create or update synth with attack, decay, sustain, release gain and apply filters.",
+      "fullName": "Create/update synth",
+      "functionType": "Action",
+      "name": "CreateSynth",
+      "sentence": "Create a synth _PARAM1_ on context _PARAM2_ of type _PARAM3_ with attack _PARAM4_ decay _PARAM5_ sustain _PARAM6_ release _PARAM7_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const synthName = eventsFunctionContext.getArgument(\"synthName\");",
+            "const contextName = eventsFunctionContext.getArgument(\"contextName\");",
+            "const waveType = eventsFunctionContext.getArgument(\"waveType\");",
+            "const attack = eventsFunctionContext.getArgument(\"attack\");",
+            "const decay = eventsFunctionContext.getArgument(\"decay\");",
+            "const sustain = eventsFunctionContext.getArgument(\"sustain\");",
+            "const release = eventsFunctionContext.getArgument(\"release\");",
+            "",
+            "gdjs.__audioContextExtension.synths[synthName] = {",
+            "    contextName,",
+            "    gainNode : {},",
+            "    waveType,",
+            "    attack,",
+            "    decay,",
+            "    sustain,",
+            "    release,",
+            "    detunes: [],",
+            "    oscillators: []",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the synth",
+          "name": "synthName",
+          "type": "string"
+        },
+        {
+          "description": "Context name",
+          "name": "contextName",
+          "type": "string"
+        },
+        {
+          "description": "Wave type",
+          "name": "waveType",
+          "supplementaryInformation": "[\"sine\",\"square\",\"triangle\",\"sawtooth\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Attack value",
+          "name": "attack",
+          "type": "expression"
+        },
+        {
+          "description": "Decay value",
+          "name": "decay",
+          "type": "expression"
+        },
+        {
+          "description": "Sustain value",
+          "name": "sustain",
+          "type": "expression"
+        },
+        {
+          "description": "Release value",
+          "name": "release",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Add detune on top of the main frequency to get cool synth effects.",
+      "fullName": "Add detune to a synth",
+      "functionType": "Action",
+      "name": "AddDetuneToSynth",
+      "sentence": "Add detune value _PARAM2_ to synth _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const synthName = eventsFunctionContext.getArgument(\"synthName\");",
+            "const detune = eventsFunctionContext.getArgument(\"detune\");",
+            "",
+            "const detunes = gdjs.__audioContextExtension.synths[synthName].detunes",
+            "",
+            "gdjs.__audioContextExtension.synths[synthName].detunes = [",
+            "    ...detunes, detune",
+            "]",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Synth name",
+          "name": "synthName",
+          "type": "string"
+        },
+        {
+          "description": "Detune value in chips",
+          "name": "detune",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Add comma separated detune values to a synth.",
+      "fullName": "Add multiple detunes to a synth",
+      "functionType": "Action",
+      "name": "AddDetunesToSynth",
+      "sentence": "Add comma separated detunes _PARAM2_ to synth _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const synthName = eventsFunctionContext.getArgument(\"synthName\");",
+            "const detunes = eventsFunctionContext.getArgument(\"detunes\").split(\",\").map(d => parseInt(d));",
+            "",
+            "const existingDetunes = gdjs.__audioContextExtension.synths[synthName].detunes",
+            "",
+            "gdjs.__audioContextExtension.synths[synthName].detunes = [",
+            "    ...existingDetunes, ...detunes",
+            "]",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Synth name",
+          "name": "synthName",
+          "type": "string"
+        },
+        {
+          "description": "Comma separated detune values",
+          "name": "detunes",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Add or update biquad filter.",
+      "fullName": "Add/update filter",
+      "functionType": "Action",
+      "name": "AddFilterToSynth",
+      "sentence": "Create a _PARAM2_ filter for synth _PARAM1_ with frequency _PARAM3_, Q value _PARAM4_ and gain _PARAM5_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const synthName = eventsFunctionContext.getArgument(\"synthName\");\r",
+            "const filterType = eventsFunctionContext.getArgument(\"filterType\");\r",
+            "const frequency = eventsFunctionContext.getArgument(\"frequency\");\r",
+            "const q = eventsFunctionContext.getArgument(\"q\");\r",
+            "const gain = eventsFunctionContext.getArgument(\"gain\");\r",
+            "\r",
+            "const synth = gdjs.__audioContextExtension.synths[synthName]\r",
+            "const filter = synth.filter\r",
+            "let node = null\r",
+            "\r",
+            "// Update if already exists\r",
+            "if (filter) {\r",
+            "    node = filter.node\r",
+            "    //filter.type = synth.filter.filterType\r",
+            "    if (frequency) node.frequency.value = frequency\r",
+            "    if (q) node.Q.value = q\r",
+            "    if (gain) node.gain.value = gain\r",
+            "}\r",
+            "\r",
+            "synth.filter = {\r",
+            "    filterType,\r",
+            "    frequency,\r",
+            "    q,\r",
+            "    gain,\r",
+            "    node\r",
+            "}\r",
+            "\r",
+            "\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Synth name",
+          "name": "synthName",
+          "type": "string"
+        },
+        {
+          "description": "Filter type",
+          "name": "filterType",
+          "supplementaryInformation": "[\"lowpass\",\"highpass\",\"bandpass\",\"lowshelf\",\"highshelf\",\"peaking\",\"notch\",\"allpass\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Frequency [0-20,000]",
+          "name": "frequency",
+          "type": "expression"
+        },
+        {
+          "description": "Quality factor [0-100]",
+          "name": "q",
+          "type": "expression"
+        },
+        {
+          "description": "Gain value",
+          "name": "gain",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Play a note a synth you've created before.",
+      "fullName": "Play note",
+      "functionType": "Action",
+      "name": "PlayNote",
+      "sentence": "Play note _PARAM2_ on octave _PARAM3_ on synth _PARAM1_ for _PARAM4_ seconds",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const notes = gdjs.__audioContextExtension.notes\r",
+            "const duration = eventsFunctionContext.getArgument(\"duration\");\r",
+            "const synthName = eventsFunctionContext.getArgument(\"synthName\");\r",
+            "const note = eventsFunctionContext.getArgument(\"note\");\r",
+            "let octave = eventsFunctionContext.getArgument(\"octave\");\r",
+            "\r",
+            "if (octave<0) octave = 0\r",
+            "if (octave>8) octave = 8\r",
+            "\r",
+            "const frequency = notes[note][octave]\r",
+            "\r",
+            "gdjs.__audioContextExtension.playFrequency(synthName, frequency, duration)\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Synth name",
+          "name": "synthName",
+          "type": "string"
+        },
+        {
+          "description": "Note name",
+          "name": "note",
+          "supplementaryInformation": "[\"C\",\"C#\",\"Db\",\"D\",\"D#\",\"Eb\",\"E\",\"F\",\"F#\",\"Gb\",\"G\",\"G#\",\"Ab\",\"A\",\"A#\",\"Bb\",\"B\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Octave (0-8)",
+          "name": "octave",
+          "type": "expression"
+        },
+        {
+          "description": "Note duration (-1 to play until stopped manually)",
+          "name": "duration",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Stop synth by name.",
+      "fullName": "Stop synth",
+      "functionType": "Action",
+      "name": "StopSynth",
+      "private": true,
+      "sentence": "Stop synth _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// TO-DO stop synth function\r",
+            "const synthName = eventsFunctionContext.getArgument(\"synthName\");\r",
+            "\r",
+            "gdjs.__audioContextExtension.stopSynth(synthName)\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Synth name",
+          "name": "synthName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Create a new chord.",
+      "fullName": "Create chord",
+      "functionType": "Action",
+      "name": "CreateChord",
+      "sentence": "Create chord _PARAM1_ with notes _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const chord = eventsFunctionContext.getArgument(\"chordName\");",
+            "const arrNotes = eventsFunctionContext.getArgument(\"notes\").split(\",\")",
+            "",
+            "const frequencies = arrNotes.map(n => {",
+            "    const trimmed = n.trim()",
+            "    const octave = parseInt(trimmed.slice(-1))",
+            "    const noteName = trimmed.substring(0, trimmed.length-1).trim()",
+            "    const frequency = gdjs.__audioContextExtension.notes[noteName][octave]",
+            "    return frequency",
+            "})",
+            "",
+            "gdjs.__audioContextExtension.chords[chord] = {",
+            "    frequencies,",
+            "    detunes: []",
+            "}",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Chord name (imaginary or real)",
+          "name": "chordName",
+          "type": "string"
+        },
+        {
+          "description": "Comma separated notes including octave eg. \"C#4, Eb4, G4\"",
+          "name": "notes",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Play an existing chord on a synth.",
+      "fullName": "Play chord",
+      "functionType": "Action",
+      "name": "PlayChord",
+      "sentence": "Play chord _PARAM1_ on synth _PARAM2_ for _PARAM3_ secods",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const chordName = eventsFunctionContext.getArgument(\"chordName\");",
+            "const synthName = eventsFunctionContext.getArgument(\"synthName\");",
+            "const duration = eventsFunctionContext.getArgument(\"duration\");",
+            "",
+            "const synth = gdjs.__audioContextExtension.synths[synthName]",
+            "const frequencies = gdjs.__audioContextExtension.chords[chordName].frequencies",
+            "",
+            "const contextName = synth.contextName",
+            "const detunes = synth.detunes",
+            "const waveType = synth.waveType",
+            "",
+            "frequencies.forEach(frequency => {",
+            "    gdjs.__audioContextExtension.playFrequency(synthName, frequency, duration)",
+            "})",
+            "",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Chord name",
+          "name": "chordName",
+          "type": "string"
+        },
+        {
+          "description": "Synth name to play the chord on",
+          "name": "synthName",
+          "type": "string"
+        },
+        {
+          "description": "Duration",
+          "name": "duration",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Number of chords (For looping).",
+      "fullName": "Number of chords",
+      "functionType": "Expression",
+      "name": "NumberOfChords",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Object.keys(gdjs.__audioContextExtension.chords).length",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Get chord name by index.",
+      "fullName": "Chord name by index",
+      "functionType": "StringExpression",
+      "name": "ChordNameByIndex",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const index = eventsFunctionContext.getArgument(\"index\");\r",
+            "eventsFunctionContext.returnValue = Object.keys(gdjs.__audioContextExtension.chords)[index]"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Chord index",
+          "name": "index",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the context already created.",
+      "fullName": "Context exists",
+      "functionType": "Condition",
+      "name": "ContextExists",
+      "sentence": "Context _PARAM1_ exists",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const contextName = eventsFunctionContext.getArgument(\"contextName\")\r",
+            "\r",
+            "const context = gdjs.__audioContextExtension.contexts[contextName]\r",
+            "\r",
+            "eventsFunctionContext.returnValue = context !== undefined"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Context name",
+          "name": "contextName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

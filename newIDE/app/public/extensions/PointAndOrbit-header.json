@@ -1,0 +1,23 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IRIhkkTTl2UHhfjrLTTH5GYwkYu1",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Point and Orbit",
+  "name": "PointAndOrbit",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/PointAndOrbit.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/PointAndOrbit-header.json",
+  "tags": "point,orbit,toward,around",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/arrow-bottom-right-bold-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Point and orbit an object toward a position or angle.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/point-and-orbit",
+  "description": "Move an object in a circle around a specific point while pointing the moving object away from the center of the circle.\nThis feature is useful in games for weapons or targeting indicators that move around a player character.\nOrbit distance and rotation speed can be changed easily.\n\nThe target position action can be used to follow the direction of the cursor.\nThe target angle action can be used to follow hte direction of a gamepad stick\n\n# Example\n![](https://i.imgur.com/N2KtaMT.png)",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWFycm93LWJvdHRvbS1yaWdodC1ib2xkLW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNOS44OCwxNS41NEw0LjIyLDkuODhMOS44OCw0LjIyTDE1LjU0LDkuODhMMTkuNzgsNS42NFYxOS43OEg1LjY0TDkuODgsMTUuNTRNMTcuNjYsMTAuNTlMMTUuNTQsMTIuNzFMOS44OCw3LjA1TDcuMDUsOS44OEwxMi43MSwxNS41NEwxMC41OSwxNy42NkgxNy42NlYxMC41OVoiIC8+PC9zdmc+"
+}

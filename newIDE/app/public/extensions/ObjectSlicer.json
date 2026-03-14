@@ -1,0 +1,840 @@
+{
+  "author": "",
+  "category": "Visual effect",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Slice a 2D object into pieces",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWtuaWZlIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTIwLjYyLDJDMjMuOTcsNy42MSAxMi40NywyMC4xNSAxMi40NywyMC4xNUw5LjYsMTcuMjhMNC45MSwyMkwyLjc3LDE5Ljg2TDIwLjYyLDJaIiAvPjwvc3ZnPg==",
+  "name": "ObjectSlicer",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/2ea979b9db9294f26b40687e214f26d7926682457113ccc6dca4174bce6033aa_knife.svg",
+  "shortDescription": "Slice sprites into smaller color-matched pieces for destruction/break effects.",
+  "version": "1.1.1",
+  "description": [
+    "Useful for creating death animations such as explosions, crumbling, dissolve, or teleportation effects.",
+    "Object used for pieces should be a solid white color (otherwise the color will not match the original object color).",
+    "",
+    "Tips:",
+    "- Adjust the collision mask to control where pieces will be created,",
+    "- Pieces are linked to the original object which can be used in other events (i.e. explode away from the original object)",
+    "",
+    "This example shows how to slice objects: [open the project online](https://editor.gdevelop.io/?project=example://object-slicer.json)."
+  ],
+  "tags": "slice,brick,destruction,pixelizer",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Slice an object into smaller pieces that match color of the original object. The new object should be a solid white color.",
+      "fullName": "Slice object into smaller pieces",
+      "functionType": "Action",
+      "name": "SliceObjectIntoPieces",
+      "sentence": "Cut _PARAM1_ into _PARAM3_ vertical strips and _PARAM4_ horizontal strips using _PARAM2_ for the new objects. Delete original object: _PARAM5_",
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Object slicer",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Calculate dimensions of small objects"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__ObjectSlicer.FragmentHeight",
+                    "=",
+                    "max(1, round(Object.Height() / HorizontalSlices))"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__ObjectSlicer.FragmentWidth",
+                    "=",
+                    "max(1, round(Object.Width() / VerticalSlices))"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Record the top left corner of sprite"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__ObjectSlicer.CurrentX",
+                    "=",
+                    "Object.BoundingBoxLeft()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__ObjectSlicer.CurrentY",
+                    "=",
+                    "Object.BoundingBoxTop()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Scan sprite from top to bottom"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__ObjectSlicer.CreationID",
+                    "=",
+                    "1"
+                  ]
+                }
+              ]
+            },
+            {
+              "infiniteLoopWarning": true,
+              "type": "BuiltinCommonInstructions::While",
+              "whileConditions": [
+                {
+                  "type": {
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "__ObjectSlicer.CurrentY",
+                    "<=",
+                    "Object.BoundingBoxBottom()"
+                  ]
+                }
+              ],
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Search left to right"
+                },
+                {
+                  "infiniteLoopWarning": true,
+                  "type": "BuiltinCommonInstructions::While",
+                  "whileConditions": [
+                    {
+                      "type": {
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "__ObjectSlicer.CurrentX",
+                        "<=",
+                        "Object.BoundingBoxRight()"
+                      ]
+                    }
+                  ],
+                  "conditions": [],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": " Record the center of Fragment (used to check if it would be inside the collision mask)"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__ObjectSlicer.FragmentCenterX",
+                            "=",
+                            "Variable(__ObjectSlicer.CurrentX) + 0.5 * Variable(__ObjectSlicer.FragmentWidth)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__ObjectSlicer.FragmentCenterY",
+                            "=",
+                            "Variable(__ObjectSlicer.CurrentY) + 0.5 * Variable(__ObjectSlicer.FragmentHeight)"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Only create objects when their center would be inside the collison mask of the object"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "CollisionPoint"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Variable(__ObjectSlicer.FragmentCenterX)",
+                            "Variable(__ObjectSlicer.FragmentCenterY)"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "WhitePiece",
+                            "Variable(__ObjectSlicer.CurrentX)",
+                            "Variable(__ObjectSlicer.CurrentY)",
+                            "Object.Layer()"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "DeleteObject",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "LinkedObjects::LinkObjects"
+                              },
+                              "parameters": [
+                                "",
+                                "Object",
+                                "WhitePiece"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Adjust the size of the new object"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ChangeWidth"
+                              },
+                              "parameters": [
+                                "WhitePiece",
+                                "=",
+                                "Variable(__ObjectSlicer.FragmentWidth)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ChangeHeight"
+                              },
+                              "parameters": [
+                                "WhitePiece",
+                                "=",
+                                "Variable(__ObjectSlicer.FragmentHeight)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Set position based on center of piece (in case the origin has been moved)"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetCenter"
+                              },
+                              "parameters": [
+                                "WhitePiece",
+                                "=",
+                                "Variable(__ObjectSlicer.FragmentCenterX)",
+                                "=",
+                                "Variable(__ObjectSlicer.FragmentCenterY)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Match the color of the pixel that is in the center of the new Fragment"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ChangeColor"
+                              },
+                              "parameters": [
+                                "WhitePiece",
+                                "ToString(ObjectSlicer::ReadPixelRed(Variable(__ObjectSlicer.FragmentCenterX), Variable(__ObjectSlicer.FragmentCenterY))) + \";\" + ToString(ObjectSlicer::ReadPixelGreen(Variable(__ObjectSlicer.FragmentCenterX), Variable(__ObjectSlicer.FragmentCenterY))) + \";\" + ToString(ObjectSlicer::ReadPixelBlue(Variable(__ObjectSlicer.FragmentCenterX), Variable(__ObjectSlicer.FragmentCenterY)))"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "WhitePiece",
+                                "CreationID",
+                                "=",
+                                "Variable(__ObjectSlicer.CreationID)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "WhitePiece",
+                                "RowID",
+                                "=",
+                                "Variable(RowID)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "WhitePiece",
+                                "ColumnID",
+                                "=",
+                                "Variable(ColumnID)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "__ObjectSlicer.CreationID",
+                                "+",
+                                "1"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Search to the right"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__ObjectSlicer.CurrentX",
+                            "+",
+                            "Variable(__ObjectSlicer.FragmentWidth)"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Search down and start over on the left side"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__ObjectSlicer.CurrentX",
+                        "=",
+                        "Object.BoundingBoxLeft()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__ObjectSlicer.CurrentY",
+                        "+",
+                        "Variable(__ObjectSlicer.FragmentHeight)"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Delete object if desired"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "DeleteObject",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "Object",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object to be sliced",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Object used for sliced pieces",
+          "longDescription": "Recommended: Use a sprite that is a single white pixel",
+          "name": "WhitePiece",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "description": "Vertical slices",
+          "name": "VerticalSlices",
+          "type": "expression"
+        },
+        {
+          "description": "Horizontal slices",
+          "name": "HorizontalSlices",
+          "type": "expression"
+        },
+        {
+          "defaultValue": "yes",
+          "description": "Delete original object",
+          "name": "DeleteObject",
+          "optional": true,
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// Define an new private object javascript for this extension",
+            "gdjs._objectSlicer = {};",
+            "",
+            "/** ",
+            " * @param {HTMLCanvasElement} canvas",
+            " */",
+            "gdjs._objectSlicer.getCanvasType = function (canvas) {",
+            "    const is2d = canvas.getContext(\"2d\");",
+            "    const isBitmap = canvas.getContext(\"bitmaprenderer\");",
+            "    const isWebGL1 = canvas.getContext(\"webgl\");",
+            "    const isWebGL2 = canvas.getContext(\"webgl2\");",
+            "    const isExperimentalWebGL = canvas.getContext(\"experimental-webgl\");",
+            "",
+            "    return is2d ?",
+            "        \"2d\" : isBitmap ?",
+            "            \"bitmaprenderer\" : isWebGL1 ?",
+            "                \"webgl\" : isWebGL2 ?",
+            "                    \"webgl2\" : isExperimentalWebGL ?",
+            "                        \"experimental-webgl\" : null;",
+            "}",
+            "",
+            "/**",
+            " * @param {HTMLCanvasElement} canvas",
+            " * @param {number} colorIndex Should be 0, 1, 2 or 3, for red, green, blue or alpha channel.",
+            " * @param {number} positionX The X position of the pixel on the canvas to read",
+            " * @param {number} positionY The Y position of the pixel on the canvas to read",
+            " */",
+            "gdjs._objectSlicer.getPixelColor = function (canvas, colorIndex, positionX, positionY) {",
+            "",
+            "    const gl = canvas.getContext(\"webgl2\") ||  canvas.getContext(\"webgl\") || canvas.getContext(\"experimental-webgl\") ;",
+            "",
+            "    const data = new Uint8Array(1 * 4); // [255,255,255,255] RGBA",
+            "",
+            "    const invertedPositionY = gl.drawingBufferHeight - positionY;",
+            "    // mandatory because textures in webGL are invert before rendering in the canvas,",
+            "    // otherwise the bottom left corner will be used",
+            "",
+            "    gl.readPixels(positionX, invertedPositionY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);",
+            "    // Read 1 pixel and store it in data.",
+            "",
+            "    return data[colorIndex];",
+            "}",
+            "",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the blue component of the pixel at the specified position.",
+      "fullName": "Read pixel blue",
+      "functionType": "Expression",
+      "name": "ReadPixelBlue",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const canvas = runtimeScene.getGame().getRenderer().getCanvas();",
+            "if (!canvas) return;",
+            "",
+            "const canvasType = gdjs._objectSlicer.getCanvasType(canvas);",
+            "let x = eventsFunctionContext.getArgument(\"PositionX\");",
+            "let y = eventsFunctionContext.getArgument(\"PositionY\");",
+            "let layer = runtimeScene.getLayer(\"\");",
+            "let position = layer.convertInverseCoords(x, y);",
+            "",
+            "if (canvasType === \"webgl\" || canvasType === \"webgl2\" || canvasType === \"experimental-webgl\") {",
+            "    eventsFunctionContext.returnValue = gdjs._objectSlicer.getPixelColor(canvas, 2, position[0], position[1]);",
+            "    // 2 is for blue in pixel buffer",
+            "} else if (canvasType === \"2d\") {",
+            "    let ctx = canvas.getContext(\"2d\");",
+            "    let data = ctx.getImageData(position[0], position[1], 1, 1).data;",
+            "    eventsFunctionContext.returnValue = data[2];",
+            "} else {",
+            "    eventsFunctionContext.returnValue = 0;",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Position X",
+          "name": "PositionX",
+          "type": "expression"
+        },
+        {
+          "description": "Position Y",
+          "name": "PositionY",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the green component of the pixel at the specified position.",
+      "fullName": "Read pixel green",
+      "functionType": "Expression",
+      "name": "ReadPixelGreen",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const canvas = runtimeScene.getGame().getRenderer().getCanvas();",
+            "if (!canvas) return;",
+            "",
+            "const canvasType = gdjs._objectSlicer.getCanvasType(canvas);",
+            "let x = eventsFunctionContext.getArgument(\"PositionX\");",
+            "let y = eventsFunctionContext.getArgument(\"PositionY\");",
+            "let layer = runtimeScene.getLayer(\"\");",
+            "let position = layer.convertInverseCoords(x, y);",
+            "",
+            "if (canvasType === \"webgl\" || canvasType === \"webgl2\" || canvasType === \"experimental-webgl\") {",
+            "    eventsFunctionContext.returnValue = gdjs._objectSlicer.getPixelColor(canvas, 1, position[0], position[1]);",
+            "    // 1 is for green in pixel buffer",
+            "} else if (canvasType === \"2d\") {",
+            "    let ctx = canvas.getContext(\"2d\");",
+            "    let data = ctx.getImageData(position[0], position[1], 1, 1).data;",
+            "    eventsFunctionContext.returnValue = data[1];",
+            "} else {",
+            "    eventsFunctionContext.returnValue = 0;",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Position X",
+          "name": "PositionX",
+          "type": "expression"
+        },
+        {
+          "description": "Position Y",
+          "name": "PositionY",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the red component of the pixel at the specified position.",
+      "fullName": "Read pixel red",
+      "functionType": "Expression",
+      "name": "ReadPixelRed",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const canvas = runtimeScene.getGame().getRenderer().getCanvas();",
+            "if (!canvas) return;",
+            "",
+            "const canvasType = gdjs._objectSlicer.getCanvasType(canvas);",
+            "let x = eventsFunctionContext.getArgument(\"PositionX\");",
+            "let y = eventsFunctionContext.getArgument(\"PositionY\");",
+            "let layer = runtimeScene.getLayer(\"\");",
+            "let position = layer.convertInverseCoords(x, y);",
+            "",
+            "if (canvasType === \"webgl\" || canvasType === \"webgl2\" || canvasType === \"experimental-webgl\") {",
+            "    eventsFunctionContext.returnValue = gdjs._objectSlicer.getPixelColor(canvas, 0, position[0], position[1]);",
+            "    // 0 is for red, in pixel buffer",
+            "} else if (canvasType === \"2d\") {",
+            "    let ctx = canvas.getContext(\"2d\");",
+            "    let data = ctx.getImageData(position[0], position[1], 1, 1).data;",
+            "    eventsFunctionContext.returnValue = data[0];",
+            "} else {",
+            "    eventsFunctionContext.returnValue = 0;",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Position X",
+          "name": "PositionX",
+          "type": "expression"
+        },
+        {
+          "description": "Position Y",
+          "name": "PositionY",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

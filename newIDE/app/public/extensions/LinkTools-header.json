@@ -1,0 +1,227 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Linked Objects Tools",
+  "name": "LinkTools",
+  "version": "1.3.1",
+  "url": "https://resources.gdevelop-app.com/extensions/LinkTools.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/LinkTools-header.json",
+  "tags": "link,graph,path,match,tactical,city,movement",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/graph-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Use linked objects as graph nodes. Pathfinding and neighbor traversal on links.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 7,
+  "helpPath": "/all-features/extensions/linked-objects-tools",
+  "eventsBasedBehaviors": [
+    {
+      "description": "The object will move from one object instance to another according to how they are linked to one another to reach a targeted object.",
+      "fullName": "Link path finding",
+      "name": "LinkPathFinding",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "MoveTo",
+          "fullName": "Move to a position",
+          "description": "Move the object to a position.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HasReachedNode",
+          "fullName": "Is at a node",
+          "description": "Check if the object position is the on a path node.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "ForgetPath",
+          "fullName": "Forget the path",
+          "description": "Forget the path.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsMoving",
+          "fullName": "Is moving",
+          "description": "Check if the object is moving.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "PathFound",
+          "fullName": "Path found",
+          "description": "Check if a path has been found.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "HasReachedDestination",
+          "fullName": "Destination reached",
+          "description": "Check if the destination was reached.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "Speed",
+          "fullName": "Speed",
+          "description": "Speed of the object on the path.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "NodeCount",
+          "fullName": "Node count",
+          "description": "Get the number of waypoints on the path.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "NodeX",
+          "fullName": "Node X",
+          "description": "Waypoint X position.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "NodeY",
+          "fullName": "Node Y",
+          "description": "Waypoint X position.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "NextNodeIndex",
+          "fullName": "Next node index",
+          "description": "Next waypoint index.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "NextNodeX",
+          "fullName": "Next node X",
+          "description": "Next waypoint X position.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "NextNodeY",
+          "fullName": "Next node Y",
+          "description": "Next waypoint Y position.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "DestinationX",
+          "fullName": "Destination X",
+          "description": "Destination X position.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "DestinationY",
+          "fullName": "Destination Y",
+          "description": "Destination Y position.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "Acceleration",
+          "fullName": "Acceleration",
+          "description": "Compare the acceleration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetAcceleration",
+          "fullName": "Acceleration",
+          "description": "Change the acceleration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SpeedMax",
+          "fullName": "Maximum speed",
+          "description": "Compare the maximum speed of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetSpeedMax",
+          "fullName": "Maximum speed",
+          "description": "Change the maximum speed of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "RotationSpeed",
+          "fullName": "Rotation speed",
+          "description": "Compare the rotation speed of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetRotationSpeed",
+          "fullName": "Rotation speed",
+          "description": "Change the rotation speed of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AngleOffset",
+          "fullName": "Angle offset",
+          "description": "Compare the rotation offset applied when moving the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetAngleOffset",
+          "fullName": "Angle offset",
+          "description": "Change the rotation offset applied when moving the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Rotate",
+          "fullName": "Object rotated",
+          "description": "Check if the object is rotated when traveling on its path.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetRotate",
+          "fullName": "Rotate the object",
+          "description": "Enable or disable rotation of the object on the path.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "name": "LinkRectangularNeighbors",
+      "fullName": "Link to neighbors on a rectangular grid",
+      "description": "Link to neighbors on a rectangular grid.",
+      "functionType": "Action"
+    },
+    {
+      "name": "LinkHexagonalNeighbors",
+      "fullName": "Link to neighbors on a hexagonal grid",
+      "description": "Link to neighbors on a hexagonal grid.",
+      "functionType": "Action"
+    },
+    {
+      "name": "LinkIsometricRectangularNeighbors",
+      "fullName": "Link to neighbors on an isometric grid",
+      "description": "Link to neighbors on an isometric grid.",
+      "functionType": "Action"
+    },
+    {
+      "name": "CanReachWithMaxWeight",
+      "fullName": "Can reach with links limited by cost",
+      "description": "Can reach through a given cost sum.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "CanReachWithMaxLength",
+      "fullName": "Can reach with links limited by length",
+      "description": "Can reach through a given number of links.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "CanReach",
+      "fullName": "Can reach",
+      "description": "Can reach through links.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "CostSum",
+      "fullName": "Cost sum",
+      "description": "Cost sum.",
+      "functionType": "Expression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "This provides:\n* \"Can reach through links\" conditions, useful to check if an object is linked to another through one or more other linked objects.\n* a path finding movement behavior that uses objects links (instead of obstacles for the other behavior)\n\nFor instance, it can be helpful for grid-based games like:\n* Match-3 ([open the project online](https://editor.gdevelop.io/?project=example://bim-bam))\n* Tactical ([open the project online](https://editor.gdevelop.io/?project=example://tactical-game-grid-movement))\n* City builders ([open the project online](https://editor.gdevelop.io/?project=example://city-builder))\n* Point and click (bypass obstacles with a predetermined polygonal chain)",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdyYXBoLW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTkuNSAxN0MxOS4zNiAxNyAxOS4yNCAxNyAxOS4xMSAxNy4wNEwxNy41IDEzLjhDMTcuOTUgMTMuMzUgMTguMjUgMTIuNzEgMTguMjUgMTJDMTguMjUgMTAuNjIgMTcuMTMgOS41IDE1Ljc1IDkuNUMxNS42MSA5LjUgMTUuNSA5LjUgMTUuMzUgOS41NEwxMy43NCA2LjNDMTQuMjEgNS44NCAxNC41IDUuMjEgMTQuNSA0LjVDMTQuNSAzLjEyIDEzLjM4IDIgMTIgMlM5LjUgMy4xMiA5LjUgNC41QzkuNSA1LjIgOS43OSA1Ljg0IDEwLjI2IDYuMjlMOC42NSA5LjU0QzguNSA5LjUgOC4zOSA5LjUgOC4yNSA5LjVDNi44NyA5LjUgNS43NSAxMC42MiA1Ljc1IDEyQzUuNzUgMTIuNzEgNi4wNCAxMy4zNCA2LjUgMTMuNzlMNC44OSAxNy4wNEM0Ljc2IDE3IDQuNjQgMTcgNC41IDE3QzMuMTIgMTcgMiAxOC4xMiAyIDE5LjVDMiAyMC44OCAzLjEyIDIyIDQuNSAyMlM3IDIwLjg4IDcgMTkuNUM3IDE4LjggNi43MSAxOC4xNiA2LjI0IDE3LjcxTDcuODYgMTQuNDZDOCAxNC41IDguMTIgMTQuNSA4LjI1IDE0LjVDOC4zOCAxNC41IDguNSAxNC41IDguNjMgMTQuNDZMMTAuMjYgMTcuNzFDOS43OSAxOC4xNiA5LjUgMTguOCA5LjUgMTkuNUM5LjUgMjAuODggMTAuNjIgMjIgMTIgMjJTMTQuNSAyMC44OCAxNC41IDE5LjVDMTQuNSAxOC4xMiAxMy4zOCAxNyAxMiAxN0MxMS44NyAxNyAxMS43NCAxNyAxMS42MSAxNy4wNEwxMCAxMy44QzEwLjQ1IDEzLjM1IDEwLjc1IDEyLjcxIDEwLjc1IDEyQzEwLjc1IDExLjMgMTAuNDYgMTAuNjcgMTAgMTAuMjFMMTEuNjEgNi45NkMxMS43NCA3IDExLjg3IDcgMTIgN0MxMi4xMyA3IDEyLjI2IDcgMTIuMzkgNi45NkwxNCAxMC4yMUMxMy41NCAxMC42NiAxMy4yNSAxMS4zIDEzLjI1IDEyQzEzLjI1IDEzLjM4IDE0LjM3IDE0LjUgMTUuNzUgMTQuNUMxNS44OCAxNC41IDE2IDE0LjUgMTYuMTMgMTQuNDZMMTcuNzYgMTcuNzFDMTcuMjkgMTguMTYgMTcgMTguOCAxNyAxOS41QzE3IDIwLjg4IDE4LjEyIDIyIDE5LjUgMjJTMjIgMjAuODggMjIgMTkuNUMyMiAxOC4xMiAyMC44OCAxNyAxOS41IDE3TTQuNSAyMC41QzMuOTUgMjAuNSAzLjUgMjAuMDUgMy41IDE5LjVTMy45NSAxOC41IDQuNSAxOC41IDUuNSAxOC45NSA1LjUgMTkuNSA1LjA1IDIwLjUgNC41IDIwLjVNMTMgMTkuNUMxMyAyMC4wNSAxMi41NSAyMC41IDEyIDIwLjVTMTEgMjAuMDUgMTEgMTkuNSAxMS40NSAxOC41IDEyIDE4LjUgMTMgMTguOTUgMTMgMTkuNU03LjI1IDEyQzcuMjUgMTEuNDUgNy43IDExIDguMjUgMTFTOS4yNSAxMS40NSA5LjI1IDEyIDguOCAxMyA4LjI1IDEzIDcuMjUgMTIuNTUgNy4yNSAxMk0xMSA0LjVDMTEgMy45NSAxMS40NSAzLjUgMTIgMy41UzEzIDMuOTUgMTMgNC41IDEyLjU1IDUuNSAxMiA1LjUgMTEgNS4wNSAxMSA0LjVNMTQuNzUgMTJDMTQuNzUgMTEuNDUgMTUuMiAxMSAxNS43NSAxMVMxNi43NSAxMS40NSAxNi43NSAxMiAxNi4zIDEzIDE1Ljc1IDEzIDE0Ljc1IDEyLjU1IDE0Ljc1IDEyTTE5LjUgMjAuNUMxOC45NSAyMC41IDE4LjUgMjAuMDUgMTguNSAxOS41UzE4Ljk1IDE4LjUgMTkuNSAxOC41IDIwLjUgMTguOTUgMjAuNSAxOS41IDIwLjA1IDIwLjUgMTkuNSAyMC41WiIgLz48L3N2Zz4="
+}

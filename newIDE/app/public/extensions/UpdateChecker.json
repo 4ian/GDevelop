@@ -1,0 +1,271 @@
+{
+  "author": "",
+  "category": "Network",
+  "description": "With this extension, you can get a very simple update checking mechanism. It will look at the version of your game on liluo, and compare it with the one of the currently running game. If it is different, you can display a message to tell your users they are on an outdated version.\nIf you want your users to see that an update is available, simply change the version in your project properties, and deploy your game to liluo like you would (make an instant build and promote it to the game page's public build).",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Update checker",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXVwZGF0ZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0yMSwxMC4xMkgxNC4yMkwxNi45Niw3LjNDMTQuMjMsNC42IDkuODEsNC41IDcuMDgsNy4yQzQuMzUsOS45MSA0LjM1LDE0LjI4IDcuMDgsMTdDOS44MSwxOS43IDE0LjIzLDE5LjcgMTYuOTYsMTdDMTguMzIsMTUuNjUgMTksMTQuMDggMTksMTIuMUgyMUMyMSwxNC4wOCAyMC4xMiwxNi42NSAxOC4zNiwxOC4zOUMxNC44NSwyMS44NyA5LjE1LDIxLjg3IDUuNjQsMTguMzlDMi4xNCwxNC45MiAyLjExLDkuMjggNS42Miw1LjgxQzkuMTMsMi4zNCAxNC43NiwyLjM0IDE4LjI3LDUuODFMMjEsM1YxMC4xMk0xMi41LDhWMTIuMjVMMTYsMTQuMzNMMTUuMjgsMTUuNTRMMTEsMTNWOEgxMi41WiIgLz48L3N2Zz4=",
+  "name": "UpdateChecker",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/update.svg",
+  "shortDescription": "Checks if the version of the game on liluo is different than the current game version.",
+  "version": "1.0.0",
+  "tags": "update,liluo",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "",
+      "fullName": "",
+      "functionType": "Action",
+      "group": "",
+      "name": "onFirstSceneLoaded",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "UpdateChecker::RecheckForUpdates"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Loads the latest game version from liluo. This is already called at the beginnign of the scene, but you can still re-call it if it failed or if you want to add a \"check again\" button. Make sure to not call this too often (or at all), as otherwise it will DDoS the version-checking server!.",
+      "fullName": "Re-check for updates",
+      "functionType": "Action",
+      "group": "",
+      "name": "RecheckForUpdates",
+      "private": false,
+      "sentence": "Request latest game version from liluo",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "UpdateChecker::CreateGlobalReference"
+              },
+              "parameters": [
+                "",
+                "__UpdateChecker.LatestVersion",
+                "__UpdateChecker.LatestVersion",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "UpdateChecker::CreateGlobalReference"
+              },
+              "parameters": [
+                "",
+                "__UpdateChecker.Error",
+                "__UpdateChecker.Error",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "SendAsyncRequest"
+              },
+              "parameters": [
+                "\"https://updates.arthuro555.com/?game-id=\" + UpdateChecker::CurrentGameID()",
+                "\"\"",
+                "\"GET\"",
+                "\"text/plain-text\"",
+                "__UpdateChecker.LatestVersion",
+                "__UpdateChecker.Error"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if the game version on liluo is different from the one of the currently running game. It may take a few seconds for the liluo game version to be obtained, and in this time frame, the condition will not trigger. If disconnected from the internet, this will not function.",
+      "fullName": "Update is available",
+      "functionType": "Condition",
+      "group": "",
+      "name": "UpdateAvailable",
+      "private": false,
+      "sentence": "An update is is available",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "VarGlobalTxt"
+              },
+              "parameters": [
+                "__UpdateChecker.LatestVersion",
+                "!=",
+                "UpdateChecker::CurrentGameVersion()"
+              ]
+            },
+            {
+              "type": {
+                "value": "VarGlobalTxt"
+              },
+              "parameters": [
+                "__UpdateChecker.LatestVersion",
+                "!=",
+                "\"0\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if the fetching of the latest version from liluo succeeded.",
+      "fullName": "Updates check failed",
+      "functionType": "Condition",
+      "group": "",
+      "name": "UpdateCheckFailed",
+      "private": false,
+      "sentence": "An error has occured while checking updates",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "VarGlobalTxt"
+              },
+              "parameters": [
+                "__UpdateChecker.Error",
+                "!=",
+                "\"0\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the Liluo ID of the current game.",
+      "fullName": "Get game ID",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "CurrentGameID",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.projectUuid;\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the game version from the project properties",
+      "fullName": "Get game version",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "CurrentGameVersion",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.version;\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Transforms a scene variable into a reference to a global variable.",
+      "fullName": "Create reference to global variable",
+      "functionType": "Action",
+      "group": "",
+      "name": "CreateGlobalReference",
+      "private": true,
+      "sentence": "Make variable _PARAM1_ a reference to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const reference = eventsFunctionContext.getArgument(\"reference\");\nconst source = eventsFunctionContext.getArgument(\"source\");\n\n// Override each method \nfor (let func of Object.getOwnPropertyNames(gdjs.Variable.prototype))\n    reference[func] = gdjs.Variable.prototype[func].bind(source);\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The scene variable to turn into a reference",
+          "longDescription": "",
+          "name": "reference",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "scenevar"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The global variable the reference will refer to",
+          "longDescription": "",
+          "name": "source",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

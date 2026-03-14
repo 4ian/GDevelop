@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "q8ubdigLvIRXLxsJDDTaokO41mc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Magnetic Effect",
+  "name": "MagneticEffect",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/MagneticEffect.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/MagneticEffect-header.json",
+  "tags": "magnet,attract",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/magnet.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Attract an object to another object, with customisable speed and distance.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/magnetic-effect",
+  "description": "With this behavior, you can attract an object to another object, such as coins attracted to a player.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLW1hZ25ldCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0zLDdWMTNBOSw5IDAgMCwwIDEyLDIyQTksOSAwIDAsMCAyMSwxM1Y3SDE3VjEzQTUsNSAwIDAsMSAxMiwxOEE1LDUgMCAwLDEgNywxM1Y3TTE3LDVIMjFWMkgxN00zLDVIN1YySDMiIC8+PC9zdmc+"
+}

@@ -1,0 +1,250 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Marching Squares (experimental)",
+  "name": "MarchingSquares",
+  "version": "0.6.0",
+  "url": "https://resources.gdevelop-app.com/extensions/MarchingSquares.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/MarchingSquares-header.json",
+  "tags": "blobs,liquid,lava,water,fog,paint,heightmap",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/peanut-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Draw dynamically changing shapes like a fog of war.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/marching-squares/details",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Add to a Shape painter object and use the actions to draw a field. Useful for fog of wars, liquid effects (water, lava, blobs...).",
+      "fullName": "Marching squares painter",
+      "name": "MarchingSquaresBehavior",
+      "objectType": "PrimitiveDrawing::Drawer",
+      "eventsFunctions": [
+        {
+          "name": "ClearField",
+          "fullName": "Clear the field",
+          "description": "Clear the field by setting every values to 0.",
+          "functionType": "Action"
+        },
+        {
+          "name": "UpsidedownFloodFrom",
+          "fullName": "Unfill area",
+          "description": "Unfill an area of the field from a given location until a given height is reached.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FloodFrom",
+          "fullName": "Fill area",
+          "description": "Fill an area of the field from a given location until a given height is reached.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ClampField",
+          "fullName": "Clamp the field",
+          "description": "Cap every value of the field to a range.",
+          "functionType": "Action"
+        },
+        {
+          "name": "TransformField",
+          "fullName": "Transform the field",
+          "description": "Apply an affine on the field values.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AddHill",
+          "fullName": "Add a hill",
+          "description": "Add a hill to the field.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AddDisk",
+          "fullName": "Add a disk",
+          "description": "Add a disk to the field.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MaskDisk",
+          "fullName": "Mask a disk",
+          "description": "Mask a disk to the field.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AddLine",
+          "fullName": "Add a line",
+          "description": "Add a line to the field.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MaskLine",
+          "fullName": "Mask a line",
+          "description": "Mask a line to the field.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MergeField",
+          "fullName": "Merge a field",
+          "description": "Apply a given operation on every value of the field using the value from the other field at the same position.",
+          "functionType": "Action"
+        },
+        {
+          "name": "UpdateHitboxes",
+          "fullName": "Update hitboxes",
+          "description": "Update the field hitboxes.",
+          "functionType": "Action"
+        },
+        {
+          "name": "DrawField",
+          "fullName": "Draw the contours",
+          "description": "Draw the field contours.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetCellWidth",
+          "fullName": "Width of the cells",
+          "description": "Change the width of the field cells.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetCellHeight",
+          "fullName": "Height of the cells",
+          "description": "Change the height of the field cells.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetFillOutside",
+          "fullName": "Fill outside",
+          "description": "Fill outside or inside of the contours.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetThreshold",
+          "fullName": "Contour threshold",
+          "description": "Change the contour threshold.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetAreaBounds",
+          "fullName": "Area bounds",
+          "description": "Change the field area bounds.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AreaLeft",
+          "fullName": "Area left",
+          "description": "Area left bound of the field.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "AreaTop",
+          "fullName": "Area top",
+          "description": "Area top bound of the field.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "AreaRight",
+          "fullName": "Area right",
+          "description": "Area right bound of the field.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "AreaBottom",
+          "fullName": "Area bottom",
+          "description": "Area bottom bound of the field.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "CellWidth",
+          "fullName": "Width of a cell",
+          "description": "Width of the field cells.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "CellHeight",
+          "fullName": "Height of a cell",
+          "description": "Height of the field cells.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "DimensionX",
+          "fullName": "Dimension X",
+          "description": "The number of cells on the x axis.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "DimensionY",
+          "fullName": "Dimension Y",
+          "description": "The number of cells on the y axis.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "ContourThreshold",
+          "fullName": "Contour threshold",
+          "description": "The contour threshold.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "NormalX",
+          "fullName": "Normal X",
+          "description": "The normal X coordinate at a given location.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "NormalY",
+          "fullName": "Normal Y",
+          "description": "The normal Y coordinate at a given location.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "NormalZ",
+          "fullName": "Normal Z",
+          "description": "The normal Z coordinate at a given location.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetGridValue",
+          "fullName": "Grid value",
+          "description": "Change the field value at a grid point.",
+          "functionType": "Action"
+        },
+        {
+          "name": "GridValue",
+          "fullName": "Grid value",
+          "description": "The field value at a grid point.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "FieldValue",
+          "fullName": "Field value",
+          "description": "The field value at a given location.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "CheckFillOutside",
+          "fullName": "Fill outside",
+          "description": "Check if the contours are filled outside.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "CheckFieldValue",
+          "fullName": "Field value",
+          "description": "Check if a field is greater than a given value.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "ContainsPoint",
+          "fullName": "Point is inside",
+          "description": "Check if a point is inside the contour.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "It can be helpful for:\n  * Liquid effects like water, blobs or lava ([open the project online](https://editor.gdevelop.io/?project=example://marching-squares-liquids))\n  * Fog of wars ([open the project online](https://editor.gdevelop.io/?project=example://marching-squares-fog-of-war))\n  * Platformer with destructible platforms ([open the project online](https://editor.gdevelop.io/?project=example://marching-squares-platforms-painter))\n  * Dynamically paint territories ([open the project online](https://editor.gdevelop.io/?project=example://marching-squares-qix))\n  * Top-down relief with physics ([open the project online](https://editor.gdevelop.io/?project=example://marching-squares-terraforming))\n  * Island generator ([open the project online](https://editor.gdevelop.io/?project=example://marching-squares-island-generator))",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXBlYW51dC1vdXRsaW5lIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDIzQzExLjUzIDIzIDExLjA3IDIyLjk1IDEwLjYxIDIyLjg1QzcuMSAyMi4xIDQuODcgMTguNjQgNS42MiAxNS4xM0M1Ljg3IDEzLjk1IDYuNDUgMTIuODcgNy4yOCAxMkM3LjYyIDExLjY0IDcuNjIgMTEuMDggNy4yOCAxMC43MkM1LjIgOC4xNCA1LjYgNC4zNiA4LjE4IDIuMjhTMTQuNTQuNjA3IDE2LjYyIDMuMTlDMTguMzkgNS4zOCAxOC4zOSA4LjUgMTYuNjIgMTAuNzJDMTYuMzMgMTEuMTMgMTYuMzcgMTEuNyAxNi43MiAxMi4wNkMxOS4xNyAxNC42OCAxOS4wNCAxOC44IDE2LjQxIDIxLjI1QzE1LjIyIDIyLjM3IDEzLjY0IDIzIDEyIDIzTTEyIDNDMTEuMDkgMyAxMC4yIDMuMzEgOS41IDMuODlDOC41NSA0LjY1IDggNS43OSA4IDdDOCA3LjkxIDguMzEgOC43OSA4Ljg4IDkuNUM5Ljg0IDEwLjY0IDkuNzcgMTIuMzMgOC43MyAxMy40MUM3LjAzIDE1LjIyIDcuMTMgMTguMDcgOC45NCAxOS43N1MxMy42IDIxLjM4IDE1LjMgMTkuNTZDMTYuOTIgMTcuODMgMTYuOTIgMTUuMTQgMTUuMyAxMy40MUMxNC4yMyAxMi4zMiAxNC4xNSAxMC42IDE1LjEyIDkuNDFDMTYuNSA3LjY5IDE2LjIyIDUuMTcgMTQuNSAzLjc5QzE0IDMuNDEgMTMuNDcgMy4xNCAxMi44OCAzQzEyLjU5IDMgMTIuMjkgMyAxMiAzTTEyIDZDMTIgNi41NSAxMi40NSA3IDEzIDdTMTQgNi41NSAxNCA2IDEzLjU1IDUgMTMgNSAxMiA1LjQ1IDEyIDZNMTQgMTlDMTQuNTUgMTkgMTUgMTguNTUgMTUgMThTMTQuNTUgMTcgMTQgMTcgMTMgMTcuNDUgMTMgMTggMTMuNDUgMTkgMTQgMTlNMTMgMTZDMTMuNTUgMTYgMTQgMTUuNTUgMTQgMTVTMTMuNTUgMTQgMTMgMTQgMTIgMTQuNDUgMTIgMTUgMTIuNDUgMTYgMTMgMTZNMTEgMThDMTEuNTUgMTggMTIgMTcuNTUgMTIgMTdTMTEuNTUgMTYgMTEgMTYgMTAgMTYuNDUgMTAgMTcgMTAuNDUgMTggMTEgMThaIiAvPjwvc3ZnPg=="
+}

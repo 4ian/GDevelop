@@ -1,0 +1,2176 @@
+{
+  "author": "",
+  "category": "Visual effect",
+  "extensionNamespace": "",
+  "fullName": "Tween into view",
+  "gdevelopVersion": "",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNMjUsMTZjLTAuMywwLTAuNS0wLjEtMC43LTAuM2MtMC40LTAuNC0wLjQtMSwwLTEuNGwzLjMtMy4zbC0zLjMtMy4zYy0wLjQtMC40LTAuNC0xLDAtMS40czEtMC40LDEuNCwwbDQsNA0KCQljMC40LDAuNCwwLjQsMSwwLDEuNGwtNCw0QzI1LjUsMTUuOSwyNS4zLDE2LDI1LDE2eiIvPg0KPC9nPg0KPGc+DQoJPHBhdGggZD0iTTI5LDEySDdjLTAuNiwwLTEtMC40LTEtMXMwLjQtMSwxLTFoMjJjMC42LDAsMSwwLjQsMSwxUzI5LjYsMTIsMjksMTJ6Ii8+DQo8L2c+DQo8Zz4NCgk8cGF0aCBkPSJNNywyNmMtMC4zLDAtMC41LTAuMS0wLjctMC4zbC00LTRjLTAuNC0wLjQtMC40LTEsMC0xLjRsNC00YzAuNC0wLjQsMS0wLjQsMS40LDBzMC40LDEsMCwxLjRMNC40LDIxbDMuMywzLjMNCgkJYzAuNCwwLjQsMC40LDEsMCwxLjRDNy41LDI1LjksNy4zLDI2LDcsMjZ6Ii8+DQo8L2c+DQo8Zz4NCgk8cGF0aCBkPSJNMjUsMjJIM2MtMC42LDAtMS0wLjQtMS0xczAuNC0xLDEtMWgyMmMwLjYsMCwxLDAuNCwxLDFTMjUuNiwyMiwyNSwyMnoiLz4NCjwvZz4NCjwvc3ZnPg0K",
+  "name": "TweenIntoView",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Glyphster Pack/Master/SVG/Arrows/557b3471ae92fa5c744b9bf14b8803a0c7745c224ed9cfe80037a8ac7295d99e_Arrows_thin_arrow_left_right_directions.svg",
+  "shortDescription": "Tween objects from off-screen into position for smooth UI/cutscene entrances.",
+  "version": "1.0.0",
+  "description": [
+    "Tween objects into position from off screen, or from a set distance, to create a polished visual effect.",
+    "",
+    "When objects are created, or if they exist at the beginning of the scene, they are put ouside of screen and tweened back to their initial position.",
+    "",
+    "This extension can be used to:",
+    "- Make smooth transitions for UI",
+    "- Animate simple cutscenes"
+  ],
+  "tags": "fade,move",
+  "authorIds": [
+    "9MGDlUQAh8QUilno4JPycekjRCJ3"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Tween objects into position from off screen.",
+      "fullName": "Tween into view",
+      "name": "TweenIntoView",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "doStepPostEvents is used to avoid a 1-frame delay:\n- The objects are created (by events or at the scene creation)\n- doStepPostEvents trigger tweens\n- The frame is displayed\n- The tween behavior start moving the objects"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "State",
+                    "=",
+                    "\"JustCreated\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "State",
+                    "=",
+                    "\"Ready\""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "We do it here because the object position is not yet known from onCreated."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "ShouldPlayAtCreation",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TweenIntoView::TweenIntoView::TweenIn"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Tween In"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CompareObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"TweenIntoView_FadeInDelay\"",
+                    ">=",
+                    "Delay"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "RemoveObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"TweenIntoView_FadeInDelay\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResetObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"TweenIntoView_FadeIn\""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "ShouldMove",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Tween::TweenBehavior::AddObjectPositionTween2"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween",
+                        "\"TweenIntoView_Move\"",
+                        "TargetX",
+                        "TargetY",
+                        "PositionEasingIn",
+                        "Duration",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "ShouldFade",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Tween::TweenBehavior::AddObjectOpacityTween2"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween",
+                        "\"TweenIntoView_Fade\"",
+                        "TargetOpacity",
+                        "OpacityEasingIn",
+                        "Duration * 0.8",
+                        "TweenDuration"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CompareObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"TweenIntoView_FadeIn\"",
+                    ">=",
+                    "Duration"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "State",
+                    "=",
+                    "\"FadedIn\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Tween Out"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CompareObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"TweenIntoView_FadeOutDelay\"",
+                    ">=",
+                    "Delay"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "RemoveObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"TweenIntoView_FadeOutDelay\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResetObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"TweenIntoView_FadeOut\""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "ShouldMove",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Tween::TweenBehavior::AddObjectPositionTween2"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween",
+                        "\"TweenIntoView_Move\"",
+                        "Object.Behavior::OriginX()",
+                        "Object.Behavior::OriginY()",
+                        "PositionEasingOut",
+                        "Duration",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "ShouldFade",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Tween::TweenBehavior::AddObjectOpacityTween2"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween",
+                        "\"TweenIntoView_Fade\"",
+                        "0",
+                        "OpacityEasingOut",
+                        "Duration * 0.8",
+                        "TweenDuration"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CompareObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"TweenIntoView_FadeOut\"",
+                    ">=",
+                    "Duration"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "State",
+                    "=",
+                    "\"FadedOut\""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "ShouldBeDeleted",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "Object",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "TweenIntoView::TweenIntoView",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the X position at the beginning of the fade-in.",
+          "fullName": "Origin X",
+          "functionType": "Expression",
+          "name": "OriginX",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "TargetX"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "Angle",
+                    "=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "TargetX - Distance"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "Distance",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "CameraBorderLeft(Object.Layer()) + TargetX - Object.BoundingBoxRight()"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "Angle",
+                    "=",
+                    "180"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "TargetX + Distance"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "Distance",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "CameraBorderRight(Object.Layer()) + TargetX - Object.BoundingBoxLeft()"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "TweenIntoView::TweenIntoView",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the Y position at the beginning of the fade-in.",
+          "fullName": "Origin Y",
+          "functionType": "Expression",
+          "name": "OriginY",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "TargetY"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "Angle",
+                        "=",
+                        "90"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "TargetY - Distance"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "Distance",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnNumber"
+                          },
+                          "parameters": [
+                            "CameraBorderTop(Object.Layer()) + TargetY - Object.BoundingBoxBottom()"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "Angle",
+                        "=",
+                        "270"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "TargetY + Distance"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "Distance",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnNumber"
+                          },
+                          "parameters": [
+                            "CameraBorderBottom(Object.Layer()) + TargetY - Object.BoundingBoxTop()"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "TweenIntoView::TweenIntoView",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Tween the object to its set starting position.",
+          "fullName": "Tween into view",
+          "functionType": "Action",
+          "name": "TweenIn",
+          "sentence": "Tween _PARAM0_ into view",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "State",
+                    "!=",
+                    "\"FadingIn\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ResetObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"TweenIntoView_FadeInDelay\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween::StopTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tween",
+                    "\"TweenIntoView_Move\"",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween::StopTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tween",
+                    "\"TweenIntoView_Fade\"",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "RemoveObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"TweenIntoView_FadeOut\""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "State",
+                            "=",
+                            "\"JustStarted\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "State",
+                            "=",
+                            "\"Ready\""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "TargetX",
+                        "=",
+                        "Object.X()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "TargetY",
+                        "=",
+                        "Object.Y()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "TargetOpacity",
+                        "=",
+                        "Object.Opacity::Value()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "State",
+                            "=",
+                            "\"JustStarted\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "State",
+                            "=",
+                            "\"Ready\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "State",
+                            "=",
+                            "\"FadedIn\""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "We evaluate the origin every time because the window may have been resized."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "ShouldMove",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetX"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "Object.Behavior::OriginX()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetY"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "Object.Behavior::OriginY()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "ShouldFade",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "OpacityCapability::OpacityBehavior::SetValue"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Opacity",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetStringVariable"
+                      },
+                      "parameters": [
+                        "State",
+                        "=",
+                        "\"FadingIn\""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "TweenIntoView::TweenIntoView",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Tween the object to its off screen position.",
+          "fullName": "Tween out of view",
+          "functionType": "Action",
+          "name": "TweenOut",
+          "sentence": "Tween _PARAM0_ out of view",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "State",
+                    "!=",
+                    "\"FadingOut\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ResetObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"TweenIntoView_FadeOutDelay\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween::StopTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tween",
+                    "\"TweenIntoView_Move\"",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween::StopTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tween",
+                    "\"TweenIntoView_Fade\"",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "RemoveObjectTimer"
+                  },
+                  "parameters": [
+                    "Object",
+                    "\"TweenIntoView_FadeIn\""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "State",
+                        "=",
+                        "\"FadedOut\""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "ShouldMove",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetX"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "TargetX"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetY"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "TargetY"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "ShouldFade",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "OpacityCapability::OpacityBehavior::SetValue"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Opacity",
+                            "=",
+                            "TargetOpacity"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetStringVariable"
+                      },
+                      "parameters": [
+                        "State",
+                        "=",
+                        "\"FadingOut\""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "TweenIntoView::TweenIntoView",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the object finished tweening into view.",
+          "fullName": "Tweened into view",
+          "functionType": "Condition",
+          "name": "IsTweenedIn",
+          "sentence": "_PARAM0_ finished tweening into view",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "State",
+                    "=",
+                    "\"FadedIn\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "TweenIntoView::TweenIntoView",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the object finished tweened out of view.",
+          "fullName": "Tweened out of view",
+          "functionType": "Condition",
+          "name": "IsTweenedOut",
+          "sentence": "_PARAM0_ finished tweening out of view",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "State",
+                    "=",
+                    "\"FadedOut\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "TweenIntoView::TweenIntoView",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set whether to delete the object when the \"tween out of view\" action has finished.",
+          "fullName": "Delete after tween out",
+          "functionType": "Action",
+          "group": "Tween into view configuration",
+          "name": "SetShouldBeDeleted",
+          "sentence": "Should delete _PARAM0_ when the \"tween out of view\" action has finished: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "ShouldBeDeleted",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Value",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "ShouldBeDeleted",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "TweenIntoView::TweenIntoView",
+              "type": "behavior"
+            },
+            {
+              "defaultValue": "yes",
+              "description": "Should delete the object when the \"tween out of view\" action has finished",
+              "name": "Value",
+              "optional": true,
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "90",
+          "type": "NumberWithChoices",
+          "label": "Direction",
+          "group": "Motion",
+          "choices": [
+            {
+              "label": "Move down",
+              "value": "90"
+            },
+            {
+              "label": "Move up",
+              "value": "270"
+            },
+            {
+              "label": "Move right",
+              "value": "0"
+            },
+            {
+              "label": "Move left",
+              "value": "180"
+            }
+          ],
+          "name": "Angle"
+        },
+        {
+          "value": "0.5",
+          "type": "Number",
+          "unit": "Second",
+          "label": "Duration",
+          "group": "Timing",
+          "name": "Duration"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "Distance",
+          "description": "Leave this value at 0 to move the object in from outside of the screen.",
+          "group": "Motion",
+          "name": "Distance"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Tween in the object at creation",
+          "group": "Timing",
+          "name": "ShouldPlayAtCreation"
+        },
+        {
+          "value": "easeFromTo",
+          "type": "Choice",
+          "label": "Moving in easing",
+          "group": "Motion",
+          "choices": [
+            {
+              "label": "linear",
+              "value": "linear"
+            },
+            {
+              "label": "easeInQuad",
+              "value": "easeInQuad"
+            },
+            {
+              "label": "easeOutQuad",
+              "value": "easeOutQuad"
+            },
+            {
+              "label": "easeInOutQuad",
+              "value": "easeInOutQuad"
+            },
+            {
+              "label": "easeInCubic",
+              "value": "easeInCubic"
+            },
+            {
+              "label": "easeOutCubic",
+              "value": "easeOutCubic"
+            },
+            {
+              "label": "easeInOutCubic",
+              "value": "easeInOutCubic"
+            },
+            {
+              "label": "easeInQuart",
+              "value": "easeInQuart"
+            },
+            {
+              "label": "easeOutQuart",
+              "value": "easeOutQuart"
+            },
+            {
+              "label": "easeInOutQuart",
+              "value": "easeInOutQuart"
+            },
+            {
+              "label": "easeInQuint",
+              "value": "easeInQuint"
+            },
+            {
+              "label": "easeOutQuint",
+              "value": "easeOutQuint"
+            },
+            {
+              "label": "easeInOutQuint",
+              "value": "easeInOutQuint"
+            },
+            {
+              "label": "easeInOutSine",
+              "value": "easeInOutSine"
+            },
+            {
+              "label": "easeInExpo",
+              "value": "easeInExpo"
+            },
+            {
+              "label": "easeOutExpo",
+              "value": "easeOutExpo"
+            },
+            {
+              "label": "easeInOutExpo",
+              "value": "easeInOutExpo"
+            },
+            {
+              "label": "easeInCirc",
+              "value": "easeInCirc"
+            },
+            {
+              "label": "easeOutCirc",
+              "value": "easeOutCirc"
+            },
+            {
+              "label": "easeInOutCirc",
+              "value": "easeInOutCirc"
+            },
+            {
+              "label": "easeOutBounce",
+              "value": "easeOutBounce"
+            },
+            {
+              "label": "easeInBack",
+              "value": "easeInBack"
+            },
+            {
+              "label": "easeOutBack",
+              "value": "easeOutBack"
+            },
+            {
+              "label": "easeInOutBack",
+              "value": "easeInOutBack"
+            },
+            {
+              "label": "elastic",
+              "value": "elastic"
+            },
+            {
+              "label": "swingFromTo",
+              "value": "swingFromTo"
+            },
+            {
+              "label": "swingFrom",
+              "value": "swingFrom"
+            },
+            {
+              "label": "swingTo",
+              "value": "swingTo"
+            },
+            {
+              "label": "bounce",
+              "value": "bounce"
+            },
+            {
+              "label": "bouncePast",
+              "value": "bouncePast"
+            },
+            {
+              "label": "easeFromTo",
+              "value": "easeFromTo"
+            },
+            {
+              "label": "easeFrom",
+              "value": "easeFrom"
+            },
+            {
+              "label": "easeTo",
+              "value": "easeTo"
+            }
+          ],
+          "name": "PositionEasingIn"
+        },
+        {
+          "value": "easeOutQuad",
+          "type": "Choice",
+          "label": "Moving out easing",
+          "group": "Motion",
+          "choices": [
+            {
+              "label": "linear",
+              "value": "linear"
+            },
+            {
+              "label": "easeInQuad",
+              "value": "easeInQuad"
+            },
+            {
+              "label": "easeOutQuad",
+              "value": "easeOutQuad"
+            },
+            {
+              "label": "easeInOutQuad",
+              "value": "easeInOutQuad"
+            },
+            {
+              "label": "easeInCubic",
+              "value": "easeInCubic"
+            },
+            {
+              "label": "easeOutCubic",
+              "value": "easeOutCubic"
+            },
+            {
+              "label": "easeInOutCubic",
+              "value": "easeInOutCubic"
+            },
+            {
+              "label": "easeInQuart",
+              "value": "easeInQuart"
+            },
+            {
+              "label": "easeOutQuart",
+              "value": "easeOutQuart"
+            },
+            {
+              "label": "easeInOutQuart",
+              "value": "easeInOutQuart"
+            },
+            {
+              "label": "easeInQuint",
+              "value": "easeInQuint"
+            },
+            {
+              "label": "easeOutQuint",
+              "value": "easeOutQuint"
+            },
+            {
+              "label": "easeInOutQuint",
+              "value": "easeInOutQuint"
+            },
+            {
+              "label": "easeInOutSine",
+              "value": "easeInOutSine"
+            },
+            {
+              "label": "easeInExpo",
+              "value": "easeInExpo"
+            },
+            {
+              "label": "easeOutExpo",
+              "value": "easeOutExpo"
+            },
+            {
+              "label": "easeInOutExpo",
+              "value": "easeInOutExpo"
+            },
+            {
+              "label": "easeInCirc",
+              "value": "easeInCirc"
+            },
+            {
+              "label": "easeOutCirc",
+              "value": "easeOutCirc"
+            },
+            {
+              "label": "easeInOutCirc",
+              "value": "easeInOutCirc"
+            },
+            {
+              "label": "easeOutBounce",
+              "value": "easeOutBounce"
+            },
+            {
+              "label": "easeInBack",
+              "value": "easeInBack"
+            },
+            {
+              "label": "easeOutBack",
+              "value": "easeOutBack"
+            },
+            {
+              "label": "easeInOutBack",
+              "value": "easeInOutBack"
+            },
+            {
+              "label": "elastic",
+              "value": "elastic"
+            },
+            {
+              "label": "swingFromTo",
+              "value": "swingFromTo"
+            },
+            {
+              "label": "swingFrom",
+              "value": "swingFrom"
+            },
+            {
+              "label": "swingTo",
+              "value": "swingTo"
+            },
+            {
+              "label": "bounce",
+              "value": "bounce"
+            },
+            {
+              "label": "bouncePast",
+              "value": "bouncePast"
+            },
+            {
+              "label": "easeFromTo",
+              "value": "easeFromTo"
+            },
+            {
+              "label": "easeFrom",
+              "value": "easeFrom"
+            },
+            {
+              "label": "easeTo",
+              "value": "easeTo"
+            }
+          ],
+          "name": "PositionEasingOut"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Delete the object when the \"tween out of view\" action has finished",
+          "group": "Timing",
+          "name": "ShouldBeDeleted"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Fade in/out the object",
+          "group": "Opacity",
+          "name": "ShouldFade"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "The X position at the end of fade in",
+          "group": "Motion",
+          "hidden": true,
+          "name": "TargetX"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "The Y position at the end of fade in",
+          "group": "Motion",
+          "hidden": true,
+          "name": "TargetY"
+        },
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Objects with opacity",
+          "extraInformation": [
+            "OpacityCapability::OpacityBehavior"
+          ],
+          "choices": [],
+          "name": "Opacity"
+        },
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Tween",
+          "extraInformation": [
+            "Tween::TweenBehavior"
+          ],
+          "choices": [],
+          "name": "Tween"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Move the object",
+          "group": "Motion",
+          "name": "ShouldMove"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Second",
+          "label": "Delay",
+          "group": "Timing",
+          "name": "Delay"
+        },
+        {
+          "value": "easeInQuad",
+          "type": "Choice",
+          "label": "Fade in easing",
+          "group": "Opacity",
+          "choices": [
+            {
+              "label": "linear",
+              "value": "linear"
+            },
+            {
+              "label": "easeInQuad",
+              "value": "easeInQuad"
+            },
+            {
+              "label": "easeOutQuad",
+              "value": "easeOutQuad"
+            },
+            {
+              "label": "easeInOutQuad",
+              "value": "easeInOutQuad"
+            },
+            {
+              "label": "easeInCubic",
+              "value": "easeInCubic"
+            },
+            {
+              "label": "easeOutCubic",
+              "value": "easeOutCubic"
+            },
+            {
+              "label": "easeInOutCubic",
+              "value": "easeInOutCubic"
+            },
+            {
+              "label": "easeInQuart",
+              "value": "easeInQuart"
+            },
+            {
+              "label": "easeOutQuart",
+              "value": "easeOutQuart"
+            },
+            {
+              "label": "easeInOutQuart",
+              "value": "easeInOutQuart"
+            },
+            {
+              "label": "easeInQuint",
+              "value": "easeInQuint"
+            },
+            {
+              "label": "easeOutQuint",
+              "value": "easeOutQuint"
+            },
+            {
+              "label": "easeInOutQuint",
+              "value": "easeInOutQuint"
+            },
+            {
+              "label": "easeInOutSine",
+              "value": "easeInOutSine"
+            },
+            {
+              "label": "easeInExpo",
+              "value": "easeInExpo"
+            },
+            {
+              "label": "easeOutExpo",
+              "value": "easeOutExpo"
+            },
+            {
+              "label": "easeInOutExpo",
+              "value": "easeInOutExpo"
+            },
+            {
+              "label": "easeInCirc",
+              "value": "easeInCirc"
+            },
+            {
+              "label": "easeOutCirc",
+              "value": "easeOutCirc"
+            },
+            {
+              "label": "easeInOutCirc",
+              "value": "easeInOutCirc"
+            },
+            {
+              "label": "easeOutBounce",
+              "value": "easeOutBounce"
+            },
+            {
+              "label": "easeInBack",
+              "value": "easeInBack"
+            },
+            {
+              "label": "easeOutBack",
+              "value": "easeOutBack"
+            },
+            {
+              "label": "easeInOutBack",
+              "value": "easeInOutBack"
+            },
+            {
+              "label": "elastic",
+              "value": "elastic"
+            },
+            {
+              "label": "swingFromTo",
+              "value": "swingFromTo"
+            },
+            {
+              "label": "swingFrom",
+              "value": "swingFrom"
+            },
+            {
+              "label": "swingTo",
+              "value": "swingTo"
+            },
+            {
+              "label": "bounce",
+              "value": "bounce"
+            },
+            {
+              "label": "bouncePast",
+              "value": "bouncePast"
+            },
+            {
+              "label": "easeFromTo",
+              "value": "easeFromTo"
+            },
+            {
+              "label": "easeFrom",
+              "value": "easeFrom"
+            },
+            {
+              "label": "easeTo",
+              "value": "easeTo"
+            }
+          ],
+          "advanced": true,
+          "name": "OpacityEasingIn"
+        },
+        {
+          "value": "easeOutQuad",
+          "type": "Choice",
+          "label": "Fade out easing",
+          "group": "Opacity",
+          "choices": [
+            {
+              "label": "linear",
+              "value": "linear"
+            },
+            {
+              "label": "easeInQuad",
+              "value": "easeInQuad"
+            },
+            {
+              "label": "easeOutQuad",
+              "value": "easeOutQuad"
+            },
+            {
+              "label": "easeInOutQuad",
+              "value": "easeInOutQuad"
+            },
+            {
+              "label": "easeInCubic",
+              "value": "easeInCubic"
+            },
+            {
+              "label": "easeOutCubic",
+              "value": "easeOutCubic"
+            },
+            {
+              "label": "easeInOutCubic",
+              "value": "easeInOutCubic"
+            },
+            {
+              "label": "easeInQuart",
+              "value": "easeInQuart"
+            },
+            {
+              "label": "easeOutQuart",
+              "value": "easeOutQuart"
+            },
+            {
+              "label": "easeInOutQuart",
+              "value": "easeInOutQuart"
+            },
+            {
+              "label": "easeInQuint",
+              "value": "easeInQuint"
+            },
+            {
+              "label": "easeOutQuint",
+              "value": "easeOutQuint"
+            },
+            {
+              "label": "easeInOutQuint",
+              "value": "easeInOutQuint"
+            },
+            {
+              "label": "easeInOutSine",
+              "value": "easeInOutSine"
+            },
+            {
+              "label": "easeInExpo",
+              "value": "easeInExpo"
+            },
+            {
+              "label": "easeOutExpo",
+              "value": "easeOutExpo"
+            },
+            {
+              "label": "easeInOutExpo",
+              "value": "easeInOutExpo"
+            },
+            {
+              "label": "easeInCirc",
+              "value": "easeInCirc"
+            },
+            {
+              "label": "easeOutCirc",
+              "value": "easeOutCirc"
+            },
+            {
+              "label": "easeInOutCirc",
+              "value": "easeInOutCirc"
+            },
+            {
+              "label": "easeOutBounce",
+              "value": "easeOutBounce"
+            },
+            {
+              "label": "easeInBack",
+              "value": "easeInBack"
+            },
+            {
+              "label": "easeOutBack",
+              "value": "easeOutBack"
+            },
+            {
+              "label": "easeInOutBack",
+              "value": "easeInOutBack"
+            },
+            {
+              "label": "elastic",
+              "value": "elastic"
+            },
+            {
+              "label": "swingFromTo",
+              "value": "swingFromTo"
+            },
+            {
+              "label": "swingFrom",
+              "value": "swingFrom"
+            },
+            {
+              "label": "swingTo",
+              "value": "swingTo"
+            },
+            {
+              "label": "bounce",
+              "value": "bounce"
+            },
+            {
+              "label": "bouncePast",
+              "value": "bouncePast"
+            },
+            {
+              "label": "easeFromTo",
+              "value": "easeFromTo"
+            },
+            {
+              "label": "easeFrom",
+              "value": "easeFrom"
+            },
+            {
+              "label": "easeTo",
+              "value": "easeTo"
+            }
+          ],
+          "advanced": true,
+          "name": "OpacityEasingOut"
+        },
+        {
+          "value": "255",
+          "type": "Number",
+          "label": "",
+          "group": "Opacity",
+          "hidden": true,
+          "name": "TargetOpacity"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "The X position at the beginning of fade in",
+          "group": "Motion",
+          "hidden": true,
+          "name": "OriginX"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "The Y position at the beginning of fade in",
+          "group": "Motion",
+          "hidden": true,
+          "name": "OriginY"
+        },
+        {
+          "value": "JustCreated",
+          "type": "String",
+          "label": "",
+          "group": "Timing",
+          "hidden": true,
+          "name": "State"
+        }
+      ],
+      "propertiesFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "propertyName": "Opacity"
+          },
+          {
+            "propertyName": "Tween"
+          },
+          {
+            "folderName": "Timing",
+            "children": [
+              {
+                "propertyName": "ShouldPlayAtCreation"
+              },
+              {
+                "propertyName": "Delay"
+              },
+              {
+                "propertyName": "Duration"
+              },
+              {
+                "propertyName": "ShouldBeDeleted"
+              },
+              {
+                "propertyName": "State"
+              }
+            ]
+          },
+          {
+            "folderName": "Motion",
+            "children": [
+              {
+                "propertyName": "ShouldMove"
+              },
+              {
+                "propertyName": "Angle"
+              },
+              {
+                "propertyName": "Distance"
+              },
+              {
+                "propertyName": "PositionEasingIn"
+              },
+              {
+                "propertyName": "PositionEasingOut"
+              },
+              {
+                "propertyName": "OriginX"
+              },
+              {
+                "propertyName": "OriginY"
+              },
+              {
+                "propertyName": "TargetX"
+              },
+              {
+                "propertyName": "TargetY"
+              }
+            ]
+          },
+          {
+            "folderName": "Opacity",
+            "children": [
+              {
+                "propertyName": "ShouldFade"
+              },
+              {
+                "propertyName": "OpacityEasingIn"
+              },
+              {
+                "propertyName": "OpacityEasingOut"
+              },
+              {
+                "propertyName": "TargetOpacity"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "eventsBasedObjects": []
+}

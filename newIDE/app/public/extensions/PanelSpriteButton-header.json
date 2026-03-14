@@ -1,0 +1,94 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Labeled button",
+  "name": "PanelSpriteButton",
+  "version": "2.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/PanelSpriteButton.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/PanelSpriteButton-header.json",
+  "tags": "button,ui",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Interface Elements/Interface Elements_interface_ui_button_ok_cta_clock_tap.svg",
+  "gdevelopVersion": ">=5.5.230",
+  "changelog": [
+    {
+      "version": "2.0.0",
+      "breaking": "- Buttons now use \"variants\", allowing easy swapping of their visual aspect. You will have to make some adjustments to existing buttons in your project. Follow this [migration documentation](https://wiki.gdevelop.io/gdevelop5/objects/custom-objects-prefab-template/migrate-to-variants/) to do these changes."
+    }
+  ],
+  "shortDescription": "Resizeable button with a label.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/objects/button",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [
+    {
+      "description": "Button with a label.",
+      "fullName": "Labeled button",
+      "name": "PanelSpriteButton",
+      "defaultName": "Button",
+      "eventsFunctions": [
+        {
+          "name": "IsIdle",
+          "fullName": "Is idle",
+          "description": "Check if the button is not used.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsClicked",
+          "fullName": "Is clicked",
+          "description": "Check if the button was just clicked.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsHovered",
+          "fullName": "Is hovered",
+          "description": "Check if the cursor is hovered over the button.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsFocused",
+          "fullName": "Is focused",
+          "description": "Check if the button is either hovered or pressed but not hovered.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsPressed",
+          "fullName": "Is pressed",
+          "description": "Check if the button is currently being pressed with mouse or touch.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetLabelTextOp",
+          "fullName": "Label text",
+          "description": "Change the label text.",
+          "functionType": "Action"
+        },
+        {
+          "name": "LabelText",
+          "fullName": "Label text",
+          "description": "Compare the label text.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "Activate",
+          "fullName": "De/activate interactions",
+          "description": "De/activate interactions with the button.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsActivated",
+          "fullName": "Interactions activated",
+          "description": "Check if interactions are activated on the button.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "description": "A button that can be used for menus and most labelled buttons of a game. The button can be customized with a background for each state and a label. It handles user interactions and a simple condition can be used to check if it is clicked.\n\nThere are ready-to-use buttons in the asset-store [menu buttons pack](https://editor.gdevelop.io/?initial-dialog=asset-store&asset-pack=menu-buttons-menu-buttons).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI5LDIzSDNjLTEuMSwwLTItMC45LTItMlYxMWMwLTEuMSwwLjktMiwyLTJoMjZjMS4xLDAsMiwwLjksMiwydjEwQzMxLDIyLjEsMzAuMSwyMywyOSwyM3oiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMywxOUwxMywxOWMtMS4xLDAtMi0wLjktMi0ydi0yYzAtMS4xLDAuOS0yLDItMmgwYzEuMSwwLDIsMC45LDIsMnYyQzE1LDE4LjEsMTQuMSwxOSwxMywxOXoiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIxOCIgeTE9IjEzIiB4Mj0iMTgiIHkyPSIxOSIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjIxIiB5MT0iMTMiIHgyPSIxOCIgeTI9IjE3Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMjEiIHkxPSIxOSIgeDI9IjE5IiB5Mj0iMTYiLz4NCjwvc3ZnPg0K"
+}

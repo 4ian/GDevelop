@@ -1,0 +1,38 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Discord rich presence (Windows, Mac, Linux)",
+  "name": "DiscordRichPresence",
+  "version": "1.1.1",
+  "url": "https://resources.gdevelop-app.com/extensions/DiscordRichPresence.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/DiscordRichPresence-header.json",
+  "tags": "discord,rich,presence,integration,status",
+  "category": "Third-party",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/discord.svg",
+  "gdevelopVersion": ">=5.6.256",
+  "shortDescription": "Display game activity status in Discord via Rich Presence integration.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/discord-rich-presence",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "ConnectToDiscord",
+      "fullName": "Initialize rich presence",
+      "description": "Attempts to connect to discord if it is installed, and initialize rich presence.",
+      "functionType": "Action"
+    },
+    {
+      "name": "UpdateRichPresence",
+      "fullName": "Update rich presence",
+      "description": "Update the data in the rich presence. See the discord documentation for more info on each field. Each field except state is optional.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Allows adding discord rich presence to your games. Only works on Windows/Mac/Linux exports. To test it on a preview, restart the discord desktop client while GDevelop is already opened, and start a preview.\n\nYou can get more infos on each field via [the discord documentation](https://discord.com/developers/docs/rich-presence/how-to#updating-presence-update-presence-payload-fields).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWRpc2NvcmQiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjIsMjRMMTYuNzUsMTlMMTcuMzgsMjFINC41QTIuNSwyLjUgMCAwLDEgMiwxOC41VjMuNUEyLjUsMi41IDAgMCwxIDQuNSwxSDE5LjVBMi41LDIuNSAwIDAsMSAyMiwzLjVWMjRNMTIsNi44QzkuMzIsNi44IDcuNDQsNy45NSA3LjQ0LDcuOTVDOC40Nyw3LjAzIDEwLjI3LDYuNSAxMC4yNyw2LjVMMTAuMSw2LjMzQzguNDEsNi4zNiA2Ljg4LDcuNTMgNi44OCw3LjUzQzUuMTYsMTEuMTIgNS4yNywxNC4yMiA1LjI3LDE0LjIyQzYuNjcsMTYuMDMgOC43NSwxNS45IDguNzUsMTUuOUw5LjQ2LDE1QzguMjEsMTQuNzMgNy40MiwxMy42MiA3LjQyLDEzLjYyQzcuNDIsMTMuNjIgOS4zLDE0LjkgMTIsMTQuOUMxNC43LDE0LjkgMTYuNTgsMTMuNjIgMTYuNTgsMTMuNjJDMTYuNTgsMTMuNjIgMTUuNzksMTQuNzMgMTQuNTQsMTVMMTUuMjUsMTUuOUMxNS4yNSwxNS45IDE3LjMzLDE2LjAzIDE4LjczLDE0LjIyQzE4LjczLDE0LjIyIDE4Ljg0LDExLjEyIDE3LjEyLDcuNTNDMTcuMTIsNy41MyAxNS41OSw2LjM2IDEzLjksNi4zM0wxMy43Myw2LjVDMTMuNzMsNi41IDE1LjUzLDcuMDMgMTYuNTYsNy45NUMxNi41Niw3Ljk1IDE0LjY4LDYuOCAxMiw2LjhNOS45MywxMC41OUMxMC41OCwxMC41OSAxMS4xMSwxMS4xNiAxMS4xLDExLjg2QzExLjEsMTIuNTUgMTAuNTgsMTMuMTMgOS45MywxMy4xM0M5LjI5LDEzLjEzIDguNzcsMTIuNTUgOC43NywxMS44NkM4Ljc3LDExLjE2IDkuMjgsMTAuNTkgOS45MywxMC41OU0xNC4xLDEwLjU5QzE0Ljc1LDEwLjU5IDE1LjI3LDExLjE2IDE1LjI3LDExLjg2QzE1LjI3LDEyLjU1IDE0Ljc1LDEzLjEzIDE0LjEsMTMuMTNDMTMuNDYsMTMuMTMgMTIuOTQsMTIuNTUgMTIuOTQsMTEuODZDMTIuOTQsMTEuMTYgMTMuNDUsMTAuNTkgMTQuMSwxMC41OVoiIC8+PC9zdmc+"
+}

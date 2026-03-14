@@ -1,0 +1,2229 @@
+{
+  "author": "",
+  "category": "Visual effect",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Character game feel",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE4LDE2bDguMS04LjFDMjMuOCw0LjksMjAuMSwzLDE2LDNDOC44LDMsMyw4LjgsMywxNnM1LjgsMTMsMTMsMTNjNC4xLDAsNy44LTEuOSwxMC4xLTQuOUwxOCwxNnoiLz4NCjxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjE0IiBjeT0iMTEiIHI9IjIiLz4NCjwvc3ZnPg0K",
+  "name": "CharacterGameFeel",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Videogames/a9c73353ecb47ef44b3cf3c744d303a7df2b28787b82eeb1d9cceb2a3980ad9c_Videogames_videogame_pacman_game_video.svg",
+  "shortDescription": "Add game feel to your platformer character object.",
+  "version": "1.2.0",
+  "description": [
+    "Add game feel behavior to your platformer character object to get the animations:",
+    "",
+    "- **Idle:** gives your character breath animation while not moving.",
+    "- **Jump:** gives your character squash and stretch animation when jumping.",
+    "- **Fall:** gives your character stretch animation when falling.",
+    "- **Land:** gives your character squash and stretch animation when landing.",
+    "",
+    "# Behavior",
+    "- Game feel behavior.",
+    "   - Includes the options (Scale strength/Scaling speed) for every animation.",
+    "",
+    "# Condition",
+    "- Animation is playing.",
+    "",
+    "# Action",
+    "- Disable animation.",
+    "- Enable animation.",
+    "",
+    "# Important",
+    "- In the events add the action [Separate player object from floor object] to avoid any kind of bugs.",
+    "![](https://i.imgur.com/TtdrAFp.png)",
+    "- Your sprite \"origin\" point, must be at the center bottom.",
+    "![](https://i.imgur.com/OdNv0cu.png)",
+    "- Your sprite bottom collision, must be filled entirely.",
+    "![](https://i.imgur.com/sHGOeqW.png)"
+  ],
+  "tags": "character,game,feel",
+  "authorIds": [
+    "IRIhkkTTl2UHhfjrLTTH5GYwkYu1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "For platformer character.",
+      "fullName": "Character game feel",
+      "name": "CharacterGameFeel",
+      "objectType": "Sprite",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Idle animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Boolean to check if the idle animation is unchecked in the behavior"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "AIdleCheck",
+                        "True",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Tween::IsPlaying"
+                      },
+                      "parameters": [
+                        "Object",
+                        "ETweenBehavior",
+                        "\"__GameFeel.Fall.Finish\""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Tween the object to its normal scale if its moving"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::PlatformerObjectBehavior::IsMovingEvenALittle"
+                          },
+                          "parameters": [
+                            "Object",
+                            "DPlatformerCharacterBehavior"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::IsOnFloor"
+                          },
+                          "parameters": [
+                            "Object",
+                            "DPlatformerCharacterBehavior"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "PlatformBehavior::IsJumping"
+                          },
+                          "parameters": [
+                            "Object",
+                            "DPlatformerCharacterBehavior"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "Tween::IsPlaying"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Fall.Finish\""
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "ObjectVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__GameFeel.Idle.BackToNormalScale",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Tween::StopTween"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ETweenBehavior",
+                                "\"__GameFeel.Idle.Breathing.Start\"",
+                                "yes"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Tween::StopTween"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ETweenBehavior",
+                                "\"__GameFeel.Idle.Breathing.End\"",
+                                "yes"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetObjectVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__GameFeel.Idle.Start",
+                                "False"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Tween::AddObjectScaleTween"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ETweenBehavior",
+                                "\"__GameFeel.Idle.Return\"",
+                                "1",
+                                "1",
+                                "\"linear\"",
+                                "100",
+                                "",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetObjectVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__GameFeel.Idle.BackToNormalScale",
+                                "True"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Tween the object to first step of breathing animation"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "PlatformBehavior::PlatformerObjectBehavior::IsMovingEvenALittle"
+                          },
+                          "parameters": [
+                            "Object",
+                            "DPlatformerCharacterBehavior"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "PlatformBehavior::IsJumping"
+                          },
+                          "parameters": [
+                            "Object",
+                            "DPlatformerCharacterBehavior"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::IsOnFloor"
+                          },
+                          "parameters": [
+                            "Object",
+                            "DPlatformerCharacterBehavior"
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "ObjectVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__GameFeel.Idle.Start",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ObjectVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__GameFeel.Fall.IsFalling",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ObjectVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__GameFeel.Land.CanFall",
+                                "False"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Tween::StopTween"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ETweenBehavior",
+                                "\"__GameFeel.Jump.Finished\"",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Tween::StopTween"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ETweenBehavior",
+                                "\"__GameFeel.Idle.Return\"",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetObjectVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__GameFeel.Idle.BackToNormalScale",
+                                "False"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Tween::AddObjectScaleTween"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ETweenBehavior",
+                                "\"__GameFeel.Idle.Breathing.Start\"",
+                                "1-BIdleScale",
+                                "1+BIdleScale",
+                                "\"easeInOutSine\"",
+                                "CIdleScalingSpeed",
+                                "",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetObjectVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__GameFeel.Idle.Start",
+                                "True"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Tween the object to the second step of breathing animation (scaling back to 1)"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "ObjectVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__GameFeel.Idle.Start",
+                                "True"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Tween::HasFinished"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ETweenBehavior",
+                                "\"__GameFeel.Idle.Breathing.Start\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Once"
+                              },
+                              "parameters": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Tween::AddObjectScaleTween"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ETweenBehavior",
+                                "\"__GameFeel.Idle.Breathing.End\"",
+                                "1",
+                                "1",
+                                "\"easeInOutSine\"",
+                                "CIdleScalingSpeed",
+                                "",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Repeat when the breath animation has finished (loop)"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Tween::HasFinished"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Idle.Breathing.End\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Idle.Start",
+                            "False"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Jump animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Boolean to check if the jump animation is unchecked in the behavior"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "FJumpCheck",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Tween the object to first step of jumping (squash)"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::IsJumping"
+                          },
+                          "parameters": [
+                            "Object",
+                            "DPlatformerCharacterBehavior"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Jump.IsJumping",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Tween::AddObjectScaleTween"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Jump.GettingReady\"",
+                            "1+GJumpScale",
+                            "1-GJumpScale",
+                            "\"easeInOutSine\"",
+                            "HJumpScalingSpeed/2",
+                            "",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Jump.IsJumping",
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Tween the object to second step of jumping (Stretch)"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Jump.IsJumping",
+                            "True"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Tween::HasFinished"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Jump.GettingReady\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Tween::StopTween"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Idle.Breathing.Start\"",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Tween::StopTween"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Idle.Breathing.End\"",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Tween::AddObjectScaleTween"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Jump.GettingReadyIsFinished\"",
+                            "1-GJumpScale",
+                            "1+GJumpScale",
+                            "\"easeInOutSine\"",
+                            "HJumpScalingSpeed",
+                            "",
+                            "no"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Tween back to object original scale"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Tween::HasFinished"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Jump.GettingReadyIsFinished\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Tween::AddObjectScaleTween"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Jump.Finished\"",
+                            "1",
+                            "1",
+                            "\"linear\"",
+                            "HJumpScalingSpeed",
+                            "",
+                            "yes"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Boolean to give the ability to repeat after standing on floor"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::IsOnFloor"
+                          },
+                          "parameters": [
+                            "Object",
+                            "DPlatformerCharacterBehavior"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Tween::HasFinished"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Jump.Finished\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Jump.IsJumping",
+                            "False"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Fall animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Boolean to check if the fall animation is unchecked in the behavior"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IallCheck",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Stretch the object when falling"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::IsFalling"
+                          },
+                          "parameters": [
+                            "Object",
+                            "DPlatformerCharacterBehavior"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Fall.IsFalling",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "Tween::IsPlaying"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Jump.Finished\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Tween::AddObjectScaleTween"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Fall.Start\"",
+                            "1-JFallScale",
+                            "1+JFallScale",
+                            "\"easeInOutSine\"",
+                            "KFallScalingSpeed",
+                            "",
+                            "yes"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Fall.IsFalling",
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::IsOnFloor"
+                          },
+                          "parameters": [
+                            "Object",
+                            "DPlatformerCharacterBehavior"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Fall.IsFalling",
+                            "True"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "If the land animation is unchecked, Tween the object to its normal scale"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "LandCheck",
+                                "True",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Once"
+                              },
+                              "parameters": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Tween::StopTween"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ETweenBehavior",
+                                "\"__GameFeel.Fall.Start\"",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Tween::AddObjectScaleTween"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ETweenBehavior",
+                                "\"__GameFeel.Fall.Finish\"",
+                                "1",
+                                "1",
+                                "\"linear\"",
+                                "100",
+                                "",
+                                "no"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "If the land animation is checked, give the ability to do the fall animation again"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "LandCheck",
+                                "True",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Once"
+                              },
+                              "parameters": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Tween::StopTween"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ETweenBehavior",
+                                "\"__GameFeel.Fall.Start\"",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetObjectVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "Object",
+                                "__GameFeel.Fall.IsFalling",
+                                "False"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "If the land animation is unchecked, give the ability to do the fall animation again after the tween"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Tween::HasFinished"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Fall.Finish\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Fall.IsFalling",
+                            "False"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Land animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Boolean to check if the fall animation is unchecked in the behavior"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "LandCheck",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Booleans to check if the object is landing"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::IsFalling"
+                          },
+                          "parameters": [
+                            "Object",
+                            "DPlatformerCharacterBehavior"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Land.IsLanding",
+                            "False"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Land.CanFall",
+                            "False"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Land.IsLanding",
+                            "True"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Land.CanFall",
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Squash the object when landing"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::IsOnFloor"
+                          },
+                          "parameters": [
+                            "Object",
+                            "DPlatformerCharacterBehavior"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Land.IsLanding",
+                            "True"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Tween::AddObjectScaleTween"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Land.Start\"",
+                            "1+MLandScale",
+                            "1-MLandScale",
+                            "\"easeInOutSine\"",
+                            "NLandScalingSpeed",
+                            "",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Land.IsLanding",
+                            "False"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Tween back to object original scale after squashing"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Tween::HasFinished"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Land.Start\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Tween::AddObjectScaleTween"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Land.Finish\"",
+                            "1",
+                            "1",
+                            "\"linear\"",
+                            "NLandScalingSpeed",
+                            "",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Boolean to give the ability to do the land animation again"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Tween::HasFinished"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ETweenBehavior",
+                            "\"__GameFeel.Land.Finish\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "__GameFeel.Land.CanFall",
+                            "False"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "CharacterGameFeel::CharacterGameFeel",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the object game feel animation is playing.",
+          "fullName": "Animation is playing",
+          "functionType": "Condition",
+          "name": "AnimationIsPlaying",
+          "sentence": "_PARAM0_ is playing _PARAM3_ game feel animation",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Idle animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Animations",
+                        "=",
+                        "\"Idle\""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "AIdleCheck",
+                            "True",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "Tween::IsPlaying"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ETweenBehavior",
+                                "\"__GameFeel.Idle.Return\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Tween::IsPlaying"
+                              },
+                              "parameters": [
+                                "Object",
+                                "TweenBehavior",
+                                "\"__GameFeel.Idle.Breathing.Start\""
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnBoolean"
+                          },
+                          "parameters": [
+                            "True"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Jump animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Animations",
+                        "=",
+                        "\"Jump\""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "FJumpCheck",
+                            "True",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Tween::IsPlaying"
+                          },
+                          "parameters": [
+                            "Object",
+                            "TweenBehavior",
+                            "\"__GameFeel.Jump.GettingReady\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnBoolean"
+                          },
+                          "parameters": [
+                            "True"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Fall animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Animations",
+                        "=",
+                        "\"Fall\""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "IallCheck",
+                            "True",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Tween::IsPlaying"
+                          },
+                          "parameters": [
+                            "Object",
+                            "TweenBehavior",
+                            "\"__GameFeel.Fall.Start\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnBoolean"
+                          },
+                          "parameters": [
+                            "True"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Land animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Animations",
+                        "=",
+                        "\"Land\""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "LandCheck",
+                            "True",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Tween::IsPlaying"
+                          },
+                          "parameters": [
+                            "Object",
+                            "TweenBehavior",
+                            "\"__GameFeel.Land.Start\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnBoolean"
+                          },
+                          "parameters": [
+                            "True"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "CharacterGameFeel::CharacterGameFeel",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween behavior",
+              "name": "TweenBehavior",
+              "supplementaryInformation": "Tween::TweenBehavior",
+              "type": "behavior"
+            },
+            {
+              "description": "Animation",
+              "name": "Animations",
+              "supplementaryInformation": "[\"Idle\",\"Jump\",\"Fall\",\"Land\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Disable game feel animation.",
+          "fullName": "Disable animation",
+          "functionType": "Action",
+          "name": "DisableAnimation",
+          "sentence": "Disable _PARAM2_ animation from _PARAM0_",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Idle animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Animations",
+                        "=",
+                        "\"Idle\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "AIdleCheck",
+                        "False",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Jump animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Animations",
+                        "=",
+                        "\"Jump\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "FJumpCheck",
+                        "False",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Fall animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Animations",
+                        "=",
+                        "\"Fall\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "IallCheck",
+                        "False",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Land animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Animations",
+                        "=",
+                        "\"Land\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "LandCheck",
+                        "False",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "CharacterGameFeel::CharacterGameFeel",
+              "type": "behavior"
+            },
+            {
+              "description": "Animation",
+              "name": "Animations",
+              "supplementaryInformation": "[\"Idle\",\"Jump\",\"Fall\",\"Land\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Enable game feel animation.",
+          "fullName": "Enable animation",
+          "functionType": "Action",
+          "name": "EnableAnimation",
+          "sentence": "Enable _PARAM2_ animation from _PARAM0_",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Idle animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Animations",
+                        "=",
+                        "\"Idle\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "AIdleCheck",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Jump animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Animations",
+                        "=",
+                        "\"Jump\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "FJumpCheck",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Fall animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Animations",
+                        "=",
+                        "\"Fall\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "IallCheck",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Land animation",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Animations",
+                        "=",
+                        "\"Land\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "LandCheck",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "CharacterGameFeel::CharacterGameFeel",
+              "type": "behavior"
+            },
+            {
+              "description": "Animation",
+              "name": "Animations",
+              "supplementaryInformation": "[\"Idle\",\"Jump\",\"Fall\",\"Land\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Idle animation",
+          "description": "Apply breath animation on the object.",
+          "group": "Idle",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "AIdleCheck"
+        },
+        {
+          "value": "0.1",
+          "type": "Number",
+          "label": "Scale strength",
+          "description": "",
+          "group": "Idle",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "BIdleScale"
+        },
+        {
+          "value": "500",
+          "type": "Number",
+          "unit": "Second",
+          "label": "Scaling speed",
+          "description": "",
+          "group": "Idle",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "CIdleScalingSpeed"
+        },
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Platformer character Behavior",
+          "description": "",
+          "group": "Required Behaviors",
+          "extraInformation": [
+            "PlatformBehavior::PlatformerObjectBehavior"
+          ],
+          "hidden": false,
+          "name": "DPlatformerCharacterBehavior"
+        },
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Tween behavior",
+          "description": "",
+          "group": "Required Behaviors",
+          "extraInformation": [
+            "Tween::TweenBehavior"
+          ],
+          "hidden": false,
+          "name": "ETweenBehavior"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Jump animation",
+          "description": "Apply squash and stretch animation on the object.",
+          "group": "Jump",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "FJumpCheck"
+        },
+        {
+          "value": "0.2",
+          "type": "Number",
+          "label": "Scale strength",
+          "description": "",
+          "group": "Jump",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "GJumpScale"
+        },
+        {
+          "value": "200",
+          "type": "Number",
+          "label": "Scaling speed",
+          "description": "",
+          "group": "Jump",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "HJumpScalingSpeed"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Fall animation",
+          "description": "Apply stretch animation on the object.",
+          "group": "Fall",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "IallCheck"
+        },
+        {
+          "value": "0.3",
+          "type": "Number",
+          "label": "Scale strength",
+          "description": "",
+          "group": "Fall",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "JFallScale"
+        },
+        {
+          "value": "200",
+          "type": "Number",
+          "label": "Scaling speed",
+          "description": "",
+          "group": "Fall",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "KFallScalingSpeed"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Land animation",
+          "description": "Apply squash animation on the object.",
+          "group": "Land",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "LandCheck"
+        },
+        {
+          "value": "0.6",
+          "type": "Number",
+          "label": "Scale strength",
+          "description": "",
+          "group": "Land",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "MLandScale"
+        },
+        {
+          "value": "100",
+          "type": "Number",
+          "label": "Scaling speed",
+          "description": "",
+          "group": "Land",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "NLandScalingSpeed"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

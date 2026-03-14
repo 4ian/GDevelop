@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "xesgTnQuyNXPVkGEDLD3Wcr8O4m1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Countdown timer (deprecated)",
+  "name": "CountdownTimer",
+  "version": "1.0.2",
+  "url": "https://resources.gdevelop-app.com/extensions/CountdownTimer.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/CountdownTimer-header.json",
+  "tags": "countdown,timer,clock,time attak",
+  "category": "General",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/UI Essentials/a87576ab3a35744221b26f87e4409ec174fb8fb79435b181232c40c29ac7340e_UI Essentials_sand_clock_time.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "A timer against the clock to create timer challenges in your projects. Countdown functionality.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 7,
+  "helpPath": "/extensions/countdown-timer",
+  "description": "This extension provides a timer against the clock to create timed challenges in your projects. You can set an initial time in seconds and then start the timer to count down. The extension includes actions to start or reset the timer, stop it at zero or allow negative numbers, and get the time remaining on the timer via an expression. With this extension, you will be able to easily add countdown functionality.\n\nThis extension is deprecated. Prefer using a timer and a substraction like in the countdown timer example ([open the project online](https://editor.gdevelop.io/?project=example://count-down-timer)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIyLDZIMTBDOC4zLDYsNyw0LjcsNywzdjBoMTh2MEMyNSw0LjcsMjMuNyw2LDIyLDZ6Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTAsMjZoMTJjMS43LDAsMywxLjMsMywzdjBIN3YwQzcsMjcuMyw4LjMsMjYsMTAsMjZ6Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjMsMjZ2LTRjMC0wLjYtMC4zLTEuMi0wLjgtMS42bC0zLjctMi44Yy0xLjEtMC44LTEuMS0yLjQsMC0zLjJsMy43LTIuOGMwLjUtMC40LDAuOC0xLDAuOC0xLjZWNiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTksNnY0YzAsMC42LDAuMywxLjIsMC44LDEuNmwzLjcsMi44YzEuMSwwLjgsMS4xLDIuNCwwLDMuMmwtMy43LDIuOEM5LjMsMjAuOCw5LDIxLjQsOSwyMnY0Ii8+DQo8cG9seWdvbiBjbGFzcz0ic3QwIiBwb2ludHM9IjExLDI2IDE2LDIxIDIxLDI2ICIvPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSIxNiwxMiAxMywxMCAxOSwxMCAiLz4NCjwvc3ZnPg0K"
+}

@@ -1,0 +1,46 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "wWP8BSlAW0UP4NeaHa2LcmmDzmH2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Idle object tracker",
+  "name": "IdleTracker",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/IdleTracker.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/IdleTracker-header.json",
+  "tags": "idle,tracking,position",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Movies and Entertainment/Movies and Entertainment_cinema_oscar_movies_award.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Detect if object hasn't moved for a configurable duration.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/idle-tracker",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Check if an object has not moved (with some tolerance, 20 pixels by default) for a certain duration (1 second by default).",
+      "fullName": "Idle tracker",
+      "name": "IdleTracker",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "HasMovedFromLastPosition",
+          "fullName": "Has just moved from last position",
+          "description": "Check if the object has just moved from its last position (using the tolerance configured in the behavior).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsIdle",
+          "fullName": "Is idle (since enough time)",
+          "description": "Check if the object is idle: it has not moved from its last position (or within the tolerance) for the time configured in the behavior.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "This behavior tracks the object position and provides a condition to check if the object has been around the same position for a certain amount of time. It's useful to track objects that are not moving (or very little, at least staying around a position).\n\nTo use:\n* Add the behavior to your object.\n* Configure the distance tolerance and the amount of time before considering objects idle.\n* Use the conditions in your events to know when the object is idle (or when it has just moved).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE5LDRjMCwyLjItMS4zLDQtMyw0cy0zLTEuOC0zLTRzMS4zLTMsMy0zUzE5LDEuOCwxOSw0eiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE0LjUsNy41bC0yLjIsMC43Yy0xLjQsMC41LTIuNSwxLjctMi43LDMuM2wtMC40LDMuNEM5LjEsMTYsMTAsMTcsMTEuMiwxN2gwYzAuNSwwLDEtMC4yLDEuNC0wLjZMMTUsMTRoMS41DQoJYzAuOCwwLDEuNS0wLjcsMS41LTEuNXYwYzAtMC44LTAuNy0xLjUtMS41LTEuNUgxNGwtMiwyIi8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTcuNSw3LjRsMi40LDAuOGMxLjQsMC41LDIuNSwxLjcsMi43LDMuM2wwLjQsMy40djBjMCwxLjItMSwyLjItMi4yLDIuMmgtMy4zYy0wLjgsMC0xLjUtMC43LTEuNS0xLjV2MA0KCWMwLTAuOCwwLjctMS41LDEuNS0xLjVIMjAiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMiwxN2MwLDIsMC4zLDYsMC45LDcuOEwxMywyNXY0bC0yLDF2MWg1VjE1Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjAsMTdjMCwyLTAuMyw2LTAuOSw3LjhMMTksMjV2NGwyLDF2MWgtNVYxNSIvPg0KPC9zdmc+DQo="
+}

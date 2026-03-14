@@ -1,0 +1,598 @@
+{
+  "author": "",
+  "category": "Ads",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Poki Games SDK",
+  "helpPath": "/extensions/poki-games-sdkhtml/details",
+  "iconUrl": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NzguODggMjczLjE2Ij4KCTxwYXRoIGZpbGw9ImJsYWNrIiBkPSJNNTQxIDg1LjhjMjEgMCAzOC0xNy40IDM4LTM4LjcgMC0yMC40LTE3LjQtMzcuNy0zOC0zNy43UzUwMy41IDI2LjYgNTAzLjUgNDdjMCAyMS40IDE3IDM4LjggMzcuNyAzOC44eiI+Cgk8L3BhdGg+Cgk8cGF0aCBmaWxsPSJibGFjayIgZD0iTTUwNCA5OS4zdjExMC41TDQ3MCAxMzZjMTUuNC0xOS4zIDIxLjctNDYuNCAyMi40LTY2VjU0aC02MC4ydjE1LjVjLTEgMTkuNi03LjMgMjguOC0yNC44IDM0LjVWMEgzNDZ2NDQuNEMzMjQgMjEuNiAyOTMgOS42IDI1Ni43IDkuNmMtNDAgMC03MyAxMy44LTk1LjYgNDBhMTE4IDExOCAwIDAgMC0xNyAyNi4yQzEyOSA2MC42IDEwOC40IDU0IDg0IDU0SDB2MjE5LjJoNTZWMjIxaDI4YzI0LjQgMCA0NS04LjMgNjAtMjMuN2ExMTYuMyAxMTYuMyAwIDAgMCAxNy42IDI3YzIyLjcgMjUuOCA1NS41IDM5LjMgOTUgMzkuMyAzOC42IDAgNzEtMTMuNSA5My42LTM5bDQuNS01LjZoNTIuN3YtNTQuM2w4LTIgMjYgNTYuNGgxMzYuOFY5OS40aC03NHptLTQxOCA2NEg1NnYtNTNoMjkuMmM3LjYgMCAyMC4zIDUuMiAyMC4zIDI1LjUgMCAxMy01LjQgMjcuMy0xOS40IDI3LjN6bTE3MCA2MGMtNDcuMyAwLTg1LjctMzkuNC04NS43LTg3LjhDMTcwLjMgODkgMjA5LjUgNTAgMjU2IDUwczg1LjYgMzkgODUuNiA4NS41YzAgNDguNC0zOC40IDg3LjgtODUuNiA4Ny44eiI+Cgk8L3BhdGg+Cgk8cGF0aCBmaWxsPSJibGFjayIgZD0iTTI1NiAxNDJjLTM4IDAtNTcgNi41LTY1IDguNiA2LjcgMzAuNSAzMy4yIDUzLjMgNjUgNTMuM3M1OC4zLTIzIDY1LTUzLjRjLTgtMi0yNy4yLTguNy02NS04Ljd6Ij4KCTwvcGF0aD4KPC9zdmc+Cg==",
+  "name": "PokiGamesSDKHtml",
+  "previewIconUrl": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NzguODggMjczLjE2Ij4KCTxwYXRoIGZpbGw9ImJsYWNrIiBkPSJNNTQxIDg1LjhjMjEgMCAzOC0xNy40IDM4LTM4LjcgMC0yMC40LTE3LjQtMzcuNy0zOC0zNy43UzUwMy41IDI2LjYgNTAzLjUgNDdjMCAyMS40IDE3IDM4LjggMzcuNyAzOC44eiI+Cgk8L3BhdGg+Cgk8cGF0aCBmaWxsPSJibGFjayIgZD0iTTUwNCA5OS4zdjExMC41TDQ3MCAxMzZjMTUuNC0xOS4zIDIxLjctNDYuNCAyMi40LTY2VjU0aC02MC4ydjE1LjVjLTEgMTkuNi03LjMgMjguOC0yNC44IDM0LjVWMEgzNDZ2NDQuNEMzMjQgMjEuNiAyOTMgOS42IDI1Ni43IDkuNmMtNDAgMC03MyAxMy44LTk1LjYgNDBhMTE4IDExOCAwIDAgMC0xNyAyNi4yQzEyOSA2MC42IDEwOC40IDU0IDg0IDU0SDB2MjE5LjJoNTZWMjIxaDI4YzI0LjQgMCA0NS04LjMgNjAtMjMuN2ExMTYuMyAxMTYuMyAwIDAgMCAxNy42IDI3YzIyLjcgMjUuOCA1NS41IDM5LjMgOTUgMzkuMyAzOC42IDAgNzEtMTMuNSA5My42LTM5bDQuNS01LjZoNTIuN3YtNTQuM2w4LTIgMjYgNTYuNGgxMzYuOFY5OS40aC03NHptLTQxOCA2NEg1NnYtNTNoMjkuMmM3LjYgMCAyMC4zIDUuMiAyMC4zIDI1LjUgMCAxMy01LjQgMjcuMy0xOS40IDI3LjN6bTE3MCA2MGMtNDcuMyAwLTg1LjctMzkuNC04NS43LTg3LjhDMTcwLjMgODkgMjA5LjUgNTAgMjU2IDUwczg1LjYgMzkgODUuNiA4NS41YzAgNDguNC0zOC40IDg3LjgtODUuNiA4Ny44eiI+Cgk8L3BhdGg+Cgk8cGF0aCBmaWxsPSJibGFjayIgZD0iTTI1NiAxNDJjLTM4IDAtNTcgNi41LTY1IDguNiA2LjcgMzAuNSAzMy4yIDUzLjMgNjUgNTMuM3M1OC4zLTIzIDY1LTUzLjRjLTgtMi0yNy4yLTguNy02NS04Ljd6Ij4KCTwvcGF0aD4KPC9zdmc+Cg==",
+  "shortDescription": "Poki Games SDK: display ads and manage game lifecycle for Poki hosting.",
+  "version": "0.1.1",
+  "description": "Please refer to [Poki's guide](https://sdk.poki.com/sdk-documentation.html) to know when to call the different actions.",
+  "origin": {
+    "identifier": "PokiGamesSDKHtml",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "poki,ads,sdk,api",
+  "authorIds": [
+    "tgIIofwSWVNtHsFW7AR2imu8gCj1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "gdjs._pokiGamesSDKHtmlExtension = {",
+            "    isSdkReady: false,",
+            "    isPlayingCommercialBreak: false,",
+            "    commercialBreakJustFinishedPlaying: false,",
+            "    isPlayingRewardedBreak: false,",
+            "    rewardedBreakJustFinishedPlaying: false,",
+            "    shouldRewardPlayer: false,",
+            "    lastShareableURL: \"\",",
+            "};",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "PokiGamesSDKHtml::LoadSDK"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Load Poki SDK.",
+      "fullName": "Load SDK",
+      "functionType": "Action",
+      "name": "LoadSDK",
+      "private": true,
+      "sentence": "Load Poki SDK",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const logger = new gdjs.Logger(\"Poki games SDK HTML\");",
+            "function addScript(src) {",
+            "    return new Promise((resolve, reject) => {",
+            "        const scriptElement = document.createElement('script');",
+            "",
+            "        scriptElement.setAttribute('src', src);",
+            "        scriptElement.addEventListener('load', resolve);",
+            "        scriptElement.addEventListener('error', reject);",
+            "",
+            "        document.body.appendChild(scriptElement);",
+            "    });",
+            "}",
+            "addScript('https://game-cdn.poki.com/scripts/v2/poki-sdk.js').then(() => {",
+            "    PokiSDK.init().then(() => {",
+            "        gdjs._pokiGamesSDKHtmlExtension.isSdkReady = true;",
+            "        logger.log(\"Poki SDK successfully initialized.\");",
+            "    }).catch(() => {",
+            "        logger.log(\"Initialized, but the user likely has adblock.\");",
+            "    });",
+            "}).catch((error) => {",
+            "    logger.error(`Failed to load Poki SDK script: ${error}`);",
+            "});"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the Poki SDK is ready to be used.",
+      "fullName": "Poki SDK is ready",
+      "functionType": "Condition",
+      "name": "IsSdkReady",
+      "sentence": "Poki SDK is ready",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._pokiGamesSDKHtmlExtension.isSdkReady;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Inform Poki game finished loading.",
+      "fullName": "Game loading finished",
+      "functionType": "Action",
+      "name": "CallGameLoadingFinished",
+      "sentence": "Inform Poki game finished loading",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (typeof PokiSDK === \"undefined\") return;",
+            "PokiSDK.gameLoadingFinished();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Inform Poki gameplay started.",
+      "fullName": "Gameplay started",
+      "functionType": "Action",
+      "name": "CallGameplayStart",
+      "sentence": "Inform Poki gameplay started",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (typeof PokiSDK === \"undefined\") return;",
+            "PokiSDK.gameplayStart();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Inform Poki gameplay stopped.",
+      "fullName": "Gameplay stopped",
+      "functionType": "Action",
+      "name": "CallGameplayStop",
+      "sentence": "Inform Poki gameplay stopped",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (typeof PokiSDK === \"undefined\") return;",
+            "PokiSDK.gameplayStop();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Request commercial break.",
+      "fullName": "Commercial break",
+      "functionType": "Action",
+      "name": "RequestCommercialBreak",
+      "sentence": "Request commercial break",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (typeof PokiSDK === \"undefined\") return;",
+            "const logger = new gdjs.Logger(\"Poki games SDK HTML\");",
+            "gdjs._pokiGamesSDKHtmlExtension.isPlayingCommercialBreak = true;",
+            "PokiSDK.commercialBreak().then(() => {",
+            "    gdjs._pokiGamesSDKHtmlExtension.commercialBreakJustFinishedPlaying = true;",
+            "}).catch((error) => {",
+            "    logger.log(`Commercial break failed: ${error}`);",
+            "}).finally(() => {",
+            "    gdjs._pokiGamesSDKHtmlExtension.isPlayingCommercialBreak = false;",
+            "});",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Request rewarded break.",
+      "fullName": "Rewarded break",
+      "functionType": "Action",
+      "name": "RequestRewardedBreak",
+      "sentence": "Request rewarded break",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (typeof PokiSDK === \"undefined\") return;",
+            "const logger = new gdjs.Logger(\"Poki games SDK HTML\");",
+            "gdjs._pokiGamesSDKHtmlExtension.isPlayingRewardedBreak = true;",
+            "gdjs._pokiGamesSDKHtmlExtension.shouldRewardPlayer = false;",
+            "PokiSDK.rewardedBreak().then((shouldRewardPlayer) => {",
+            "    gdjs._pokiGamesSDKHtmlExtension.rewardedBreakJustFinishedPlaying = true;",
+            "    gdjs._pokiGamesSDKHtmlExtension.shouldRewardPlayer = shouldRewardPlayer;",
+            "}).catch((error) => {",
+            "    logger.log(`Rewarded break failed: ${error}`);",
+            "}).finally(() => {",
+            "    gdjs._pokiGamesSDKHtmlExtension.isPlayingRewardedBreak = false;",
+            "});",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Create a shareable URL from parameters stored in a variable structure.",
+      "fullName": "Create shareable URL",
+      "functionType": "Action",
+      "name": "ShareableURL",
+      "sentence": "Create shareable URL from parameters _PARAM0_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (typeof PokiSDK === \"undefined\") return;",
+            "const logger = new gdjs.Logger(\"Poki games SDK HTML\");",
+            "/** @type {gdjs.Variable} */",
+            "const parametersVariable = eventsFunctionContext.getArgument(\"Parameters\");",
+            "let params = parametersVariable.toJSObject();",
+            "if (!params || typeof params !== \"object\" || Array.isArray(params)) {",
+            "    logger.log(\"Shareable URL parameters should be a structure variable.\");",
+            "    params = {};",
+            "}",
+            "PokiSDK.shareableURL(params).then((url) => {",
+            "    gdjs._pokiGamesSDKHtmlExtension.lastShareableURL = url;",
+            "}).catch((error) => {",
+            "    logger.log(`Failed to create shareable URL: ${error}`);",
+            "});",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Variable structure with URL parameters (example children: id, type)",
+          "name": "Parameters",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the last shareable URL generated by Create shareable URL.",
+      "fullName": "Last shareable URL",
+      "functionType": "StringExpression",
+      "name": "LastShareableURL",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._pokiGamesSDKHtmlExtension.lastShareableURL || \"\";",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Read a URL parameter from Poki URL or the current URL.",
+      "fullName": "Get URL parameter",
+      "functionType": "StringExpression",
+      "name": "URLParam",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (typeof PokiSDK === \"undefined\") {",
+            "    eventsFunctionContext.returnValue = \"\";",
+            "    return;",
+            "}",
+            "eventsFunctionContext.returnValue = PokiSDK.getURLParam(eventsFunctionContext.getArgument(\"Key\"));",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Parameter name (without the gd prefix)",
+          "longDescription": "",
+          "name": "Key",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Open an external URL via Poki SDK.",
+      "fullName": "Open external link",
+      "functionType": "Action",
+      "name": "OpenExternalLink",
+      "sentence": "Open external link _PARAM0_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (typeof PokiSDK === \"undefined\") return;",
+            "PokiSDK.openExternalLink(eventsFunctionContext.getArgument(\"Url\"));",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "URL to open",
+          "longDescription": "",
+          "name": "Url",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Move the Poki Pill on mobile.",
+      "fullName": "Move Poki Pill",
+      "functionType": "Action",
+      "name": "MovePill",
+      "sentence": "Move Poki Pill to _PARAM0_ percent from top with _PARAM1_ px offset",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (typeof PokiSDK === \"undefined\") return;",
+            "const topPercent = Number(eventsFunctionContext.getArgument(\"TopPercent\"));",
+            "const topPx = Number(eventsFunctionContext.getArgument(\"TopPx\"));",
+            "PokiSDK.movePill(topPercent, topPx);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "0",
+          "description": "Top percent (0-50)",
+          "longDescription": "",
+          "name": "TopPercent",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "20",
+          "description": "Additional pixel offset",
+          "longDescription": "",
+          "name": "TopPx",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Measure an event for analytics.",
+      "fullName": "Measure event",
+      "functionType": "Action",
+      "name": "Measure",
+      "sentence": "Measure category _PARAM0_ what _PARAM1_ action _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (typeof PokiSDK === \"undefined\") return;",
+            "PokiSDK.measure(",
+            "    eventsFunctionContext.getArgument(\"Category\"),",
+            "    eventsFunctionContext.getArgument(\"What\"),",
+            "    eventsFunctionContext.getArgument(\"MeasureAction\")",
+            ");",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Category (for example: level, tutorial, drawing)",
+          "longDescription": "",
+          "name": "Category",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "What is measured (for example: 1, de_dust, skip-level)",
+          "longDescription": "",
+          "name": "What",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Action (for example: start, complete, fail)",
+          "longDescription": "",
+          "name": "MeasureAction",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if a commercial break is playing.",
+      "fullName": "Commercial break is playing",
+      "functionType": "Condition",
+      "name": "IsCommercialBreakPlaying",
+      "sentence": "Commercial break is playing",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._pokiGamesSDKHtmlExtension.isPlayingCommercialBreak;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if a rewarded break is playing.",
+      "fullName": "Rewarded break is playing",
+      "functionType": "Condition",
+      "name": "IsRewardedBreakPlaying",
+      "sentence": "Rewarded break is playing",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._pokiGamesSDKHtmlExtension.isPlayingRewardedBreak;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if a commercial break just finished playing.",
+      "fullName": "Commercial break just finished playing",
+      "functionType": "Condition",
+      "name": "DidCommercialBreakJustFinishPlaying",
+      "sentence": "Commercial break just finished playing",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._pokiGamesSDKHtmlExtension.commercialBreakJustFinishedPlaying;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if a rewarded break just finished playing.",
+      "fullName": "Rewarded break just finished playing",
+      "functionType": "Condition",
+      "name": "DidRewardedBreakJustFinishPlaying",
+      "sentence": "Rewarded break just finished playing",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._pokiGamesSDKHtmlExtension.rewardedBreakJustFinishedPlaying;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if player should be rewarded after a rewarded break finished playing.",
+      "fullName": "Should reward player",
+      "functionType": "Condition",
+      "name": "ShouldRewardPlayer",
+      "sentence": "Should reward player",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._pokiGamesSDKHtmlExtension.shouldRewardPlayer;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onScenePostEvents",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "gdjs._pokiGamesSDKHtmlExtension.commercialBreakJustFinishedPlaying = false;",
+            "gdjs._pokiGamesSDKHtmlExtension.rewardedBreakJustFinishedPlaying = false;",
+            "gdjs._pokiGamesSDKHtmlExtension.shouldRewardPlayer = false;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

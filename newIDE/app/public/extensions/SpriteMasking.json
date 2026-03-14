@@ -1,0 +1,139 @@
+{
+  "author": "Arthur Pacaud (arthuro555)",
+  "category": "Visual effect",
+  "description": "When masked, the masked object is only visible through the mask.",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Object Masking",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXRyYW5zaXRpb24tbWFza2VkIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE1LDJDMTYuOTQsMiAxOC41OSwyLjcgMTkuOTUsNC4wNUMyMS4zLDUuNDEgMjIsNy4wNiAyMiw5QzIyLDEwLjU2IDIxLjUsMTEuOTYgMjAuNTgsMTMuMkMxOS42NCwxNC40MyAxOC40NCwxNS4yNyAxNi45NywxNS43TDE3LDE1LjM4VjE1QzE3LDEyLjgxIDE2LjIzLDEwLjkzIDE0LjY1LDkuMzVDMTMuMDcsNy43NyAxMS4xOSw3IDksN0g4LjYzTDguMyw3LjAzQzguNzMsNS41NiA5LjU3LDQuMzYgMTAuOCwzLjQyQzEyLjA0LDIuNSAxMy40NCwyIDE1LDJNOSw4QTcsNyAwIDAsMSAxNiwxNUE3LDcgMCAwLDEgOSwyMkE3LDcgMCAwLDEgMiwxNUE3LDcgMCAwLDEgOSw4TTksMTBBNSw1IDAgMCwwIDQsMTVBNSw1IDAgMCwwIDksMjBBNSw1IDAgMCwwIDE0LDE1QTUsNSAwIDAsMCA5LDEwWiIgLz48L3N2Zz4=",
+  "name": "SpriteMasking",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/transition-masked.svg",
+  "shortDescription": "Mask objects using a sprite or a Shape Painter.",
+  "dimension": "2D",
+  "version": "2.1.1",
+  "tags": "masking,javascript,pixi,sprites",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Define a shape painter as a mask of an object.",
+      "fullName": "Mask an object with a shape painter",
+      "functionType": "Action",
+      "name": "MaskWithShapePainter",
+      "private": false,
+      "sentence": "Mask _PARAM1_ with mask _PARAM2_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const maskObject = eventsFunctionContext.getObjects(\"Mask\")[0];\nif (!maskObject) return;\n\nconst maskedObjects = eventsFunctionContext.getObjects(\"Masked\");\nfor (const maskedObject of maskedObjects) {\n    const maskedRenderer = maskedObject.getRendererObject(); \n    maskedRenderer.mask = maskObject.getRendererObject();\n}\n\n",
+          "parameterObjects": "masked",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to mask",
+          "longDescription": "",
+          "name": "Masked",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Shape painter to use as a mask",
+          "longDescription": "",
+          "name": "Mask",
+          "optional": false,
+          "supplementaryInformation": "PrimitiveDrawing::Drawer",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Define a sprite as a mask of an object.",
+      "fullName": "Mask an object with a sprite",
+      "functionType": "Action",
+      "name": "Mask",
+      "private": false,
+      "sentence": "Mask _PARAM1_ with mask _PARAM2_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const maskObject = eventsFunctionContext.getObjects(\"Mask\")[0];\nif (!maskObject) return;\n\nconst maskedObjects = eventsFunctionContext.getObjects(\"Masked\");\nfor (const maskedObject of maskedObjects) {\n    const maskedRenderer = maskedObject.getRendererObject(); \n    maskedRenderer.mask = maskObject.getRendererObject();\n}\n\n",
+          "parameterObjects": "masked",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object to mask",
+          "longDescription": "",
+          "name": "Masked",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Sprite object to use as a mask",
+          "longDescription": "",
+          "name": "Mask",
+          "optional": false,
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Remove the mask of the specified object.",
+      "fullName": "Remove the mask",
+      "functionType": "Action",
+      "name": "Unmask",
+      "private": false,
+      "sentence": "Remove the mask of _PARAM1_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const maskedObjects = eventsFunctionContext.getObjects(\"Masked\");\n\nfor (const maskedObject of maskedObjects) {\n    const maskedRenderer = maskedObject.getRendererObject(); \n    maskedRenderer.mask = null;\n}\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Object with a mask to remove",
+          "longDescription": "",
+          "name": "Masked",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

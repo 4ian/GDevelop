@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IRIhkkTTl2UHhfjrLTTH5GYwkYu1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Animation system",
+  "name": "AnimationSystem",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/AnimationSystem.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/AnimationSystem-header.json",
+  "tags": "animation,animate,system",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Videogames/Videogames_videogame_pacman_ghost_character_play.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Adds easy to use pre-made animations.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/animation-system",
+  "description": "Helpful for making animations for sprites without having to spend time animating the character in editors\n- You can use multi animations on one object to get more effects\n- For the animations that do Not have Trigger once, you can use Timers to make it Have one !\n- Added condition to check if the door is Open or Close from animation (3D open/close door)\n- Added condition to check if the animation has finished (if trigger once set to YES)\n- User can change the origin point of the object to control the animations\n- Animation behavior must be installed in the object to make the extension works",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTkuMywyNy40TDkuMywyNy40YzAuNywwLjcsMS45LDAuNywyLjcsMGwwLDBjMC43LTAuNywxLjktMC43LDIuNywwbDAsMGMwLjcsMC43LDEuOSwwLjcsMi43LDBsMCwwDQoJYzAuNy0wLjcsMS45LTAuNywyLjcsMGwwLDBjMC43LDAuNywxLjksMC43LDIuNywwbDAsMGMwLjctMC43LDEuOS0wLjcsMi43LDBsMC43LDAuNlYxM2MwLTUuNS00LjUtMTAtMTAtMTBoMEMxMC41LDMsNiw3LjUsNiwxMw0KCXYxNS4xbDAuNy0wLjZDNy40LDI2LjcsOC42LDI2LjcsOS4zLDI3LjR6Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMTMiIHkxPSIxMyIgeDI9IjEzIiB5Mj0iMTYiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIxOSIgeTE9IjEzIiB4Mj0iMTkiIHkyPSIxNiIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjExIiB5MT0iMTkiIHgyPSIyMSIgeTI9IjE5Ii8+DQo8L3N2Zz4NCg=="
+}

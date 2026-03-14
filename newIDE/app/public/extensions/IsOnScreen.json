@@ -1,0 +1,128 @@
+{
+  "author": "Silver-Streak, @Bouh, Tristan Rhodes",
+  "category": "Game mechanic",
+  "extensionNamespace": "",
+  "fullName": "Object \"Is On Screen\" Detection",
+  "gdevelopVersion": "",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLW1vbml0b3Itc2NyZWVuc2hvdCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik05LDZINVYxMEg3VjhIOU0xOSwxMEgxN1YxMkgxNVYxNEgxOU0yMSwxNkgzVjRIMjFNMjEsMkgzQzEuODksMiAxLDIuODkgMSw0VjE2QTIsMiAwIDAsMCAzLDE4SDEwVjIwSDhWMjJIMTZWMjBIMTRWMThIMjFBMiwyIDAgMCwwIDIzLDE2VjRDMjMsMi44OSAyMi4xLDIgMjEsMiIgLz48L3N2Zz4=",
+  "name": "IsOnScreen",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/monitor-screenshot.svg",
+  "shortDescription": "Condition to check if an object is visible in its layer's camera viewport.",
+  "dimension": "2D",
+  "version": "1.2.2",
+  "description": [
+    "This extension adds conditions to check if an object is located within the visible portion of its layer's camera. The condition also allows for specifying padding to the virtual screen border.",
+    "",
+    "Note that this does not take into account any object visibility, such as being hidden or 0 opacity, but can be combined with those existing conditions."
+  ],
+  "origin": {
+    "identifier": "IsOnScreen",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "is on screen,condition,visible,hide,screen",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
+    "8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "This behavior provides a condition to check if the object is located within the visible portion of its layer's camera. The condition also allows for specifying padding to the virtual screen border.\nNote that object visibility, such as being hidden or 0 opacity, is not considered (but you can use those existing conditions in addition to this behavior).",
+      "fullName": "Is on screen",
+      "name": "InOnScreen",
+      "objectType": "",
+      "quickCustomizationVisibility": "hidden",
+      "eventsFunctions": [
+        {
+          "description": "Checks if an object position is within the viewport of its layer.",
+          "fullName": "Is on screen",
+          "functionType": "Condition",
+          "name": "IsOnScreen",
+          "sentence": "_PARAM0_ is on screen (padded by _PARAM2_ pixels)",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/*",
+                "Get the object layer, convert the position from this layer to the screen coordinates.",
+                "Get the point on each side on the object on screen, and compare with the screen area.",
+                "",
+                "This way even if the camera has a rotation or custom scale the object is always compared to the screen area.",
+                "*/",
+                "",
+                "",
+                "// Get the layer of the object.",
+                "const object = objects[0];",
+                "const layer = runtimeScene.getLayer(object.getLayer());",
+                "",
+                "// Get the aabb of the object on his layer.",
+                "const aabb = object.getVisibilityAABB();",
+                "",
+                "// Get the layer to convert the coordinates of the AABB to the screen coordinates",
+                "const topLeft = layer.convertInverseCoords(aabb.min[0], aabb.min[1]);",
+                "const topRight = layer.convertInverseCoords(aabb.max[0], aabb.min[1]);",
+                "const bottomRight = layer.convertInverseCoords(aabb.max[0], aabb.max[1]);",
+                "const bottomLeft = layer.convertInverseCoords(aabb.min[0], aabb.max[1]);",
+                "",
+                "// Get the points on each side of the object on screen.",
+                "const posLeftObjectOnScreen = Math.min(topLeft[0], topRight[0], bottomLeft[0], bottomRight[0]);",
+                "const posRightObjectOnScreen = Math.max(topLeft[0], topRight[0], bottomLeft[0], bottomRight[0]);",
+                "const posUpObjectOnScreen = Math.min(topLeft[1], topRight[1], bottomLeft[1], bottomRight[1]);",
+                "const posDownObjectOnScreen = Math.max(topLeft[1], topRight[1], bottomLeft[1], bottomRight[1]);",
+                "",
+                "const padding = eventsFunctionContext.getArgument(\"Padding\");",
+                "",
+                "if (",
+                "    !(posLeftObjectOnScreen - padding > runtimeScene.getGame().getGameResolutionWidth() ||",
+                "        posUpObjectOnScreen - padding > runtimeScene.getGame().getGameResolutionHeight() ||",
+                "        posRightObjectOnScreen + padding < 0 ||",
+                "        posDownObjectOnScreen + padding < 0",
+                "        )",
+                ") {",
+                "    eventsFunctionContext.returnValue = true;",
+                "}",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "IsOnScreen::InOnScreen",
+              "type": "behavior"
+            },
+            {
+              "description": "Padding (in pixels)",
+              "longDescription": "Number of pixels to pad the screen border. Zero by default. A negative value goes inside the screen, a positive value go outside.",
+              "name": "Padding",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": [
+            {
+              "name": "Group",
+              "objects": []
+            }
+          ]
+        }
+      ],
+      "propertyDescriptors": [],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

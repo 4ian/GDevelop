@@ -1,0 +1,4056 @@
+{
+  "author": "",
+  "category": "General",
+  "extensionNamespace": "",
+  "fullName": "3D model 9-patch",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNlbGVjdC1ncm91cCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik01IDNBMiAyIDAgMCAwIDMgNUg1TTcgM1Y1SDlWM00xMSAzVjVIMTNWM00xNSAzVjVIMTdWM00xOSAzVjVIMjFBMiAyIDAgMCAwIDE5IDNNMyA3VjlINVY3TTcgN1YxMUgxMVY3TTEzIDdWMTFIMTdWN00xOSA3VjlIMjFWN00zIDExVjEzSDVWMTFNMTkgMTFWMTNIMjFWMTFNNyAxM1YxN0gxMVYxM00xMyAxM1YxN0gxN1YxM00zIDE1VjE3SDVWMTVNMTkgMTVWMTdIMjFWMTVNMyAxOUEyIDIgMCAwIDAgNSAyMVYxOU03IDE5VjIxSDlWMTlNMTEgMTlWMjFIMTNWMTlNMTUgMTlWMjFIMTdWMTlNMTkgMTlWMjFBMiAyIDAgMCAwIDIxIDE5WiIgLz48L3N2Zz4=",
+  "name": "Model9Patch3D",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/ff2624a18972ac70bedc9ef990d9ddbc894c3a7b6e46a75ace8e9572c9aa5a50_select-group.svg",
+  "shortDescription": "3D platforms and walls.",
+  "version": "0.3.0",
+  "description": "3D platforms and walls that resize as 9-patch. Corners don't stretch and sides can be tiled.",
+  "origin": {
+    "identifier": "Model9Patch3D",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "3d,platform,wall",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "fullName": "Inner size",
+      "functionType": "Action",
+      "name": "SetInnerSize",
+      "private": true,
+      "sentence": "Change the inner size of _PARAM1_ to _PARAM2_ ; _PARAM3_ ; _PARAM4_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const width = eventsFunctionContext.getArgument(\"Width\");",
+            "const height = eventsFunctionContext.getArgument(\"Height\");",
+            "const depth = eventsFunctionContext.getArgument(\"Depth\");",
+            "/** @type {gdjs.CustomRuntimeObject} */",
+            "const object = objects[0];",
+            "object._innerArea.max[0] = width;",
+            "object._innerArea.max[1] = height;",
+            "object._innerArea.max[2] = depth;",
+            ""
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "",
+          "name": "Width",
+          "type": "expression"
+        },
+        {
+          "description": "Height",
+          "name": "Height",
+          "type": "expression"
+        },
+        {
+          "description": "Depth",
+          "name": "Depth",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": [
+    {
+      "areaMaxX": 64,
+      "areaMaxY": 64,
+      "areaMaxZ": 64,
+      "areaMinX": 0,
+      "areaMinY": 0,
+      "areaMinZ": 0,
+      "defaultName": "",
+      "assetStoreTag": "3d 9patch",
+      "description": "A 3D model with corners that don't stretch and sides that can be tiled.",
+      "fullName": "3D model 9-patch",
+      "is3D": true,
+      "isUsingLegacyInstancesRenderer": false,
+      "name": "Model9Patch3D",
+      "objects": [
+        {
+          "assetStoreId": "",
+          "name": "TopCenter",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": false,
+            "isReceivingShadow": false,
+            "keepAspectRatio": false,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "TopSide",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": false,
+            "isReceivingShadow": false,
+            "keepAspectRatio": false,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "TopCorner",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": false,
+            "isReceivingShadow": false,
+            "keepAspectRatio": false,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "CenterSide",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": false,
+            "isReceivingShadow": false,
+            "keepAspectRatio": false,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "CenterCorner",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": false,
+            "isReceivingShadow": false,
+            "keepAspectRatio": false,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "BottomSide",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": false,
+            "isReceivingShadow": false,
+            "keepAspectRatio": false,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "BottomCorner",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": false,
+            "isReceivingShadow": false,
+            "keepAspectRatio": false,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "BottomCenter",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": false,
+            "isReceivingShadow": false,
+            "keepAspectRatio": false,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "Placeholder",
+          "type": "Scene3D::Cube3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "width": 64,
+            "height": 64,
+            "depth": 64,
+            "enableTextureTransparency": false,
+            "facesOrientation": "Z",
+            "frontFaceResourceName": "",
+            "backFaceResourceName": "",
+            "backFaceUpThroughWhichAxisRotation": "X",
+            "leftFaceResourceName": "",
+            "rightFaceResourceName": "",
+            "topFaceResourceName": "",
+            "bottomFaceResourceName": "",
+            "frontFaceVisible": true,
+            "backFaceVisible": true,
+            "leftFaceVisible": true,
+            "rightFaceVisible": true,
+            "topFaceVisible": true,
+            "bottomFaceVisible": true,
+            "frontFaceResourceRepeat": false,
+            "backFaceResourceRepeat": false,
+            "leftFaceResourceRepeat": false,
+            "rightFaceResourceRepeat": false,
+            "topFaceResourceRepeat": false,
+            "bottomFaceResourceRepeat": false,
+            "materialType": "Basic"
+          }
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "TopCenter"
+          },
+          {
+            "objectName": "TopSide"
+          },
+          {
+            "objectName": "TopCorner"
+          },
+          {
+            "objectName": "CenterSide"
+          },
+          {
+            "objectName": "CenterCorner"
+          },
+          {
+            "objectName": "BottomSide"
+          },
+          {
+            "objectName": "BottomCorner"
+          },
+          {
+            "objectName": "BottomCenter"
+          },
+          {
+            "objectName": "Placeholder"
+          }
+        ]
+      },
+      "objectsGroups": [
+        {
+          "name": "Patch",
+          "objects": [
+            {
+              "name": "TopCenter"
+            },
+            {
+              "name": "TopCorner"
+            },
+            {
+              "name": "TopSide"
+            },
+            {
+              "name": "CenterSide"
+            },
+            {
+              "name": "CenterCorner"
+            },
+            {
+              "name": "BottomSide"
+            },
+            {
+              "name": "BottomCorner"
+            },
+            {
+              "name": "BottomCenter"
+            }
+          ]
+        },
+        {
+          "name": "Center",
+          "objects": [
+            {
+              "name": "CenterSide"
+            },
+            {
+              "name": "CenterCorner"
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 64,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Placeholder",
+          "persistentUuid": "7291525a-2a23-4d93-8642-36128b1c779f",
+          "width": 64,
+          "x": 0,
+          "y": 0,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "editionSettings": {
+        "grid": false,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "gridHeight": 32,
+        "gridDepth": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridOffsetZ": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 5.1009109467086775,
+        "windowMask": false,
+        "selectedLayer": ""
+      },
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "Placeholder"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3D",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "value": "ResizableCapability::ResizableBehavior::Width"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Resizable",
+                        "!=",
+                        "Width"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ResizableCapability::ResizableBehavior::Height"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Resizable",
+                        "!=",
+                        "Height"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::Depth"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Object3D",
+                        "!=",
+                        "Depth"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Width",
+                    "=",
+                    "Object.Width()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Height",
+                    "=",
+                    "Object.Height()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Depth",
+                    "=",
+                    "Object.Object3D::Depth()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "Patch",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3D::Create9Patch"
+                  },
+                  "parameters": [
+                    "Object",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResizableCapability::ResizableBehavior::SetWidth"
+                  },
+                  "parameters": [
+                    "Placeholder",
+                    "Resizable",
+                    "=",
+                    "Width"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResizableCapability::ResizableBehavior::SetHeight"
+                  },
+                  "parameters": [
+                    "Placeholder",
+                    "Resizable",
+                    "=",
+                    "Height"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetDepth"
+                  },
+                  "parameters": [
+                    "Placeholder",
+                    "Object3D",
+                    "=",
+                    "Depth"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Scale",
+                    "=",
+                    "1"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Model9Patch3D::SetInnerSize"
+                  },
+                  "parameters": [
+                    "",
+                    "Object",
+                    "Width",
+                    "Height",
+                    "Depth",
+                    ""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetIncludedInParentCollisionMask"
+                      },
+                      "parameters": [
+                        "Patch",
+                        "no"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3D",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Create a 9-patch over a 3D box using 3D models for the parts.",
+          "fullName": "Create a 3D 9-patch",
+          "functionType": "Action",
+          "name": "Create9Patch",
+          "private": true,
+          "sentence": "Create a 9-patch over _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3D::CreateZPlan"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TopCenter",
+                    "Depth - Size / 2",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3D::Create9PatchSlice"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TopCorner",
+                    "TopSide",
+                    "Depth - Size / 2",
+                    "Object.Object3D::Depth() - Size / 2"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3D::CreateZPlan"
+                  },
+                  "parameters": [
+                    "Object",
+                    "BottomCenter",
+                    "Size / 2",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3D::Create9PatchSlice"
+                  },
+                  "parameters": [
+                    "Object",
+                    "BottomCorner",
+                    "BottomSide",
+                    "Size / 2",
+                    "Object.Object3D::Depth() - Size / 2"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnZ",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Depth - 2 * Size",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3D::Create9PatchSlice"
+                  },
+                  "parameters": [
+                    "Object",
+                    "CenterCorner",
+                    "CenterSide",
+                    "Depth / 2",
+                    "Object.Object3D::Depth() - Size / 2"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetScaleZ"
+                  },
+                  "parameters": [
+                    "Center",
+                    "Object3D",
+                    "=",
+                    "(Depth - 2 * Size) / Size"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnZ",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Z",
+                    "=",
+                    "Size / 2"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Repeat",
+                  "repeatExpression": "ceil(Depth / Size) - 2",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "Z",
+                        "+",
+                        "Size"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Model9Patch3D::Model9Patch3D::Create9PatchSlice"
+                      },
+                      "parameters": [
+                        "Object",
+                        "CenterCorner",
+                        "CenterSide",
+                        "Z",
+                        "Object.Object3D::Depth() - Size / 2"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3D",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Create a 9-patch sliceover a 3D box using 3D models for the parts.",
+          "fullName": "Create a 3D 9-patch slice",
+          "functionType": "Action",
+          "name": "Create9PatchSlice",
+          "private": true,
+          "sentence": "Create a 9-patch slice with corner: _PARAM1_ side: _PARAM2_ at Z: _PARAM3_ into _PARAM0_",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Corners",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Corner",
+                        "Width - Size / 2",
+                        "Height - Size / 2",
+                        "Object.Layer()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Object3D",
+                        "=",
+                        "Z"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Corner",
+                        "Size / 2",
+                        "Height - Size / 2",
+                        "Object.Layer()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipX"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Flippable",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Object3D",
+                        "=",
+                        "Z"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Corner",
+                        "Size / 2",
+                        "Size / 2",
+                        "Object.Layer()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipX"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Flippable",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipY"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Flippable",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Object3D",
+                        "=",
+                        "Z"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Corner",
+                        "Width - Size / 2",
+                        "Size / 2",
+                        "Object.Layer()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipY"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Flippable",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Object3D",
+                        "=",
+                        "Z"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Sides",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsTiledOnY",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Model9Patch3D::Model9Patch3D::TileOnY"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Side",
+                            "Width - Size / 2",
+                            "Z",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Model9Patch3D::Model9Patch3D::TileOnY"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Side",
+                            "Size / 2",
+                            "Z",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "FlippableCapability::FlippableBehavior::FlipX"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Flippable",
+                            "yes"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsTiledOnY",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "Side",
+                            "Width - Size / 2",
+                            "Height / 2",
+                            "Object.Layer()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ResizableCapability::ResizableBehavior::SetHeight"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Resizable",
+                            "=",
+                            "Height - 2 * Size"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetZ"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Object3D",
+                            "=",
+                            "Z"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "Side",
+                            "Size / 2",
+                            "Height / 2",
+                            "Object.Layer()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ResizableCapability::ResizableBehavior::SetHeight"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Resizable",
+                            "=",
+                            "Height - 2 * Size"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "FlippableCapability::FlippableBehavior::FlipX"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Flippable",
+                            "yes"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetZ"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Object3D",
+                            "=",
+                            "Z"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsTiledOnX",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Model9Patch3D::Model9Patch3D::TileOnX"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Side",
+                            "Height - Size / 2",
+                            "Z",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAngle"
+                          },
+                          "parameters": [
+                            "Side",
+                            "=",
+                            "90"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Model9Patch3D::Model9Patch3D::TileOnX"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Side",
+                            "Size / 2",
+                            "Z",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAngle"
+                          },
+                          "parameters": [
+                            "Side",
+                            "=",
+                            "90"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "FlippableCapability::FlippableBehavior::FlipX"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Flippable",
+                            "yes"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsTiledOnX",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "The hight is changed because it becomes the width when it's rotated by 90°."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "Side",
+                            "Width / 2",
+                            "Height - Size / 2",
+                            "Object.Layer()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ResizableCapability::ResizableBehavior::SetHeight"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Resizable",
+                            "=",
+                            "Width - 2 * Size"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAngle"
+                          },
+                          "parameters": [
+                            "Side",
+                            "=",
+                            "90"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetZ"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Object3D",
+                            "=",
+                            "Z"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "Side",
+                            "Width / 2",
+                            "Size / 2",
+                            "Object.Layer()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ResizableCapability::ResizableBehavior::SetHeight"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Resizable",
+                            "=",
+                            "Width - 2 * Size"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAngle"
+                          },
+                          "parameters": [
+                            "Side",
+                            "=",
+                            "90"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "FlippableCapability::FlippableBehavior::FlipX"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Flippable",
+                            "yes"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetZ"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Object3D",
+                            "=",
+                            "Z"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3D",
+              "type": "object"
+            },
+            {
+              "description": "Top corner",
+              "name": "Corner",
+              "supplementaryInformation": "Scene3D::Model3DObject",
+              "type": "objectListOrEmptyIfJustDeclared"
+            },
+            {
+              "description": "Top side",
+              "name": "Side",
+              "supplementaryInformation": "Scene3D::Model3DObject",
+              "type": "objectListOrEmptyIfJustDeclared"
+            },
+            {
+              "description": "Z",
+              "name": "Z",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Create tiles on X axis.",
+          "fullName": "Tile on X",
+          "functionType": "Action",
+          "name": "TileOnX",
+          "private": true,
+          "sentence": "Tile _PARAM1_ on X axis at Y: _PARAM2_ and Z: _PARAM3_ into _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "X",
+                    "=",
+                    "Size / 2"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "ceil(Width / Size) - 2",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "X",
+                    "+",
+                    "Size"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Tile",
+                    "X",
+                    "Y",
+                    "Object.Layer()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetZ"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "Object3D",
+                    "=",
+                    "Z"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3D",
+              "type": "object"
+            },
+            {
+              "description": "Tile",
+              "name": "Tile",
+              "supplementaryInformation": "Scene3D::Model3DObject",
+              "type": "objectListOrEmptyIfJustDeclared"
+            },
+            {
+              "description": "Y position",
+              "name": "Y",
+              "type": "expression"
+            },
+            {
+              "description": "Z position",
+              "name": "Z",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Create tiles on Y axis.",
+          "fullName": "Tile on Y",
+          "functionType": "Action",
+          "name": "TileOnY",
+          "private": true,
+          "sentence": "Tile _PARAM1_ on Y axis at X: _PARAM2_ and Z: _PARAM3_ into _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Y",
+                    "=",
+                    "Size / 2"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "ceil(Height / Size) - 2",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Y",
+                    "+",
+                    "Size"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Tile",
+                    "X",
+                    "Y",
+                    "Object.Layer()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetZ"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "Object3D",
+                    "=",
+                    "Z"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3D",
+              "type": "object"
+            },
+            {
+              "description": "Tile",
+              "name": "Tile",
+              "supplementaryInformation": "Scene3D::Model3DObject",
+              "type": "objectListOrEmptyIfJustDeclared"
+            },
+            {
+              "description": "X position",
+              "name": "X",
+              "type": "expression"
+            },
+            {
+              "description": "Z position",
+              "name": "Z",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Create tiles on X and Y axis.",
+          "fullName": "Tile on X and Y",
+          "functionType": "Action",
+          "name": "TileOnXY",
+          "private": true,
+          "sentence": "Tile _PARAM1_ on X and Y axis at Z: _PARAM2_ into _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Y",
+                    "=",
+                    "Size / 2"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "ceil(Height / Size) - 2",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Y",
+                    "+",
+                    "Size"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "X",
+                    "=",
+                    "Size / 2"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Repeat",
+                  "repeatExpression": "ceil(Width / Size) - 2",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "X",
+                        "+",
+                        "Size"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Tile",
+                        "X",
+                        "Y",
+                        "Object.Layer()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Tile",
+                        "Object3D",
+                        "=",
+                        "Z"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3D",
+              "type": "object"
+            },
+            {
+              "description": "Tile",
+              "name": "Tile",
+              "supplementaryInformation": "Scene3D::Model3DObject",
+              "type": "objectListOrEmptyIfJustDeclared"
+            },
+            {
+              "description": "Z position",
+              "name": "Z",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Create Z plan tiled according to properties ",
+          "fullName": "Create Z plan",
+          "functionType": "Action",
+          "name": "CreateZPlan",
+          "private": true,
+          "sentence": "Create a Z plan of _PARAM1_ at Z: _PARAM2_ into _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "The scale is used instead of the dimension because the model may not be the exact same size as a cube."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnX",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnY",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Tile",
+                    "Width / 2",
+                    "Height / 2",
+                    "Object.Layer()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetX"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "Scale",
+                    "=",
+                    "(Width - 2 * Size) / Size"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetY"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "Scale",
+                    "=",
+                    "(Height - 2 * Size) / Size"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetZ"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "Object3D",
+                    "=",
+                    "Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnX",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnY",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3D::TileOnX"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tile",
+                    "Height / 2",
+                    "Z",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetY"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "Scale",
+                    "=",
+                    "(Height - 2 * Size) / Size"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnX",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnY",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3D::TileOnY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tile",
+                    "Width / 2",
+                    "Z",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetX"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "Scale",
+                    "=",
+                    "(Width - 2 * Size) / Size"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnX",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnY",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3D::TileOnXY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tile",
+                    "Z",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3D",
+              "type": "object"
+            },
+            {
+              "description": "Tile",
+              "name": "Tile",
+              "supplementaryInformation": "Scene3D::Model3DObject",
+              "type": "objectListOrEmptyIfJustDeclared"
+            },
+            {
+              "description": "Z position",
+              "name": "Z",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "100",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "Patch size",
+          "name": "Size"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "Tiled on X",
+          "name": "IsTiledOnX"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "Tiled on Y",
+          "name": "IsTiledOnY"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "Tiled on Z",
+          "name": "IsTiledOnZ"
+        },
+        {
+          "value": "-1",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "",
+          "hidden": true,
+          "name": "Width"
+        },
+        {
+          "value": "-1",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "",
+          "hidden": true,
+          "name": "Height"
+        },
+        {
+          "value": "-1",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "",
+          "hidden": true,
+          "name": "Depth"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "",
+          "hidden": true,
+          "name": "X"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "",
+          "hidden": true,
+          "name": "Y"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "",
+          "hidden": true,
+          "name": "Z"
+        }
+      ]
+    },
+    {
+      "areaMaxX": 64,
+      "areaMaxY": 64,
+      "areaMaxZ": 64,
+      "areaMinX": 0,
+      "areaMinY": 0,
+      "areaMinZ": 0,
+      "defaultName": "Model9Patch3D",
+      "assetStoreTag": "3d 9patch",
+      "description": "A 3D model with corners that don't stretch and sides that can be tiled.",
+      "fullName": "3D model 9-patch (single depth)",
+      "is3D": true,
+      "isUsingLegacyInstancesRenderer": false,
+      "name": "Model9Patch3DSingleDepth",
+      "objects": [
+        {
+          "assetStoreId": "",
+          "name": "TopCenter",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": false,
+            "isReceivingShadow": false,
+            "keepAspectRatio": false,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "Corner",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": false,
+            "isReceivingShadow": false,
+            "keepAspectRatio": false,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "Side",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": false,
+            "isReceivingShadow": false,
+            "keepAspectRatio": false,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "BottomCenter",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": false,
+            "isReceivingShadow": false,
+            "keepAspectRatio": false,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "Placeholder",
+          "type": "Scene3D::Cube3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "width": 64,
+            "height": 64,
+            "depth": 64,
+            "enableTextureTransparency": false,
+            "facesOrientation": "Z",
+            "frontFaceResourceName": "",
+            "backFaceResourceName": "",
+            "backFaceUpThroughWhichAxisRotation": "X",
+            "leftFaceResourceName": "",
+            "rightFaceResourceName": "",
+            "topFaceResourceName": "",
+            "bottomFaceResourceName": "",
+            "frontFaceVisible": true,
+            "backFaceVisible": true,
+            "leftFaceVisible": true,
+            "rightFaceVisible": true,
+            "topFaceVisible": true,
+            "bottomFaceVisible": true,
+            "frontFaceResourceRepeat": false,
+            "backFaceResourceRepeat": false,
+            "leftFaceResourceRepeat": false,
+            "rightFaceResourceRepeat": false,
+            "topFaceResourceRepeat": false,
+            "bottomFaceResourceRepeat": false,
+            "materialType": "Basic"
+          }
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "TopCenter"
+          },
+          {
+            "objectName": "Side"
+          },
+          {
+            "objectName": "Corner"
+          },
+          {
+            "objectName": "BottomCenter"
+          },
+          {
+            "objectName": "Placeholder"
+          }
+        ]
+      },
+      "objectsGroups": [
+        {
+          "name": "Patch",
+          "objects": [
+            {
+              "name": "TopCenter"
+            },
+            {
+              "name": "Corner"
+            },
+            {
+              "name": "Side"
+            },
+            {
+              "name": "BottomCenter"
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 100,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Placeholder",
+          "persistentUuid": "472d203a-2423-42cd-8501-186230f28338",
+          "width": 100,
+          "x": 0,
+          "y": 0,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "editionSettings": {
+        "grid": false,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "gridHeight": 32,
+        "gridDepth": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridOffsetZ": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 6.020922394364914,
+        "windowMask": false,
+        "selectedLayer": ""
+      },
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "Placeholder"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3DSingleDepth",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "value": "ResizableCapability::ResizableBehavior::Width"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Resizable",
+                        "!=",
+                        "Width"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ResizableCapability::ResizableBehavior::Height"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Resizable",
+                        "!=",
+                        "Height"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::Depth"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Object3D",
+                        "!=",
+                        "Depth"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Width",
+                    "=",
+                    "Object.Width()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Height",
+                    "=",
+                    "Object.Height()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Depth",
+                    "=",
+                    "Object.Object3D::Depth()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "Patch",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3DSingleDepth::Create9Patch"
+                  },
+                  "parameters": [
+                    "Object",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResizableCapability::ResizableBehavior::SetWidth"
+                  },
+                  "parameters": [
+                    "Placeholder",
+                    "Resizable",
+                    "=",
+                    "Width"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResizableCapability::ResizableBehavior::SetHeight"
+                  },
+                  "parameters": [
+                    "Placeholder",
+                    "Resizable",
+                    "=",
+                    "Height"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetDepth"
+                  },
+                  "parameters": [
+                    "Placeholder",
+                    "Object3D",
+                    "=",
+                    "Depth"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Scale",
+                    "=",
+                    "1"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Model9Patch3D::SetInnerSize"
+                  },
+                  "parameters": [
+                    "",
+                    "Object",
+                    "Width",
+                    "Height",
+                    "Depth",
+                    ""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetIncludedInParentCollisionMask"
+                      },
+                      "parameters": [
+                        "Patch",
+                        "no"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3DSingleDepth",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Create a 9-patch over a 3D box using 3D models for the parts.",
+          "fullName": "Create a 3D 9-patch",
+          "functionType": "Action",
+          "name": "Create9Patch",
+          "private": true,
+          "sentence": "Create a 9-patch over _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "The scale is used instead of the dimension because the model may not be the exact same size as a cube."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3DSingleDepth::CreateZPlan"
+                  },
+                  "parameters": [
+                    "Object",
+                    "TopCenter",
+                    "Depth / 2",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3DSingleDepth::CreateZPlan"
+                  },
+                  "parameters": [
+                    "Object",
+                    "BottomCenter",
+                    "Depth / 2",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3DSingleDepth::Create9PatchSlice"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Corner",
+                    "Side",
+                    "Depth / 2",
+                    "Object.Object3D::Depth() - Size / 2"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetScaleZ"
+                  },
+                  "parameters": [
+                    "Patch",
+                    "Object3D",
+                    "=",
+                    "Depth / Size"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3DSingleDepth",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Create a 9-patch sliceover a 3D box using 3D models for the parts.",
+          "fullName": "Create a 3D 9-patch slice",
+          "functionType": "Action",
+          "name": "Create9PatchSlice",
+          "private": true,
+          "sentence": "Create a 9-patch slice with corner: _PARAM1_ side: _PARAM2_ at Z: _PARAM3_ into _PARAM0_",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Corners",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Corner",
+                        "Width - Size / 2",
+                        "Height - Size / 2",
+                        "Object.Layer()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Object3D",
+                        "=",
+                        "Z"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Corner",
+                        "Size / 2",
+                        "Height - Size / 2",
+                        "Object.Layer()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipX"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Flippable",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Object3D",
+                        "=",
+                        "Z"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Corner",
+                        "Size / 2",
+                        "Size / 2",
+                        "Object.Layer()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipX"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Flippable",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipY"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Flippable",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Object3D",
+                        "=",
+                        "Z"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Corner",
+                        "Width - Size / 2",
+                        "Size / 2",
+                        "Object.Layer()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipY"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Flippable",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Corner",
+                        "Object3D",
+                        "=",
+                        "Z"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Sides",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsTiledOnY",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "Y",
+                        "=",
+                        "Size / 2"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Repeat",
+                      "repeatExpression": "ceil(Height / Size) - 2",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "Y",
+                            "+",
+                            "Size"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "Side",
+                                "Width - Size / 2",
+                                "Y",
+                                "Object.Layer()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Scene3D::Base3DBehavior::SetZ"
+                              },
+                              "parameters": [
+                                "Side",
+                                "Object3D",
+                                "=",
+                                "Z"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "Side",
+                                "Size / 2",
+                                "Y",
+                                "Object.Layer()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "FlippableCapability::FlippableBehavior::FlipX"
+                              },
+                              "parameters": [
+                                "Side",
+                                "Flippable",
+                                "yes"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Scene3D::Base3DBehavior::SetZ"
+                              },
+                              "parameters": [
+                                "Side",
+                                "Object3D",
+                                "=",
+                                "Z"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsTiledOnY",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "Side",
+                            "Width - Size / 2",
+                            "Height / 2",
+                            "Object.Layer()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ScalableCapability::ScalableBehavior::SetY"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Scale",
+                            "=",
+                            "(Height - 2 * Size) / Size"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetZ"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Object3D",
+                            "=",
+                            "Z"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "Side",
+                            "Size / 2",
+                            "Height / 2",
+                            "Object.Layer()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ScalableCapability::ScalableBehavior::SetY"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Scale",
+                            "=",
+                            "(Height - 2 * Size) / Size"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "FlippableCapability::FlippableBehavior::FlipX"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Flippable",
+                            "yes"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetZ"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Object3D",
+                            "=",
+                            "Z"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsTiledOnX",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "X",
+                        "=",
+                        "Size / 2"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Repeat",
+                      "repeatExpression": "ceil(Width / Size) - 2",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "X",
+                            "+",
+                            "Size"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "Side",
+                                "X",
+                                "Height - Size / 2",
+                                "Object.Layer()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetAngle"
+                              },
+                              "parameters": [
+                                "Side",
+                                "=",
+                                "90"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Scene3D::Base3DBehavior::SetZ"
+                              },
+                              "parameters": [
+                                "Side",
+                                "Object3D",
+                                "=",
+                                "Z"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "Side",
+                                "X",
+                                "Size / 2",
+                                "Object.Layer()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetAngle"
+                              },
+                              "parameters": [
+                                "Side",
+                                "=",
+                                "90"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "FlippableCapability::FlippableBehavior::FlipX"
+                              },
+                              "parameters": [
+                                "Side",
+                                "Flippable",
+                                "yes"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Scene3D::Base3DBehavior::SetZ"
+                              },
+                              "parameters": [
+                                "Side",
+                                "Object3D",
+                                "=",
+                                "Z"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsTiledOnX",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "The hight is changed because it becomes the width when it's rotated by 90°."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "Side",
+                            "Width / 2",
+                            "Height - Size / 2",
+                            "Object.Layer()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ScalableCapability::ScalableBehavior::SetY"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Scale",
+                            "=",
+                            "(Width - 2 * Size) / Size"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAngle"
+                          },
+                          "parameters": [
+                            "Side",
+                            "=",
+                            "90"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetZ"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Object3D",
+                            "=",
+                            "Z"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "Side",
+                            "Width / 2",
+                            "Size / 2",
+                            "Object.Layer()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ScalableCapability::ScalableBehavior::SetY"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Scale",
+                            "=",
+                            "(Width - 2 * Size) / Size"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAngle"
+                          },
+                          "parameters": [
+                            "Side",
+                            "=",
+                            "90"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "FlippableCapability::FlippableBehavior::FlipX"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Flippable",
+                            "yes"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetZ"
+                          },
+                          "parameters": [
+                            "Side",
+                            "Object3D",
+                            "=",
+                            "Z"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3DSingleDepth",
+              "type": "object"
+            },
+            {
+              "description": "Top corner",
+              "name": "Corner",
+              "supplementaryInformation": "Scene3D::Model3DObject",
+              "type": "objectListOrEmptyIfJustDeclared"
+            },
+            {
+              "description": "Top side",
+              "name": "Side",
+              "supplementaryInformation": "Scene3D::Model3DObject",
+              "type": "objectListOrEmptyIfJustDeclared"
+            },
+            {
+              "description": "Z",
+              "name": "Z",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Create tiles on X axis.",
+          "fullName": "Tile on X",
+          "functionType": "Action",
+          "name": "TileOnX",
+          "private": true,
+          "sentence": "Tile _PARAM1_ on X axis at Y: _PARAM2_ and Z: _PARAM3_ into _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "X",
+                    "=",
+                    "Size / 2"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "ceil(Width / Size) - 2",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "X",
+                    "+",
+                    "Size"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Tile",
+                    "X",
+                    "Y",
+                    "Object.Layer()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetZ"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "Object3D",
+                    "=",
+                    "Z"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3DSingleDepth",
+              "type": "object"
+            },
+            {
+              "description": "Tile",
+              "name": "Tile",
+              "supplementaryInformation": "Scene3D::Model3DObject",
+              "type": "objectListOrEmptyIfJustDeclared"
+            },
+            {
+              "description": "Y position",
+              "name": "Y",
+              "type": "expression"
+            },
+            {
+              "description": "Z position",
+              "name": "Z",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Create tiles on Y axis.",
+          "fullName": "Tile on Y",
+          "functionType": "Action",
+          "name": "TileOnY",
+          "private": true,
+          "sentence": "Tile _PARAM1_ on Y axis at X: _PARAM2_ and Z: _PARAM3_ into _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Y",
+                    "=",
+                    "Size / 2"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "ceil(Height / Size) - 2",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Y",
+                    "+",
+                    "Size"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Tile",
+                    "X",
+                    "Y",
+                    "Object.Layer()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetZ"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "Object3D",
+                    "=",
+                    "Z"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3DSingleDepth",
+              "type": "object"
+            },
+            {
+              "description": "Tile",
+              "name": "Tile",
+              "supplementaryInformation": "Scene3D::Model3DObject",
+              "type": "objectListOrEmptyIfJustDeclared"
+            },
+            {
+              "description": "X position",
+              "name": "X",
+              "type": "expression"
+            },
+            {
+              "description": "Z position",
+              "name": "Z",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Create tiles on X and Y axis.",
+          "fullName": "Tile on X and Y",
+          "functionType": "Action",
+          "name": "TileOnXY",
+          "private": true,
+          "sentence": "Tile _PARAM1_ on X and Y axis at Z: _PARAM2_ into _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Y",
+                    "=",
+                    "Size / 2"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "ceil(Height / Size) - 2",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Y",
+                    "+",
+                    "Size"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "X",
+                    "=",
+                    "Size / 2"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Repeat",
+                  "repeatExpression": "ceil(Width / Size) - 2",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "X",
+                        "+",
+                        "Size"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Tile",
+                        "X",
+                        "Y",
+                        "Object.Layer()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Tile",
+                        "Object3D",
+                        "=",
+                        "Z"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3DSingleDepth",
+              "type": "object"
+            },
+            {
+              "description": "Tile",
+              "name": "Tile",
+              "supplementaryInformation": "Scene3D::Model3DObject",
+              "type": "objectListOrEmptyIfJustDeclared"
+            },
+            {
+              "description": "Z position",
+              "name": "Z",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Create Z plan tiled according to properties ",
+          "fullName": "Create Z plan",
+          "functionType": "Action",
+          "name": "CreateZPlan",
+          "private": true,
+          "sentence": "Create a Z plan of _PARAM1_ at Z: _PARAM2_ into _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "The scale is used instead of the dimension because the model may not be the exact same size as a cube."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnX",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnY",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Tile",
+                    "Width / 2",
+                    "Height / 2",
+                    "Object.Layer()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetX"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "Scale",
+                    "=",
+                    "(Width - 2 * Size) / Size"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetY"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "Scale",
+                    "=",
+                    "(Height - 2 * Size) / Size"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetZ"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "Object3D",
+                    "=",
+                    "Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnX",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnY",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3DSingleDepth::TileOnX"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tile",
+                    "Height / 2",
+                    "Z",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetY"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "Scale",
+                    "=",
+                    "(Height - 2 * Size) / Size"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnX",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnY",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3DSingleDepth::TileOnY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tile",
+                    "Width / 2",
+                    "Z",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetX"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "Scale",
+                    "=",
+                    "(Width - 2 * Size) / Size"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnX",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsTiledOnY",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Model9Patch3D::Model9Patch3DSingleDepth::TileOnXY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tile",
+                    "Z",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Model9Patch3D::Model9Patch3DSingleDepth",
+              "type": "object"
+            },
+            {
+              "description": "Tile",
+              "name": "Tile",
+              "supplementaryInformation": "Scene3D::Model3DObject",
+              "type": "objectListOrEmptyIfJustDeclared"
+            },
+            {
+              "description": "Z position",
+              "name": "Z",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "100",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "Patch size",
+          "name": "Size"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "Tiled on X",
+          "name": "IsTiledOnX"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "Tiled on Y",
+          "name": "IsTiledOnY"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "Only used by the scene editor.",
+          "extraInformation": [
+            "TopCenter"
+          ],
+          "choices": [],
+          "hidden": true,
+          "name": "ShowTopCenter"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "Only used by the scene editor.",
+          "extraInformation": [
+            "Side"
+          ],
+          "choices": [],
+          "hidden": true,
+          "name": "ShowSide"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "Only used by the scene editor.",
+          "extraInformation": [
+            "Corner"
+          ],
+          "choices": [],
+          "hidden": true,
+          "name": "ShowCorner"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "Only used by the scene editor.",
+          "extraInformation": [
+            "BottomCenter"
+          ],
+          "choices": [],
+          "hidden": true,
+          "name": "ShowBottomCenter"
+        },
+        {
+          "value": "-1",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "",
+          "hidden": true,
+          "name": "Width"
+        },
+        {
+          "value": "-1",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "",
+          "hidden": true,
+          "name": "Height"
+        },
+        {
+          "value": "-1",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "",
+          "hidden": true,
+          "name": "Depth"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "",
+          "hidden": true,
+          "name": "X"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "",
+          "hidden": true,
+          "name": "Y"
+        }
+      ]
+    }
+  ]
+}

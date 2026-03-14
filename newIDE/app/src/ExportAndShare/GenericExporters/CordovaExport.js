@@ -16,7 +16,7 @@ export const ExplanationHeader = (): React.Node => (
   <Text align="center">
     <Trans>
       This will export your game as a Cordova project. Cordova is a technology
-      that enables HTML5 games to be packaged for iOS and Android.
+      that enables HTML5 games to be packaged for Android.
     </Trans>
   </Text>
 );
@@ -73,7 +73,7 @@ export const DoneFooter = ({
       <Text>
         <Trans>
           You can now compile the game by yourself using Cordova command-line
-          tool to iOS (XCode is required) or Android (Android SDK is required).
+          tool for Android (Android SDK is required).
         </Trans>
       </Text>
       <ColumnStackLayout justifyContent="center">
@@ -92,6 +92,6 @@ export const DoneFooter = ({
 export const cordovaExporter = {
   key: 'cordovaexport',
   tabName: (<Trans>Mobile</Trans>: React.Node),
-  name: (<Trans>iOS &amp; Android (manual)</Trans>: React.Node),
+  name: (<Trans>Android (manual)</Trans>: React.Node),
   helpPage: '/publishing/android_and_ios_with_cordova',
 };

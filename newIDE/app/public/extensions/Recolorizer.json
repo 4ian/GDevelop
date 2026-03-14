@@ -1,0 +1,1307 @@
+{
+  "author": "",
+  "category": "Visual effect",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Object recolorizer (experimental)",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO30NCgkuc3Qye2ZpbGw6bm9uZTtzdHJva2U6IzAwMDAwMDtzdHJva2Utd2lkdGg6MjtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLWRhc2hhcnJheTo2LDY7fQ0KCS5zdDN7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtZGFzaGFycmF5OjQsNDt9DQoJLnN0NHtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7fQ0KCS5zdDV7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1kYXNoYXJyYXk6My4xMDgxLDMuMTA4MTt9DQoJDQoJCS5zdDZ7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDtzdHJva2UtZGFzaGFycmF5OjQsMzt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE2LjksMTRjLTEuOCwwLTMuMywxLjQtMy4zLDMuMXYwLjdjMCwxLjEtMC42LDEuOS0xLjYsMi4ybDAsMGgxLjZsMy4xLDBjMS44LDAsMy40LTEuNCwzLjMtMy4xDQoJQzIwLDE1LjMsMTguNiwxNCwxNi45LDE0eiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIwLjMsMTEuNUMxOC45LDExLjIsMTcuNSwxMSwxNiwxMWMtNy4yLDAtMTMsNC0xMyw5YzAsMSwwLjIsMiwwLjcsMi45YzEsMiwzLjYsMi42LDUuNCwxLjNsMCwwDQoJYzIuNC0xLjcsNS44LDAsNS44LDNWMjljMC40LDAsMC43LDAsMS4xLDBjNy4yLDAsMTMtNCwxMy05YzAtMi4yLTEuMS00LjItMi45LTUuNyIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE3LjQsMTQuMWw5LjgtOC44YzAuNC0wLjQsMS4xLTAuNCwxLjUsMGwwLDBjMC40LDAuNCwwLjQsMSwwLDEuNEwyMCwxNiIvPg0KPC9zdmc+DQo=",
+  "name": "Recolorizer",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Graphic Design/Graphic Design_color_colour_palette_paint_brush.svg",
+  "shortDescription": "Independently change the colors of a sprite, a tiled sprite or a panel sprite.",
+  "version": "0.1.4",
+  "description": [
+    "This extension allows to restyle a sprite, a tiled sprite or a panel sprite.",
+    "",
+    "It can be used to:",
+    "- Change the color of player short according to its team color.",
+    "- Add small color variation to trees of a forest.",
+    "- Restyle objects to match other assets.",
+    "",
+    "An example shows how to change the 2 main colors of an object ([open the project online](https://editor.gdevelop.io/?project=example://recolorizer)).",
+    "",
+    "This extension is experimental and might no longer work in future version of GDevelop.",
+    "The [color map effect](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layer-effects/#color-map) is the prefered way to recolorize 2D objects."
+  ],
+  "origin": {
+    "identifier": "Recolorizer",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "color,hue,saturation,lightness,hsl,hsv,rgb",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Define JavaScript classes.",
+      "fullName": "Define JavaScript classes",
+      "functionType": "Action",
+      "name": "DefineJavaScript",
+      "private": true,
+      "sentence": "Define JavaScript classes",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (gdjs.__recolorizerExtension) {",
+            "    return;",
+            "}",
+            "",
+            "/**",
+            " * Converts an HSL color value to RGB. Conversion formula",
+            " * adapted from http://en.wikipedia.org/wiki/HSL_color_space.",
+            " * Assumes h, s, and l are contained in the set [0, 1] and",
+            " * returns r, g, and b in the set [0, 255].",
+            " * https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion",
+            " *",
+            " * @param   {number}  h       The hue",
+            " * @param   {number}  s       The saturation",
+            " * @param   {number}  l       The lightness",
+            " * @return  {number[]}           The RGB representation",
+            " */",
+            "function hslToRgb(h, s, l) {",
+            "    let r, g, b;",
+            "    if (s == 0) {",
+            "        r = g = b = l; // achromatic",
+            "    } else {",
+            "        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;",
+            "        const p = 2 * l - q;",
+            "        r = hue2rgb(p, q, h + 1 / 3);",
+            "        g = hue2rgb(p, q, h);",
+            "        b = hue2rgb(p, q, h - 1 / 3);",
+            "    }",
+            "",
+            "    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];",
+            "}",
+            "",
+            "function hue2rgb(p, q, t) {",
+            "    if (t < 0) t += 1;",
+            "    if (t > 1) t -= 1;",
+            "    if (t < 1 / 6) return p + (q - p) * 6 * t;",
+            "    if (t < 1 / 2) return q;",
+            "    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;",
+            "    return p;",
+            "}",
+            "",
+            "/**",
+            " * Converts an RGB color value to HSL. Conversion formula",
+            " * adapted from http://en.wikipedia.org/wiki/HSL_color_space.",
+            " * Assumes r, g, and b are contained in the set [0, 255] and",
+            " * returns h, s, and l in the set [0, 1].",
+            " * https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion",
+            " *",
+            " * @param   {number}  r       The red color value",
+            " * @param   {number}  g       The green color value",
+            " * @param   {number}  b       The blue color value",
+            " * @return  {number[]}           The HSL representation",
+            " */",
+            "function rgbToHsl(r, g, b) {",
+            "    r /= 255, g /= 255, b /= 255;",
+            "    const max = Math.max(r, g, b), min = Math.min(r, g, b);",
+            "    let h, s, l = (max + min) / 2;",
+            "",
+            "    if (max == min) {",
+            "        h = s = 0; // achromatic",
+            "    } else {",
+            "        const d = max - min;",
+            "        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);",
+            "        switch (max) {",
+            "            case r: h = (g - b) / d + (g < b ? 6 : 0); break;",
+            "            case g: h = (b - r) / d + 2; break;",
+            "            case b: h = (r - g) / d + 4; break;",
+            "        }",
+            "        h /= 6;",
+            "    }",
+            "",
+            "    return [h, s, l];",
+            "}",
+            "",
+            "/**",
+            " * @param {HTMLCanvasElement} canvas",
+            " * @param {PIXI.Texture} texture",
+            " * @returns {HTMLCanvasElement}",
+            " */",
+            "function resetCanvas(canvas, texture) {",
+            "    const context = canvas.getContext('2d');",
+            "    const crop = texture._frame;",
+            "    context.save();",
+            "    context.globalCompositeOperation = 'copy';",
+            "    context.drawImage(",
+            "        texture.baseTexture.getDrawableSource(),",
+            "        crop.x,",
+            "        crop.y,",
+            "        crop.width,",
+            "        crop.height,",
+            "        0,",
+            "        0,",
+            "        crop.width,",
+            "        crop.height",
+            "    );",
+            "    context.restore();",
+            "    return canvas;",
+            "}",
+            "",
+            "/**",
+            " * Replace a color with an other one.",
+            " *",
+            " * @param {HTMLCanvasElement} sourceCanvas",
+            " * @param {HTMLCanvasElement} targetCanvas",
+            " * @param {{x: number, y: number, width: number, height: number}} frame",
+            " * @param {[number, number, number]} originColor The color to replace from.",
+            " * @param {[number, number, number]} targetColor The color to replate to.",
+            " * @param {number} hueScope Pixels within the hue scope relatively from originColor are recolorized.",
+            " * @param {number} saturationScope Pixels within the saturation scope relatively from originColor are recolorized.",
+            " * @param {number} lighnessScope Pixels within the lightness scope relatively from originColor are recolorized.",
+            " */",
+            "function recolorizeTexture(sourceCanvas, targetCanvas, frame, originColor, targetColor, hueScope, saturationScope, lighnessScope) {",
+            "    const sourceContext = sourceCanvas.getContext('2d');",
+            "    const targetContext = targetCanvas.getContext('2d');",
+            "    const sourcePixels = sourceContext.getImageData(0, 0, frame.width, frame.height).data;",
+            "    const targetImageData = targetContext.getImageData(0, 0, frame.width, frame.height);",
+            "    const targetPixels = targetImageData.data;",
+            "",
+            "    const originColorHSL = rgbToHsl(originColor[0], originColor[1], originColor[2]);",
+            "    const targetColorHSL = rgbToHsl(targetColor[0], targetColor[1], targetColor[2]);",
+            "",
+            "    const originHue = originColorHSL[0];",
+            "    const originSaturation = originColorHSL[1];",
+            "    const originLightness = originColorHSL[2];",
+            "",
+            "    const targetHue = targetColorHSL[0];",
+            "    const targetSaturation = targetColorHSL[1];",
+            "    const saturationDelta = targetSaturation - originSaturation;",
+            "    const lightnessDelta = targetColorHSL[2] - originLightness;",
+            "",
+            "    // hue is not knowned for graycase colors.",
+            "    const hueIsConstrained = hueScope < 0.5;",
+            "",
+            "    for (let i = 0; i < sourcePixels.length; i += 4) {",
+            "        const alpha = sourcePixels[i + 3];",
+            "        if (alpha === 0) {",
+            "            continue;",
+            "        }",
+            "        const pixelHsl = rgbToHsl(sourcePixels[i + 0], sourcePixels[i + 1], sourcePixels[i + 2]);",
+            "",
+            "        const pixelHue = pixelHsl[0];",
+            "        const pixelSaturation = pixelHsl[1];",
+            "        const pixelLightness = pixelHsl[2];",
+            "",
+            "        const hueDelta = gdjs.evtTools.common.mod(pixelHue - originHue + 0.5, 1) - 0.5;",
+            "        if ((!hueIsConstrained || Math.abs(hueDelta) <= hueScope)",
+            "         && Math.abs(pixelSaturation - originSaturation) <= saturationScope",
+            "         && Math.abs(pixelLightness - originLightness) <= lighnessScope) {",
+            "            // graycase pixels must take the targeted hue",
+            "            pixelHsl[0] = pixelSaturation === 0 ? targetHue : gdjs.evtTools.common.mod(pixelHue - originHue + targetHue, 1);",
+            "            // white pixels must also take the targeted saturation.",
+            "            pixelHsl[1] = pixelLightness > 0.999 ? targetSaturation : gdjs.evtTools.common.clamp(pixelSaturation + saturationDelta, 0, 1);",
+            "            pixelHsl[2] = gdjs.evtTools.common.clamp(pixelLightness + lightnessDelta, 0, 1);",
+            "            const pixelRgb = hslToRgb(pixelHsl[0], pixelHsl[1], pixelHsl[2]);",
+            "            targetPixels[i + 0] = pixelRgb[0];",
+            "            targetPixels[i + 1] = pixelRgb[1];",
+            "            targetPixels[i + 2] = pixelRgb[2];",
+            "        }",
+            "    }",
+            "    targetContext.putImageData(targetImageData, 0, 0);",
+            "};",
+            "",
+            "/**",
+            " * @param {[number, number, number]} originColor The color to replace from.",
+            " * @param {[number, number, number]} targetColor The color to replate to.",
+            " * @param {number} hueScope Pixels within the hue scope relatively from originColor are recolorized.",
+            " * @param {number} saturationScope Pixels within the saturation scope relatively from originColor are recolorized.",
+            " * @param {number} lighnessScope Pixels within the lightness scope relatively from originColor are recolorized.",
+            " * @return {number} key",
+            " */",
+            "function getRecolorizationKey(originColor, targetColor, hueScope, saturationScope, lighnessScope) {",
+            "    return String.fromCharCode(originColor[0] * (2 ** 8) + originColor[1],",
+            "        originColor[2] * (2 ** 8) + targetColor[0],",
+            "        targetColor[1] * (2 ** 8) + targetColor[2],",
+            "        (hueScope * (2 ** 8) + saturationScope) * (2 ** 8),",
+            "        lighnessScope * (2 ** 8));",
+            "}",
+            "",
+            "/**",
+            " * @param {PIXI.Texture} texture",
+            " * @returns {HTMLCanvasElement}",
+            " */",
+            "function getCanvas(texture) {",
+            "    /** @type {HTMLCanvasElement} */",
+            "    const canvas = document.createElement('canvas');",
+            "",
+            "    const context = canvas.getContext('2d');",
+            "    const crop = texture._frame.clone();",
+            "    const resolution = texture.baseTexture.resolution;",
+            "",
+            "    crop.x *= resolution;",
+            "    crop.y *= resolution;",
+            "    crop.width *= resolution;",
+            "    crop.height *= resolution;",
+            "",
+            "    canvas.width = Math.ceil(crop.width);",
+            "    canvas.height = Math.ceil(crop.height);",
+            "",
+            "    context.save();",
+            "    context.globalCompositeOperation = 'copy';",
+            "    context.drawImage(",
+            "        texture.baseTexture.getDrawableSource(),",
+            "        crop.x,",
+            "        crop.y,",
+            "        crop.width,",
+            "        crop.height,",
+            "        0,",
+            "        0,",
+            "        crop.width,",
+            "        crop.height",
+            "    );",
+            "    context.restore();",
+            "",
+            "    return canvas;",
+            "}",
+            "",
+            "/**",
+            " * Manage recolorizations to ensure uniqueness of textures.",
+            " **/",
+            "class RecolorizationManager {",
+            "    /**",
+            "     * Create a manager.",
+            "     * @param {PIXI.Texture[]} sourceTextures",
+            "     */",
+            "    constructor(sourceTextures) {",
+            "        /** @type {PIXI.Texture[]} */",
+            "        this.sourceTextures = sourceTextures;",
+            "        this.sourceCanvas = sourceTextures.map(texture => gdjs.__recolorizerExtension.getCanvas(texture));",
+            "        /** @type {Map<string, {userCount: integer, textures: PIXI.Texture[], canvas: HTMLCanvasElement[]}>} */",
+            "        this.recolorizedSprites = new Map();",
+            "        /** @type {Array<{userCount: integer, textures: PIXI.Texture[], canvas: HTMLCanvasElement[]}>} */",
+            "        this.recycledRecolorizedSprites = [];",
+            "    }",
+            "",
+            "    /**",
+            "     * Unregister a recoloration usage.",
+            "     *",
+            "     * @param {string} previousRecolorizationKey",
+            "     */",
+            "    unregister(previousRecolorizationKey) {",
+            "        const previousRecolorizedSprite = this.recolorizedSprites.get(previousRecolorizationKey);",
+            "        if (previousRecolorizedSprite) {",
+            "            previousRecolorizedSprite.userCount--;",
+            "            if (previousRecolorizedSprite.userCount <= 0) {",
+            "                this.recolorizedSprites.delete(previousRecolorizationKey);",
+            "                this.recycledRecolorizedSprites.push(previousRecolorizedSprite);",
+            "            }",
+            "        }",
+            "    }",
+            "",
+            "    /**",
+            "     * Register a recolorization usage and get recolored textures.",
+            "     *",
+            "     * @param {string} recolorizationKey",
+            "     * @param {Array<{originColor: [number, number, number], targetColor: [number, number, number], hueScope: number, saturationScope: number, lighnessScope: number}>} recolorizations",
+            "     * @returns {PIXI.Texture[]} ",
+            "     */",
+            "    register(recolorizationKey, recolorizations) {",
+            "        if (recolorizationKey === \"\") {",
+            "            return this.sourceTextures;",
+            "        }",
+            "",
+            "        /** @type {PIXI.Texture[]} */",
+            "        let targetTextures;",
+            "        let recolorizedSprite = this.recolorizedSprites.get(recolorizationKey);",
+            "        if (recolorizedSprite) {",
+            "            targetTextures = recolorizedSprite.textures;",
+            "        }",
+            "        else {",
+            "            if (this.recycledRecolorizedSprites.length > 0) {",
+            "                const reusableRecolorizedSprite = this.recycledRecolorizedSprites.pop();",
+            "                targetTextures = reusableRecolorizedSprite.textures;",
+            "                /** @type {PIXI.Texture[]} */",
+            "                const targetCanvas = reusableRecolorizedSprite.canvas;",
+            "",
+            "                for (let textureIndex = 0; textureIndex < this.sourceTextures.length; textureIndex++) {",
+            "                    const sourceTexture = this.sourceTextures[textureIndex];",
+            "                    const targetCanva = targetCanvas[textureIndex];",
+            "                    resetCanvas(targetCanva, sourceTexture);",
+            "                }",
+            "",
+            "                this._recolorizeAll(targetCanvas, recolorizations);",
+            "",
+            "                targetTextures.forEach(texture => texture.update());",
+            "                reusableRecolorizedSprite.userCount = 0;",
+            "                recolorizedSprite = reusableRecolorizedSprite;",
+            "            }",
+            "            else {",
+            "                /** @type {HTMLCanvasElement[]} */",
+            "                const targetCanvas = this.sourceTextures.map(texture => gdjs.__recolorizerExtension.getCanvas(texture));",
+            "",
+            "                this._recolorizeAll(targetCanvas, recolorizations);",
+            "",
+            "                targetTextures = targetCanvas.map((targetCanva, index) => {",
+            "                    const texture = PIXI.Texture.from(targetCanva);",
+            "                    texture.baseTexture.scaleMode = this.sourceTextures[index].baseTexture.scaleMode;",
+            "                    texture.baseTexture.wrapMode = this.sourceTextures[index].baseTexture.wrapMode;",
+            "                    texture.baseTexture.alphaMode = this.sourceTextures[index].baseTexture.alphaMode;",
+            "                    return texture;",
+            "                });",
+            "                recolorizedSprite = { userCount: 0, textures: targetTextures, canvas: targetCanvas };",
+            "            }",
+            "            this.recolorizedSprites.set(recolorizationKey, recolorizedSprite);",
+            "        }",
+            "        recolorizedSprite.userCount++;",
+            "        return targetTextures;",
+            "    }",
+            "",
+            "    /**",
+            "     * Apply a recoloration to every textures.",
+            "     *",
+            "     * @param {HTMLCanvasElement[]} targetCanvas",
+            "     * @param {Array<{originColor: [number, number, number], targetColor: [number, number, number], hueScope: number, saturationScope: number, lighnessScope: number}>} recolorizations",
+            "     */",
+            "    _recolorizeAll(targetCanvas, recolorizations) {",
+            "        for (let textureIndex = 0; textureIndex < this.sourceTextures.length; textureIndex++) {",
+            "            const sourceTexture = this.sourceTextures[textureIndex];",
+            "            const targetCanva = targetCanvas[textureIndex];",
+            "            const frame = sourceTexture._frame;",
+            "            for (const recolorization of recolorizations) {",
+            "                recolorizeTexture(",
+            "                    this.sourceCanvas[textureIndex],",
+            "                    targetCanva,",
+            "                    frame,",
+            "                    recolorization.originColor,",
+            "                    recolorization.targetColor,",
+            "                    recolorization.hueScope,",
+            "                    recolorization.saturationScope,",
+            "                    recolorization.lighnessScope",
+            "                );",
+            "            }",
+            "        }",
+            "    }",
+            "}",
+            "",
+            "/**",
+            " * Object recolorizer.",
+            " **/",
+            "class Recolorizer {",
+            "    /**",
+            "     * Create an object recolorizer.",
+            "     * @param {RecolorizationManager} manager",
+            "     * @param {{texture: PIXI.Texture[]}} sourceTextureConatiners",
+            "     */",
+            "    constructor(manager, sourceTextureContainers) {",
+            "        this.manager = manager;",
+            "        this.sourceTextureContainers = sourceTextureContainers;",
+            "",
+            "        this.previousRecolorizationKey = \"\";",
+            "        this.recolorizationKey = \"\";",
+            "        /** @type {Array<{originColor: [number, number, number], targetColor: [number, number, number], hueScope: number, saturationScope: number, lighnessScope: number}>} */",
+            "        this.recolorizations = [];",
+            "    }",
+            "",
+            "    /**",
+            "     * Replace a color with an other one.",
+            "     *",
+            "     * @param {[number, number, number]} originColor The color to replace from.",
+            "     * @param {[number, number, number]} targetColor The color to replate to.",
+            "     * @param {number} hueScope Pixels within the hue scope relatively from originColor are recolorized.",
+            "     * @param {number} saturationScope Pixels within the saturation scope relatively from originColor are recolorized.",
+            "     * @param {number} lighnessScope Pixels within the lightness scope relatively from originColor are recolorized.",
+            "     */",
+            "    recolorizeSprite(originColor, targetColor, hueScope, saturationScope, lighnessScope) {",
+            "        this.recolorizationKey += getRecolorizationKey(originColor, targetColor, hueScope, saturationScope, lighnessScope);",
+            "        this.recolorizations.push({ originColor, targetColor, hueScope, saturationScope, lighnessScope});",
+            "    }",
+            "",
+            "    /**",
+            "     * Reset the default textures of the object.",
+            "     */",
+            "    resetSprite() {",
+            "        this.recolorizationKey = \"\";",
+            "        this.recolorizations = [];",
+            "    }",
+            "",
+            "    /**",
+            "     * Update the textures of the object.",
+            "     */",
+            "    updateSprite() {",
+            "        const needsRecolorization = this.recolorizationKey !== this.previousRecolorizationKey;",
+            "        if (needsRecolorization) {",
+            "            this.manager.unregister(this.previousRecolorizationKey);",
+            "",
+            "            /** @type {PIXI.Texture[]} */",
+            "            const targetTextures = this.manager.register(this.recolorizationKey, this.recolorizations);",
+            "",
+            "            let textureIndex = 0;",
+            "            for (const container of this.sourceTextureContainers) {",
+            "                container.texture = targetTextures[textureIndex];",
+            "                textureIndex++;",
+            "            }",
+            "            this.previousRecolorizationKey = this.recolorizationKey;",
+            "        }",
+            "        return needsRecolorization;",
+            "    }",
+            "}",
+            "",
+            "gdjs.__recolorizerExtension = {",
+            "    getCanvas,",
+            "    RecolorizationManager,",
+            "    Recolorizer",
+            "};"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Independently change the colors of a sprite.",
+      "fullName": "Sprite recolorizer",
+      "name": "SpriteRecolorizer",
+      "objectType": "Sprite",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Recolorizer::DefineJavaScript"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const {RecolorizationManager, Recolorizer} = gdjs.__recolorizerExtension;",
+                "",
+                "/** @type {gdjs.SpriteRuntimeObject} */",
+                "const sprite = objects[0];",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = sprite.getBehavior(behaviorName);",
+                "",
+                "if (!runtimeScene.__recolorizerExtension) {",
+                "    runtimeScene.__recolorizerExtension = { managers: new Map()};",
+                "}",
+                "/** @type {Map} */",
+                "const managers = runtimeScene.__recolorizerExtension.managers || new Map();",
+                "let manager = managers.get(sprite.getName());",
+                "if (!manager) {",
+                "    /** @type {PIXI.Texture[]} */",
+                "    const sourceTextures = [];",
+                "    for (const animation of sprite._animator._animations) {",
+                "        for (const direction of animation.directions) {",
+                "            for (const frame of direction.frames) {",
+                "                sourceTextures.push(frame.texture);",
+                "            }",
+                "        }",
+                "    }",
+                "    manager = new RecolorizationManager(sourceTextures);",
+                "    managers.set(sprite.getName(), manager);",
+                "}",
+                "",
+                "/** @type {{texture: PIXI.Texture[]}} */",
+                "const sourceTextureContainers = [];",
+                "for (const animation of sprite._animator._animations) {",
+                "    for (const direction of animation.directions) {",
+                "        for (const frame of direction.frames) {",
+                "            sourceTextureContainers.push(frame);",
+                "        }",
+                "    }",
+                "}",
+                "",
+                "behavior.recolorizer = new Recolorizer(",
+                "    manager,",
+                "    sourceTextureContainers",
+                ");"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::SpriteRecolorizer",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Replace a given color of an object with another one. The scope allows to change similar colors at once.",
+          "fullName": "Recolorize",
+          "functionType": "Action",
+          "name": "Recolorize",
+          "sentence": "Recolorize _PARAM0_ from color _PARAM2_ to color _PARAM3_ within a scope of  hue: _PARAM4_° saturation: _PARAM5_% lightness: _PARAM6_%",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = objects[0].getBehavior(behaviorName);",
+                "",
+                "const originColor = gdjs.rgbOrHexToRGBColor(eventsFunctionContext.getArgument(\"OriginColor\"));",
+                "const targetColor = gdjs.rgbOrHexToRGBColor(eventsFunctionContext.getArgument(\"TargetColor\"));",
+                "const hueScope = gdjs.evtTools.common.clamp(eventsFunctionContext.getArgument(\"HueScope\") / 360, 0, 180);",
+                "const saturationScope = gdjs.evtTools.common.clamp(eventsFunctionContext.getArgument(\"SaturationScope\") / 100, 0, 50);",
+                "const lightnessScope = gdjs.evtTools.common.clamp(eventsFunctionContext.getArgument(\"LightnessScope\") / 100, 0, 50);",
+                "",
+                "behavior.recolorizer.recolorizeSprite(originColor, targetColor, hueScope, saturationScope, lightnessScope);"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::SpriteRecolorizer",
+              "type": "behavior"
+            },
+            {
+              "description": "Origin color",
+              "name": "OriginColor",
+              "type": "color"
+            },
+            {
+              "description": "Target color",
+              "name": "TargetColor",
+              "type": "color"
+            },
+            {
+              "description": "Hue scope (from 0° to 180°)",
+              "name": "HueScope",
+              "type": "expression"
+            },
+            {
+              "description": "Saturation scope (in percent)",
+              "name": "SaturationScope",
+              "type": "expression"
+            },
+            {
+              "description": "Lightness scope (in percent)",
+              "name": "LightnessScope",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set back the original colors of an object.",
+          "fullName": "Reset color",
+          "functionType": "Action",
+          "name": "ResetColor",
+          "sentence": "Reset the colors of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = objects[0].getBehavior(behaviorName);",
+                "",
+                "behavior.recolorizer.resetSprite();"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::SpriteRecolorizer",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "\r",
+                "/** @type {gdjs.SpriteRuntimeObject} */\r",
+                "const sprite = objects[0];\r",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");\r",
+                "const behavior = sprite.getBehavior(behaviorName);\r",
+                "\r",
+                "const recolorized = behavior.recolorizer.updateSprite();\r",
+                "if (recolorized) {\r",
+                "    sprite._animationFrameDirty = true;\r",
+                "}"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::SpriteRecolorizer",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onDestroy",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Unsure that destroyed instance recolorization can be free."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Recolorizer::SpriteRecolorizer::ResetColor"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::SpriteRecolorizer",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Independently change the colors of a tiled sprite.",
+      "fullName": "Tiled sprite recolorizer",
+      "name": "TiledSpriteRecolorizer",
+      "objectType": "TiledSpriteObject::TiledSprite",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Recolorizer::DefineJavaScript"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const {RecolorizationManager, Recolorizer} = gdjs.__recolorizerExtension;",
+                "",
+                "/** @type {gdjs.TiledSpriteRuntimeObject} */",
+                "const tiledSprite = objects[0];",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = tiledSprite.getBehavior(behaviorName);",
+                "",
+                "if (!runtimeScene.__recolorizerExtension) {",
+                "    runtimeScene.__recolorizerExtension = { managers: new Map()};",
+                "}",
+                "/** @type {Map} */",
+                "const managers = runtimeScene.__recolorizerExtension.managers || new Map();",
+                "let manager = managers.get(tiledSprite.getName());",
+                "if (!manager) {",
+                "    /** @type {PIXI.TilingSprite} */",
+                "    const tilingSprite = tiledSprite.getRendererObject();",
+                "    manager = new RecolorizationManager([tilingSprite.texture]);",
+                "    managers.set(tiledSprite.getName(), manager);",
+                "}",
+                "",
+                "behavior.recolorizer = new Recolorizer(",
+                "    manager,",
+                "    [tiledSprite.getRendererObject()]",
+                ");",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::TiledSpriteRecolorizer",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Replace a given color of an object with another one. The scope allows to change similar colors at once.",
+          "fullName": "Recolorize",
+          "functionType": "Action",
+          "name": "Recolorize",
+          "sentence": "Recolorize _PARAM0_ from color _PARAM2_ to color _PARAM3_ within a scope of  hue: _PARAM4_° saturation: _PARAM5_% lightness: _PARAM6_%",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = objects[0].getBehavior(behaviorName);",
+                "",
+                "const originColor = gdjs.rgbOrHexToRGBColor(eventsFunctionContext.getArgument(\"OriginColor\"));",
+                "const targetColor = gdjs.rgbOrHexToRGBColor(eventsFunctionContext.getArgument(\"TargetColor\"));",
+                "const hueScope = gdjs.evtTools.common.clamp(eventsFunctionContext.getArgument(\"HueScope\") / 360, 0, 180);",
+                "const saturationScope = gdjs.evtTools.common.clamp(eventsFunctionContext.getArgument(\"SaturationScope\") / 100, 0, 50);",
+                "const lightnessScope = gdjs.evtTools.common.clamp(eventsFunctionContext.getArgument(\"LightnessScope\") / 100, 0, 50);",
+                "",
+                "behavior.recolorizer.recolorizeSprite(originColor, targetColor, hueScope, saturationScope, lightnessScope);"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::TiledSpriteRecolorizer",
+              "type": "behavior"
+            },
+            {
+              "description": "Origin color",
+              "name": "OriginColor",
+              "type": "color"
+            },
+            {
+              "description": "Target color",
+              "name": "TargetColor",
+              "type": "color"
+            },
+            {
+              "description": "Hue scope (from 0° to 180°)",
+              "name": "HueScope",
+              "type": "expression"
+            },
+            {
+              "description": "Saturation scope (in percent)",
+              "name": "SaturationScope",
+              "type": "expression"
+            },
+            {
+              "description": "Lightness scope (in percent)",
+              "name": "LightnessScope",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set back the original colors of an object.",
+          "fullName": "Reset color",
+          "functionType": "Action",
+          "name": "ResetColor",
+          "sentence": "Reset the colors of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = objects[0].getBehavior(behaviorName);",
+                "",
+                "behavior.recolorizer.resetSprite();"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::TiledSpriteRecolorizer",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "\r",
+                "const object = objects[0];\r",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");\r",
+                "const behavior = object.getBehavior(behaviorName);\r",
+                "\r",
+                "const recolorized = behavior.recolorizer.updateSprite();"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::TiledSpriteRecolorizer",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onDestroy",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Unsure that destroyed instance recolorization can be free."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Recolorizer::TiledSpriteRecolorizer::ResetColor"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::TiledSpriteRecolorizer",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Independently change the colors of a panel sprite.",
+      "fullName": "Panel sprite recolorizer",
+      "name": "PanelSpriteRecolorizer",
+      "objectType": "PanelSpriteObject::PanelSprite",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Recolorizer::DefineJavaScript"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const {RecolorizationManager, Recolorizer} = gdjs.__recolorizerExtension;",
+                "",
+                "/** @type {gdjs.PanelSpriteRuntimeObject} */",
+                "const panelSprite = objects[0];",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = panelSprite.getBehavior(behaviorName);",
+                "",
+                "if (!runtimeScene.__recolorizerExtension) {",
+                "    runtimeScene.__recolorizerExtension = { managers: new Map()};",
+                "}",
+                "/** @type {Map} */",
+                "const managers = runtimeScene.__recolorizerExtension.managers || new Map();",
+                "let manager = managers.get(panelSprite.getName());",
+                "if (!manager) {",
+                "    const renderer = panelSprite._renderer;",
+                "    /** @type {PIXI.Texture[]} */",
+                "    const sourceTextures = renderer._borderSprites.map(sprite => sprite.texture);",
+                "    sourceTextures.push(renderer._centerSprite.texture);",
+                "    manager = new RecolorizationManager(sourceTextures);",
+                "    managers.set(panelSprite.getName(), manager);",
+                "}",
+                "",
+                "const renderer = panelSprite._renderer;",
+                "",
+                "behavior.recolorizer = new Recolorizer(",
+                "    manager,",
+                "    [...renderer._borderSprites, renderer._centerSprite],",
+                ");",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PanelSpriteObject::PanelSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::PanelSpriteRecolorizer",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Replace a given color of an object with another one. The scope allows to change similar colors at once.",
+          "fullName": "Recolorize",
+          "functionType": "Action",
+          "name": "Recolorize",
+          "sentence": "Recolorize _PARAM0_ from color _PARAM2_ to color _PARAM3_ within a scope of  hue: _PARAM4_° saturation: _PARAM5_% lightness: _PARAM6_%",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = objects[0].getBehavior(behaviorName);",
+                "",
+                "const originColor = gdjs.rgbOrHexToRGBColor(eventsFunctionContext.getArgument(\"OriginColor\"));",
+                "const targetColor = gdjs.rgbOrHexToRGBColor(eventsFunctionContext.getArgument(\"TargetColor\"));",
+                "const hueScope = gdjs.evtTools.common.clamp(eventsFunctionContext.getArgument(\"HueScope\") / 360, 0, 180);",
+                "const saturationScope = gdjs.evtTools.common.clamp(eventsFunctionContext.getArgument(\"SaturationScope\") / 100, 0, 50);",
+                "const lightnessScope = gdjs.evtTools.common.clamp(eventsFunctionContext.getArgument(\"LightnessScope\") / 100, 0, 50);",
+                "",
+                "behavior.recolorizer.recolorizeSprite(originColor, targetColor, hueScope, saturationScope, lightnessScope);"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PanelSpriteObject::PanelSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::PanelSpriteRecolorizer",
+              "type": "behavior"
+            },
+            {
+              "description": "Origin color",
+              "name": "OriginColor",
+              "type": "color"
+            },
+            {
+              "description": "Target color",
+              "name": "TargetColor",
+              "type": "color"
+            },
+            {
+              "description": "Hue scope (from 0° to 180°)",
+              "name": "HueScope",
+              "type": "expression"
+            },
+            {
+              "description": "Saturation scope (in percent)",
+              "name": "SaturationScope",
+              "type": "expression"
+            },
+            {
+              "description": "Lightness scope (in percent)",
+              "name": "LightnessScope",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set back the original colors of an object.",
+          "fullName": "Reset color",
+          "functionType": "Action",
+          "name": "ResetColor",
+          "sentence": "Reset the colors of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = objects[0].getBehavior(behaviorName);",
+                "",
+                "behavior.recolorizer.resetSprite();"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PanelSpriteObject::PanelSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::PanelSpriteRecolorizer",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/** @type {gdjs.PanelSpriteRuntimeObject} */\r",
+                "const panelSprite = objects[0];\r",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");\r",
+                "const behavior = panelSprite.getBehavior(behaviorName);\r",
+                "\r",
+                "const recolorized = behavior.recolorizer.updateSprite();\r",
+                "if (recolorized) {\r",
+                "      const renderer = panelSprite._renderer;\r",
+                "      //renderer._wasRendered = false;\r",
+                "      renderer._spritesContainer.cacheAsBitmap = false;\r",
+                "}"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PanelSpriteObject::PanelSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::PanelSpriteRecolorizer",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onDestroy",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Unsure that destroyed instance recolorization can be free."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Recolorizer::PanelSpriteRecolorizer::ResetColor"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PanelSpriteObject::PanelSprite",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Recolorizer::PanelSpriteRecolorizer",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

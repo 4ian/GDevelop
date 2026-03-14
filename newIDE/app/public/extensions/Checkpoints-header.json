@@ -1,0 +1,45 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "30b1QQoYi1gQQHzIjMlNY8aLyYV2",
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Checkpoints",
+  "name": "Checkpoints",
+  "version": "1.0.2",
+  "url": "https://resources.gdevelop-app.com/extensions/Checkpoints.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Checkpoints-header.json",
+  "tags": "position,checkpoint",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/flag-variant.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Respawn objects at checkpoints.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 3,
+  "helpPath": "/extensions/checkpoints",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "SaveCheckpoint",
+      "fullName": "Save checkpoint",
+      "description": "Update a checkpoint of an object.",
+      "functionType": "Action"
+    },
+    {
+      "name": "LoadCheckpoint",
+      "fullName": "Load checkpoint",
+      "description": "Change the position of the object to the saved checkpoint.",
+      "functionType": "Action"
+    },
+    {
+      "name": "CheckpointExist",
+      "fullName": "Checkpoint exists",
+      "description": "Check if a checkpoint has a position saved / does exist.",
+      "functionType": "Condition"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "This extension can save checkpoints and respawn objects at the last one.\n\nThe platformer example uses this extension ([open the project online](https://editor.gdevelop.io/?project=example://platformer)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZsYWctdmFyaWFudCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik02LDNBMSwxIDAgMCwxIDcsNFY0Ljg4QzguMDYsNC40NCA5LjUsNCAxMSw0QzE0LDQgMTQsNiAxNiw2QzE5LDYgMjAsNCAyMCw0VjEyQzIwLDEyIDE5LDE0IDE2LDE0QzEzLDE0IDEzLDEyIDExLDEyQzgsMTIgNywxNCA3LDE0VjIxSDVWNEExLDEgMCAwLDEgNiwzWiIgLz48L3N2Zz4="
+}

@@ -1,0 +1,1414 @@
+{
+  "author": "",
+  "category": "User interface",
+  "extensionNamespace": "",
+  "fullName": "Two choices dialog boxes",
+  "gdevelopVersion": ">=5.5.230",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjMiIHkxPSIxMSIgeDI9IjI5IiB5Mj0iMTEiLz4NCjxnPg0KCTxwYXRoIGQ9Ik03LDlDNi43LDksNi41LDguOSw2LjMsOC43QzYuMSw4LjUsNiw4LjMsNiw4YzAtMC4zLDAuMS0wLjUsMC4zLTAuN2MwLDAsMC4xLTAuMSwwLjEtMC4xYzAuMSwwLDAuMS0wLjEsMC4yLTAuMQ0KCQlDNi43LDcsNi43LDcsNi44LDdjMC4xLDAsMC4zLDAsMC40LDBjMC4xLDAsMC4xLDAsMC4yLDAuMWMwLjEsMCwwLjEsMC4xLDAuMiwwLjFjMCwwLDAuMSwwLjEsMC4xLDAuMWMwLjEsMC4xLDAuMiwwLjIsMC4yLDAuMw0KCQlDOCw3LjcsOCw3LjksOCw4YzAsMC4xLDAsMC4zLTAuMSwwLjRDNy45LDguNSw3LjgsOC42LDcuNyw4LjdDNy41LDguOSw3LjMsOSw3LDl6Ii8+DQo8L2c+DQo8Zz4NCgk8cGF0aCBkPSJNMTAsOUM5LjcsOSw5LjUsOC45LDkuMyw4LjdDOS4xLDguNSw5LDguMyw5LDhjMC0wLjEsMC0wLjMsMC4xLTAuNGMwLjEtMC4xLDAuMS0wLjIsMC4yLTAuM2MwLjEtMC4xLDAuMi0wLjIsMC4zLTAuMg0KCQlDMTAsNi45LDEwLjQsNywxMC43LDcuM2MwLjEsMC4xLDAuMiwwLjIsMC4yLDAuM0MxMSw3LjcsMTEsNy45LDExLDhjMCwwLjMtMC4xLDAuNS0wLjMsMC43QzEwLjUsOC45LDEwLjMsOSwxMCw5eiIvPg0KPC9nPg0KPGc+DQoJPHBhdGggZD0iTTEzLDljLTAuMSwwLTAuMywwLTAuNC0wLjFjLTAuMS0wLjEtMC4yLTAuMS0wLjMtMC4yYy0wLjEtMC4xLTAuMi0wLjItMC4yLTAuM0MxMiw4LjMsMTIsOC4xLDEyLDhjMC0wLjEsMC0wLjMsMC4xLTAuNA0KCQljMC4xLTAuMSwwLjEtMC4yLDAuMi0wLjNjMC40LTAuNCwxLTAuNCwxLjQsMGMwLjEsMC4xLDAuMiwwLjIsMC4yLDAuM0MxNCw3LjcsMTQsNy45LDE0LDhjMCwwLjEsMCwwLjMtMC4xLDAuNA0KCQljLTAuMSwwLjEtMC4xLDAuMi0wLjIsMC4zQzEzLjUsOC45LDEzLjMsOSwxMyw5eiIvPg0KPC9nPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI3LDVINUMzLjksNSwzLDUuOSwzLDd2MThjMCwxLjEsMC45LDIsMiwyaDIyYzEuMSwwLDItMC45LDItMlY3QzI5LDUuOSwyOC4xLDUsMjcsNXoiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yMywyM0g5Yy0xLjEsMC0yLTAuOS0yLTJ2LTRjMC0xLjEsMC45LTIsMi0yaDE0YzEuMSwwLDIsMC45LDIsMnY0QzI1LDIyLjEsMjQuMSwyMywyMywyM3oiLz4NCjxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjE1LDE5IDE2LDIwIDE4LDE4ICIvPg0KPC9zdmc+DQo=",
+  "name": "TwoChoicesDialogBoxes",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Interface Elements/0842ffc478006e9b6687fca9a5761494c4efd1df873220637af5b4ac7253f850_Interface Elements_interface_ui_window_application_app_button_cta.svg",
+  "shortDescription": "Two-choice dialog box with keyboard, gamepad, and touch support. Customizable text.",
+  "version": "0.3.2",
+  "description": [
+    "A dialog box showing multiple options (usually \"yes\" and \"no\") and a customizable text message.",
+    "It handles keyboard, gamepad and touch controls.",
+    "",
+    "There are ready-to-use dialog boxes in the asset-store [dialog boxes pack](https://editor.gdevelop.io/?initial-dialog=asset-store&asset-pack=dialog-boxes-dialog-boxes)."
+  ],
+  "origin": {
+    "identifier": "TwoChoicesDialogBoxes",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "dialog,dialogue,box,input,confirmation,popup",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Check if the events are running for the editor.",
+      "fullName": "Editor is running",
+      "functionType": "Condition",
+      "name": "IsInGameEdition",
+      "private": true,
+      "sentence": "Events are running for the editor",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const game = runtimeScene.getGame();\r",
+            "eventsFunctionContext.returnValue = game.isInGameEdition && game.isInGameEdition();"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": [
+    {
+      "areaMaxX": 600,
+      "areaMaxY": 213,
+      "areaMaxZ": 32,
+      "areaMinX": 0,
+      "areaMinY": 0,
+      "areaMinZ": 0,
+      "assetStoreTag": "dialog boxes",
+      "defaultName": "",
+      "description": "A dialog box showing two options.",
+      "fullName": "Two choices dialog box ",
+      "isInnerAreaFollowingParentSize": true,
+      "isTextContainer": true,
+      "isUsingLegacyInstancesRenderer": false,
+      "name": "TwoChoicesDialogBox",
+      "objects": [
+        {
+          "assetStoreId": "90d94b6e3a23c34948e59eaaef4679740f8ab588696d59b21e0c0c2ef106b94d",
+          "name": "NoButton",
+          "type": "PanelSpriteButton::PanelSpriteButton",
+          "variant": "Semi-transparent black and white",
+          "variables": [
+            {
+              "name": "ID",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [
+            {
+              "effectType": "Outline",
+              "name": "OutlineEffect",
+              "doubleParameters": {
+                "padding": 0,
+                "thickness": 2
+              },
+              "stringParameters": {
+                "color": "255;255;255"
+              },
+              "booleanParameters": {}
+            }
+          ],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 2,
+              "leftEdgeAnchor": 0,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 2,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "content": {
+            "LeftPadding": 8,
+            "RightPadding": 8,
+            "PressedLabelOffsetY": 0,
+            "IdleLabelOffsetY": -8,
+            "BottomPadding": 8,
+            "TopPadding": 8,
+            "MinimalWidth": 300
+          }
+        },
+        {
+          "assetStoreId": "90d94b6e3a23c34948e59eaaef4679740f8ab588696d59b21e0c0c2ef106b94d",
+          "name": "YesButton",
+          "type": "PanelSpriteButton::PanelSpriteButton",
+          "variant": "Semi-transparent black and white",
+          "variables": [
+            {
+              "name": "ID",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [
+            {
+              "effectType": "Outline",
+              "name": "OutlineEffect",
+              "doubleParameters": {
+                "padding": 0,
+                "thickness": 2
+              },
+              "stringParameters": {
+                "color": "255;255;255"
+              },
+              "booleanParameters": {}
+            }
+          ],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 2,
+              "leftEdgeAnchor": 0,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 2,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "content": {
+            "LeftPadding": 8,
+            "RightPadding": 8,
+            "PressedLabelOffsetY": 0,
+            "IdleLabelOffsetY": -8,
+            "BottomPadding": 8,
+            "TopPadding": 8,
+            "MinimalWidth": 300
+          }
+        },
+        {
+          "assetStoreId": "",
+          "bottomMargin": 16,
+          "height": 48,
+          "leftMargin": 16,
+          "name": "TextBorder",
+          "rightMargin": 16,
+          "texture": "Border.png",
+          "tiled": true,
+          "topMargin": 16,
+          "type": "PanelSpriteObject::PanelSprite",
+          "width": 48,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 2,
+              "leftEdgeAnchor": 1,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 2,
+              "topEdgeAnchor": 1,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "Dialogue",
+          "type": "BitmapText::BitmapTextObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 2,
+              "leftEdgeAnchor": 1,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 2,
+              "topEdgeAnchor": 1,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "content": {
+            "text": "Default message. Continue?",
+            "opacity": 255,
+            "scale": 2,
+            "fontSize": 20,
+            "tint": "255;255;255",
+            "bitmapFontResourceName": "8BitOperatorPlus8Regular_Edited.fnt",
+            "textureAtlasResourceName": "8BitOperatorPlus8Regular_Edited.png",
+            "align": "left",
+            "wordWrap": true,
+            "verticalTextAlignment": "top"
+          }
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "Dialogue"
+          },
+          {
+            "objectName": "TextBorder"
+          },
+          {
+            "objectName": "YesButton"
+          },
+          {
+            "objectName": "NoButton"
+          }
+        ]
+      },
+      "objectsGroups": [
+        {
+          "name": "Buttons",
+          "objects": [
+            {
+              "name": "NoButton"
+            },
+            {
+              "name": "YesButton"
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 1,
+          "height": 124,
+          "layer": "",
+          "name": "Dialogue",
+          "persistentUuid": "c7183394-9ca6-4c16-9d13-f0b7cfe803d8",
+          "width": 554,
+          "x": 19,
+          "y": 18,
+          "zOrder": 45,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 0,
+          "height": 213,
+          "layer": "",
+          "name": "TextBorder",
+          "persistentUuid": "639d5661-817d-4faa-b33b-c0ff129c309a",
+          "width": 600,
+          "x": 0,
+          "y": 0,
+          "zOrder": 43,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 32,
+          "height": 36,
+          "layer": "",
+          "name": "YesButton",
+          "persistentUuid": "a0ca78d3-0a23-4bbe-89de-fb2d0a53996c",
+          "width": 105,
+          "x": 350,
+          "y": 160,
+          "zOrder": 510,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 32,
+          "height": 36,
+          "layer": "",
+          "name": "NoButton",
+          "persistentUuid": "6781aafa-3ae9-4820-bb97-682a524a0cf6",
+          "width": 103,
+          "x": 471,
+          "y": 160,
+          "zOrder": 510,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "ID",
+              "persistentUuid": "bb563dbe-93eb-4412-b843-f60016b9a893",
+              "type": "number",
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "editionSettings": {},
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "EffectCapability::EffectBehavior::EnableEffect"
+                  },
+                  "parameters": [
+                    "Buttons",
+                    "Effect",
+                    "\"OutlineEffect\"",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Text",
+                    "=",
+                    "TextMessage"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PanelSpriteButton::PanelSpriteButton::SetLabelText"
+                  },
+                  "parameters": [
+                    "YesButton",
+                    "LabelButtonID0",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PanelSpriteButton::PanelSpriteButton::SetLabelText"
+                  },
+                  "parameters": [
+                    "NoButton",
+                    "LabelButtonID1",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TwoChoicesDialogBoxes::TwoChoicesDialogBox",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Gamepad, mouse, touch and keyboard are fully supported.\nEach action from a device increment or decrement an index that is used to focus the active button, make outlines and trigger a sound effect."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Visible"
+                  },
+                  "parameters": [
+                    "Object"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "Dialogue",
+                    "Text",
+                    "=",
+                    "Object.Text::Value()"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "TwoChoicesDialogBoxes::IsInGameEdition"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PanelSpriteButton::PanelSpriteButton::IsHovered"
+                          },
+                          "parameters": [
+                            "Buttons",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlaySound"
+                          },
+                          "parameters": [
+                            "",
+                            "HoveredSound",
+                            "",
+                            "20",
+                            "RandomFloatInRange(0.8,0.9)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "TwoChoicesDialogBoxes::TwoChoicesDialogBox::SetActiveButtonById"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "Buttons.ID",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "NumpadLeft"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Left"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Button_pressed"
+                              },
+                              "parameters": [
+                                "",
+                                "1",
+                                "\"Left\"",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Axis_pushed"
+                              },
+                              "parameters": [
+                                "",
+                                "1",
+                                "\"Left\"",
+                                "\"Left\"",
+                                ""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TwoChoicesDialogBoxes::TwoChoicesDialogBox::SetActiveButtonById"
+                          },
+                          "parameters": [
+                            "Object",
+                            "-",
+                            "1",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PlaySound"
+                          },
+                          "parameters": [
+                            "",
+                            "HoveredSound",
+                            "",
+                            "20",
+                            "RandomFloatInRange(0.8,0.9)"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "NumpadRight"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Right"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Button_pressed"
+                              },
+                              "parameters": [
+                                "",
+                                "1",
+                                "\"Right\"",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Axis_pushed"
+                              },
+                              "parameters": [
+                                "",
+                                "1",
+                                "\"Left\"",
+                                "\"Right\"",
+                                ""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TwoChoicesDialogBoxes::TwoChoicesDialogBox::SetActiveButtonById"
+                          },
+                          "parameters": [
+                            "Object",
+                            "+",
+                            "1",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PlaySound"
+                          },
+                          "parameters": [
+                            "",
+                            "HoveredSound",
+                            "",
+                            "20",
+                            "RandomFloatInRange(0.8,0.9)"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "To escape the dialog we can focus the button with the identifier 1 which is usually the button to cancel/deny by pressing one of the key or buttons"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "EnableEscape",
+                            "True",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Escape"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Button_pressed"
+                              },
+                              "parameters": [
+                                "",
+                                "1",
+                                "\"B\"",
+                                ""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TwoChoicesDialogBoxes::TwoChoicesDialogBox::SetActiveButtonById"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "1",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TwoChoicesDialogBoxes::TwoChoicesDialogBox",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onHotReloading",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Text",
+                    "=",
+                    "TextMessage"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PanelSpriteButton::PanelSpriteButton::SetLabelTextOp"
+                  },
+                  "parameters": [
+                    "YesButton",
+                    "=",
+                    "LabelButtonID0",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PanelSpriteButton::PanelSpriteButton::SetLabelTextOp"
+                  },
+                  "parameters": [
+                    "NoButton",
+                    "=",
+                    "LabelButtonID1",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TwoChoicesDialogBoxes::TwoChoicesDialogBox",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the \"Yes\" button of the dialog was selected.",
+          "fullName": "\"Yes\" button is clicked",
+          "functionType": "Condition",
+          "name": "IsYesClicked",
+          "sentence": "\"Yes\" button of _PARAM0_ is clicked",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "The button is clicked\nOr\nThe button is active and a key is pressed to validate the button"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "value": "PanelSpriteButton::PanelSpriteButton::IsClicked"
+                      },
+                      "parameters": [
+                        "YesButton",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::And"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "TwoChoicesDialogBoxes::TwoChoicesDialogBox::ActiveButtonById"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "0",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "NumpadReturn"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Return"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Space"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Button_pressed"
+                              },
+                              "parameters": [
+                                "",
+                                "1",
+                                "\"A\"",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Space"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TwoChoicesDialogBoxes::TwoChoicesDialogBox",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the \"No\" button of the dialog was selected.",
+          "fullName": "\"No\" button is clicked",
+          "functionType": "Condition",
+          "name": "IsNoClicked",
+          "sentence": "\"No\" button of _PARAM0_ is clicked",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "The button is clicked\nOr\nThe button is active and a key is pressed to validate the button"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "value": "PanelSpriteButton::PanelSpriteButton::IsClicked"
+                      },
+                      "parameters": [
+                        "NoButton",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "KeyPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Escape"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::And"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "TwoChoicesDialogBoxes::TwoChoicesDialogBox::ActiveButtonById"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "1",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "NumpadReturn"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Return"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Button_pressed"
+                              },
+                              "parameters": [
+                                "",
+                                "1",
+                                "\"A\"",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Space"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TwoChoicesDialogBoxes::TwoChoicesDialogBox",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the highlighted button.",
+          "fullName": "Highlighted button",
+          "functionType": "ExpressionAndCondition",
+          "group": "Dialog Box configuration",
+          "name": "ActiveButtonById",
+          "private": true,
+          "sentence": "the highlighted button",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "HighlightedButtonIndex"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TwoChoicesDialogBoxes::TwoChoicesDialogBox",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "ActiveButtonById",
+          "name": "SetActiveButtonById",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "HighlightedButtonIndex",
+                    "=",
+                    "mod(Value, SceneInstancesCount(Buttons))"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "VarObjet"
+                  },
+                  "parameters": [
+                    "Buttons",
+                    "ID",
+                    "=",
+                    "HighlightedButtonIndex"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "EffectCapability::EffectBehavior::EnableEffect"
+                  },
+                  "parameters": [
+                    "Buttons",
+                    "Effect",
+                    "\"OutlineEffect\"",
+                    "yes"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "VarObjet"
+                  },
+                  "parameters": [
+                    "Buttons",
+                    "ID",
+                    "!=",
+                    "HighlightedButtonIndex"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "EffectCapability::EffectBehavior::EnableEffect"
+                  },
+                  "parameters": [
+                    "Buttons",
+                    "Effect",
+                    "\"OutlineEffect\"",
+                    "no"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TwoChoicesDialogBoxes::TwoChoicesDialogBox",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the text shown by the dialog.",
+          "fullName": "Text message",
+          "functionType": "ExpressionAndCondition",
+          "group": "Dialog Box configuration",
+          "name": "TextMessage",
+          "private": true,
+          "sentence": "the text",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "TextMessage"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TwoChoicesDialogBoxes::TwoChoicesDialogBox",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "TextMessage",
+          "name": "SetTextMessage",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "TextMessage",
+                    "=",
+                    "Value"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "Dialogue",
+                    "Text",
+                    "=",
+                    "TextMessage"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TwoChoicesDialogBoxes::TwoChoicesDialogBox",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "Default message. Continue?",
+          "type": "MultilineString",
+          "label": "Message",
+          "name": "TextMessage"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "",
+          "hidden": true,
+          "name": "HighlightedButtonIndex"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Cancel with Escape key",
+          "description": "Enable or disable the escape key to close the dialog.",
+          "name": "EnableEscape"
+        },
+        {
+          "value": "Yes",
+          "type": "String",
+          "label": "Label for the \"Yes\" button",
+          "description": "This is the button with identifier 0.",
+          "name": "LabelButtonID0"
+        },
+        {
+          "value": "No",
+          "type": "String",
+          "label": "Label for the \"No\" button",
+          "description": "This is the button with identifier 1.",
+          "name": "LabelButtonID1"
+        },
+        {
+          "value": "",
+          "type": "Choice",
+          "label": "",
+          "choices": [
+            {
+              "label": "YesButton.LabelText=LabelButtonID0",
+              "value": "YesButton.LabelText=LabelButtonID0"
+            },
+            {
+              "label": "NoButton.LabelText=LabelButtonID1",
+              "value": "NoButton.LabelText=LabelButtonID1"
+            },
+            {
+              "label": "Dialogue.Text=TextMessage",
+              "value": "Dialogue.Text=TextMessage"
+            }
+          ],
+          "hidden": true,
+          "name": "_PropertyMapping"
+        },
+        {
+          "value": "",
+          "type": "Resource",
+          "label": "Sound at hovering",
+          "extraInformation": [
+            "audio"
+          ],
+          "choices": [],
+          "name": "HoveredSound"
+        }
+      ]
+    }
+  ],
+  "requiredExtensions": [
+    {
+      "extensionName": "Gamepads",
+      "extensionVersion": "0.9.1"
+    },
+    {
+      "extensionName": "PanelSpriteButton",
+      "extensionVersion": "2.1.1"
+    }
+  ]
+}

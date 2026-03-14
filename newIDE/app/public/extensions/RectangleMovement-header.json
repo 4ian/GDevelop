@@ -1,0 +1,223 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "wWP8BSlAW0UP4NeaHa2LcmmDzmH2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Rectangular movement",
+  "name": "RectangleMovement",
+  "version": "1.3.0",
+  "url": "https://resources.gdevelop-app.com/extensions/RectangleMovement.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/RectangleMovement-header.json",
+  "tags": "rectangular,movement,rectangle,patrol,platform,enemy",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/shape-rectangle-plus.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Move objects in a rectangular pattern.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/rectangle-movement",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Move objects in a rectangular pattern.",
+      "fullName": "Rectangular movement",
+      "name": "RectangleMovement",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "TeleportToCorner",
+          "fullName": "Teleport at a corner",
+          "description": "Teleport the object to a corner of the movement rectangle.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Perimeter",
+          "fullName": "Perimeter",
+          "description": "Return the perimeter of the movement rectangle.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "LoopDuration",
+          "fullName": "Loop duration",
+          "description": "Return the time the object takes to go through the whole rectangle (in seconds).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "HorizontalEdgeDuration",
+          "fullName": "Horizontal edge duration",
+          "description": "Return the time the object takes to go through a horizontal edge (in seconds).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "VerticalEdgeDuration",
+          "fullName": "Vertical edge duration",
+          "description": "Return the time the object takes to go through a vertical edge (in seconds).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "Width",
+          "fullName": "Width",
+          "description": "Return the rectangle width.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "Height",
+          "fullName": "Height",
+          "description": "Return the rectangle height.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "Left",
+          "fullName": "Left bound",
+          "description": "Return the left bound of the movement.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "Top",
+          "fullName": "Top bound",
+          "description": "Return the top bound of the movement.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "Right",
+          "fullName": "Right bound",
+          "description": "Return the right bound of the movement.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "Bottom",
+          "fullName": "Bottom bound",
+          "description": "Return the bottom bound of the movement.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetLeft",
+          "fullName": "Left bound",
+          "description": "Change the left bound of the rectangular movement.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetTop",
+          "fullName": "Top bound",
+          "description": "Change the top bound of the rectangular movement.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetRight",
+          "fullName": "Right bound",
+          "description": "Change the right bound of the rectangular movement.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetBottom",
+          "fullName": "Bottom bound",
+          "description": "Change the bottom bound of the rectangular movement.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetHorizontalEdgeDuration",
+          "fullName": "Horizontal edge duration",
+          "description": "Change the time the object takes to go through a horizontal edge (in seconds).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetVerticalEdgeDuration",
+          "fullName": "Vertical edge duration",
+          "description": "Change the time the object takes to go through a vertical edge (in seconds).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetClockwise",
+          "fullName": "Clockwise",
+          "description": "Change the direction to clockwise or counter-clockwise.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetEasing",
+          "fullName": "Easing",
+          "description": "Change the easing function of the movement.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ToogleClockwise",
+          "fullName": "Toggle direction",
+          "description": "Toggle the direction to clockwise or counter-clockwise.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsMovingClockwise",
+          "fullName": "Is moving clockwise",
+          "description": "Check if the object is moving clockwise.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsMovingLeft",
+          "fullName": "Is moving left",
+          "description": "Check if the object is moving to the left.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsMovingUp",
+          "fullName": "Is moving up",
+          "description": "Check if the object is moving up.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsMovingRight",
+          "fullName": "Is moving right",
+          "description": "Object is moving to the right.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsMovingDown",
+          "fullName": "Is moving down",
+          "description": "Check if the object is moving down.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsOnLeft",
+          "fullName": "Is on left",
+          "description": "Object is on the left side of the rectangle.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsOnTop",
+          "fullName": "Is on top",
+          "description": "Object is on the top side of the rectangle.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsOnRight",
+          "fullName": "Is on right",
+          "description": "Object is on the right side of the rectangle.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsOnBottom",
+          "fullName": "Is on bottom",
+          "description": "Object is on the bottom side of the rectangle.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "name": "MoveAlongBorderOfObject",
+      "fullName": "Update rectangular movement to follow the border of an object",
+      "description": "Update rectangular movement to follow the border of an object. Run once, or every time the center object moves.",
+      "functionType": "Action"
+    },
+    {
+      "name": "MoveToNearestCorner",
+      "fullName": "Move to the nearest corner of the center object",
+      "description": "Move to the nearest corner of the center object.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Move objects in a rectangular pattern with easing functions from the Tween extension.\n\nIt can be used for:\n\n- Moveable platforms\n- Enemy movement patterns\n- Moving along the border of another object (inside, center, outside)\n\nThe platformer example uses this extension ([open the project online](https://editor.gdevelop.io/?project=example://platformer)).\n\nThis game shows how to make objects move around the border of another object ([open the project online](https://editor.gdevelop.io/?project=example://moving-saw-platformer)).\n\nThis example can be used to test different settings ([open the project online](https://editor.gdevelop.io/?project=example://rectangular-movement)).\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNoYXBlLXJlY3RhbmdsZS1wbHVzIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE5LDZIMjJWOEgxOVYxMUgxN1Y4SDE0VjZIMTdWM0gxOVY2TTE3LDE3VjE0SDE5VjE5SDNWNkgxMVY4SDVWMTdIMTdaIiAvPjwvc3ZnPg=="
+}

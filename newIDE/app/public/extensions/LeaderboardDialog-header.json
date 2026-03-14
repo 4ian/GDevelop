@@ -1,0 +1,152 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Game over dialog",
+  "name": "LeaderboardDialog",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/LeaderboardDialog.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/LeaderboardDialog-header.json",
+  "tags": "leaderboard,score",
+  "category": "User interface",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Halloween/4bffa50f979bde55e4a0e49b67bf51aac30f4de5e1e12ab13952aa25773363b2_Halloween_skull.svg",
+  "gdevelopVersion": "",
+  "shortDescription": "Score display dialog with submit-to-leaderboard, retry, and main menu buttons.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/leaderboard-dialog",
+  "requiredExtensions": [
+    {
+      "extensionName": "PanelSpriteButton",
+      "extensionVersion": "2.2.0"
+    },
+    {
+      "extensionName": "TweenIntoView",
+      "extensionVersion": "1.0.0"
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [
+    {
+      "description": "Display the score and let players choose what to do next.",
+      "fullName": "Game over dialog",
+      "name": "LeaderboardDialog",
+      "defaultName": "GameOverDialog",
+      "eventsFunctions": [
+        {
+          "name": "Score",
+          "fullName": "Score",
+          "description": "Compare the score.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetScore",
+          "fullName": "Score",
+          "description": "Change the score.",
+          "functionType": "Action"
+        },
+        {
+          "name": "BestScore",
+          "fullName": "Best score",
+          "description": "Compare the best score of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetBestScore",
+          "fullName": "Best score",
+          "description": "Change the best score of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "DefaultPlayerName",
+          "fullName": "Default player name",
+          "description": "Compare the default player name.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetDefaultPlayerName",
+          "fullName": "Default player name",
+          "description": "Change the default player name.",
+          "functionType": "Action"
+        },
+        {
+          "name": "PlayerName",
+          "fullName": "Player name",
+          "description": "Compare the player name.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsRestartClicked",
+          "fullName": "Restart button clicked",
+          "description": "Check if the restart button of the dialog is clicked.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsNextClicked",
+          "fullName": "Next button clicked",
+          "description": "Check if the next button of the dialog is clicked.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsBackClicked",
+          "fullName": "Back button clicked",
+          "description": "Check if the back button of the dialog is clicked.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsScoreSubmitted",
+          "fullName": "Score is submitted",
+          "description": "Check if the score has been sucessfully submitted by the dialog.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "LeaderboardId",
+          "fullName": "Leaderboard",
+          "description": "Compare the leaderboard of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetLeaderboardId",
+          "fullName": "Leaderboard",
+          "description": "Change the leaderboard of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetTitle",
+          "fullName": "Title",
+          "description": "Change the title of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "TweenIn",
+          "fullName": "Fade in decorations",
+          "description": "Fade in the decoration objects of the dialog.",
+          "functionType": "Action"
+        },
+        {
+          "name": "TweenOut",
+          "fullName": "Fade out decorations",
+          "description": "Fade out the decoration objects of the dialog.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HasTweenedIn",
+          "fullName": "Decorations are faded in",
+          "description": "Check if the fade in animation of the decorations is finished.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "HasTweenedOut",
+          "fullName": "Decorations are faded out",
+          "description": "Check if the fade out animation of the decorations is finished.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "description": "Display the score and let players choose what to do next:\n- Submit the score to a leaderboard\n- Retry\n- Go back to the main menu",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI4LDE0LjhDMjgsOC4zLDIyLjYsMywxNiwzUzQsOC4zLDQsMTQuOGMwLDEuMywwLjIsMi41LDAuNiwzLjZDNC4yLDE5LjEsNCwxOS45LDQsMjAuN2MwLDIuNiwyLjEsNC43LDQuOCw0LjcNCgljMC40LDAsMC44LTAuMSwxLjItMC4yVjI5aDEydi0zLjdjMC40LDAuMSwwLjgsMC4yLDEuMiwwLjJjMi43LDAsNC44LTIuMSw0LjgtNC43YzAtMC44LTAuMi0xLjYtMC42LTIuM0MyNy44LDE3LjMsMjgsMTYuMSwyOCwxNC44DQoJeiIvPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMTgsMjQgMTYsMjIgMTQsMjQgIi8+DQo8Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSIyMC41IiBjeT0iMTguNSIgcj0iMi41Ii8+DQo8Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSIxMS41IiBjeT0iMTguNSIgcj0iMi41Ii8+DQo8L3N2Zz4NCg=="
+}

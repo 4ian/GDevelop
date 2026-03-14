@@ -1,0 +1,179 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Smooth Camera",
+  "name": "SmoothCamera",
+  "version": "0.4.4",
+  "url": "https://resources.gdevelop-app.com/extensions/SmoothCamera.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/SmoothCamera-header.json",
+  "tags": "camera,scrolling,follow,smooth,platformer,platform",
+  "category": "Camera",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Computers and Hardware/Computers and Hardware_camcoder_gopro_go_pro_camera.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Smoothly scroll to follow an object.",
+  "eventsBasedBehaviorsCount": 2,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/tutorials/follow-player-with-camera/",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Smoothly scroll to follow an object.",
+      "fullName": "Smooth Camera",
+      "name": "SmoothCamera",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "MoveCameraCloser",
+          "fullName": "Move the camera closer",
+          "description": "Move the camera closer to the object. This action must be called after the object has moved for the frame.",
+          "functionType": "Action"
+        },
+        {
+          "name": "WaitAndCatchUp",
+          "fullName": "Wait and catch up",
+          "description": "Delay the camera according to a maximum speed and catch up the delay.",
+          "functionType": "Action"
+        },
+        {
+          "name": "DrawDebug",
+          "fullName": "Draw debug",
+          "description": "Draw the targeted and actual camera position.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetFollowOnX",
+          "fullName": "Follow on X",
+          "description": "Enable or disable the following on X axis.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetFollowOnY",
+          "fullName": "Follow on Y",
+          "description": "Enable or disable the following on Y axis.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetFollowFreeAreaRight",
+          "fullName": "Follow free area right border",
+          "description": "Change the camera follow free area right border.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetFollowFreeAreaLeft",
+          "fullName": "Follow free area left border",
+          "description": "Change the camera follow free area left border.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetFollowFreeAreaTop",
+          "fullName": "Follow free area top border",
+          "description": "Change the camera follow free area top border.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetFollowFreeAreaBottom",
+          "fullName": "Follow free area bottom border",
+          "description": "Change the camera follow free area bottom border.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetLeftwardSpeedMax",
+          "fullName": "Leftward maximum speed",
+          "description": "Change the camera leftward maximum speed (in pixels per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetRightwardSpeedMax",
+          "fullName": "Rightward maximum speed",
+          "description": "Change the camera rightward maximum speed (in pixels per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetUpwardSpeedMax",
+          "fullName": "Upward maximum speed",
+          "description": "Change the camera upward maximum speed (in pixels per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetDownwardSpeedMax",
+          "fullName": "Downward maximum speed",
+          "description": "Change the camera downward maximum speed (in pixels per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetLeftwardSpeed",
+          "fullName": "Leftward catch-up speed",
+          "description": "Change the camera leftward catch-up speed (in ratio per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetRightwardSpeed",
+          "fullName": "Rightward catch-up speed",
+          "description": "Change the camera rightward catch-up speed (in ratio per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetDownwardSpeed",
+          "fullName": "Downward catch-up speed",
+          "description": "Change the camera downward catch-up speed (in ratio per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetUpwardSpeed",
+          "fullName": "Upward catch-up speed",
+          "description": "Change the camera upward catch-up speed (in ratio per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "OffsetX",
+          "fullName": "Camera offset X",
+          "description": "Compare the camera offset on X axis of the object. This is not the current difference between the object and the camera position.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetOffsetXOp",
+          "fullName": "Camera offset X",
+          "description": "Change the camera offset on X axis of the object. This is not the current difference between the object and the camera position.",
+          "functionType": "Action"
+        },
+        {
+          "name": "OffsetY",
+          "fullName": "Camera offset Y",
+          "description": "Compare the camera offset on Y axis of the object. This is not the current difference between the object and the camera position.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetOffsetYOp",
+          "fullName": "Camera offset Y",
+          "description": "Change the camera offset on Y axis of the object. This is not the current difference between the object and the camera position.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetForecastTime",
+          "fullName": "Forecast time",
+          "description": "Change the camera forecast time (in seconds).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetCameraDelay",
+          "fullName": "Camera delay",
+          "description": "Change the camera delay (in seconds).",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Smoothly scroll to follow a character and stabilize the camera when jumping.",
+      "fullName": "Smooth platformer camera",
+      "name": "SmoothPlatformerCamera",
+      "objectType": "",
+      "eventsFunctions": []
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "The camera follows an object according to:\n- a frame rate independent catch-up speed to make the scrolling from smooth to strong\n- a maximum speed to do linear following ([open the project online](https://editor.gdevelop.io/?project=example://platformer-with-tilemap)) or slow down the camera when teleporting the object\n- a follow-free zone to avoid scrolling on small movements\n- an offset to see further in one direction\n- an extra delay and catch-up speed to give an impression of speed (useful for dash)\n- position forecasting and delay to simulate a cameraman response time\n\nA platformer dedicated behavior allows to switch of settings when the character is in air or on the floor. This can be used to stabilize the camera when jumping.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjQsMTNoLTZjLTEuMSwwLTItMC45LTItMlY1YzAtMS4xLDAuOS0yLDItMmg2YzEuMSwwLDIsMC45LDIsMnY2QzI2LDEyLjEsMjUuMSwxMywyNCwxM3oiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yNiw4djEwYzAsMS4xLTAuOSwyLTIsMkg4Yy0xLjEsMC0yLTAuOS0yLTJWOGMwLTEuMSwwLjktMiwyLTJoOCIvPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMjEiIGN5PSI4IiByPSIyIi8+DQo8Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSIxMSIgY3k9IjE2IiByPSIxIi8+DQo8cmVjdCB4PSI5IiB5PSI5IiBjbGFzcz0ic3QwIiB3aWR0aD0iNCIgaGVpZ2h0PSIzIi8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSIyMSwyOSAyMSwyOSAxMSwyOSAxMSwyOSAiLz4NCjxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjE4LDIwIDE4LDI5IDE0LDI5IDE0LDIwICIvPg0KPHJlY3QgeD0iNyIgeT0iMyIgY2xhc3M9InN0MCIgd2lkdGg9IjQiIGhlaWdodD0iMyIvPg0KPC9zdmc+DQo="
+}

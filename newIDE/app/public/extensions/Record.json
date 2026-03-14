@@ -1,0 +1,884 @@
+{
+  "author": "",
+  "category": "Advanced",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Record",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZpZGVvLXZpbnRhZ2UiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTgsMTQuNVYxMUExLDEgMCAwLDAgMTcsMTBIMTZDMTguMjQsOC4zOSAxOC43Niw1LjI3IDE3LjE1LDNDMTUuNTQsMC43OCAxMi40MiwwLjI2IDEwLjE3LDEuODdDOS41LDIuMzUgOC45NiwzIDguNiwzLjczQzYuMjUsMi4yOCAzLjE3LDMgMS43Miw1LjM3QzAuMjgsNy43MiAxLDEwLjggMy4zNiwxMi4yNUMzLjU3LDEyLjM3IDMuNzgsMTIuNSA0LDEyLjU4VjIxQTEsMSAwIDAsMCA1LDIySDE3QTEsMSAwIDAsMCAxOCwyMVYxNy41TDIyLDIxLjVWMTAuNUwxOCwxNC41TTEzLDRBMiwyIDAgMCwxIDE1LDZBMiwyIDAgMCwxIDEzLDhBMiwyIDAgMCwxIDExLDZBMiwyIDAgMCwxIDEzLDRNNiw2QTIsMiAwIDAsMSA4LDhBMiwyIDAgMCwxIDYsMTBBMiwyIDAgMCwxIDQsOEEyLDIgMCAwLDEgNiw2WiIgLz48L3N2Zz4=",
+  "name": "Record",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/video-vintage.svg",
+  "shortDescription": "Record gameplay as video clips for download.",
+  "version": "1.1.0",
+  "description": "Actions to record the game and let players download the clips. Includes options to pause and resume recordings. Additionally, frame rate and file format can be chosen.",
+  "origin": {
+    "identifier": "Record",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "dom apis,record,capture,video",
+  "authorIds": [
+    "AlZ3D1xkH0QDao7T37VZZUeYNpn1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "let tempElectron;\r",
+            "let tempFS;\r",
+            "\r",
+            "try {\r",
+            "    // will throw an error if undefined \r",
+            "    tempElectron = runtimeScene.getGame().getRenderer().getElectron();\r",
+            "    tempFS = runtimeScene.getGame().getRenderer().getElectronRemote().require('fs/promises');\r",
+            "} catch (error) {\r",
+            "    tempElectron = {};\r",
+            "    tempFS = false;\r",
+            "}\r",
+            "\r",
+            "const electron = tempElectron;\r",
+            "const fs = tempFS;\r",
+            "\r",
+            "gdjs._extensionRecord = {\r",
+            "    fs: fs,\r",
+            "    mediaRecorder: null,\r",
+            "    // Default settings for recording video\r",
+            "    options: {\r",
+            "        videoBitsPerSecond: 2500000,\r",
+            "        // audioBitsPerSecond: 128000,\r",
+            "        format: 'webm',\r",
+            "        codec: ''\r",
+            "    },\r",
+            "    // Default settings for recording GIF\r",
+            "    gif: {\r",
+            "        videoFramesPerSecond: 5,\r",
+            "        videoQuality: 10,\r",
+            "        videoDithering: false,\r",
+            "    },\r",
+            "    handler: {\r",
+            "        error: {\r",
+            "            event: false,\r",
+            "            name: '',\r",
+            "        },\r",
+            "        resume: false,\r",
+            "        pause: false,\r",
+            "        start: false,\r",
+            "        stop: false,\r",
+            "        save: false,\r",
+            "    },\r",
+            "    blob: null,\r",
+            "    fps: runtimeScene.getGame().getGameData().properties.minFPS,\r",
+            "    isFormatSupported:\r",
+            "        (format) => MediaRecorder.isTypeSupported('video/' + format) || GifRecorder.isTypeSupported('image/' + format),\r",
+            "    setError: (name) => {\r",
+            "        gdjs._extensionRecord.handler.error.event = true;\r",
+            "        gdjs._extensionRecord.handler.error.name = name;\r",
+            "    },\r",
+            "    gifMode: () => gdjs._extensionRecord.options.format === 'gif',\r",
+            "}\r",
+            "\r",
+            "/*\r",
+            "  MediaStream-GifRecorder\r",
+            "  https://github.com/kettek/MediaStream-GifRecorder\r",
+            "\r",
+            "  Under an MIT Licence\r",
+            "*/\r",
+            "!function(t){var e={};function i(n){if(e[n])return e[n].exports;var r=e[n]={i:n,l:!1,exports:{}};return t[n].call(r.exports,r,r.exports,i),r.l=!0,r.exports}i.m=t,i.c=e,i.d=function(t,e,n){i.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:n})},i.r=function(t){\"undefined\"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:\"Module\"}),Object.defineProperty(t,\"__esModule\",{value:!0})},i.t=function(t,e){if(1&e&&(t=i(t)),8&e)return t;if(4&e&&\"object\"==typeof t&&t&&t.__esModule)return t;var n=Object.create(null);if(i.r(n),Object.defineProperty(n,\"default\",{enumerable:!0,value:t}),2&e&&\"string\"!=typeof t)for(var r in t)i.d(n,r,function(e){return t[e]}.bind(null,r));return n},i.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return i.d(e,\"a\",e),e},i.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},i.p=\"\",i(i.s=1)}([function(t,e){!function(t){var e={};function i(n){if(e[n])return e[n].exports;var r=e[n]={i:n,l:!1,exports:{}};return t[n].call(r.exports,r,r.exports,i),r.l=!0,r.exports}i.m=t,i.c=e,i.d=function(t,e,n){i.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:n})},i.r=function(t){\"undefined\"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:\"Module\"}),Object.defineProperty(t,\"__esModule\",{value:!0})},i.t=function(t,e){if(1&e&&(t=i(t)),8&e)return t;if(4&e&&\"object\"==typeof t&&t&&t.__esModule)return t;var n=Object.create(null);if(i.r(n),Object.defineProperty(n,\"default\",{enumerable:!0,value:t}),2&e&&\"string\"!=typeof t)for(var r in t)i.d(n,r,function(e){return t[e]}.bind(null,r));return n},i.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return i.d(e,\"a\",e),e},i.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},i.p=\"\",i(i.s=2)}([function(t,e){t.exports=class{constructor(){this._listeners={}}addEventListener(t,e){t in this._listeners||(this._listeners[t]=[]),this._listeners[t].push(e)}removeEventListener(t,e){if(t in this._listeners)for(var i=this._listeners[t],n=0,r=i.length;n<r;n++)if(i[n]===e)return void i.splice(n,1)}dispatchEvent(t){if(!(t.type in this._listeners))return!0;for(var e=this._listeners[t.type].slice(),i=0,n=e.length;i<n;i++)e[i].call(this,t);return!t.defaultPrevented}}},function(t,e,i){t.exports=function(){return i(3)('!function(t){var e={};function i(r){if(e[r])return e[r].exports;var s=e[r]={i:r,l:!1,exports:{}};return t[r].call(s.exports,s,s.exports,i),s.l=!0,s.exports}i.m=t,i.c=e,i.d=function(t,e,r){i.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:r})},i.r=function(t){\"undefined\"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:\"Module\"}),Object.defineProperty(t,\"__esModule\",{value:!0})},i.t=function(t,e){if(1&e&&(t=i(t)),8&e)return t;if(4&e&&\"object\"==typeof t&&t&&t.__esModule)return t;var r=Object.create(null);if(i.r(r),Object.defineProperty(r,\"default\",{enumerable:!0,value:t}),2&e&&\"string\"!=typeof t)for(var s in t)i.d(r,s,function(e){return t[e]}.bind(null,s));return r},i.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return i.d(e,\"a\",e),e},i.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},i.p=\"\",i(i.s=3)}([function(t,e){\\n/*!\\n  LZWEncoder.js\\n\\n  Authors\\n  Kevin Weiner (original Java version - kweiner@fmsware.com)\\n  Thibault Imbert (AS3 version - bytearray.org)\\n  Johan Nordberg (JS version - code@johan-nordberg.com)\\n\\n  Acknowledgements\\n  GIFCOMPR.C - GIF Image compression routines\\n  Lempel-Ziv compression based on \\'compress\\'. GIF modifications by\\n  David Rowley (mgardi@watdcsu.waterloo.edu)\\n  GIF Image compression - modified \\'compress\\'\\n  Based on: compress.c - File compression ala IEEE Computer, June 1984.\\n  By Authors: Spencer W. Thomas (decvax!harpo!utah-cs!utah-gr!thomas)\\n  Jim McKie (decvax!mcvax!jim)\\n  Steve Davies (decvax!vax135!petsd!peora!srd)\\n  Ken Turkowski (decvax!decwrl!turtlevax!ken)\\n  James A. Woods (decvax!ihnp4!ames!jaw)\\n  Joe Orost (decvax!vax135!petsd!joe)\\n*/\\nvar i=-1,r=12,s=5003,o=[0,1,3,7,15,31,63,127,255,511,1023,2047,4095,8191,16383,32767,65535];t.exports=function(t,e,n,a){var h,l,u,p,f,c,y=Math.max(2,a),d=new Uint8Array(256),w=new Int32Array(s),g=new Int32Array(s),b=0,x=0,P=!1;function v(t,e){d[l++]=t,l>=254&&S(e)}function m(t){B(s),x=f+2,P=!0,F(f,t)}function B(t){for(var e=0;e<t;++e)w[e]=-1}function S(t){l>0&&(t.writeByte(l),t.writeBytes(d,0,l),l=0)}function T(t){return(1<<t)-1}function M(){return 0===remaining?i:(--remaining,255&n[curPixel++])}function F(t,e){for(h&=o[b],b>0?h|=t<<b:h=t,b+=n_bits;b>=8;)v(255&h,e),h>>=8,b-=8;if((x>u||P)&&(P?(u=T(n_bits=p),P=!1):(++n_bits,u=n_bits==r?1<<r:T(n_bits))),t==c){for(;b>0;)v(255&h,e),h>>=8,b-=8;S(e)}}this.encode=function(o){o.writeByte(y),remaining=t*e,curPixel=0,function(t,e){var o,n,a,h,y,d,b;for(p=t,P=!1,n_bits=p,u=T(n_bits),c=1+(f=1<<t-1),x=f+2,l=0,h=M(),b=0,o=s;o<65536;o*=2)++b;b=8-b,B(d=s),F(f,e);t:for(;(n=M())!=i;)if(o=(n<<r)+h,w[a=n<<b^h]!==o){if(w[a]>=0){y=d-a,0===a&&(y=1);do{if((a-=y)<0&&(a+=d),w[a]===o){h=g[a];continue t}}while(w[a]>=0)}F(h,e),h=n,x<1<<r?(g[a]=x++,w[a]=o):m(e)}else h=g[a];F(h,e),F(c,e)}(y+1,o),o.writeByte(0)}}},function(t,e){\\n/*! NeuQuant Neural-Net Quantization Algorithm\\n * ------------------------------------------\\n *\\n * Copyright (c) 1994 Anthony Dekker\\n *\\n * NEUQUANT Neural-Net quantization algorithm by Anthony Dekker, 1994.\\n * See \"Kohonen neural networks for optimal colour quantization\"\\n * in \"Network: Computation in Neural Systems\" Vol. 5 (1994) pp 351-367.\\n * for a discussion of the algorithm.\\n * See also  http://members.ozemail.com.au/~dekker/NEUQUANT.HTML\\n *\\n * Any party obtaining a copy of these files from the author, directly or\\n * indirectly, is granted, free of charge, a full and unrestricted irrevocable,\\n * world-wide, paid up, royalty-free, nonexclusive right and license to deal\\n * in this software and documentation files (the \"Software\"), including without\\n * limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,\\n * and/or sell copies of the Software, and to permit persons who receive\\n * copies from any such party to do so, with the only requirement being\\n * that this copyright notice remain intact.\\n *\\n * (JavaScript port 2012 by Johan Nordberg)\\n */\\nvar i=100,r=256,s=r-1,o=4,n=16,a=1<<n,h=10,l=10,u=a>>l,p=a<<h-l,f=6,c=(r>>3)*(1<<f),y=30,d=1024,w=256,g=1<<18,b=499,x=491,P=487,v=503,m=3*v;t.exports=function(t,e){var B,S,T,M,F;function A(t,e,i,r,s){B[e][0]-=t*(B[e][0]-i)/d,B[e][1]-=t*(B[e][1]-r)/d,B[e][2]-=t*(B[e][2]-s)/d}function C(t,e,i,s,o){for(var n,a,h=Math.abs(e-t),l=Math.min(e+t,r),u=e+1,p=e-1,f=1;u<l||p>h;)a=F[f++],u<l&&((n=B[u++])[0]-=a*(n[0]-i)/g,n[1]-=a*(n[1]-s)/g,n[2]-=a*(n[2]-o)/g),p>h&&((n=B[p--])[0]-=a*(n[0]-i)/g,n[1]-=a*(n[1]-s)/g,n[2]-=a*(n[2]-o)/g)}function D(t,e,i){var s,a,f,c,y,d=~(1<<31),w=d,g=-1,b=g;for(s=0;s<r;s++)a=B[s],(f=Math.abs(a[0]-t)+Math.abs(a[1]-e)+Math.abs(a[2]-i))<d&&(d=f,g=s),(c=f-(T[s]>>n-o))<w&&(w=c,b=s),y=M[s]>>l,M[s]-=y,T[s]+=y<<h;return M[g]+=u,T[g]-=p,b}this.buildColormap=function(){!function(){var t,e;for(B=[],S=new Int32Array(256),T=new Int32Array(r),M=new Int32Array(r),F=new Int32Array(r>>3),t=0;t<r;t++)e=(t<<o+8)/r,B[t]=new Float64Array([e,e,e,0]),M[t]=a/r,T[t]=0}(),function(){var r,s,n,a,h,l,u=t.length,p=30+(e-1)/3,g=u/(3*e),B=~~(g/i),S=d,T=c,M=T>>f;for(M<=1&&(M=0),r=0;r<M;r++)F[r]=S*((M*M-r*r)*w/(M*M));u<m?(e=1,s=3):s=u%b!=0?3*b:u%x!=0?3*x:u%P!=0?3*P:3*v;var I=0;for(r=0;r<g;)if(A(S,l=D(n=(255&t[I])<<o,a=(255&t[I+1])<<o,h=(255&t[I+2])<<o),n,a,h),0!==M&&C(M,l,n,a,h),(I+=s)>=u&&(I-=u),0===B&&(B=1),++r%B==0)for(S-=S/p,(M=(T-=T/y)>>f)<=1&&(M=0),l=0;l<M;l++)F[l]=S*((M*M-l*l)*w/(M*M))}(),function(){for(var t=0;t<r;t++)B[t][0]>>=o,B[t][1]>>=o,B[t][2]>>=o,B[t][3]=t}(),function(){var t,e,i,o,n,a,h=0,l=0;for(t=0;t<r;t++){for(n=t,a=(i=B[t])[1],e=t+1;e<r;e++)(o=B[e])[1]<a&&(n=e,a=o[1]);if(o=B[n],t!=n&&(e=o[0],o[0]=i[0],i[0]=e,e=o[1],o[1]=i[1],i[1]=e,e=o[2],o[2]=i[2],i[2]=e,e=o[3],o[3]=i[3],i[3]=e),a!=h){for(S[h]=l+t>>1,e=h+1;e<a;e++)S[e]=t;h=a,l=t}}for(S[h]=l+s>>1,e=h+1;e<256;e++)S[e]=s}()},this.getColormap=function(){for(var t=[],e=[],i=0;i<r;i++)e[B[i][3]]=i;for(var s=0,o=0;o<r;o++){var n=e[o];t[s++]=B[n][0],t[s++]=B[n][1],t[s++]=B[n][2]}return t},this.lookupRGB=function(t,e,i){for(var s,o,n,a=1e3,h=-1,l=S[e],u=l-1;l<r||u>=0;)l<r&&((n=(o=B[l])[1]-e)>=a?l=r:(l++,n<0&&(n=-n),(s=o[0]-t)<0&&(s=-s),(n+=s)<a&&((s=o[2]-i)<0&&(s=-s),(n+=s)<a&&(a=n,h=o[3])))),u>=0&&((n=e-(o=B[u])[1])>=a?u=-1:(u--,n<0&&(n=-n),(s=o[0]-t)<0&&(s=-s),(n+=s)<a&&((s=o[2]-i)<0&&(s=-s),(n+=s)<a&&(a=n,h=o[3]))));return h}}},function(t,e){\\n/*!\\n  ByteArray.js\\n\\n  Authors\\n  Kevin Weiner (original Java version - kweiner@fmsware.com)\\n  Thibault Imbert (AS3 version - bytearray.org)\\n  Johan Nordberg (JS version - code@johan-nordberg.com)\\n  Ketchetwahmeegwun T. Southall (JavaScript restructure - kettek@kettek.net)\\n*/\\nfunction i(){this.page=-1,this.pages=[],this.newPage()}i.pageSize=4096,i.charMap={};for(var r=0;r<256;r++)i.charMap[r]=String.fromCharCode(r);i.prototype.newPage=function(){this.pages[++this.page]=new Uint8Array(i.pageSize),this.cursor=0},i.prototype.getData=function(){for(var t=\"\",e=0;e<this.pages.length;e++)for(var r=0;r<i.pageSize;r++)t+=i.charMap[this.pages[e][r]];return t},i.prototype.writeByte=function(t){this.cursor>=i.pageSize&&this.newPage(),this.pages[this.page][this.cursor++]=t},i.prototype.writeUTFBytes=function(t){for(var e=t.length,i=0;i<e;i++)this.writeByte(t.charCodeAt(i))},i.prototype.writeBytes=function(t,e,i){for(var r=i||t.length,s=e||0;s<r;s++)this.writeByte(t[s])},t.exports=i},function(t,e,i){\"use strict\";i.r(e);var r=i(0),s=i.n(r),o=i(1),n=i.n(o),a=i(2),h=i.n(a);\\n/*!\\n  GifFrame.worker.js\\n\\n  Authors\\n  Kevin Weiner (original Java version - kweiner@fmsware.com)\\n  Thibault Imbert (AS3 version - bytearray.org)\\n  Johan Nordberg (JS version - code@johan-nordberg.com)\\n  Ketchetwahmeegwun T. Southall (JavaScript restructure - kettek@kettek.net)\\n*/\\nfunction l(t,e){this.width=~~t,this.height=~~e,this.transparent=null,this.transIndex=0,this.repeat=-1,this.delay=0,this.image=null,this.pixels=null,this.indexedPixels=null,this.colorDepth=null,this.colorTab=null,this.neuQuant=null,this.usedEntry=new Array,this.palSize=7,this.dispose=-1,this.firstFrame=!0,this.sample=10,this.dither=!1,this.globalPalette=!1,this.out=new h.a}l.prototype.setDelay=function(t){this.delay=Math.round(t/10)},l.prototype.setFrameRate=function(t){this.delay=Math.round(100/t)},l.prototype.setDispose=function(t){t>=0&&(this.dispose=t)},l.prototype.setRepeat=function(t){this.repeat=t},l.prototype.setTransparent=function(t){this.transparent=t},l.prototype.addFrame=function(t){this.image=t,this.colorTab=this.globalPalette&&this.globalPalette.slice?this.globalPalette:null,this.getImagePixels(),this.analyzePixels(),!0===this.globalPalette&&(this.globalPalette=this.colorTab),this.firstFrame&&(this.writeLSD(),this.writePalette(),this.repeat>=0&&this.writeNetscapeExt()),this.writeGraphicCtrlExt(),this.writeImageDesc(),this.firstFrame||this.globalPalette||this.writePalette(),this.writePixels(),this.firstFrame=!1},l.prototype.finish=function(){this.out.writeByte(59)},l.prototype.setQuality=function(t){t<1&&(t=1),this.sample=t},l.prototype.setDither=function(t){!0===t&&(t=\"FloydSteinberg\"),this.dither=t},l.prototype.setGlobalPalette=function(t){this.globalPalette=t},l.prototype.getGlobalPalette=function(){return this.globalPalette&&this.globalPalette.slice&&this.globalPalette.slice(0)||this.globalPalette},l.prototype.writeHeader=function(){this.out.writeUTFBytes(\"GIF89a\")},l.prototype.analyzePixels=function(){this.colorTab||(this.neuQuant=new n.a(this.pixels,this.sample),this.neuQuant.buildColormap(),this.colorTab=this.neuQuant.getColormap()),this.dither?this.ditherPixels(this.dither.replace(\"-serpentine\",\"\"),null!==this.dither.match(/-serpentine/)):this.indexPixels(),this.pixels=null,this.colorDepth=8,this.palSize=7,null!==this.transparent&&(this.transIndex=this.findClosest(this.transparent,!0))},l.prototype.indexPixels=function(t){var e=this.pixels.length/3;this.indexedPixels=new Uint8Array(e);for(var i=0,r=0;r<e;r++){var s=this.findClosestRGB(255&this.pixels[i++],255&this.pixels[i++],255&this.pixels[i++]);this.usedEntry[s]=!0,this.indexedPixels[r]=s}},l.prototype.ditherPixels=function(t,e){var i={FalseFloydSteinberg:[[3/8,1,0],[3/8,0,1],[.25,1,1]],FloydSteinberg:[[7/16,1,0],[3/16,-1,1],[5/16,0,1],[1/16,1,1]],Stucki:[[8/42,1,0],[4/42,2,0],[2/42,-2,1],[4/42,-1,1],[8/42,0,1],[4/42,1,1],[2/42,2,1],[1/42,-2,2],[2/42,-1,2],[4/42,0,2],[2/42,1,2],[1/42,2,2]],Atkinson:[[1/8,1,0],[1/8,2,0],[1/8,-1,1],[1/8,0,1],[1/8,1,1],[1/8,0,2]]};if(!t||!i[t])throw\"Unknown dithering kernel: \"+t;var r=i[t],s=0,o=this.height,n=this.width,a=this.pixels,h=e?-1:1;this.indexedPixels=new Uint8Array(this.pixels.length/3);for(var l=0;l<o;l++){e&&(h*=-1);for(var u=1==h?0:n-1,p=1==h?n:0;u!==p;u+=h){var f=3*(s=l*n+u),c=a[f],y=a[f+1],d=a[f+2];f=this.findClosestRGB(c,y,d),this.usedEntry[f]=!0,this.indexedPixels[s]=f,f*=3;for(var w=c-this.colorTab[f],g=y-this.colorTab[f+1],b=d-this.colorTab[f+2],x=1==h?0:r.length-1,P=1==h?r.length:0;x!==P;x+=h){var v=r[x][1],m=r[x][2];if(v+u>=0&&v+u<n&&m+l>=0&&m+l<o){var B=r[x][0];f=s+v+m*n,a[f*=3]=Math.max(0,Math.min(255,a[f]+w*B)),a[f+1]=Math.max(0,Math.min(255,a[f+1]+g*B)),a[f+2]=Math.max(0,Math.min(255,a[f+2]+b*B))}}}}},l.prototype.findClosest=function(t,e){return this.findClosestRGB((16711680&t)>>16,(65280&t)>>8,255&t,e)},l.prototype.findClosestRGB=function(t,e,i,r){if(null===this.colorTab)return-1;if(this.neuQuant&&!r)return this.neuQuant.lookupRGB(t,e,i);for(var s=0,o=16777216,n=this.colorTab.length,a=0,h=0;a<n;h++){var l=t-(255&this.colorTab[a++]),u=e-(255&this.colorTab[a++]),p=i-(255&this.colorTab[a++]),f=l*l+u*u+p*p;(!r||this.usedEntry[h])&&f<o&&(o=f,s=h)}return s},l.prototype.getImagePixels=function(){var t=this.width,e=this.height;this.pixels=new Uint8Array(t*e*3);for(var i=this.image,r=0,s=0,o=0;o<e;o++)for(var n=0;n<t;n++)this.pixels[s++]=i[r++],this.pixels[s++]=i[r++],this.pixels[s++]=i[r++],r++},l.prototype.writeGraphicCtrlExt=function(){var t,e;this.out.writeByte(33),this.out.writeByte(249),this.out.writeByte(4),null===this.transparent?(t=0,e=0):(t=1,e=2),this.dispose>=0&&(e=7&this.dispose),e<<=2,this.out.writeByte(0|e|t),this.writeShort(this.delay),this.out.writeByte(this.transIndex),this.out.writeByte(0)},l.prototype.writeImageDesc=function(){this.out.writeByte(44),this.writeShort(0),this.writeShort(0),this.writeShort(this.width),this.writeShort(this.height),this.firstFrame||this.globalPalette?this.out.writeByte(0):this.out.writeByte(128|this.palSize)},l.prototype.writeLSD=function(){this.writeShort(this.width),this.writeShort(this.height),this.out.writeByte(240|this.palSize),this.out.writeByte(0),this.out.writeByte(0)},l.prototype.writeNetscapeExt=function(){this.out.writeByte(33),this.out.writeByte(255),this.out.writeByte(11),this.out.writeUTFBytes(\"NETSCAPE2.0\"),this.out.writeByte(3),this.out.writeByte(1),this.writeShort(this.repeat),this.out.writeByte(0)},l.prototype.writePalette=function(){this.out.writeBytes(this.colorTab);for(var t=768-this.colorTab.length,e=0;e<t;e++)this.out.writeByte(0)},l.prototype.writeShort=function(t){this.out.writeByte(255&t),this.out.writeByte(t>>8&255)},l.prototype.writePixels=function(){new s.a(this.width,this.height,this.indexedPixels,this.colorDepth).encode(this.out)},l.prototype.stream=function(){return this.out},self.onmessage=function(t){const e=t.data,i=new l(e.width,e.height);0===e.index?i.writeHeader():i.firstFrame=!1,i.setTransparent(e.transparent),i.setDispose(e.dispose),i.setRepeat(e.repeat),i.setDelay(e.delay),i.setQuality(e.quality),i.setDither(e.dither),i.setGlobalPalette(e.globalPalette),i.addFrame(e.data),e.last&&i.finish(),!0===e.globalPalette&&(e.globalPalette=i.getGlobalPalette());const r=i.stream();if(e.data=r.pages,e.cursor=r.cursor,e.pageSize=r.constructor.pageSize,e.canTransfer){const t=Array.from(e.data).map(t=>t.buffer);return self.postMessage(e,t)}return self.postMessage(e)}}]);',i.p+\"a64f2600dfa962d9062c.worker.js\")}},function(t,e,i){\"use strict\";i.r(e);var n=i(0),r=i.n(n),s=i(1),o=i.n(s);window.GifEncoder=\r",
+            "/*!\r",
+            "  GifEncoder.js\r",
+            "\r",
+            "  Authors\r",
+            "  Kevin Weiner (original Java version - kweiner@fmsware.com)\r",
+            "  Thibault Imbert (AS3 version - bytearray.org)\r",
+            "  Johan Nordberg (JS version - code@johan-nordberg.com)\r",
+            "  Ketchetwahmeegwun T. Southall (JavaScript restructure - kettek@kettek.net)\r",
+            "*/\r",
+            "class extends r.a{constructor(t){super(),this._running=!1,this._options=Object.assign({workers:2,repeat:0,background:\"#000\",quality:10,width:null,height:null,transparent:null,debug:!1,dither:!1},t),this._frames=[],this._freeWorkers=[],this._activeWorkers=[]}setWidth(t){this._options.width=t,null!=this._canvas&&(this._canvas.width=t)}setHeight(t){this._options.height=t,null!=this._canvas&&(this._canvas.height=t)}addFrame(t,e){e=e||{};const i=Object.assign({delay:500,copy:!1,dispose:-1,transparent:this._options.transparent},e);if(null==this._options.width&&this.setWidth(t.width),null==this._options.height&&this.setHeight(t.height),t instanceof ImageData)i.data=t.data;else if(t instanceof CanvasRenderingContext2D||t instanceof WebGLRenderingContext)e.copy?i.data=this.getContextData(t):i.context=t;else{if(null==t.childNodes)throw new Error(\"Invalid image\");e.copy?i.data=this.getImageData(t):i.image=t}return this._frames.push(i)}get running(){return this._running}render(){let t;if(this.running)throw new Error(\"Already running\");if(null==this._options.width||null==this._options.height)throw new Error(\"Width and height must be set prior to rendering\");this._running=!0,this._nextFrame=0,this._finishedFrames=0,this._imageParts=(()=>{let e,i;const n=[];for(t=0,e=0<=(i=this._frames.length);e?t<i:t>i;e?t++:t--)n.push(null);return n})();const e=this.spawnWorkers();if(!0===this._options.globalPalette)this.renderNextFrame();else{let i,n;for(t=0,i=0<=(n=e);i?t<n:t>n;i?t++:t--)this.renderNextFrame()}return this.dispatchEvent(new ProgressEvent(\"start\")),this.dispatchEvent(new ProgressEvent(\"progress\",{loaded:this._finishedFrames,total:this._frames.length}))}abort(){for(;;){var t=this._activeWorkers.shift();if(null==t)break;t.terminate()}this._running=!1,this.dispatchEvent(new ProgressEvent(\"abort\"))}spawnWorkers(){const t=Math.min(this._options.workers,this._frames.length);return function(t,e,i){let n=[],r=t<e,s=e;for(let e=t;r?e<s:e>s;r?e++:e--)n.push(e);return n}(this._freeWorkers.length,t).forEach(t=>{const e=new o.a;return e.onmessage=t=>(this._activeWorkers.splice(this._activeWorkers.indexOf(e),1),this._freeWorkers.push(e),this.frameFinished(t.data)),this._freeWorkers.push(e)}),t}frameFinished(t){if(this._finishedFrames++,this.dispatchEvent(new ProgressEvent(\"progress\",{loaded:this._finishedFrames,total:this._frames.length})),this._imageParts[t.index]=t,!0===this._options.globalPalette&&(this._options.globalPalette=t.globalPalette,this._frames.length>2))for(let t=1,e=this._freeWorkers.length,i=1<=e;i?t<e:t>e;i?t++:t--)this._renderNextFrame();return Array.from(this._imageParts).includes(null)?this.renderNextFrame():this.finishRendering()}finishRendering(){let t,e=0;for(t of Array.from(this._imageParts))e+=(t.data.length-1)*t.pageSize+t.cursor;e+=t.pageSize-t.cursor;const i=new Uint8Array(e);let n=0;for(t of Array.from(this._imageParts))for(let e=0;e<t.data.length;e++){const r=t.data[e];i.set(r,n),e===t.data.length-1?n+=t.cursor:n+=t.pageSize}const r=new Blob([i],{type:\"image/gif\"});return this.dispatchEvent(new BlobEvent(\"finished\",{data:r}))}renderNextFrame(){if(0===this._freeWorkers.length)throw new Error(\"No free workers\");if(this._nextFrame>=this._frames.length)return;const t=this._frames[this._nextFrame++],e=this._freeWorkers.shift(),i=this.getTask(t);return this._activeWorkers.push(e),e.postMessage(i)}getContextData(t){return t.getImageData(0,0,this._options.width,this._options.height).data}getImageData(t){null==this._canvas&&(this._canvas=document.createElement(\"canvas\"),this._canvas.width=this._options.width,this._canvas.height=this._options.height);const e=this._canvas.getContext(\"2d\");return e.setFill=this._options.background,e.fillRect(0,0,this._options.width,this._options.height),e.drawImage(t,0,0),this.getContextData(e)}getTask(t){const e=this._frames.indexOf(t),i={index:e,last:e===this._frames.length-1,delay:t.delay,dispose:t.dispose,transparent:t.transparent,width:this._options.width,height:this._options.height,quality:this._options.quality,dither:this._options.dither,globalPalette:this._options.globalPalette,repeat:this._options.repeat};if(null!=t.data)i.data=t.data;else if(null!=t.context)i.data=this._getContextData(t.context);else{if(null==t.image)throw new Error(\"Invalid frame\");i.data=this._getImageData(t.image)}return i}}},function(t,e,i){\"use strict\";var n=window.URL||window.webkitURL;t.exports=function(t,e){try{try{var i;try{(i=new(window.BlobBuilder||window.WebKitBlobBuilder||window.MozBlobBuilder||window.MSBlobBuilder)).append(t),i=i.getBlob()}catch(e){i=new Blob([t])}return new Worker(n.createObjectURL(i))}catch(e){return new Worker(\"data:application/javascript,\"+encodeURIComponent(t))}}catch(t){if(!e)throw Error(\"Inline worker is not supported\");return new Worker(e)}}}])},function(t,e,i){\"use strict\";i.r(e),i.d(e,\"default\",(function(){return b}));i(0);const n=new WeakMap,r=new WeakMap;function s(t){const e=n.get(t);return console.assert(null!=e,\"'this' is expected an Event object, but got\",t),e}function o(t){null==t.passiveListener?t.event.cancelable&&(t.canceled=!0,\"function\"==typeof t.event.preventDefault&&t.event.preventDefault()):\"undefined\"!=typeof console&&\"function\"==typeof console.error&&console.error(\"Unable to preventDefault inside passive event listener invocation.\",t.passiveListener)}function a(t,e){n.set(this,{eventTarget:t,event:e,eventPhase:2,currentTarget:t,canceled:!1,stopped:!1,immediateStopped:!1,passiveListener:null,timeStamp:e.timeStamp||Date.now()}),Object.defineProperty(this,\"isTrusted\",{value:!1,enumerable:!0});const i=Object.keys(e);for(let t=0;t<i.length;++t){const e=i[t];e in this||Object.defineProperty(this,e,h(e))}}function h(t){return{get(){return s(this).event[t]},set(e){s(this).event[t]=e},configurable:!0,enumerable:!0}}function l(t){return{value(){const e=s(this).event;return e[t].apply(e,arguments)},configurable:!0,enumerable:!0}}function u(t){if(null==t||t===Object.prototype)return a;let e=r.get(t);return null==e&&(e=function(t,e){const i=Object.keys(e);if(0===i.length)return t;function n(e,i){t.call(this,e,i)}n.prototype=Object.create(t.prototype,{constructor:{value:n,configurable:!0,writable:!0}});for(let r=0;r<i.length;++r){const s=i[r];if(!(s in t.prototype)){const t=\"function\"==typeof Object.getOwnPropertyDescriptor(e,s).value;Object.defineProperty(n.prototype,s,t?l(s):h(s))}}return n}(u(Object.getPrototypeOf(t)),t),r.set(t,e)),e}function c(t){return s(t).immediateStopped}function p(t,e){s(t).passiveListener=e}a.prototype={get type(){return s(this).event.type},get target(){return s(this).eventTarget},get currentTarget(){return s(this).currentTarget},composedPath(){const t=s(this).currentTarget;return null==t?[]:[t]},get NONE(){return 0},get CAPTURING_PHASE(){return 1},get AT_TARGET(){return 2},get BUBBLING_PHASE(){return 3},get eventPhase(){return s(this).eventPhase},stopPropagation(){const t=s(this);t.stopped=!0,\"function\"==typeof t.event.stopPropagation&&t.event.stopPropagation()},stopImmediatePropagation(){const t=s(this);t.stopped=!0,t.immediateStopped=!0,\"function\"==typeof t.event.stopImmediatePropagation&&t.event.stopImmediatePropagation()},get bubbles(){return Boolean(s(this).event.bubbles)},get cancelable(){return Boolean(s(this).event.cancelable)},preventDefault(){o(s(this))},get defaultPrevented(){return s(this).canceled},get composed(){return Boolean(s(this).event.composed)},get timeStamp(){return s(this).timeStamp},get srcElement(){return s(this).eventTarget},get cancelBubble(){return s(this).stopped},set cancelBubble(t){if(!t)return;const e=s(this);e.stopped=!0,\"boolean\"==typeof e.event.cancelBubble&&(e.event.cancelBubble=!0)},get returnValue(){return!s(this).canceled},set returnValue(t){t||o(s(this))},initEvent(){}},Object.defineProperty(a.prototype,\"constructor\",{value:a,configurable:!0,writable:!0}),\"undefined\"!=typeof window&&void 0!==window.Event&&(Object.setPrototypeOf(a.prototype,window.Event.prototype),r.set(window.Event.prototype,a));const d=new WeakMap;function f(t){return null!==t&&\"object\"==typeof t}function g(t){const e=d.get(t);if(null==e)throw new TypeError(\"'this' is expected an EventTarget object, but got another value.\");return e}function y(t,e){Object.defineProperty(t,\"on\"+e,function(t){return{get(){let e=g(this).get(t);for(;null!=e;){if(3===e.listenerType)return e.listener;e=e.next}return null},set(e){\"function\"==typeof e||f(e)||(e=null);const i=g(this);let n=null,r=i.get(t);for(;null!=r;)3===r.listenerType?null!==n?n.next=r.next:null!==r.next?i.set(t,r.next):i.delete(t):n=r,r=r.next;if(null!==e){const r={listener:e,listenerType:3,passive:!1,once:!1,next:null};null===n?i.set(t,r):n.next=r}},configurable:!0,enumerable:!0}}(e))}function v(t){function e(){m.call(this)}e.prototype=Object.create(m.prototype,{constructor:{value:e,configurable:!0,writable:!0}});for(let i=0;i<t.length;++i)y(e.prototype,t[i]);return e}function m(){if(!(this instanceof m)){if(1===arguments.length&&Array.isArray(arguments[0]))return v(arguments[0]);if(arguments.length>0){const t=new Array(arguments.length);for(let e=0;e<arguments.length;++e)t[e]=arguments[e];return v(t)}throw new TypeError(\"Cannot call a class as a function\")}d.set(this,new Map)}m.prototype={addEventListener(t,e,i){if(null==e)return;if(\"function\"!=typeof e&&!f(e))throw new TypeError(\"'listener' should be a function or an object.\");const n=g(this),r=f(i),s=(r?Boolean(i.capture):Boolean(i))?1:2,o={listener:e,listenerType:s,passive:r&&Boolean(i.passive),once:r&&Boolean(i.once),next:null};let a=n.get(t);if(void 0===a)return void n.set(t,o);let h=null;for(;null!=a;){if(a.listener===e&&a.listenerType===s)return;h=a,a=a.next}h.next=o},removeEventListener(t,e,i){if(null==e)return;const n=g(this),r=(f(i)?Boolean(i.capture):Boolean(i))?1:2;let s=null,o=n.get(t);for(;null!=o;){if(o.listener===e&&o.listenerType===r)return void(null!==s?s.next=o.next:null!==o.next?n.set(t,o.next):n.delete(t));s=o,o=o.next}},dispatchEvent(t){if(null==t||\"string\"!=typeof t.type)throw new TypeError('\"event.type\" should be a string.');const e=g(this),i=t.type;let n=e.get(i);if(null==n)return!0;const r=function(t,e){return new(u(Object.getPrototypeOf(e)))(t,e)}(this,t);let o=null;for(;null!=n;){if(n.once?null!==o?o.next=n.next:null!==n.next?e.set(i,n.next):e.delete(i):o=n,p(r,n.passive?n.listener:null),\"function\"==typeof n.listener)try{n.listener.call(this,r)}catch(t){\"undefined\"!=typeof console&&\"function\"==typeof console.error&&console.error(t)}else 3!==n.listenerType&&\"function\"==typeof n.listener.handleEvent&&n.listener.handleEvent(r);if(c(r))break;n=n.next}return p(r,null),function(t,e){s(t).eventPhase=e}(r,0),function(t,e){s(t).currentTarget=e}(r,null),!r.defaultPrevented}},Object.defineProperty(m.prototype,\"constructor\",{value:m,configurable:!0,writable:!0}),\"undefined\"!=typeof window&&void 0!==window.EventTarget&&Object.setPrototypeOf(m.prototype,window.EventTarget.prototype);\"undefined\"==typeof BlobEvent&&(BlobEvent=class extends Event{constructor(t,e){super(t,e),this.data=e.data}});const w=(t,e)=>e.every(e=>t.includes(e));class b extends m{constructor(t,e){super(),this.options=Object.assign({videoFramesPerSecond:5,videoDithering:\"FloydSteinberg\",videoQuality:10,webWorkers:4},e),this._videoFramesPerSecond=this.options.videoFramesPerSecond,this._videoDithering=this.options.videoDithering,this._videoQuality=this.options.videoQuality,this._webWorkers=this.options.webWorkers,this._state=\"inactive\",this._stream=t,this._canStart=!1,this._waitingToStart=!1,this._encoder=null,this._video=document.createElement(\"video\"),this._video.muted=!0,this._video.autoplay=!0,this._video.playsInline=!0,this._video.addEventListener(\"loadeddata\",()=>{this._canvas.width=this.options.dwidth?this.options.dwidth:this._video.videoWidth,this._canvas.height=this.options.dheight?this.options.dheight:this._video.videoHeight,!this._canStart&&this._waitingToStart&&(this._canStart=!0,this.start())}),this._canvas=document.createElement(\"canvas\"),this._context=this._canvas.getContext(\"2d\"),this._ar=null,this._accumulator=0,this._lastTimestamp=0}static isTypeSupported(t){return\"image/gif\"===t}static get mimeType(){return\"image/gif\"}get state(){return this._state}get stream(){return this._stream}pause(){\"recording\"==this._state&&(cancelAnimationFrame(this._ar),this._state=\"paused\",this.dispatchEvent(new CustomEvent(\"pause\")))}resume(){\"paused\"==this._state&&(this._state=\"recording\",this.dispatchEvent(new CustomEvent(\"resume\")),this._ar=requestAnimationFrame(t=>{this._accumulator=0,this._lastTimestamp=performance.now()-1/this._videoFramesPerSecond*1e3,this.capture(t)}))}start(t){\"inactive\"==this._state&&(this._video.srcObject=this._stream,this._canStart?(this._video.paused&&this._video.play(),this._encoder=new window.GifEncoder({workers:this._webWorkers,quality:this._videoQuality,dither:this._videoDithering,width:this._canvas.width,height:this._canvas.height}),this._encoder.addEventListener(\"finished\",t=>{this.dispatchEvent(new BlobEvent(\"dataavailable\",{data:t.data}))}),this._encoder.addEventListener(\"progress\",t=>{this.dispatchEvent(t)}),this._lastTimestamp=performance.now(),this._accumulator=0,this._state=\"recording\",this._ar=requestAnimationFrame(t=>this.capture(t)),this.dispatchEvent(new CustomEvent(\"start\"))):this._waitingToStart=!0)}stop(){\"inactive\"!=this._state&&(this._canStart=!1,this._waitingToStart=!1,this._state=\"inactive\",this._encoder.render(),this.dispatchEvent(new CustomEvent(\"stop\")))}requestData(){console.error(\"requestData not implemented.\")}capture(t){this._accumulator+=t-this._lastTimestamp;for(var e=1/this._videoFramesPerSecond*1e3;this._accumulator>=e;){const t=this.options,i=Object.keys(t);w(i,[\"sx\",\"sy\",\"swidth\",\"sheight\",\"dx\",\"dy\",\"dwidth\",\"dheight\"])?this._context.drawImage(this._video,t.sx,t.sy,t.swidth,t.sheight,t.dx,t.dy,t.dwidth,t.dheight):this._context.drawImage(this._video,0,0),this._encoder.addFrame(this._context,{copy:!0,delay:e}),this._accumulator-=e}this._lastTimestamp=t,\"recording\"==this._state&&(this._ar=requestAnimationFrame(t=>this.capture(t)))}}window.GifRecorder=b}]);\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Start the recording.",
+      "fullName": "Start recording",
+      "functionType": "Action",
+      "group": "Basic",
+      "name": "Start",
+      "sentence": "Start recording",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const recorder = gdjs._extensionRecord;\r",
+            "const canvas = runtimeScene.getGame().getRenderer().getCanvas();\r",
+            "const stream = canvas.captureStream(recorder.fps);\r",
+            "const recordedChunks = [];\r",
+            "\r",
+            "if (recorder) {\r",
+            "  if (recorder.gifMode()) recorder.mediaRecorder = new GifRecorder(stream, recorder.gif);\r",
+            "  else recorder.mediaRecorder = new MediaRecorder(stream, recorder.options);\r",
+            "}\r",
+            "\r",
+            "recorder.mediaRecorder.addEventListener('error', (event) => recorder.setError(event.error.name));\r",
+            "recorder.mediaRecorder.addEventListener('resume', () => recorder.handler.resume = true);\r",
+            "recorder.mediaRecorder.addEventListener('pause', () => recorder.handler.pause = true);\r",
+            "recorder.mediaRecorder.addEventListener('start', () => recorder.handler.start = true);\r",
+            "recorder.mediaRecorder.addEventListener('save', () => recorder.handler.save = true);\r",
+            "recorder.mediaRecorder.addEventListener('stop', () => {\r",
+            "  if (!recorder.gifMode()) {\r",
+            "    recorder.blob = new Blob(recordedChunks, {\r",
+            "      type: 'video/' + recorder.options.format + recorder.options.codec\r",
+            "    });\r",
+            "  }\r",
+            "\r",
+            "  recorder.handler.stop = true;\r",
+            "});\r",
+            "recorder.mediaRecorder.addEventListener('dataavailable', (event) => {\r",
+            "  if (recorder.gifMode()) recorder.blob = event.data;\r",
+            "  if (event.data.size > 0) recordedChunks.push(event.data);\r",
+            "});\r",
+            "\r",
+            "recorder.mediaRecorder.start(2000);\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "End the recording.",
+      "fullName": "Stop recording",
+      "functionType": "Action",
+      "group": "Basic",
+      "name": "Stop",
+      "sentence": "Stop the recording",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (gdjs._extensionRecord.mediaRecorder) gdjs._extensionRecord.mediaRecorder.stop();\r",
+            "else gdjs._extensionRecord.setError('Stopping a recording that has not started');"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Pause recording.",
+      "fullName": "Pause recording",
+      "functionType": "Action",
+      "group": "Basic",
+      "name": "Pause",
+      "sentence": "Pause recording",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (gdjs._extensionRecord.mediaRecorder) gdjs._extensionRecord.mediaRecorder.pause();\r",
+            "else gdjs._extensionRecord.setError('Pausing a recording that has not started');"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Resume recording.",
+      "fullName": "Resume recording",
+      "functionType": "Action",
+      "group": "Basic",
+      "name": "Resume",
+      "sentence": "Resume recording",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (gdjs._extensionRecord.mediaRecorder) gdjs._extensionRecord.mediaRecorder.resume();\r",
+            "else gdjs._extensionRecord.setError('Resuming a recording that has not started');"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Save recording to the file system on destop, or to the downloads folder for web. Always ask for permission to save a file.",
+      "fullName": "Save recording",
+      "functionType": "Action",
+      "group": "Basic",
+      "name": "Save",
+      "sentence": "Save recording to _PARAM1_ as _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const recorder = gdjs._extensionRecord;\r",
+            "const path = eventsFunctionContext.getArgument('path');\r",
+            "const name = eventsFunctionContext.getArgument('name');\r",
+            "\r",
+            "if (!recorder.mediaRecorder) {\r",
+            "    recorder.setError('Saving a recording that has not started'); \r",
+            "} else if (!recorder.blob) {\r",
+            "    recorder.setError('Saving a recording that has not stopped'); \r",
+            "} else {\r",
+            "    if (recorder.fs) {\r",
+            "        desktopDownload().then(\r",
+            "            () => recorder.handler.save = true,\r",
+            "            () => recorder.setError('Recording could not be saved to disk'),\r",
+            "        );\r",
+            "    }\r",
+            "    else {\r",
+            "        webDownload();\r",
+            "    }\r",
+            "}\r",
+            "\r",
+            "async function desktopDownload() {\r",
+            "    const buffer = await Buffer.from(await recorder.blob.arrayBuffer());\r",
+            "    await recorder.fs.writeFile(path + '/' + name + '.' + recorder.options.format, buffer);\r",
+            "}\r",
+            "\r",
+            "function webDownload() {\r",
+            "    const href = URL.createObjectURL(recorder.blob);\r",
+            "    const ref = window.open(href, name);\r",
+            "    ref.onbeforeunload = () => URL.revokeObjectURL(href);\r",
+            "\r",
+            "    recorder.handler.save = true\r",
+            "};\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "File location, set using a FileSystem path e.g. FileSystem::DesktopPath() (only used for desktop saves)",
+          "name": "path",
+          "type": "string"
+        },
+        {
+          "description": "Name to save file as",
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns the current status of the reccorder: inactive (not recording), recording, or paused.",
+      "fullName": "Get current state",
+      "functionType": "StringExpression",
+      "group": "Advanced",
+      "name": "Status",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (gdjs._extensionRecord.mediaRecorder) eventsFunctionContext.returnValue = gdjs._extensionRecord.mediaRecorder.state;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the current framerate.",
+      "fullName": "Get frame rate",
+      "functionType": "Expression",
+      "group": "Options/Video",
+      "name": "FrameRate",
+      "sentence": "Set frame rate to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._extensionRecord.fps;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Set the frame rate, must be set before starting a recording. Defaults to the min FPS set in the game properties.",
+      "fullName": "Set frame rate",
+      "functionType": "Action",
+      "group": "Options/Video",
+      "name": "SetFrameRate",
+      "sentence": "Set frame rate to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "gdjs._extensionRecord.fps = eventsFunctionContext.getArgument('fps');\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Recommended fps for video: 25, 30, 60, for GIFs use 5, 10, 20",
+          "name": "fps",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns the current video bit rate per second.",
+      "fullName": "Get video bit rate per second",
+      "functionType": "Expression",
+      "group": "Options/Video",
+      "name": "VideoBitRate",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._extensionRecord.mediaRecorder.videoBitsPerSecond;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Set the video bit rate, must be set before starting a recording. Defaults to 2500000.",
+      "fullName": "Set video bit rate",
+      "functionType": "Action",
+      "group": "Options/Video",
+      "name": "SetVideoBitRate",
+      "sentence": "Set the video bit rate to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "gdjs._extensionRecord.options.videoBitsPerSecond = eventsFunctionContext.getArgument('rate');\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "video bits per second",
+          "name": "rate",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns the audio bit rate per second.  Defaults to 128000 if not set.",
+      "fullName": "Set audio bit rate",
+      "functionType": "Action",
+      "group": "Options/Video",
+      "name": "SetAudioBitRate",
+      "private": true,
+      "sentence": "Set the audio bit rate to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// Audio recording doesn't work. This function exsits for when it does.\r",
+            "eventsFunctionContext.returnValue = gdjs._extensionRecord.mediaRecorder.audioBitsPerSecond;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "audio bits per second",
+          "name": "rate",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns the audio bit rate per second.",
+      "fullName": "Get audio bit rate per second",
+      "functionType": "Expression",
+      "group": "Options/Video",
+      "name": "AudioBitRate",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// Audio recording doesn't work. This function exsits for when it does.\r",
+            "gdjs._extensionRecord.options.videoBitsPerSecond = eventsFunctionContext.getArgument('rate');\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Set the file format, if a selected file format is unsupported on the users platform a supported one will be picked by deafult.",
+      "fullName": "Set file format",
+      "functionType": "Action",
+      "group": "Options/Video",
+      "name": "SetFormat",
+      "sentence": "Set file format to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const format = eventsFunctionContext.getArgument('format');\r",
+            "const supported = gdjs._extensionRecord.isFormatSupported(format);\r",
+            "\r",
+            "if (supported === true) gdjs._extensionRecord.options.format = format;\r",
+            "else gdjs._extensionRecord.format = 'webm';\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Recording format",
+          "name": "format",
+          "supplementaryInformation": "[\"webm\",\"mp4\",\"ogg\",\"gif\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns the current video format.",
+      "fullName": "Get codec",
+      "functionType": "Expression",
+      "group": "Options/Video",
+      "name": "Format",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._extensionRecord.mediaRecorder.options.format;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Set the video codec, if a selected codec is unsupported on the users platform a supported one will be picked by deafult.",
+      "fullName": "Set codec",
+      "functionType": "Action",
+      "group": "Options/Video",
+      "name": "SetCodec",
+      "sentence": "Set video codec _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "gdjs._extensionRecord.options.codec = ';codecs=' + eventsFunctionContext.getArgument('codec');",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "codec",
+          "name": "codec",
+          "supplementaryInformation": "[\"webm\",\"mp4\",\"ogg\",\"gif\"]",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns the current video codec.",
+      "fullName": "Get video codec",
+      "functionType": "Expression",
+      "group": "Options/Video",
+      "name": "Codec",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._extensionRecord.mediaRecorder.options.codec;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "When an error occurs this method will return what type of error it is.",
+      "fullName": "Error type",
+      "functionType": "StringExpression",
+      "group": "Advanced",
+      "name": "ErrorType",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._extensionRecord.handler.error.name;\r",
+            "gdjs._extensionRecord.handler.error.name = '';"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if an error has occurred.",
+      "fullName": "When an errror has occurred ",
+      "functionType": "Condition",
+      "group": "Events",
+      "name": "OnError",
+      "sentence": "When an error has occurred",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._extensionRecord.handler.error.event;",
+            "gdjs._extensionRecord.handler.error.event = false;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a recording has just been paused.",
+      "fullName": "When recording has paused",
+      "functionType": "Condition",
+      "group": "Events",
+      "name": "OnPause",
+      "sentence": "When recording has paused",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._extensionRecord.handler.pause;\r",
+            "gdjs._extensionRecord.handler.pause = false;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a recording has just been resumed.",
+      "fullName": "When recording has resumed",
+      "functionType": "Condition",
+      "group": "Events",
+      "name": "OnResume",
+      "sentence": "When recording has resumed",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._extensionRecord.handler.resume;\r",
+            "gdjs._extensionRecord.handler.resume = false;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if recording has just started.",
+      "fullName": "When recording has started",
+      "functionType": "Condition",
+      "group": "Events",
+      "name": "OnStart",
+      "sentence": "When recording has started",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._extensionRecord.handler.start;\r",
+            "gdjs._extensionRecord.handler.start = false;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if recording has just stopped.",
+      "fullName": "When recording has stopped",
+      "functionType": "Condition",
+      "group": "Events",
+      "name": "OnStop",
+      "sentence": "When recording has stopped",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._extensionRecord.handler.stop;\r",
+            "gdjs._extensionRecord.handler.stop = false;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if recording has just been saved.",
+      "fullName": "When recording has saved",
+      "functionType": "Condition",
+      "group": "Events",
+      "name": "OnSave",
+      "sentence": "When recording has been saved",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._extensionRecord.handler.save;\r",
+            "gdjs._extensionRecord.handler.save = false;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the specified format is available on the users device. To avoid unsupported formats pick commons ones like MP4 or WebM.",
+      "fullName": "Is format supported on user device",
+      "functionType": "Condition",
+      "group": "Basic",
+      "name": "IsFormatSupported",
+      "sentence": "Check if _PARAM1_ is available on the users device",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue =\r",
+            "    gdjs._extensionRecord.isFormatSupported(eventsFunctionContext.getArgument('format'));"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Select a common format for the best results",
+          "name": "format",
+          "supplementaryInformation": "[\"webm\",\"mp4\",\"ogg\",\"gif\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the current GIF quality.",
+      "fullName": "Get frame rate",
+      "functionType": "Expression",
+      "group": "Options/GIF",
+      "name": "Quality",
+      "sentence": "Set frame rate to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._extensionRecord.gif.videoQuality;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Set the GIF quality, must be set before starting a recording. Defaults to 10.",
+      "fullName": "Set GIF quality",
+      "functionType": "Action",
+      "group": "Options/GIF",
+      "name": "SetQuality",
+      "sentence": "Set the GIF quality to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "gdjs._extensionRecord.gif.videoQuality = eventsFunctionContext.getArgument('quality');",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Quality",
+          "name": "quality",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns whether or not dithering is enabled for GIFs.",
+      "fullName": "Get frame rate",
+      "functionType": "Expression",
+      "group": "Options/GIF",
+      "name": "Dithering",
+      "sentence": "Set frame rate to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs._extensionRecord.gif.videoDithering;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Enable dithering in GIF, must be set before starting a recording. Defaults to false.",
+      "fullName": "Set GIF Dithering",
+      "functionType": "Action",
+      "group": "Options/GIF",
+      "name": "SetDithering",
+      "sentence": "Enable dithering _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "gdjs._extensionRecord.gif.videoDithering = eventsFunctionContext.getArgument('dithering');",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Dithering",
+          "name": "dithering",
+          "type": "trueorfalse"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

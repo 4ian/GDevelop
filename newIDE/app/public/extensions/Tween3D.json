@@ -1,0 +1,5254 @@
+{
+  "author": "",
+  "category": "Visual effect",
+  "extensionNamespace": "",
+  "fullName": "Advanced 3D tween",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXRlbm5pcy1iYWxsIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLDJDMTQuNSwyIDE2Ljc1LDIuOSAxOC41LDQuNEMxNi4zNiw2LjIzIDE1LDguOTYgMTUsMTJDMTUsMTUuMDQgMTYuMzYsMTcuNzcgMTguNSwxOS42QzE2Ljc1LDIxLjEgMTQuNSwyMiAxMiwyMkM5LjUsMjIgNy4yNSwyMS4xIDUuNSwxOS42QzcuNjQsMTcuNzcgOSwxNS4wNCA5LDEyQzksOC45NiA3LjY0LDYuMjMgNS41LDQuNEM3LjI1LDIuOSA5LjUsMiAxMiwyTTIyLDEyQzIyLDE0LjMyIDIxLjIxLDE2LjQ1IDE5Ljg4LDE4LjE1QzE4LjEyLDE2LjY4IDE3LDE0LjQ3IDE3LDEyQzE3LDkuNTMgMTguMTIsNy4zMiAxOS44OCw1Ljg1QzIxLjIxLDcuNTUgMjIsOS42OCAyMiwxMk0yLDEyQzIsOS42OCAyLjc5LDcuNTUgNC4xMiw1Ljg1QzUuODgsNy4zMiA3LDkuNTMgNywxMkM3LDE0LjQ3IDUuODgsMTYuNjggNC4xMiwxOC4xNUMyLjc5LDE2LjQ1IDIsMTQuMzIgMiwxMloiIC8+PC9zdmc+",
+  "name": "Tween3D",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/30bc03f9cf5f2f42960246a605352a6937ae6b603f0177396a83193849a4724a_tennis-ball.svg",
+  "shortDescription": "Smoothly squash, strentch, tint and wobble 3D models.",
+  "version": "0.3.1",
+  "description": [
+    "Change 3D models proportions over time to make smooth animations like wobbling.",
+    "",
+    "It's used in this example:",
+    "* a 3D Bomberman-like game ([open the project online](https://editor.gdevelop.io/?project=example://3d-bomber-bunny))"
+  ],
+  "origin": {
+    "identifier": "Tween3D",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "3d,tween,smooth,interpolation,wobble,color",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "dt0tRnf2kHWJnjkrpnzTzNj9Yc63"
+  ],
+  "changelog": [
+    {
+      "version": "0.1.0",
+      "breaking": "- The Tween behavior is now required by the 3D Tween behavior. Add the Tween behavior on any object that uses the 3D Tween behavior."
+    }
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "Tween3D::DefineHelperClasses"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Define helper classes JavaScript code.",
+      "fullName": "Define helper classes",
+      "functionType": "Action",
+      "name": "DefineHelperClasses",
+      "private": true,
+      "sentence": "Define helper classes JavaScript code",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (gdjs.__tween3DExtension) {",
+            "  return;",
+            "}",
+            "",
+            "class Tint {",
+            "  /**",
+            "   * Materials by material `id`.",
+            "   * @type {Map<number, THREE.Material>}",
+            "   */",
+            "  materials;",
+            "  usageCount = 0;",
+            "",
+            "  /**",
+            "   * @param materials {Map<number, THREE.Material>}",
+            "   */",
+            "  constructor(materials) {",
+            "    this.materials = materials;",
+            "  }",
+            "",
+            "  /**",
+            "   * @param object {gdjs.RuntimeObject3D}",
+            "   */",
+            "  applyTo(object) {",
+            "    object.get3DRendererObject().traverse((mesh) => {",
+            "      if (mesh.material) {",
+            "        const material = mesh.material;",
+            "        const originalId = material.originalId || material.id;",
+            "        const tintedMaterial = this.materials.get(originalId);",
+            "        if (tintedMaterial) {",
+            "          mesh.material = tintedMaterial;",
+            "        }",
+            "      }",
+            "    });",
+            "  }",
+            "",
+            "  /**",
+            "   * @param tintColor {number}",
+            "   * @param originalTint {Tint}",
+            "   */",
+            "  setColor(tintColor, originalTint) {",
+            "    const originalMaterials = originalTint.materials;",
+            "    for (const [materialId, material] of this.materials) {",
+            "      const originalMaterial = originalMaterials.get(materialId);",
+            "      if (!originalMaterial) {",
+            "        // A new material may have been changed by another extension.",
+            "        continue;",
+            "      }",
+            "      const originalColor = originalMaterial.color;",
+            "",
+            "      const color = material.color;",
+            "      color.setHex(tintColor);",
+            "      color.r *= originalColor.r;",
+            "      color.g *= originalColor.g;",
+            "      color.b *= originalColor.b;",
+            "    }",
+            "  }",
+            "",
+            "  dispose() {",
+            "    for (const material of this.materials.values()) {",
+            "      material.dispose();",
+            "    }",
+            "  }",
+            "}",
+            "",
+            "class TintManager {",
+            "  /**",
+            "   * Tints by color hex.",
+            "   * @type {Map<integer, Tint>}",
+            "   */",
+            "  tints = new Map();",
+            "  /**",
+            "   * Materials by material `id`.",
+            "   * @type {Tint}",
+            "   */",
+            "  originalTint;",
+            "  /**",
+            "   * @type {Array<THREE.Material>}",
+            "   */",
+            "  recycledTints = [];",
+            "",
+            "  /**",
+            "   * @param {gdjs.RuntimeObject3D} object",
+            "   */",
+            "  constructor(object) {",
+            "    const materials = new Map();",
+            "    object.get3DRendererObject().traverse((mesh) => {",
+            "      if (mesh.material && mesh.material.color) {",
+            "        const material = mesh.material;",
+            "        materials.set(material.id, material);",
+            "      }",
+            "    });",
+            "    this.originalTint = new Tint(materials);",
+            "  }",
+            "",
+            "  /**",
+            "   * @param {gdjs.RuntimeObject3D} object",
+            "   * @param {number} color",
+            "   */",
+            "  applyTint(object, color) {",
+            "    const previousColor = this.getTint(object);",
+            "    if (color === previousColor) {",
+            "      return;",
+            "    }",
+            "    if (previousColor !== 0xffffff) {",
+            "      const previousTint = this.tints.get(previousColor);",
+            "      previousTint.usageCount--;",
+            "      if (previousTint.usageCount === 0) {",
+            "        this.tints.delete(previousColor);",
+            "        this.recycledTints.push(previousTint);",
+            "      }",
+            "    }",
+            "    let tint = color === 0xffffff ? this.originalTint : this.tints.get(color);",
+            "    if (!tint) {",
+            "      tint = this.createTint(object, color);",
+            "      this.tints.set(color, tint);",
+            "    }",
+            "    tint.applyTo(object);",
+            "    tint.usageCount++;",
+            "    object.__tint3DExtension_tint = color;",
+            "  }",
+            "",
+            "  /**",
+            "   * @param {gdjs.RuntimeObject3D} object",
+            "   * @return {number}",
+            "   */",
+            "  getTint(object) {",
+            "    return object.__tint3DExtension_tint === undefined ? 0xffffff : object.__tint3DExtension_tint;",
+            "  }",
+            "",
+            "  /**",
+            "   * @param {gdjs.RuntimeObject3D} object",
+            "   * @param {number} color",
+            "   */",
+            "  createTint(object, color) {",
+            "    let tint;",
+            "    if (this.recycledTints.length > 0) {",
+            "      tint = this.recycledTints.pop();",
+            "      tint.usageCount = 0;",
+            "    }",
+            "    else {",
+            "      const materials = new Map();",
+            "      for (const [originalId, material] of this.originalTint.materials) {",
+            "        const tintedMaterial = material.clone();",
+            "        tintedMaterial.originalId = originalId;",
+            "        materials.set(originalId, tintedMaterial);",
+            "      }",
+            "      tint = new Tint(materials);",
+            "    }",
+            "    tint.setColor(color, this.originalTint);",
+            "    return tint;",
+            "  }",
+            "",
+            "  dispose() {",
+            "    for (const tint of this.tints.values()) {",
+            "      tint.dispose();",
+            "    }",
+            "    this.tints.clear();",
+            "    for (const tint of this.recycledTints) {",
+            "      tint.dispose();",
+            "    }",
+            "    this.recycledTints.length = 0;",
+            "  }",
+            "}",
+            "",
+            "gdjs.registerObjectDeletedFromSceneCallback(function (runtimeScene, deletedObject) {",
+            "  const extension = runtimeScene.__tween3DExtension;",
+            "  if (!extension) {",
+            "    return;",
+            "  }",
+            "  const managers = extension.tintManagers;",
+            "  const manager = managers.get(deletedObject.getName());",
+            "  if (manager) {",
+            "    manager.applyTint(deletedObject, 0xffffff);",
+            "  }",
+            "});",
+            "",
+            "",
+            "/**",
+            " * @param {number} r",
+            " * @param {number} g",
+            " * @param {number} b",
+            " * @return {number[]}",
+            " */",
+            "const rgbToHsl = (r, g, b) => {",
+            "  r /= 255;",
+            "  g /= 255;",
+            "  b /= 255;",
+            "  let v = Math.max(r, g, b),",
+            "    c = v - Math.min(r, g, b),",
+            "    f = 1 - Math.abs(v + v - c - 1);",
+            "  let h =",
+            "    c &&",
+            "    (v === r ? (g - b) / c : v === g ? 2 + (b - r) / c : 4 + (r - g) / c);",
+            "  return [",
+            "    Math.round(60 * (h < 0 ? h + 6 : h)),",
+            "    Math.round((f ? c / f : 0) * 100),",
+            "    Math.round(((v + v - c) / 2) * 100),",
+            "  ];",
+            "};",
+            "",
+            "/**",
+            " * @param {number} h",
+            " * @param {number} s",
+            " * @param {number} l",
+            " * @return {number[]}",
+            " */",
+            "const hslToRgb = (h, s, l) => {",
+            "  h = h %= 360;",
+            "  if (h < 0) {",
+            "    h += 360;",
+            "  }",
+            "  s = s / 100;",
+            "  l = l / 100;",
+            "  const a = s * Math.min(l, 1 - l);",
+            "  const f = (n = 0, k = (n + h / 30) % 12) =>",
+            "    l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);",
+            "  return [",
+            "    Math.round(f(0) * 255),",
+            "    Math.round(f(8) * 255),",
+            "    Math.round(f(4) * 255),",
+            "  ];",
+            "};",
+            "",
+            "gdjs.__tween3DExtension = {",
+            "  TintManager,",
+            "  rgbToHsl,",
+            "  hslToRgb,",
+            "};",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the tint of an object. The default color is white.",
+      "fullName": "Tint color",
+      "functionType": "Action",
+      "group": "Color",
+      "name": "SetTint",
+      "sentence": "Change tint of _PARAM1_ to _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const color = gdjs.rgbOrHexStringToNumber(eventsFunctionContext.getArgument(\"Color\") || \"255; 255;255\");",
+            "",
+            "if (!runtimeScene.__tween3DExtension) {",
+            "  runtimeScene.__tween3DExtension = {",
+            "    tintManagers: new Map()",
+            "  };",
+            "}",
+            "const { tintManagers } = runtimeScene.__tween3DExtension;",
+            "for (const object of objects) {",
+            "  let manager = tintManagers.get(object.getName());",
+            "  if (!manager) {",
+            "    const { TintManager } = gdjs.__tween3DExtension;",
+            "    manager = new TintManager(object);",
+            "    tintManagers.set(object.getName(), manager);",
+            "  }",
+            "  manager.applyTint(object, color);",
+            "}",
+            ""
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Object capability",
+          "name": "Object3D",
+          "supplementaryInformation": "Scene3D::Base3DBehavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Color",
+          "name": "Color",
+          "type": "color"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Change the tint of an object.",
+      "fullName": "Tint color (by number)",
+      "functionType": "Action",
+      "group": "Color",
+      "name": "SetTintNumber",
+      "private": true,
+      "sentence": "Change tint of _PARAM1_ to _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const color = eventsFunctionContext.getArgument(\"Color\");",
+            "",
+            "if (!runtimeScene.__tween3DExtension) {",
+            "  runtimeScene.__tween3DExtension = {",
+            "    tintManagers: new Map()",
+            "  };",
+            "}",
+            "const { tintManagers } = runtimeScene.__tween3DExtension;",
+            "for (const object of objects) {",
+            "  let manager = tintManagers.get(object.getName());",
+            "  if (!manager) {",
+            "    const { TintManager } = gdjs.__tween3DExtension;",
+            "    manager = new TintManager(object);",
+            "    tintManagers.set(object.getName(), manager);",
+            "  }",
+            "  manager.applyTint(object, color);",
+            "}",
+            ""
+          ],
+          "parameterObjects": "Object",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Object capability",
+          "name": "Object3D",
+          "supplementaryInformation": "Scene3D::Base3DBehavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Color",
+          "name": "Color",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Blend two RGB colors by applying a weighted mean.",
+      "fullName": "Blend RGB colors",
+      "functionType": "Expression",
+      "name": "RgbMean",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const { rgbToHsl, hslToRgb } = gdjs.__tween3DExtension;",
+            "",
+            "const [r1, g1, b1] = gdjs.hexNumberToRGBArray(eventsFunctionContext.getArgument(\"Color1\"));",
+            "const [r2, g2, b2] = gdjs.hexNumberToRGBArray(eventsFunctionContext.getArgument(\"Color2\"));",
+            "const ratio = eventsFunctionContext.getArgument(\"Ratio\");",
+            "",
+            "const [h1, s1, l1] = rgbToHsl(r1, g1, b1);",
+            "const [h2, s2, l2] = rgbToHsl(r2, g2, b2);",
+            "",
+            "const h = h1 + ratio * (h2 - h1);",
+            "const s = s1 + ratio * (s2 - s1);",
+            "const l = l1 + ratio * (l2 - l1);",
+            "",
+            "const [r, g, b] = hslToRgb(h, s, l);",
+            "",
+            "eventsFunctionContext.returnValue = gdjs.rgbToHexNumber(r, g, b);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "First RGB color",
+          "name": "Color1",
+          "type": "expression"
+        },
+        {
+          "description": "Second RGB color",
+          "name": "Color2",
+          "type": "expression"
+        },
+        {
+          "description": "Ratio",
+          "longDescription": "Range: 0 to 1, where 0 gives the first color and 1 gives the second color",
+          "name": "Ratio",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "RGB to number",
+      "functionType": "Expression",
+      "name": "RgbToNumber",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue = gdjs.rgbOrHexStringToNumber(eventsFunctionContext.getArgument(\"Color\"));",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Color",
+          "name": "Color",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onSceneUnloading",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (!runtimeScene.__tween3DExtension) {",
+            "    return;",
+            "}",
+            "const { tintManagers } = runtimeScene.__tween3DExtension;",
+            "",
+            "for (const manager of tintManagers.values()) {",
+            "    manager.dispose();",
+            "}",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "the stretch on Z axis. The object volume is conserved. A stretch of 2 makes the object appear 2 times longer on Z in proportion to the dimensions on X and Y.",
+      "fullName": "Stretch on Z axis",
+      "functionType": "ExpressionAndCondition",
+      "name": "StretchZ",
+      "private": true,
+      "sentence": "the stretch on Z axis of _PARAM1_ (it no longer does anything, use the one from 3D tween behavior instead)",
+      "events": [],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Object",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "3D capability",
+          "name": "Object3D",
+          "supplementaryInformation": "Scene3D::Base3DBehavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Scalable capacity",
+          "name": "Scale",
+          "supplementaryInformation": "ScalableCapability::ScalableBehavior",
+          "type": "behavior"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "Stretch on Z axis",
+      "functionType": "ActionWithOperator",
+      "getterName": "StretchZ",
+      "name": "SetStretchZ",
+      "private": true,
+      "sentence": "",
+      "events": [],
+      "parameters": [
+        {
+          "description": "Object",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "3D capability",
+          "name": "Object3D",
+          "supplementaryInformation": "Scene3D::Base3DBehavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Scalable capacity",
+          "name": "Scale",
+          "supplementaryInformation": "ScalableCapability::ScalableBehavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Stretch ratio",
+          "name": "StretchRatio",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "the stretch on Y axis. The object volume is conserved. A stretch of 2 makes the object appear 2 times longer on Y in proportion to the dimensions on X and Z.",
+      "fullName": "Stretch on Y axis",
+      "functionType": "ExpressionAndCondition",
+      "name": "StretchY",
+      "private": true,
+      "sentence": "the stretch on Y axis of _PARAM1_ (it no longer does anything, use the one from 3D tween behavior instead)",
+      "events": [],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Object",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "3D capability",
+          "name": "Object3D",
+          "supplementaryInformation": "Scene3D::Base3DBehavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Scalable capacity",
+          "name": "Scale",
+          "supplementaryInformation": "ScalableCapability::ScalableBehavior",
+          "type": "behavior"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "Stretch on Z axis",
+      "functionType": "ActionWithOperator",
+      "getterName": "StretchY",
+      "name": "SetStretchY",
+      "private": true,
+      "sentence": "",
+      "events": [],
+      "parameters": [
+        {
+          "description": "Object",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "3D capability",
+          "name": "Object3D",
+          "supplementaryInformation": "Scene3D::Base3DBehavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Scalable capacity",
+          "name": "Scale",
+          "supplementaryInformation": "ScalableCapability::ScalableBehavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Stretch ratio",
+          "name": "StretchRatio",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "the scale volume.",
+      "fullName": "Scale volume",
+      "functionType": "ExpressionAndCondition",
+      "name": "ScaleVolume",
+      "private": true,
+      "sentence": "the scale volume of _PARAM1_ (it no longer does anything, use the one from 3D tween behavior instead)",
+      "events": [],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Object",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "3D capability",
+          "name": "Object3D",
+          "supplementaryInformation": "Scene3D::Base3DBehavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Scalable capacity",
+          "name": "Scale",
+          "supplementaryInformation": "ScalableCapability::ScalableBehavior",
+          "type": "behavior"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "Stretch on Z axis",
+      "functionType": "ActionWithOperator",
+      "getterName": "ScaleVolume",
+      "name": "SetScaleVolume",
+      "private": true,
+      "sentence": "",
+      "events": [],
+      "parameters": [
+        {
+          "description": "Object",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "3D capability",
+          "name": "Object3D",
+          "supplementaryInformation": "Scene3D::Base3DBehavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Scalable capacity",
+          "name": "Scale",
+          "supplementaryInformation": "ScalableCapability::ScalableBehavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Stretch ratio",
+          "name": "StretchRatio",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Exponentially tween bewteen 2 values  according to an easing function.",
+      "fullName": "Ease exponentially",
+      "functionType": "Expression",
+      "name": "EaseExp",
+      "private": true,
+      "sentence": "the exponent-tweened value of tween _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "exp(Tween::Ease(Easing, log(InitialValue), log(TargetedValue), Weighting))"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Easing",
+          "name": "Easing",
+          "type": "string"
+        },
+        {
+          "description": "Initial value",
+          "name": "InitialValue",
+          "type": "expression"
+        },
+        {
+          "description": "Targeted value",
+          "name": "TargetedValue",
+          "type": "expression"
+        },
+        {
+          "description": "Weighting",
+          "name": "Weighting",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Smoothly squash, strentch and tint 3D models.",
+      "fullName": "Advanced 3D tween",
+      "name": "Tween3D",
+      "objectType": "",
+      "quickCustomizationVisibility": "hidden",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::DefineHelperClasses"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the stretch on Z axis. The object volume is conserved. A stretch of 2 makes the object appear 2 times longer on Z in proportion to the dimensions on X and Y.",
+          "fullName": "Stretch on Z axis",
+          "functionType": "ExpressionAndCondition",
+          "group": "Size",
+          "name": "StretchZ",
+          "sentence": "the stretch on Z axis",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Object3D::ScaleZ() / sqrt(Object.Scale::X() * Object.Scale::Y())"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "Stretch on Z axis",
+          "functionType": "ActionWithOperator",
+          "getterName": "StretchZ",
+          "name": "SetStretchZ",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CompareArgumentAsNumber"
+                  },
+                  "parameters": [
+                    "\"Value\"",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "_Tween3D.Volume",
+                    "=",
+                    "Object.Behavior::ScaleVolume()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetScaleZ"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Object3D",
+                    "=",
+                    "pow(Variable(_Tween3D.Volume) * Value * Value, 1/3)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "_Tween3D.SurfaceRatio",
+                    "=",
+                    "sqrt((Variable(_Tween3D.Volume) / Object.Object3D::ScaleZ()) / (Object.Scale::X() * Object.Scale::Y()))"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetX"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Scale",
+                    "*",
+                    "Variable(_Tween3D.SurfaceRatio)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Scale",
+                    "*",
+                    "Variable(_Tween3D.SurfaceRatio)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Scalable capacity",
+              "name": "Scale",
+              "supplementaryInformation": "ScalableCapability::ScalableBehavior",
+              "type": "behavior"
+            },
+            {
+              "description": "Stretch ratio",
+              "name": "StretchRatio",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the stretch on Y axis. The object volume is conserved. A stretch of 2 makes the object appear 2 times longer on Y in proportion to the dimensions on X and Z.",
+          "fullName": "Stretch on Y axis",
+          "functionType": "ExpressionAndCondition",
+          "group": "Size",
+          "name": "StretchY",
+          "sentence": "the stretch on Y axis",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Scale::Y() / sqrt(Object.Scale::X() * Object.Object3D::ScaleZ())"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "Stretch on Z axis",
+          "functionType": "ActionWithOperator",
+          "getterName": "StretchY",
+          "name": "SetStretchY",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CompareArgumentAsNumber"
+                  },
+                  "parameters": [
+                    "\"Value\"",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "_Tween3D.Volume",
+                    "=",
+                    "Object.Behavior::ScaleVolume()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Scale",
+                    "=",
+                    "pow(Variable(_Tween3D.Volume) * Value * Value, 1/3)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "_Tween3D.SurfaceRatio",
+                    "=",
+                    "sqrt((Variable(_Tween3D.Volume) / Object.Object3D::ScaleZ()) / (Object.Scale::X() * Object.Scale::Y()))"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetX"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Scale",
+                    "*",
+                    "Variable(_Tween3D.SurfaceRatio)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetScaleZ"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Object3D",
+                    "*",
+                    "Variable(_Tween3D.SurfaceRatio)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Scalable capacity",
+              "name": "Scale",
+              "supplementaryInformation": "ScalableCapability::ScalableBehavior",
+              "type": "behavior"
+            },
+            {
+              "description": "Stretch ratio",
+              "name": "StretchRatio",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the scale volume.",
+          "fullName": "Scale volume",
+          "functionType": "ExpressionAndCondition",
+          "group": "Size",
+          "name": "ScaleVolume",
+          "sentence": "the scale volume",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Scale::X() * Object.Scale::Y() * Object.Object3D::ScaleZ()"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "Stretch on Z axis",
+          "functionType": "ActionWithOperator",
+          "getterName": "ScaleVolume",
+          "name": "SetScaleVolume",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CompareArgumentAsNumber"
+                  },
+                  "parameters": [
+                    "\"Value\"",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "_Tween3D.Ratio",
+                    "=",
+                    "pow(Value / Object.Behavior::ScaleVolume(), 1 / 3)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetScaleZ"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Object3D",
+                    "*",
+                    "Variable(_Tween3D.Ratio)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Scale",
+                    "*",
+                    "Variable(_Tween3D.Ratio)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetX"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Scale",
+                    "*",
+                    "Variable(_Tween3D.Ratio)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Scalable capacity",
+              "name": "Scale",
+              "supplementaryInformation": "ScalableCapability::ScalableBehavior",
+              "type": "behavior"
+            },
+            {
+              "description": "Stretch ratio",
+              "name": "StretchRatio",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the color of a 3d object.",
+          "fullName": "Color of a 3d object",
+          "functionType": "Expression",
+          "group": "Color",
+          "name": "Tint",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "if (!runtimeScene.__tween3DExtension) {",
+                "  runtimeScene.__tween3DExtension = {",
+                "    tintManagers: new Map()",
+                "  };",
+                "}",
+                "const { tintManagers } = runtimeScene.__tween3DExtension;",
+                "if (objects.length === 0) {",
+                "  eventsFunctionContext.returnValue = 0xffffff;",
+                "}",
+                "else {",
+                "  const object = objects[0];",
+                "  let manager = tintManagers.get(object.getName());",
+                "  if (!manager) {",
+                "    const { TintManager } = gdjs.__tween3DExtension;",
+                "    manager = new TintManager(object);",
+                "    tintManagers.set(object.getName(), manager);",
+                "  }",
+                "  eventsFunctionContext.returnValue = manager.getTint(object);",
+                "}",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Tweens an object stretch Z from its current value to a new one. The stretch can never be 0 or less.",
+          "fullName": "Tween stretch Z",
+          "functionType": "Action",
+          "group": "Size",
+          "name": "TweenStretchZ",
+          "sentence": "Tween the stretch Z of _PARAM0_ to _PARAM3_ over _PARAM4_ seconds with easing _PARAM5_ as _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::StartTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    "TargetedValue",
+                    "Duration",
+                    "Easing",
+                    "\"StretchZ\"",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            },
+            {
+              "description": "Stretch on Z axis",
+              "name": "TargetedValue",
+              "type": "expression"
+            },
+            {
+              "description": "Duration (in seconds)",
+              "name": "Duration",
+              "type": "expression"
+            },
+            {
+              "description": "Easing",
+              "name": "Easing",
+              "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Tweens an object stretch Y from its current value to a new one. The stretch can never be 0 or less.",
+          "fullName": "Tween stretch Y",
+          "functionType": "Action",
+          "group": "Size",
+          "name": "TweenStretchY",
+          "sentence": "Tween the stretch Y of _PARAM0_ to _PARAM3_ over _PARAM4_ seconds with easing _PARAM5_ as _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::StartTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    "TargetedValue",
+                    "Duration",
+                    "Easing",
+                    "\"StretchY\"",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            },
+            {
+              "description": "Stretch on Y axis",
+              "name": "TargetedValue",
+              "type": "expression"
+            },
+            {
+              "description": "Duration (in seconds)",
+              "name": "Duration",
+              "type": "expression"
+            },
+            {
+              "description": "Easing",
+              "name": "Easing",
+              "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Tweens an object scale volume from its current value to a new one. The scale volume can never be 0 or less.",
+          "fullName": "Tween scale volume",
+          "functionType": "Action",
+          "group": "Size",
+          "name": "TweenScaleVolume",
+          "sentence": "Tween the scale volume of _PARAM0_ to _PARAM3_ over _PARAM4_ seconds with easing _PARAM5_ as _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::StartTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    "TargetedValue",
+                    "Duration",
+                    "Easing",
+                    "\"ScaleVolume\"",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            },
+            {
+              "description": "Scale volume",
+              "name": "TargetedValue",
+              "type": "expression"
+            },
+            {
+              "description": "Duration (in seconds)",
+              "name": "Duration",
+              "type": "expression"
+            },
+            {
+              "description": "Easing",
+              "name": "Easing",
+              "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Tweens the object color from its current value to a new one.",
+          "fullName": "Tween object color",
+          "functionType": "Action",
+          "group": "Color",
+          "name": "TweenTint",
+          "sentence": "Tween the color of _PARAM0_ to _PARAM3_ over _PARAM4_ seconds with easing _PARAM5_ as _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::StartTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    "Tween3D::RgbToNumber(TargetedValue)",
+                    "Duration",
+                    "Easing",
+                    "\"Tint\"",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            },
+            {
+              "description": "Color",
+              "name": "TargetedValue",
+              "type": "color"
+            },
+            {
+              "description": "Duration (in seconds)",
+              "name": "Duration",
+              "type": "expression"
+            },
+            {
+              "description": "Easing",
+              "name": "Easing",
+              "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Tweens an object Z position from its current value to a new one.",
+          "fullName": "Tween Z position (deprecated)",
+          "functionType": "Action",
+          "group": "Position",
+          "name": "TweenPositionZ",
+          "private": true,
+          "sentence": "Tween the Z position of object _PARAM0_ to _PARAM3_ over _PARAM4_ seconds with easing _PARAM5_ as _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween::AddObjectPositionZTween2"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tween",
+                    "Object3D",
+                    "TweenIdentifier",
+                    "TargetedValue",
+                    "Easing",
+                    "Duration",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            },
+            {
+              "description": "Rotation X in degree",
+              "name": "TargetedValue",
+              "type": "expression"
+            },
+            {
+              "description": "Duration (in seconds)",
+              "name": "Duration",
+              "type": "expression"
+            },
+            {
+              "description": "Easing",
+              "name": "Easing",
+              "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Tweens an object depth from its current value to a new one.",
+          "fullName": "Tween depth (Z size) (deprecated)",
+          "functionType": "Action",
+          "group": "Position",
+          "name": "TweenDepth",
+          "private": true,
+          "sentence": "Tween the depth of object _PARAM0_ to _PARAM3_ over _PARAM4_ seconds with easing _PARAM5_ as _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween::AddObjectDepthTween2"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tween",
+                    "Object3D",
+                    "TweenIdentifier",
+                    "TargetedValue",
+                    "Easing",
+                    "Duration",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            },
+            {
+              "description": "Rotation X in degree",
+              "name": "TargetedValue",
+              "type": "expression"
+            },
+            {
+              "description": "Duration (in seconds)",
+              "name": "Duration",
+              "type": "expression"
+            },
+            {
+              "description": "Easing",
+              "name": "Easing",
+              "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Tweens an object X rotation from its current value to a new one.",
+          "fullName": "Tween X rotation (deprecated)",
+          "functionType": "Action",
+          "group": "Angle",
+          "name": "TweenRotationX",
+          "private": true,
+          "sentence": "Tween the X rotation of object _PARAM0_ to _PARAM3_ over _PARAM4_ seconds with easing _PARAM5_ as _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween::TweenBehavior::AddObjectRotationXTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tween",
+                    "Object3D",
+                    "TweenIdentifier",
+                    "TargetedValue",
+                    "Easing",
+                    "Duration",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            },
+            {
+              "description": "Rotation X in degree",
+              "name": "TargetedValue",
+              "type": "expression"
+            },
+            {
+              "description": "Duration (in seconds)",
+              "name": "Duration",
+              "type": "expression"
+            },
+            {
+              "description": "Easing",
+              "name": "Easing",
+              "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Tweens an object Y rotation from its current value to a new one.",
+          "fullName": "Tween rotation Y (deprecated)",
+          "functionType": "Action",
+          "group": "Angle",
+          "name": "TweenRotationY",
+          "private": true,
+          "sentence": "Tween the Y rotation of object _PARAM0_ to _PARAM3_ over _PARAM4_ seconds with easing _PARAM5_ as _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween::TweenBehavior::AddObjectRotationYTween"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tween",
+                    "Object3D",
+                    "TweenIdentifier",
+                    "TargetedValue",
+                    "Easing",
+                    "Duration",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            },
+            {
+              "description": "Rotation Y in degree",
+              "name": "TargetedValue",
+              "type": "expression"
+            },
+            {
+              "description": "Duration (in seconds)",
+              "name": "Duration",
+              "type": "expression"
+            },
+            {
+              "description": "Easing",
+              "name": "Easing",
+              "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "_Tween3D.Index",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "Object.VariableChildCount(_Tween3D.Tweens)",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "_Tween3D.Identifier",
+                    "=",
+                    "Object.Behavior::TweenIdentifier(Variable(_Tween3D.Index))"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Tween3D::Tween3D::IsPlaying"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "VariableString(_Tween3D.Identifier)",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Tween3D::Tween3D::SetTime"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "min(Object.Behavior::Time(VariableString(_Tween3D.Identifier)) + TimeDelta() * LayerTimeScale(Object.Layer()), Object.Behavior::Duration(VariableString(_Tween3D.Identifier)))",
+                        "VariableString(_Tween3D.Identifier)",
+                        ""
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Tween3D::Tween3D::Type"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"StretchZ\"",
+                            "VariableString(_Tween3D.Identifier)",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Tween3D::Tween3D::SetStretchZ"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "Object.Behavior::ExponentTweenedValue(VariableString(_Tween3D.Identifier))",
+                            "Object3D"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Tween3D::Tween3D::Type"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"StretchY\"",
+                            "VariableString(_Tween3D.Identifier)",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Tween3D::Tween3D::SetStretchY"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "Object.Behavior::ExponentTweenedValue(VariableString(_Tween3D.Identifier))",
+                            "Object3D"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Tween3D::Tween3D::Type"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"ScaleVolume\"",
+                            "VariableString(_Tween3D.Identifier)",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Tween3D::Tween3D::SetScaleVolume"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "Object.Behavior::ExponentTweenedValue(VariableString(_Tween3D.Identifier))",
+                            "Object3D"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Tween3D::Tween3D::Type"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Tint\"",
+                            "VariableString(_Tween3D.Identifier)",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Tween3D::SetTintNumber"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Object",
+                            "Object3D",
+                            "Object.Behavior::TweenedColor(VariableString(_Tween3D.Identifier))",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "_Tween3D.Index",
+                        "+",
+                        "1"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the tweened value",
+          "fullName": "Tweened value",
+          "functionType": "ExpressionAndCondition",
+          "name": "TweenedValue",
+          "private": true,
+          "sentence": "the value of tween _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Tween::Ease(Object.Behavior::Easing(VariableString(_Tween3D.Identifier)), Object.Behavior::InitialValue(VariableString(_Tween3D.Identifier)), Object.Behavior::TargetedValue(VariableString(_Tween3D.Identifier)), Object.Behavior::Progress(VariableString(_Tween3D.Identifier)))"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the tweened color",
+          "fullName": "Tweened color",
+          "functionType": "ExpressionAndCondition",
+          "name": "TweenedColor",
+          "private": true,
+          "sentence": "the color value of tween _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Tween3D::RgbMean(Object.Behavior::InitialValue(VariableString(_Tween3D.Identifier)), Object.Behavior::TargetedValue(VariableString(_Tween3D.Identifier)), \nTween::Ease(Object.Behavior::Easing(VariableString(_Tween3D.Identifier)), 0, 1, Object.Behavior::Progress(VariableString(_Tween3D.Identifier))))\n\n"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the exponent-tweened value",
+          "fullName": "Tweened value (exponent)",
+          "functionType": "ExpressionAndCondition",
+          "name": "ExponentTweenedValue",
+          "private": true,
+          "sentence": "the exponent-tweened value of tween _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Tween3D::EaseExp(Object.Behavior::Easing(VariableString(_Tween3D.Identifier)), Object.Behavior::InitialValue(VariableString(_Tween3D.Identifier)), Object.Behavior::TargetedValue(VariableString(_Tween3D.Identifier)), Object.Behavior::Progress(VariableString(_Tween3D.Identifier)))"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "Start tween",
+          "functionType": "Action",
+          "name": "StartTween",
+          "private": true,
+          "sentence": "Tween the _PARAM6_ of object _PARAM0_ to _PARAM3_ over _PARAM4_ seconds with _PARAM5_ easing as _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "Tween3D::Tween3D::Exists"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::InvalidateTweenIdentifiers"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetTime"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "=",
+                    "0",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetType"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "=",
+                    "Type",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetDuration"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "=",
+                    "Duration",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetEasing"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "=",
+                    "Easing",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetTargetedValue"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "=",
+                    "TargetedValue",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Type",
+                    "=",
+                    "\"StretchZ\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetInitialValue"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "=",
+                    "Object.Behavior::StretchZ()",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Type",
+                    "=",
+                    "\"StretchY\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetInitialValue"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "=",
+                    "Object.Behavior::StretchY()",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Type",
+                    "=",
+                    "\"ScaleVolume\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetInitialValue"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "=",
+                    "Object.Behavior::ScaleVolume()",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Type",
+                    "=",
+                    "\"Tint\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetInitialValue"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "=",
+                    "Object.Behavior::Tint()",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            },
+            {
+              "description": "Stretch",
+              "name": "TargetedValue",
+              "type": "expression"
+            },
+            {
+              "description": "Duration (in seconds)",
+              "name": "Duration",
+              "type": "expression"
+            },
+            {
+              "description": "Easing",
+              "name": "Easing",
+              "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+              "type": "stringWithSelector"
+            },
+            {
+              "description": "Type",
+              "name": "Type",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the tween type",
+          "fullName": "Type",
+          "functionType": "ExpressionAndCondition",
+          "name": "Type",
+          "private": true,
+          "sentence": "the type of tween _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "Object.VariableString(_Tween3D.Tweens[TweenIdentifier].Type)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "Type",
+          "name": "SetType",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarObjetTxt"
+                  },
+                  "parameters": [
+                    "Object",
+                    "_Tween3D.Tweens[TweenIdentifier].Type",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the elapsed time",
+          "fullName": "Time",
+          "functionType": "ExpressionAndCondition",
+          "name": "Time",
+          "private": true,
+          "sentence": "the elapsed time of tween _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Variable(_Tween3D.Tweens[TweenIdentifier].Time)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "Time",
+          "name": "SetTime",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Object",
+                    "_Tween3D.Tweens[TweenIdentifier].Time",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the tween duration",
+          "fullName": "Duration",
+          "functionType": "ExpressionAndCondition",
+          "name": "Duration",
+          "private": true,
+          "sentence": "the duration of tween _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Variable(_Tween3D.Tweens[TweenIdentifier].Duration)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "Duration",
+          "name": "SetDuration",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Object",
+                    "_Tween3D.Tweens[TweenIdentifier].Duration",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the tween easing",
+          "fullName": "Easing",
+          "functionType": "ExpressionAndCondition",
+          "name": "Easing",
+          "private": true,
+          "sentence": "the easing of tween _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "Object.VariableString(_Tween3D.Tweens[TweenIdentifier].Easing)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "Easing",
+          "name": "SetEasing",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarObjetTxt"
+                  },
+                  "parameters": [
+                    "Object",
+                    "_Tween3D.Tweens[TweenIdentifier].Easing",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the tween initial value",
+          "fullName": "Initial value",
+          "functionType": "ExpressionAndCondition",
+          "name": "InitialValue",
+          "private": true,
+          "sentence": "the initial value of tween _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Variable(_Tween3D.Tweens[TweenIdentifier].InitialValue)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "InitialValue",
+          "name": "SetInitialValue",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Object",
+                    "_Tween3D.Tweens[TweenIdentifier].InitialValue",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the tween targeted value",
+          "fullName": "Targeted value",
+          "functionType": "ExpressionAndCondition",
+          "name": "TargetedValue",
+          "private": true,
+          "sentence": "the targeted value of tween _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Variable(_Tween3D.Tweens[TweenIdentifier].TargetedValue)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "TargetedValue",
+          "name": "SetTargetedValue",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Object",
+                    "_Tween3D.Tweens[TweenIdentifier].TargetedValue",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the tween is paused",
+          "fullName": "Paused",
+          "functionType": "Condition",
+          "name": "IsPaused",
+          "private": true,
+          "sentence": "The tween _PARAM2_ of _PARAM0_ is paused",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ObjectVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "Object",
+                    "_Tween3D.Tweens[TweenIdentifier].IsPaused",
+                    "True"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change if the tween is paused",
+          "fullName": "Paused",
+          "functionType": "Action",
+          "name": "SetPaused",
+          "private": true,
+          "sentence": "The tween _PARAM2_ of _PARAM0_ is paused: _PARAM3_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsPaused",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetObjectVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "Object",
+                    "_Tween3D.Tweens[TweenIdentifier].IsPaused",
+                    "True"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsPaused",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetObjectVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "Object",
+                    "_Tween3D.Tweens[TweenIdentifier].IsPaused",
+                    "False"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            },
+            {
+              "description": "Paused",
+              "name": "IsPaused",
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Stop the running tween animation.",
+          "fullName": "Stop a tween",
+          "functionType": "Action",
+          "name": "StopTween",
+          "sentence": "Stop the tween _PARAM2_ on _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::Exists"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetTime"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "=",
+                    "Object.Behavior::Duration(TweenIdentifier)",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "JumpToEnd",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": []
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            },
+            {
+              "description": "Jump to end",
+              "name": "JumpToEnd",
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Pause the running tween animation.",
+          "fullName": "Pause a tween",
+          "functionType": "Action",
+          "name": "PauseTween",
+          "sentence": "Pause the tween _PARAM2_ on _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::Exists"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetPaused"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    "yes",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Resume the tween animation.",
+          "fullName": "Resume a tween",
+          "functionType": "Action",
+          "name": "ResumeTween",
+          "sentence": "Resume the tween _PARAM2_ on _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::Exists"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetPaused"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    "no",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Remove the tween animation from the object.",
+          "fullName": "Remove a tween",
+          "functionType": "Action",
+          "name": "RemoveTween",
+          "sentence": "Remove the tween _PARAM2_ from _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::Exists"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ObjectVariableRemoveChild"
+                  },
+                  "parameters": [
+                    "Object",
+                    "_Tween3D.Tweens",
+                    "TweenIdentifier"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::InvalidateTweenIdentifiers"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the tween animation exists.",
+          "fullName": "Tween exists",
+          "functionType": "Condition",
+          "name": "Exists",
+          "sentence": "Tween _PARAM2_ on _PARAM0_ exists",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ObjectVariableChildExists"
+                  },
+                  "parameters": [
+                    "Object",
+                    "_Tween3D.Tweens",
+                    "TweenIdentifier"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the tween animation is currently playing.",
+          "fullName": "Tween is playing",
+          "functionType": "Condition",
+          "name": "IsPlaying",
+          "sentence": "Tween _PARAM2_ on _PARAM0_ is playing",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::Exists"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "Tween3D::Tween3D::HasFinished"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "Tween3D::Tween3D::IsPaused"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the tween animation has finished playing.",
+          "fullName": "Tween finished playing",
+          "functionType": "Condition",
+          "name": "HasFinished",
+          "sentence": "Tween _PARAM2_ on _PARAM0_ has finished playing",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::Progress"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ">=",
+                    "1",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the progress of a tween (between 0.0 and 1.0).",
+          "fullName": "Progress of a tween",
+          "functionType": "ExpressionAndCondition",
+          "name": "Progress",
+          "sentence": "the progress of tween _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::Exists"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "TweenIdentifier",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Behavior::Time(TweenIdentifier) / Object.Behavior::Duration(TweenIdentifier)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Tween identifier",
+              "name": "TweenIdentifier",
+              "supplementaryInformation": "objectTween3D",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the tween identifier for a given index.",
+          "fullName": "Tween identifier",
+          "functionType": "StringExpression",
+          "name": "TweenIdentifier",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const object = objects[0];",
+                "",
+                "const childIndex = eventsFunctionContext.getArgument(\"ChildIndex\");",
+                "",
+                "object.__Tween3D = object.__Tween3D || {};",
+                "object.__Tween3D.variableIdentifiers =",
+                "    object.__Tween3D.variableIdentifiers",
+                "    || Object.keys(object.getVariables().get(\"_Tween3D\").getChild(\"Tweens\").getAllChildren());",
+                "",
+                "eventsFunctionContext.returnValue = object.__Tween3D.variableIdentifiers[childIndex];",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            },
+            {
+              "description": "Child index",
+              "name": "ChildIndex",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Invalidate tween identifiers.",
+          "fullName": "Invalidate tween identifiers",
+          "functionType": "Action",
+          "name": "InvalidateTweenIdentifiers",
+          "private": true,
+          "sentence": "Invalidate tween identifiers of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const object = objects[0];",
+                "",
+                "object.__Tween3D = object.__Tween3D || {};",
+                "object.__Tween3D.variableIdentifiers = null;",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Tween3D",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "3D capability",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "Scene3D::Base3DBehavior"
+          ],
+          "name": "Object3D"
+        },
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Scalable capacity",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "ScalableCapability::ScalableBehavior"
+          ],
+          "name": "Scale"
+        },
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Tween",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "Tween::TweenBehavior"
+          ],
+          "name": "Tween"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Squash and stretch a 3D model in loop.",
+      "fullName": "3D wobble",
+      "name": "Wobble",
+      "objectType": "",
+      "quickCustomizationVisibility": "hidden",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Wobble::UpdateScaleVolume"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween3D::Wobble::UpdateStretch"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Tween",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "ScaleMinTweenTime",
+                        "<",
+                        "ScaleMinTweenDuration"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "ScaleMinTweenTime",
+                        "+",
+                        "Object.Behavior::TimeDelta()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "ScaleMin",
+                        "=",
+                        "Tween3D::EaseExp(ScaleMinTweenEasing, ScaleMinTweenInitialValue, ScaleMinTweenTarget, ScaleMinTweenTime / ScaleMinTweenDuration)"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "ScaleMinTweenTime",
+                            ">=",
+                            "ScaleMinTweenDuration"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "ScaleMin",
+                            "=",
+                            "ScaleMinTweenTarget"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "ScaleMaxTweenTime",
+                        "<",
+                        "ScaleMaxTweenDuration"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "ScaleMaxTweenTime",
+                        "+",
+                        "Object.Behavior::TimeDelta()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "ScaleMax",
+                        "=",
+                        "Tween3D::EaseExp(ScaleMaxTweenEasing, ScaleMaxTweenInitialValue, ScaleMaxTweenTarget, ScaleMaxTweenTime / ScaleMaxTweenDuration)"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "ScaleMaxTweenTime",
+                            ">=",
+                            "ScaleMaxTweenDuration"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "ScaleMin",
+                            "=",
+                            "ScaleMinTweenTarget"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Wobble",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Tween3D::Wobble::UpdateScaleVolume"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Tween3D::Wobble::UpdateStretch"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "Angle",
+                        "+",
+                        "mod(Object.Behavior::TimeDelta() *  2 * Pi()\n / PeriodDuration, 2 * Pi())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the minimum scale volume of the object.",
+          "fullName": "Minimum scale volume",
+          "functionType": "ExpressionAndCondition",
+          "group": "3D wobble scale configuration",
+          "name": "ScaleMin",
+          "sentence": "the minimum scale volume",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "ScaleMin"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "ScaleMin",
+          "name": "SetScaleMin",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ScaleMin",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the maximum scale volume of the object.",
+          "fullName": "Maximum scale volume",
+          "functionType": "ExpressionAndCondition",
+          "group": "3D wobble scale configuration",
+          "name": "ScaleMax",
+          "sentence": "the maximum scale volume",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "ScaleMax"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "ScaleMax",
+          "name": "SetScaleMax",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ScaleMax",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Tweens the minimum scale volume from its current value to a new one. The scale volume can never be 0 or less.",
+          "fullName": "Tween minimum scale volume",
+          "functionType": "Action",
+          "group": "3D wobble scale configuration",
+          "name": "TweenScaleMin",
+          "sentence": "Tween the minimum scale volume of object _PARAM0_ to _PARAM2_ over _PARAM3_ seconds with _PARAM4_ easing",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ScaleMinTweenInitialValue",
+                    "=",
+                    "Object.Behavior::ScaleMin()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ScaleMinTweenTime",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ScaleMinTweenTarget",
+                    "=",
+                    "TargetedValue"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ScaleMinTweenDuration",
+                    "=",
+                    "Duration"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "ScaleMinTweenEasing",
+                    "=",
+                    "Easing"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            },
+            {
+              "description": "Minimum scale volume",
+              "name": "TargetedValue",
+              "type": "expression"
+            },
+            {
+              "description": "Duration (in seconds)",
+              "name": "Duration",
+              "type": "expression"
+            },
+            {
+              "description": "Easing",
+              "name": "Easing",
+              "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Tweens the maximum scale volume from its current value to a new one. The scale volume can never be 0 or less.",
+          "fullName": "Tween maximum scale volume",
+          "functionType": "Action",
+          "group": "3D wobble scale configuration",
+          "name": "TweenScaleMax",
+          "sentence": "Tween the maximum scale volume of object _PARAM0_ to _PARAM2_ over _PARAM3_ seconds with _PARAM4_ easing",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ScaleMaxTweenInitialValue",
+                    "=",
+                    "Object.Behavior::ScaleMax()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ScaleMaxTweenTime",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ScaleMaxTweenTarget",
+                    "=",
+                    "TargetedValue"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ScaleMaxTweenDuration",
+                    "=",
+                    "Duration"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "ScaleMaxTweenEasing",
+                    "=",
+                    "Easing"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            },
+            {
+              "description": "Maximum scale volume",
+              "name": "TargetedValue",
+              "type": "expression"
+            },
+            {
+              "description": "Duration (in seconds)",
+              "name": "Duration",
+              "type": "expression"
+            },
+            {
+              "description": "Easing",
+              "name": "Easing",
+              "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "Time delta",
+          "functionType": "Expression",
+          "name": "TimeDelta",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "TimeDelta() * LayerTimeScale(Object.Layer())"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "Update scale volume",
+          "functionType": "Action",
+          "name": "UpdateScaleVolume",
+          "private": true,
+          "sentence": "Update scale volume of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetScaleVolume"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tween3D",
+                    "=",
+                    "exp(log(ScaleMin) + (log(ScaleMax) - log(ScaleMin)) * sin(Angle + ScalePeriodOffset / PeriodDuration * 2 * Pi()))",
+                    "Object3D"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "Update stretch",
+          "functionType": "Action",
+          "name": "UpdateStretch",
+          "private": true,
+          "sentence": "Update stretch of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Top",
+                    "=",
+                    "\"Z+\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetStretchZ"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tween3D",
+                    "=",
+                    "exp(log(StretchMin) + (log(StretchMax) - log(StretchMin)) * sin(Angle + StretchPeriodOffset / PeriodDuration * 2 * Pi()))",
+                    "Object3D"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Top",
+                    "=",
+                    "\"Y-\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween3D::Tween3D::SetStretchY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Tween3D",
+                    "=",
+                    "exp(log(StretchMin) + (log(StretchMax) - log(StretchMin)) * sin(Angle + StretchPeriodOffset / PeriodDuration * 2 * Pi()))",
+                    "Object3D"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the cycle duration of the object.",
+          "fullName": "Cycle duration",
+          "functionType": "ExpressionAndCondition",
+          "group": "3D wobble configuration",
+          "name": "PeriodDuration",
+          "sentence": "the cycle duration",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "PeriodDuration"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "PeriodDuration",
+          "name": "SetPeriodDuration",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "PeriodDuration",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the scale cycle offset of the object.",
+          "fullName": "Scale cycle offset",
+          "functionType": "ExpressionAndCondition",
+          "group": "3D wobble scale configuration",
+          "name": "ScalePeriodOffset",
+          "sentence": "the scale cycle offset",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "ScalePeriodOffset"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "ScalePeriodOffset",
+          "name": "SetScalePeriodOffset",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ScalePeriodOffset",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the minimum stretch of the object.",
+          "fullName": "Minimum stretch",
+          "functionType": "ExpressionAndCondition",
+          "group": "3D wobble stretch configuration",
+          "name": "StretchMin",
+          "sentence": "the minimum stretch",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "StretchMin"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "StretchMin",
+          "name": "SetStretchMin",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "StretchMin",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the maximum stretch of the object.",
+          "fullName": "Maximum stretch",
+          "functionType": "ExpressionAndCondition",
+          "group": "3D wobble stretch configuration",
+          "name": "StretchMax",
+          "sentence": "the maximum stretch",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "StretchMax"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "StretchMax",
+          "name": "SetStretchMax",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "StretchMax",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the stretch cycle offset of the object.",
+          "fullName": "Stretch cycle offset",
+          "functionType": "ExpressionAndCondition",
+          "group": "3D wobble stretch configuration",
+          "name": "StretchPeriodOffset",
+          "sentence": "the stretch cycle offset",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "StretchPeriodOffset"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "StretchPeriodOffset",
+          "name": "SetStretchPeriodOffset",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "StretchPeriodOffset",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "Tween3D::Wobble",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "0.75",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "Minimum scale volume",
+          "description": "",
+          "group": "Scale",
+          "extraInformation": [],
+          "name": "ScaleMin"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "Maximum scale volume",
+          "description": "",
+          "group": "Scale",
+          "extraInformation": [],
+          "name": "ScaleMax"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "unit": "Second",
+          "label": "Cycle duration",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "PeriodDuration"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Second",
+          "label": "Scale cycle offset",
+          "description": "",
+          "group": "Scale",
+          "extraInformation": [],
+          "name": "ScalePeriodOffset"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "Minimum stretch",
+          "description": "",
+          "group": "Stretch",
+          "extraInformation": [],
+          "name": "StretchMin"
+        },
+        {
+          "value": "1.25",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "Maximum stretch",
+          "description": "",
+          "group": "Stretch",
+          "extraInformation": [],
+          "name": "StretchMax"
+        },
+        {
+          "value": "-0.25",
+          "type": "Number",
+          "unit": "Second",
+          "label": "Stretch cycle offset",
+          "description": "",
+          "group": "Stretch",
+          "extraInformation": [],
+          "name": "StretchPeriodOffset"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "DegreeAngle",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "Angle"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "ScaleMinTweenTarget"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Second",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "ScaleMinTweenDuration"
+        },
+        {
+          "value": "",
+          "type": "String",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "ScaleMinTweenEasing"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "ScaleMaxTweenTarget"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Second",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "ScaleMaxTweenDuration"
+        },
+        {
+          "value": "",
+          "type": "String",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "ScaleMaxTweenEasing"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Second",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "ScaleMinTweenTime"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Second",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "ScaleMaxTweenTime"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "ScaleMinTweenInitialValue"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "ScaleMaxTweenInitialValue"
+        },
+        {
+          "value": "Z+",
+          "type": "Choice",
+          "label": "Top orientation",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "Z+",
+            "Y-"
+          ],
+          "name": "Top"
+        },
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "3D tween",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "Tween3D::Tween3D"
+          ],
+          "name": "Tween3D"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

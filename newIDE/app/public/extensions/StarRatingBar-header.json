@@ -1,0 +1,58 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Star Rating Bar",
+  "name": "StarRatingBar",
+  "version": "1.2.1",
+  "url": "https://resources.gdevelop-app.com/extensions/StarRatingBar.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/StarRatingBar-header.json",
+  "tags": "rate,score,display",
+  "category": "User interface",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/745c5811a2856b9b828e959b496d50dd52e0b5879f372e411675f38a5708775d_star-half-full.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Animated star rating bar, with customizable number of stars.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/star-rating-bar",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [
+    {
+      "description": "An animated score counter with an icon and a customisable font.",
+      "fullName": "Star Rating Bar",
+      "name": "StarRatingBar",
+      "defaultName": "StarRatingBar",
+      "eventsFunctions": [
+        {
+          "name": "Rate",
+          "fullName": "Rate",
+          "description": "Compare the rate of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetRate",
+          "fullName": "Rate",
+          "description": "Change the rate of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Disabled",
+          "fullName": "Disable the rating",
+          "description": "Check if the object is disabled.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetDisabled",
+          "fullName": "Disable the rating",
+          "description": "Enable or disable the object.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "description": "An animated bar to rate out of 5, or more by editing and adding more stars in the object.\nThe animation can be disabled.\nThe star icon and background are customizable.\n\nThere are ready-to-use bars in the asset-store [star rating bars pack](https://editor.gdevelop.io/?initial-dialog=asset-store&asset-pack=star-rating-bars-star-rating-bars).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXN0YXItaGFsZi1mdWxsIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLDE1LjRWNi4xTDEzLjcxLDEwLjEzTDE4LjA5LDEwLjVMMTQuNzcsMTMuMzlMMTUuNzYsMTcuNjdNMjIsOS4yNEwxNC44MSw4LjYzTDEyLDJMOS4xOSw4LjYzTDIsOS4yNEw3LjQ1LDEzLjk3TDUuODIsMjFMMTIsMTcuMjdMMTguMTgsMjFMMTYuNTQsMTMuOTdMMjIsOS4yNFoiIC8+PC9zdmc+"
+}

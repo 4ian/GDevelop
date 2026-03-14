@@ -1,0 +1,64 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "9MGDlUQAh8QUilno4JPycekjRCJ3"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Tween into view",
+  "name": "TweenIntoView",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/TweenIntoView.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/TweenIntoView-header.json",
+  "tags": "fade,move",
+  "category": "Visual effect",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Glyphster Pack/Master/SVG/Arrows/557b3471ae92fa5c744b9bf14b8803a0c7745c224ed9cfe80037a8ac7295d99e_Arrows_thin_arrow_left_right_directions.svg",
+  "gdevelopVersion": "",
+  "shortDescription": "Tween objects from off-screen into position for smooth UI/cutscene entrances.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/tween-into-view",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Tween objects into position from off screen.",
+      "fullName": "Tween into view",
+      "name": "TweenIntoView",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "TweenIn",
+          "fullName": "Tween into view",
+          "description": "Tween the object to its set starting position.",
+          "functionType": "Action"
+        },
+        {
+          "name": "TweenOut",
+          "fullName": "Tween out of view",
+          "description": "Tween the object to its off screen position.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsTweenedIn",
+          "fullName": "Tweened into view",
+          "description": "Check if the object finished tweening into view.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsTweenedOut",
+          "fullName": "Tweened out of view",
+          "description": "Check if the object finished tweened out of view.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetShouldBeDeleted",
+          "fullName": "Delete after tween out",
+          "description": "Set whether to delete the object when the \"tween out of view\" action has finished.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Tween objects into position from off screen, or from a set distance, to create a polished visual effect.\n\nWhen objects are created, or if they exist at the beginning of the scene, they are put ouside of screen and tweened back to their initial position.\n\nThis extension can be used to:\n- Make smooth transitions for UI\n- Animate simple cutscenes",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNMjUsMTZjLTAuMywwLTAuNS0wLjEtMC43LTAuM2MtMC40LTAuNC0wLjQtMSwwLTEuNGwzLjMtMy4zbC0zLjMtMy4zYy0wLjQtMC40LTAuNC0xLDAtMS40czEtMC40LDEuNCwwbDQsNA0KCQljMC40LDAuNCwwLjQsMSwwLDEuNGwtNCw0QzI1LjUsMTUuOSwyNS4zLDE2LDI1LDE2eiIvPg0KPC9nPg0KPGc+DQoJPHBhdGggZD0iTTI5LDEySDdjLTAuNiwwLTEtMC40LTEtMXMwLjQtMSwxLTFoMjJjMC42LDAsMSwwLjQsMSwxUzI5LjYsMTIsMjksMTJ6Ii8+DQo8L2c+DQo8Zz4NCgk8cGF0aCBkPSJNNywyNmMtMC4zLDAtMC41LTAuMS0wLjctMC4zbC00LTRjLTAuNC0wLjQtMC40LTEsMC0xLjRsNC00YzAuNC0wLjQsMS0wLjQsMS40LDBzMC40LDEsMCwxLjRMNC40LDIxbDMuMywzLjMNCgkJYzAuNCwwLjQsMC40LDEsMCwxLjRDNy41LDI1LjksNy4zLDI2LDcsMjZ6Ii8+DQo8L2c+DQo8Zz4NCgk8cGF0aCBkPSJNMjUsMjJIM2MtMC42LDAtMS0wLjQtMS0xczAuNC0xLDEtMWgyMmMwLjYsMCwxLDAuNCwxLDFTMjUuNiwyMiwyNSwyMnoiLz4NCjwvZz4NCjwvc3ZnPg0K"
+}

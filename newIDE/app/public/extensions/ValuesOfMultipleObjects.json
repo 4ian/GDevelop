@@ -1,0 +1,1539 @@
+{
+  "author": "Tristan Rhodes (https://victrisgames.itch.io/)",
+  "category": "Game mechanic",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Values of multiple objects",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWRvdHMtaGV4YWdvbiIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xNiAxMkMxNiAxMC45IDE2LjkgMTAgMTggMTBTMjAgMTAuOSAyMCAxMiAxOS4xIDE0IDE4IDE0IDE2IDEzLjEgMTYgMTJNMTAgMTJDMTAgMTAuOSAxMC45IDEwIDEyIDEwUzE0IDEwLjkgMTQgMTIgMTMuMSAxNCAxMiAxNCAxMCAxMy4xIDEwIDEyTTQgMTJDNCAxMC45IDQuOSAxMCA2IDEwUzggMTAuOSA4IDEyIDcuMSAxNCA2IDE0IDQgMTMuMSA0IDEyTTEzIDE4QzEzIDE2LjkgMTMuOSAxNiAxNSAxNlMxNyAxNi45IDE3IDE4IDE2LjEgMjAgMTUgMjAgMTMgMTkuMSAxMyAxOE03IDE4QzcgMTYuOSA3LjkgMTYgOSAxNlMxMSAxNi45IDExIDE4IDEwLjEgMjAgOSAyMCA3IDE5LjEgNyAxOE0xMyA2QzEzIDQuOSAxMy45IDQgMTUgNFMxNyA0LjkgMTcgNiAxNi4xIDggMTUgOCAxMyA3LjEgMTMgNk03IDZDNyA0LjkgNy45IDQgOSA0UzExIDQuOSAxMSA2IDEwLjEgOCA5IDggNyA3LjEgNyA2IiAvPjwvc3ZnPg==",
+  "name": "ValuesOfMultipleObjects",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/dots-hexagon.svg",
+  "shortDescription": "Aggregate min/max/average position, size, Z-order across picked object instances.",
+  "version": "1.5.0",
+  "description": [
+    "Provides values based on picked object instances: minimum or average X or Y position, center position, width, height, 2D Z-order.  ",
+    "Useful for camera tracking, flocking behaviors, and more.",
+    "",
+    "An example shows how to use the extension ([open the Itch.io page](https://victrisgames.itch.io/values-of-multiple-objects))."
+  ],
+  "origin": {
+    "identifier": "ValuesOfMultipleObjects",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "objects,expression,calculate,center,middle,average,position,flocking,camera,mean,median,max,min,velocity",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
+    "OaVzVu7cuKhv5Qj0i3vRZYFttl72"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Minimum X position of picked object instances (using AABB of objects).",
+      "fullName": "Minimum X position of picked object instances",
+      "functionType": "Expression",
+      "name": "MinX",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// If the instances doesn't exist we exit this function, returnValue will be 0",
+            "if (objects.length == 0) return;",
+            "",
+            "let minX = objects[0].getAABB().min[0] || 0;",
+            "",
+            "objects.forEach((object) => {",
+            "",
+            "    let aabb = object.getAABB();",
+            "    ",
+            "    if (aabb.min[0] < minX) {",
+            "        minX = aabb.min[0];",
+            "    }",
+            "})",
+            "",
+            "eventsFunctionContext.returnValue = minX;"
+          ],
+          "parameterObjects": "objects",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "objects",
+          "name": "objects",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Maximum X position of picked object instances (using AABB of objects).",
+      "fullName": "Maximum X position of picked object instances",
+      "functionType": "Expression",
+      "name": "MaxX",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// If the instances doesn't exist we exit this function, returnValue will be 0",
+            "if (objects.length == 0) return;",
+            "",
+            "let minX = objects[0].getAABB().max[0] || 0;",
+            "",
+            "objects.forEach((object) => {",
+            "",
+            "    let aabb = object.getAABB();",
+            "    ",
+            "    if (aabb.max[0] > minX) {",
+            "        minX = aabb.max[0];",
+            "    }",
+            "})",
+            "",
+            "eventsFunctionContext.returnValue = minX;"
+          ],
+          "parameterObjects": "objects",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "objects",
+          "name": "objects",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Minimum Y position of picked object instances (using AABB of objects).",
+      "fullName": "Minimum Y position of picked object instances",
+      "functionType": "Expression",
+      "name": "MinY",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// If the instances doesn't exist we exit this function, returnValue will be 0",
+            "if (objects.length == 0) return;",
+            "",
+            "let minX = objects[0].getAABB().min[1] || 0;",
+            "",
+            "objects.forEach((object) => {",
+            "",
+            "    let aabb = object.getAABB();",
+            "",
+            "    if (aabb.min[1] < minX) {",
+            "        minX = aabb.min[1];",
+            "    }",
+            "})",
+            "",
+            "eventsFunctionContext.returnValue = minX;"
+          ],
+          "parameterObjects": "objects",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "objects",
+          "name": "objects",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Maximum Y position of picked object instances (using AABB of objects).",
+      "fullName": "Maximum Y position of picked object instances",
+      "functionType": "Expression",
+      "name": "MaxY",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// If the instances doesn't exist we exit this function, returnValue will be 0",
+            "if (objects.length == 0) return;",
+            "",
+            "let minX = objects[0].getAABB().max[1] || 0;",
+            "",
+            "objects.forEach((object) => {",
+            "",
+            "    let aabb = object.getAABB();",
+            "    ",
+            "    if (aabb.max[1] > minX) {",
+            "        minX = aabb.max[1];",
+            "    }",
+            "})",
+            "",
+            "eventsFunctionContext.returnValue = minX;"
+          ],
+          "parameterObjects": "objects",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "objects",
+          "name": "objects",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Minimum Z order of picked object instances.",
+      "fullName": "Minimum Z order of picked object instances",
+      "functionType": "Expression",
+      "name": "MinZOrder",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "MinZOrder",
+                "=",
+                "Object.ZOrder()"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Plan"
+                  },
+                  "parameters": [
+                    "Object",
+                    "<",
+                    "MinZOrder"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "MinZOrder",
+                    "=",
+                    "Object.ZOrder()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "MinZOrder"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "MinZOrder",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "objects",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Maximum Z order of picked object instances.",
+      "fullName": "Maximum Z order of picked object instances",
+      "functionType": "Expression",
+      "name": "MaxZOrder",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "MaxZOrder",
+                "=",
+                "Object.ZOrder()"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Plan"
+                  },
+                  "parameters": [
+                    "Object",
+                    ">",
+                    "MaxZOrder"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "MaxZOrder",
+                    "=",
+                    "Object.ZOrder()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "MaxZOrder"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "MaxZOrder",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "objects",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Average Z order of picked object instances.",
+      "fullName": "Average Z order of picked object instances",
+      "functionType": "Expression",
+      "name": "AverageZOrder",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SubtotalZOrder",
+                    "+",
+                    "Object.ZOrder()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Prevent dividing by 0"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PickedInstancesCount"
+                  },
+                  "parameters": [
+                    "Object",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "SubtotalZOrder / PickedInstancesCount(Object)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "SubtotalZOrder",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "objects",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "X center point (absolute) of picked object instances.",
+      "fullName": "X center point (absolute) of picked object instances ",
+      "functionType": "Expression",
+      "name": "AbsoluteCenterOfObjectsX",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Return the midpoint between the min and max values"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "(ValuesOfMultipleObjects::MaxX(Object) + ValuesOfMultipleObjects::MinX(Object)) / 2"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Objects",
+          "longDescription": "Objects that will be used to calculate their center point ",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Y center point (absolute) of picked object instances.",
+      "fullName": "Y center point (absolute) of picked object instances",
+      "functionType": "Expression",
+      "name": "AbsoluteCenterOfObjectsY",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Return the midpoint between the min and max values"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "(ValuesOfMultipleObjects::MaxY(Object) + ValuesOfMultipleObjects::MinY(Object)) / 2"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Objects",
+          "longDescription": "Objects that will be used to calculate their center point ",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "X center point (average) of picked object instances.",
+      "fullName": "X center point (average) of picked object instances ",
+      "functionType": "Expression",
+      "name": "AverageCenterOfObjectsX",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SubtotalX",
+                    "+",
+                    "Object.ZOrder()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Prevent dividing by 0"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PickedInstancesCount"
+                  },
+                  "parameters": [
+                    "Object",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "SubtotalX / PickedInstancesCount(Object)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "SubtotalX",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Objects",
+          "longDescription": "Objects that will be used to calculate their center point ",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Y center point (average) of picked object instances.",
+      "fullName": "Y center point (average) of picked object instances",
+      "functionType": "Expression",
+      "name": "AverageCenterOfObjectsY",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SubtotalY",
+                    "+",
+                    "Object.ZOrder()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Prevent dividing by 0"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PickedInstancesCount"
+                  },
+                  "parameters": [
+                    "Object",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "SubtotalY / PickedInstancesCount(Object)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "SubtotalY",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Objects",
+          "longDescription": "Objects that will be used to calculate their center point ",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Min object height of picked object instances.",
+      "fullName": "Min object height of picked object instances",
+      "functionType": "Expression",
+      "name": "MinHeight",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "MinHeight",
+                "=",
+                "Object.Height()"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Height"
+                  },
+                  "parameters": [
+                    "Object",
+                    "<",
+                    "MinHeight"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "MinHeight",
+                    "=",
+                    "Object.Height()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "MinHeight"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "MinHeight",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Objects",
+          "name": "Object",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Max object height of picked object instances.",
+      "fullName": "Max object height of picked object instances",
+      "functionType": "Expression",
+      "name": "MaxHeight",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "MaxHeight",
+                "=",
+                "Object.Height()"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Height"
+                  },
+                  "parameters": [
+                    "Object",
+                    ">",
+                    "MaxHeight"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "MaxHeight",
+                    "=",
+                    "Object.Height()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "MaxHeight"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "MaxHeight",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Objects",
+          "name": "Object",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Average height of picked object instances.",
+      "fullName": "Average height of picked object instances",
+      "functionType": "Expression",
+      "name": "AverageHeight",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SubtotalHeight",
+                    "+",
+                    "Object.ZOrder()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Prevent dividing by 0"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PickedInstancesCount"
+                  },
+                  "parameters": [
+                    "Object",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "SubtotalHeight / PickedInstancesCount(Object)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "SubtotalHeight",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Objects",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Min object width of picked object instances.",
+      "fullName": "Min object width of picked object instances",
+      "functionType": "Expression",
+      "name": "MinWidth",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "MinWidth",
+                "=",
+                "Object.Width()"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Width"
+                  },
+                  "parameters": [
+                    "Object",
+                    "<",
+                    "MinWidth"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "MinWidth",
+                    "=",
+                    "Object.Width()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "MinWidth"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "MinWidth",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Objects",
+          "name": "Object",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Max object width of picked object instances.",
+      "fullName": "Max object width of picked object instances",
+      "functionType": "Expression",
+      "name": "MaxWidth",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "MaxWidth",
+                "=",
+                "Object.Width()"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Width"
+                  },
+                  "parameters": [
+                    "Object",
+                    ">",
+                    "MaxWidth"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "MaxWidth",
+                    "=",
+                    "Object.Width()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "MaxWidth"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "MaxWidth",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Objects",
+          "name": "Object",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Average width of picked object instances.",
+      "fullName": "Average width of picked object instances",
+      "functionType": "Expression",
+      "name": "AverageWidth",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SubtotalWidth",
+                    "+",
+                    "Object.ZOrder()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Prevent dividing by 0"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PickedInstancesCount"
+                  },
+                  "parameters": [
+                    "Object",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "SubtotalWidth / PickedInstancesCount(Object)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "SubtotalWidth",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Objects",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Average horizontal force (X) of picked object instances.",
+      "fullName": "Average horizontal force (X) of picked object instances",
+      "functionType": "Expression",
+      "name": "AverageForceX",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SubtotalHorizontalForce",
+                    "+",
+                    "Object.ZOrder()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Prevent dividing by 0"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PickedInstancesCount"
+                  },
+                  "parameters": [
+                    "Object",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "SubtotalHorizontalForce / PickedInstancesCount(Object)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "SubtotalHorizontalForce",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Objects",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Average vertical force (Y) of picked object instances.",
+      "fullName": "Average vertical force (Y) of picked object instances",
+      "functionType": "Expression",
+      "name": "AverageForceY",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SubtotalVerticalForce",
+                    "+",
+                    "Object.ZOrder()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Prevent dividing by 0"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PickedInstancesCount"
+                  },
+                  "parameters": [
+                    "Object",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "SubtotalVerticalForce / PickedInstancesCount(Object)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "SubtotalVerticalForce",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Objects",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Average angle of rotation of picked object instances.",
+      "fullName": "Average angle of rotation of picked object instances",
+      "functionType": "Expression",
+      "name": "AverageAngle",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SubtotalAngle",
+                    "+",
+                    "Object.ZOrder()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Prevent dividing by 0"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PickedInstancesCount"
+                  },
+                  "parameters": [
+                    "Object",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "SubtotalAngle / PickedInstancesCount(Object)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "SubtotalAngle",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Objects",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

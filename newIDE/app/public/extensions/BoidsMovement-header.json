@@ -1,0 +1,185 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "rotBq28wITdtfsrE7McHQri4k2w2",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Boids movement",
+  "name": "BoidsMovement",
+  "version": "0.4.1",
+  "url": "https://resources.gdevelop-app.com/extensions/BoidsMovement.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/BoidsMovement-header.json",
+  "tags": "flock,swarm,boids,crowd,horde",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Restaurant/Restaurant_restaurant_seafood_animal_fish.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Simulates flocks movement.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/boids-movement/details/",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Move as part of a flock.",
+      "fullName": "Boids Movement",
+      "name": "BoidsMovement",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "MoveInDirection",
+          "fullName": "Move in a direction",
+          "description": "Intend to move in a given direction.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MoveToPosition",
+          "fullName": "Move toward a position",
+          "description": "Intend to move toward a position.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MoveToObject",
+          "fullName": "Move toward an object",
+          "description": "Intend to move toward an object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AvoidPosition",
+          "fullName": "Avoid a position",
+          "description": "Intend to avoid an area with a given center and radius.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AvoidObject",
+          "fullName": "Avoid an object",
+          "description": "Intend to avoid an area from an object center and a given radius.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Speed",
+          "fullName": "Speed",
+          "description": "Return the current speed.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "VelocityX",
+          "fullName": "Velocity X",
+          "description": "Return the current horizontal speed.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "VelocityY",
+          "fullName": "Velocity Y",
+          "description": "Return the current vertical  speed.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "ShouldRotate",
+          "fullName": "Object Rotated",
+          "description": "Check if the object is rotated while moving on its path.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "MaxSpeed",
+          "fullName": "Maximum speed",
+          "description": "Return the maximum speed.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetMaxSpeed",
+          "fullName": "Maximum speed",
+          "description": "Change the maximum speed of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MaxAcceleration",
+          "fullName": "Maximum acceleration",
+          "description": "Return the maximum acceleration.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetMaxAcceleration",
+          "fullName": "Maximum acceleration",
+          "description": "Change the maximum acceleration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "CohesionRadius",
+          "fullName": "Cohesion sight radius",
+          "description": "Return the cohesion sight radius.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetCohesionRadius",
+          "fullName": "Cohesion sight radius",
+          "description": "Change the cohesion sight radius.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AlignmentRadius",
+          "fullName": "Alignment sight radius",
+          "description": "Return the alignment sight radius.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetAlignmentRadius",
+          "fullName": "Alignment sight radius",
+          "description": "Return the alignment sight radius.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SeparationRadius",
+          "fullName": "Separation sight radius",
+          "description": "Return the separation sight radius.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetSeparationRadius",
+          "fullName": "Separation sight radius",
+          "description": "Return the separation sight radius.",
+          "functionType": "Action"
+        },
+        {
+          "name": "CohesionWeight",
+          "fullName": "Cohesion weight",
+          "description": "Return which weight the cohesion takes in the chosen direction.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetCohesionWeight",
+          "fullName": "Cohesion weight",
+          "description": "Change the weight the cohesion takes in the chosen direction.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AlignmentWeight",
+          "fullName": "Alignment weight",
+          "description": "Return which weight the alignment takes in the chosen direction.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetAlignmentWeight",
+          "fullName": "Alignment weight",
+          "description": "Change the weight the alignment takes in the chosen direction.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SeparationWeight",
+          "fullName": "Separation weight",
+          "description": "Return which weight the separation takes in the chosen direction.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetSeparationWeight",
+          "fullName": "Separation weight",
+          "description": "Change the weight the separation takes in the chosen direction.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Simulates swarms or flocks movement following the separation, alignment, cohesion principles. The flock can be attracted to a location or avoid some obstacles.\n\nThe [Fish School example](https://editor.gdevelop.io/?project=example://fish-school) shows how properties impact on the movement.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNMjkuMywxMC4xYy0wLjQtMC4xLTAuOCwwLTEuMSwwLjNsLTMuMiw0Yy0xLjctMi01LjktNi40LTExLTYuNGMtMC4yLDAtMC4zLDAtMC41LDBjMS40LDIuNCwyLjEsNS4xLDIuMSw4DQoJCWMwLDIuOC0wLjcsNS42LTIuMSw4YzAuMiwwLDAuMywwLDAuNSwwYzUuMSwwLDkuMy00LjMsMTEtNi40bDMuMiw0YzAuMiwwLjIsMC41LDAuNCwwLjgsMC40YzAuMSwwLDAuMiwwLDAuMy0wLjENCgkJYzAuNC0wLjEsMC43LTAuNSwwLjctMC45VjExQzMwLDEwLjYsMjkuNywxMC4yLDI5LjMsMTAuMXoiLz4NCgk8cGF0aCBkPSJNMTEuNCw4LjRjLTUuMiwxLjUtOSw2LjgtOS4yLDdjLTAuMiwwLjMtMC4yLDAuOCwwLDEuMmMwLjIsMC4zLDQsNS42LDkuMiw3YzEuNS0yLjMsMi4yLTQuOSwyLjItNy42DQoJCUMxMy42LDEzLjMsMTIuOCwxMC42LDExLjQsOC40eiBNMTAsMTZjMCwwLjYtMC40LDEtMSwxcy0xLTAuNC0xLTF2LTJjMC0wLjYsMC40LTEsMS0xczEsMC40LDEsMVYxNnoiLz4NCjwvZz4NCjwvc3ZnPg0K"
+}

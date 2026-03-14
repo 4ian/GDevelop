@@ -1,0 +1,32 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Copy camera settings",
+  "name": "CopyCameraSettings",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/CopyCameraSettings.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/CopyCameraSettings-header.json",
+  "tags": "camera,clone,zoom,position,layer,angle,copy",
+  "category": "Camera",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/layers-triple-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Copy camera position, zoom, and rotation from one layer to another.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/copy-camera-settings",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "CopyCameraSettings",
+      "fullName": "Copy camera settings",
+      "description": "Copy camera settings of a layer and apply them to another layer.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Useful when multiple layers need to use the same camera values.\n\nHow to use:\n- Run the \"Copy camera settings\" action after all other camera actions have been performed\n\nTips:\n- Do not use on layers that implement a parallax effect",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWxheWVycy10cmlwbGUtb3V0bGluZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMiAxNi41NEwxOS4zNyAxMC44TDIxIDEyLjA3TDEyIDE5LjA3TDMgMTIuMDdMNC42MiAxMC44MUwxMiAxNi41NE0xMiAxNEwzIDdMMTIgMEwyMSA3TDEyIDE0TTEyIDIuNTNMNi4yNiA3TDEyIDExLjQ3TDE3Ljc0IDdMMTIgMi41M00xMiAyMS40N0wxOS4zNyAxNS43M0wyMSAxN0wxMiAyNEwzIDE3TDQuNjIgMTUuNzRMMTIgMjEuNDciIC8+PC9zdmc+"
+}

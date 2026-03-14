@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "ZShmW1xkW7WWl9AkB78VITJMiTw1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Game properties data",
+  "name": "GetPropertiesData",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/GetPropertiesData.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/GetPropertiesData-header.json",
+  "tags": "Version,Publisher Name,Package Name,Title,Width,Height,Orientation",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/numeric.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Get Version, Title, Publisher name, PackageName from properties tab.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 13,
+  "helpPath": "/extensions/get-properties-data",
+  "description": "* Add an string expression that returns the current game version from game properties tab.\n* Add an string expression that returns the game title from game properties tab.\n* Add an string expression that returns the game publisher name from game properties tab.\n* Add an string expression that returns the package name from game properties tab.\n* Add an string expression that returns the orientation from game properties.\n* Add an string expression that returns the window width from game properties.\n* Add an string expression that returns the window height from game properties.\n* Add an string expression that returns the maxFPS from game properties.\n* Add an string expression that returns the minFPS from game properties.\n* Add an string expression that returns the scale mode from game properties.\n* Add an string expression that returns the pixel rounding from game properties.\n* Add an string expression that returns the scale mode from game properties.\n* Add an string expression that returns the vertical sync from game properties.\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLW51bWVyaWMiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCwxN1Y5SDJWN0g2VjE3SDRNMjIsMTVDMjIsMTYuMTEgMjEuMSwxNyAyMCwxN0gxNlYxNUgyMFYxM0gxOFYxMUgyMFY5SDE2VjdIMjBBMiwyIDAgMCwxIDIyLDlWMTAuNUExLjUsMS41IDAgMCwxIDIwLjUsMTJBMS41LDEuNSAwIDAsMSAyMiwxMy41VjE1TTE0LDE1VjE3SDhWMTNDOCwxMS44OSA4LjksMTEgMTAsMTFIMTJWOUg4VjdIMTJBMiwyIDAgMCwxIDE0LDlWMTFDMTQsMTIuMTEgMTMuMSwxMyAxMiwxM0gxMFYxNUgxNFoiIC8+PC9zdmc+"
+}

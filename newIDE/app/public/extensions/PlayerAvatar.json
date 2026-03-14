@@ -1,0 +1,465 @@
+{
+  "author": "",
+  "category": "User interface",
+  "extensionNamespace": "",
+  "fullName": "Player avatar",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjIuNywyMi45Yy0yLjItMC41LTMuNy0yLjUtMy43LTQuN2MxLjgtMSwzLTMsMy01LjJ2MGMwLTEuMSwwLjktMiwyLTJoMGwwLTIuM2MwLTIuOC0yLjEtNS40LTQuOS01LjcNCgljLTItMC4yLTMuOCwwLjYtNC45LDIuMWMtMC44LTAuMi0xLjYtMC4xLTIuNiwwLjZjLTEsMC44LTEuNiwyLTEuNiwzLjNsMCwxdjEuNXYxLjNjMCwyLjIsMS4yLDQuMywzLDUuNHYwYzAsMi4zLTEuNiw0LjItMy44LDQuOA0KCWMtMi42LDAuNy00LjUsMi44LTUuMSw1LjRDNC4xLDI4LjcsNC4zLDI5LDQuNywyOWwyMi43LDBjMC40LDAsMC42LTAuMywwLjUtMC43QzI3LjMsMjUuNywyNS4zLDIzLjYsMjIuNywyMi45eiIvPg0KPC9zdmc+DQo=",
+  "name": "PlayerAvatar",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Users/1f89f002e87f1e836320f69725d21e3294e7e2e18ff7dd645c6973e9775d24c3_Users_avatar_user_profile_male.svg",
+  "shortDescription": "Display player avatars from GDevelop accounts in multiplayer games.",
+  "version": "1.1.1",
+  "description": "An object that displays a player avatar according to their GDevelop account. It can be used for multiplayer games.",
+  "origin": {
+    "identifier": "PlayerAvatar",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "ui,avatar,gdevelop",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Return the UserID from a lobby player number.",
+      "fullName": "UserID",
+      "functionType": "StringExpression",
+      "name": "UserID",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {number} */",
+            "const parameterPlayerNumber = eventsFunctionContext.getArgument(\"PlayerNumber\");",
+            "",
+            "eventsFunctionContext.returnValue = gdjs.multiplayerMessageManager ? gdjs.multiplayerMessageManager.getPlayerId(parameterPlayerNumber) : \"\";",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Lobby player number",
+          "name": "PlayerNumber",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "//Define an new private object javascript for the Avatar extension",
+            "gdjs._extensionAvatar = {};",
+            "",
+            "gdjs._extensionAvatar.getGDevelopProfile = async function (url) {",
+            "",
+            "    // Get the URL of the avatar from the GDevelop profile API",
+            "    try {",
+            "        const response = await fetch(url);",
+            "        if (!response.ok) {",
+            "            throw new Error(`Response status: ${response.status}`);",
+            "        }",
+            "",
+            "        const json = await response.json();",
+            "        return json;",
+            "",
+            "    } catch (error) {",
+            "        console.error(error.message);",
+            "        return null;",
+            "    }",
+            "}",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": [
+    {
+      "areaMaxX": 100,
+      "areaMaxY": 100,
+      "areaMaxZ": 64,
+      "areaMinX": 0,
+      "areaMinY": 0,
+      "areaMinZ": 0,
+      "defaultName": "Avatar",
+      "description": "Display a player avatar according to their GDevelop account.",
+      "fullName": "Multiplayer Avatar",
+      "isUsingLegacyInstancesRenderer": false,
+      "name": "PlayerAvatar",
+      "objects": [
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "Avatar",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "Border",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Border",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "metadata": "{\"pskl\":{}}",
+                  "timeBetweenFrames": 0.08,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "Avatar"
+          },
+          {
+            "objectName": "Border"
+          }
+        ]
+      },
+      "objectsGroups": [],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 0,
+          "height": 100,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Avatar",
+          "persistentUuid": "39e3ba66-0223-4d8b-a78e-a45d367c277d",
+          "width": 100,
+          "x": 0,
+          "y": 0,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 0,
+          "height": 100,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Border",
+          "persistentUuid": "4dc03ef7-9424-4db7-b752-a44ba07ddd10",
+          "width": 100,
+          "x": 0,
+          "y": 0,
+          "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "editionSettings": {
+        "grid": false,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 4.117647058823533,
+        "windowMask": false,
+        "selectedLayer": ""
+      },
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "BorderEnabled",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "Border",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "PlayerNumber",
+                    "!=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PlayerAvatar::PlayerAvatar::SetUserID"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "PlayerAvatar::UserID(PlayerNumber)",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PlayerAvatar::PlayerAvatar",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the player unique ID of the avatar.",
+          "fullName": "Player unique ID",
+          "functionType": "ExpressionAndCondition",
+          "name": "UserID",
+          "sentence": "the player unique ID",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "UserID"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PlayerAvatar::PlayerAvatar",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "UserID",
+          "name": "SetUserID",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Value",
+                    "!=",
+                    "UserID"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "UserID",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "// Check if there is no multiplayer in game, exit the function.",
+                    "if (!gdjs.multiplayerMessageManager) return;",
+                    "",
+                    "/** @type {string} */",
+                    "const parameterUserID = eventsFunctionContext.getArgument(\"Value\");",
+                    "",
+                    "// If the userID isn't valid, exit the function.",
+                    "if (parameterUserID.length < 20 ||",
+                    "    parameterUserID.length > 36) return;",
+                    "",
+                    "// Get the PixiJS renderer of the Avatar Sprite",
+                    "const spriteRenderer = objects[0].getRendererObject();",
+                    "",
+                    "// Build the URL to request to the API the profile from a GDevelop userID.",
+                    "const url = \"https://api.gdevelop.io/user/user-public-profile/\" + parameterUserID;",
+                    "",
+                    "// Get the reponse from the API when possible then change the texture by the image from the GDevelop user profile.",
+                    "gdjs._extensionAvatar.getGDevelopProfile(url).then((json) => {",
+                    "  const baseTexture = PIXI.BaseTexture.from(json.iconUrl.split(\"?\")[0] + \"?s=200\");",
+                    "  spriteRenderer.texture = new PIXI.Texture(baseTexture);",
+                    "});",
+                    ""
+                  ],
+                  "parameterObjects": "Avatar",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PlayerAvatar::PlayerAvatar",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "Lobby player number",
+          "name": "PlayerNumber"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Border enabled",
+          "description": "Enable the border on the avatar.",
+          "name": "BorderEnabled"
+        },
+        {
+          "value": "",
+          "type": "String",
+          "label": "Player unique ID",
+          "hidden": true,
+          "name": "UserID"
+        }
+      ]
+    }
+  ]
+}

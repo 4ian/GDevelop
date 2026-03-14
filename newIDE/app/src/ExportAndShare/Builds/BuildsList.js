@@ -57,12 +57,6 @@ const buildFilterOptions: Array<{
   },
 
   {
-    key: 'cordova-ios-build',
-    value: 'cordova-ios-build',
-    label: t`iOS builds`,
-  },
-
-  {
     key: 'electron-build',
     value: 'electron-build',
     label: t`Desktop builds`,
@@ -76,12 +70,10 @@ const filterBuilds = (builds: ?Array<Build>, buildFilter: BuildFilter) => {
       return builds.filter(build => build.type === 'web-build');
     case 'cordova-build':
       return builds.filter(build => build.type === 'cordova-build');
-    case 'cordova-ios-build':
-      return builds.filter(build => build.type === 'cordova-ios-build');
     case 'electron-build':
       return builds.filter(build => build.type === 'electron-build');
     default:
-      return builds;
+      return builds.filter(build => build.type !== 'cordova-ios-build');
   }
 };
 
@@ -89,9 +81,6 @@ const emptyBuildMessage = {
   'web-build': <Trans>You don't have any web builds for this game.</Trans>,
   'cordova-build': (
     <Trans>You don't have any Android builds for this game.</Trans>
-  ),
-  'cordova-ios-build': (
-    <Trans>You don't have any iOS builds for this game.</Trans>
   ),
   'electron-build': (
     <Trans>You don't have any desktop builds for this game.</Trans>

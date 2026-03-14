@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Platform ledge grabber",
+  "name": "PlatformLedgeGrabber",
+  "version": "0.2.1",
+  "url": "https://resources.gdevelop-app.com/extensions/PlatformLedgeGrabber.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/PlatformLedgeGrabber-header.json",
+  "tags": "platform,ledge,climb",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/human-handsup.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Grab platforms ledges within reach automatically.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/platform-ledge-grabber",
+  "description": "Platforms ledges are grabbed automatically when they are within reach.\n\nAdditional constraints can be added to:\n- make the grabbing range smaller\n- only grab ledges the character is facing",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWh1bWFuLWhhbmRzdXAiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNSwxQzUsMy43IDYuNTYsNi4xNiA5LDcuMzJWMjJIMTFWMTVIMTNWMjJIMTVWNy4zMUMxNy40NCw2LjE2IDE5LDMuNyAxOSwxSDE3QTUsNSAwIDAsMSAxMiw2QTUsNSAwIDAsMSA3LDFNMTIsMUMxMC44OSwxIDEwLDEuODkgMTAsM0MxMCw0LjExIDEwLjg5LDUgMTIsNUMxMy4xMSw1IDE0LDQuMTEgMTQsM0MxNCwxLjg5IDEzLjExLDEgMTIsMVoiIC8+PC9zdmc+"
+}

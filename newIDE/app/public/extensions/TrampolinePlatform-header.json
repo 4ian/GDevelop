@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IRIhkkTTl2UHhfjrLTTH5GYwkYu1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Trampoline Platform",
+  "name": "TrampolinePlatform",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/TrampolinePlatform.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/TrampolinePlatform-header.json",
+  "tags": "trampoline,platform,jump,bounce",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Sports and Fitness/Sports and Fitness_skipping_training_jump_rope.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Convert object to trampoline platform.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/trampoline-platform",
+  "description": "# User can\n- Use the extension action multi times on multi objects.\n- Set the trampoline force.\n- Set multi forces for each trampoline.\n- Set which object can jump on that trampoline.\n- Set group of objects to jump on the trampoline.\n- Set the boolean (On/Off) to trigger the trampoline:\n    1. On: Trigger if player is on top of it.\n    2. Off: Trigger if player collided with it.\n- Check if a trampoline has been triggered (for animations).\n\n# Actions\n- Extension action.\n\n# Conditions\n- Check if a trampoline has been triggered.\n\n# Example\n![](https://i.imgur.com/XIYBQB9.png)\n- *Recommended to use platform behavior (Jump through) on the trampoline.*  \n- *Extension action must run in every frame.*",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTcsMTJIM1Y1YzAtMS4xLDAuOS0yLDItMmgwYzEuMSwwLDIsMC45LDIsMlYxMnoiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yOSwyMmgtNHYtN2MwLTEuMSwwLjktMiwyLTJoMGMxLjEsMCwyLDAuOSwyLDJWMjJ6Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNSwxMnYzYzAsMy45LDMuMSw3LDcsN2gwYzMuOSwwLDctMy4xLDctN1Y4YzAtMi4yLTEuOC00LTQtNGgwYy0yLjIsMC00LDEuOC00LDR2MTBjMCw1LjUsNC41LDEwLDEwLDEwaDANCgljMy4zLDAsNi0yLjcsNi02djAiLz4NCjwvc3ZnPg0K"
+}

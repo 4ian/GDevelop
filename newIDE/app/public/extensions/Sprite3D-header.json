@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "3D sprite",
+  "name": "Sprite3D",
+  "version": "0.1.2",
+  "url": "https://resources.gdevelop-app.com/extensions/Sprite3D.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Sprite3D-header.json",
+  "tags": "3d",
+  "category": "General",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/3bd33ec77ed20d3f631c6c92884728b375aa2879174bc9f289c864d0e0383d59_ghost-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "An animated sprite in 3D.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/objects/sprite/",
+  "description": "The 3D sprite is an object that can be moved and rotated in 3D.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdob3N0LW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIgMkM3LjAzIDIgMyA2LjAzIDMgMTFWMjJMNiAxOUw5IDIyTDEyIDE5TDE1IDIyTDE4IDE5TDIxIDIyVjExQzIxIDYuMDMgMTYuOTcgMiAxMiAyTTE5IDE3LjE3TDE4IDE2LjE3TDE2LjU5IDE3LjU5TDE1IDE5LjE3TDEzLjQxIDE3LjU5TDEyIDE2LjE3TDEwLjU5IDE3LjU5TDkgMTkuMTdMNy40MSAxNy41OUw2IDE2LjE3TDUgMTcuMTdWMTFDNSA3LjE0IDguMTQgNCAxMiA0UzE5IDcuMTQgMTkgMTFWMTcuMTdNMTEgMTBDMTEgMTEuMTEgMTAuMTEgMTIgOSAxMlM3IDExLjExIDcgMTAgNy45IDggOSA4IDExIDguOSAxMSAxME0xNyAxMEMxNyAxMS4xMSAxNi4xMSAxMiAxNSAxMlMxMyAxMS4xMSAxMyAxMCAxMy45IDggMTUgOCAxNyA4LjkgMTcgMTBaIiAvPjwvc3ZnPg=="
+}

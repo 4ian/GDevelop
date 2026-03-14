@@ -1,0 +1,1271 @@
+{
+  "author": "@Bouh, D8H",
+  "category": "General",
+  "dimension": "",
+  "extensionNamespace": "",
+  "fullName": "Variables copier",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZhcmlhYmxlLWJveCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xOSAzSDVDMy45IDMgMyAzLjkgMyA1VjE5QzMgMjAuMSAzLjkgMjEgNSAyMUgxOUMyMC4xIDIxIDIxIDIwLjEgMjEgMTlWNUMyMSAzLjkgMjAuMSAzIDE5IDNNNy40IDE4QzUuOSAxNi41IDUgMTQuMyA1IDEyUzUuOSA3LjUgNy40IDZMOSA2LjdDNy43IDcuOSA3IDkuOSA3IDEyUzcuNyAxNi4xIDkgMTcuM0w3LjQgMThNMTIuNyAxNUwxMS45IDEzTDEwLjUgMTVIOUwxMS4zIDExLjlMMTAgOUgxMS4zTDEyLjEgMTFMMTMuNSA5SDE1TDEyLjggMTJMMTQuMSAxNUgxMi43TTE2LjYgMThMMTUgMTcuM0MxNi4zIDE2IDE3IDE0LjEgMTcgMTJTMTYuMyA3LjkgMTUgNi43TDE2LjYgNkMxOC4xIDcuNSAxOSA5LjcgMTkgMTJTMTguMSAxNi41IDE2LjYgMThaIiAvPjwvc3ZnPg==",
+  "name": "ExtendedVariables",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/variable-box.svg",
+  "shortDescription": "Copy structure and array variables.",
+  "version": "1.1.0",
+  "description": "Copy all the children of a structure or an array into another variable.",
+  "origin": {
+    "identifier": "ExtendedVariables",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Check if a global variable exists.",
+      "fullName": "Global variable exists",
+      "functionType": "Condition",
+      "group": "Deprecated",
+      "name": "C_global_variable_exist",
+      "private": true,
+      "sentence": "If the global variable _PARAM1_ exist",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "False"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "ExtendedVariables::GlobalVariableExist"
+              },
+              "parameters": [
+                "",
+                "GlobalVariableName",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the global variable",
+          "name": "GlobalVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the global variable exists.",
+      "fullName": "Global variable exists",
+      "functionType": "Condition",
+      "group": "Global variables",
+      "name": "GlobalVariableExist",
+      "private": true,
+      "sentence": "If the global variable _PARAM1_ exist",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const globalVariables = runtimeScene.getGame().getVariables();\r",
+            "eventsFunctionContext.returnValue = globalVariables.has(eventsFunctionContext.getArgument(\"GlobalVariableName\"));"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the global variable",
+          "name": "GlobalVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a scene variable exists.",
+      "fullName": "Scene variable exists",
+      "functionType": "Condition",
+      "group": "Deprecated",
+      "name": "C_scene_variable_exist",
+      "private": true,
+      "sentence": "If the scene variable _PARAM1_ exist",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "False"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "ExtendedVariables::SceneVariableExist"
+              },
+              "parameters": [
+                "",
+                "SceneVariableName",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the scene variable",
+          "name": "SceneVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the scene variable exists.",
+      "fullName": "Scene variable exists",
+      "functionType": "Condition",
+      "group": "Scene variables",
+      "name": "SceneVariableExist",
+      "private": true,
+      "sentence": "If the scene variable _PARAM1_ exist",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const sceneVariables = runtimeScene.getVariables();\r",
+            "eventsFunctionContext.returnValue = sceneVariables.has(eventsFunctionContext.getArgument(\"SceneVariableName\"));"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the scene variable",
+          "name": "SceneVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if an object variable exists.",
+      "fullName": "Object variable exists",
+      "functionType": "Condition",
+      "group": "Deprecated",
+      "name": "C_object_variable_exist",
+      "private": true,
+      "sentence": "Object _PARAM1_ has object variable _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "False"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "ExtendedVariables::ObjectVariableExist"
+              },
+              "parameters": [
+                "",
+                "ObjectToCheck",
+                "ObjectVariableName",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object",
+          "name": "ObjectToCheck",
+          "type": "objectList"
+        },
+        {
+          "description": "Name of object variable",
+          "name": "ObjectVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if an object variable exists.",
+      "fullName": "Object variable exists",
+      "functionType": "Condition",
+      "group": "Variables",
+      "name": "ObjectVariableExist",
+      "private": true,
+      "sentence": "Object _PARAM1_ has object variable _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "let returnValue = true;\r",
+            "if (!objects.length) {\r",
+            "    returnValue = false;\r",
+            "} else {\r",
+            "    const objectVariableName = eventsFunctionContext.getArgument(\"ObjectVariableName\");\r",
+            "    for (let i = 0; i < objects.length; i++) {\r",
+            "        if (!objects[i].hasVariable(objectVariableName)) {\r",
+            "            // If any object does NOT have the variable, return false.\r",
+            "            returnValue = false;\r",
+            "            break;\r",
+            "        }\r",
+            "    }\r",
+            "}\r",
+            "\r",
+            "eventsFunctionContext.returnValue = returnValue;"
+          ],
+          "parameterObjects": "ObjectToCheck",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object",
+          "name": "ObjectToCheck",
+          "type": "objectList"
+        },
+        {
+          "description": "Name of object variable",
+          "name": "ObjectVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Delete a global variable, removing it from memory.",
+      "fullName": "Delete global variable",
+      "functionType": "Action",
+      "group": "Deprecated",
+      "name": "A_Delete_global_variable",
+      "private": true,
+      "sentence": "Delete global variable _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ExtendedVariables::DeleteGlobalVariable"
+              },
+              "parameters": [
+                "",
+                "GlobalVariableName",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the global variable to delete",
+          "name": "GlobalVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Delete the global variable, removing it from memory.",
+      "fullName": "Delete global variable",
+      "functionType": "Action",
+      "group": "Global variables",
+      "name": "DeleteGlobalVariable",
+      "private": true,
+      "sentence": "Delete the global variable _PARAM1_ from memory",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "runtimeScene.getGame().getVariables().remove(eventsFunctionContext.getArgument(\"GlobalVariableName\"));",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the global variable to delete",
+          "name": "GlobalVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Modify the text of a scene variable.",
+      "fullName": "String of a scene variable",
+      "functionType": "Action",
+      "group": "Deprecated",
+      "name": "A_Modify_scene_variable_string",
+      "private": true,
+      "sentence": "Change the text of scene variable _PARAM1_ to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ExtendedVariables::ModifySceneVariableString"
+              },
+              "parameters": [
+                "",
+                "SceneVariableName",
+                "SceneVariableValue",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the scene variable",
+          "name": "SceneVariableName",
+          "type": "string"
+        },
+        {
+          "description": "Value",
+          "name": "SceneVariableValue",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Modify the text of a scene variable.",
+      "fullName": "String of a scene variable",
+      "functionType": "Action",
+      "group": "Scene variables",
+      "name": "ModifySceneVariableString",
+      "private": true,
+      "sentence": "Change the text of scene variable _PARAM1_ to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const variable = runtimeScene.getVariables().get(eventsFunctionContext.getArgument(\"SceneVariableName\"));\r",
+            "variable.setString(eventsFunctionContext.getArgument(\"SceneVariableValue\"));"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the scene variable",
+          "name": "SceneVariableName",
+          "type": "string"
+        },
+        {
+          "description": "Value",
+          "name": "SceneVariableValue",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Modify the text of a global variable.",
+      "fullName": "String of a global variable",
+      "functionType": "Action",
+      "group": "Global variables",
+      "name": "ModifyGlobalVariableString",
+      "private": true,
+      "sentence": "Change the text of global variable _PARAM1_ to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const variable = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"GlobalVariableName\"));\r",
+            "variable.setString(eventsFunctionContext.getArgument(\"GlobalVariableValue\"));"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the global variable",
+          "name": "GlobalVariableName",
+          "type": "string"
+        },
+        {
+          "description": "Value",
+          "name": "GlobalVariableValue",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Modify the value of a global variable.",
+      "fullName": "Value of a global variable",
+      "functionType": "Action",
+      "group": "Deprecated",
+      "name": "A_Modify_global_variable",
+      "private": true,
+      "sentence": "Change the global variable _PARAM1_ with value: _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ExtendedVariables::ModifyGlobalVariable"
+              },
+              "parameters": [
+                "",
+                "SceneVariableName",
+                "SceneVariableValue",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the global variable",
+          "name": "SceneVariableName",
+          "type": "string"
+        },
+        {
+          "description": "Value",
+          "name": "SceneVariableValue",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Modify the text of a global variable.",
+      "fullName": "String of a global variable",
+      "functionType": "Action",
+      "group": "Deprecated",
+      "name": "A_Modify_global_variable_string",
+      "private": true,
+      "sentence": "Change the text of global variable _PARAM1_ to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ExtendedVariables::ModifyGlobalVariableString"
+              },
+              "parameters": [
+                "",
+                "SceneVariableName",
+                "SceneVariableValue",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the global variable",
+          "name": "SceneVariableName",
+          "type": "string"
+        },
+        {
+          "description": "Value",
+          "name": "SceneVariableValue",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Modify the value of a global variable.",
+      "fullName": "Value of a global variable",
+      "functionType": "Action",
+      "group": "Global variables",
+      "name": "ModifyGlobalVariable",
+      "private": true,
+      "sentence": "Change the global variable _PARAM1_ with value: _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const variable = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"GlobalVariableName\"));\r",
+            "variable.setNumber(eventsFunctionContext.getArgument(\"GlobalVariableValue\"));"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the global variable",
+          "name": "GlobalVariableName",
+          "type": "string"
+        },
+        {
+          "description": "Value",
+          "name": "GlobalVariableValue",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Modify the value of a scene variable.",
+      "fullName": "Value of a scene variable",
+      "functionType": "Action",
+      "group": "Deprecated",
+      "name": "A_Modify_scene_variable",
+      "private": true,
+      "sentence": "Change the scene variable _PARAM1_ with value: _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ExtendedVariables::ModifySceneVariable"
+              },
+              "parameters": [
+                "",
+                "SceneVariableName",
+                "SceneVariableValue",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the scene variable",
+          "name": "SceneVariableName",
+          "type": "string"
+        },
+        {
+          "description": "Value",
+          "name": "SceneVariableValue",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Modify the value of a scene variable.",
+      "fullName": "Value of a scene variable",
+      "functionType": "Action",
+      "group": "Scene variables",
+      "name": "ModifySceneVariable",
+      "private": true,
+      "sentence": "Change the scene variable _PARAM1_ with value: _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const variable = runtimeScene.getVariables().get(eventsFunctionContext.getArgument(\"SceneVariableName\"));\r",
+            "variable.setNumber(eventsFunctionContext.getArgument(\"SceneVariableValue\"));"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the scene variable",
+          "name": "SceneVariableName",
+          "type": "string"
+        },
+        {
+          "description": "Value",
+          "name": "SceneVariableValue",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Delete scene variable, the variable will be deleted from the memory.",
+      "fullName": "Delete scene variable",
+      "functionType": "Action",
+      "group": "Deprecated",
+      "name": "A_Delete_scene_variable",
+      "private": true,
+      "sentence": "Delete the scene variable _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ExtendedVariables::DeleteSceneVariable"
+              },
+              "parameters": [
+                "",
+                "SceneVariableName",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the scene variable to delete",
+          "name": "SceneVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Delete the scene variable, the variable will be deleted from the memory.",
+      "fullName": "Delete scene variable",
+      "functionType": "Action",
+      "group": "Scene variables",
+      "name": "DeleteSceneVariable",
+      "private": true,
+      "sentence": "Delete the scene variable _PARAM1_ from memory",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "runtimeScene.getVariables().remove(eventsFunctionContext.getArgument(\"SceneVariableName\"));",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the scene variable to delete",
+          "name": "SceneVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Copy an object variable from one object to another.",
+      "fullName": "Copy an object variable",
+      "functionType": "Action",
+      "group": "Deprecated",
+      "name": "A_CopyObjectVariable",
+      "private": true,
+      "sentence": "Copy the variable _PARAM1_ of _PARAM2_ to the variable _PARAM3_ of _PARAM4_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ExtendedVariables::CopyObjectVariable"
+              },
+              "parameters": [
+                "",
+                "SourceObject",
+                "SourceVariableName",
+                "TargetObject",
+                "TargetVariableName",
+                "no",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Source object",
+          "name": "SourceObject",
+          "type": "objectList"
+        },
+        {
+          "description": "Variable to copy",
+          "name": "SourceVariableName",
+          "type": "string"
+        },
+        {
+          "description": "Destination object",
+          "longDescription": "To copy the variable between 2 instances of the same object, the variable has to be copied to another object first.",
+          "name": "TargetObject",
+          "type": "objectList"
+        },
+        {
+          "description": "Destination variable",
+          "name": "TargetVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Copy the object variable from one object to another.",
+      "fullName": "Copy an object variable",
+      "functionType": "Action",
+      "group": "Variables",
+      "name": "CopyObjectVariable",
+      "sentence": "Copy the variable _PARAM2_ of _PARAM1_ to the variable _PARAM4_ of _PARAM3_ (clear destination first: _PARAM5_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const sourceObject = eventsFunctionContext.getObjects(\"SourceObject\")[0];",
+            "const targetObject = eventsFunctionContext.getObjects(\"TargetObject\")[0];",
+            "const sourceVariableName = eventsFunctionContext.getArgument(\"SourceVariableName\");",
+            "const targetVariableName = eventsFunctionContext.getArgument(\"TargetVariableName\");",
+            "const isExactCopy = eventsFunctionContext.getArgument(\"isExactCopy\");",
+            "",
+            "const sourceVariables = sourceObject.getVariables();",
+            "const targetVariables = targetObject.getVariables();",
+            "",
+            "if (sourceVariables.has(sourceVariableName))",
+            "{",
+            "    gdjs.Variable.copy",
+            "    (",
+            "        sourceVariables.get(sourceVariableName),",
+            "        targetVariables.get(targetVariableName),",
+            "        isExactCopy",
+            "    );",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Source object",
+          "name": "SourceObject",
+          "type": "objectList"
+        },
+        {
+          "description": "Variable to copy",
+          "name": "SourceVariableName",
+          "type": "string"
+        },
+        {
+          "description": "Destination object",
+          "longDescription": "To copy the variable between 2 instances of the same object, the variable has to be copied to another object first.",
+          "name": "TargetObject",
+          "type": "objectList"
+        },
+        {
+          "description": "Destination variable",
+          "name": "TargetVariableName",
+          "type": "string"
+        },
+        {
+          "defaultValue": "yes",
+          "description": "Clear the destination variable before copying",
+          "name": "isExactCopy",
+          "optional": true,
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Copy all object variables from one object to another.",
+      "fullName": "Copy all object variables",
+      "functionType": "Action",
+      "group": "Deprecated",
+      "name": "A_CopyAllObjectVariables",
+      "private": true,
+      "sentence": "Copy all variables from _PARAM1_ to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ExtendedVariables::CopyAllObjectVariables"
+              },
+              "parameters": [
+                "",
+                "SourceObject",
+                "TargetObject",
+                "no",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Source object",
+          "name": "SourceObject",
+          "type": "objectList"
+        },
+        {
+          "description": "Destination object",
+          "name": "TargetObject",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Copy all object variables from one object to another.",
+      "fullName": "Copy all object variables",
+      "functionType": "Action",
+      "group": "Variables",
+      "name": "CopyAllObjectVariables",
+      "sentence": "Copy all variables from object _PARAM1_ to object _PARAM2_ (clear destination first: _PARAM3_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// This JS event use private scope from the API, this can be borken at anytime.",
+            "",
+            "const sourceObject = eventsFunctionContext.getObjects(\"SourceObject\")[0];",
+            "const targetObject = eventsFunctionContext.getObjects(\"TargetObject\")[0];",
+            "const isExactCopy = eventsFunctionContext.getArgument(\"isExactCopy\");",
+            "",
+            "const targetVariables = targetObject.getVariables();",
+            "const sourceVariables = sourceObject.getVariables()._variables.items;",
+            "for (const variableName in sourceVariables)",
+            "{",
+            "    if (sourceVariables.hasOwnProperty(variableName))",
+            "    {",
+            "        gdjs.Variable.copy(sourceVariables[variableName], targetVariables.get(variableName), isExactCopy);",
+            "    }",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Source object",
+          "name": "SourceObject",
+          "type": "objectList"
+        },
+        {
+          "description": "Destination object",
+          "name": "TargetObject",
+          "type": "objectList"
+        },
+        {
+          "defaultValue": "yes",
+          "description": "Clear the destination variable before copying",
+          "name": "isExactCopy",
+          "optional": true,
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Delete an object variable, removing it from memory.",
+      "fullName": "Delete object variable",
+      "functionType": "Action",
+      "group": "Variables",
+      "name": "DeleteObjectVariable",
+      "private": true,
+      "sentence": "Delete for the object _PARAM1_ the object variable _PARAM2_ from the memory",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const object = eventsFunctionContext.getObjects(\"Object\")[0];\r",
+            "const objectVariables = object.getVariables();\r",
+            "\r",
+            "objectVariables.remove(eventsFunctionContext.getArgument(\"VariableName\"));"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Name of object variable",
+          "name": "VariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the text of a global variable.",
+      "fullName": "Text of a global variable",
+      "functionType": "StringExpression",
+      "group": "Global variables",
+      "name": "GlobalVariableString",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const globalVariables = runtimeScene.getGame().getVariables();\r",
+            "const variableExist = globalVariables.has(eventsFunctionContext.getArgument(\"GlobalVariableName\"));\r",
+            "\r",
+            "if (variableExist) {\r",
+            "    eventsFunctionContext.returnValue = globalVariables.get(eventsFunctionContext.getArgument(\"GlobalVariableName\")).getAsString();\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Name of the global variable",
+          "name": "GlobalVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the text of a scene variable.",
+      "fullName": "Text of a scene variable",
+      "functionType": "StringExpression",
+      "group": "Scene variables",
+      "name": "VariableString",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const sceneVariables = runtimeScene.getVariables();\r",
+            "const variableExist = sceneVariables.has(eventsFunctionContext.getArgument(\"SceneVariableName\"));\r",
+            "\r",
+            "if (variableExist) {\r",
+            "    eventsFunctionContext.returnValue = sceneVariables.get(eventsFunctionContext.getArgument(\"SceneVariableName\")).getAsString();\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Name of the scene variable",
+          "name": "SceneVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the value of a global variable.",
+      "fullName": "Value of a global variable",
+      "functionType": "Expression",
+      "group": "Global variables",
+      "name": "GlobalVariable",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const globalVariables = runtimeScene.getGame().getVariables();\r",
+            "const variableExist = globalVariables.has(eventsFunctionContext.getArgument(\"GlobalVariableName\"));\r",
+            "\r",
+            "if (variableExist) {\r",
+            "    eventsFunctionContext.returnValue = globalVariables.get(eventsFunctionContext.getArgument(\"GlobalVariableName\")).getAsNumber();\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Name of the global variable",
+          "name": "GlobalVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the value of a scene variable.",
+      "fullName": "Value of a scene variable",
+      "functionType": "Expression",
+      "group": "Scene variables",
+      "name": "Variable",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const sceneVariables = runtimeScene.getVariables();\r",
+            "const variableExist = sceneVariables.has(eventsFunctionContext.getArgument(\"SceneVariableName\"));\r",
+            "\r",
+            "if (variableExist) {\r",
+            "    eventsFunctionContext.returnValue = sceneVariables.get(eventsFunctionContext.getArgument(\"SceneVariableName\")).getAsNumber();\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Name of the scene variable",
+          "name": "SceneVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Copy the global variable to scene. This copy everything from the types to the values.",
+      "fullName": "Copy a global variable to scene",
+      "functionType": "Action",
+      "group": "Copy variables",
+      "name": "CopyGlobalVariableToScene",
+      "private": true,
+      "sentence": "Copy the global variable:_PARAM1_ to a scene variable:_PARAM2_ (clear destination first: _PARAM3_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const globalVariable = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"globalVariableName\"));",
+            "const sceneVariable = runtimeScene.getVariables().get(eventsFunctionContext.getArgument(\"sceneVariableName\"));",
+            "const isExactCopy = eventsFunctionContext.getArgument(\"isExactCopy\");",
+            "",
+            "gdjs.Variable.copy(globalVariable, sceneVariable, isExactCopy);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Global variable to copy",
+          "name": "globalVariableName",
+          "type": "string"
+        },
+        {
+          "description": "Scene variable destination",
+          "name": "sceneVariableName",
+          "type": "string"
+        },
+        {
+          "defaultValue": "yes",
+          "description": "Clear the destination variable before copying",
+          "name": "isExactCopy",
+          "optional": true,
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Copy the scene variable to global. This copy everything from the types to the values.",
+      "fullName": "Copy a scene variable to global ",
+      "functionType": "Action",
+      "group": "Copy variables",
+      "name": "CopySceneVariableToGlobal",
+      "private": true,
+      "sentence": "Copy the scene variable:_PARAM1_ to a global variable:_PARAM2_ (clear destination first: _PARAM3_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const sceneVariable = runtimeScene.getVariables().get(eventsFunctionContext.getArgument(\"sceneVariableName\"));",
+            "const globalVariable = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"globalVariableName\"));",
+            "const isExactCopy = eventsFunctionContext.getArgument(\"isExactCopy\");",
+            "",
+            "gdjs.Variable.copy(sceneVariable, globalVariable, isExactCopy);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Scene variable to copy",
+          "name": "sceneVariableName",
+          "type": "string"
+        },
+        {
+          "description": "Global variable destination",
+          "name": "globalVariableName",
+          "type": "string"
+        },
+        {
+          "defaultValue": "yes",
+          "description": "Clear the destination variable before copying",
+          "name": "isExactCopy",
+          "optional": true,
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Copy all the chidren of a variable into another variable.",
+      "fullName": "Copy a variable",
+      "functionType": "Action",
+      "name": "CopyVariable",
+      "sentence": "Copy _PARAM1_ to _PARAM2_ (clear destination first: _PARAM3_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const sourceVariable = eventsFunctionContext.getArgument(\"SourceVariable\");",
+            "/** @type {gdjs.Variable} */",
+            "const destinationVariable = eventsFunctionContext.getArgument(\"DestinationVariable\");",
+            "const isExactCopy = eventsFunctionContext.getArgument(\"isExactCopy\");",
+            "",
+            "if (sourceVariable.isPrimitive() === destinationVariable.isPrimitive()) {",
+            "    gdjs.Variable.copy(sourceVariable, destinationVariable, isExactCopy);",
+            "}",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Variable to copy",
+          "name": "SourceVariable",
+          "type": "variable"
+        },
+        {
+          "description": "Destination variable",
+          "name": "DestinationVariable",
+          "type": "variable"
+        },
+        {
+          "defaultValue": "yes",
+          "description": "Clear the destination variable before copying",
+          "name": "isExactCopy",
+          "optional": true,
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

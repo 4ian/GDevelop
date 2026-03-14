@@ -1,0 +1,44 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Homing projectile",
+  "name": "HomingProjectile",
+  "version": "0.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/HomingProjectile.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/HomingProjectile-header.json",
+  "tags": "projectile,homing,target,guided,missile,rocket,autoattack,ranged,attack,fire,shoot",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/rocket-launch.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Make a projectile object move towards a target object.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 3,
+  "helpPath": "https://victrisgames.itch.io/extension-homing-projectile",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "LockOnTarget",
+      "fullName": "Lock projectile to target",
+      "description": "Lock projectile object to target object.  (This is required for \"Move projectile towards target\").",
+      "functionType": "Action"
+    },
+    {
+      "name": "MoveTowardsTargetPhysics",
+      "fullName": "Move physics projectile towards target",
+      "description": "Move physics projectile towards the object that it has been locked to.  This action must be run every frame.",
+      "functionType": "Action"
+    },
+    {
+      "name": "MoveTowardsTarget",
+      "fullName": "Move projectile towards target",
+      "description": "Move projectile towards the object that it has been locked to.  This action must be run every frame.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "This extension requires two actions to function correctly:\n1) \"Lock projectile to target\" should be used once per projectile. \n2) \"Move projectile towards target\" should be run every frame.  This will move all projectiles that are locked to targets.\n\nParameters:\n- Rotation Speed: How fast the projectile rotates. This is critical in determining how fast the projectile can turn corners.\n- Initial Speed: Starting speed of the projectile\n- Acceleration: How much speed is added over time\n- Max Speed:  The max speed a projectile can travel (does not apply to physics object)\n- Max Lifetime:  The number of seconds a projectile can exist after locking onto a target.  Once this time is reached the object is deleted.\n\nTips:\n- Make sure to set the angle of the projectile before you use the \"Move\" action.  The projectile will turn towards the target, but you might want the projectile to be facing a certain direction. \n- Since Max Speed is not enforced on the physics object, you can accomplish this by changing Linear Decay on the Physics behavior\n- Use the lifetime parameter to prevent missiles from chasing objects forever",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXJvY2tldC1sYXVuY2giIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTMuMTMgMjIuMTlMMTEuNSAxOC4zNkMxMy4wNyAxNy43OCAxNC41NCAxNyAxNS45IDE2LjA5TDEzLjEzIDIyLjE5TTUuNjQgMTIuNUwxLjgxIDEwLjg3TDcuOTEgOC4xQzcgOS40NiA2LjIyIDEwLjkzIDUuNjQgMTIuNU0yMS42MSAyLjM5QzIxLjYxIDIuMzkgMTYuNjYgLjI2OSAxMSA1LjkzQzguODEgOC4xMiA3LjUgMTAuNTMgNi42NSAxMi42NEM2LjM3IDEzLjM5IDYuNTYgMTQuMjEgNy4xMSAxNC43N0w5LjI0IDE2Ljg5QzkuNzkgMTcuNDUgMTAuNjEgMTcuNjMgMTEuMzYgMTcuMzVDMTMuNSAxNi41MyAxNS44OCAxNS4xOSAxOC4wNyAxM0MyMy43MyA3LjM0IDIxLjYxIDIuMzkgMjEuNjEgMi4zOU0xNC41NCA5LjQ2QzEzLjc2IDguNjggMTMuNzYgNy40MSAxNC41NCA2LjYzUzE2LjU5IDUuODUgMTcuMzcgNi42M0MxOC4xNCA3LjQxIDE4LjE1IDguNjggMTcuMzcgOS40NkMxNi41OSAxMC4yNCAxNS4zMiAxMC4yNCAxNC41NCA5LjQ2TTguODggMTYuNTNMNy40NyAxNS4xMkw4Ljg4IDE2LjUzTTYuMjQgMjJMOS44OCAxOC4zNkM5LjU0IDE4LjI3IDkuMjEgMTguMTIgOC45MSAxNy45MUw0LjgzIDIySDYuMjRNMiAyMkgzLjQxTDguMTggMTcuMjRMNi43NiAxNS44M0wyIDIwLjU5VjIyTTIgMTkuMTdMNi4wOSAxNS4wOUM1Ljg4IDE0Ljc5IDUuNzMgMTQuNDcgNS42NCAxNC4xMkwyIDE3Ljc2VjE5LjE3WiIgLz48L3N2Zz4="
+}

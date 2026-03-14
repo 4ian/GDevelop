@@ -1,0 +1,795 @@
+{
+  "author": "",
+  "category": "Camera",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Camera impulse",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNMjEsMzBjLTAuMywwLTAuNS0wLjEtMC43LTAuM2wtNC00Yy0wLjQtMC40LTAuNC0xLDAtMS40czEtMC40LDEuNCwwbDMuMywzLjNsMy4zLTMuM2MwLjQtMC40LDEtMC40LDEuNCwwczAuNCwxLDAsMS40DQoJCWwtNCw0QzIxLjUsMjkuOSwyMS4zLDMwLDIxLDMweiIvPg0KPC9nPg0KPGc+DQoJPHBhdGggZD0iTTIxLDMwYy0wLjYsMC0xLTAuNC0xLTFWN2MwLTAuNiwwLjQtMSwxLTFzMSwwLjQsMSwxdjIyQzIyLDI5LjYsMjEuNiwzMCwyMSwzMHoiLz4NCjwvZz4NCjxnPg0KCTxwYXRoIGQ9Ik0xNSw4Yy0wLjMsMC0wLjUtMC4xLTAuNy0wLjNMMTEsNC40TDcuNyw3LjdjLTAuNCwwLjQtMSwwLjQtMS40LDBzLTAuNC0xLDAtMS40bDQtNGMwLjQtMC40LDEtMC40LDEuNCwwbDQsNA0KCQljMC40LDAuNCwwLjQsMSwwLDEuNEMxNS41LDcuOSwxNS4zLDgsMTUsOHoiLz4NCjwvZz4NCjxnPg0KCTxwYXRoIGQ9Ik0xMSwyNmMtMC42LDAtMS0wLjQtMS0xVjNjMC0wLjYsMC40LTEsMS0xczEsMC40LDEsMXYyMkMxMiwyNS42LDExLjYsMjYsMTEsMjZ6Ii8+DQo8L2c+DQo8L3N2Zz4NCg==",
+  "name": "CameraImpulse",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Arrows/Arrows_thin_arrow_up_down_directions.svg",
+  "shortDescription": "Camera impulse movement for earthquake or impact effects.",
+  "dimension": "2D",
+  "version": "1.1.0",
+  "description": [
+    "Move the camera following an impulse trajectory.",
+    "",
+    "It can be used to simulate earthquakes or impacts."
+  ],
+  "origin": {
+    "identifier": "CameraImpulse",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "implusion,shaking,camera,effect,screen,shake,translate",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [
+    {
+      "name": "Impulses",
+      "type": "structure",
+      "children": []
+    },
+    {
+      "name": "Impulse",
+      "type": "structure",
+      "children": [
+        {
+          "name": "AwayDuration",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "AwayEasing",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "BackDuration",
+          "type": "string",
+          "value": ""
+        },
+        {
+          "name": "BackEasing",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "DeltaX",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "DeltaY",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "Layer",
+          "type": "string",
+          "value": ""
+        },
+        {
+          "name": "StayDuration",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "Time",
+          "type": "number",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "Identifer",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "name": "Layers",
+      "type": "structure",
+      "children": []
+    },
+    {
+      "name": "Layer",
+      "type": "structure",
+      "children": [
+        {
+          "name": "CameraDeltaX",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "CameraDeltaY",
+          "type": "number",
+          "value": 0
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onScenePostEvents",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Step time counters."
+        },
+        {
+          "type": "BuiltinCommonInstructions::ForEachChildVariable",
+          "iterableVariableName": "Impulses",
+          "valueIteratorVariableName": "Impulse",
+          "keyIteratorVariableName": "Identifer",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Impulses[Identifer].Time",
+                    "+",
+                    "TimeDelta()"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Apply impulses on cameras."
+        },
+        {
+          "type": "BuiltinCommonInstructions::ForEachChildVariable",
+          "iterableVariableName": "Impulses",
+          "valueIteratorVariableName": "Impulse",
+          "keyIteratorVariableName": "Identifer",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "Impulse.Time",
+                    ">=",
+                    "Impulse.AwayDuration + Impulse.StayDuration + Impulse.BackDuration"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "RemoveVariableChild"
+                  },
+                  "parameters": [
+                    "Impulses",
+                    "Identifer"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "Impulse.Time",
+                    "<",
+                    "Impulse.AwayDuration + Impulse.StayDuration + Impulse.BackDuration"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Going away"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "Impulse.Time",
+                        "<",
+                        "Impulse.AwayDuration"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "DistanceFactor",
+                        "=",
+                        "Tween::Ease(Impulse.AwayEasing, 0, 1, Impulse.Time / Impulse.AwayDuration)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Staying"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "Impulse.Time",
+                        ">=",
+                        "Impulse.AwayDuration"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "Impulse.Time",
+                        "<",
+                        "Impulse.AwayDuration + Impulse.StayDuration"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "DistanceFactor",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Going back"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "Impulse.Time",
+                        ">=",
+                        "Impulse.AwayDuration + Impulse.StayDuration"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "DistanceFactor",
+                        "=",
+                        "Tween::Ease(Impulse.BackEasing, 0, 1, (1 - (Impulse.Time - Impulse.AwayDuration - Impulse.StayDuration) / Impulse.BackDuration))"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Keep the camera displacement to revert it in onScenePreEvents"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "Layers[Impulse.Layer].CameraDeltaX",
+                        "+",
+                        "Impulse.DeltaX * DistanceFactor"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "Layers[Impulse.Layer].CameraDeltaY",
+                        "+",
+                        "Impulse.DeltaY * DistanceFactor"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetCameraCenterX"
+                      },
+                      "parameters": [
+                        "",
+                        "+",
+                        "Layers[Impulse.Layer].CameraDeltaX",
+                        "Impulse.Layer",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetCameraCenterY"
+                      },
+                      "parameters": [
+                        "",
+                        "+",
+                        "Layers[Impulse.Layer].CameraDeltaY",
+                        "Impulse.Layer",
+                        "0"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "variables": [
+                {
+                  "name": "DistanceFactor",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onScenePreEvents",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Revert the impulses."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEachChildVariable",
+              "iterableVariableName": "Layers",
+              "valueIteratorVariableName": "Layer",
+              "keyIteratorVariableName": "LayerName",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetCameraCenterX"
+                  },
+                  "parameters": [
+                    "",
+                    "-",
+                    "Layer.CameraDeltaX",
+                    "LayerName",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetCameraCenterY"
+                  },
+                  "parameters": [
+                    "",
+                    "-",
+                    "Layer.CameraDeltaY",
+                    "LayerName",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Layers[LayerName].CameraDeltaX",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Layers[LayerName].CameraDeltaY",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "LayerName",
+              "type": "string",
+              "value": ""
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Add an impulse to the camera position.",
+      "fullName": "Add a camera impulse",
+      "functionType": "Action",
+      "name": "AddImpulse",
+      "sentence": "Add an impulse _PARAM1_ to the camera from layer _PARAM2_ with an amplitude of _PARAM3_  and an angle of _PARAM4_,  going away in _PARAM5_ seconds with _PARAM6_ easing, staying _PARAM7_  seconds, going back in _PARAM8_ seconds with _PARAM9_ easing",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "Impulses[NewIdentifier].Layer",
+                "=",
+                "LayerName"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Impulses[NewIdentifier].DeltaX",
+                "=",
+                "DisplacementX"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Impulses[NewIdentifier].DeltaY",
+                "=",
+                "DisplacementY"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Impulses[NewIdentifier].AwayDuration",
+                "=",
+                "AwayDuration"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Impulses[NewIdentifier].StayDuration",
+                "=",
+                "StayDuration"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Impulses[NewIdentifier].BackDuration",
+                "=",
+                "BackDuration"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "Impulses[NewIdentifier].AwayEasing",
+                "=",
+                "AwayEasing"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "Impulses[NewIdentifier].BackEasing",
+                "=",
+                "BackEasing"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Impulses[NewIdentifier].Time",
+                "=",
+                "0"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Identifier",
+          "name": "NewIdentifier",
+          "type": "string"
+        },
+        {
+          "description": "Layer",
+          "name": "LayerName",
+          "type": "string"
+        },
+        {
+          "description": "Displacement X",
+          "name": "DisplacementX",
+          "type": "expression"
+        },
+        {
+          "description": "Displacement Y",
+          "name": "DisplacementY",
+          "type": "expression"
+        },
+        {
+          "description": "Get away duration (in seconds)",
+          "name": "AwayDuration",
+          "type": "expression"
+        },
+        {
+          "description": "Get away easing",
+          "name": "AwayEasing",
+          "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Stay duration (in seconds)",
+          "name": "StayDuration",
+          "type": "expression"
+        },
+        {
+          "description": "Get back duration (in seconds)",
+          "name": "BackDuration",
+          "type": "expression"
+        },
+        {
+          "description": "Get back easing",
+          "name": "BackEasing",
+          "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Add an impulse to the camera position.",
+      "fullName": "Add a camera impulse (angle)",
+      "functionType": "Action",
+      "name": "AddImpulseAngle",
+      "sentence": "Add an impulse _PARAM1_ to the camera from layer _PARAM2_ with an amplitude of _PARAM3_  and an angle of _PARAM4_,  going away in _PARAM5_ seconds with _PARAM6_ easing, staying _PARAM7_  seconds, going back in _PARAM8_ seconds with _PARAM9_ easing",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CameraImpulse::AddImpulse"
+              },
+              "parameters": [
+                "",
+                "Identifier",
+                "LayerName",
+                "XFromAngleAndDistance(Angle, Amplitude)",
+                "YFromAngleAndDistance(Angle, Amplitude)",
+                "AwayDuration",
+                "AwayEasing",
+                "StayDuration",
+                "BackDuration",
+                "BackEasing",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Identifier",
+          "name": "Identifier",
+          "type": "string"
+        },
+        {
+          "description": "Layer",
+          "name": "LayerName",
+          "type": "string"
+        },
+        {
+          "description": "Amplitude",
+          "name": "Amplitude",
+          "type": "expression"
+        },
+        {
+          "description": "Angle (in degree)",
+          "name": "Angle",
+          "type": "expression"
+        },
+        {
+          "description": "Get away duration (in seconds)",
+          "name": "AwayDuration",
+          "type": "expression"
+        },
+        {
+          "description": "Get away easing",
+          "name": "AwayEasing",
+          "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Stay duration (in seconds)",
+          "name": "StayDuration",
+          "type": "expression"
+        },
+        {
+          "description": "Get back duration (in seconds)",
+          "name": "BackDuration",
+          "type": "expression"
+        },
+        {
+          "description": "Get back easing",
+          "name": "BackEasing",
+          "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a camera impulse is playing.",
+      "fullName": "Camera impulse is playing",
+      "functionType": "Condition",
+      "name": "IsPlaying",
+      "sentence": "Camera impulse _PARAM1_ is playing",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "VariableChildExists2"
+              },
+              "parameters": [
+                "Impulses",
+                "Identifier"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Identifier",
+          "name": "Identifier",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

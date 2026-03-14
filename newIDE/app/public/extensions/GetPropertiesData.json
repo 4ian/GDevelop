@@ -1,0 +1,287 @@
+{
+  "author": "UlisesFreitas",
+  "category": "Advanced",
+  "description": "* Add an string expression that returns the current game version from game properties tab.\n* Add an string expression that returns the game title from game properties tab.\n* Add an string expression that returns the game publisher name from game properties tab.\n* Add an string expression that returns the package name from game properties tab.\n* Add an string expression that returns the orientation from game properties.\n* Add an string expression that returns the window width from game properties.\n* Add an string expression that returns the window height from game properties.\n* Add an string expression that returns the maxFPS from game properties.\n* Add an string expression that returns the minFPS from game properties.\n* Add an string expression that returns the scale mode from game properties.\n* Add an string expression that returns the pixel rounding from game properties.\n* Add an string expression that returns the scale mode from game properties.\n* Add an string expression that returns the vertical sync from game properties.\n",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Game properties data",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLW51bWVyaWMiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCwxN1Y5SDJWN0g2VjE3SDRNMjIsMTVDMjIsMTYuMTEgMjEuMSwxNyAyMCwxN0gxNlYxNUgyMFYxM0gxOFYxMUgyMFY5SDE2VjdIMjBBMiwyIDAgMCwxIDIyLDlWMTAuNUExLjUsMS41IDAgMCwxIDIwLjUsMTJBMS41LDEuNSAwIDAsMSAyMiwxMy41VjE1TTE0LDE1VjE3SDhWMTNDOCwxMS44OSA4LjksMTEgMTAsMTFIMTJWOUg4VjdIMTJBMiwyIDAgMCwxIDE0LDlWMTFDMTQsMTIuMTEgMTMuMSwxMyAxMiwxM0gxMFYxNUgxNFoiIC8+PC9zdmc+",
+  "name": "GetPropertiesData",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/numeric.svg",
+  "shortDescription": "Get Version, Title, Publisher name, PackageName from properties tab.",
+  "version": "1.0.0",
+  "origin": {
+    "identifier": "GetPropertiesData",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "Version,Publisher Name,Package Name,Title,Width,Height,Orientation",
+  "authorIds": [
+    "ZShmW1xkW7WWl9AkB78VITJMiTw1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Return the current game version.",
+      "fullName": "Return current game version",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "ReturnGameVersion",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.version;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the game title from properties.",
+      "fullName": "Return the game title",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "ReturnGameTitle",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.name;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the publisher name from properties.",
+      "fullName": "Return the publisher name",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "ReturnPublisherName",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.author;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the package name from properties.",
+      "fullName": "Return the package name",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "ReturnPackageName",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.packageName;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the orientation from properties.",
+      "fullName": "Return the orientation",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "ReturnOrientation",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.orientation;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the window width from properties.",
+      "fullName": "Return the window width",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "ReturnWindowWidth",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.windowWidth;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the window height from properties.",
+      "fullName": "Return the window height",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "ReturnWindowHeight",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.windowHeight;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return max FPS from properties.",
+      "fullName": "Return max FPS",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "ReturnMaxFPS",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.maxFPS;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return min FPS from properties.",
+      "fullName": "Return min FPS",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "ReturnMinFPS",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.minFPS;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return scale mode from properties.",
+      "fullName": "Return the game scale mode",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "ReturnScaleMode",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.scaleMode;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return pixel rounding from properties.",
+      "fullName": "Return pixel rounding",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "ReturnPixelRounding",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.pixelsRounding;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return size on start from properties.",
+      "fullName": "Return size on start",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "ReturnSizeOnStart",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.sizeOnStartupMode;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return vertical sync from properties.",
+      "fullName": "Return vertical sync",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "ReturnVerticalSync",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.verticalSync;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

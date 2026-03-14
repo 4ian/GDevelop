@@ -1,0 +1,177 @@
+{
+  "author": "",
+  "category": "Audio",
+  "description": "# User can\n- Set any channel volume based on the distance betwen 2 objects.\n- Use the extension action multi times on different objects.\n- Set the Sound range.\n- Set the maximum volume range.\n\n# Example\n![](https://i.imgur.com/uBgnRU7.png)",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Sound volume based on distance",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8cmVjdCB4PSI2IiB5PSIzIiBjbGFzcz0ic3QxIiB3aWR0aD0iMjAiIGhlaWdodD0iMjYiLz4NCjxjaXJjbGUgY2xhc3M9InN0MSIgY3g9IjE2IiBjeT0iMTkiIHI9IjciLz4NCjxjaXJjbGUgY2xhc3M9InN0MSIgY3g9IjE2IiBjeT0iMTkiIHI9IjIiLz4NCjxjaXJjbGUgY2xhc3M9InN0MSIgY3g9IjIxIiBjeT0iOCIgcj0iMiIvPg0KPC9zdmc+DQo=",
+  "name": "SoundVolumeBasedOnDistance",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Music/Music_speaker_audio_sound.svg",
+  "shortDescription": "Make any sound volume on any channel increase and decrease based on distance.",
+  "version": "1.0.2",
+  "origin": {
+    "identifier": "SoundVolumeBasedOnDistance",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "sound,volume,distance",
+  "authorIds": [
+    "IRIhkkTTl2UHhfjrLTTH5GYwkYu1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Change a channel volume based on distance between 2 objects.",
+      "fullName": "Sound volume based on distance",
+      "functionType": "Action",
+      "group": "",
+      "name": "SoundObjects",
+      "private": false,
+      "sentence": "Change channel _PARAM3_ volume based on the distance between _PARAM1_ and _PARAM2_ at _PARAM4_ sound range and _PARAM5_ max volume range",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVolumeSoundCanal"
+              },
+              "parameters": [
+                "",
+                "Channel",
+                "=",
+                "Source.Variable(__SoundVolumeBasedOnDistance.Audio)"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarObjet"
+              },
+              "parameters": [
+                "Source",
+                "__SoundVolumeBasedOnDistance.Audio",
+                "=",
+                "Full-DistanceBetweenPositions(Player.BoundingBoxCenterX(), Player.BoundingBoxCenterY(), Source.BoundingBoxCenterX(), Source.BoundingBoxCenterY())/Range"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "VarObjet"
+              },
+              "parameters": [
+                "Source",
+                "__SoundVolumeBasedOnDistance.Audio",
+                "<",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarObjet"
+              },
+              "parameters": [
+                "Source",
+                "__SoundVolumeBasedOnDistance.Audio",
+                "=",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "VarObjet"
+              },
+              "parameters": [
+                "Source",
+                "__SoundVolumeBasedOnDistance.Audio",
+                ">",
+                "100"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarObjet"
+              },
+              "parameters": [
+                "Source",
+                "__SoundVolumeBasedOnDistance.Audio",
+                "=",
+                "100"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Player object",
+          "longDescription": "",
+          "name": "Player",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Sound source object",
+          "longDescription": "",
+          "name": "Source",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Sound channel",
+          "longDescription": "",
+          "name": "Channel",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Sound range",
+          "longDescription": "How far the player can go before the sound start fading out.",
+          "name": "Range",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Max volume range (in pixels)",
+          "longDescription": "Distance between object and sound source object to get the maximum volume.  \n*Note: increasing max volume range will also increase the sound range.*",
+          "name": "Full",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

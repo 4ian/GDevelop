@@ -1,0 +1,414 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "QjE1CI3drHNR9Wklz2gTC5WbEgh1"
+  ],
+  "extensionNamespace": "",
+  "fullName": " Shock wave effect",
+  "name": "ShockWaveEffect",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/ShockWaveEffect.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ShockWaveEffect-header.json",
+  "tags": "exlosion,particle",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/octagram-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Draw expanding shock wave effect.",
+  "eventsBasedBehaviorsCount": 2,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/shock-wave-effect",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Draw ellipse shock waves.",
+      "fullName": "Ellipse shock wave",
+      "name": "EllipseShockWave",
+      "objectType": "PrimitiveDrawing::Drawer",
+      "eventsFunctions": [
+        {
+          "name": "StartWidth",
+          "fullName": "Start width",
+          "description": "Compare the start width of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetStartWidth",
+          "fullName": "Start width",
+          "description": "Change the start width of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StartHeight",
+          "fullName": "Start height",
+          "description": "Compare the start height of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetStartHeight",
+          "fullName": "Start height",
+          "description": "Change the start height of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StartOutlineThickness",
+          "fullName": "Start outline thickness",
+          "description": "Compare the start outline of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetStartOutlineThickness",
+          "fullName": "Start outline thickness",
+          "description": "Change the start outline of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StartColor",
+          "fullName": "Start color",
+          "description": "Compare the start color of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetStartColor",
+          "fullName": "Start color",
+          "description": "Change the start color of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StartOpacity",
+          "fullName": "Start opacity",
+          "description": "Compare the start opacity of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetStartOpacity",
+          "fullName": "Start opacity",
+          "description": "Change the start opacity of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StartAngle",
+          "fullName": "Start angle",
+          "description": "Compare the start angle of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetStartAngle",
+          "fullName": "Start angle",
+          "description": "Change the start angle of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "EndWidth",
+          "fullName": "End width",
+          "description": "Compare the end width of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEndWidth",
+          "fullName": "End width",
+          "description": "Change the end width of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "EndHeight",
+          "fullName": "End height",
+          "description": "Compare the end height of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEndHeight",
+          "fullName": "End height",
+          "description": "Change the end height of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "EndOutlineThickness",
+          "fullName": "End outline thickness",
+          "description": "Compare the end outline thickness of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEndOutlineThickness",
+          "fullName": "End outline thickness",
+          "description": "Change the end outline thickness of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "EndColor",
+          "fullName": "End Color",
+          "description": "Compare the end Color of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEndColor",
+          "fullName": "End Color",
+          "description": "Change the end Color of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "EndOpacity",
+          "fullName": "End Opacity",
+          "description": "Compare the end Opacity of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEndOpacity",
+          "fullName": "End Opacity",
+          "description": "Change the end Opacity of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "EndAngle",
+          "fullName": "End angle",
+          "description": "Compare the end angle of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEndAngle",
+          "fullName": "End angle",
+          "description": "Change the end angle of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Duration",
+          "fullName": "Duration",
+          "description": "Compare the duration of the animation.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetDuration",
+          "fullName": "Duration",
+          "description": "Change the duration of the animation.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Easing",
+          "fullName": "Easing",
+          "description": "Compare the easing of the animation.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEasing",
+          "fullName": "Easing",
+          "description": "Change the easing of the animation.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsFilled",
+          "fullName": "Shape filled",
+          "description": "Check if the shape is filled.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetIsFilled",
+          "fullName": "Enable filling",
+          "description": "Enable or disable the filling of the shape.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Draw star shock waves.",
+      "fullName": "Star shock waves",
+      "name": "StarShockWave",
+      "objectType": "PrimitiveDrawing::Drawer",
+      "eventsFunctions": [
+        {
+          "name": "StartRadius",
+          "fullName": "Start radius",
+          "description": "Compare the start radius of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetStartRadius",
+          "fullName": "Start radius",
+          "description": "Change the start radius of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StartInnerRadius",
+          "fullName": "Start inner radius",
+          "description": "Compare the start inner radius of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetStartInnerRadius",
+          "fullName": "Start inner radius",
+          "description": "Change the start inner radius of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StartOutlineThickness",
+          "fullName": "Start outline thickness",
+          "description": "Compare the start outline thickness of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetStartOutlineThickness",
+          "fullName": "Start outline thickness",
+          "description": "Change the start outline thickness of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StartColor",
+          "fullName": "Start color",
+          "description": "Compare the start color of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetStartColor",
+          "fullName": "Start color",
+          "description": "Change the start color of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StartOpacity",
+          "fullName": "Start opacity",
+          "description": "Compare the start opacity of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetStartOpacity",
+          "fullName": "Start opacity",
+          "description": "Change the start opacity of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StartAngle",
+          "fullName": "Start angle",
+          "description": "Compare the start angle of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetStartAngle",
+          "fullName": "Start angle",
+          "description": "Change the start angle of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "EndRadius",
+          "fullName": "End radius",
+          "description": "Compare the end radius of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEndRadius",
+          "fullName": "End radius",
+          "description": "Change the end radius of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "EndInnerRadius",
+          "fullName": "End inner radius",
+          "description": "Compare the end inner radius of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEndInnerRadius",
+          "fullName": "End inner radius",
+          "description": "Change the end inner radius of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "EndOutlineThickness",
+          "fullName": "End outline thickness",
+          "description": "Compare the end outline thickness of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEndOutlineThickness",
+          "fullName": "End outline thickness",
+          "description": "Change the end outline thickness of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "EndColor",
+          "fullName": "End color",
+          "description": "Compare the end color of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEndColor",
+          "fullName": "End color",
+          "description": "Change the end color of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "EndOpacity",
+          "fullName": "End opacity",
+          "description": "Compare the end opacity of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEndOpacity",
+          "fullName": "End opacity",
+          "description": "Change the end opacity of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "EndAngle",
+          "fullName": "End angle",
+          "description": "Compare the end angle of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEndAngle",
+          "fullName": "End angle",
+          "description": "Change the end angle of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Easing",
+          "fullName": "Easing",
+          "description": "Compare the easing of the animation.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEasing",
+          "fullName": "Easing",
+          "description": "Change the easing of the animation.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Duration",
+          "fullName": "Duration",
+          "description": "Compare the duration of the animation.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetDuration",
+          "fullName": "Duration",
+          "description": "Change the duration of the animation.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsFilling",
+          "fullName": "Shape filled",
+          "description": "Check if the shape is filled.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetIsFilling",
+          "fullName": "Enable filling",
+          "description": "Enable or disable the filling of the shape.",
+          "functionType": "Action"
+        },
+        {
+          "name": "PointsCount",
+          "fullName": "Number of points",
+          "description": "Compare the number of points of the star.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetPointsCount",
+          "fullName": "Number of points",
+          "description": "Change the number of points of the star.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Draw ellipse or star shaped shock waves.\n\nShock wave animations can be used for:\n\n- Explosions\n- Water effects\n- Player feedback\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLW9jdGFncmFtLW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMi4yLDE2LjA2TDMuODgsMTJMMi4yLDcuOTRMNi4yNiw2LjI2TDcuOTQsMi4yTDEyLDMuODhMMTYuMDYsMi4yTDE3Ljc0LDYuMjZMMjEuOCw3Ljk0TDIwLjEyLDEyTDIxLjgsMTYuMDZMMTcuNzQsMTcuNzRMMTYuMDYsMjEuOEwxMiwyMC4xMkw3Ljk0LDIxLjhMNi4yNiwxNy43NEwyLjIsMTYuMDZNNC44MSw5TDYuMDUsMTJMNC44MSwxNUw3Ljc5LDE2LjIxTDksMTkuMTlMMTIsMTcuOTVMMTUsMTkuMTlMMTYuMjEsMTYuMjFMMTkuMTksMTVMMTcuOTUsMTJMMTkuMTksOUwxNi4yMSw3Ljc5TDE1LDQuODFMMTIsNi4wNUw5LDQuODFMNy43OSw3Ljc5TDQuODEsOVoiIC8+PC9zdmc+"
+}

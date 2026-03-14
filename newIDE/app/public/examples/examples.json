@@ -1,0 +1,41 @@
+﻿{
+  "exampleShortHeaders": [
+    {
+      "id": "3d-wall-sliding",
+      "slug": "3d-wall-sliding",
+      "name": "3D Wall Sliding Template",
+      "shortDescription": "A 3D wall sliding starter template for Carrots Engine.",
+      "description": "Show how to make players slide on walls in 3D.",
+      "license": "MIT",
+      "tags": ["Starting point", "3D", "Movement", "Platformer"],
+      "authorIds": [],
+      "previewImageUrls": ["/examples/3d-wall-sliding/preview.jpg"],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    }
+  ],
+  "filters": {
+    "allTags": ["Starting point", "3D", "Movement", "Platformer"],
+    "defaultTags": ["Starting point", "3D", "Movement", "Platformer"],
+    "tagsTree": []
+  },
+  "examplesById": {
+    "3d-wall-sliding": {
+      "id": "3d-wall-sliding",
+      "slug": "3d-wall-sliding",
+      "name": "3D Wall Sliding Template",
+      "shortDescription": "A 3D wall sliding starter template for Carrots Engine.",
+      "description": "Show how to make players slide on walls in 3D.",
+      "license": "MIT",
+      "tags": ["Starting point", "3D", "Movement", "Platformer"],
+      "authorIds": [],
+      "previewImageUrls": ["/examples/3d-wall-sliding/preview.jpg"],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "/examples/3d-wall-sliding/game.json",
+      "authors": []
+    }
+  }
+}

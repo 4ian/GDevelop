@@ -1,0 +1,243 @@
+{
+  "author": "@Bouh",
+  "category": "Advanced",
+  "description": "Provides expressions allowing to read the RGB value of pixels on screen.",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Read pixels",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggZD0iTTIzLDI4Yy0xLjEsMC0yLjEtMC43LTIuNS0xLjhjMC0wLjEsMC0wLjItMC4xLTAuMmgtOC45YzAsMC4xLDAsMC4yLTAuMSwwLjJDMTEuMSwyNy4zLDEwLjEsMjgsOSwyOGMtMC42LDAtMSwwLjQtMSwxDQoJczAuNCwxLDEsMWgxNGMwLjYsMCwxLTAuNCwxLTFTMjMuNiwyOCwyMywyOHoiLz4NCjxwYXRoIGQ9Ik0yNywzSDVDMy4zLDMsMiw0LjMsMiw2djE1YzAsMS43LDEuMywzLDMsM2g2LjloOC4xSDI3YzEuNywwLDMtMS4zLDMtM1Y2QzMwLDQuMywyOC43LDMsMjcsM3ogTTEwLjQsMTlsNC42LTQuNmwxLjMsMS4zDQoJYzAuNCwwLjQsMSwwLjQsMS40LDBsMC4yLTAuMmwzLDMuNUgxMC40eiBNMjMsMThjMCwwLjEsMCwwLjIsMCwwLjJsLTQuMi00LjlDMTguNiwxMy4xLDE4LjMsMTMsMTgsMTNjLTAuMywwLTAuNSwwLjEtMC43LDAuMw0KCUwxNywxMy42bC0xLjMtMS4zYy0wLjQtMC40LTEtMC40LTEuNCwwTDksMTcuNlY5YzAtMC42LDAuNC0xLDEtMWgxMmMwLjYsMCwxLDAuNCwxLDFWMTh6Ii8+DQo8L3N2Zz4NCg==",
+  "name": "ReadPixels",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Computers and Hardware/Computers and Hardware_screen_computer_image.svg",
+  "shortDescription": "Read the values of pixels on the screen.",
+  "version": "0.0.6",
+  "tags": "pixel,colors,screen,gl,webgl",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Return the alpha component of the pixel at the specified position.",
+      "fullName": "Read pixel alpha",
+      "functionType": "Expression",
+      "name": "ReadPixelAlpha",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const canvas = runtimeScene.getGame().getRenderer().getCanvas();\nif (!canvas) return;\n\nconst canvasType = gdjs._readPixels.getCanvasType(canvas);\nlet x = eventsFunctionContext.getArgument(\"PositionX\");\nlet y = eventsFunctionContext.getArgument(\"PositionY\");\nlet layer = runtimeScene.getLayer(\"\");\nlet position = layer.convertInverseCoords(x, y);\n\nif (canvasType === \"webgl\" || canvasType === \"webgl2\" || canvasType === \"experimental-webgl\") {\n    eventsFunctionContext.returnValue = gdjs._readPixels.getPixelColor(canvas, 3, position[0], position[1]);\n    // 3 is for alpha in pixel buffer\n} else if (canvasType === \"2d\") {\n    let ctx = canvas.getContext(\"2d\");\n    let data = ctx.getImageData(position[0], position[1], 1, 1).data;\n    eventsFunctionContext.returnValue = data[3];\n} else {\n    eventsFunctionContext.returnValue = 0;\n}",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Position X",
+          "longDescription": "",
+          "name": "PositionX",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Position Y",
+          "longDescription": "",
+          "name": "PositionY",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the blue component of the pixel at the specified position.",
+      "fullName": "Read pixel blue",
+      "functionType": "Expression",
+      "name": "ReadPixelBlue",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const canvas = runtimeScene.getGame().getRenderer().getCanvas();\nif (!canvas) return;\n\nconst canvasType = gdjs._readPixels.getCanvasType(canvas);\nlet x = eventsFunctionContext.getArgument(\"PositionX\");\nlet y = eventsFunctionContext.getArgument(\"PositionY\");\nlet layer = runtimeScene.getLayer(\"\");\nlet position = layer.convertInverseCoords(x, y);\n\nif (canvasType === \"webgl\" || canvasType === \"webgl2\" || canvasType === \"experimental-webgl\") {\n    eventsFunctionContext.returnValue = gdjs._readPixels.getPixelColor(canvas, 2, position[0], position[1]);\n    // 2 is for blue in pixel buffer\n} else if (canvasType === \"2d\") {\n    let ctx = canvas.getContext(\"2d\");\n    let data = ctx.getImageData(position[0], position[1], 1, 1).data;\n    eventsFunctionContext.returnValue = data[2];\n} else {\n    eventsFunctionContext.returnValue = 0;\n}",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Position X",
+          "longDescription": "",
+          "name": "PositionX",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Position Y",
+          "longDescription": "",
+          "name": "PositionY",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the green component of the pixel at the specified position.",
+      "fullName": "Read pixel green",
+      "functionType": "Expression",
+      "name": "ReadPixelGreen",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const canvas = runtimeScene.getGame().getRenderer().getCanvas();\nif (!canvas) return;\n\nconst canvasType = gdjs._readPixels.getCanvasType(canvas);\nlet x = eventsFunctionContext.getArgument(\"PositionX\");\nlet y = eventsFunctionContext.getArgument(\"PositionY\");\nlet layer = runtimeScene.getLayer(\"\");\nlet position = layer.convertInverseCoords(x, y);\n\nif (canvasType === \"webgl\" || canvasType === \"webgl2\" || canvasType === \"experimental-webgl\") {\n    eventsFunctionContext.returnValue = gdjs._readPixels.getPixelColor(canvas, 1, position[0], position[1]);\n    // 1 is for green in pixel buffer\n} else if (canvasType === \"2d\") {\n    let ctx = canvas.getContext(\"2d\");\n    let data = ctx.getImageData(position[0], position[1], 1, 1).data;\n    eventsFunctionContext.returnValue = data[1];\n} else {\n    eventsFunctionContext.returnValue = 0;\n}",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Position X",
+          "longDescription": "",
+          "name": "PositionX",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Position Y",
+          "longDescription": "",
+          "name": "PositionY",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the red component of the pixel at the specified position.",
+      "fullName": "Read pixel red",
+      "functionType": "Expression",
+      "name": "ReadPixelRed",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const canvas = runtimeScene.getGame().getRenderer().getCanvas();\nif (!canvas) return;\n\nconst canvasType = gdjs._readPixels.getCanvasType(canvas);\nlet x = eventsFunctionContext.getArgument(\"PositionX\");\nlet y = eventsFunctionContext.getArgument(\"PositionY\");\nlet layer = runtimeScene.getLayer(\"\");\nlet position = layer.convertInverseCoords(x, y);\n\nif (canvasType === \"webgl\" || canvasType === \"webgl2\" || canvasType === \"experimental-webgl\") {\n    eventsFunctionContext.returnValue = gdjs._readPixels.getPixelColor(canvas, 0, position[0], position[1]);\n    // 0 is for red, in pixel buffer\n} else if (canvasType === \"2d\") {\n    let ctx = canvas.getContext(\"2d\");\n    let data = ctx.getImageData(position[0], position[1], 1, 1).data;\n    eventsFunctionContext.returnValue = data[0];\n} else {\n    eventsFunctionContext.returnValue = 0;\n}",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Position X",
+          "longDescription": "",
+          "name": "PositionX",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Position Y",
+          "longDescription": "",
+          "name": "PositionY",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "",
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "\n// Define an new private object javascript for this extension\ngdjs._readPixels = {};\n\n/** \n * @param {HTMLCanvasElement} canvas\n */\ngdjs._readPixels.getCanvasType = function (canvas) {\n    const is2d = canvas.getContext(\"2d\");\n    const isBitmap = canvas.getContext(\"bitmaprenderer\");\n    const isWebGL1 = canvas.getContext(\"webgl\");\n    const isWebGL2 = canvas.getContext(\"webgl2\");\n    const isExperimentalWebGL = canvas.getContext(\"experimental-webgl\");\n\n    return is2d ?\n        \"2d\" : isBitmap ?\n            \"bitmaprenderer\" : isWebGL1 ?\n                \"webgl\" : isWebGL2 ?\n                    \"webgl2\" : isExperimentalWebGL ?\n                        \"experimental-webgl\" : null;\n}\n\n/**\n * @param {HTMLCanvasElement} canvas\n * @param {number} colorIndex Should be 0, 1, 2 or 3, for red, green, blue or alpha channel.\n * @param {number} positionX The X position of the pixel on the canvas to read\n * @param {number} positionY The Y position of the pixel on the canvas to read\n */\ngdjs._readPixels.getPixelColor = function (canvas, colorIndex, positionX, positionY) {\n\n    const gl = canvas.getContext(\"webgl2\") ||  canvas.getContext(\"webgl\") || canvas.getContext(\"experimental-webgl\") ;\n\n    const data = new Uint8Array(1 * 4); // [255,255,255,255] RGBA\n\n    const invertedPositionY = gl.drawingBufferHeight - positionY;\n    // mandatory because textures in webGL are invert before rendering in the canvas,\n    // otherwise the bottom left corner will be used\n\n    gl.readPixels(positionX, invertedPositionY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);\n    // Read 1 pixel and store it in data.\n\n    return data[colorIndex];\n}\n\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

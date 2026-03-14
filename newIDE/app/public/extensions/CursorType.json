@@ -1,0 +1,322 @@
+{
+  "author": "@Bouh, @arthuro555",
+  "category": "User interface",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Cursor type",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWN1cnNvci1kZWZhdWx0LW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTAuMDcsMTQuMjdDMTAuNTcsMTQuMDMgMTEuMTYsMTQuMjUgMTEuNCwxNC43NUwxMy43LDE5Ljc0TDE1LjUsMTguODlMMTMuMTksMTMuOTFDMTIuOTUsMTMuNDEgMTMuMTcsMTIuODEgMTMuNjcsMTIuNThMMTMuOTUsMTIuNUwxNi4yNSwxMi4wNUw4LDUuMTJWMTUuOUw5LjgyLDE0LjQzTDEwLjA3LDE0LjI3TTEzLjY0LDIxLjk3QzEzLjE0LDIyLjIxIDEyLjU0LDIyIDEyLjMxLDIxLjVMMTAuMTMsMTYuNzZMNy42MiwxOC43OEM3LjQ1LDE4LjkyIDcuMjQsMTkgNywxOUExLDEgMCAwLDEgNiwxOFYzQTEsMSAwIDAsMSA3LDJDNy4yNCwyIDcuNDcsMi4wOSA3LjY0LDIuMjNMNy42NSwyLjIyTDE5LjE0LDExLjg2QzE5LjU3LDEyLjIyIDE5LjYyLDEyLjg1IDE5LjI3LDEzLjI3QzE5LjEyLDEzLjQ1IDE4LjkxLDEzLjU3IDE4LjcsMTMuNjFMMTUuNTQsMTQuMjNMMTcuNzQsMTguOTZDMTgsMTkuNDYgMTcuNzYsMjAuMDUgMTcuMjYsMjAuMjhMMTMuNjQsMjEuOTdaIiAvPjwvc3ZnPg==",
+  "name": "CursorType",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/cursor-default-outline.svg",
+  "shortDescription": "Change mouse cursor type (pointer, crosshair, etc). Auto-change on object hover.",
+  "version": "0.0.8",
+  "description": [
+    "Provides an action to change the type of the cursor, and a behavior to change the cursor when an object is hovered.",
+    "",
+    "Find the list of cursors here: https://developer.mozilla.org/en-US/docs/Web/CSS/cursor"
+  ],
+  "origin": {
+    "identifier": "CursorType",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "mouse,cursor,pointer,javascript,desktop",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1",
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92"
+  ],
+  "dependencies": [],
+  "globalVariables": [
+    {
+      "name": "ZOrderSorting",
+      "type": "number",
+      "value": 0
+    }
+  ],
+  "sceneVariables": [
+    {
+      "name": "DefaultCursor",
+      "type": "string",
+      "value": "default"
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "description": "Change the type of the cursor.",
+      "fullName": "Cursor type",
+      "functionType": "Action",
+      "name": "ChangeCursorType",
+      "sentence": "Change the cursor to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Set as variable instead of directly setting as a CursorHover behavior can override it.\nBy using a variable, we ensure to be able to change it back to that \"default\" after the override is over."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "DefaultCursor",
+                "=",
+                "CursorType"
+              ]
+            },
+            {
+              "type": {
+                "value": "CursorType::DoChangeCursorType"
+              },
+              "parameters": [
+                "",
+                "CursorType",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "defaultValue": "default",
+          "description": "The new cursor type",
+          "longDescription": "List of available cursors on https://developer.mozilla.org/en-US/docs/Web/CSS/cursor",
+          "name": "CursorType",
+          "supplementaryInformation": "[\"auto\",\"default\",\"none\",\"context-menu\",\"help\",\"pointer\",\"progress\",\"wait\",\"cell\",\"crosshair\",\"text\",\"vertical-text\",\"alias\",\"copy\",\"move\",\"no-drop\",\"not-allowed\",\"grab\",\"grabbing\",\"all-scroll\",\"col-resize\",\"row-resize\",\"n-resize\",\"e-resize\",\"s-resize\",\"w-resize\",\"ne-resize\",\"nw-resize\",\"se-resize\",\"sw-resize\",\"ew-resize\",\"ns-resize\",\"nwse-resize\",\"zoom-in\",\"zoom-out\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Do change the type of the cursor.",
+      "fullName": "Do change cursor type",
+      "functionType": "Action",
+      "name": "DoChangeCursorType",
+      "private": true,
+      "sentence": "Do change the cursor to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const cursorType = eventsFunctionContext.getArgument(\"CursorType\");",
+            "",
+            "runtimeScene.getGame().getRenderer().getCanvas().style.cursor = cursorType;",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The new cursor type",
+          "name": "CursorType",
+          "supplementaryInformation": "[]",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onScenePreEvents",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Reset ordering as the object with highest Z-Order might not exist anymore or be not be hovered anymore."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "ZOrderSorting",
+                "=",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "CursorType::DoChangeCursorType"
+              },
+              "parameters": [
+                "",
+                "DefaultCursor",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Change the cursor appearence when the object is hovered (on Windows, macOS or Linux).",
+      "fullName": "Custom cursor when hovered",
+      "name": "CursorHover",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Check the z Order to ensure the cursor shown is the one from the foremost object "
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Plan"
+                  },
+                  "parameters": [
+                    "Object",
+                    ">",
+                    "ZOrderSorting"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SourisSurObjet"
+                  },
+                  "parameters": [
+                    "Object",
+                    "",
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ZOrderSorting",
+                    "=",
+                    "Object.ZOrder()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "CursorType::DoChangeCursorType"
+                  },
+                  "parameters": [
+                    "",
+                    "CursorType",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "CursorType::CursorHover",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "default",
+          "type": "Choice",
+          "label": "The cursor type",
+          "description": "See https://developer.mozilla.org/en-US/docs/Web/CSS/cursor for a list of possible cursors.",
+          "group": "",
+          "extraInformation": [
+            "auto",
+            "default",
+            "none",
+            "context-menu",
+            "help",
+            "pointer",
+            "progress",
+            "wait",
+            "cell",
+            "crosshair",
+            "text",
+            "vertical-text",
+            "alias",
+            "copy",
+            "move",
+            "no-drop",
+            "not-allowed",
+            "grab",
+            "grabbing",
+            "all-scroll",
+            "col-resize",
+            "row-resize",
+            "n-resize",
+            "e-resize",
+            "s-resize",
+            "w-resize",
+            "ne-resize",
+            "nw-resize",
+            "se-resize",
+            "sw-resize",
+            "ew-resize",
+            "ns-resize",
+            "nwse-resize",
+            "zoom-in",
+            "zoom-out"
+          ],
+          "name": "CursorType"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

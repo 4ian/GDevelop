@@ -1,0 +1,3895 @@
+{
+  "author": "@4ian, Tristan Rhodes (https://victrisgames.itch.io/)",
+  "category": "Movement",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Rectangular movement",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNoYXBlLXJlY3RhbmdsZS1wbHVzIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE5LDZIMjJWOEgxOVYxMUgxN1Y4SDE0VjZIMTdWM0gxOVY2TTE3LDE3VjE0SDE5VjE5SDNWNkgxMVY4SDVWMTdIMTdaIiAvPjwvc3ZnPg==",
+  "name": "RectangleMovement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/shape-rectangle-plus.svg",
+  "shortDescription": "Move objects in a rectangular pattern.",
+  "dimension": "2D",
+  "version": "1.3.0",
+  "description": [
+    "Move objects in a rectangular pattern with easing functions from the Tween extension.",
+    "",
+    "It can be used for:",
+    "",
+    "- Moveable platforms",
+    "- Enemy movement patterns",
+    "- Moving along the border of another object (inside, center, outside)",
+    "",
+    "The platformer example uses this extension ([open the project online](https://editor.gdevelop.io/?project=example://platformer)).",
+    "",
+    "This game shows how to make objects move around the border of another object ([open the project online](https://editor.gdevelop.io/?project=example://moving-saw-platformer)).",
+    "",
+    "This example can be used to test different settings ([open the project online](https://editor.gdevelop.io/?project=example://rectangular-movement)).",
+    ""
+  ],
+  "origin": {
+    "identifier": "RectangleMovement",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "rectangular,movement,rectangle,patrol,platform,enemy",
+  "authorIds": [
+    "wWP8BSlAW0UP4NeaHa2LcmmDzmH2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Distance from an object to the closest edge of a second object.",
+      "fullName": "Distance from an object to the closest edge of a second object",
+      "functionType": "Expression",
+      "name": "DistanceToClosestEdge",
+      "private": true,
+      "sentence": "Distance from _PARAM1_ to the closest edge of _PARAM2_ ",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "If point is inside rectangle, just use min distance"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CenterX"
+              },
+              "parameters": [
+                "MovingObject",
+                ">=",
+                "CenterObject.BoundingBoxLeft()"
+              ]
+            },
+            {
+              "type": {
+                "value": "CenterX"
+              },
+              "parameters": [
+                "MovingObject",
+                "<=",
+                "CenterObject.BoundingBoxRight()"
+              ]
+            },
+            {
+              "type": {
+                "value": "CenterY"
+              },
+              "parameters": [
+                "MovingObject",
+                ">=",
+                "CenterObject.BoundingBoxTop()"
+              ]
+            },
+            {
+              "type": {
+                "value": "CenterY"
+              },
+              "parameters": [
+                "MovingObject",
+                "<=",
+                "CenterObject.BoundingBoxBottom()"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "min(\nmin(\nMovingObject.BoundingBoxCenterY() - CenterObject.BoundingBoxTop(), \nCenterObject.BoundingBoxBottom() - MovingObject.BoundingBoxCenterY()),\nmin(\nMovingObject.BoundingBoxCenterX() - CenterObject.BoundingBoxLeft(), \nCenterObject.BoundingBoxRight() - MovingObject.BoundingBoxCenterX())\n)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "If point is outside rectangle, find distance to clamped position on rectangle"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Or"
+              },
+              "parameters": [],
+              "subInstructions": [
+                {
+                  "type": {
+                    "value": "CenterX"
+                  },
+                  "parameters": [
+                    "MovingObject",
+                    "<",
+                    "CenterObject.BoundingBoxLeft()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "CenterX"
+                  },
+                  "parameters": [
+                    "MovingObject",
+                    ">",
+                    "CenterObject.BoundingBoxRight()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "CenterY"
+                  },
+                  "parameters": [
+                    "MovingObject",
+                    "<",
+                    "CenterObject.BoundingBoxTop()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "CenterY"
+                  },
+                  "parameters": [
+                    "MovingObject",
+                    ">",
+                    "CenterObject.BoundingBoxBottom()"
+                  ]
+                }
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "DistanceBetweenPositions(\nMovingObject.BoundingBoxCenterX(),\nMovingObject.BoundingBoxCenterY(),\nclamp(MovingObject.BoundingBoxCenterX(), CenterObject.BoundingBoxLeft(), CenterObject.BoundingBoxRight()),\nclamp(MovingObject.BoundingBoxCenterY(), CenterObject.BoundingBoxTop(), CenterObject.BoundingBoxBottom())\n)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Center object",
+          "name": "CenterObject",
+          "type": "objectList"
+        },
+        {
+          "description": "Moving object",
+          "name": "MovingObject",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Update rectangular movement to follow the border of an object. Run once, or every time the center object moves.",
+      "fullName": "Update rectangular movement to follow the border of an object",
+      "functionType": "Action",
+      "name": "MoveAlongBorderOfObject",
+      "sentence": "Update rectangular movement of _PARAM1_ to follow the border of _PARAM3_. Position on border: _PARAM4_",
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Create object link (if one has not been created)",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ObjectVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "MovingObject",
+                    "__RectangleMovement.Linked",
+                    "False"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Set a valid initial value by picking any Center object",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "MovingObject",
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "MovingObject",
+                                "__RectangleMovement.DistanceToClosestEdge",
+                                "=",
+                                "RectangleMovement::DistanceToClosestEdge(CenterObject, MovingObject)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "colorB": 228,
+                          "colorG": 176,
+                          "colorR": 74,
+                          "creationTime": 0,
+                          "name": "Update value if distance is lower than existing minimum",
+                          "source": "",
+                          "type": "BuiltinCommonInstructions::Group",
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::ForEach",
+                              "object": "CenterObject",
+                              "conditions": [],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "MovingObject",
+                                        "__RectangleMovement.DistanceToClosestEdge",
+                                        "=",
+                                        "min(MovingObject.Variable(__RectangleMovement.DistanceToClosestEdge), RectangleMovement::DistanceToClosestEdge(CenterObject, MovingObject))"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "parameters": []
+                        },
+                        {
+                          "colorB": 228,
+                          "colorG": 176,
+                          "colorR": 74,
+                          "creationTime": 0,
+                          "name": "Link objects that have the closest distance",
+                          "source": "",
+                          "type": "BuiltinCommonInstructions::Group",
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::ForEach",
+                              "object": "CenterObject",
+                              "conditions": [],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Comment",
+                                  "color": {
+                                    "b": 109,
+                                    "g": 230,
+                                    "r": 255,
+                                    "textB": 0,
+                                    "textG": 0,
+                                    "textR": 0
+                                  },
+                                  "comment": "Link the MovingObject that has the shortest distance (and don't create more links even if another object has the same distance)"
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "ObjectVariableAsBoolean"
+                                      },
+                                      "parameters": [
+                                        "MovingObject",
+                                        "__RectangleMovement.Linked",
+                                        "False"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                                      },
+                                      "parameters": [
+                                        "RectangleMovement::DistanceToClosestEdge(CenterObject, MovingObject)",
+                                        "=",
+                                        "MovingObject.Variable(__RectangleMovement.DistanceToClosestEdge)"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "LinkedObjects::LinkObjects"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "MovingObject",
+                                        "CenterObject"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SetObjectVariableAsBoolean"
+                                      },
+                                      "parameters": [
+                                        "MovingObject",
+                                        "__RectangleMovement.Linked",
+                                        "True"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "parameters": []
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Update rectangular movement to follow the border of object",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "CenterObject",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "LinkedObjects::PickObjectsLinkedTo"
+                      },
+                      "parameters": [
+                        "",
+                        "MovingObject",
+                        "CenterObject",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Inside (default)",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Or"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "CompareArgumentAsString"
+                                  },
+                                  "parameters": [
+                                    "\"PositionOnBorder\"",
+                                    "=",
+                                    "\"Inside\""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "CompareArgumentAsString"
+                                  },
+                                  "parameters": [
+                                    "\"PositionOnBorder\"",
+                                    "=",
+                                    "\"\""
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "RectangleMovement::RectangleMovement::SetTop"
+                              },
+                              "parameters": [
+                                "MovingObject",
+                                "RectangleMovement",
+                                "CenterObject.BoundingBoxTop()",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "RectangleMovement::RectangleMovement::SetBottom"
+                              },
+                              "parameters": [
+                                "MovingObject",
+                                "RectangleMovement",
+                                "CenterObject.BoundingBoxBottom() - MovingObject.Height()",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "RectangleMovement::RectangleMovement::SetLeft"
+                              },
+                              "parameters": [
+                                "MovingObject",
+                                "RectangleMovement",
+                                "CenterObject.BoundingBoxLeft()",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "RectangleMovement::RectangleMovement::SetRight"
+                              },
+                              "parameters": [
+                                "MovingObject",
+                                "RectangleMovement",
+                                "CenterObject.BoundingBoxRight() - MovingObject.Width()",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "parameters": []
+                    },
+                    {
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Center",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "PositionOnBorder",
+                                "=",
+                                "\"Center\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "RectangleMovement::RectangleMovement::SetTop"
+                              },
+                              "parameters": [
+                                "MovingObject",
+                                "RectangleMovement",
+                                "CenterObject.BoundingBoxTop() - MovingObject.Height()/2",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "RectangleMovement::RectangleMovement::SetBottom"
+                              },
+                              "parameters": [
+                                "MovingObject",
+                                "RectangleMovement",
+                                "CenterObject.BoundingBoxBottom() - MovingObject.Height()/2",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "RectangleMovement::RectangleMovement::SetLeft"
+                              },
+                              "parameters": [
+                                "MovingObject",
+                                "RectangleMovement",
+                                "CenterObject.BoundingBoxLeft() - MovingObject.Width()/2",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "RectangleMovement::RectangleMovement::SetRight"
+                              },
+                              "parameters": [
+                                "MovingObject",
+                                "RectangleMovement",
+                                "CenterObject.BoundingBoxRight() - MovingObject.Width()/2",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "parameters": []
+                    },
+                    {
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Outside",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "PositionOnBorder",
+                                "=",
+                                "\"Outside\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "RectangleMovement::RectangleMovement::SetTop"
+                              },
+                              "parameters": [
+                                "MovingObject",
+                                "RectangleMovement",
+                                "CenterObject.BoundingBoxTop() - MovingObject.Height()",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "RectangleMovement::RectangleMovement::SetBottom"
+                              },
+                              "parameters": [
+                                "MovingObject",
+                                "RectangleMovement",
+                                "CenterObject.BoundingBoxBottom()",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "RectangleMovement::RectangleMovement::SetLeft"
+                              },
+                              "parameters": [
+                                "MovingObject",
+                                "RectangleMovement",
+                                "CenterObject.BoundingBoxLeft() - MovingObject.Width()",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "RectangleMovement::RectangleMovement::SetRight"
+                              },
+                              "parameters": [
+                                "MovingObject",
+                                "RectangleMovement",
+                                "CenterObject.BoundingBoxRight()",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "parameters": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Moving object",
+          "name": "MovingObject",
+          "type": "objectList"
+        },
+        {
+          "description": "Rectangle Movement (required)",
+          "name": "RectangleMovement",
+          "supplementaryInformation": "RectangleMovement::RectangleMovement",
+          "type": "behavior"
+        },
+        {
+          "description": "Center object",
+          "name": "CenterObject",
+          "type": "objectList"
+        },
+        {
+          "description": "Position on border",
+          "name": "PositionOnBorder",
+          "supplementaryInformation": "[\"Inside\",\"Center\",\"Outside\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Move to the nearest corner of the center object.",
+      "fullName": "Move to the nearest corner of the center object",
+      "functionType": "Action",
+      "name": "MoveToNearestCorner",
+      "sentence": "Move _PARAM1_ to the nearest corner of _PARAM3_",
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Create a link to the closest object",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ObjectVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "MovingObject",
+                    "__RectangleMovement.Linked",
+                    "False"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "RectangleMovement::MoveAlongBorderOfObject"
+                  },
+                  "parameters": [
+                    "",
+                    "MovingObject",
+                    "RectangleMovement",
+                    "CenterObject",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Move to nearest corner",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "MovingObject",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "LinkedObjects::PickObjectsLinkedTo"
+                      },
+                      "parameters": [
+                        "",
+                        "CenterObject",
+                        "MovingObject",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Distance to TopLeft (don't use a condition on the first check so the variable starts with a valid corner)"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "MovingObject",
+                            "__RectangleMovement.ClosestCornerDistance",
+                            "=",
+                            "DistanceBetweenPositions(MovingObject.BoundingBoxCenterX(), MovingObject.BoundingBoxCenterY(), CenterObject.BoundingBoxLeft(), CenterObject.BoundingBoxTop())"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "RectangleMovement::RectangleMovement::TeleportToCorner"
+                          },
+                          "parameters": [
+                            "MovingObject",
+                            "RectangleMovement",
+                            "\"Top-left corner\"",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Distance to TopRight"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                          },
+                          "parameters": [
+                            "DistanceBetweenPositions(MovingObject.BoundingBoxCenterX(), MovingObject.BoundingBoxCenterY(), CenterObject.BoundingBoxRight(), CenterObject.BoundingBoxTop())",
+                            "<",
+                            "MovingObject.Variable(__RectangleMovement.ClosestCornerDistance)"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "MovingObject",
+                            "__RectangleMovement.ClosestCornerDistance",
+                            "=",
+                            "DistanceBetweenPositions(MovingObject.BoundingBoxCenterX(), MovingObject.BoundingBoxCenterY(), CenterObject.BoundingBoxRight(), CenterObject.BoundingBoxTop())"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "RectangleMovement::RectangleMovement::TeleportToCorner"
+                          },
+                          "parameters": [
+                            "MovingObject",
+                            "RectangleMovement",
+                            "\"Top-right corner\"",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Distance to BottomLeft"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                          },
+                          "parameters": [
+                            "DistanceBetweenPositions(MovingObject.BoundingBoxCenterX(), MovingObject.BoundingBoxCenterY(), CenterObject.BoundingBoxLeft(), CenterObject.BoundingBoxBottom())",
+                            "<",
+                            "MovingObject.Variable(__RectangleMovement.ClosestCornerDistance)"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "MovingObject",
+                            "__RectangleMovement.ClosestCornerDistance",
+                            "=",
+                            "DistanceBetweenPositions(MovingObject.BoundingBoxCenterX(), MovingObject.BoundingBoxCenterY(), CenterObject.BoundingBoxLeft(), CenterObject.BoundingBoxBottom())"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "RectangleMovement::RectangleMovement::TeleportToCorner"
+                          },
+                          "parameters": [
+                            "MovingObject",
+                            "RectangleMovement",
+                            "\"Bottom-left corner\"",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Distance to BottomRight"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                          },
+                          "parameters": [
+                            "DistanceBetweenPositions(MovingObject.BoundingBoxCenterX(), MovingObject.BoundingBoxCenterY(), CenterObject.BoundingBoxRight(), CenterObject.BoundingBoxBottom())",
+                            "<",
+                            "MovingObject.Variable(__RectangleMovement.ClosestCornerDistance)"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "MovingObject",
+                            "__RectangleMovement.ClosestCornerDistance",
+                            "=",
+                            "DistanceBetweenPositions(MovingObject.BoundingBoxCenterX(), MovingObject.BoundingBoxCenterY(), CenterObject.BoundingBoxRight(), CenterObject.BoundingBoxBottom())"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "RectangleMovement::RectangleMovement::TeleportToCorner"
+                          },
+                          "parameters": [
+                            "MovingObject",
+                            "RectangleMovement",
+                            "\"Bottom-right corner\"",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Moving object",
+          "name": "MovingObject",
+          "type": "objectList"
+        },
+        {
+          "description": "Rectangle Movement (required)",
+          "name": "RectangleMovement",
+          "supplementaryInformation": "RectangleMovement::RectangleMovement",
+          "type": "behavior"
+        },
+        {
+          "description": "Center object",
+          "name": "CenterObject",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Move objects in a rectangular pattern.",
+      "fullName": "Rectangular movement",
+      "name": "RectangleMovement",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "OldX",
+                    "=",
+                    "Object.X()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "OldY",
+                    "=",
+                    "Object.Y()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Set the initial state according to the configuration."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "InitialPosition",
+                    "=",
+                    "\"Top-right corner\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Progress",
+                    "=",
+                    "Object.Behavior::TopRightDuration() / Object.Behavior::LoopDuration()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "InitialPosition",
+                    "=",
+                    "\"Bottom-right corner\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Progress",
+                    "=",
+                    "Object.Behavior::BottomRightDuration() / Object.Behavior::LoopDuration()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "InitialPosition",
+                    "=",
+                    "\"Bottom-left corner\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Progress",
+                    "=",
+                    "Object.Behavior::BottomLeftDuration() / Object.Behavior::LoopDuration()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Left",
+                    "=",
+                    "Object.X() - Object.Behavior::DeltaX()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Top",
+                    "=",
+                    "Object.Y() - Object.Behavior::DeltaY()"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Update the rectangle when the object is moved outside of the behavior."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Left",
+                    "+",
+                    "Object.X() - OldX"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Top",
+                    "+",
+                    "Object.Y() - OldY"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Move the object on the rectangular path."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "Left + Object.Behavior::DeltaX()",
+                    "=",
+                    "Top + Object.Behavior::DeltaY()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Save the position to detect when the object is moved outside of the behavior."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "OldX",
+                    "=",
+                    "Object.X()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "OldY",
+                    "=",
+                    "Object.Y()"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Step on the path."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Progress",
+                    "=",
+                    "mod(Progress + TimeDelta() / Object.Behavior::LoopDuration(), 1)"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Progress",
+                    "=",
+                    "mod(Progress - TimeDelta() / Object.Behavior::LoopDuration(), 1)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Teleport the object to a corner of the movement rectangle.",
+          "fullName": "Teleport at a corner",
+          "functionType": "Action",
+          "name": "TeleportToCorner",
+          "sentence": "Set the position of _PARAM0_ at the _PARAM2_ of the rectangle loop",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareStrings"
+                  },
+                  "parameters": [
+                    "Corner",
+                    "=",
+                    "\"Top-left corner\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Progress",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareStrings"
+                  },
+                  "parameters": [
+                    "Corner",
+                    "=",
+                    "\"Top-right corner\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Progress",
+                    "=",
+                    "Object.Behavior::TopRightDuration() / Object.Behavior::LoopDuration()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareStrings"
+                  },
+                  "parameters": [
+                    "Corner",
+                    "=",
+                    "\"Bottom-right corner\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Progress",
+                    "=",
+                    "Object.Behavior::BottomRightDuration() / Object.Behavior::LoopDuration()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareStrings"
+                  },
+                  "parameters": [
+                    "Corner",
+                    "=",
+                    "\"Bottom-left corner\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Progress",
+                    "=",
+                    "Object.Behavior::BottomLeftDuration() / Object.Behavior::LoopDuration()"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            },
+            {
+              "description": "Corner",
+              "name": "Corner",
+              "supplementaryInformation": "[\"Top-left corner\",\"Top-right corner\",\"Bottom-left corner\",\"Bottom-right corner\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the perimeter of the movement rectangle.",
+          "fullName": "Perimeter",
+          "functionType": "Expression",
+          "group": "Rectangular movement shape",
+          "name": "Perimeter",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "2 * (abs(Width) +  abs(Height))"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the time the object takes to go through the whole rectangle (in seconds).",
+          "fullName": "Loop duration",
+          "functionType": "Expression",
+          "name": "LoopDuration",
+          "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "2 * (HorizontalEdgeDuration + VerticalEdgeDuration)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the time the object takes to go through a horizontal edge (in seconds).",
+          "fullName": "Horizontal edge duration",
+          "functionType": "Expression",
+          "name": "HorizontalEdgeDuration",
+          "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "HorizontalEdgeDuration"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the time the object takes to go through a vertical edge (in seconds).",
+          "fullName": "Vertical edge duration",
+          "functionType": "Expression",
+          "name": "VerticalEdgeDuration",
+          "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "VerticalEdgeDuration"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the rectangle width.",
+          "fullName": "Width",
+          "functionType": "Expression",
+          "group": "Rectangular movement/Shape",
+          "name": "Width",
+          "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Width"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the rectangle height.",
+          "fullName": "Height",
+          "functionType": "Expression",
+          "group": "Rectangular movement/Shape",
+          "name": "Height",
+          "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Height"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the left bound of the movement.",
+          "fullName": "Left bound",
+          "functionType": "Expression",
+          "group": "Rectangular movement/Shape",
+          "name": "Left",
+          "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Left"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the top bound of the movement.",
+          "fullName": "Top bound",
+          "functionType": "Expression",
+          "group": "Rectangular movement/Shape",
+          "name": "Top",
+          "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Top"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the right bound of the movement.",
+          "fullName": "Right bound",
+          "functionType": "Expression",
+          "group": "Rectangular movement/Shape",
+          "name": "Right",
+          "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Left + Width"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the bottom bound of the movement.",
+          "fullName": "Bottom bound",
+          "functionType": "Expression",
+          "group": "Rectangular movement/Shape",
+          "name": "Bottom",
+          "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Top + Height"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the left bound of the rectangular movement.",
+          "fullName": "Left bound",
+          "functionType": "Action",
+          "group": "Rectangular movement shape",
+          "name": "SetLeft",
+          "sentence": "Change the movement left bound of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Width",
+                    "+",
+                    "Left - Value"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Left",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            },
+            {
+              "description": "Value",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the top bound of the rectangular movement.",
+          "fullName": "Top bound",
+          "functionType": "Action",
+          "group": "Rectangular movement shape",
+          "name": "SetTop",
+          "sentence": "Change the movement top bound of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Height",
+                    "+",
+                    "Top - Value"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Top",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            },
+            {
+              "description": "Value",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the right bound of the rectangular movement.",
+          "fullName": "Right bound",
+          "functionType": "Action",
+          "group": "Rectangular movement shape",
+          "name": "SetRight",
+          "sentence": "Change the movement right bound of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Width",
+                    "=",
+                    "Value - Left"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            },
+            {
+              "description": "Value",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the bottom bound of the rectangular movement.",
+          "fullName": "Bottom bound",
+          "functionType": "Action",
+          "group": "Rectangular movement shape",
+          "name": "SetBottom",
+          "sentence": "Change the movement bottom bound of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Height",
+                    "=",
+                    "Value - Top"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            },
+            {
+              "description": "Value",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the time the object takes to go through a horizontal edge (in seconds).",
+          "fullName": "Horizontal edge duration",
+          "functionType": "Action",
+          "group": "Rectangular movement speed",
+          "name": "SetHorizontalEdgeDuration",
+          "sentence": "Change the time _PARAM0_ takes to go through a horizontal edge to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "HorizontalEdgeDuration",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            },
+            {
+              "description": "Value",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the time the object takes to go through a vertical edge (in seconds).",
+          "fullName": "Vertical edge duration",
+          "functionType": "Action",
+          "group": "Rectangular movement speed",
+          "name": "SetVerticalEdgeDuration",
+          "sentence": "Change the time _PARAM0_ takes to go through a vertical edge to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "VerticalEdgeDuration",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            },
+            {
+              "description": "Value",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the direction to clockwise or counter-clockwise.",
+          "fullName": "Clockwise",
+          "functionType": "Action",
+          "group": "Rectangular movement speed",
+          "name": "SetClockwise",
+          "sentence": "Use clockwise direction for _PARAM0_: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Value",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Value",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            },
+            {
+              "description": "Clockwise",
+              "name": "Value",
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the easing function of the movement.",
+          "fullName": "Easing",
+          "functionType": "Action",
+          "group": "Rectangular movement speed",
+          "name": "SetEasing",
+          "sentence": "Change the easing of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "Easing",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            },
+            {
+              "description": "Easing",
+              "name": "Value",
+              "supplementaryInformation": "[\"linear\",\"easeInQuad\",\"easeOutQuad\",\"easeInOutQuad\",\"easeInCubic\",\"easeOutCubic\",\"easeInOutCubic\",\"easeInQuart\",\"easeOutQuart\",\"easeInOutQuart\",\"easeInQuint\",\"easeOutQuint\",\"easeInOutQuint\",\"easeInOutSine\",\"easeInExpo\",\"easeOutExpo\",\"easeInOutExpo\",\"easeInCirc\",\"easeOutCirc\",\"easeInOutCirc\",\"easeOutBounce\",\"easeInBack\",\"easeOutBack\",\"easeInOutBack\",\"elastic\",\"swingFromTo\",\"swingFrom\",\"swingTo\",\"bounce\",\"bouncePast\",\"easeFromTo\",\"easeFrom\",\"easeTo\"]",
+              "type": "stringWithSelector"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Toggle the direction to clockwise or counter-clockwise.",
+          "fullName": "Toggle direction",
+          "functionType": "Action",
+          "name": "ToogleClockwise",
+          "sentence": "Toogle the direction of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "ToogleClockwise",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "ToogleClockwise",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "ToogleClockwise",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "ToogleClockwise",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the object is moving clockwise.",
+          "fullName": "Is moving clockwise",
+          "functionType": "Condition",
+          "name": "IsMovingClockwise",
+          "sentence": "_PARAM0_ is moving clockwise",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the object is moving to the left.",
+          "fullName": "Is moving left",
+          "functionType": "Condition",
+          "name": "IsMovingLeft",
+          "sentence": "_PARAM0_ is moving to the left",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "RectangleMovement::RectangleMovement::IsOnTop"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "RectangleMovement::RectangleMovement::IsOnBottom"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the object is moving up.",
+          "fullName": "Is moving up",
+          "functionType": "Condition",
+          "name": "IsMovingUp",
+          "sentence": "_PARAM0_ is moving up",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "RectangleMovement::RectangleMovement::IsOnLeft"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "RectangleMovement::RectangleMovement::IsOnRight"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Object is moving to the right.",
+          "fullName": "Is moving right",
+          "functionType": "Condition",
+          "name": "IsMovingRight",
+          "sentence": "_PARAM0_ is moving to the right",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "RectangleMovement::RectangleMovement::IsOnTop"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "RectangleMovement::RectangleMovement::IsOnBottom"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the object is moving down.",
+          "fullName": "Is moving down",
+          "functionType": "Condition",
+          "name": "IsMovingDown",
+          "sentence": "_PARAM0_ is moving down",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "RectangleMovement::RectangleMovement::IsOnRight"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Clockwise",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "RectangleMovement::RectangleMovement::IsOnLeft"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Object is on the left side of the rectangle.",
+          "fullName": "Is on left",
+          "functionType": "Condition",
+          "name": "IsOnLeft",
+          "sentence": "_PARAM0_ is on the left side",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Behavior::CurrentTime()",
+                    ">=",
+                    "Object.Behavior::BottomLeftDuration()"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Object is on the top side of the rectangle.",
+          "fullName": "Is on top",
+          "functionType": "Condition",
+          "name": "IsOnTop",
+          "sentence": "_PARAM0_ is on the top side",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Behavior::CurrentTime()",
+                    "<=",
+                    "Object.Behavior::TopRightDuration()"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Object is on the right side of the rectangle.",
+          "fullName": "Is on right",
+          "functionType": "Condition",
+          "name": "IsOnRight",
+          "sentence": "_PARAM0_ is on the right side",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Behavior::CurrentTime()",
+                    ">=",
+                    "Object.Behavior::TopRightDuration()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Behavior::CurrentTime()",
+                    "<=",
+                    "Object.Behavior::BottomRightDuration()"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Object is on the bottom side of the rectangle.",
+          "fullName": "Is on bottom",
+          "functionType": "Condition",
+          "name": "IsOnBottom",
+          "sentence": "_PARAM0_ is on the bottom side",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Behavior::CurrentTime()",
+                    ">=",
+                    "Object.Behavior::BottomRightDuration()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Behavior::CurrentTime()",
+                    "<=",
+                    "Object.Behavior::BottomLeftDuration()"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the duration between the top-left vertex and the top-right one.",
+          "fullName": "Duration to top right",
+          "functionType": "Expression",
+          "name": "TopRightDuration",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "HorizontalEdgeDuration"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the duration between the top-left vertex and the bottom-right one.",
+          "fullName": "Duration to bottom right",
+          "functionType": "Expression",
+          "name": "BottomRightDuration",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "HorizontalEdgeDuration + VerticalEdgeDuration"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the duration between the top-left vertex and the bottom-left one.",
+          "fullName": "Duration to bottom left",
+          "functionType": "Expression",
+          "name": "BottomLeftDuration",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "2 * HorizontalEdgeDuration + VerticalEdgeDuration"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the ratio between the covered distance from the last vertex and the edge length (between 0 and 1).",
+          "fullName": "Progress on edge",
+          "functionType": "Expression",
+          "name": "EdgeProgress",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Behavior::HalfCurrentTime() / HorizontalEdgeDuration"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Behavior::HalfCurrentTime()",
+                    ">=",
+                    "abs(HorizontalEdgeDuration)"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "(Object.Behavior::HalfCurrentTime() - HorizontalEdgeDuration) / VerticalEdgeDuration"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the X position of the current edge origin.",
+          "fullName": "Edge origin X",
+          "functionType": "Expression",
+          "name": "EdgeOriginX",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Behavior::CurrentTime()",
+                    ">=",
+                    "Object.Behavior::TopRightDuration()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Behavior::CurrentTime()",
+                    "<",
+                    "Object.Behavior::BottomLeftDuration()"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Width"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the Y position of the current edge origin.",
+          "fullName": "Edge origin Y",
+          "functionType": "Expression",
+          "name": "EdgeOriginY",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Behavior::CurrentTime()",
+                    ">=",
+                    "Object.Behavior::BottomRightDuration()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Behavior::CurrentTime()",
+                    "<",
+                    "Object.Behavior::Perimeter()"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Height"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the X position of the current edge target.",
+          "fullName": "Edge target X",
+          "functionType": "Expression",
+          "name": "EdgeTargetY",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Behavior::CurrentTime()",
+                    ">=",
+                    "Object.Behavior::TopRightDuration()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Behavior::CurrentTime()",
+                    "<",
+                    "Object.Behavior::BottomLeftDuration()"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Height"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the Y position of the current edge target.",
+          "fullName": "Edge target Y",
+          "functionType": "Expression",
+          "name": "EdgeTargetX",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "Object.Behavior::CurrentTime()",
+                    "<",
+                    "Object.Behavior::BottomRightDuration()"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Width"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the time from the top-left vertex.",
+          "fullName": "Current time",
+          "functionType": "Expression",
+          "name": "CurrentTime",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Progress * Object.Behavior::LoopDuration()"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the covered length from the top-left vertex or the bottom-right one.",
+          "fullName": "Half Current length",
+          "functionType": "Expression",
+          "name": "HalfCurrentTime",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object. Behavior::LoopDuration() * mod(Progress, 0.5)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the displacement on the X axis from the top-left vertex.",
+          "fullName": "Delta X",
+          "functionType": "Expression",
+          "name": "DeltaX",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Tween::Ease(Easing, Object.Behavior::EdgeOriginX(), Object.Behavior::EdgeTargetX(), Object.Behavior::EdgeProgress())"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the displacement on the Y axis from the top-left vertex.",
+          "fullName": "Delta Y",
+          "functionType": "Expression",
+          "name": "DeltaY",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Tween::Ease(Easing, Object.Behavior::EdgeOriginY(), Object.Behavior::EdgeTargetY(), Object.Behavior::EdgeProgress())"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "RectangleMovement::RectangleMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "100",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "Width",
+          "description": "",
+          "group": "Dimension",
+          "extraInformation": [],
+          "name": "Width"
+        },
+        {
+          "value": "100",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "Height",
+          "description": "",
+          "group": "Dimension",
+          "extraInformation": [],
+          "name": "Height"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Clockwise",
+          "description": "",
+          "group": "Speed",
+          "extraInformation": [],
+          "name": "Clockwise"
+        },
+        {
+          "value": "4",
+          "type": "Number",
+          "unit": "Second",
+          "label": "Horizontal edge duration",
+          "description": "",
+          "group": "Speed",
+          "extraInformation": [],
+          "name": "HorizontalEdgeDuration"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "unit": "Second",
+          "label": "Vertical edge duration",
+          "description": "",
+          "group": "Speed",
+          "extraInformation": [],
+          "name": "VerticalEdgeDuration"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "Left"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "Top"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "Progress"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "OldX"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "OldY"
+        },
+        {
+          "value": "easeInOutSine",
+          "type": "Choice",
+          "label": "Easing",
+          "description": "",
+          "group": "Speed",
+          "extraInformation": [
+            "linear",
+            "easeInQuad",
+            "easeOutQuad",
+            "easeInOutQuad",
+            "easeInCubic",
+            "easeOutCubic",
+            "easeInOutCubic",
+            "easeInQuart",
+            "easeOutQuart",
+            "easeInOutQuart",
+            "easeInQuint",
+            "easeOutQuint",
+            "easeInOutQuint",
+            "easeInOutSine",
+            "easeInExpo",
+            "easeOutExpo",
+            "easeInOutExpo",
+            "easeInCirc",
+            "easeOutCirc",
+            "easeInOutCirc",
+            "easeOutBounce",
+            "easeInBack",
+            "easeOutBack",
+            "easeInOutBack",
+            "elastic",
+            "swingFromTo",
+            "swingFrom",
+            "swingTo",
+            "bounce",
+            "bouncePast",
+            "easeFromTo",
+            "easeFrom",
+            "easeTo"
+          ],
+          "name": "Easing"
+        },
+        {
+          "value": "Top-left corner",
+          "type": "Choice",
+          "label": "Initial position",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "Top-left corner",
+            "Top-right corner",
+            "Bottom-right corner",
+            "Bottom-left corner"
+          ],
+          "name": "InitialPosition"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "ToogleClockwise"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

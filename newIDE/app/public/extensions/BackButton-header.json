@@ -1,0 +1,38 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Android back button",
+  "name": "BackButton",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/BackButton.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/BackButton-header.json",
+  "tags": "back,mobile,button,input",
+  "category": "Input",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/keyboard-backspace.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Customize Android back button: prevent default quit, detect presses. Android only.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/back-button",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "onBackButtonPressed",
+      "fullName": "Back button is pressed",
+      "description": "Triggers whenever the player presses the back button.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "doDefault",
+      "fullName": "Trigger back button",
+      "description": "This simulates the normal action of the back button. \nThis action will quit the app when in a mobile app, and go back to the previous page when in a web browser.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Prevents the Android phone/tablet back button from quitting the game and provides a condition to check when it's pressed (to allow customising its behavior). Works only for games published on Android.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWtleWJvYXJkLWJhY2tzcGFjZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0yMSwxMUg2LjgzTDEwLjQxLDcuNDFMOSw2TDMsMTJMOSwxOEwxMC40MSwxNi41OEw2LjgzLDEzSDIxVjExWiIgLz48L3N2Zz4="
+}

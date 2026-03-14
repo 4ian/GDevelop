@@ -1,0 +1,33 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "GfzRsieyUFVnsRR8OZThsPR29oq2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Drag camera with the mouse (or touchscreen)",
+  "name": "DragCameraWithPointer",
+  "version": "1.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/DragCameraWithPointer.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/DragCameraWithPointer-header.json",
+  "tags": "mouse,cursor,pointer,touch,drag,camera,scroll,gestures",
+  "category": "Camera",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/drag-variant.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Pan/drag camera with mouse or touch. Configurable inertia and bounds.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/drag-camera-with-pointer",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "DragCameraWithPointer",
+      "fullName": "Drag camera with the mouse",
+      "description": "Move a camera by dragging the mouse (or touchscreen).",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Move a camera by dragging the mouse (or touchscreen). \n\nHow to use:\n- Run this action on every frame that you want the camera to be movable by the mouse (or touchscreen)\n- Select the mouse button to use (choose \"left\" for touchscreen)\n- Select which directions the camera will move (vertical, horizontal, or both) \n- Select the layer that will be moved\n\nTips:\n- If no parameters are selected, the camera will move in both directions when the left mouse button (or touchscreen) are dragged.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWRyYWctdmFyaWFudCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0yMi42NywxMkwxOC4xOCwxNi41TDE1LjY3LDE0TDE3LjY1LDEyTDE1LjY3LDEwLjA0TDE4LjE4LDcuNTNMMjIuNjcsMTJNMTIsMS4zM0wxNi40Nyw1LjgyTDEzLjk2LDguMzNMMTIsNi4zNUwxMCw4LjMzTDcuNSw1LjgyTDEyLDEuMzNNMTIsMjIuNjdMNy41MywxOC4xOEwxMC4wNCwxNS42N0wxMiwxNy42NUwxNCwxNS42N0wxNi41LDE4LjE4TDEyLDIyLjY3TTEuMzMsMTJMNS44Miw3LjVMOC4zMywxMEw2LjM1LDEyTDguMzMsMTMuOTZMNS44MiwxNi40N0wxLjMzLDEyTTEyLDEwQTIsMiAwIDAsMSAxNCwxMkEyLDIgMCAwLDEgMTIsMTRBMiwyIDAgMCwxIDEwLDEyQTIsMiAwIDAsMSAxMiwxMFoiIC8+PC9zdmc+"
+}

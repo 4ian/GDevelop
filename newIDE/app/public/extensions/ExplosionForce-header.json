@@ -1,0 +1,32 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Explosion force",
+  "name": "ExplosionForce",
+  "version": "1.3.2",
+  "url": "https://resources.gdevelop-app.com/extensions/ExplosionForce.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ExplosionForce-header.json",
+  "tags": "explosion,explode,force,destruction,destroy,physics,target",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/bomb.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Apply radial explosion physics force to nearby Physics 2D objects within radius.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "https://victrisgames.itch.io/extension-explosion-force",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "ApplyExplosionForce",
+      "fullName": "Simulate explosion with physics forces",
+      "description": "Simulate an explosion with physics forces on target objects.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Apply explosion-like physics forces to target objects that are inside the explosion radius. Forces will push the target objects away from the explosion center.  The force applied is stronger the closer the target object is to the explosion center.  Target objects will be changed to \"Dynamic\" physics objects. \n\nRequirements:\n\n- Target Objects must have physics behavior\n\nTips:\n\n- Use the \"__ExplosionForce.Exploded\" object variable to detect when target objects are affected by an explosion.  For instance, start an opacity tween that fades away and deletes the objects.\n\nVariables given to Target Objects:\n\n- \"__ExplosionForce.Exploded\" (boolean)\n- \"__ExplosionForce.Magnitude\" (number)\n- \"__ExplosionForce.Angle\" (number)\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWJvbWIiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTEuMjUsNkEzLjI1LDMuMjUgMCAwLDEgMTQuNSwyLjc1QTMuMjUsMy4yNSAwIDAsMSAxNy43NSw2QzE3Ljc1LDYuNDIgMTguMDgsNi43NSAxOC41LDYuNzVDMTguOTIsNi43NSAxOS4yNSw2LjQyIDE5LjI1LDZWNS4yNUgyMC43NVY2QTIuMjUsMi4yNSAwIDAsMSAxOC41LDguMjVBMi4yNSwyLjI1IDAgMCwxIDE2LjI1LDZBMS43NSwxLjc1IDAgMCwwIDE0LjUsNC4yNUExLjc1LDEuNzUgMCAwLDAgMTIuNzUsNkgxNFY3LjI5QzE2Ljg5LDguMTUgMTksMTAuODMgMTksMTRBNyw3IDAgMCwxIDEyLDIxQTcsNyAwIDAsMSA1LDE0QzUsMTAuODMgNy4xMSw4LjE1IDEwLDcuMjlWNkgxMS4yNU0yMiw2SDI0VjdIMjJWNk0xOSw0VjJIMjBWNEgxOU0yMC45MSw0LjM4TDIyLjMzLDIuOTZMMjMuMDQsMy42N0wyMS42Miw1LjA5TDIwLjkxLDQuMzhaIiAvPjwvc3ZnPg=="
+}

@@ -1,0 +1,107 @@
+{
+  "author": "",
+  "category": "Third-party",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "OllamaAI",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNoYXQtcHJvY2Vzc2luZy1vdXRsaW5lIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDNDNi41IDMgMiA2LjU4IDIgMTFDMi4wNSAxMy4xNSAzLjA2IDE1LjE3IDQuNzUgMTYuNUM0Ljc1IDE3LjEgNC4zMyAxOC42NyAyIDIxQzQuMzcgMjAuODkgNi42NCAyMCA4LjQ3IDE4LjVDOS42MSAxOC44MyAxMC44MSAxOSAxMiAxOUMxNy41IDE5IDIyIDE1LjQyIDIyIDExUzE3LjUgMyAxMiAzTTEyIDE3QzcuNTggMTcgNCAxNC4zMSA0IDExUzcuNTggNSAxMiA1IDIwIDcuNjkgMjAgMTEgMTYuNDIgMTcgMTIgMTdNMTcgMTJWMTBIMTVWMTJIMTdNMTMgMTJWMTBIMTFWMTJIMTNNOSAxMlYxMEg3VjEySDlaIiAvPjwvc3ZnPg==",
+  "name": "OllamaAI",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/17afc029e0ccfc314f5b7f5f53632ca24b3e6082d0cc87c0777dcfa79fd56e0b_chat-processing-outline.svg",
+  "shortDescription": "This extension adds the functionality to your project to easily send requests to the \"Ollama\" AI, and get responses from it.",
+  "version": "1.0.0",
+  "description": [
+    "Create a simple action to send the following data to a Ollama AI server:",
+    "",
+    "- URL (The server's URL with port)",
+    "- Model (The model you want to generate the response)",
+    "- Prompt (The prompt you send to the server to reply to)"
+  ],
+  "tags": "ollama,ai,llama,llama2,llama3,chat,bot",
+  "authorIds": [],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Sends the prompt string, the model string, and the stream boolean from the given structure.",
+      "fullName": "Send prompt to a model",
+      "functionType": "Action",
+      "name": "Request",
+      "sentence": "Send _PARAM2_ and _PARAM3_ to _PARAM1_, then store the response JSON in the variable \"Ollama_AI_JSON\"",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarSceneTxt"
+              },
+              "parameters": [
+                "Ollama_AI.model",
+                "=",
+                "Model"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarSceneTxt"
+              },
+              "parameters": [
+                "Ollama_AI.prompt",
+                "=",
+                "Prompt"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetSceneVariableAsBoolean"
+              },
+              "parameters": [
+                "Ollama_AI.stream",
+                "False"
+              ]
+            },
+            {
+              "type": {
+                "value": "SendAsyncRequest"
+              },
+              "parameters": [
+                "API_URL",
+                "ToJSON(Ollama_AI)",
+                "\"POST\"",
+                "",
+                "Ollama_AI_JSON",
+                "Ollama_AI_Error"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The URL where the Ollama model is hosted (e.g. http://localhost:11434/api/generate)",
+          "longDescription": "The URL should be in this format: \"http://<ip address>:11434/api/generate\". If you are hosting and testing locally, use this URL: \"http://localhost:11434/api/generate\". Read the extension's GitHub issue on how to host your own server.",
+          "name": "API_URL",
+          "supplementaryInformation": "[\"http://localhost:11434/api/generate\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "The model to be used when generating a response",
+          "longDescription": "The recommended one is \"llama3\", an older version is \"llama2\", but you can also customize the models and use those. Read the extension's GitHub issue on how to do this.",
+          "name": "Model",
+          "supplementaryInformation": "[\"llama3\",\"llama2\",\"codegemma\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Your prompt to the AI, for example: \"Why is the sky blue?\"",
+          "longDescription": "The response will be stored in JSON in the variable \"Ollama_AI_JSON\". After that, you can convert the JSON to a structure. You can see how you can do it in the example on the extension's GitHub.",
+          "name": "Prompt",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

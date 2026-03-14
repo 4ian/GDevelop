@@ -1,0 +1,38 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Unique Identifiers",
+  "name": "UUID",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/UUID.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/UUID-header.json",
+  "tags": "random,generation,uid,uuid,guid,v4,unique,id,identifier",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/identifier.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Generate unique identifiers: UUIDv4 random strings and incremented integer UIDs.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/uuid",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "GenerateUUIDv4",
+      "fullName": "Generate a UUIDv4",
+      "description": "Generates a unique identifier with the UUIDv4 pattern.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "GenerateIncrementedIntegerUID",
+      "fullName": "Generate an incremented integer UID",
+      "description": "Generates a unique identifier with the incremented integer pattern.",
+      "functionType": "Expression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Adds UUID (Universally Unique Identifiers) generation expressions via multiple patterns:\n- UUIDv4: Creates a long random string of characters following the UUIDv4 standard. If available on the system/browser, will use a cryptographic random number generator, otherwise uses the same pseudorandom number generator as the `Random()` expression. Chances of collisions are extremely low, but not non-existent. As the return value is a string, it may not be the most performant pattern. It can not be predicted in most cases.\n- Incremented integer: Returns use an integer that will be incremented after each call. Very performant and no risk of collisions. The UID will be predictable, so it may be vulnerable to some cryptographic attacks if used for private unique tokens, like password reset verification UID. Note that if you store IDs and then restart the game, there may be duplicates, since it'll reset the counter.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWlkZW50aWZpZXIiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNiwxOFY4SDhWMThINk02LDQuNUg4VjYuNUg2VjQuNU0xNyw0SDE5VjE4SDE3VjE3Ljc1QzE3LDE3Ljc1IDE1LjY3LDE4IDE1LDE4QTUsNSAwIDAsMSAxMCwxM0E1LDUgMCAwLDEgMTUsOEMxNS42Nyw4IDE3LDguMjUgMTcsOC4yNVY0TTE3LDEwLjI1QzE3LDEwLjI1IDE1LjY3LDEwIDE1LDEwQTMsMyAwIDAsMCAxMiwxM0EzLDMgMCAwLDAgMTUsMTZDMTUuNjcsMTYgMTcsMTUuNzUgMTcsMTUuNzVWMTAuMjVaIiAvPjwvc3ZnPg=="
+}

@@ -1,0 +1,24 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "oc974hW1zSYZfAnRbpKoXizqc1D3",
+    "3qThSVKAPdP03MXTWNpe2QaNxpv1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Top-down walk",
+  "name": "Walk3D",
+  "version": "0.2.1",
+  "url": "https://resources.gdevelop-app.com/extensions/Walk3D.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Walk3D-header.json",
+  "tags": "",
+  "category": "Movement",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/941323cf01b837b2eb512ecbf0a95add8a195b3696eb6f5865dc090e526dc9b3_walk.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Turn and move objects forward and sideways.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/walk3d",
+  "description": "Move objects forward and sideways according to the direction they're facing.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXdhbGsiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTQuMTIsMTBIMTlWOC4ySDE1LjM4TDEzLjM4LDQuODdDMTMuMDgsNC4zNyAxMi41NCw0LjAzIDExLjkyLDQuMDNDMTEuNzQsNC4wMyAxMS41OCw0LjA2IDExLjQyLDQuMTFMNiw1LjhWMTFINy44VjcuMzNMOS45MSw2LjY3TDYsMjJINy44TDEwLjY3LDEzLjg5TDEzLDE3VjIySDE0LjhWMTUuNTlMMTIuMzEsMTEuMDVMMTMuMDQsOC4xOE0xNCwzLjhDMTUsMy44IDE1LjgsMyAxNS44LDJDMTUuOCwxIDE1LDAuMiAxNCwwLjJDMTMsMC4yIDEyLjIsMSAxMi4yLDJDMTIuMiwzIDEzLDMuOCAxNCwzLjhaIiAvPjwvc3ZnPg=="
+}

@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "XqKHAww3OUe8NPLCCWqA478em9j2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Extra inventory functions (deprecated)",
+  "name": "ExtraInventory",
+  "version": "0.0.2",
+  "url": "https://resources.gdevelop-app.com/extensions/ExtraInventory.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ExtraInventory-header.json",
+  "tags": "inventory,extra,items",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Education and Learning/Education and Learning_education_school_bag_backpack.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Adds functions that let you add/remove multiple items from an inventory, as well as a function to set the count of an item.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 3,
+  "helpPath": "/extensions/extra-inventory",
+  "description": "Adds functions that let you add or remove multiple items from an inventory, as well as a function to set the count of an item in an inventory.\n\nThis function makes use of GDevelop's built-in inventory system.\n\nThis extension is deprecated. The [simple inventory extension](https://wiki.gdevelop.io/gdevelop5/extensions/inventories) should be used instead.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIzLDI5SDljLTEuMSwwLTItMC45LTItMlYxNGMwLTMuOSwzLjEtNyw3LTdoNGMzLjksMCw3LDMuMSw3LDd2MTNDMjUsMjguMSwyNC4xLDI5LDIzLDI5eiIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjciIHkxPSIxOCIgeDI9IjI1IiB5Mj0iMTgiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xOCwyNmgtNGMtMS4xLDAtMi0wLjktMi0ydi0yaDh2MkMyMCwyNS4xLDE5LjEsMjYsMTgsMjZ6Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMTIiIHkxPSI4IiB4Mj0iMTIiIHkyPSIxOSIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjIwIiB5MT0iOCIgeDI9IjIwIiB5Mj0iMTkiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xOSw3aC02VjVjMC0xLjEsMC45LTIsMi0yaDJjMS4xLDAsMiwwLjksMiwyVjd6Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjYsMjdoLTF2LThoMWMxLjEsMCwyLDAuOSwyLDJ2NEMyOCwyNi4xLDI3LjEsMjcsMjYsMjd6Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNiwyN2gxdi04SDZjLTEuMSwwLTIsMC45LTIsMnY0QzQsMjYuMSw0LjksMjcsNiwyN3oiLz4NCjwvc3ZnPg0K"
+}

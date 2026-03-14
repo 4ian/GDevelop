@@ -1,0 +1,58 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "d3W2ZbWOpKRw2rXfBTscZztY7GH2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Sway",
+  "name": "Sway",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/Sway.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Sway-header.json",
+  "tags": "tween,sway,wobble,shake,grass,plant,snake,flame,fire,candle",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/swap-horizontal-variant.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Sway objects like grass in wind with configurable amplitude, frequency, and phase.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/sway",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Sway multiple instances of an object at different times - useful for random grass swaying.",
+      "fullName": "Sway",
+      "name": "Sway",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "ChangeSwayAngle",
+          "fullName": "Set sway angle left and right",
+          "description": "Set sway angle left and right.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ChangeSwayAngleTime",
+          "fullName": "Set sway angle time range",
+          "description": "Set sway angle time range.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ChangeSwayYScale",
+          "fullName": "Set sway Y scale mininum and maximum",
+          "description": "Set sway Y scale mininum and maximum.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ChangeSwayYScaleTime",
+          "fullName": "Set sway Y scale time range",
+          "description": "Set Y scale time range.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "This extension makes objects sway at different times.\n\nIt can be used to:\n- Simulate grass and plant movement swaying in the wind\n- Animate seaweed in an underwater environment\n- Give flames a flickering look \n\nSet *Center* and *Origin* points to the center base of the object for best results.\n\nCheck out [this demo](https://gd.games/bubble/swayexamples) to see what this extension can do.\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXN3YXAtaG9yaXpvbnRhbC12YXJpYW50IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTQsNkw4LDEwVjdIMTZBMiwyIDAgMCwxIDE4LDlBMiwyIDAgMCwxIDE2LDExSDhBNCw0IDAgMCwwIDQsMTVBNCw0IDAgMCwwIDgsMTlIMTZWMjJMMjAsMThMMTYsMTRWMTdIOEEyLDIgMCAwLDEgNiwxNUEyLDIgMCAwLDEgOCwxM0gxNkE0LDQgMCAwLDAgMjAsOUE0LDQgMCAwLDAgMTYsNUg4VjJMNCw2WiIgLz48L3N2Zz4="
+}

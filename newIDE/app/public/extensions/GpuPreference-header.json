@@ -1,0 +1,20 @@
+{
+  "tier": "community",
+  "authorIds": [],
+  "extensionNamespace": "",
+  "fullName": "GPU preference",
+  "name": "GpuPreference",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/GpuPreference.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/GpuPreference-header.json",
+  "tags": "",
+  "category": "Advanced",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/4c734811321280eae3cb1b80d331a0e83f51626db34f80861a13b78f8bc1f8f6_chip.svg",
+  "gdevelopVersion": "",
+  "shortDescription": "Sets the active GPU to integrated or dedicated, if these are both available, ensuring the highest FPS for you application.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/gpu-preference",
+  "description": "If you want to ensure that a high-power GPU is used, and you have something like an effect-heavy 3D game, you can give players the ability to choose between which of their video cards is used.\n\nFor example, the preference \"2\" can either unlock the full power of a user's integrated graphics card, or use the dedicated one if available.\nIf you are sure your app runs on high FPS on integrated graphics, use preference \"1\".",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNoaXAiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNiw0SDE4VjVIMjFWN0gxOFY5SDIxVjExSDE4VjEzSDIxVjE1SDE4VjE3SDIxVjE5SDE4VjIwSDZWMTlIM1YxN0g2VjE1SDNWMTNINlYxMUgzVjlINlY3SDNWNUg2VjRNMTEsMTVWMThIMTJWMTVIMTFNMTMsMTVWMThIMTRWMTVIMTNNMTUsMTVWMThIMTZWMTVIMTVaIiAvPjwvc3ZnPg=="
+}

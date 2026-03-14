@@ -1,0 +1,2595 @@
+{
+  "author": "",
+  "category": "Network",
+  "extensionNamespace": "",
+  "fullName": "Multiplayer custom lobbies",
+  "gdevelopVersion": "",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggZD0iTTI3LDRINUMzLjMsNCwyLDUuMywyLDd2MThjMCwxLjcsMS4zLDMsMywzaDEwLjRjLTAuOS0xLjUtMS40LTMuMi0xLjQtNWMwLTUuNSw0LjUtMTAsMTAtMTBjMi4zLDAsNC4zLDAuOCw2LDJWNw0KCUMzMCw1LjMsMjguNyw0LDI3LDR6IE03LjksOC40QzcuOSw4LjUsNy44LDguNiw3LjcsOC43QzcuNSw4LjksNy4zLDksNyw5UzYuNSw4LjksNi4zLDguN0M2LjEsOC41LDYsOC4zLDYsOGMwLTAuMywwLjEtMC41LDAuMy0wLjcNCgljMCwwLDAuMS0wLjEsMC4xLTAuMWMwLjEsMCwwLjEtMC4xLDAuMi0wLjFDNi43LDcsNi43LDcsNi44LDdjMC4xLDAsMC4zLDAsMC40LDBjMC4xLDAsMC4xLDAsMC4yLDAuMWMwLjEsMCwwLjEsMC4xLDAuMiwwLjENCgljMCwwLDAuMSwwLjEsMC4xLDAuMWMwLjEsMC4xLDAuMiwwLjIsMC4yLDAuM0M4LDcuNyw4LDcuOSw4LDhDOCw4LjEsOCw4LjMsNy45LDguNHogTTEwLjcsOC43QzEwLjUsOC45LDEwLjMsOSwxMCw5DQoJQzkuNyw5LDkuNSw4LjksOS4zLDguN0M5LjEsOC41LDksOC4zLDksOGMwLTAuMSwwLTAuMywwLjEtMC40YzAuMS0wLjEsMC4xLTAuMiwwLjItMC4zYzAuMS0wLjEsMC4yLTAuMiwwLjMtMC4yDQoJQzEwLDYuOSwxMC40LDcsMTAuNyw3LjNjMC4xLDAuMSwwLjIsMC4yLDAuMiwwLjNDMTEsNy43LDExLDcuOSwxMSw4QzExLDguMywxMC45LDguNSwxMC43LDguN3ogTTEzLjksOC40Yy0wLjEsMC4xLTAuMSwwLjItMC4yLDAuMw0KCUMxMy41LDguOSwxMy4zLDksMTMsOWMtMC4xLDAtMC4zLDAtMC40LTAuMWMtMC4xLTAuMS0wLjItMC4xLTAuMy0wLjJjLTAuMS0wLjEtMC4yLTAuMi0wLjItMC4zQzEyLDguMywxMiw4LjEsMTIsOA0KCWMwLTAuMSwwLTAuMywwLjEtMC40YzAuMS0wLjEsMC4xLTAuMiwwLjItMC4zYzAuNC0wLjQsMS0wLjQsMS40LDBjMC4xLDAuMSwwLjIsMC4yLDAuMiwwLjNDMTQsNy43LDE0LDcuOSwxNCw4DQoJQzE0LDguMSwxNCw4LjMsMTMuOSw4LjR6Ii8+DQo8cGF0aCBkPSJNMjQsMTVjLTQuNCwwLTgsMy42LTgsOHMzLjYsOCw4LDhzOC0zLjYsOC04UzI4LjQsMTUsMjQsMTV6IE0yNywyNGgtMnYyYzAsMC42LTAuNCwxLTEsMXMtMS0wLjQtMS0xdi0yaC0yDQoJYy0wLjYsMC0xLTAuNC0xLTFzMC40LTEsMS0xaDJ2LTJjMC0wLjYsMC40LTEsMS0xczEsMC40LDEsMXYyaDJjMC42LDAsMSwwLjQsMSwxUzI3LjYsMjQsMjcsMjR6Ii8+DQo8L3N2Zz4NCg==",
+  "name": "MultiplayerCustomLobbies",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Glyphster Pack/Master/SVG/Applications and Programming/a99813f48b4c6bc26cf2a28cb711a75105386ad69408d7e895ff69bb29051e95_Applications and Programming_application_coding_web_page_add.svg",
+  "shortDescription": "Custom lobbies for built-in multiplayer.",
+  "version": "1.0.1",
+  "description": [
+    "Customize the interface of multiplayer lobbies.",
+    "",
+    "There are ready-to-use custom lobbies in the asset-store [lobbies pack](https://editor.gdevelop.io/?initial-dialog=asset-store&asset-pack=multiplayer-custom-lobbies-multiplayer-custom-lobbies).",
+    "",
+    "Joining will only work if the \"join after game starts\" setting is enabled, as the game automatically starts after joining a lobby."
+  ],
+  "origin": {
+    "identifier": "MultiplayerCustomLobbies",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "multiplayer,lobby,lobbies",
+  "authorIds": [
+    "dt0tRnf2kHWJnjkrpnzTzNj9Yc63"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [
+    {
+      "name": "json",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "name": "error",
+      "type": "string",
+      "value": ""
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "Multiplayer::DisableVariableSynchronization"
+              },
+              "parameters": [
+                "",
+                "json"
+              ]
+            },
+            {
+              "type": {
+                "value": "Multiplayer::DisableVariableSynchronization"
+              },
+              "parameters": [
+                "",
+                "error"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the events are running for the editor.",
+      "fullName": "Editor is running",
+      "functionType": "Condition",
+      "name": "IsInGameEdition",
+      "private": true,
+      "sentence": "Events are running for the editor",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const game = runtimeScene.getGame();\r",
+            "eventsFunctionContext.returnValue = game.isInGameEdition && game.isInGameEdition();"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return project identifier.",
+      "fullName": "Project identifier",
+      "functionType": "StringExpression",
+      "name": "ProjectUUID",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.projectUuid;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return game version.",
+      "fullName": "Game version",
+      "functionType": "StringExpression",
+      "name": "GameVersion",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().getGameData().properties.version;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return true if game run in preview.",
+      "fullName": "Preview",
+      "functionType": "StringExpression",
+      "name": "IsPreview",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getGame().isPreview();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Define a shape painter as a mask of an object.",
+      "fullName": "Mask an object with a shape painter",
+      "functionType": "Action",
+      "name": "MaskWithShapePainter",
+      "private": true,
+      "sentence": "Mask _PARAM1_ with mask _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const maskObject = eventsFunctionContext.getObjects(\"Mask\")[0];",
+            "if (!maskObject) return;",
+            "",
+            "const maskedObjects = eventsFunctionContext.getObjects(\"Masked\");",
+            "for (const maskedObject of maskedObjects) {",
+            "    const maskedRenderer = maskedObject.getRendererObject(); ",
+            "    maskedRenderer.mask = maskObject.getRendererObject();",
+            "}",
+            "",
+            ""
+          ],
+          "parameterObjects": "masked",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object to mask",
+          "name": "Masked",
+          "type": "objectList"
+        },
+        {
+          "description": "Shape painter to use as a mask",
+          "name": "Mask",
+          "supplementaryInformation": "PrimitiveDrawing::Drawer",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Loading.",
+      "fullName": "Loading",
+      "name": "Loading",
+      "objectType": "PrimitiveDrawing::Drawer",
+      "private": true,
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "time",
+                    "+",
+                    "TimeDelta()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::Arc"
+                  },
+                  "parameters": [
+                    "Object",
+                    "0",
+                    "0",
+                    "20",
+                    "(time*360)-90",
+                    "((time*360)+60)-90",
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "PrimitiveDrawing::Drawer",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "MultiplayerCustomLobbies::Loading",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Number",
+          "unit": "Second",
+          "label": "",
+          "hidden": true,
+          "name": "time"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": [
+    {
+      "areaMaxX": 1240,
+      "areaMaxY": 680,
+      "areaMaxZ": 1,
+      "areaMinX": 0,
+      "areaMinY": 0,
+      "areaMinZ": 0,
+      "assetStoreTag": "multiplayer custom lobbies",
+      "defaultName": "CustomLobbies",
+      "description": "Customize the interface of multiplayer lobbies.\n\nJoining will only work if the \"join after game starts\" setting is enabled, as the game automatically starts after joining a lobby.",
+      "fullName": "Multiplayer custom lobbies",
+      "isInnerAreaFollowingParentSize": true,
+      "isTextContainer": true,
+      "isUsingLegacyInstancesRenderer": false,
+      "name": "CustomLobbies",
+      "objects": [
+        {
+          "assetStoreId": "",
+          "name": "Lobby",
+          "type": "MultiplayerCustomLobbies::Lobby",
+          "variant": "",
+          "variables": [
+            {
+              "name": "StartY",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "Old",
+              "type": "boolean",
+              "value": false
+            }
+          ],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "rightEdgeAnchor": 2,
+              "bottomEdgeAnchor": 0,
+              "leftEdgeAnchor": 1,
+              "relativeToOriginalWindowSize": true,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "content": {}
+        },
+        {
+          "assetStoreId": "",
+          "bottomMargin": 20,
+          "height": 80,
+          "leftMargin": 20,
+          "name": "Background",
+          "rightMargin": 20,
+          "texture": "",
+          "tiled": false,
+          "topMargin": 20,
+          "type": "PanelSpriteObject::PanelSprite",
+          "width": 240,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 2,
+              "leftEdgeAnchor": 1,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 2,
+              "topEdgeAnchor": 1,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "PlayersTitle",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "leftEdgeAnchor": 3,
+              "rightEdgeAnchor": 0,
+              "bottomEdgeAnchor": 0,
+              "relativeToOriginalWindowSize": true,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "string": "Players",
+          "font": "",
+          "textAlignment": "left",
+          "characterSize": 20,
+          "color": {
+            "b": 96,
+            "g": 96,
+            "r": 96
+          },
+          "content": {
+            "bold": false,
+            "isOutlineEnabled": false,
+            "isShadowEnabled": false,
+            "italic": false,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 2,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "underlined": false,
+            "text": "Players",
+            "font": "",
+            "textAlignment": "left",
+            "verticalTextAlignment": "top",
+            "characterSize": 20,
+            "lineHeight": 0,
+            "color": "96;96;96"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "LobbyTitle",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Lobby name",
+          "font": "",
+          "textAlignment": "left",
+          "characterSize": 20,
+          "color": {
+            "b": 96,
+            "g": 96,
+            "r": 96
+          },
+          "content": {
+            "bold": false,
+            "isOutlineEnabled": false,
+            "isShadowEnabled": false,
+            "italic": false,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 2,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "underlined": false,
+            "text": "Lobby name",
+            "font": "",
+            "textAlignment": "left",
+            "verticalTextAlignment": "top",
+            "characterSize": 20,
+            "lineHeight": 0,
+            "color": "96;96;96"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "Loading",
+          "type": "PrimitiveDrawing::Drawer",
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 4,
+              "leftEdgeAnchor": 4,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 4,
+              "topEdgeAnchor": 4,
+              "useLegacyBottomAndRightAnchors": false
+            },
+            {
+              "name": "Loading",
+              "type": "MultiplayerCustomLobbies::Loading",
+              "time": 0
+            }
+          ],
+          "fillOpacity": 0,
+          "outlineSize": 10,
+          "outlineOpacity": 255,
+          "absoluteCoordinates": false,
+          "clearBetweenFrames": true,
+          "antialiasing": "high",
+          "fillColor": {
+            "r": 255,
+            "g": 255,
+            "b": 255
+          },
+          "outlineColor": {
+            "r": 255,
+            "g": 255,
+            "b": 255
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "Scrollbar",
+          "type": "Scrollbar::Scrollbar",
+          "variant": "",
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 2,
+              "topEdgeAnchor": 1,
+              "leftEdgeAnchor": 0,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 2,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "content": {}
+        },
+        {
+          "assetStoreId": "",
+          "name": "ViewportMask",
+          "type": "PrimitiveDrawing::Drawer",
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 2,
+              "leftEdgeAnchor": 1,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 2,
+              "topEdgeAnchor": 1,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "fillOpacity": 255,
+          "outlineSize": 0,
+          "outlineOpacity": 255,
+          "absoluteCoordinates": false,
+          "clearBetweenFrames": false,
+          "antialiasing": "none",
+          "fillColor": {
+            "r": 255,
+            "g": 255,
+            "b": 255
+          },
+          "outlineColor": {
+            "r": 0,
+            "g": 0,
+            "b": 0
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "BitmapLobbyTitle",
+          "type": "BitmapText::BitmapTextObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "text": "Lobby name",
+            "opacity": 255,
+            "scale": 1,
+            "fontSize": 20,
+            "tint": "255;255;255",
+            "bitmapFontResourceName": "",
+            "textureAtlasResourceName": "",
+            "align": "left",
+            "verticalTextAlignment": "top"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "BitmapPlayersTitle",
+          "type": "BitmapText::BitmapTextObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "leftEdgeAnchor": 3,
+              "rightEdgeAnchor": 0,
+              "bottomEdgeAnchor": 0,
+              "relativeToOriginalWindowSize": true,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "content": {
+            "text": "Players",
+            "opacity": 255,
+            "scale": 1,
+            "fontSize": 20,
+            "tint": "255;255;255",
+            "bitmapFontResourceName": "",
+            "textureAtlasResourceName": "",
+            "align": "left",
+            "verticalTextAlignment": "top"
+          }
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "Background"
+          },
+          {
+            "objectName": "LobbyTitle"
+          },
+          {
+            "objectName": "PlayersTitle"
+          },
+          {
+            "objectName": "Scrollbar"
+          },
+          {
+            "objectName": "Lobby"
+          },
+          {
+            "objectName": "BitmapLobbyTitle"
+          },
+          {
+            "objectName": "BitmapPlayersTitle"
+          },
+          {
+            "objectName": "Loading"
+          },
+          {
+            "objectName": "ViewportMask"
+          }
+        ]
+      },
+      "objectsGroups": [],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "LobbyTitle",
+          "persistentUuid": "18ab1f95-1a91-4402-93c1-e9ac457c26e9",
+          "width": 0,
+          "x": 50,
+          "y": 30,
+          "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "PlayersTitle",
+          "persistentUuid": "769576ac-ead4-496e-837d-c273f4641601",
+          "width": 0,
+          "x": 586,
+          "y": 30,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 1.0024252223120453,
+          "height": 680,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Background",
+          "persistentUuid": "81934342-cee5-4d74-83d5-7eb067e6c1d8",
+          "width": 1240,
+          "x": 0,
+          "y": 0,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 52.901023890784984,
+          "layer": "",
+          "name": "Lobby",
+          "persistentUuid": "88c71631-df55-494b-a5eb-757890a319d7",
+          "width": 1240,
+          "x": 0,
+          "y": 80,
+          "zOrder": 13,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Lobby",
+          "persistentUuid": "eba5ca7d-8986-49b7-ac7b-dd89e6721e4d",
+          "width": 0,
+          "x": 0,
+          "y": 150,
+          "zOrder": 13,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 70.4,
+          "height": 550,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Scrollbar",
+          "persistentUuid": "aa693df9-cec2-432e-82d4-cd52e260c2b1",
+          "width": 11,
+          "x": 1215,
+          "y": 80,
+          "zOrder": 14,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "editionSettings": {},
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "MultiplayerCustomLobbies::IsInGameEdition"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SceneInstancesCount"
+                      },
+                      "parameters": [
+                        "",
+                        "Lobby",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "RowHeight",
+                        "=",
+                        "1.4 * Lobby.Height()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Detect the margin from Lobby instances positions."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SceneInstancesCount"
+                      },
+                      "parameters": [
+                        "",
+                        "Lobby",
+                        ">",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "Lobby",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "ListTop",
+                            "=",
+                            "min(ListTop, Lobby.BoundingBoxTop())"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "ListBottom",
+                            "=",
+                            "max(ListBottom, Lobby.BoundingBoxBottom())"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "RowHeight",
+                            "=",
+                            "Lobby.Height() + (ListBottom - ListTop - Lobby.Height() * SceneInstancesCount(Lobby)) / (SceneInstancesCount(Lobby) - 1)"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "variables": [
+                    {
+                      "name": "ListTop",
+                      "type": "number",
+                      "value": 123456
+                    },
+                    {
+                      "name": "ListBottom",
+                      "type": "number",
+                      "value": -123456
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Shape painters are faster than sprites for masking, especially when only a rectangle is drawn."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "Lobby",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Cache"
+                      },
+                      "parameters": [
+                        "Scrollbar"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "UpdateLobbies",
+                        "True",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Loading",
+                        "620",
+                        "340",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ResetObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"UpdateLobbiesTimer\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "ViewportMask",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "ViewportMask",
+                        "0",
+                        "Scrollbar.Y()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangePlan"
+                      },
+                      "parameters": [
+                        "ViewportMask",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PrimitiveDrawing::Rectangle"
+                      },
+                      "parameters": [
+                        "ViewportMask",
+                        "0",
+                        "0",
+                        "100",
+                        "100"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ResizableCapability::ResizableBehavior::SetWidth"
+                      },
+                      "parameters": [
+                        "ViewportMask",
+                        "Resizable",
+                        "=",
+                        "Object.Width()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ResizableCapability::ResizableBehavior::SetHeight"
+                      },
+                      "parameters": [
+                        "ViewportMask",
+                        "Resizable",
+                        "=",
+                        "Scrollbar.Height()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Cache"
+                      },
+                      "parameters": [
+                        "ViewportMask"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "MultiplayerCustomLobbies::CustomLobbies",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "MultiplayerCustomLobbies::IsInGameEdition"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "UpdateLobbies",
+                            "True",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "CompareObjectTimer"
+                          },
+                          "parameters": [
+                            "Object",
+                            "\"UpdateLobbiesTimer\"",
+                            ">=",
+                            "10"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "AjoutObjConcern"
+                      },
+                      "parameters": [
+                        "",
+                        "Object"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "MultiplayerCustomLobbies::CustomLobbies::UpdateLobbies"
+                      },
+                      "parameters": [
+                        "Object",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "UpdateLobbies",
+                        "False",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ResetObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"UpdateLobbiesTimer\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Multiplayer::IsSearchingForLobbyToJoin"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Scrollbar::Scrollbar::IsScrollingRequired"
+                          },
+                          "parameters": [
+                            "Scrollbar",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "SourisSurObjet"
+                              },
+                              "parameters": [
+                                "Background",
+                                "",
+                                "",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "Scrollbar::Scrollbar::IsThumbDragged"
+                              },
+                              "parameters": [
+                                "Scrollbar",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::Or"
+                                  },
+                                  "parameters": [],
+                                  "subInstructions": [
+                                    {
+                                      "type": {
+                                        "value": "IsMouseWheelScrollingUp"
+                                      },
+                                      "parameters": [
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "IsMouseWheelScrollingDown"
+                                      },
+                                      "parameters": [
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "Scrollbar::Scrollbar::SetScrollPosition"
+                                  },
+                                  "parameters": [
+                                    "Scrollbar",
+                                    "-",
+                                    "0.01 * MouseWheelDelta() * RowHeight",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "MouseButtonFromTextPressed"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "\"Left\""
+                                  ]
+                                }
+                              ],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::Once"
+                                      },
+                                      "parameters": []
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "SetNumberVariable"
+                                      },
+                                      "parameters": [
+                                        "OldCursorY",
+                                        "=",
+                                        "CursorY()"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "Scrollbar::Scrollbar::SetScrollPosition"
+                                      },
+                                      "parameters": [
+                                        "Scrollbar",
+                                        "-",
+                                        "CursorY() - OldCursorY",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SetNumberVariable"
+                                      },
+                                      "parameters": [
+                                        "OldCursorY",
+                                        "=",
+                                        "CursorY()"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "MettreY"
+                          },
+                          "parameters": [
+                            "Lobby",
+                            "=",
+                            "Lobby.StartY - Scrollbar.ScrollPosition()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "BoundingBoxBottom"
+                              },
+                              "parameters": [
+                                "Lobby",
+                                "<",
+                                "Scrollbar.BoundingBoxTop()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BoundingBoxTop"
+                              },
+                              "parameters": [
+                                "Lobby",
+                                ">",
+                                "Scrollbar.BoundingBoxBottom()"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Cache"
+                          },
+                          "parameters": [
+                            "Lobby"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "MultiplayerCustomLobbies::Lobby::ActivateInteractions"
+                          },
+                          "parameters": [
+                            "Lobby",
+                            "",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BoundingBoxBottom"
+                          },
+                          "parameters": [
+                            "Lobby",
+                            ">=",
+                            "Scrollbar.BoundingBoxTop()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BoundingBoxTop"
+                          },
+                          "parameters": [
+                            "Lobby",
+                            "<=",
+                            "Scrollbar.BoundingBoxBottom()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Lobby",
+                            "Old",
+                            "False"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Montre"
+                          },
+                          "parameters": [
+                            "Lobby",
+                            ""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "MultiplayerCustomLobbies::Lobby::IsFull"
+                              },
+                              "parameters": [
+                                "Lobby",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "MultiplayerCustomLobbies::Lobby::ActivateInteractions"
+                              },
+                              "parameters": [
+                                "Lobby",
+                                "yes",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "MultiplayerCustomLobbies::CustomLobbies",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Update lobbies.",
+          "fullName": "Update lobbies",
+          "functionType": "Action",
+          "name": "UpdateLobbies",
+          "private": true,
+          "sentence": "Update lobbies _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "await": true,
+                    "value": "SendAsyncRequest"
+                  },
+                  "parameters": [
+                    "\"https://api.gdevelop.io/play/game/\"+MultiplayerCustomLobbies::ProjectUUID()+\"/public-lobby?isPreview=\"+MultiplayerCustomLobbies::IsPreview()+\"&gameVersion=\"+MultiplayerCustomLobbies::GameVersion()",
+                    "\"\"",
+                    "\"GET\"",
+                    "\"\"",
+                    "json",
+                    "error"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "JSONToVariableStructure2"
+                  },
+                  "parameters": [
+                    "json",
+                    "data"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Montre"
+                  },
+                  "parameters": [
+                    "ViewportMask",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Montre"
+                  },
+                  "parameters": [
+                    "Scrollbar",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "Loading",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "Lobby",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "y",
+                    "=",
+                    "Scrollbar.Y()"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::ForEachChildVariable",
+                  "iterableVariableName": "data",
+                  "valueIteratorVariableName": "value",
+                  "keyIteratorVariableName": "",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Lobby",
+                        "0",
+                        "y",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "MultiplayerCustomLobbies::Lobby::SetLobbyName"
+                      },
+                      "parameters": [
+                        "Lobby",
+                        "value.name",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "MultiplayerCustomLobbies::Lobby::SetPlayersCount"
+                      },
+                      "parameters": [
+                        "Lobby",
+                        "VariableChildCount(value.players)",
+                        "value.maxPlayers",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "MultiplayerCustomLobbies::Lobby::SetLobbyID"
+                      },
+                      "parameters": [
+                        "Lobby",
+                        "value.id",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Lobby",
+                        "StartY",
+                        "=",
+                        "Lobby.Y()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "y",
+                        "+",
+                        "RowHeight"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "MultiplayerCustomLobbies::MaskWithShapePainter"
+                      },
+                      "parameters": [
+                        "",
+                        "Lobby",
+                        "ViewportMask",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Scrollbar::Scrollbar::SetContentLength"
+                      },
+                      "parameters": [
+                        "Scrollbar",
+                        "=",
+                        "RowHeight * VariableChildCount(data) - RowHeight + Lobby.Height()",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "variables": [
+                {
+                  "name": "y",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "name": "data",
+                  "type": "structure",
+                  "children": []
+                },
+                {
+                  "name": "value",
+                  "type": "structure",
+                  "children": [
+                    {
+                      "name": "id",
+                      "type": "string",
+                      "value": "0"
+                    },
+                    {
+                      "name": "maxPlayers",
+                      "type": "number",
+                      "value": 0
+                    },
+                    {
+                      "name": "name",
+                      "type": "string",
+                      "value": "0"
+                    },
+                    {
+                      "name": "players",
+                      "type": "array",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "MultiplayerCustomLobbies::CustomLobbies",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return last error.",
+          "fullName": "Last error",
+          "functionType": "StringExpression",
+          "name": "LastError",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "error"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "MultiplayerCustomLobbies::CustomLobbies",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "",
+          "hidden": true,
+          "name": "OldCursorY"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "label": "",
+          "hidden": true,
+          "name": "ListHeight"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "hidden": true,
+          "name": "UpdateLobbies"
+        },
+        {
+          "value": "70",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "",
+          "hidden": true,
+          "name": "RowHeight"
+        }
+      ]
+    },
+    {
+      "areaMaxX": 1240,
+      "areaMaxY": 50,
+      "areaMaxZ": 1,
+      "areaMinX": 0,
+      "areaMinY": 0,
+      "areaMinZ": 0,
+      "defaultName": "",
+      "description": "Custom lobby.",
+      "fullName": "Custom lobby",
+      "isInnerAreaFollowingParentSize": true,
+      "isTextContainer": true,
+      "isUsingLegacyInstancesRenderer": false,
+      "name": "Lobby",
+      "private": true,
+      "objects": [
+        {
+          "assetStoreId": "",
+          "bold": true,
+          "italic": false,
+          "name": "PlayersCount",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 0,
+              "leftEdgeAnchor": 3,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 0,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "string": "0/4",
+          "font": "",
+          "textAlignment": "center",
+          "characterSize": 20,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          },
+          "content": {
+            "bold": true,
+            "isOutlineEnabled": false,
+            "isShadowEnabled": false,
+            "italic": false,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 2,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "underlined": false,
+            "text": "0/4",
+            "font": "",
+            "textAlignment": "center",
+            "verticalTextAlignment": "top",
+            "characterSize": 20,
+            "lineHeight": 0,
+            "color": "255;255;255"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "bold": true,
+          "italic": false,
+          "name": "LobbyName",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Lobby Name",
+          "font": "",
+          "textAlignment": "left",
+          "characterSize": 20,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          },
+          "content": {
+            "bold": true,
+            "isOutlineEnabled": false,
+            "isShadowEnabled": false,
+            "italic": false,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 2,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "underlined": false,
+            "text": "Lobby Name",
+            "font": "",
+            "textAlignment": "left",
+            "verticalTextAlignment": "top",
+            "characterSize": 20,
+            "lineHeight": 0,
+            "color": "255;255;255"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "JoinButton",
+          "type": "PanelSpriteButton::PanelSpriteButton",
+          "variant": "",
+          "variables": [
+            {
+              "name": "LobbyID",
+              "type": "string",
+              "value": "0"
+            }
+          ],
+          "effects": [
+            {
+              "effectType": "BlackAndWhite",
+              "name": "Full",
+              "doubleParameters": {
+                "opacity": 1
+              },
+              "stringParameters": {},
+              "booleanParameters": {}
+            }
+          ],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "relativeToOriginalWindowSize": true,
+              "bottomEdgeAnchor": 0,
+              "leftEdgeAnchor": 0,
+              "rightEdgeAnchor": 2,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "content": {
+            "LabelText": "Join",
+            "HoveredFadeOutDuration": 0.125
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "BitmapLobbyName",
+          "type": "BitmapText::BitmapTextObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "text": "Lobby Name",
+            "opacity": 255,
+            "scale": 1,
+            "fontSize": 20,
+            "tint": "255;255;255",
+            "bitmapFontResourceName": "",
+            "textureAtlasResourceName": "",
+            "align": "left",
+            "verticalTextAlignment": "top"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "BitmapPlayersCount",
+          "type": "BitmapText::BitmapTextObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 0,
+              "leftEdgeAnchor": 3,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 0,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "content": {
+            "text": "0/4",
+            "opacity": 255,
+            "scale": 1,
+            "fontSize": 20,
+            "tint": "255;255;255",
+            "bitmapFontResourceName": "",
+            "textureAtlasResourceName": "",
+            "align": "left",
+            "verticalTextAlignment": "top"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "bottomMargin": 16,
+          "height": 50,
+          "leftMargin": 16,
+          "name": "Background",
+          "rightMargin": 16,
+          "texture": "",
+          "tiled": false,
+          "topMargin": 16,
+          "type": "PanelSpriteObject::PanelSprite",
+          "width": 1240,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 2,
+              "leftEdgeAnchor": 1,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 2,
+              "topEdgeAnchor": 1,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ]
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "JoinButton"
+          },
+          {
+            "objectName": "Background"
+          },
+          {
+            "objectName": "LobbyName"
+          },
+          {
+            "objectName": "PlayersCount"
+          },
+          {
+            "objectName": "BitmapLobbyName"
+          },
+          {
+            "objectName": "BitmapPlayersCount"
+          }
+        ]
+      },
+      "objectsGroups": [
+        {
+          "name": "LobbyNameLabel",
+          "objects": [
+            {
+              "name": "LobbyName"
+            },
+            {
+              "name": "BitmapLobbyName"
+            }
+          ]
+        },
+        {
+          "name": "PlayersCountLabel",
+          "objects": [
+            {
+              "name": "PlayersCount"
+            },
+            {
+              "name": "BitmapPlayersCount"
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 1,
+          "height": 50,
+          "layer": "",
+          "name": "JoinButton",
+          "persistentUuid": "bc851bdf-1dad-4c64-88f5-c4351d03b70d",
+          "width": 200,
+          "x": 990,
+          "y": 0,
+          "zOrder": 7,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "LobbyName",
+          "persistentUuid": "84331fe9-1e32-465b-8fb4-2e83bcab8bae",
+          "width": 0,
+          "x": 50,
+          "y": 15,
+          "zOrder": 4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 0,
+          "height": 23,
+          "keepRatio": true,
+          "layer": "",
+          "name": "PlayersCount",
+          "persistentUuid": "d1b8d5b4-d25b-407d-a92c-b3cacbf4c3d4",
+          "width": 67,
+          "x": 586,
+          "y": 15,
+          "zOrder": 11,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 64,
+          "height": 50,
+          "layer": "",
+          "name": "JoinButton",
+          "persistentUuid": "767def37-1d26-479d-898d-fb296fe12716",
+          "width": 200,
+          "x": 990,
+          "y": 0,
+          "zOrder": 12,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "editionSettings": {},
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "EffectCapability::EffectBehavior::EnableEffect"
+                  },
+                  "parameters": [
+                    "JoinButton",
+                    "Effect",
+                    "\"Full\"",
+                    "no"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "MultiplayerCustomLobbies::Lobby",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PanelSpriteButton::PanelSpriteButton::IsClicked"
+                  },
+                  "parameters": [
+                    "JoinButton",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "Multiplayer::IsSearchingForLobbyToJoin"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Multiplayer::QuickJoinWithLobbyID"
+                  },
+                  "parameters": [
+                    "",
+                    "JoinButton.LobbyID",
+                    "",
+                    "no"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "MultiplayerCustomLobbies::Lobby",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set lobby name.",
+          "fullName": "Set lobby name",
+          "functionType": "Action",
+          "name": "SetLobbyName",
+          "sentence": "Set lobby name _PARAM0_:  _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "LobbyNameLabel",
+                    "Text",
+                    "=",
+                    "NameLobby"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "MultiplayerCustomLobbies::Lobby",
+              "type": "object"
+            },
+            {
+              "description": "Lobby name",
+              "name": "NameLobby",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set players in lobby count.",
+          "fullName": "Set players in lobby count",
+          "functionType": "Action",
+          "name": "SetPlayersCount",
+          "sentence": "Set players in lobby count _PARAM0_, players in lobby: _PARAM1_, max players _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "PlayersCountLabel",
+                    "Text",
+                    "=",
+                    "PlayersInLobby+\"/\"+MaxPlayers"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "PlayersInLobby",
+                    ">=",
+                    "MaxPlayers"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PanelSpriteButton::PanelSpriteButton::Activate"
+                  },
+                  "parameters": [
+                    "JoinButton",
+                    "Anchor",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "EffectCapability::EffectBehavior::EnableEffect"
+                  },
+                  "parameters": [
+                    "JoinButton",
+                    "Effect",
+                    "\"Full\"",
+                    "yes"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PanelSpriteButton::PanelSpriteButton::SetLabelTextOp"
+                  },
+                  "parameters": [
+                    "JoinButton",
+                    "=",
+                    "\"Full\"",
+                    "\"Full\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "Full",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "MultiplayerCustomLobbies::Lobby",
+              "type": "object"
+            },
+            {
+              "description": "Players count in lobby",
+              "name": "PlayersInLobby",
+              "type": "expression"
+            },
+            {
+              "description": "Maxum count players in lobby",
+              "name": "MaxPlayers",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Set lobby ID.",
+          "fullName": "Set lobby ID",
+          "functionType": "Action",
+          "name": "SetLobbyID",
+          "sentence": "Set lobby ID _PARAM0_: _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarObjetTxt"
+                  },
+                  "parameters": [
+                    "JoinButton",
+                    "LobbyID",
+                    "=",
+                    "LobbyID"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "MultiplayerCustomLobbies::Lobby",
+              "type": "object"
+            },
+            {
+              "description": "Lobby ID",
+              "name": "LobbyID",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return true if lobby is full.",
+          "fullName": "Is full",
+          "functionType": "Condition",
+          "name": "IsFull",
+          "sentence": "Lobby _PARAM0_ is full",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Full",
+                    "=",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "False"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Full",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "MultiplayerCustomLobbies::Lobby",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Activate interactions.",
+          "fullName": "Activate interactions",
+          "functionType": "Action",
+          "name": "ActivateInteractions",
+          "sentence": "Activate interactions of _PARAM0_: _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "YesOrNo",
+                    "=",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PanelSpriteButton::PanelSpriteButton::Activate"
+                  },
+                  "parameters": [
+                    "JoinButton",
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "YesOrNo",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PanelSpriteButton::PanelSpriteButton::Activate"
+                  },
+                  "parameters": [
+                    "JoinButton",
+                    "yes",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "MultiplayerCustomLobbies::Lobby",
+              "type": "object"
+            },
+            {
+              "description": "Yes or no",
+              "name": "YesOrNo",
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "hidden": true,
+          "name": "Full"
+        }
+      ]
+    }
+  ],
+  "requiredExtensions": [
+    {
+      "extensionName": "PanelSpriteButton",
+      "extensionVersion": "2.1.1"
+    },
+    {
+      "extensionName": "Scrollbar",
+      "extensionVersion": "1.0.0"
+    }
+  ]
+}

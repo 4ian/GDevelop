@@ -1,7 +1,6 @@
 // @flow
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import RaisedButton from '../../UI/RaisedButton';
@@ -14,15 +13,12 @@ import {
   type Build,
   type BuildArtifactKeyName,
 } from '../../Utils/GDevelopServices/Build';
-import { type Game, updateGame } from '../../Utils/GDevelopServices/Game';
+import { type Game } from '../../Utils/GDevelopServices/Game';
 import Window from '../../Utils/Window';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
-import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import Toggle from '../../UI/Toggle';
 import TextButton from '../../UI/TextButton';
 import Download from '../../UI/CustomSvgIcons/Download';
 import Copy from '../../UI/CustomSvgIcons/Copy';
-import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import LinearProgress from '../../UI/LinearProgress';
 import FlatButton from '../../UI/FlatButton';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
@@ -75,16 +71,6 @@ const downloadButtons = [
     icon: <Download />,
   },
   {
-    displayName: t`IPA for App Store`,
-    key: 'iosAppStoreIpaKey',
-    icon: <Download />,
-  },
-  {
-    displayName: t`IPA for testing on registered devices`,
-    key: 'iosDevelopmentIpaKey',
-    icon: <Download />,
-  },
-  {
     displayName: t`Linux (AppImage)`,
     key: 'linuxAppImageKey',
     icon: <Download />,
@@ -112,14 +98,8 @@ type Props = {|
 const BuildProgressAndActions = ({
   build,
   game,
-  onGameUpdated,
-  gameUpdating,
-  setGameUpdating,
   onCopyToClipboard,
 }: Props): React.Node => {
-  const { getAuthorizationHeader, profile } = React.useContext(
-    AuthenticatedUserContext
-  );
   const config = buildTypesConfig[build.type];
   const estimatedTime = config.estimatedTimeInSeconds(build);
   const secondsSinceLastUpdate = Math.abs(
@@ -141,57 +121,6 @@ const BuildProgressAndActions = ({
     if (url) navigator.clipboard.writeText(url);
     onCopyToClipboard && onCopyToClipboard();
   };
-
-  const onUpdatePublicBuild = React.useCallback(
-    async (buildId: ?string, i18n: I18nType) => {
-      if (!profile || !game || !onGameUpdated || !setGameUpdating) return;
-
-      const { id } = profile;
-      const answer = Window.showConfirmDialog(
-        buildId
-          ? i18n._(
-              t`"${build.name ||
-                shortenUuidForDisplay(
-                  build.id
-                )}" will be the new build of this game published on gd.games. Continue?`
-            )
-          : i18n._(
-              t`"${build.name ||
-                shortenUuidForDisplay(
-                  build.id
-                )}" will be unpublished on gd.games. Continue?`
-            )
-      );
-      if (!answer) return;
-      try {
-        setGameUpdating(true);
-        const updatedGame = await updateGame(
-          getAuthorizationHeader,
-          id,
-          game.id,
-          {
-            publicWebBuildId: buildId,
-          }
-        );
-        onGameUpdated(updatedGame);
-      } catch (err) {
-        console.error('Unable to update the game', err);
-      } finally {
-        setGameUpdating(false);
-      }
-    },
-    [
-      profile,
-      game,
-      onGameUpdated,
-      setGameUpdating,
-      build.name,
-      build.id,
-      getAuthorizationHeader,
-    ]
-  );
-
-  const isBuildPublished = !!game && game.publicWebBuildId === build.id;
 
   return (
     <I18n>
@@ -289,26 +218,11 @@ const BuildProgressAndActions = ({
                 alignItems="center"
               >
                 {game && !!build.s3Key && (
-                  <>
-                    <Toggle
-                      label={<Trans>Publish this build on gd.games</Trans>}
-                      labelPosition="left"
-                      toggled={isBuildPublished}
-                      onToggle={() => {
-                        onUpdatePublicBuild(
-                          isBuildPublished ? null : build.id,
-                          i18n
-                        );
-                      }}
-                      disabled={gameUpdating}
-                    />
-                    <Spacer />
-                    <TextButton
-                      label={<Trans>Copy build link</Trans>}
-                      icon={<Copy />}
-                      onClick={onCopyBuildLink}
-                    />
-                  </>
+                  <TextButton
+                    label={<Trans>Copy build link</Trans>}
+                    icon={<Copy />}
+                    onClick={onCopyBuildLink}
+                  />
                 )}
                 {downloadButtons
                   // $FlowFixMe[invalid-computed-prop]

@@ -1,0 +1,82 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "3D object shake",
+  "name": "ShakeObject3D",
+  "version": "2.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/ShakeObject3D.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ShakeObject3D-header.json",
+  "tags": "3d,shaking,effect,shake,translate,rotate",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/vector-difference-ab.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "changelog": [
+    {
+      "version": "2.0.0",
+      "breaking": "- The behavior for 3D box has been removed. The other behavior can be used for both models and boxes."
+    }
+  ],
+  "shortDescription": "Shake 3D objects.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/shake-object3d",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Shake 3D objects with translation and rotation.",
+      "fullName": "3D shake",
+      "name": "ShakeModel3D",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "Shake",
+          "fullName": "Shake",
+          "description": "Shake the object with a linear easing at the start and the end.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StartShaking",
+          "fullName": "Start shaking",
+          "description": "Shake the object with a linear easing at the start and keep shaking until the stop action is used.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StopShaking",
+          "fullName": "Stop shaking",
+          "description": "Stop shaking the object with a linear easing.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsShaking",
+          "fullName": "Is shaking",
+          "description": "Check if the object is shaking.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsStopping",
+          "fullName": "Is stopping to shake",
+          "description": "Check if the object is stopping to shake.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "Frequency",
+          "fullName": "Shaking frequency",
+          "description": "Compare the shaking frequency of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFrequency",
+          "fullName": "Shaking frequency",
+          "description": "Change the shaking frequency of the object.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Shake 3D objects with translation and rotation.\n\nThe 3D racing game example uses this extension ([open the project online](https://editor.gdevelop.io/?project=example://3d-racing-game)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZlY3Rvci1kaWZmZXJlbmNlLWFiIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTMsMUMxLjg5LDEgMSwxLjg5IDEsM1Y1SDNWM0g1VjFIM003LDFWM0gxMFYxSDdNMTIsMVYzSDE0VjVIMTZWM0MxNiwxLjg5IDE1LjExLDEgMTQsMUgxMk0xLDdWMTBIM1Y3SDFNMTQsN0MxNCw3IDE0LDExLjY3IDE0LDE0QzExLjY3LDE0IDcsMTQgNywxNEM3LDE0IDcsMTggNywyMEM3LDIxLjExIDcuODksMjIgOSwyMkgyMEMyMS4xMSwyMiAyMiwyMS4xMSAyMiwyMFY5QzIyLDcuODkgMjEuMTEsNyAyMCw3QzE4LDcgMTQsNyAxNCw3TTE2LDlIMjBWMjBIOVYxNkgxNEMxNS4xMSwxNiAxNiwxNS4xMSAxNiwxNFY5TTEsMTJWMTRDMSwxNS4xMSAxLjg5LDE2IDMsMTZINVYxNEgzVjEySDFaIiAvPjwvc3ZnPg=="
+}

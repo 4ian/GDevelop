@@ -1,0 +1,46 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "3D physics character animator",
+  "name": "PhysicsCharacter3DAnimator",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/PhysicsCharacter3DAnimator.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/PhysicsCharacter3DAnimator-header.json",
+  "tags": "3d,animation",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Sports and Fitness/Sports and Fitness_training_running_run.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Change animations of 3D physics characters automatically.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/physics-character3danimator",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Change animations of a 3D physics character automatically.",
+      "fullName": "3D physics character animator",
+      "name": "PhysicsCharacter3DAnimator",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "RotationSpeed",
+          "fullName": "Rotation speed",
+          "description": "Compare the rotation speed of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetRotationSpeed",
+          "fullName": "Rotation speed",
+          "description": "Change the rotation speed of the object.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Automatically change the animationsof a 3D physics character based on movement and interaction with platform objects.\n\nThe 3D platformer example uses this extension ([open the project online](https://editor.gdevelop.io/?project=example://3d-platformer)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGc+DQoJPHBhdGggZD0iTTIzLDExYzIuMiwwLDQtMS44LDQtNHMtMS44LTQtNC00cy00LDEuOC00LDRTMjAuOCwxMSwyMywxMXoiLz4NCgk8cGF0aCBkPSJNMzAuOCwxMi40Yy0wLjMtMC40LTEtMC41LTEuNC0wLjJsLTIuOSwyLjNjLTAuOCwwLjctMiwwLjYtMi43LTAuMmwtNy45LTcuOWMtMS42LTEuNi00LjEtMS42LTUuNywwTDcuMyw5LjMNCgkJYy0wLjQsMC40LTAuNCwxLDAsMS40czEsMC40LDEuNCwwbDIuOC0yLjhjMC44LTAuOCwyLjEtMC44LDIuOSwwbDEuNiwxLjZMMTEuNiwxNGMtMSwxLTEuNCwyLjMtMS4xLDMuN2MwLjIsMS4xLDAuOSwyLDEuOCwyLjYNCgkJbC0xLjYsMS42Yy0wLjQsMC40LTEsMC40LTEuNCwwbC0zLjYtMy42Yy0wLjQtMC40LTEtMC40LTEuNCwwcy0wLjQsMSwwLDEuNGwzLjYsMy42YzAuNiwwLjYsMS4zLDAuOSwyLjEsMC45czEuNi0wLjMsMi4xLTAuOQ0KCQlsMi4xLTIuMWwyLjUsMWMwLjcsMC4zLDEuMiwxLDEuMiwxLjh2NmMwLDAuNiwwLjQsMSwxLDFzMS0wLjQsMS0xdi02YzAtMS42LTEtMy4xLTIuNS0zLjdsLTEuNy0wLjdsNS4yLTUuMmwxLjQsMS40DQoJCWMwLjgsMC44LDEuOCwxLjIsMi45LDEuMmMwLjksMCwxLjgtMC4zLDIuNS0wLjlsMi45LTIuM0MzMS4xLDEzLjQsMzEuMSwxMi44LDMwLjgsMTIuNHoiLz4NCjwvZz4NCjwvc3ZnPg0K"
+}

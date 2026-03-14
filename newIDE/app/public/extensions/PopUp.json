@@ -1,0 +1,207 @@
+{
+  "author": "",
+  "category": "User interface",
+  "description": "This extension adds actions to display three kinds of pop-ups.\n\n## Alert\n - Pops-up a message that will pause the game until dismissed by the player.\n\n## Confirmation\n - Pops-up a dialogue containing a message with the option to either confirm or cancel.\n\n## Prompt\n**Note that this pop-up type is unsupported on previews and PC exports.**\n - Displays a message to the player with a text field to write an answer in. The player will also have the option to either confirm or discard their input.\n",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Pop-up",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLW1lc3NhZ2UtYWxlcnQiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTMgMTFIMTFWNUgxM00xMyAxNUgxMVYxM0gxM00yMCAySDRDMi45IDIgMiAyLjkgMiA0VjIyTDYgMThIMjBDMjEuMSAxOCAyMiAxNy4xIDIyIDE2VjRDMjIgMi45IDIxLjEgMiAyMCAyWiIgLz48L3N2Zz4=",
+  "name": "PopUp",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/message-alert.svg",
+  "shortDescription": "Display pop-ups to alert, ask confirmation, and let user type a response in text box.",
+  "version": "1.0.0",
+  "tags": "pop up,alert,message,prompt,confirm,dialog",
+  "authorIds": [
+    "HBp2oDKV87gKFbdd1wyV1jRYRC13",
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "The response to a pop-up message is filled.",
+      "fullName": "Existing prompt response",
+      "functionType": "Condition",
+      "group": "",
+      "name": "PromptValidResponse",
+      "private": false,
+      "sentence": "Response from the pop-up prompt is filled",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const promptResponse = runtimeScene.getVariables().get(\"__PopUp\").getChild(\"Prompt\").getAsString();\neventsFunctionContext.returnValue = promptResponse !== \"\";\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the text response by user to prompt.",
+      "fullName": "Response to prompt",
+      "functionType": "StringExpression",
+      "group": "",
+      "name": "PromptResponse",
+      "private": false,
+      "sentence": "Open prompt with message : _PARAM1_ with ID: _PARAM2_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getVariables().get(\"__PopUp\").getChild(\"Prompt\").getAsString();\r\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Displays a prompt in a pop-up that prompts the user for input. This action return the text input or the false boolean if canceled.",
+      "fullName": "Prompt",
+      "functionType": "Action",
+      "group": "Web browsers",
+      "name": "Prompt",
+      "private": false,
+      "sentence": "Open a prompt pop-up box with message: _PARAM1_ (placeholder: _PARAM2_)",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const message = eventsFunctionContext.getArgument(\"Message\");\nconst defaultText = eventsFunctionContext.getArgument(\"DefaultText\");\n\nconst response = prompt(message, defaultText);\nruntimeScene\n    .getVariables()\n    .get(\"__PopUp\")\n    .getChild(\"Prompt\")\n    .setString(response || \"\");\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Prompt message",
+          "longDescription": "",
+          "name": "Message",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Input placeholder",
+          "longDescription": "",
+          "name": "DefaultText",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Ask confirmation of user with a message in a dialog box with an OK button, and a Cancel button.",
+      "fullName": "Confirm",
+      "functionType": "Action",
+      "group": "",
+      "name": "Confirm",
+      "private": false,
+      "sentence": "Open a confirmation pop-up box with message: _PARAM1_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const isConfirmed = confirm(eventsFunctionContext.getArgument(\"Message\"));\nruntimeScene\n    .getVariables()\n    .get(\"__PopUp\")\n    .getChild(\"Confirm\")\n    .setBoolean(isConfirmed);\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Confirmation message",
+          "longDescription": "The text to display in the confirm box.",
+          "name": "Message",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a confirmation was accepted.",
+      "fullName": "Pop-up message confirmed",
+      "functionType": "Condition",
+      "group": "",
+      "name": "ConfimationResponse",
+      "private": false,
+      "sentence": "Pop-up message is confirmed",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = runtimeScene.getVariables().get(\"__PopUp\").getChild(\"Confirm\").getAsBoolean();\r\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": []
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Displays an alert box with a message and an OK button in a pop-up window.",
+      "fullName": "Alert",
+      "functionType": "Action",
+      "group": "",
+      "name": "Alert",
+      "private": false,
+      "sentence": "Open an alert pop-up box with message: _PARAM1_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "alert(eventsFunctionContext.getArgument(\"Message\"));\r\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Alert message",
+          "longDescription": "",
+          "name": "Message",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

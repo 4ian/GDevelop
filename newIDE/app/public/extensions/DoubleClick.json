@@ -1,0 +1,306 @@
+{
+  "author": "Silver-Streak",
+  "category": "Input",
+  "extensionNamespace": "",
+  "fullName": "Double-click and tap",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMTYiIHkxPSIzIiB4Mj0iMTYiIHkyPSI2Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMTYiIHkxPSIxMCIgeDI9IjE2IiB5Mj0iMTMiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNiwxMEwxNiwxMGMtMS4xLDAtMi0wLjktMi0ydjBjMC0xLjEsMC45LTIsMi0yaDBjMS4xLDAsMiwwLjksMiwydjBDMTgsOS4xLDE3LjEsMTAsMTYsMTB6Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNywxNC4xYzIuMy0wLjcsNS41LTEuMSw5LTEuMWMzLjUsMCw2LjcsMC40LDksMS4xIi8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTYsMjlMMTYsMjljLTUsMC05LTQtOS05di01LjlWOWMwLTMuMywyLjctNiw2LTZoNmMzLjMsMCw2LDIuNyw2LDZ2MTFDMjUsMjUsMjEsMjksMTYsMjl6Ii8+DQo8L3N2Zz4NCg==",
+  "name": "DoubleClick",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Computers and Hardware/Computers and Hardware_mouse_wireless_pc.svg",
+  "shortDescription": "Detect double-click (mouse) or double-tap (touch) on objects or anywhere.",
+  "version": "2.0.1",
+  "description": [
+    "Check for a double-click with a mouse, or a tap and double-click on a touchscreen.",
+    "",
+    "Please note: Touch devices do not have alternatives for middle/right clicks. Taps on a touch device will get counted for _any_ use of these conditions, so you should either design your controls accordingly, or build out separate events if the device has a touch screen."
+  ],
+  "origin": {
+    "identifier": "DoubleClick",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "mouse,cursor,pointer,click,tap",
+  "authorIds": [
+    "8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "changelog": [
+    {
+      "version": "2.0.0",
+      "breaking": [
+        "- Mouse button value now needs quotes",
+        "- The double-click sensitivity now relies on the device settings"
+      ]
+    }
+  ],
+  "dependencies": [],
+  "globalVariables": [
+    {
+      "name": "MaxDelay",
+      "type": "number",
+      "value": 0.5
+    }
+  ],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "class ClickCounter {",
+            "    // Multiple clicks",
+            "    multipleClickButton = -1;",
+            "    count = 0;",
+            "",
+            "    // Simple click",
+            "    lastButton = -1;",
+            "    lastPointerId = 0;",
+            "    lastTime = 0;",
+            "    hasMoved = false;",
+            "    simpleClickButton = -1;",
+            "",
+            "    constructor() {",
+            "        window.addEventListener(",
+            "            'click',",
+            "            event => {",
+            "                if (event.detail > 1) {",
+            "                    this.multipleClickButton = convertHtmlMouseButtonToInputManagerMouseButton(event.button);",
+            "                    this.count = event.detail;",
+            "                }",
+            "            }",
+            "        );",
+            "",
+            "        // The 'click' event doesn't do any constraint on the 1st click.",
+            "        // It doesn't allow to differenciate a dragging from a click.",
+            "        // So, we check it manually.",
+            "",
+            "        window.addEventListener(",
+            "            'pointerdown',",
+            "            event => {",
+            "                this.lastButton = event.button;",
+            "                this.lastPointerId = event.pointerId;",
+            "                this.lastTime = Date.now();",
+            "                this.hasMoved = false;",
+            "            }",
+            "        );",
+            "",
+            "        window.addEventListener(",
+            "            'pointermove',",
+            "            event => {",
+            "                if (event.pointerId === this.lastPointerId) {",
+            "                    this.hasMoved = true;",
+            "                }",
+            "            }",
+            "        );",
+            "",
+            "        window.addEventListener(",
+            "            'pointerup',",
+            "            (event) => {",
+            "                if (event.button === this.lastButton &&",
+            "                    event.pointerId === this.lastPointerId &&",
+            "                    (!this.hasMoved || Date.now() - this.lastTime < 500)) {",
+            "                    this.simpleClickButton = convertHtmlMouseButtonToInputManagerMouseButton(event.button);",
+            "                    this.lastButton = -1;",
+            "                }",
+            "            }",
+            "        );",
+            "",
+            "    }",
+            "",
+            "    reset() {",
+            "        this.multipleClickButton = -1;",
+            "        this.simpleClickButton = -1;",
+            "    }",
+            "",
+            "    hasClicked(buttonName, clickCount) {",
+            "        const button = gdjs.evtTools.input.mouseButtonsNameToCode[buttonName];",
+            "        if (clickCount === 1) {",
+            "            return button === this.simpleClickButton;",
+            "        }",
+            "        else {",
+            "            return button === this.multipleClickButton && clickCount === this.count",
+            "        }",
+            "    }",
+            "}",
+            "",
+            "// Converts HTML mouse button to InputManager mouse button.",
+            "// This function is used to align HTML button values with GDevelop 3 C++ SFML Mouse button enum values,",
+            "// notably the middle and right buttons.",
+            "function convertHtmlMouseButtonToInputManagerMouseButton(button) {",
+            "    switch (button) {",
+            "        case 1: // Middle button",
+            "            return gdjs.InputManager.MOUSE_MIDDLE_BUTTON;",
+            "        case 2: // Right button",
+            "            return gdjs.InputManager.MOUSE_RIGHT_BUTTON;",
+            "    }",
+            "    return button;",
+            "}",
+            "",
+            "gdjs._DoubleClickExtension = { clickCounter: new ClickCounter() };",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onScenePostEvents",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const { clickCounter } = gdjs._DoubleClickExtension;\r",
+            "\r",
+            "clickCounter.reset();\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the specified mouse button is clicked twice in a short amount of time.",
+      "fullName": "Double-clicked (or double-tapped)",
+      "functionType": "Condition",
+      "name": "HasDoubleClicked",
+      "sentence": "_PARAM1_ mouse button is double-clicked",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "DoubleClick::HasClicked"
+              },
+              "parameters": [
+                "",
+                "MouseButton",
+                "2",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Mouse button to track",
+          "longDescription": "As touch devices do not have middle/right tap equivalents, you will need to account for this within your events if you're not using the left mouse button and building for touch devices.",
+          "name": "MouseButton",
+          "type": "mouseButton"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the specified mouse button is clicked.",
+      "fullName": "Clicked (or tapped)",
+      "functionType": "Condition",
+      "name": "HasSimpleClicked",
+      "sentence": "_PARAM1_ mouse button is clicked",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "DoubleClick::HasClicked"
+              },
+              "parameters": [
+                "",
+                "MouseButton",
+                "1",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Mouse button to track",
+          "longDescription": "As touch devices do not have middle/right tap equivalents, you will need to account for this within your events if you're not using the left mouse button and building for touch devices.",
+          "name": "MouseButton",
+          "type": "mouseButton"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the specified mouse button is clicked.",
+      "fullName": "Clicked (or tapped)",
+      "functionType": "Condition",
+      "name": "HasClicked",
+      "private": true,
+      "sentence": "_PARAM1_ mouse button is clicked _PARAM2_ times",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const { clickCounter } = gdjs._DoubleClickExtension;",
+            "",
+            "const buttonName = eventsFunctionContext.getArgument(\"MouseButton\");",
+            "const clickCount = eventsFunctionContext.getArgument(\"ClickCount\");",
+            "",
+            "eventsFunctionContext.returnValue = clickCounter.hasClicked(buttonName, clickCount);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Mouse button to track",
+          "longDescription": "As touch devices do not have middle/right tap equivalents, you will need to account for this within your events if you're not using the left mouse button and building for touch devices.",
+          "name": "MouseButton",
+          "type": "mouseButton"
+        },
+        {
+          "description": "Click count",
+          "name": "ClickCount",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

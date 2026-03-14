@@ -1,0 +1,71 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "q8ubdigLvIRXLxsJDDTaokO41mc2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Boomerang",
+  "name": "Boomerang",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/Boomerang.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Boomerang-header.json",
+  "tags": "boomerang,throw,attack,projectile,ricochet,rebound,launch",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/boomerang.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Throw objects that return to thrower after set time or on command.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/boomerang",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Throw an object that returns to the thrower like a boomerang.",
+      "fullName": "Boomerang",
+      "name": "Boomerang",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "ThrowBoomerangAngle",
+          "fullName": "Throw boomerang toward an angle",
+          "description": "Throw boomerang toward an angle.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ThrowBoomerangPosition",
+          "fullName": "Throw boomerang toward a position",
+          "description": "Throw boomerang toward a position.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ReturnBoomerang",
+          "fullName": "Send boomerang back to thrower",
+          "description": "Send boomerang back to thrower.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetReturnTime",
+          "fullName": "Set amount of time before boomerang changes directions",
+          "description": "Set amount of time before boomerang changes directions (seconds).",
+          "functionType": "Action"
+        },
+        {
+          "name": "TrackingThrower",
+          "fullName": "Track position of boomerang thrower",
+          "description": "Track position of boomerang thrower.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsBoomerangReturning",
+          "fullName": "Boomerang is returning to thrower",
+          "description": "Boomerang is returning to thrower.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Throw an object that returns to the thrower after a length of time, or when an action is used to return it.\n\nHow to throw a boomerang: \n- Create a bomerang object that has this behavior\n- Use one of the \"Throw boomerang...\" actions\n- Run the \"Track location of thrower\" action every frame so the boomerang returns correctly\n\nTips:\n- If you want the boomerang to bounce off objects, check for collisions and then use the action \"Send boomerang back to thrower\"",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWJvb21lcmFuZyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMCAySDRDMi45IDIgMiAyLjkgMiA0UzIuOSA2IDQgNkg4TDEwIDJNMTggMkMyMC4yIDIgMjIgMy44IDIyIDZWMTJMMTggMTRDMTggOS42IDE0LjQgNiAxMCA2TDEyIDJIMThNMTggMjBWMTZMMjIgMTRWMjBDMjIgMjEuMSAyMS4xIDIyIDIwIDIyUzE4IDIxLjEgMTggMjBaIiAvPjwvc3ZnPg=="
+}

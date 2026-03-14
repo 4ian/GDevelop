@@ -1,0 +1,206 @@
+{
+  "author": "",
+  "category": "Audio",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Sounds and music by filename",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8cmVjdCB4PSI2IiB5PSIzIiBjbGFzcz0ic3QxIiB3aWR0aD0iMjAiIGhlaWdodD0iMjYiLz4NCjxjaXJjbGUgY2xhc3M9InN0MSIgY3g9IjE2IiBjeT0iMTkiIHI9IjciLz4NCjxjaXJjbGUgY2xhc3M9InN0MSIgY3g9IjE2IiBjeT0iMTkiIHI9IjIiLz4NCjxjaXJjbGUgY2xhc3M9InN0MSIgY3g9IjIxIiBjeT0iOCIgcj0iMiIvPg0KPC9zdmc+DQo=",
+  "name": "AudioByName",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Music/Music_speaker_audio_sound.svg",
+  "shortDescription": "Play audio with an expression as filename.",
+  "version": "1.0.0",
+  "description": [
+    "Allows for playing a sound resource by filename as a string. This also allows for dynamically selecting a filename via string expressions, which can be useful for things like reducing the number of events required for playing voiced dialogue in larger games or dynamic music based on the current room.",
+    "",
+    "Please note, you may need to preload your audio files via events or resources panel because of how resources are now loaded gradually. "
+  ],
+  "tags": "sound,music",
+  "authorIds": [
+    "Khhq7a4Lu8bt91GLLhG0QiGLpfx2",
+    "8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Play a music file on a specific channel by name or string expression. \nThis can be useful to reduce the number of events needed to dynamically play different music files.  e.g. Playing music based off a room ID variable for the current room the player is in.\n\nNote: Music files should be preloaded before using these actions, such at the start of the first scene, current scene, or in the resources panel for the entire game. This is to avoid any potential audio pause since the normal resource loading at the start of the game or scene won't load these files by default. For web games, music files must be preloaded to start at all.",
+      "fullName": "Play music on a channel by name",
+      "functionType": "Action",
+      "name": "PlayMusicOnChannelByName",
+      "sentence": "Play the music _PARAM1_ on channel _PARAM2_, loop: _PARAM3_, volume: _PARAM4_, pitch: _PARAM5_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const soundManager = runtimeScene.getGame().getSoundManager();",
+            "soundManager.playMusicOnChannel(",
+            "    eventsFunctionContext.getArgument(\"Music\"),",
+            "    eventsFunctionContext.getArgument(\"Channel\"),",
+            "    eventsFunctionContext.getArgument(\"Loop\"),",
+            "    eventsFunctionContext.getArgument(\"Volume\"),",
+            "    eventsFunctionContext.getArgument(\"Pitch\"));",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Audio file resource name",
+          "longDescription": "The final string must match the full resource name as displayed in the resource list.",
+          "name": "Music",
+          "type": "string"
+        },
+        {
+          "description": "Channel identifier",
+          "name": "Channel",
+          "type": "expression"
+        },
+        {
+          "defaultValue": "no",
+          "description": "Repeat the sound",
+          "name": "Loop",
+          "optional": true,
+          "type": "yesorno"
+        },
+        {
+          "description": "Volume",
+          "longDescription": "From 0-100, with 100 being full volume.",
+          "name": "Volume",
+          "type": "expression"
+        },
+        {
+          "description": "Pitch (speed)",
+          "longDescription": "1 for normal speed",
+          "name": "Pitch",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Play a sound file on a specific channel by name or string expression. \nThis can be useful to reduce the number of events needed to dynamically play different sound files. e.g. Playing a voice over line based off the current dialogue node name.\n\nNote: Sound files should be preloaded before using these actions, such at the start of the first scene, current scene, or in the resources panel for the entire game. This is to avoid any potential audio pause since the normal resource loading at the start of the game or scene won't load these files by default.",
+      "fullName": "Play sound on a channel by name",
+      "functionType": "Action",
+      "name": "PlaySoundOnChannelByName",
+      "sentence": "Play the sound _PARAM1_ on channel _PARAM2_, loop: _PARAM3_, volume: _PARAM4_, pitch: _PARAM5_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const soundManager = runtimeScene.getGame().getSoundManager();",
+            "soundManager.playSoundOnChannel(",
+            "    eventsFunctionContext.getArgument(\"Sound\"),",
+            "    eventsFunctionContext.getArgument(\"Channel\"),",
+            "    eventsFunctionContext.getArgument(\"Loop\"),",
+            "    eventsFunctionContext.getArgument(\"Volume\"),",
+            "    eventsFunctionContext.getArgument(\"Pitch\"));",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Audio file resource name",
+          "longDescription": "The final string must match the full resource name as displayed in the resource list.",
+          "name": "Sound",
+          "type": "string"
+        },
+        {
+          "description": "Channel identifier",
+          "name": "Channel",
+          "type": "expression"
+        },
+        {
+          "defaultValue": "no",
+          "description": "Repeat the sound",
+          "name": "Loop",
+          "optional": true,
+          "type": "yesorno"
+        },
+        {
+          "description": "Volume",
+          "longDescription": "From 0-100, with 100 being full volume.",
+          "name": "Volume",
+          "type": "expression"
+        },
+        {
+          "description": "Pitch (speed)",
+          "longDescription": "1 for normal speed",
+          "name": "Pitch",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Preload a sound file by name or string expression. ",
+      "fullName": "Preload a sound file by name",
+      "functionType": "Action",
+      "group": "Loading",
+      "name": "PreloadSoundByName",
+      "sentence": "Preload the sound file _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const soundManager = runtimeScene.getGame().getSoundManager();",
+            "soundManager.loadAudio(",
+            "    eventsFunctionContext.getArgument(\"Sound\"),false);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Audio file resource name",
+          "longDescription": "The final string must match the full resource name as displayed in the resource list.",
+          "name": "Sound",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Preload a music file by name or string expression.",
+      "fullName": "Preload a music file by name",
+      "functionType": "Action",
+      "group": "Loading",
+      "name": "PreloadMusicByName",
+      "sentence": "Preload the music file _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const soundManager = runtimeScene.getGame().getSoundManager();",
+            "soundManager.loadAudio(",
+            "    eventsFunctionContext.getArgument(\"Music\"),true);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Audio file resource name",
+          "longDescription": "The final string must match the full resource name as displayed in the resource list.",
+          "name": "Music",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

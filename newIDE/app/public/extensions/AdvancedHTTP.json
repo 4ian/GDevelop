@@ -1,0 +1,1317 @@
+{
+  "author": "",
+  "category": "Network",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Advanced HTTP",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSIxMSwxMiAyMSwxOCAzMSwxMiAiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSI0IiB5MT0iMTIiIHgyPSIxMSIgeTI9IjEyIi8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMSIgeTE9IjE2IiB4Mj0iMTIiIHkyPSIxNiIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjQiIHkxPSIyMCIgeDI9IjExIiB5Mj0iMjAiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMSwxMnYtMWMwLTIuMiwxLjgtNCw0LTRoMTJjMi4yLDAsNCwxLjgsNCw0djEwYzAsMi4yLTEuOCw0LTQsNEgxNWMtMi4yLDAtNC0xLjgtNC00di0xIi8+DQo8L3N2Zz4NCg==",
+  "name": "AdvancedHTTP",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Email/04e28ac117741933d15ac1cadb34e0d799c7a561352b1525a1b75c5bd1dbeabc_Email_email_envelope_letter_message_fast.svg",
+  "shortDescription": "HTTP requests with custom headers, methods, caching, CORS bypass, and JSON/FormData body.",
+  "version": "1.1.0",
+  "description": "An extension to create HTTP requests with more advanced settings than the built-in \"Network request\" action, like specifying headers or bypassing CORS.",
+  "tags": "header,beacon,http,request,get,post,delete,patch,head,method,body,html,request,web,curl,url",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Creates a template for your request. All requests must be made from a request template.",
+      "fullName": "Create a new request template",
+      "functionType": "Action",
+      "group": "Request creation",
+      "name": "CreateRequest",
+      "sentence": "Create request template _PARAM1_ with URL _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GlobalVariableClearChildren"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request]"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].URL",
+                "=",
+                "URL"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "New request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        },
+        {
+          "description": "URL the request will be sent to",
+          "name": "URL",
+          "supplementaryInformation": "sceneURL",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Creates a new request template with all the attributes from an existing one.",
+      "fullName": "Copy a request template",
+      "functionType": "Action",
+      "group": "Request creation",
+      "name": "CopyRequest",
+      "sentence": "Create request _PARAM1_ from template _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "JSONToGlobalVariableStructure"
+              },
+              "parameters": [
+                "GlobalVarToJSON(__AdvancedHTTP.Requests[OriginRequest])",
+                "__AdvancedHTTP.Requests[Request]"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "New request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        },
+        {
+          "description": "Request to copy",
+          "name": "OriginRequest",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The HTTP method of the request. GET is the default and what you should use if you are unsure which to pick. A request to a REST API endpoint may have a different effect depending on the method - refer to the documentation of the API you are calling to learn about the appropriate method to use.",
+      "fullName": "HTTP Method (Verb)",
+      "functionType": "Action",
+      "group": "Request settings",
+      "name": "SetRequestMethod",
+      "sentence": "Set HTTP method of request _PARAM1_ to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].Options.method",
+                "=",
+                "Method"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        },
+        {
+          "description": "HTTP Method",
+          "name": "Method",
+          "supplementaryInformation": "[\"GET\",\"POST\",\"PUT\",\"PATCH\",\"DELETE\",\"HEAD\",\"TRACE\",\"CONNECT\",\"OPTIONS\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "the HTTP method of the request. GET is the default and what you should use if you are unsure which to pick. A request to a REST API endpoint may have a different effect depending on the method - refer to the documentation of the API you are calling to learn about the appropriate method to use.",
+      "fullName": "HTTP Method (Verb)",
+      "functionType": "ExpressionAndCondition",
+      "group": "Request settings",
+      "name": "RequestMethod",
+      "sentence": "HTTP method of request _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GlobalVariableChildExists"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].Options",
+                "\"method\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__AdvancedHTTP.Requests[Request].Options.method)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "GlobalVariableChildExists"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].Options",
+                "\"method\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "\"GET\""
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "supplementaryInformation": "[\"GET\",\"HEAD\",\"POST\",\"PUT\",\"OPTIONS\",\"CONNECT\",\"TRACE\"]",
+        "type": "stringWithSelector"
+      },
+      "parameters": [
+        {
+          "description": "Request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Defines to what extent the results of the request is can/must be cached. When cached, instead of sending a request to the server, the browser will avoid making a real request to the server and will use a previous response given by the server for the same request.\n\nThe server also has a say in this via the Cache-Control header.",
+      "fullName": "HTTP Caching strategy",
+      "functionType": "Action",
+      "group": "Request settings",
+      "name": "SetRequestCache",
+      "sentence": "Set HTTP caching strategy of request _PARAM1_ to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].Options.cache",
+                "=",
+                "Cache"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        },
+        {
+          "description": "HTTP Caching strategy",
+          "longDescription": "Learn more about what each caching strategy does [on the MDN page for cache](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache).",
+          "name": "Cache",
+          "supplementaryInformation": "[\"default\",\"no-store\",\"reload\",\"no-cache\",\"force-cache\",\"only-if-cached\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "the HTTP method of the request. GET is the default and what you should use if you are unsure which to pick. A request to a REST API endpoint may have a different effect depending on the method - refer to the documentation of the API you are calling to learn about the appropriate method to use.",
+      "fullName": "HTTP Caching",
+      "functionType": "ExpressionAndCondition",
+      "group": "Request settings",
+      "name": "RequestCache",
+      "sentence": "HTTP caching strategy of request _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GlobalVariableChildExists"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].Options",
+                "\"cache\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__AdvancedHTTP.Requests[Request].Options.cache)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "GlobalVariableChildExists"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].Options",
+                "\"cache\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "\"default\""
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "supplementaryInformation": "[\"default\",\"reload\",\"no-cache\",\"force-cache\",\"only-if-cached\"]",
+        "type": "stringWithSelector"
+      },
+      "parameters": [
+        {
+          "description": "Request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The HTTP method of the request. GET is the default and what you should use if you are unsure which to pick. A request to a REST API endpoint may have a different effect depending on the method - refer to the documentation of the API you are calling to learn about the appropriate method to use.",
+      "fullName": "HTTP Method (Verb)",
+      "functionType": "ActionWithOperator",
+      "getterName": "RequestBody",
+      "group": "Request settings",
+      "name": "SetRequestBody",
+      "sentence": "Set HTTP method of request _PARAM1_ to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].Options.body",
+                "=",
+                "Value"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        },
+        {
+          "description": "HTTP Method",
+          "name": "Method",
+          "supplementaryInformation": "[\"GET\",\"POST\",\"PUT\",\"PATCH\",\"DELETE\",\"HEAD\",\"TRACE\",\"CONNECT\",\"OPTIONS\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Sets the body of an HTTP request to a JSON representation of a structure variable.",
+      "fullName": "Body as JSON",
+      "functionType": "Action",
+      "getterName": "RequestBody",
+      "group": "Request settings",
+      "name": "SetJSONRequestBody",
+      "sentence": "Set body of request _PARAM1_ to contents of _PARAM2_ as JSON",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CopyArgumentToVariable"
+              },
+              "parameters": [
+                "\"Body\"",
+                "__AdvancedHTTP.Body"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].Options.body",
+                "=",
+                "ToJSON(__AdvancedHTTP.Body)"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        },
+        {
+          "description": "Variable with body contents",
+          "name": "Body",
+          "supplementaryInformation": "[\"GET\",\"POST\",\"PUT\",\"PATCH\",\"DELETE\",\"HEAD\",\"TRACE\",\"CONNECT\",\"OPTIONS\"]",
+          "type": "scenevar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Sets the body of an HTTP request to a form data representation of a structure variable.",
+      "fullName": "Body as form data",
+      "functionType": "Action",
+      "getterName": "RequestBody",
+      "group": "Request settings",
+      "name": "SetFormDataRequestBody",
+      "sentence": "Set body of request _PARAM1_ to contents of _PARAM2_ as form data",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Merge form data with the form data of the request"
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "gdjs.Variable.copy(",
+            "    eventsFunctionContext.getArgument(\"Body\"),",
+            "    runtimeScene.getGame().getVariables().get(\"__AdvancedHTTP\")",
+            "        .getChild(\"Requests\")",
+            "        .getChild(eventsFunctionContext.getArgument(\"Request\"))",
+            "        .getChild(\"FormData\"),",
+            "    /* mergeVariables = */true",
+            ");",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        },
+        {
+          "description": "Variable with body contents",
+          "name": "Body",
+          "supplementaryInformation": "[\"GET\",\"POST\",\"PUT\",\"PATCH\",\"DELETE\",\"HEAD\",\"TRACE\",\"CONNECT\",\"OPTIONS\"]",
+          "type": "scenevar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "the body of the HTTP request. Contains data to send to the server, ususally in plain text, JSON or FormData format. This cannot be set for GET requests.",
+      "fullName": "Body",
+      "functionType": "ExpressionAndCondition",
+      "group": "Request settings",
+      "name": "RequestBody",
+      "sentence": "body of request _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GlobalVariableChildExists"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].Options",
+                "\"body\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__AdvancedHTTP.Requests[Request].Options.body)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "supplementaryInformation": "[\"GET\",\"HEAD\",\"POST\",\"PUT\",\"OPTIONS\",\"CONNECT\",\"TRACE\"]",
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The HTTP method of the request. GET is the default and what you should use if you are unsure which to pick. A request to a REST API endpoint may have a different effect depending on the method - refer to the documentation of the API you are calling to learn about the appropriate method to use.",
+      "fullName": "HTTP Method (Verb)",
+      "functionType": "ActionWithOperator",
+      "getterName": "RequestHeader",
+      "group": "Request settings",
+      "name": "SetRequestHeader",
+      "sentence": "Set HTTP method of request _PARAM1_ to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].Options.headers[Header]",
+                "=",
+                "Value"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        },
+        {
+          "description": "HTTP Method",
+          "name": "Method",
+          "supplementaryInformation": "[\"GET\",\"POST\",\"PUT\",\"PATCH\",\"DELETE\",\"HEAD\",\"TRACE\",\"CONNECT\",\"OPTIONS\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "an HTTP header to be sent with the request.",
+      "fullName": "Header",
+      "functionType": "ExpressionAndCondition",
+      "group": "Request settings",
+      "name": "RequestHeader",
+      "sentence": "HTTP header _PARAM2_ of request _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GlobalVariableChildExists"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].Options",
+                "\"headers\""
+              ]
+            },
+            {
+              "type": {
+                "value": "GlobalVariableChildExists"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].Options.headers",
+                "Header"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__AdvancedHTTP.Requests[Request].Options.headers[Header])"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "supplementaryInformation": "sceneHeader",
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        },
+        {
+          "description": "HTTP header name",
+          "name": "Header",
+          "supplementaryInformation": "sceneHeader",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The HTTP method of the request. GET is the default and what you should use if you are unsure which to pick. A request to a REST API endpoint may have a different effect depending on the method - refer to the documentation of the API you are calling to learn about the appropriate method to use.",
+      "fullName": "HTTP Method (Verb)",
+      "functionType": "ActionWithOperator",
+      "getterName": "RequestURL",
+      "group": "Request settings",
+      "name": "SetRequestURL",
+      "sentence": "Set HTTP method of request _PARAM1_ to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarGlobalTxt"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].URL",
+                "=",
+                "Value"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "the request template's target URL.",
+      "fullName": "URL",
+      "functionType": "ExpressionAndCondition",
+      "group": "Request settings",
+      "name": "RequestURL",
+      "sentence": "the URL of request template _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__AdvancedHTTP.Requests[Request].URL)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "supplementaryInformation": "sceneURL",
+        "type": "identifier"
+      },
+      "parameters": [
+        {
+          "description": "Request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "CORS prevents most external websites from being queried with the browser's HTTP client, since the browser may be authenticated on that website and as such another website would be able to impersonate the player on that other website.\n\nWhen the CORS Bypass is enabled, the request will be made from a server that is not authenticated anywhere and as such is not blocked by CORS, and it will share the response with your game. Note that as such, authentication cookies are ignored! If you own the REST API you are requesting, add CORS headers to your server instead of using this CORS Bypass.",
+      "fullName": "Enable CORS Bypass",
+      "functionType": "Action",
+      "group": "Request settings",
+      "name": "UseCORSBypass",
+      "sentence": "Enable CORS Bypass for request _PARAM1_: _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "UseBypass",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetGlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].CORS",
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "UseBypass",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetGlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].CORS",
+                "False"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        },
+        {
+          "defaultValue": "yes",
+          "description": "Enable the CORS Bypass?",
+          "longDescription": "The CORS Bypass server is offered for free by [arthuro555](https://twitter.com/arthuro555). Consider making a [donation](https://ko-fi.com/arthuro555) to help keep the CORS Bypass server running.",
+          "name": "UseBypass",
+          "optional": true,
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks whether or not CORS Bypass has been enabled for the request template.",
+      "fullName": "CORS Bypass enabled",
+      "functionType": "Condition",
+      "group": "Request settings",
+      "name": "IsUsingCORSBypass",
+      "sentence": "CORS Bypass is enabled for request _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "GlobalVariableAsBoolean"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Requests[Request].CORS",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request template name",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Executes the request defined by a request template.",
+      "fullName": "Execute the request",
+      "functionType": "Action",
+      "group": "Request execution",
+      "name": "ExecuteRequest",
+      "sentence": "Execute request _PARAM1_ and store results in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const logger = (this.logger || (this.logger = new gdjs.Logger(\"Advanced HTTP\")));",
+            "const advancedHTTP = (gdjs._advancedHTTP || (gdjs._advancedHTTP = { responses: new Map(), id: 1 }));",
+            "",
+            "/** @type {gdjs.Variable} */",
+            "const result = eventsFunctionContext.getArgument(\"Response\");",
+            "const requestName = eventsFunctionContext.getArgument(\"Request\");",
+            "const request = runtimeScene",
+            "    .getGame()",
+            "    .getVariables()",
+            "    .get(\"__AdvancedHTTP\")",
+            "    .getChild(\"Requests\")",
+            "    .getChild(requestName)",
+            "    .toJSObject();",
+            "if (!request.Options) request.Options = {}",
+            "if (request.Options.method === 'GET' || request.Options.method === 'HEAD') delete request.Options.body;",
+            "",
+            "if (typeof request.URL !== \"string\") {",
+            "    eventsFunctionContext.task.resolve();",
+            "    logger.error(`Couldn't execute request '${requestName}' - has it been properly initialized?`);",
+            "    return;",
+            "}",
+            "",
+            "function isContentful(obj) {",
+            "    for (var x in obj) { return true; }",
+            "    return false;",
+            "}",
+            "const hasFormData = request.FormData && isContentful(request.FormData)",
+            "console.log(isContentful(request.FormData), request.FormData)",
+            "",
+            "if (hasFormData) {",
+            "    if (request.Options.body && request.Options.body !== \"\") {",
+            "        console.warn(`The request ${requestName} has both form data and a separate body - the body will be ignored and replaced by the form data.`);",
+            "    }",
+            "",
+            "    delete request.Options.body;",
+            "}",
+            "",
+            "if (request.CORS) {",
+            "    // Cache makes sense only on the client. CF Workers does not support cache property on fetch anyways.",
+            "    const cache = request.Options.cache;",
+            "    delete request.Options.cache;",
+            "    eventsFunctionContext.task = new gdjs.PromiseTask(",
+            "        fetch(`https://cors.arthuro555.com?${JSON.stringify({",
+            "            url: request.URL,",
+            "            options: request.Options,",
+            "            formData: isContentful(request.FormData) ? request.FormData : undefined",
+            "        })}`, { keepalive: true, cache })",
+            "            .then(async (response) => {",
+            "                const { ok, status, headers, body } = await response.json();",
+            "                result.fromJSObject({",
+            "                    ok,",
+            "                    status,",
+            "                    headers,",
+            "                    body,",
+            "                });",
+            "            })",
+            "            .catch((e) => {",
+            "                logger.error(`Couldn't execute request '${requestName}': ${e}`);",
+            "            })",
+            "    );",
+            "} else {",
+            "    if (hasFormData && request.Options.method !== 'GET' && request.Options.method !== 'HEAD') {",
+            "        const fd = request.Options.body = new FormData();",
+            "        for (const key of Object.keys(request.FormData)) {",
+            "            fd.append(key, request.FormData[key])",
+            "        }",
+            "    }",
+            "",
+            "    eventsFunctionContext.task = new gdjs.PromiseTask(",
+            "        fetch(request.URL, { keepalive: true, ...request.Options })",
+            "            .then((response) => {",
+            "                const id = advancedHTTP.id++;",
+            "                const { ok, status, headers } = response;",
+            "                result.fromJSObject({",
+            "                    id,",
+            "                    ok,",
+            "                    status,",
+            "                    headers: Object.fromEntries(headers.entries()),",
+            "                });",
+            "                result.getChild(\"id\").setNumber(id);",
+            "                advancedHTTP.responses.set(id, response);",
+            "                setTimeout(() => advancedHTTP.responses.delete(id), 10_000);",
+            "            })",
+            "            .catch((e) => {",
+            "                logger.error(`Couldn't execute request '${requestName}': ${e}`);",
+            "            })",
+            "    );",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Request to execute",
+          "name": "Request",
+          "supplementaryInformation": "sceneRequest",
+          "type": "identifier"
+        },
+        {
+          "description": "Variable where to store the response to the request",
+          "name": "Response",
+          "type": "scenevar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks whether the server marked the response as a success (status code 1XX/2XX), not as a failure (status code 4XX/5XX).",
+      "fullName": "Success",
+      "functionType": "Condition",
+      "group": "Response",
+      "name": "ResponseSuccess",
+      "sentence": "Response _PARAM1_ indicates a success",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CopyArgumentToVariable"
+              },
+              "parameters": [
+                "\"Response\"",
+                "__AdvancedHTTP.Response"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "SceneVariableAsBoolean"
+              },
+              "parameters": [
+                "__AdvancedHTTP.Response.ok",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Variable containing the response",
+          "name": "Response",
+          "type": "scenevar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "the status code of the HTTP request (e.g. 200 if succeeded, 404 if not found, etc).",
+      "fullName": "Status code",
+      "functionType": "ExpressionAndCondition",
+      "group": "Response",
+      "name": "ResponseStatusCode",
+      "sentence": "Status code of response _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CopyArgumentToVariable"
+              },
+              "parameters": [
+                "\"Response\"",
+                "__AdvancedHTTP.Response"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "Variable(__AdvancedHTTP.Response.status)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Variable containing the response",
+          "name": "Response",
+          "type": "scenevar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the status text for a response. For example, for a response with the status code 404, the status text will be \"Not Found\".",
+      "fullName": "Status text",
+      "functionType": "StringExpression",
+      "group": "Response",
+      "name": "ResponseStatusText",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "GlobalVariableChildExists"
+              },
+              "parameters": [
+                "__AdvancedHTTP",
+                "\"StatusTexts\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "JSONToGlobalVariableStructure"
+              },
+              "parameters": [
+                "\"{\\\"100\\\":\\\"Continue\\\",\\\"101\\\":\\\"Switching Protocols\\\",\\\"102\\\":\\\"Processing\\\",\\\"200\\\":\\\"OK\\\",\\\"201\\\":\\\"Created\\\",\\\"202\\\":\\\"Accepted\\\",\\\"203\\\":\\\"Non-Authoritative Information\\\",\\\"204\\\":\\\"No Content\\\",\\\"205\\\":\\\"Reset Content\\\",\\\"206\\\":\\\"Partial Content\\\",\\\"207\\\":\\\"Multi-Status\\\",\\\"226\\\":\\\"IM Used\\\",\\\"300\\\":\\\"Multiple Choices\\\",\\\"301\\\":\\\"Moved Permanently\\\",\\\"302\\\":\\\"Found\\\",\\\"303\\\":\\\"See Other\\\",\\\"304\\\":\\\"Not Modified\\\",\\\"305\\\":\\\"Use Proxy\\\",\\\"307\\\":\\\"Temporary Redirect\\\",\\\"308\\\":\\\"Permanent Redirect\\\",\\\"400\\\":\\\"Bad Request\\\",\\\"401\\\":\\\"Unauthorized\\\",\\\"402\\\":\\\"Payment Required\\\",\\\"403\\\":\\\"Forbidden\\\",\\\"404\\\":\\\"Not Found\\\",\\\"405\\\":\\\"Method Not Allowed\\\",\\\"406\\\":\\\"Not Acceptable\\\",\\\"407\\\":\\\"Proxy Authentication Required\\\",\\\"408\\\":\\\"Request Timeout\\\",\\\"409\\\":\\\"Conflict\\\",\\\"410\\\":\\\"Gone\\\",\\\"411\\\":\\\"Length Required\\\",\\\"412\\\":\\\"Precondition Failed\\\",\\\"413\\\":\\\"Payload Too Large\\\",\\\"414\\\":\\\"URI Too Long\\\",\\\"415\\\":\\\"Unsupported Media Type\\\",\\\"416\\\":\\\"Range Not Satisfiable\\\",\\\"417\\\":\\\"Expectation Failed\\\",\\\"418\\\":\\\"I'm a teapot\\\",\\\"422\\\":\\\"Unprocessable Entity\\\",\\\"423\\\":\\\"Locked\\\",\\\"424\\\":\\\"Failed Dependency\\\",\\\"426\\\":\\\"Upgrade Required\\\",\\\"428\\\":\\\"Precondition Required\\\",\\\"429\\\":\\\"Too Many Requests\\\",\\\"431\\\":\\\"Request Header Fields Too Large\\\",\\\"451\\\":\\\"Unavailable For Legal Reasons\\\",\\\"500\\\":\\\"Internal Server Error\\\",\\\"501\\\":\\\"Not Implemented\\\",\\\"502\\\":\\\"Bad Gateway\\\",\\\"503\\\":\\\"Service Unavailable\\\",\\\"504\\\":\\\"Gateway Time-out\\\",\\\"505\\\":\\\"HTTP Version Not Supported\\\",\\\"506\\\":\\\"Variant Also Negotiates\\\",\\\"507\\\":\\\"Insufficient Storage\\\",\\\"511\\\":\\\"Network Authentication Required\\\",\\\"1xx\\\":\\\"**Informational**\\\",\\\"2xx\\\":\\\"**Successful**\\\",\\\"3xx\\\":\\\"**Redirection**\\\",\\\"4xx\\\":\\\"**Client Error**\\\",\\\"5xx\\\":\\\"**Server Error**\\\",\\\"7xx\\\":\\\"**Developer Error**\\\"}\"",
+                "__AdvancedHTTP.StatusTexts"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CopyArgumentToVariable"
+              },
+              "parameters": [
+                "\"Response\"",
+                "__AdvancedHTTP.Response"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "GlobalVariableString(__AdvancedHTTP.StatusTexts[Variable(__AdvancedHTTP.Response.status)])"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Variable containing the response",
+          "name": "Response",
+          "type": "scenevar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "one of the HTTP headers included in the server's response.",
+      "fullName": "Header",
+      "functionType": "ExpressionAndCondition",
+      "group": "Response",
+      "name": "ResponseHeader",
+      "sentence": "Header _PARAM2_ of response _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CopyArgumentToVariable"
+              },
+              "parameters": [
+                "\"Response\"",
+                "__AdvancedHTTP.Response"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "VariableString(__AdvancedHTTP.Response.headers[Header])"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Variable containing the response",
+          "name": "Response",
+          "type": "scenevar"
+        },
+        {
+          "description": "Header",
+          "name": "Header",
+          "supplementaryInformation": "sceneHeader",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Reads the body sent by the server, and store it as a string in a variable.",
+      "fullName": "Get response body (text)",
+      "functionType": "Action",
+      "group": "Response",
+      "name": "ReadResponseText",
+      "sentence": "Read body of response _PARAM1_ into _PARAM2_ as text",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const logger = (this.logger || (this.logger = new gdjs.Logger(\"Advanced HTTP\")));\r",
+            "const advancedHTTP = (gdjs._advancedHTTP || (gdjs._advancedHTTP = { responses: new Map(), id: 1 }));\r",
+            "\r",
+            "/** @type {gdjs.Variable} */\r",
+            "const response = eventsFunctionContext.getArgument(\"Response\");\r",
+            "/** @type {gdjs.Variable} */\r",
+            "const body = eventsFunctionContext.getArgument(\"Body\");\r",
+            "\r",
+            "const id = response.getChild(\"id\").getAsNumber();\r",
+            "const responseBody = response.getChild(\"body\").getAsString();\r",
+            "\r",
+            "if (responseBody !== \"0\") {\r",
+            "    body.setString(responseBody);\r",
+            "    eventsFunctionContext.task.resolve();\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "if (!advancedHTTP.responses.has(id)) {\r",
+            "    eventsFunctionContext.task.resolve();\r",
+            "    logger.error(`Couldn't read the body of a request. Either an invalid request has passed, or the body has already been disposed of. The body must be read within 10 seconds of the request succeeding, as it will then be disposed of.`);\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "const fetchResponse = advancedHTTP.responses.get(id);\r",
+            "\r",
+            "eventsFunctionContext.task = new gdjs.PromiseTask(\r",
+            "    fetchResponse\r",
+            "        .text()\r",
+            "        .then((text) => {\r",
+            "            body.setString(text);\r",
+            "        })\r",
+            "        .catch((e) => {\r",
+            "            logger.error(`An error occured while reading the body of a request: ${e}`)\r",
+            "        })\r",
+            ")\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Variable containing the response",
+          "name": "Response",
+          "type": "scenevar"
+        },
+        {
+          "description": "Variable where to write the body contents into",
+          "name": "Body",
+          "type": "scenevar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Reads the body sent by the server, parses it as JSON and stores the resulting structure in a variable.",
+      "fullName": "Get response body (JSON)",
+      "functionType": "Action",
+      "group": "Response",
+      "name": "ReadResponseJSON",
+      "sentence": "Read body of response _PARAM1_ into _PARAM2_ as JSON",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const logger = (this.logger || (this.logger = new gdjs.Logger(\"Advanced HTTP\")));\r",
+            "const advancedHTTP = (gdjs._advancedHTTP || (gdjs._advancedHTTP = { responses: new Map(), id: 1 }));\r",
+            "\r",
+            "/** @type {gdjs.Variable} */\r",
+            "const response = eventsFunctionContext.getArgument(\"Response\");\r",
+            "/** @type {gdjs.Variable} */\r",
+            "const body = eventsFunctionContext.getArgument(\"Body\");\r",
+            "\r",
+            "const id = response.getChild(\"id\").getAsNumber();\r",
+            "const responseBody = response.getChild(\"body\").getAsString();\r",
+            "\r",
+            "if (responseBody !== \"0\") {\r",
+            "    try {\r",
+            "        const parsedBody = JSON.parse(responseBody)\r",
+            "        body.fromJSObject(parsedBody);\r",
+            "    } catch (e) {\r",
+            "        logger.error(`An error occured while reading the body of a request: ${e}`)\r",
+            "    }\r",
+            "    eventsFunctionContext.task.resolve();\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "if (!advancedHTTP.responses.has(id)) {\r",
+            "    eventsFunctionContext.task.resolve();\r",
+            "    logger.error(`Couldn't read the body of a request. Either an invalid request has passed, or the body has already been disposed of. The body must be read within 10 seconds of the request succeeding, as it will then be disposed of.`);\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "const fetchResponse = advancedHTTP.responses.get(id);\r",
+            "\r",
+            "eventsFunctionContext.task = new gdjs.PromiseTask(\r",
+            "    fetchResponse\r",
+            "        .json()\r",
+            "        .then((json) => {\r",
+            "            body.fromJSObject(json);\r",
+            "        })\r",
+            "        .catch((e) => {\r",
+            "            logger.error(`An error occured while reading the body of a request: ${e}`)\r",
+            "        })\r",
+            ")\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Variable containing the response",
+          "name": "Response",
+          "type": "scenevar"
+        },
+        {
+          "description": "Variable where to write the body contents into",
+          "name": "Body",
+          "type": "scenevar"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

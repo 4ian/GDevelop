@@ -1,0 +1,82 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Depth effect",
+  "name": "DepthEffect",
+  "version": "0.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/DepthEffect.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/DepthEffect-header.json",
+  "tags": "depth,effect,scale",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Virtual Reality/Virtual Reality_vr_computer_3d_cube_screen_tv.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "changelog": [
+    {
+      "version": "0.1.0",
+      "breaking": "- The behavior dedicated to text has been removed as the other behavior now work for any object."
+    }
+  ],
+  "shortDescription": "Scale objects based on Y position to simulate depth.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/depth-effect",
+  "eventsBasedBehaviors": [
+    {
+      "description": "The scale of the object decreases the closer it is to the horizon, giving the illusion that the object is travelling away from the viewer.",
+      "fullName": "Depth effect",
+      "name": "DepthEffect_Sprite",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "PercentAwayFromHorizon",
+          "fullName": "Percent away from horizon",
+          "description": "Percent away from the horizon.  This is \"0\" at the horizon, and \"1\" at the bottom of the screen.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "ExponentY",
+          "fullName": "Exponential rate of change",
+          "description": "Exponential rate of change, based on Y position.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "MaxScale",
+          "fullName": "Max scale",
+          "description": "Max scale when the object is at the bottom of the screen.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "HorizonY",
+          "fullName": "Y value of horizon",
+          "description": "Y value of horizon.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetMaxScale",
+          "fullName": "Set max scale",
+          "description": "Set max scale when the object is at the bottom of the screen (Default: 2).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetExponentY",
+          "fullName": "Set exponential rate of change",
+          "description": "Set Y exponential rate of change (Default: 2).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetHorizonY",
+          "fullName": "Set Y position of horizon",
+          "description": "Set Y position of the horizon, where objects are infinitely small (Default: 0).",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "The scale of the object decreases the closer it is to the horizon, giving the illusion that the object is travelling away from the viewer.\n\nProperties:\n- Horizon Y position (Default: 0)\n- Max scale of the object when it is at the bottom of the screen (Default: 1)\n- Y exponent can be used to control the rate of change  (Default: 2)\n\nTips:\n- If you want speed to look constant, be sure to reduce the object's speed based on scale or Y value.  If you don't do this, the object will appear to be moving faster when it is near the top of the screen.  This matches how objects appear in the real world.\n- This extension works well with the Y-sort extension, which changes Z order based on Y position.\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSIxNiwyIDgsNS45IDE2LDkuOCAyNCw1LjkgIi8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSI4LDUuOSA4LDE1LjEgMTYsMTkgMjQsMTUuMSAyNCw1LjkgIi8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMTYiIHkxPSI5LjgiIHgyPSIxNiIgeTI9IjE5Ii8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSIyMCwyNyAyMiwzMCAxMCwzMCAxMiwyNyAiLz4NCjxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjkuOSw1IDMsNSAzLDI0IDI5LDI0IDI5LDUgMjIuMSw1ICIvPg0KPC9zdmc+DQo="
+}

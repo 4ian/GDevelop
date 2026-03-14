@@ -1,0 +1,785 @@
+{
+  "author": "",
+  "category": "Game mechanic",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Simple inventories",
+  "helpPath": "/all-features/inventory",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDojRkZGRkZGO30NCjwvc3R5bGU+DQo8cGF0aCBkPSJNNiwxOXY4YzAsMS43LDEuMywzLDMsM2gxNGMxLjcsMCwzLTEuMywzLTN2LThINnogTTIxLDI0YzAsMS43LTEuMywzLTMsM2gtNGMtMS43LDAtMy0xLjMtMy0zdi0yYzAtMC42LDAuNC0xLDEtMWg4DQoJYzAuNiwwLDEsMC40LDEsMVYyNHoiLz4NCjxnPg0KCTxwYXRoIGQ9Ik0yMiw3LjFWMTdoNHYtM0MyNiwxMS4xLDI0LjQsOC41LDIyLDcuMXoiLz4NCgk8cGF0aCBkPSJNMTAsNy4xYy0yLjQsMS40LTQsNC00LDYuOXYzaDRWNy4xeiIvPg0KPC9nPg0KPGc+DQoJPHBhdGggZD0iTTE5LDhoLTZjLTAuNiwwLTEtMC40LTEtMVY1YzAtMS43LDEuMy0zLDMtM2gyYzEuNywwLDMsMS4zLDMsM3YyQzIwLDcuNiwxOS42LDgsMTksOHogTTE0LDZoNFY1YzAtMC42LTAuNC0xLTEtMWgtMg0KCQljLTAuNiwwLTEsMC40LTEsMVY2eiIvPg0KPC9nPg0KPHBhdGggZD0iTTE4LDZoLTRjLTAuNywwLTEuNCwwLjEtMiwwLjNWN3YxdjloOFY4VjdWNi4zQzE5LjQsNi4xLDE4LjcsNiwxOCw2eiIvPg0KPGc+DQoJPHBhdGggZD0iTTQsMTguMmMtMS4yLDAuNC0yLDEuNS0yLDIuOHY0YzAsMS4zLDAuOCwyLjQsMiwyLjhWMTguMnoiLz4NCjwvZz4NCjxnPg0KCTxwYXRoIGQ9Ik0yOCwxOC4ydjkuNmMxLjItMC40LDItMS41LDItMi44di00QzMwLDE5LjcsMjkuMiwxOC42LDI4LDE4LjJ6Ii8+DQo8L2c+DQo8L3N2Zz4NCg==",
+  "name": "Inventories",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Glyphster Pack/Master/SVG/Education and Learning/032fea6b6614c8b1c923bc3336520e8c24a418d18c16dae507ef2e885e01f8c9_Education and Learning_education_school_bag_backpack.svg",
+  "shortDescription": "Inventory system: add/remove items, stackable quantities, limited/unlimited capacity.",
+  "version": "1.1.0",
+  "description": "Manage inventory items with limited or unlimited item capacity.",
+  "tags": "inventory,bag,item",
+  "authorIds": [
+    "wWP8BSlAW0UP4NeaHa2LcmmDzmH2",
+    "vJeYciaE9tW37HzSPOyo9MLOI5E3",
+    "XqKHAww3OUe8NPLCCWqA478em9j2",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [
+    {
+      "folded": true,
+      "name": "Inventories",
+      "type": "structure",
+      "children": []
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "description": "Add an item in an inventory.",
+      "fullName": "Add an item",
+      "functionType": "Action",
+      "name": "AddItem",
+      "sentence": "Add a _PARAM2_ to inventory _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "Inventories::SetItemCount"
+              },
+              "parameters": [
+                "",
+                "+",
+                "1",
+                "InventoryName",
+                "ItemName",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Inventory name",
+          "name": "InventoryName",
+          "supplementaryInformation": "sceneInventory",
+          "type": "identifier"
+        },
+        {
+          "description": "Item name",
+          "name": "ItemName",
+          "supplementaryInformation": "sceneInventoryItem",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Remove an item from an inventory.",
+      "fullName": "Remove an item",
+      "functionType": "Action",
+      "name": "RemoveItem",
+      "sentence": "Remove a _PARAM2_ from inventory _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "Inventories::SetItemCount"
+              },
+              "parameters": [
+                "",
+                "-",
+                "1",
+                "InventoryName",
+                "ItemName",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Inventory name",
+          "name": "InventoryName",
+          "supplementaryInformation": "sceneInventory",
+          "type": "identifier"
+        },
+        {
+          "description": "Item name",
+          "name": "ItemName",
+          "supplementaryInformation": "sceneInventoryItem",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "the number of an item in an inventory.",
+      "fullName": "Item count",
+      "functionType": "ExpressionAndCondition",
+      "name": "ItemCount",
+      "sentence": "the count of _PARAM2_ in _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "Inventories[InventoryName][ItemName].Count"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Inventory name",
+          "name": "InventoryName",
+          "supplementaryInformation": "sceneInventory",
+          "type": "identifier"
+        },
+        {
+          "description": "Item name",
+          "name": "ItemName",
+          "supplementaryInformation": "sceneInventoryItem",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "ActionWithOperator",
+      "getterName": "ItemCount",
+      "name": "SetItemCount",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "Inventories::IsLimitedItemCapacity"
+              },
+              "parameters": [
+                "",
+                "InventoryName",
+                "ItemName",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Inventories[InventoryName][ItemName].Count",
+                "=",
+                "max(0, Value)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Inventories::IsLimitedItemCapacity"
+              },
+              "parameters": [
+                "",
+                "InventoryName",
+                "ItemName",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Inventories[InventoryName][ItemName].Count",
+                "=",
+                "clamp(0, Inventories::ItemCapacity(InventoryName, ItemName), Value)"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Inventory name",
+          "name": "InventoryName",
+          "supplementaryInformation": "sceneInventory",
+          "type": "identifier"
+        },
+        {
+          "description": "Item name",
+          "name": "ItemName",
+          "supplementaryInformation": "sceneInventoryItem",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if at least one of the specified items is in the inventory.",
+      "fullName": "Has an item",
+      "functionType": "Condition",
+      "name": "HasItem",
+      "sentence": "Inventory _PARAM1_ contains a _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Inventories::ItemCount"
+              },
+              "parameters": [
+                "",
+                ">",
+                "0",
+                "InventoryName",
+                "ItemName",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Inventory name",
+          "name": "InventoryName",
+          "supplementaryInformation": "sceneInventory",
+          "type": "identifier"
+        },
+        {
+          "description": "Item name",
+          "name": "ItemName",
+          "supplementaryInformation": "sceneInventoryItem",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "the maximum number of the specified item that can be added in the inventory. By default, the number allowed for each item is unlimited.",
+      "fullName": "Item capacity",
+      "functionType": "ExpressionAndCondition",
+      "name": "ItemCapacity",
+      "sentence": "_PARAM2_ capacity in inventory _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "Inventories[InventoryName][ItemName].Capacity"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Inventory name",
+          "name": "InventoryName",
+          "supplementaryInformation": "sceneInventory",
+          "type": "identifier"
+        },
+        {
+          "description": "Item name",
+          "name": "ItemName",
+          "supplementaryInformation": "sceneInventoryItem",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "Item capacity",
+      "functionType": "ActionWithOperator",
+      "getterName": "ItemCapacity",
+      "name": "SetItemCapacity",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "Inventories[InventoryName][ItemName].Capacity",
+                "=",
+                "Value"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Inventory name",
+          "name": "Parameter",
+          "supplementaryInformation": "sceneInventory",
+          "type": "identifier"
+        },
+        {
+          "description": "Item name",
+          "name": "Parameter2",
+          "supplementaryInformation": "sceneInventoryItem",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a limited amount of an object is allowed by the inventory. Item capacity is unlimited by default.",
+      "fullName": "Limited item capacity",
+      "functionType": "Condition",
+      "name": "IsLimitedItemCapacity",
+      "sentence": "Allow a limited count of _PARAM2_ in inventory _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Inventories[InventoryName][ItemName].IsCapacityLimited",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Inventory name",
+          "name": "InventoryName",
+          "supplementaryInformation": "sceneInventory",
+          "type": "identifier"
+        },
+        {
+          "description": "Item name",
+          "name": "ItemName",
+          "supplementaryInformation": "sceneInventoryItem",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Allow a limited amount of an object to be in an inventory. Item capacity is unlimited by default.",
+      "fullName": "Limit item capacity",
+      "functionType": "Action",
+      "name": "SetIsLimitedItemCapacity",
+      "sentence": "Allow a limited count of _PARAM2_ in inventory _PARAM1_: _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "IsCapacityLimited",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetBooleanVariable"
+              },
+              "parameters": [
+                "Inventories[InventoryName][ItemName].IsCapacityLimited",
+                "False",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "IsCapacityLimited",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetBooleanVariable"
+              },
+              "parameters": [
+                "Inventories[InventoryName][ItemName].IsCapacityLimited",
+                "True",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Inventory name",
+          "name": "InventoryName",
+          "supplementaryInformation": "sceneInventory",
+          "type": "identifier"
+        },
+        {
+          "description": "Item name",
+          "name": "ItemName",
+          "supplementaryInformation": "sceneInventoryItem",
+          "type": "identifier"
+        },
+        {
+          "description": "Limit the item capacity",
+          "name": "IsCapacityLimited",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if an item has reached its maximum number allowed in the inventory.",
+      "fullName": "Item full",
+      "functionType": "Condition",
+      "name": "IsItemCapacityReached",
+      "sentence": "Inventory _PARAM1_ is full of _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Inventories::IsLimitedItemCapacity"
+              },
+              "parameters": [
+                "",
+                "InventoryName",
+                "ItemName",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "Inventories::ItemCount"
+              },
+              "parameters": [
+                "",
+                ">=",
+                "Inventories::ItemCapacity(ItemName, InventoryName)",
+                "InventoryName",
+                "ItemName",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Inventory name",
+          "name": "InventoryName",
+          "supplementaryInformation": "sceneInventory",
+          "type": "identifier"
+        },
+        {
+          "description": "Item name",
+          "name": "ItemName",
+          "supplementaryInformation": "sceneInventoryItem",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if an item is equipped.",
+      "fullName": "Item equipped",
+      "functionType": "Condition",
+      "name": "IsItemEquipped",
+      "sentence": "_PARAM2_ is equipped in inventory _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "Inventories[InventoryName][ItemName].IsEquipped",
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Inventory name",
+          "name": "InventoryName",
+          "supplementaryInformation": "sceneInventory",
+          "type": "identifier"
+        },
+        {
+          "description": "Item name",
+          "name": "ItemName",
+          "supplementaryInformation": "sceneInventoryItem",
+          "type": "identifier"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Mark an item as being equipped. If the item count is 0, it won't be marked as equipped.",
+      "fullName": "Equip an item",
+      "functionType": "Action",
+      "name": "SetIsItemEquipped",
+      "sentence": "Set _PARAM2_ as equipped in inventory _PARAM1_: _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "IsItemEquipped",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetBooleanVariable"
+              },
+              "parameters": [
+                "Inventories[InventoryName][ItemName].IsEquipped",
+                "False",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "IsItemEquipped",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetBooleanVariable"
+              },
+              "parameters": [
+                "Inventories[InventoryName][ItemName].IsEquipped",
+                "True",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Inventory name",
+          "name": "InventoryName",
+          "supplementaryInformation": "sceneInventory",
+          "type": "identifier"
+        },
+        {
+          "description": "Item name",
+          "name": "ItemName",
+          "supplementaryInformation": "sceneInventoryItem",
+          "type": "identifier"
+        },
+        {
+          "description": "Equip",
+          "name": "IsItemEquipped",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Save all the items of the inventory in a scene variable, so that it can be restored later.",
+      "fullName": "Save an inventory in a scene variable",
+      "functionType": "Action",
+      "group": "Variable",
+      "name": "CopyInventoryToVariable",
+      "sentence": "Save inventory _PARAM1_ in variable _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CopyVariableToArgument2"
+              },
+              "parameters": [
+                "\"SceneVariable\"",
+                "Inventories[InventoryName]"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Inventory name",
+          "name": "InventoryName",
+          "supplementaryInformation": "sceneInventory",
+          "type": "identifier"
+        },
+        {
+          "description": "Scene variable",
+          "name": "SceneVariable",
+          "supplementaryInformation": "scene",
+          "type": "scenevar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Load the content of the inventory from a scene variable.",
+      "fullName": "Load an inventory from a scene variable",
+      "functionType": "Action",
+      "group": "Variable",
+      "name": "CopyToVariableToInventory",
+      "sentence": "Load inventory _PARAM1_ from variable _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CopyArgumentToVariable2"
+              },
+              "parameters": [
+                "\"SceneVariable\"",
+                "Inventories[InventoryName]"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Inventory name",
+          "name": "InventoryName",
+          "supplementaryInformation": "sceneInventory",
+          "type": "identifier"
+        },
+        {
+          "description": "Scene variable",
+          "name": "SceneVariable",
+          "supplementaryInformation": "scene",
+          "type": "scenevar"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

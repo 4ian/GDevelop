@@ -1,0 +1,78 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Shake object",
+  "name": "ShakeObject",
+  "version": "1.6.1",
+  "url": "https://resources.gdevelop-app.com/extensions/ShakeObject.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ShakeObject-header.json",
+  "tags": "shaking,object,effect,shake,scale,position,rotate,angle",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/arrow-all.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Shake objects with configurable translation, rotation, and scale intensity.",
+  "eventsBasedBehaviorsCount": 2,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/shake-object",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Shake objects with translation and rotation.",
+      "fullName": "Shake object (position, angle)",
+      "name": "ShakeObject_PositionAngle",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "ShakeObject_PositionAngle",
+          "fullName": "Shake object (position, angle)",
+          "description": "Shake an object, using one or more ways to shake (position, angle). Make sure to \"Stop shaking\" before starting a new shake if it uses different parameters. ",
+          "functionType": "Action"
+        },
+        {
+          "name": "StopShaking",
+          "fullName": "Stop shaking the object",
+          "description": "Stop any shaking of object that was initiated by the Shake Object extension.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsShaking",
+          "fullName": "Check if an object is shaking",
+          "description": "Check if an object is shaking.",
+          "functionType": "Condition"
+        }
+      ]
+    },
+    {
+      "description": "Shake objects with translation, rotation and scale.",
+      "fullName": "Shake object (position, angle, scale)",
+      "name": "ShakeObject_PositionAngleScale",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "ShakeObject_PositionAngleScale",
+          "fullName": "Shake object (position, angle, scale)",
+          "description": "Shake an object, using one or more ways to shake (position, angle, scale). Make sure to \"Stop shaking\" before starting a new shake if it uses different parameters.",
+          "functionType": "Action"
+        },
+        {
+          "name": "StopShaking",
+          "fullName": "Stop shaking an object",
+          "description": "Stop shaking an object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsShaking",
+          "fullName": "Check if an object is shaking",
+          "description": "Check if an object is shaking.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Shake an object (position, angle or scale).\n\nIt can be used for:\n- Hit or impact\n- Object slowly rocking back and forth (like a ship)\n- Simulate engine vibration, earthquake, or pulsing\n\nThe top-down RPG example uses this extension for damage animations ([open the project online](https://editor.gdevelop.io/?project=example://top-down-rpg)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWFycm93LWFsbCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMywxMUgxOEwxNi41LDkuNUwxNy45Miw4LjA4TDIxLjg0LDEyTDE3LjkyLDE1LjkyTDE2LjUsMTQuNUwxOCwxM0gxM1YxOEwxNC41LDE2LjVMMTUuOTIsMTcuOTJMMTIsMjEuODRMOC4wOCwxNy45Mkw5LjUsMTYuNUwxMSwxOFYxM0g2TDcuNSwxNC41TDYuMDgsMTUuOTJMMi4xNiwxMkw2LjA4LDguMDhMNy41LDkuNUw2LDExSDExVjZMOS41LDcuNUw4LjA4LDYuMDhMMTIsMi4xNkwxNS45Miw2LjA4TDE0LjUsNy41TDEzLDZWMTFaIiAvPjwvc3ZnPg=="
+}

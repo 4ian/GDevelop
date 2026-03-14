@@ -1,0 +1,98 @@
+{
+  "author": "@Lizard-13",
+  "category": "Game mechanic",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Rectangular 2D grid",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZpZXctZ3JpZC1wbHVzLW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMyAyMUgxMVYxM0gzTTUgMTVIOVYxOUg1TTMgMTFIMTFWM0gzTTUgNUg5VjlINU0xMyAzVjExSDIxVjNNMTkgOUgxNVY1SDE5TTE4IDE2SDIxVjE4SDE4VjIxSDE2VjE4SDEzVjE2SDE2VjEzSDE4WiIgLz48L3N2Zz4=",
+  "name": "SnapToGrid",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/view-grid-plus-outline.svg",
+  "shortDescription": "Snap objects on a virtual grid.",
+  "dimension": "2D",
+  "version": "0.0.4",
+  "description": [
+    "It allows to snap objects on a *virtual 2D grid*.",
+    "",
+    "It's useful for:",
+    "- level editors",
+    "- building systems",
+    "",
+    "A [simple example](https://editor.gdevelop.io/?project=example://snap-object-to-grid) shows how to snap objects that are dragged with the mouse."
+  ],
+  "tags": "snap,grid,positioning,tiles",
+  "authorIds": [],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Snap object to a virtual grid (i.e: this is not the grid used in the editor).",
+      "fullName": "Snap objects to a virtual grid",
+      "functionType": "Action",
+      "name": "SnapObjectToVirtualGrid",
+      "sentence": "Snap _PARAM1_ to a virtual grid using cells with width: _PARAM2_px, height _PARAM3_px and an offset position (_PARAM4_; _PARAM5_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Round the Object position to snap to the in-game grid",
+          "comment2": ""
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "MettreXY"
+              },
+              "parameters": [
+                "Object",
+                "=",
+                "CellWidth * round((Object.X() - OffsetX) / CellWidth) + OffsetX",
+                "=",
+                "CellHeight * round((Object.Y() - OffsetY) / CellHeight) + OffsetY"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Objects to snap to the virtual grid",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Width of a cell of the virtual grid (in pixels)",
+          "name": "CellWidth",
+          "type": "expression"
+        },
+        {
+          "description": "Height of a cell of the virtual grid (in pixels)",
+          "name": "CellHeight",
+          "type": "expression"
+        },
+        {
+          "description": "Offset on the X axis of the virtual grid (in pixels)",
+          "name": "OffsetX",
+          "type": "expression"
+        },
+        {
+          "description": "Offset on the Y axis of the virtual grid (in pixels)",
+          "name": "OffsetY",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

@@ -1,0 +1,956 @@
+{
+  "author": "",
+  "category": "Advanced",
+  "dimension": "",
+  "extensionNamespace": "",
+  "fullName": "Unpicks all instances",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNlbGVjdGlvbi1lbGxpcHNlLWFycm93LWluc2lkZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMS4yIDRDOS45NCA0LjEyIDguNzIgNC41MyA3LjY0IDUuMkw2LjY0IDMuNDdDNy45NSAyLjY0IDkuNDUgMi4xMyAxMSAyTTE3LjUzIDYuMjVDMTYuNjIgNS4zOSAxNS41MyA0LjczIDE0LjM0IDQuMzNMMTUgMi4zOUMxNi41IDIuODQgMTcuODkgMy42NiAxOSA0Ljc4TTUuMzQgNy40MUM0LjY0IDguNDQgNC4xOSA5LjYgNCAxMC44M0wyIDEwLjU1QzIuMiA5IDIuNzkgNy41IDMuNyA2LjIzTTIyIDEyVjEyLjY2TDIwIDEyLjVWMTJDMjAgMTAuOTIgMTkuODEgOS44NiAxOS4zOSA4Ljg2TDIxLjIyIDguMDZDMjEuNzUgOS4zMSAyMiAxMC42NSAyMiAxMk02IDE3LjNMNC41IDE4LjYxQzMuNDcgMTcuNDMgMi43MiAxNi4wNCAyLjMgMTQuNTNMNC4xNyAxNEM0LjUzIDE1LjIyIDUuMTYgMTYuMzUgNiAxNy4zTTEyLjE0IDIySDEyQzEwLjUgMjIgOSAyMS42OCA3LjY0IDIxLjA3TDguNTMgMTkuMjRDOS42MiAxOS43NSAxMC44IDIwIDEyIDIwSDEyLjE5TTE3IDIxSDE1VjE1SDIxVjE3SDE4LjQyTDIxLjE0IDE5Ljc2TDE5LjczIDIxLjE3TDE3IDE4LjUiIC8+PC9zdmc+",
+  "name": "ObjectPickingTools",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/selection-ellipse-arrow-inside.svg",
+  "shortDescription": "Unpick all instances of an object.",
+  "version": "2.2.0",
+  "description": "Unpick all instances of an object to only pick objects created by following actions.",
+  "origin": {
+    "identifier": "ObjectPickingTools",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Unpicks all instances of an object.",
+      "fullName": "Unpick all instances",
+      "functionType": "Action",
+      "name": "UnpickAction",
+      "sentence": "Unpick all instances of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const lists = eventsFunctionContext.getObjectsLists(\"Object\").items;",
+            "for (const listName in lists)",
+            "    lists[listName].length = 0;",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object to unpick all instances from",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Unpicks all instances of an object.",
+      "fullName": "Unpick all instances",
+      "functionType": "Condition",
+      "name": "UnpickCondition",
+      "sentence": "Unpick all instances of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const lists = eventsFunctionContext.getObjectsLists(\"Object\").items;",
+            "for (const listName in lists)",
+            "    lists[listName].length = 0;",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object to unpick all instances from",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Pick object instances that have the lowest Z-order.",
+      "fullName": "Pick objects with lowest Z-order",
+      "functionType": "Action",
+      "name": "PickLowestZAction",
+      "private": true,
+      "sentence": "Pick _PARAM1_ with the lowest Z-order",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// Create an empty array to hold the objects with the lowest value\r",
+            "let lowestValueObjects = [];\r",
+            "\r",
+            "// Initialize the lowest value to a very small number\r",
+            "let lowestValue = Infinity;\r",
+            "\r",
+            "// Get all instances of \"object\"\r",
+            "const lists = eventsFunctionContext.getObjectsLists(\"Object\").items;\r",
+            "\r",
+            "// Loop through each object to find the lowest value\r",
+            "for (const listName in lists) {\r",
+            "    for (const object of lists[listName]) {\r",
+            "        // Get the value of the variable\r",
+            "        const value = object.getZOrder();\r",
+            "        // Compare and update the lowest value\r",
+            "        if (value < lowestValue) {\r",
+            "            lowestValue = value;\r",
+            "            lowestValueObjects = [object]; // Reset the list to contain only this new lowest value object\r",
+            "        } else if (value === lowestValue) {\r",
+            "            lowestValueObjects.push(object); // If the value is equal to the current lowest, add it to the list\r",
+            "        }\r",
+            "    }\r",
+            "    // Remove all picked instances\r",
+            "    lists[listName].length = 0;\r",
+            "}\r",
+            "\r",
+            "// Pick all object instances with the lowest value\r",
+            "if (lowestValueObjects.length !== 0) {\r",
+            "    for (const object of lowestValueObjects) {\r",
+            "        lists[object.getName()].push(object);\r",
+            "    }\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object to select instances from",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Pick object instances that have the lowest Z-order.",
+      "fullName": "Pick objects with lowest Z-order",
+      "functionType": "Condition",
+      "name": "PickLowestZCondition",
+      "private": true,
+      "sentence": "Pick _PARAM1_ with the lowest Z-order",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// Create an empty array to hold the objects with the lowest value\r",
+            "let lowestValueObjects = [];\r",
+            "\r",
+            "// Initialize the lowest value to a very small number\r",
+            "let lowestValue = Infinity;\r",
+            "\r",
+            "// Get all instances of \"object\"\r",
+            "const lists = eventsFunctionContext.getObjectsLists(\"Object\").items;\r",
+            "\r",
+            "// Loop through each object to find the lowest value\r",
+            "for (const listName in lists) {\r",
+            "    for (const object of lists[listName]) {\r",
+            "        // Get the value of the variable\r",
+            "        const value = object.getZOrder();\r",
+            "        // Compare and update the lowest value\r",
+            "        if (value < lowestValue) {\r",
+            "            lowestValue = value;\r",
+            "            lowestValueObjects = [object]; // Reset the list to contain only this new lowest value object\r",
+            "        } else if (value === lowestValue) {\r",
+            "            lowestValueObjects.push(object); // If the value is equal to the current lowest, add it to the list\r",
+            "        }\r",
+            "    }\r",
+            "    // Remove all picked instances\r",
+            "    lists[listName].length = 0;\r",
+            "}\r",
+            "\r",
+            "// Pick all object instances with the lowest value\r",
+            "if (lowestValueObjects.length !== 0) {\r",
+            "    for (const object of lowestValueObjects) {\r",
+            "        lists[object.getName()].push(object);\r",
+            "    }\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object to select instances from",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Pick object instances that have the highest Z-order.",
+      "fullName": "Pick objects with highest Z-order",
+      "functionType": "Action",
+      "name": "PickHighestZAction",
+      "private": true,
+      "sentence": "Pick _PARAM1_ with the highest Z-order",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// Create an empty array to hold the objects with the highest value\r",
+            "let highestValueObjects = [];\r",
+            "\r",
+            "// Initialize the highest value to a very small number\r",
+            "let highestValue = -Infinity;\r",
+            "\r",
+            "// Get all instances of \"object\"\r",
+            "const lists = eventsFunctionContext.getObjectsLists(\"Object\").items;\r",
+            "\r",
+            "// Loop through each object to find the highest value\r",
+            "for (const listName in lists) {\r",
+            "    for (const object of lists[listName]) {\r",
+            "        // Get the value of the variable\r",
+            "        const value = object.getZOrder();\r",
+            "        // Compare and update the highest value\r",
+            "        if (value > highestValue) {\r",
+            "            highestValue = value;\r",
+            "            highestValueObjects = [object]; // Reset the list to contain only this new highest value object\r",
+            "        } else if (value === highestValue) {\r",
+            "            highestValueObjects.push(object); // If the value is equal to the current highest, add it to the list\r",
+            "        }\r",
+            "    }\r",
+            "    // Remove all picked instances\r",
+            "    lists[listName].length = 0;\r",
+            "}\r",
+            "\r",
+            "// Pick all object instances with the highest value\r",
+            "if (highestValueObjects.length !== 0) {\r",
+            "    for (const object of highestValueObjects) {\r",
+            "        lists[object.getName()].push(object);\r",
+            "    }\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object to select instances from",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Pick object instances that have the highest Z-order.",
+      "fullName": "Pick objects with highest Z-order",
+      "functionType": "Condition",
+      "name": "PickHighestZCondition",
+      "private": true,
+      "sentence": "Pick _PARAM1_ with the highest Z-order",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// Create an empty array to hold the objects with the highest value\r",
+            "let highestValueObjects = [];\r",
+            "\r",
+            "// Initialize the highest value to a very small number\r",
+            "let highestValue = -Infinity;\r",
+            "\r",
+            "// Get all instances of \"object\"\r",
+            "const lists = eventsFunctionContext.getObjectsLists(\"Object\").items;\r",
+            "\r",
+            "// Loop through each object to find the highest value\r",
+            "for (const listName in lists) {\r",
+            "    for (const object of lists[listName]) {\r",
+            "        // Get the value of the variable\r",
+            "        const value = object.getZOrder();\r",
+            "        // Compare and update the highest value\r",
+            "        if (value > highestValue) {\r",
+            "            highestValue = value;\r",
+            "            highestValueObjects = [object]; // Reset the list to contain only this new highest value object\r",
+            "        } else if (value === highestValue) {\r",
+            "            highestValueObjects.push(object); // If the value is equal to the current highest, add it to the list\r",
+            "        }\r",
+            "    }\r",
+            "    // Remove all picked instances\r",
+            "    lists[listName].length = 0;\r",
+            "}\r",
+            "\r",
+            "// Pick all object instances with the highest value\r",
+            "if (highestValueObjects.length !== 0) {\r",
+            "    for (const object of highestValueObjects) {\r",
+            "        lists[object.getName()].push(object);\r",
+            "    }\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object to select instances from",
+          "name": "Object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Pick object instances that have the lowest value of an object variable.",
+      "fullName": "Pick objects with lowest variable value",
+      "functionType": "Action",
+      "name": "PickLowestVariableValueAction",
+      "private": true,
+      "sentence": "Pick _PARAM1_ with the lowest value of variable _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// Create an empty array to hold the objects with the lowest variable value\r",
+            "let lowestValueObjects = [];\r",
+            "\r",
+            "// Initialize the lowest value to a very small number\r",
+            "let lowestValue = Infinity;\r",
+            "\r",
+            "// Get all instances of \"object\"\r",
+            "const lists = eventsFunctionContext.getObjectsLists(\"Object\").items;\r",
+            "\r",
+            "// Store the variable name\r",
+            "const objectVariableName = eventsFunctionContext.getArgument(\"ObjectVariableName\");\r",
+            "\r",
+            "// Loop through each object to find the lowest value\r",
+            "for (const listName in lists) {\r",
+            "    for (const object of lists[listName]) {\r",
+            "        // Get the value of the variable\r",
+            "        const value = object.getVariables().get(objectVariableName).getAsNumber();\r",
+            "        // Compare and update the lowest value\r",
+            "        if (value < lowestValue) {\r",
+            "            lowestValue = value;\r",
+            "            lowestValueObjects = [object]; // Reset the list to contain only this new lowest value object\r",
+            "        } else if (value === lowestValue) {\r",
+            "            lowestValueObjects.push(object); // If the value is equal to the current lowest, add it to the list\r",
+            "        }\r",
+            "    }\r",
+            "    // Remove all picked instances\r",
+            "    lists[listName].length = 0;\r",
+            "}\r",
+            "\r",
+            "// Pick all object instances with the lowest value\r",
+            "if (lowestValueObjects.length !== 0) {\r",
+            "    for (const object of lowestValueObjects) {\r",
+            "        lists[object.getName()].push(object);\r",
+            "    }\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object to select instances from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Object variable name",
+          "name": "ObjectVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Pick object instances that have the lowest value of an object variable.",
+      "fullName": "Pick objects with lowest variable value",
+      "functionType": "Condition",
+      "name": "PickLowestVariableValueCondition",
+      "private": true,
+      "sentence": "Pick _PARAM1_ with the lowest value of variable _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// Create an empty array to hold the objects with the lowest variable value\r",
+            "let lowestValueObjects = [];\r",
+            "\r",
+            "// Initialize the lowest value to a very small number\r",
+            "let lowestValue = Infinity;\r",
+            "\r",
+            "// Get all instances of \"object\"\r",
+            "const lists = eventsFunctionContext.getObjectsLists(\"Object\").items;\r",
+            "\r",
+            "// Store the variable name\r",
+            "const objectVariableName = eventsFunctionContext.getArgument(\"ObjectVariableName\");\r",
+            "\r",
+            "// Loop through each object to find the lowest value\r",
+            "for (const listName in lists) {\r",
+            "    for (const object of lists[listName]) {\r",
+            "        // Get the value of the variable\r",
+            "        const value = object.getVariables().get(objectVariableName).getAsNumber();\r",
+            "        // Compare and update the lowest value\r",
+            "        if (value < lowestValue) {\r",
+            "            lowestValue = value;\r",
+            "            lowestValueObjects = [object]; // Reset the list to contain only this new lowest value object\r",
+            "        } else if (value === lowestValue) {\r",
+            "            lowestValueObjects.push(object); // If the value is equal to the current lowest, add it to the list\r",
+            "        }\r",
+            "    }\r",
+            "    // Remove all picked instances\r",
+            "    lists[listName].length = 0;\r",
+            "}\r",
+            "\r",
+            "// Pick all object instances with the lowest value\r",
+            "if (lowestValueObjects.length !== 0) {\r",
+            "    for (const object of lowestValueObjects) {\r",
+            "        lists[object.getName()].push(object);\r",
+            "    }\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object to select instances from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Object variable name",
+          "name": "ObjectVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Pick object instances that have the highest value of an object variable.",
+      "fullName": "Pick objects with highest variable value",
+      "functionType": "Action",
+      "name": "PickHighestVariableValueAction",
+      "private": true,
+      "sentence": "Pick _PARAM1_ with the highest value of variable _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// Create an empty array to hold the objects with the highest variable value\r",
+            "let highestValueObjects = [];\r",
+            "\r",
+            "// Initialize the highest value to a very small number\r",
+            "let highestValue = -Infinity;\r",
+            "\r",
+            "// Get all instances of \"object\"\r",
+            "const lists = eventsFunctionContext.getObjectsLists(\"Object\").items;\r",
+            "\r",
+            "// Store the variable name\r",
+            "const objectVariableName = eventsFunctionContext.getArgument(\"ObjectVariableName\");\r",
+            "\r",
+            "// Loop through each object to find the highest value\r",
+            "for (const listName in lists) {\r",
+            "    for (const object of lists[listName]) {\r",
+            "        // Get the value of the variable\r",
+            "        const value = object.getVariables().get(objectVariableName).getAsNumber();\r",
+            "        // Compare and update the highest value\r",
+            "        if (value > highestValue) {\r",
+            "            highestValue = value;\r",
+            "            highestValueObjects = [object]; // Reset the list to contain only this new highest value object\r",
+            "        } else if (value === highestValue) {\r",
+            "            highestValueObjects.push(object); // If the value is equal to the current highest, add it to the list\r",
+            "        }\r",
+            "    }\r",
+            "    // Remove all picked instances\r",
+            "    lists[listName].length = 0;\r",
+            "}\r",
+            "\r",
+            "// Pick all object instances with the highest value\r",
+            "if (highestValueObjects.length !== 0) {\r",
+            "    for (const object of highestValueObjects) {\r",
+            "        lists[object.getName()].push(object);\r",
+            "    }\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object to select instances from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Object variable name",
+          "name": "ObjectVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Pick object instances that have the highest value of an object variable.",
+      "fullName": "Pick objects with highest variable value",
+      "functionType": "Condition",
+      "name": "PickHighestVariableValueCondition",
+      "private": true,
+      "sentence": "Pick _PARAM1_ with the highest value of variable _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// Create an empty array to hold the objects with the highest variable value\r",
+            "let highestValueObjects = [];\r",
+            "\r",
+            "// Initialize the highest value to a very small number\r",
+            "let highestValue = -Infinity;\r",
+            "\r",
+            "// Get all instances of \"object\"\r",
+            "const lists = eventsFunctionContext.getObjectsLists(\"Object\").items;\r",
+            "\r",
+            "// Store the variable name\r",
+            "const objectVariableName = eventsFunctionContext.getArgument(\"ObjectVariableName\");\r",
+            "\r",
+            "// Loop through each object to find the highest value\r",
+            "for (const listName in lists) {\r",
+            "    for (const object of lists[listName]) {\r",
+            "        // Get the value of the variable\r",
+            "        const value = object.getVariables().get(objectVariableName).getAsNumber();\r",
+            "        // Compare and update the highest value\r",
+            "        if (value > highestValue) {\r",
+            "            highestValue = value;\r",
+            "            highestValueObjects = [object]; // Reset the list to contain only this new highest value object\r",
+            "        } else if (value === highestValue) {\r",
+            "            highestValueObjects.push(object); // If the value is equal to the current highest, add it to the list\r",
+            "        }\r",
+            "    }\r",
+            "    // Remove all picked instances\r",
+            "    lists[listName].length = 0;\r",
+            "}\r",
+            "\r",
+            "// Pick all object instances with the highest value\r",
+            "if (highestValueObjects.length !== 0) {\r",
+            "    for (const object of highestValueObjects) {\r",
+            "        lists[object.getName()].push(object);\r",
+            "    }\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object to select instances from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Object variable name",
+          "name": "ObjectVariableName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Picks the first instance out of a list of objects.",
+      "fullName": "Pick the first object (deprecated)",
+      "functionType": "Action",
+      "name": "PickFirstAction",
+      "private": true,
+      "sentence": "Pick the first _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const lists = eventsFunctionContext.getObjectsLists(\"object\").items;\r",
+            "\r",
+            "for (const listName in lists) {\r",
+            "    const list = lists[listName];\r",
+            "    // TODO The 1st object in the list won't necessarily be the oldest one.\r",
+            "    // For instance, a collision condition that uses a spatial structure may change the order.\r",
+            "    if (list.length > 1) {\r",
+            "        list.length = 1;\r",
+            "    }\r",
+            "}\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object to select an instances from",
+          "name": "object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Picks the first instance out of a list of objects.",
+      "fullName": "Pick the first object (deprecated)",
+      "functionType": "Condition",
+      "name": "PickFirstCondition",
+      "private": true,
+      "sentence": "Pick the first _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const lists = eventsFunctionContext.getObjectsLists(\"object\").items;\r",
+            "\r",
+            "for (const listName in lists) {\r",
+            "    const list = lists[listName];\r",
+            "    // TODO The 1st object in the list won't necessarily be the oldest one.\r",
+            "    // For instance, a collision condition that uses a spatial structure may change the order.\r",
+            "    if (list.length > 1) {\r",
+            "        list.length = 1;\r",
+            "    }\r",
+            "}\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object to select an instances from",
+          "name": "object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Picks the last instance out of a list of objects.",
+      "fullName": "Pick the last object (deprecated)",
+      "functionType": "Action",
+      "name": "PickLastAction",
+      "private": true,
+      "sentence": "Pick the last _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const lists = eventsFunctionContext.getObjectsLists(\"object\").items;\r",
+            "\r",
+            "for (const listName in lists) {\r",
+            "    const list = lists[listName];\r",
+            "    // TODO The last object in the list won't necessarily be the newest one.\r",
+            "    // For instance, a collision condition that uses a spatial structure may change the order.\r",
+            "    if (list.length > 1) {\r",
+            "        list[0] = list[list.length - 1];\r",
+            "        list.length = 1;\r",
+            "    }\r",
+            "}\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object to select an instances from",
+          "name": "object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Picks the last instance out of a list of objects.",
+      "fullName": "Pick the last object (deprecated)",
+      "functionType": "Condition",
+      "name": "PickLastCondition",
+      "private": true,
+      "sentence": "Pick the last _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const lists = eventsFunctionContext.getObjectsLists(\"object\").items;\r",
+            "\r",
+            "for (const listName in lists) {\r",
+            "    const list = lists[listName];\r",
+            "    // TODO The last object in the list won't necessarily be the newest one.\r",
+            "    // For instance, a collision condition that uses a spatial structure may change the order.\r",
+            "    if (list.length > 1) {\r",
+            "        list[0] = list[list.length - 1];\r",
+            "        list.length = 1;\r",
+            "    }\r",
+            "}\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object to select an instances from",
+          "name": "object",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Picks the Nth instance out of a list of objects.",
+      "fullName": "Pick the Nth object (deprecated)",
+      "functionType": "Action",
+      "name": "PickNthAction",
+      "private": true,
+      "sentence": "Pick the _PARAM2_th _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const lists = eventsFunctionContext.getObjectsLists(\"object\").items;\r",
+            "const n = eventsFunctionContext.getArgument(\"n\");\r",
+            "\r",
+            "for (const listName in lists) {\r",
+            "    const list = lists[listName];\r",
+            "    // TODO Objects from the list won't necessarily be the order they were created.\r",
+            "    // For instance, a collision condition that uses a spatial structure may change the order.\r",
+            "    if (n < list.length) {\r",
+            "        list[0] = list[n];\r",
+            "        list.length = 1;\r",
+            "    }\r",
+            "    else {\r",
+            "        list.length = 0;\r",
+            "    }\r",
+            "}\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object to select an instances from",
+          "name": "object",
+          "type": "objectList"
+        },
+        {
+          "description": "The place in the objects lists an instance has to have to be picked",
+          "name": "n",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Picks the Nth instance out of a list of objects.",
+      "fullName": "Pick the Nth object (deprecated)",
+      "functionType": "Condition",
+      "name": "PickNthCondition",
+      "private": true,
+      "sentence": "Pick the _PARAM2_th _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const lists = eventsFunctionContext.getObjectsLists(\"object\").items;\r",
+            "const n = eventsFunctionContext.getArgument(\"n\");\r",
+            "\r",
+            "for (const listName in lists) {\r",
+            "    const list = lists[listName];\r",
+            "    // TODO Objects from the list won't necessarily be the order they were created.\r",
+            "    // For instance, a collision condition that uses a spatial structure may change the order.\r",
+            "    if (n < list.length) {\r",
+            "        list[0] = list[n];\r",
+            "        list.length = 1;\r",
+            "    }\r",
+            "    else {\r",
+            "        list.length = 0;\r",
+            "    }\r",
+            "}\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object to select an instances from",
+          "name": "object",
+          "type": "objectList"
+        },
+        {
+          "description": "The place in the objects lists an instance has to have to be picked",
+          "name": "n",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

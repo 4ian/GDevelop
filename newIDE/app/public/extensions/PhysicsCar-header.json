@@ -1,0 +1,160 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "2D Top-Down Physics Car",
+  "name": "PhysicsCar",
+  "version": "0.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/PhysicsCar.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/PhysicsCar-header.json",
+  "tags": "race",
+  "category": "Movement",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/b4a3bb68575adbecb4418e0397ef8c05913e1f0757dfd111de7e6a4ff31eb149_car-back.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Simulate top-down car motion with drifting.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/physics-car",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Simulate 2D car motion, from a top-down view.",
+      "fullName": "Physics car",
+      "name": "PhysicsCar",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "SimulateRightKey",
+          "fullName": "Simulate right key press",
+          "description": "Simulate a press of the right key.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SimulateLeftKey",
+          "fullName": "Simulate left key press",
+          "description": "Simulate a press of the left key.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SimulateUpKey",
+          "fullName": "Simulate up key press",
+          "description": "Simulate a press of the up key.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SimulateDownKey",
+          "fullName": "Simulate down key press",
+          "description": "Simulate a press of the down key.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SimulateSteeringStick",
+          "fullName": "Simulate steering stick",
+          "description": "Simulate a steering stick for a given axis force.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SimulateAccelerationStick",
+          "fullName": "Simulate acceleration stick",
+          "description": "Simulate an acceleration stick for a given axis force.",
+          "functionType": "Action"
+        },
+        {
+          "name": "DrawDebug",
+          "fullName": "Draw forces for debug",
+          "description": "Draw forces applying on the car for debug purpose.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SteeringAngle",
+          "fullName": "Steering angle",
+          "description": "Compare the steering angle of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetSteeringAngle",
+          "fullName": "Steering angle",
+          "description": "Change the steering angle of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Acceleration",
+          "fullName": "Acceleration",
+          "description": "Compare the acceleration of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetAcceleration",
+          "fullName": "Acceleration",
+          "description": "Change the acceleration of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SpeedMax",
+          "fullName": "Maximum speed",
+          "description": "Compare the maximum speed of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetSpeedMax",
+          "fullName": "Maximum speed",
+          "description": "Change the maximum speed of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "WheelGripRatio",
+          "fullName": "Wheel grip ratio",
+          "description": "Compare the wheel grip ratio of the object (from 0 to 1). A ratio of 0 is like driving on ice.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetWheelGripRatio",
+          "fullName": "Wheel grip ratio",
+          "description": "Change the wheel grip ratio of the object (from 0 to 1). A ratio of 0 is like driving on ice.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SteeringAngleMax",
+          "fullName": "Maximum steering angle",
+          "description": "Compare the maximum steering angle of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetSteeringAngleMax",
+          "fullName": "Maximum steering angle",
+          "description": "Change the maximum steering angle of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SteeringSpeed",
+          "fullName": "Steering speed",
+          "description": "Compare the steering speed of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetSteeringSpeed",
+          "fullName": "Steering speed",
+          "description": "Change the steering speed of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SteeringBackSpeed",
+          "fullName": "Sterring back speed",
+          "description": "Compare the sterring speed when turning back of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetSteeringBackSpeed",
+          "fullName": "Sterring back speed",
+          "description": "Change the sterring speed when turning back of the object.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Simulate car motion, from a top-down view, with the 2D Physics Engine behavior.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNhci1iYWNrIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTYsMTFMNyw3SDE3TDE4LDExTTE4LjkyLDZDMTguNzEsNS40IDE4LjE0LDUgMTcuNSw1SDYuNUM1Ljg2LDUgNS4yOSw1LjQgNS4wOCw2TDMsMTJWMjBBMSwxIDAgMCwwIDQsMjFINUExLDEgMCAwLDAgNiwyMFYxOEgxOFYyMEExLDEgMCAwLDAgMTksMjFIMjBBMSwxIDAgMCwwIDIxLDIwVjEyTDE4LjkyLDZNNywxNkg1VjE0SDdWMTZNMTksMTZIMTdWMTRIMTlWMTZNMTQsMTZIMTBWMTRIMTRWMTZaIiAvPjwvc3ZnPg=="
+}

@@ -1,0 +1,85 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1",
+    "IRIhkkTTl2UHhfjrLTTH5GYwkYu1",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Repeat every X seconds",
+  "name": "RepeatEveryXSeconds",
+  "version": "0.2.1",
+  "url": "https://resources.gdevelop-app.com/extensions/RepeatEveryXSeconds.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/RepeatEveryXSeconds-header.json",
+  "tags": "repeat,timer,time",
+  "category": "General",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/repeat.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Trigger an action repeatedly at a configurable time interval in seconds.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 4,
+  "helpPath": "/extensions/repeat-every-xseconds",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Allows to repeat an object timer every X seconds.",
+      "fullName": "Repeat every X seconds",
+      "name": "RepeatTimer",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "Repeat2",
+          "fullName": "Repeat with an object timer",
+          "description": "Triggers every X seconds.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "Repetition",
+          "fullName": "Repetition number of an object timer",
+          "description": "Compare the number of times the timer has repeated.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "RepeatXTimes",
+          "fullName": "Repeat with an object timer X times",
+          "description": "Triggers every X seconds X amount of times.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "DeleteTimer",
+          "fullName": "Reset repetition count of an object timer",
+          "description": "Reset repetition count of an object timer.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "name": "Repeat",
+      "fullName": "Repeat with a scene timer",
+      "description": "Triggers every X seconds.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "Repetition",
+      "fullName": "Repetition number of a scene timer",
+      "description": "Compare the number of times the timer has repeated.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "RepeatXTimes",
+      "fullName": "Repeat with a scene timer X times",
+      "description": "Triggers every X seconds X amount of times.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "DeleteTimer",
+      "fullName": "Reset repetition count of a scene timer",
+      "description": "Reset repetition count of a scene timer.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Convenience conditions, actions and behaviors for timers to trigger a condition every X seconds.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXJlcGVhdCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xNywxN0g3VjE0TDMsMThMNywyMlYxOUgxOVYxM0gxN003LDdIMTdWMTBMMjEsNkwxNywyVjVINVYxMUg3VjdaIiAvPjwvc3ZnPg=="
+}

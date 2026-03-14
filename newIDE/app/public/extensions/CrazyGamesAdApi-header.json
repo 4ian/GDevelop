@@ -1,0 +1,288 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "rotBq28wITdtfsrE7McHQri4k2w2",
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
+    "mnImQKdn8nQxwzkS5D6a1JB27V23",
+    "taRwmWxwAFYFL9yyBwB3cwBw0BO2",
+    "dt0tRnf2kHWJnjkrpnzTzNj9Yc63"
+  ],
+  "extensionNamespace": "",
+  "fullName": "CrazyGames SDK v3",
+  "name": "CrazyGamesAdApi",
+  "version": "3.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/CrazyGamesAdApi.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/CrazyGamesAdApi-header.json",
+  "tags": "api,crazygames,ads,authentication,monetization",
+  "category": "Third-party",
+  "previewIconUrl": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODkiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgODkgMTAwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTg0LjkwMzQgMjUuODkyOUM4NS4wNzI3IDE4LjY4MjQgODQuNjQ5NCA2LjExNjk0IDgwLjA3NzYgMC44NzQ4NTlDNzcuNTcyOSAtMS45OTY2NCA3MS42MTgzIDIuODA4MDEgNjcuNzY2MSA2LjUxOTA5QzYxLjM4MSAzLjQwNzcxIDUzLjUzNTUgMS44NzY3MSA0My45OTY4IDEuODc2NzFDMzQuNDU4IDEuODc2NzEgMjYuNjE5NiAzLjQxNDc2IDIwLjI0MTYgNi41MTkwOUMxNi4zODI0IDIuODA4MDEgMTAuNDM0OCAtMS45ODk1OSA3LjkzMDE0IDAuODgxOTE1QzMuMzY1MzcgNi4xMTY5NCAyLjkzNSAxOC42NDAxIDMuMTA0MzIgMjUuODU3NkMxLjA1MTIzIDMxLjUwMTkgMCAzOC4wOTE1IDAgNDUuNjEyNUMwIDYxLjQzMDQgNC41Mjk1IDczLjE0MjIgMTMuNDU0NCA4MC40NzI3QzE5LjQ2NTYgODUuMzk3MyAyNy4zMTgxIDg4LjIzMzUgMzcuMzIyNSA4OS4wODcyQzM2Ljg2MDcgODkuMzE4MSAzNi4zOTIzIDg5LjU0NjggMzUuOTE3NyA4OS43Nzg1TDM1LjkxNjMgODkuNzc5MkwzNS45MTU5IDg5Ljc3OTRDMzUuMTg3NSA5MC4xMzUgMzQuNDQ0NyA5MC40OTc3IDMzLjY4OSA5MC44ODYzTDMwLjA2MjYgOTIuNjY0MkwyOC4wMDI1IDkzLjY3MzFDMjcuNDEwMiA5My45ODI5IDI2LjgxMjMgOTQuMjgyIDI2LjIwNjUgOTQuNTg1MkwyNi4yMDYyIDk0LjU4NTRDMjQuNzY5NyA5NS4zMDQyIDIzLjI4ODQgOTYuMDQ1NSAyMS43MzAzIDk3LjAwMzJMMjEuMTg3IDk3LjI5MjVDMjEuMDMxOCA5Ny40MDU0IDIwLjg4MzcgOTcuNTk1OSAyMC44NTU0IDk3LjgwNzVDMjAuNzg0OSA5OC4yMDk3IDIxLjA2MDEgOTguNTkwNyAyMS40NjIyIDk4LjY0NzFDMjIuMDU4NyA5OC43MzY4IDIyLjY1MzMgOTguODM0NSAyMy4yNDggOTguOTMyMkwyMy4yNDgzIDk4LjkzMjJDMjQuNjY1IDk5LjE2NSAyNi4wODE2IDk5LjM5NzcgMjcuNTIyNyA5OS41MjE5TDI5LjA0NjYgOTkuNjkxM0MyOS41NDc2IDk5Ljc0NzcgMzAuMDU1NSA5OS43OSAzMC41NzA2IDk5LjgxODNMMzMuNjMyNiA5OS45ODc2QzM3LjczMTcgMTAwLjA1OCA0MS44NTkxIDk5LjgzMjQgNDUuOTUxMSA5OS4xOTAzQzUwLjAzNjEgOTguNTc2NSA1NC4wNTA2IDk3LjQzMzYgNTcuOTA5OCA5NS44NDYxQzYxLjc1NSA5NC4yNTg3IDY1LjQyMzcgOTIuMTkxNSA2OC43NDY4IDg5LjY3MjhDNzUuMzM2NCA4NC41NTc3IDgwLjUxNSA3Ny42NzE3IDgzLjU5ODEgNjkuOTk1NkM4NC43MjcgNjcuMjE1OCA4NS41NjY2IDY0LjMzMDIgODYuMTczMyA2MS40MDIyQzg3LjM5MzkgNTYuNzAzNCA4OC4wMTQ4IDUxLjQ0MDEgODguMDE0OCA0NS42MTI1Qzg4LjAxNDggMzguMTEyNyA4Ni45NzA2IDMxLjUzNzIgODQuOTI0NSAyNS45TDg0LjkwMzQgMjUuODkyOVpNNDMuOTg5NyA3My41MjMyQzI3LjEyNzYgNzMuNTIzMiAxNS45MDI2IDY4Ljc4MiAxNS45MDI2IDQ1LjYwNTRDMTUuOTAyNiAzNC42NzY4IDE4LjQwNzMgMjcuMjc1OCAyMy41NzE3IDIzLjAyODVDMjcuOTMxOSAxOS40MzAzIDM0LjYyMDMgMTcuNjg3NiA0My45ODk3IDE3LjY4NzZDNTMuMzU5MiAxNy42ODc2IDYwLjA0NzYgMTkuNDQ0NCA2NC40MDc4IDIzLjAyODVDNjkuNTU4MSAyNy4yNjg3IDcyLjA3NjkgMzQuNjU1NiA3Mi4wNzY5IDQ1LjYwNTRDNzIuMDc2OSA2OC43ODIgNjAuODUxOSA3My41MjMyIDQzLjk4OTcgNzMuNTIzMlpNMzUuMDI5NiAzOS42NzE5QzM1LjAyOTYgMzcuNTkwNiAzNi40MTI0IDM1LjgyNjggMzguMzEwMyAzNS4yMzQxQzM3LjI2NjEgMzQuMjY3NiAzNS44NjkxIDMzLjY3NDkgMzQuMzMxMSAzMy42NzQ5QzMxLjEwNjggMzMuNjc0OSAyOC40NjgxIDM2LjI5OTUgMjguNDY4MSAzOS41MDI2VjUxLjE1NzlDMjguNDY4MSA1NC4zNjEgMzEuMTA2OCA1Ni45ODU2IDM0LjMzMTEgNTYuOTg1NkMzNy41NTU0IDU2Ljk4NTYgNDAuMTk0IDU0LjM2ODEgNDAuMTk0IDUxLjE1NzlWNDQuMzAwMkM0MC4wMzE4IDQ0LjMxNDMgMzkuODY5NSA0NC4zMjg0IDM5LjcwNzIgNDQuMzI4NEMzNy4xMTc5IDQ0LjMyODQgMzUuMDIyNSA0Mi4yNDcxIDM1LjAyMjUgMzkuNjc5TDM1LjAyOTYgMzkuNjcxOVpNNTcuMjExNCAzNC44ODg0QzU1LjQxMjMgMzUuNTM3NSA1NC4xMjgyIDM3LjI0NDkgNTQuMTI4MiAzOS4yNTU3VjM5LjI2MjdDNTQuMTI4MiA0MS44MzA4IDU2LjIyMzYgNDMuOTEyMSA1OC44MTI5IDQzLjkxMjFDNTkuMDUyOCA0My45MTIxIDU5LjI4NTYgNDMuODkxIDU5LjUxMTQgNDMuODU1N1Y1MS4xNTc5QzU5LjUxMTQgNTQuMzY4MSA1Ni44NzI3IDU2Ljk4NTYgNTMuNjQ4NCA1Ni45ODU2QzUwLjQyNDIgNTYuOTg1NiA0Ny43ODU1IDU0LjM2MSA0Ny43ODU1IDUxLjE1NzlWMzkuNTAyNkM0Ny43ODU1IDM2LjI5OTUgNTAuNDI0MiAzMy42NzQ5IDUzLjY0ODQgMzMuNjc0OUM1NC45ODg5IDMzLjY3NDkgNTYuMjIzNiAzNC4xMzM1IDU3LjIxMTQgMzQuODg4NFoiIGZpbGw9IiMwQzBEMTQiLz4KPC9zdmc+Cg==",
+  "gdevelopVersion": ">=5.5.222",
+  "changelog": [
+    {
+      "version": "3.1.0",
+      "breaking": "- The expression Get user session data, is changing to get and return a string, or \"null\" is returned if no data."
+    }
+  ],
+  "shortDescription": "CrazyGames SDK: display ads, user accounts, game events for CrazyGames hosting.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 42,
+  "helpPath": "/extensions/crazy-games-ad-api/details",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "LinkAccountResponse",
+      "fullName": "Link account response",
+      "description": "Get link account response.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "LastError",
+      "fullName": "Get last error",
+      "description": "Compare the last error from the CrazyGames API.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "UserSignIn",
+      "fullName": "Check and load if an user is signed in CrazyGames",
+      "description": "Check if an user is signed into CrazyGames. If signed in, retrieves username and profile picture.",
+      "functionType": "Action"
+    },
+    {
+      "name": "UserSignedIn",
+      "fullName": "User is signed in",
+      "description": "Check if the user is signed in.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "InviteLink",
+      "fullName": "Invite link",
+      "description": "Return an invite link.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "InviteButton",
+      "fullName": "Display invite button",
+      "description": "Display an invite button.",
+      "functionType": "Action"
+    },
+    {
+      "name": "LoadSDK",
+      "fullName": "Load SDK",
+      "description": "Load CrazyGames SDK.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsSDKLoaded",
+      "fullName": "CrazyGames SDK is ready",
+      "description": "Check if the CrazyGames SDK is ready to be used.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "SetGameplayStarted",
+      "fullName": "Gameplay started",
+      "description": "Let CrazyGames know gameplay started.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetGameplayStopped",
+      "fullName": "Gameplay stopped",
+      "description": "Let CrazyGames know gameplay stopped.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetLoadingStarted",
+      "fullName": "Loading started",
+      "description": "Let CrazyGames know loading started.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetLoadingStopped",
+      "fullName": "Loading stopped",
+      "description": "Let CrazyGames know loading stopped.",
+      "functionType": "Action"
+    },
+    {
+      "name": "DisplayCrazyGamesAd",
+      "fullName": "Display video ad",
+      "description": "Display a video ad. The game is automatically muted while the video is playing.",
+      "functionType": "Action"
+    },
+    {
+      "name": "AdFinishedPlaying",
+      "fullName": "Video ad just finished playing",
+      "description": "Checks if a video ad just finished playing successfully.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsVideoAdPlaying",
+      "fullName": "Video ad is playing",
+      "description": "Checks if a video ad is playing.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "UserChanged",
+      "fullName": "User changed",
+      "description": "Check if the user changed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "AdHadAnError",
+      "fullName": "Video ad had an error",
+      "description": "Check if a video ad had an error.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "GenerateInviteLink",
+      "fullName": "Generate an invite link",
+      "description": "Generate an invite link to invite friends to join your game sessions. This URL can be added to the clipboard or displayed in the game to let the user select it.",
+      "functionType": "Action"
+    },
+    {
+      "name": "DisplayHappyTime",
+      "fullName": "Display happy time",
+      "description": "Display an happy time by emitting sparkling confetti. The celebration should remain a special moment.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ScanForAdBlockers",
+      "fullName": "Scan for ad blockers",
+      "description": "Scan for ad blockers.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsAdBlocked",
+      "fullName": "Ad blocker is detected",
+      "description": "Check if user is using an ad blocker. This condition is always false before the \"Scan for ad blockers\" is called.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "DisplayBanner",
+      "fullName": "Display a banner",
+      "description": "Display a banner that can be called once per 60 seconds.",
+      "functionType": "Action"
+    },
+    {
+      "name": "HideBanner",
+      "fullName": "Hide a banner",
+      "description": "Hide a banner.",
+      "functionType": "Action"
+    },
+    {
+      "name": "HideAllBanners",
+      "fullName": "Hide all banners",
+      "description": "Hide all banners.",
+      "functionType": "Action"
+    },
+    {
+      "name": "HideInviteButton",
+      "fullName": "Hide invite button",
+      "description": "Hide the invite button.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Environment",
+      "fullName": "Get the environment",
+      "description": "Get the environment.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "AuthenticateUser",
+      "fullName": "Retrieve user data",
+      "description": "Retrieve user data.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ShowAuthWindow",
+      "fullName": "Show CrazyGames login window",
+      "description": "Show CrazyGames login window.",
+      "functionType": "Action"
+    },
+    {
+      "name": "LinkAccount",
+      "fullName": "Show account link prompt",
+      "description": "Show account link prompt.",
+      "functionType": "Action"
+    },
+    {
+      "name": "UserName",
+      "fullName": "Username",
+      "description": "Compare the username.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "CrazyGamesUserID",
+      "fullName": "CrazyGames User ID",
+      "description": "Compare the CrazyGames User ID.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ProfilePic",
+      "fullName": "Gets the signed-in user's profile picture URL",
+      "description": "Gets the signed-in user's profile picture URL.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "IsInstantMultiplayer",
+      "fullName": "Is instantly joining a lobby",
+      "description": "Return true when the user prefers to instantly join a lobby.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "IsDisableChat",
+      "fullName": "Is the user chat disabled",
+      "description": "Return true if the user prefers the chat disabled.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "SystemInfo",
+      "fullName": "Retrieves user system info",
+      "description": "Retrieves user system info, browser, version and device.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "InviteParam",
+      "fullName": "Get invite parameters",
+      "description": "Get invite parameters if user is invited to this game.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "SaveSessionData",
+      "fullName": "Save session data",
+      "description": "Save the session data.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SessionData",
+      "fullName": "Get user session data",
+      "description": "Get user session data, if there is no saved data, \"null\" will be returned.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "IsUserAccountAvailable",
+      "fullName": "Is user account available",
+      "description": "Compare the availability of the user's account.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "UserToken",
+      "fullName": "Get User Token",
+      "description": "Retrieve the user's session token for authentication.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "XsollaToken",
+      "fullName": "Get Xsolla Token",
+      "description": "Retrieve the authentication token from Xsolla.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "GenerateXsollaToken",
+      "fullName": "Generate Xsolla token",
+      "description": "Generate Xsolla token.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Refer to the [CrazyGames guide](https://docs.crazygames.com/sdk/intro/) for a full overview of the CrazyGames SDK, and to [this guide](https://wiki.gdevelop.io/gdevelop5/extensions/crazy-games-ad-api/details/) for using this SDK inside your GDevelop game.",
+  "iconUrl": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODkiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgODkgMTAwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTg0LjkwMzQgMjUuODkyOUM4NS4wNzI3IDE4LjY4MjQgODQuNjQ5NCA2LjExNjk0IDgwLjA3NzYgMC44NzQ4NTlDNzcuNTcyOSAtMS45OTY2NCA3MS42MTgzIDIuODA4MDEgNjcuNzY2MSA2LjUxOTA5QzYxLjM4MSAzLjQwNzcxIDUzLjUzNTUgMS44NzY3MSA0My45OTY4IDEuODc2NzFDMzQuNDU4IDEuODc2NzEgMjYuNjE5NiAzLjQxNDc2IDIwLjI0MTYgNi41MTkwOUMxNi4zODI0IDIuODA4MDEgMTAuNDM0OCAtMS45ODk1OSA3LjkzMDE0IDAuODgxOTE1QzMuMzY1MzcgNi4xMTY5NCAyLjkzNSAxOC42NDAxIDMuMTA0MzIgMjUuODU3NkMxLjA1MTIzIDMxLjUwMTkgMCAzOC4wOTE1IDAgNDUuNjEyNUMwIDYxLjQzMDQgNC41Mjk1IDczLjE0MjIgMTMuNDU0NCA4MC40NzI3QzE5LjQ2NTYgODUuMzk3MyAyNy4zMTgxIDg4LjIzMzUgMzcuMzIyNSA4OS4wODcyQzM2Ljg2MDcgODkuMzE4MSAzNi4zOTIzIDg5LjU0NjggMzUuOTE3NyA4OS43Nzg1TDM1LjkxNjMgODkuNzc5MkwzNS45MTU5IDg5Ljc3OTRDMzUuMTg3NSA5MC4xMzUgMzQuNDQ0NyA5MC40OTc3IDMzLjY4OSA5MC44ODYzTDMwLjA2MjYgOTIuNjY0MkwyOC4wMDI1IDkzLjY3MzFDMjcuNDEwMiA5My45ODI5IDI2LjgxMjMgOTQuMjgyIDI2LjIwNjUgOTQuNTg1MkwyNi4yMDYyIDk0LjU4NTRDMjQuNzY5NyA5NS4zMDQyIDIzLjI4ODQgOTYuMDQ1NSAyMS43MzAzIDk3LjAwMzJMMjEuMTg3IDk3LjI5MjVDMjEuMDMxOCA5Ny40MDU0IDIwLjg4MzcgOTcuNTk1OSAyMC44NTU0IDk3LjgwNzVDMjAuNzg0OSA5OC4yMDk3IDIxLjA2MDEgOTguNTkwNyAyMS40NjIyIDk4LjY0NzFDMjIuMDU4NyA5OC43MzY4IDIyLjY1MzMgOTguODM0NSAyMy4yNDggOTguOTMyMkwyMy4yNDgzIDk4LjkzMjJDMjQuNjY1IDk5LjE2NSAyNi4wODE2IDk5LjM5NzcgMjcuNTIyNyA5OS41MjE5TDI5LjA0NjYgOTkuNjkxM0MyOS41NDc2IDk5Ljc0NzcgMzAuMDU1NSA5OS43OSAzMC41NzA2IDk5LjgxODNMMzMuNjMyNiA5OS45ODc2QzM3LjczMTcgMTAwLjA1OCA0MS44NTkxIDk5LjgzMjQgNDUuOTUxMSA5OS4xOTAzQzUwLjAzNjEgOTguNTc2NSA1NC4wNTA2IDk3LjQzMzYgNTcuOTA5OCA5NS44NDYxQzYxLjc1NSA5NC4yNTg3IDY1LjQyMzcgOTIuMTkxNSA2OC43NDY4IDg5LjY3MjhDNzUuMzM2NCA4NC41NTc3IDgwLjUxNSA3Ny42NzE3IDgzLjU5ODEgNjkuOTk1NkM4NC43MjcgNjcuMjE1OCA4NS41NjY2IDY0LjMzMDIgODYuMTczMyA2MS40MDIyQzg3LjM5MzkgNTYuNzAzNCA4OC4wMTQ4IDUxLjQ0MDEgODguMDE0OCA0NS42MTI1Qzg4LjAxNDggMzguMTEyNyA4Ni45NzA2IDMxLjUzNzIgODQuOTI0NSAyNS45TDg0LjkwMzQgMjUuODkyOVpNNDMuOTg5NyA3My41MjMyQzI3LjEyNzYgNzMuNTIzMiAxNS45MDI2IDY4Ljc4MiAxNS45MDI2IDQ1LjYwNTRDMTUuOTAyNiAzNC42NzY4IDE4LjQwNzMgMjcuMjc1OCAyMy41NzE3IDIzLjAyODVDMjcuOTMxOSAxOS40MzAzIDM0LjYyMDMgMTcuNjg3NiA0My45ODk3IDE3LjY4NzZDNTMuMzU5MiAxNy42ODc2IDYwLjA0NzYgMTkuNDQ0NCA2NC40MDc4IDIzLjAyODVDNjkuNTU4MSAyNy4yNjg3IDcyLjA3NjkgMzQuNjU1NiA3Mi4wNzY5IDQ1LjYwNTRDNzIuMDc2OSA2OC43ODIgNjAuODUxOSA3My41MjMyIDQzLjk4OTcgNzMuNTIzMlpNMzUuMDI5NiAzOS42NzE5QzM1LjAyOTYgMzcuNTkwNiAzNi40MTI0IDM1LjgyNjggMzguMzEwMyAzNS4yMzQxQzM3LjI2NjEgMzQuMjY3NiAzNS44NjkxIDMzLjY3NDkgMzQuMzMxMSAzMy42NzQ5QzMxLjEwNjggMzMuNjc0OSAyOC40NjgxIDM2LjI5OTUgMjguNDY4MSAzOS41MDI2VjUxLjE1NzlDMjguNDY4MSA1NC4zNjEgMzEuMTA2OCA1Ni45ODU2IDM0LjMzMTEgNTYuOTg1NkMzNy41NTU0IDU2Ljk4NTYgNDAuMTk0IDU0LjM2ODEgNDAuMTk0IDUxLjE1NzlWNDQuMzAwMkM0MC4wMzE4IDQ0LjMxNDMgMzkuODY5NSA0NC4zMjg0IDM5LjcwNzIgNDQuMzI4NEMzNy4xMTc5IDQ0LjMyODQgMzUuMDIyNSA0Mi4yNDcxIDM1LjAyMjUgMzkuNjc5TDM1LjAyOTYgMzkuNjcxOVpNNTcuMjExNCAzNC44ODg0QzU1LjQxMjMgMzUuNTM3NSA1NC4xMjgyIDM3LjI0NDkgNTQuMTI4MiAzOS4yNTU3VjM5LjI2MjdDNTQuMTI4MiA0MS44MzA4IDU2LjIyMzYgNDMuOTEyMSA1OC44MTI5IDQzLjkxMjFDNTkuMDUyOCA0My45MTIxIDU5LjI4NTYgNDMuODkxIDU5LjUxMTQgNDMuODU1N1Y1MS4xNTc5QzU5LjUxMTQgNTQuMzY4MSA1Ni44NzI3IDU2Ljk4NTYgNTMuNjQ4NCA1Ni45ODU2QzUwLjQyNDIgNTYuOTg1NiA0Ny43ODU1IDU0LjM2MSA0Ny43ODU1IDUxLjE1NzlWMzkuNTAyNkM0Ny43ODU1IDM2LjI5OTUgNTAuNDI0MiAzMy42NzQ5IDUzLjY0ODQgMzMuNjc0OUM1NC45ODg5IDMzLjY3NDkgNTYuMjIzNiAzNC4xMzM1IDU3LjIxMTQgMzQuODg4NFoiIGZpbGw9IiMwQzBEMTQiLz4KPC9zdmc+Cg=="
+}

@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "n4hGQoIPV1f6gSQY4f2aqsDB2gD3"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Forces And Positions 3D (FP3D)",
+  "name": "FP3D",
+  "version": "0.20.0",
+  "url": "https://resources.gdevelop-app.com/extensions/FP3D.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/FP3D-header.json",
+  "tags": "3d,parent,forces",
+  "category": "Movement",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/e2314b6adb780c72b1332a13d17abb17458ebb9c8fbecbbdd6cc2d4127178df2_axis-arrow.svg",
+  "gdevelopVersion": "",
+  "shortDescription": "Adds functions to position 3D objects and apply forces to them.",
+  "eventsBasedBehaviorsCount": 3,
+  "eventsFunctionsCount": 35,
+  "helpPath": "/extensions/fp3d",
+  "description": "CONTAINS BASIC AND COMPLEX FUNCTIONS.\nFunctions such as:\n- applying impulses and forces to objects with physics\n\n- \"sticking\" objects to other objects or in front of the camera\n\n- translating the normal of an intersection from a raycast into angles (useful for portals or wall jumps!)\n\n- translating the 3D position onto a 2D plane with optional functions such as scaling down or making the icon orbit the screen if the target position is behind the camera\n\n- camera collision for third-person games\n\n- behaviors that automate or facilitate processes, like SnapToGrid or FPS Parenting.\n\n- condition that checks whether an object or the camera is looking at a target.\n\n= function to get the object closest to the center of the camera (useful for aim assistance)",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWF4aXMtYXJyb3ciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIsMkwxNiw2SDEzVjEzLjg1TDE5LjUzLDE3LjYxTDIxLDE1LjAzTDIyLjUsMjAuNUwxNywyMS45NkwxOC41MywxOS4zNUwxMiwxNS41OEw1LjQ3LDE5LjM1TDcsMjEuOTZMMS41LDIwLjVMMywxNS4wM0w0LjQ3LDE3LjYxTDExLDEzLjg1VjZIOEwxMiwyWiIgLz48L3N2Zz4="
+}

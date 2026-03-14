@@ -1,0 +1,256 @@
+{
+  "author": "",
+  "category": "General",
+  "extensionNamespace": "",
+  "fullName": "3D sprite",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "/objects/sprite/",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdob3N0LW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIgMkM3LjAzIDIgMyA2LjAzIDMgMTFWMjJMNiAxOUw5IDIyTDEyIDE5TDE1IDIyTDE4IDE5TDIxIDIyVjExQzIxIDYuMDMgMTYuOTcgMiAxMiAyTTE5IDE3LjE3TDE4IDE2LjE3TDE2LjU5IDE3LjU5TDE1IDE5LjE3TDEzLjQxIDE3LjU5TDEyIDE2LjE3TDEwLjU5IDE3LjU5TDkgMTkuMTdMNy40MSAxNy41OUw2IDE2LjE3TDUgMTcuMTdWMTFDNSA3LjE0IDguMTQgNCAxMiA0UzE5IDcuMTQgMTkgMTFWMTcuMTdNMTEgMTBDMTEgMTEuMTEgMTAuMTEgMTIgOSAxMlM3IDExLjExIDcgMTAgNy45IDggOSA4IDExIDguOSAxMSAxME0xNyAxMEMxNyAxMS4xMSAxNi4xMSAxMiAxNSAxMlMxMyAxMS4xMSAxMyAxMCAxMy45IDggMTUgOCAxNyA4LjkgMTcgMTBaIiAvPjwvc3ZnPg==",
+  "name": "Sprite3D",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/3bd33ec77ed20d3f631c6c92884728b375aa2879174bc9f289c864d0e0383d59_ghost-outline.svg",
+  "shortDescription": "An animated sprite in 3D.",
+  "version": "0.1.2",
+  "description": "The 3D sprite is an object that can be moved and rotated in 3D.",
+  "origin": {
+    "identifier": "Sprite3D",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "3d",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Define helper classes JavaScript code.",
+      "fullName": "Define helper classes",
+      "functionType": "Action",
+      "name": "DefineHelperClasses",
+      "private": true,
+      "sentence": "Define helper classes JavaScript code",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "if (gdjs.__sprite3DExtension) {",
+            "    return;",
+            "}",
+            "",
+            "const vertexColors = [];",
+            "",
+            "class Sprite3DRenderer {",
+            "    /** @type {gdjs.CustomRuntimeObject} */",
+            "    object;",
+            "    /** @type {THREE.Mesh} */",
+            "    mesh;",
+            "",
+            "    /**",
+            "     * @param object {gdjs.CustomRuntimeObject}",
+            "     */",
+            "    constructor(object) {",
+            "        this.object = object;",
+            "",
+            "        const geometry = new THREE.PlaneGeometry(1, -1);",
+            "        const animationFrame = object.getAnimator().getCurrentFrame();",
+            "        if (animationFrame) {",
+            "            const material = animationFrame.texture;",
+            "            this.mesh = new THREE.Mesh(geometry, material);",
+            "            this.mesh.rotation.order = 'ZYX';",
+            "            object.get3DRendererObject().add(this.mesh);",
+            "            // Ensure a forward compatibility when vertexColors will be set to true",
+            "            // in the engine to allow to tint 3D sprites.",
+            "            vertexColors.length = geometry.attributes.position.count * 3;",
+            "            vertexColors.fill(1);",
+            "            geometry.setAttribute(",
+            "                'color',",
+            "                new THREE.BufferAttribute(new Float32Array(vertexColors), 3)",
+            "            );",
+            "        }",
+            "        this.updateFrame();",
+            "        object.getAnimator().setOnFrameChangeCallback(() => this.updateFrame());",
+            "    }",
+            "",
+            "    updateFrame() {",
+            "        const frame = this.object.getAnimator().getCurrentFrame();",
+            "        if (!frame) {",
+            "            return;",
+            "        }",
+            "        const material = frame.texture;",
+            "",
+            "        const image = material.map.image;",
+            "        const width = image.width;",
+            "        const height = image.height;",
+            "        const origin = frame.origin;",
+            "        this.mesh.position.set(-origin.x + width / 2, -origin.y + height / 2, 0);",
+            "        this.mesh.scale.set(width, height, 1);",
+            "",
+            "        const center = frame.center;",
+            "        this.object.setRotationCenter(center.x - origin.x, center.y - origin.y);",
+            "",
+            "        this.mesh.material = material;",
+            "",
+            "        const hitBoxes = this.object._untransformedHitBoxes;",
+            "        if (frame.hasCustomCollisionMask) {",
+            "            let i = 0;",
+            "            for (let len = frame.customCollisionMask.length; i < len; ++i) {",
+            "                const polygonData = frame.customCollisionMask[i];",
+            "",
+            "                // Add a polygon, if necessary (Avoid recreating a polygon if it already exists).",
+            "                if (i >= hitBoxes.length) {",
+            "                    hitBoxes.push(new gdjs.Polygon());",
+            "                }",
+            "                let j = 0;",
+            "                for (const len2 = polygonData.length; j < len2; ++j) {",
+            "                    const pointData = polygonData[j];",
+            "",
+            "                    // Add a point, if necessary (Avoid recreating a point if it already exists).",
+            "                    if (j >= hitBoxes[i].vertices.length) {",
+            "                        hitBoxes[i].vertices.push([0, 0]);",
+            "                    }",
+            "                    hitBoxes[i].vertices[j][0] = pointData.x - origin.x;",
+            "                    hitBoxes[i].vertices[j][1] = pointData.y - origin.y;",
+            "                }",
+            "                hitBoxes[i].vertices.length = j;",
+            "            }",
+            "            hitBoxes.length = i;",
+            "        }",
+            "        else if (hitBoxes.length === 0) {",
+            "            const hitBox = new gdjs.Polygon();",
+            "            hitBoxes.push(hitBox);",
+            "            const vertices = hitBox.vertices;",
+            "            vertices.push([-origin.x, -origin.y]);",
+            "            vertices.push([-origin.x + width, -origin.y]);",
+            "            vertices.push([-origin.x + width, -origin.y + height]);",
+            "            vertices.push([-origin.x, -origin.y + height]);",
+            "        }",
+            "",
+            "        const aabb = this.object._unrotatedAABB;",
+            "        aabb.min[0] = -origin.x;",
+            "        aabb.min[1] = -origin.y;",
+            "        aabb.max[0] = -origin.x + width;",
+            "        aabb.max[1] = -origin.y + height;",
+            "",
+            "        this.object._isUntransformedHitBoxesDirty = false;",
+            "    }",
+            "}",
+            "",
+            "gdjs.__sprite3DExtension = {",
+            "    Sprite3DRenderer",
+            "};",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": [
+    {
+      "areaMaxX": 64,
+      "areaMaxY": 64,
+      "areaMaxZ": 64,
+      "areaMinX": 0,
+      "areaMinY": 0,
+      "areaMinZ": 0,
+      "defaultName": "",
+      "description": "An animated sprite in 3D.",
+      "fullName": "3D sprite",
+      "is3D": true,
+      "isAnimatable": true,
+      "isUsingLegacyInstancesRenderer": true,
+      "name": "Sprite3D",
+      "objects": [],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT"
+      },
+      "objectsGroups": [],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "instances": [],
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Sprite3D::DefineHelperClasses"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/** @type {gdjs.CustomRuntimeObject} */\r",
+                "const object = objects[0];\r",
+                "\r",
+                "object.__sprite3DExtension = {};\r",
+                "object.__sprite3DExtension.sprite3DRenderer = new gdjs.__sprite3DExtension.Sprite3DRenderer(object)\r",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Sprite3D::Sprite3D",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": []
+    }
+  ]
+}

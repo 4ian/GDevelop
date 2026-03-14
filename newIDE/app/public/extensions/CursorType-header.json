@@ -1,0 +1,41 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1",
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Cursor type",
+  "name": "CursorType",
+  "version": "0.0.8",
+  "url": "https://resources.gdevelop-app.com/extensions/CursorType.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/CursorType-header.json",
+  "tags": "mouse,cursor,pointer,javascript,desktop",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/cursor-default-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Change mouse cursor type (pointer, crosshair, etc). Auto-change on object hover.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/cursor-type",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Change the cursor appearence when the object is hovered (on Windows, macOS or Linux).",
+      "fullName": "Custom cursor when hovered",
+      "name": "CursorHover",
+      "objectType": "",
+      "eventsFunctions": []
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "name": "ChangeCursorType",
+      "fullName": "Cursor type",
+      "description": "Change the type of the cursor.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Provides an action to change the type of the cursor, and a behavior to change the cursor when an object is hovered.\n\nFind the list of cursors here: https://developer.mozilla.org/en-US/docs/Web/CSS/cursor",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWN1cnNvci1kZWZhdWx0LW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTAuMDcsMTQuMjdDMTAuNTcsMTQuMDMgMTEuMTYsMTQuMjUgMTEuNCwxNC43NUwxMy43LDE5Ljc0TDE1LjUsMTguODlMMTMuMTksMTMuOTFDMTIuOTUsMTMuNDEgMTMuMTcsMTIuODEgMTMuNjcsMTIuNThMMTMuOTUsMTIuNUwxNi4yNSwxMi4wNUw4LDUuMTJWMTUuOUw5LjgyLDE0LjQzTDEwLjA3LDE0LjI3TTEzLjY0LDIxLjk3QzEzLjE0LDIyLjIxIDEyLjU0LDIyIDEyLjMxLDIxLjVMMTAuMTMsMTYuNzZMNy42MiwxOC43OEM3LjQ1LDE4LjkyIDcuMjQsMTkgNywxOUExLDEgMCAwLDEgNiwxOFYzQTEsMSAwIDAsMSA3LDJDNy4yNCwyIDcuNDcsMi4wOSA3LjY0LDIuMjNMNy42NSwyLjIyTDE5LjE0LDExLjg2QzE5LjU3LDEyLjIyIDE5LjYyLDEyLjg1IDE5LjI3LDEzLjI3QzE5LjEyLDEzLjQ1IDE4LjkxLDEzLjU3IDE4LjcsMTMuNjFMMTUuNTQsMTQuMjNMMTcuNzQsMTguOTZDMTgsMTkuNDYgMTcuNzYsMjAuMDUgMTcuMjYsMjAuMjhMMTMuNjQsMjEuOTdaIiAvPjwvc3ZnPg=="
+}

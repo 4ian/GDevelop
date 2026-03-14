@@ -1,0 +1,2452 @@
+{
+  "author": "",
+  "category": "User interface",
+  "extensionNamespace": "",
+  "fullName": "Game over dialog",
+  "gdevelopVersion": "",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI4LDE0LjhDMjgsOC4zLDIyLjYsMywxNiwzUzQsOC4zLDQsMTQuOGMwLDEuMywwLjIsMi41LDAuNiwzLjZDNC4yLDE5LjEsNCwxOS45LDQsMjAuN2MwLDIuNiwyLjEsNC43LDQuOCw0LjcNCgljMC40LDAsMC44LTAuMSwxLjItMC4yVjI5aDEydi0zLjdjMC40LDAuMSwwLjgsMC4yLDEuMiwwLjJjMi43LDAsNC44LTIuMSw0LjgtNC43YzAtMC44LTAuMi0xLjYtMC42LTIuM0MyNy44LDE3LjMsMjgsMTYuMSwyOCwxNC44DQoJeiIvPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMTgsMjQgMTYsMjIgMTQsMjQgIi8+DQo8Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSIyMC41IiBjeT0iMTguNSIgcj0iMi41Ii8+DQo8Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSIxMS41IiBjeT0iMTguNSIgcj0iMi41Ii8+DQo8L3N2Zz4NCg==",
+  "name": "LeaderboardDialog",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Halloween/4bffa50f979bde55e4a0e49b67bf51aac30f4de5e1e12ab13952aa25773363b2_Halloween_skull.svg",
+  "shortDescription": "Score display dialog with submit-to-leaderboard, retry, and main menu buttons.",
+  "version": "1.1.0",
+  "description": [
+    "Display the score and let players choose what to do next:",
+    "- Submit the score to a leaderboard",
+    "- Retry",
+    "- Go back to the main menu"
+  ],
+  "tags": "leaderboard,score",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Check if the events are running for the editor.",
+      "fullName": "Editor is running",
+      "functionType": "Condition",
+      "name": "IsInGameEdition",
+      "private": true,
+      "sentence": "Events are running for the editor",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const game = runtimeScene.getGame();\r",
+            "eventsFunctionContext.returnValue = game.isInGameEdition && game.isInGameEdition();"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return a formated time for a given timestamp",
+      "fullName": "Format time",
+      "functionType": "StringExpression",
+      "name": "FormatTime",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "ToString(Time)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Format",
+                "=",
+                "\"MM:SS.ms\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "LeaderboardDialog::PadStart(ToString(floor(Time / 60)), 2, \"0\") + \":\" + LeaderboardDialog::PadStart(LeaderboardDialog::ToFixed(mod(Time, 60), 3), 6, \"0\")"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Format",
+                "=",
+                "\"MM:SS\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "LeaderboardDialog::PadStart(ToString(floor(Time / 60)), 2, \"0\") + \":\" + LeaderboardDialog::PadStart(ToString(mod(floor(Time), 60)), 2, \"0\")"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Format",
+                "=",
+                "\"SS\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "LeaderboardDialog::ToFixed(Time, 3)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Format",
+                "=",
+                "\"SS.ms\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "LeaderboardDialog::ToFixed(Time, 3)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Format",
+                "=",
+                "\"ms\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "ToString(floor(Time * 1000))"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Format",
+                "=",
+                "\"HH:MM:SS.ms\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "LeaderboardDialog::PadStart(ToString(floor(Time / 3600)), 2, \"0\") + \":\" + LeaderboardDialog::PadStart(ToString(mod(floor(Time / 60), 60)), 2, \"0\") + \":\" + LeaderboardDialog::PadStart(LeaderboardDialog::ToFixed(mod(Time, 60), 3), 6, \"0\")"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "StringVariable"
+              },
+              "parameters": [
+                "Format",
+                "=",
+                "\"HH:MM:SS\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnString"
+              },
+              "parameters": [
+                "LeaderboardDialog::PadStart(ToString(floor(Time / 3600)), 2, \"0\") + \":\" + LeaderboardDialog::PadStart(ToString(mod(floor(Time / 60), 60)), 2, \"0\") + \":\" + LeaderboardDialog::PadStart(ToString(mod(floor(Time), 60)), 2, \"0\")"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Time",
+          "name": "Time",
+          "type": "expression"
+        },
+        {
+          "description": "Format",
+          "name": "Format",
+          "supplementaryInformation": "[\"MM:SS.ms\",\"MM:SS\",\"SS\",\"SS.ms\",\"ms\",\"HH:MM:SS.ms\",\"HH:MM:SS\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Formats a number to a string with the specified number of decimal places.",
+      "fullName": "To fixed",
+      "functionType": "StringExpression",
+      "name": "ToFixed",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const valueToBeRounded = eventsFunctionContext.getArgument(\"ValueToBeRounded\");",
+            "const numberOfDecimalPlaces = eventsFunctionContext.getArgument(\"NumberOfDecimalPlaces\");",
+            "eventsFunctionContext.returnValue = valueToBeRounded.toFixed(numberOfDecimalPlaces);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "The value to be rounded",
+          "name": "ValueToBeRounded",
+          "type": "expression"
+        },
+        {
+          "description": "Number of decimal places",
+          "name": "NumberOfDecimalPlaces",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "fullName": "Pad start",
+      "functionType": "StringExpression",
+      "name": "PadStart",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "const targetLength = eventsFunctionContext.getArgument(\"TargetLength\");",
+            "const padString = eventsFunctionContext.getArgument(\"PadString\");",
+            "eventsFunctionContext.returnValue = value.padStart(targetLength, padString);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Text",
+          "name": "Value",
+          "type": "string"
+        },
+        {
+          "description": "Target length",
+          "name": "TargetLength",
+          "type": "expression"
+        },
+        {
+          "description": "Pad string",
+          "name": "PadString",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": [
+    {
+      "areaMaxX": 688,
+      "areaMaxY": 480,
+      "areaMaxZ": 48,
+      "areaMinX": 0,
+      "areaMinY": 0,
+      "areaMinZ": 0,
+      "assetStoreTag": "game over dialogs",
+      "defaultName": "GameOverDialog",
+      "description": "Display the score and let players choose what to do next.",
+      "fullName": "Game over dialog",
+      "isInnerAreaFollowingParentSize": true,
+      "isUsingLegacyInstancesRenderer": false,
+      "name": "LeaderboardDialog",
+      "objects": [
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "ScoreLabel",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Score:",
+          "font": "",
+          "textAlignment": "",
+          "characterSize": 40,
+          "color": {
+            "b": 79,
+            "g": 72,
+            "r": 72
+          },
+          "content": {
+            "bold": false,
+            "isOutlineEnabled": false,
+            "isShadowEnabled": false,
+            "italic": false,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 2,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "underlined": false,
+            "text": "Score:",
+            "font": "",
+            "textAlignment": "",
+            "verticalTextAlignment": "top",
+            "characterSize": 40,
+            "lineHeight": 0,
+            "color": "72;72;79"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "PlayerNameInput",
+          "type": "TextInput::TextInputObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 0,
+              "leftEdgeAnchor": 1,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 2,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "content": {
+            "initialValue": "",
+            "placeholder": "PlayerName",
+            "fontResourceName": "",
+            "fontSize": 40,
+            "inputType": "text",
+            "textColor": "72;72;79",
+            "fillColor": "231;232;243",
+            "fillOpacity": 255,
+            "borderColor": "255;255;255",
+            "borderOpacity": 255,
+            "borderWidth": 6,
+            "readOnly": false,
+            "disabled": false
+          }
+        },
+        {
+          "assetStoreId": "bfab3a269992cf43081e2cb8053c28aaef11f2f9e0d0cbdc00207ea271f69c2c",
+          "name": "SubmitTextButton",
+          "type": "PanelSpriteButton::PanelSpriteButton",
+          "variant": "Yellow button 2",
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 0,
+              "leftEdgeAnchor": 0,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 2,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "content": {
+            "LeftPadding": 16,
+            "RightPadding": 16,
+            "PressedLabelOffsetY": 10,
+            "BottomPadding": 32,
+            "TopPadding": 16,
+            "HoveredFadeOutDuration": 0.25,
+            "LabelText": "Send"
+          }
+        },
+        {
+          "assetStoreId": "bfab3a269992cf43081e2cb8053c28aaef11f2f9e0d0cbdc00207ea271f69c2c",
+          "name": "RetryTextButton",
+          "type": "PanelSpriteButton::PanelSpriteButton",
+          "variant": "Yellow button 2",
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 2,
+              "leftEdgeAnchor": 4,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 4,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "content": {
+            "LeftPadding": 16,
+            "RightPadding": 16,
+            "PressedLabelOffsetY": 10,
+            "BottomPadding": 32,
+            "TopPadding": 16,
+            "HoveredFadeOutDuration": 0.25,
+            "LabelText": "Restart"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "bottomMargin": 32,
+          "height": 128,
+          "leftMargin": 16,
+          "name": "Panel",
+          "rightMargin": 16,
+          "texture": "",
+          "tiled": false,
+          "topMargin": 16,
+          "type": "PanelSpriteObject::PanelSprite",
+          "width": 128,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 2,
+              "leftEdgeAnchor": 1,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 2,
+              "topEdgeAnchor": 1,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "Title",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 0,
+              "leftEdgeAnchor": 1,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 2,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "string": "Game over",
+          "font": "",
+          "textAlignment": "center",
+          "characterSize": 60,
+          "color": {
+            "b": 79,
+            "g": 72,
+            "r": 72
+          },
+          "content": {
+            "bold": false,
+            "isOutlineEnabled": false,
+            "isShadowEnabled": false,
+            "italic": false,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 2,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "underlined": false,
+            "text": "Game over",
+            "font": "",
+            "textAlignment": "center",
+            "verticalTextAlignment": "top",
+            "characterSize": 60,
+            "lineHeight": 0,
+            "color": "72;72;79"
+          }
+        },
+        {
+          "assetStoreId": "bfab3a269992cf43081e2cb8053c28aaef11f2f9e0d0cbdc00207ea271f69c2c",
+          "name": "BackTextButton",
+          "type": "PanelSpriteButton::PanelSpriteButton",
+          "variant": "Yellow button 2",
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 2,
+              "leftEdgeAnchor": 4,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 4,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "content": {
+            "LeftPadding": 16,
+            "RightPadding": 16,
+            "PressedLabelOffsetY": 10,
+            "BottomPadding": 32,
+            "TopPadding": 16,
+            "HoveredFadeOutDuration": 0.25,
+            "LabelText": "Back"
+          }
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "Medal",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": []
+        },
+        {
+          "assetStoreId": "bfab3a269992cf43081e2cb8053c28aaef11f2f9e0d0cbdc00207ea271f69c2c",
+          "name": "NextTextButton",
+          "type": "PanelSpriteButton::PanelSpriteButton",
+          "variant": "Yellow button 2",
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 2,
+              "leftEdgeAnchor": 4,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 4,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "content": {
+            "LeftPadding": 16,
+            "RightPadding": 16,
+            "PressedLabelOffsetY": 10,
+            "BottomPadding": 32,
+            "TopPadding": 16,
+            "HoveredFadeOutDuration": 0.25,
+            "LabelText": "Next"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "BestScoreLabel",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Best:",
+          "font": "",
+          "textAlignment": "",
+          "characterSize": 40,
+          "color": {
+            "b": 79,
+            "g": 72,
+            "r": 72
+          },
+          "content": {
+            "bold": false,
+            "isOutlineEnabled": false,
+            "isShadowEnabled": false,
+            "italic": false,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 2,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "underlined": false,
+            "text": "Best:",
+            "font": "",
+            "textAlignment": "",
+            "verticalTextAlignment": "top",
+            "characterSize": 40,
+            "lineHeight": 0,
+            "color": "72;72;79"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "BitmapTitle",
+          "type": "BitmapText::BitmapTextObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 0,
+              "leftEdgeAnchor": 1,
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 2,
+              "topEdgeAnchor": 0,
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ],
+          "content": {
+            "text": "Game over",
+            "opacity": 255,
+            "scale": 1,
+            "fontSize": 20,
+            "tint": "255;255;255",
+            "bitmapFontResourceName": "",
+            "textureAtlasResourceName": "",
+            "align": "center",
+            "verticalTextAlignment": "top"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "BitmapScoreLabel",
+          "type": "BitmapText::BitmapTextObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "text": "Score:",
+            "opacity": 255,
+            "scale": 1,
+            "fontSize": 20,
+            "tint": "255;255;255",
+            "bitmapFontResourceName": "",
+            "textureAtlasResourceName": "",
+            "align": "left",
+            "verticalTextAlignment": "top"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "BitmapBestScoreLabel",
+          "type": "BitmapText::BitmapTextObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "text": "Best:",
+            "opacity": 255,
+            "scale": 1,
+            "fontSize": 20,
+            "tint": "255;255;255",
+            "bitmapFontResourceName": "",
+            "textureAtlasResourceName": "",
+            "align": "left",
+            "verticalTextAlignment": "top"
+          }
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "Decoration",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
+              "bottomEdgeAnchor": 0,
+              "leftEdgeAnchor": 0,
+              "rightEdgeAnchor": 0,
+              "topEdgeAnchor": 0,
+              "relativeToOriginalWindowSize": true,
+              "useLegacyBottomAndRightAnchors": false
+            },
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
+            },
+            {
+              "name": "TweenIntoView",
+              "type": "TweenIntoView::TweenIntoView",
+              "TweenDirection": "Above",
+              "TweenDuration": 1,
+              "TweenDistance": 0,
+              "UponCreation_TweenIn": true,
+              "TweenEasing_In": "easeFromTo",
+              "TweenEasing_Out": "easeOutQuad",
+              "Upon_TweenOut_Delete": true,
+              "WhileTweening_FadeOpacity": true,
+              "Initialized": false,
+              "StartingX": 0,
+              "StartingY": 0,
+              "Opacity": "Opacity",
+              "Tween": "Tween",
+              "ShouldFade": false,
+              "ShouldMove": false
+            }
+          ],
+          "animations": []
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "folderName": "Bitmap labels",
+            "children": [
+              {
+                "objectName": "BitmapTitle"
+              },
+              {
+                "objectName": "BitmapScoreLabel"
+              },
+              {
+                "objectName": "BitmapBestScoreLabel"
+              }
+            ]
+          },
+          {
+            "objectName": "Title"
+          },
+          {
+            "objectName": "ScoreLabel"
+          },
+          {
+            "objectName": "BestScoreLabel"
+          },
+          {
+            "objectName": "Medal"
+          },
+          {
+            "objectName": "PlayerNameInput"
+          },
+          {
+            "objectName": "SubmitTextButton"
+          },
+          {
+            "objectName": "RetryTextButton"
+          },
+          {
+            "objectName": "BackTextButton"
+          },
+          {
+            "objectName": "NextTextButton"
+          },
+          {
+            "objectName": "Panel"
+          },
+          {
+            "objectName": "Decoration"
+          }
+        ]
+      },
+      "objectsGroups": [
+        {
+          "name": "ActionTextButton",
+          "objects": [
+            {
+              "name": "RetryTextButton"
+            },
+            {
+              "name": "BackTextButton"
+            },
+            {
+              "name": "NextTextButton"
+            }
+          ]
+        },
+        {
+          "name": "Titles",
+          "objects": [
+            {
+              "name": "Title"
+            },
+            {
+              "name": "BitmapTitle"
+            }
+          ]
+        },
+        {
+          "name": "ScoreLabels",
+          "objects": [
+            {
+              "name": "ScoreLabel"
+            },
+            {
+              "name": "BitmapScoreLabel"
+            }
+          ]
+        },
+        {
+          "name": "BestScoreLabels",
+          "objects": [
+            {
+              "name": "BestScoreLabel"
+            },
+            {
+              "name": "BitmapBestScoreLabel"
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 71,
+          "layer": "",
+          "name": "ScoreLabel",
+          "persistentUuid": "e0571581-5b6f-4e0b-928a-92dd21b3851d",
+          "width": 606,
+          "x": 36,
+          "y": 41,
+          "zOrder": 18,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 1,
+          "height": 96,
+          "layer": "",
+          "name": "PlayerNameInput",
+          "persistentUuid": "1b66c419-4bc7-406f-91e7-7deeb515ff67",
+          "width": 360,
+          "x": 40,
+          "y": 160,
+          "zOrder": 19,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "RetryTextButton",
+          "persistentUuid": "d9bfca46-e22c-42c9-a581-b88dbe1f5967",
+          "width": 0,
+          "x": 224,
+          "y": 320,
+          "zOrder": 35,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 48,
+          "height": 106,
+          "layer": "",
+          "name": "SubmitTextButton",
+          "persistentUuid": "3ad1036e-666f-4a8c-9b85-6d882e192ee8",
+          "width": 216,
+          "x": 432,
+          "y": 150,
+          "zOrder": 37,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 0,
+          "height": 480,
+          "layer": "",
+          "name": "Panel",
+          "persistentUuid": "273f403b-d896-4fa8-81bd-ef1d5d6bd006",
+          "width": 688,
+          "x": 0,
+          "y": 0,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "editionSettings": {
+        "grid": false,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "gridHeight": 32,
+        "gridDepth": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridOffsetZ": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 0.7548872383151299,
+        "windowMask": false,
+        "selectedLayer": "",
+        "gameEditorMode": "instances-editor"
+      },
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "LeaderboardDialog::LeaderboardDialog::SetScore"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "0",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "LeaderboardDialog::LeaderboardDialog::SetDefaultPlayerName"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "DefaultPlayerName",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "LeaderboardDialog::IsInGameEdition"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SceneInstancesCount"
+                  },
+                  "parameters": [
+                    "",
+                    "SubmitTextButton",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PlayerAuthentication::DisplayAuthenticationBanner"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PlayerAuthentication::IsPlayerAuthenticated"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                      },
+                      "parameters": [
+                        "PlayerNameInput",
+                        "Text",
+                        "=",
+                        "PlayerAuthentication::Username()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TextInput::TextInputObject::SetDisabled"
+                      },
+                      "parameters": [
+                        "PlayerNameInput",
+                        "yes"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TweenIntoView::TweenIntoView::SetShouldBeDeleted"
+                  },
+                  "parameters": [
+                    "Decoration",
+                    "TweenIntoView",
+                    "no",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "LeaderboardDialog::IsInGameEdition"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SceneInstancesCount"
+                  },
+                  "parameters": [
+                    "",
+                    "SubmitTextButton",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PlayerAuthentication::HasPlayerLoggedIn"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                      },
+                      "parameters": [
+                        "PlayerNameInput",
+                        "Text",
+                        "=",
+                        "PlayerAuthentication::Username()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TextInput::TextInputObject::SetDisabled"
+                      },
+                      "parameters": [
+                        "PlayerNameInput",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PlayerAuthentication::DisplayAuthenticationBanner"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Leaderboards::IsLeaderboardViewErrored"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlayerAuthentication::DisplayAuthenticationBanner"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Handle leaderboards.\nTo create a leaderboard, make sure your game is registered in Home > Profile > Games Dashboard and then, click on \"Manage game\" > Leaderboards. When a leaderboard is created, it should be available in the actions."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PanelSpriteButton::PanelSpriteButton::IsClicked"
+                      },
+                      "parameters": [
+                        "SubmitTextButton",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PlayerAuthentication::IsPlayerAuthenticated"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Leaderboards::SaveConnectedPlayerScore"
+                          },
+                          "parameters": [
+                            "",
+                            "LeaderboardId",
+                            "Score"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "PlayerAuthentication::IsPlayerAuthenticated"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Leaderboards::SavePlayerScore"
+                          },
+                          "parameters": [
+                            "",
+                            "LeaderboardId",
+                            "Score",
+                            "PlayerNameInput.Text()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlayerAuthentication::HideAuthenticationBanner"
+                          },
+                          "parameters": [
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Leaderboards::DisplayLeaderboard"
+                          },
+                          "parameters": [
+                            "",
+                            "LeaderboardId",
+                            "yes"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the score.",
+          "fullName": "Score",
+          "functionType": "ExpressionAndCondition",
+          "name": "Score",
+          "sentence": "the score",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Score"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "Score",
+          "name": "SetScore",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Score",
+                    "=",
+                    "Value"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "ScoreLabels",
+                    "Text",
+                    "=",
+                    "ScoreLabelText + Object.FormatScore(Value)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the best score of the object.",
+          "fullName": "Best score",
+          "functionType": "ExpressionAndCondition",
+          "name": "BestScore",
+          "sentence": "the best score",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "BestScore"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "BestScore",
+          "name": "SetBestScore",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "BestScore",
+                    "=",
+                    "Value"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "BestScoreLabels",
+                    "Text",
+                    "=",
+                    "BestScoreLabelText + Object.FormatScore(Value)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the formated score.",
+          "fullName": "Format score",
+          "functionType": "StringExpression",
+          "name": "FormatScore",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Format",
+                    "=",
+                    "\"Number\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "Prefix + ToString(roundTo(Value, NumberDecimalPoint)) + Suffix"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "Format",
+                    "!=",
+                    "\"Number\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "Prefix + LeaderboardDialog::FormatTime(Value, Format) + Suffix"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            },
+            {
+              "description": "Score",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the default player name.",
+          "fullName": "Default player name",
+          "functionType": "ExpressionAndCondition",
+          "name": "DefaultPlayerName",
+          "sentence": "the default player name",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "DefaultPlayerName"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "DefaultPlayerName",
+          "name": "SetDefaultPlayerName",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "DefaultPlayerName",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "PlayerAuthentication::IsPlayerAuthenticated"
+                  },
+                  "parameters": []
+                },
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "DefaultPlayerName",
+                    "!=",
+                    "\"0\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "PlayerNameInput",
+                    "Text",
+                    "=",
+                    "DefaultPlayerName"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the player name.",
+          "fullName": "Player name",
+          "functionType": "ExpressionAndCondition",
+          "name": "PlayerName",
+          "sentence": "the player name",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "PlayerNameInput.Text::Value()"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the restart button of the dialog is clicked.",
+          "fullName": "Restart button clicked",
+          "functionType": "Condition",
+          "name": "IsRestartClicked",
+          "sentence": "Restart button of _PARAM0_ is clicked",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PanelSpriteButton::PanelSpriteButton::IsClicked"
+                  },
+                  "parameters": [
+                    "RetryTextButton",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PlayerAuthentication::HideAuthenticationBanner"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the next button of the dialog is clicked.",
+          "fullName": "Next button clicked",
+          "functionType": "Condition",
+          "name": "IsNextClicked",
+          "sentence": "Next button of _PARAM0_ is clicked",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PanelSpriteButton::PanelSpriteButton::IsClicked"
+                  },
+                  "parameters": [
+                    "NextTextButton",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PlayerAuthentication::HideAuthenticationBanner"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the back button of the dialog is clicked.",
+          "fullName": "Back button clicked",
+          "functionType": "Condition",
+          "name": "IsBackClicked",
+          "sentence": "Back button of _PARAM0_ is clicked",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "PanelSpriteButton::PanelSpriteButton::IsClicked"
+                  },
+                  "parameters": [
+                    "BackTextButton",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PlayerAuthentication::HideAuthenticationBanner"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the score has been sucessfully submitted by the dialog.",
+          "fullName": "Score is submitted",
+          "functionType": "Condition",
+          "name": "IsScoreSubmitted",
+          "sentence": "_PARAM0_ submitted a score",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Allow to try and submit again in case of error."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Leaderboards::HasPlayerJustClosedLeaderboardView"
+                  },
+                  "parameters": []
+                },
+                {
+                  "type": {
+                    "value": "Leaderboards::HasLastSaveSucceeded"
+                  },
+                  "parameters": [
+                    "LeaderboardId"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the leaderboard of the object.",
+          "fullName": "Leaderboard",
+          "functionType": "ExpressionAndCondition",
+          "name": "LeaderboardId",
+          "sentence": "the leaderboard",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "LeaderboardId"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "leaderboardId"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "LeaderboardId",
+          "name": "SetLeaderboardId",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "LeaderboardId",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the title of the object.",
+          "fullName": "Title",
+          "functionType": "ExpressionAndCondition",
+          "name": "Title",
+          "private": true,
+          "sentence": "the title",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "Title.Text::Value()"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "Title",
+          "name": "SetTitle",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "Title",
+                    "Text",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Fade in the decoration objects of the dialog.",
+          "fullName": "Fade in decorations",
+          "functionType": "Action",
+          "name": "TweenIn",
+          "sentence": "Fade in the decorations of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TweenIntoView::TweenIntoView::TweenIn"
+                  },
+                  "parameters": [
+                    "Decoration",
+                    "TweenIntoView",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Fade out the decoration objects of the dialog.",
+          "fullName": "Fade out decorations",
+          "functionType": "Action",
+          "name": "TweenOut",
+          "sentence": "Fade out the decorations of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TweenIntoView::TweenIntoView::TweenOut"
+                  },
+                  "parameters": [
+                    "Decoration",
+                    "TweenIntoView",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the fade in animation of the decorations is finished.",
+          "fullName": "Decorations are faded in",
+          "functionType": "Condition",
+          "name": "HasTweenedIn",
+          "sentence": "Fade in animation of _PARAM0_ is finished",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "TweenIntoView::TweenIntoView::IsTweenedIn"
+                  },
+                  "parameters": [
+                    "Decoration",
+                    "TweenIntoView",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "False"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the fade out animation of the decorations is finished.",
+          "fullName": "Decorations are faded out",
+          "functionType": "Condition",
+          "name": "HasTweenedOut",
+          "sentence": "Fade out animation of _PARAM0_ is finished",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "TweenIntoView::TweenIntoView::IsTweenedOut"
+                  },
+                  "parameters": [
+                    "Decoration",
+                    "TweenIntoView",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "False"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "String",
+          "label": "Default player name",
+          "name": "DefaultPlayerName"
+        },
+        {
+          "value": "",
+          "type": "LeaderboardId",
+          "label": "Leaderboard",
+          "name": "LeaderboardId"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "",
+          "hidden": true,
+          "name": "Score"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "Best score",
+          "hidden": true,
+          "name": "BestScore"
+        },
+        {
+          "value": "Number",
+          "type": "Choice",
+          "label": "Format",
+          "group": "Score format",
+          "choices": [
+            {
+              "label": "Number",
+              "value": "Number"
+            },
+            {
+              "label": "MM:SS.ms",
+              "value": "MM:SS.ms"
+            },
+            {
+              "label": "MM:SS",
+              "value": "MM:SS"
+            },
+            {
+              "label": "SS.ms",
+              "value": "SS.ms"
+            },
+            {
+              "label": "SS",
+              "value": "SS"
+            },
+            {
+              "label": "ms",
+              "value": "ms"
+            },
+            {
+              "label": "HH:MM:SS.ms",
+              "value": "HH:MM:SS.ms"
+            },
+            {
+              "label": "HH:MM:SS",
+              "value": "HH:MM:SS"
+            }
+          ],
+          "name": "Format"
+        },
+        {
+          "value": "",
+          "type": "String",
+          "label": "Prefix",
+          "group": "Score format",
+          "name": "Prefix"
+        },
+        {
+          "value": "",
+          "type": "String",
+          "label": "Suffix",
+          "group": "Score format",
+          "name": "Suffix"
+        },
+        {
+          "value": "3",
+          "type": "Number",
+          "label": "Round to decimal point",
+          "group": "Score format",
+          "name": "NumberDecimalPoint"
+        },
+        {
+          "value": "Score: ",
+          "type": "String",
+          "label": "Score label",
+          "name": "ScoreLabelText"
+        },
+        {
+          "value": "Best: ",
+          "type": "String",
+          "label": "Best score label",
+          "name": "BestScoreLabelText"
+        }
+      ],
+      "propertiesFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "propertyName": "DefaultPlayerName"
+          },
+          {
+            "propertyName": "LeaderboardId"
+          },
+          {
+            "propertyName": "Score"
+          },
+          {
+            "propertyName": "BestScore"
+          },
+          {
+            "folderName": "Score format",
+            "children": [
+              {
+                "propertyName": "Format"
+              },
+              {
+                "propertyName": "Prefix"
+              },
+              {
+                "propertyName": "Suffix"
+              },
+              {
+                "propertyName": "NumberDecimalPoint"
+              }
+            ]
+          },
+          {
+            "propertyName": "ScoreLabelText"
+          },
+          {
+            "propertyName": "BestScoreLabelText"
+          }
+        ]
+      }
+    }
+  ],
+  "requiredExtensions": [
+    {
+      "extensionName": "PanelSpriteButton",
+      "extensionVersion": "2.2.0"
+    },
+    {
+      "extensionName": "TweenIntoView",
+      "extensionVersion": "1.0.0"
+    }
+  ]
+}

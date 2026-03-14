@@ -1,0 +1,79 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "wWP8BSlAW0UP4NeaHa2LcmmDzmH2",
+    "dt0tRnf2kHWJnjkrpnzTzNj9Yc63"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Linear Movement",
+  "name": "LinearMovement",
+  "version": "0.1.1",
+  "url": "https://resources.gdevelop-app.com/extensions/LinearMovement.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/LinearMovement-header.json",
+  "tags": "line,movement,linear",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/ray-start-arrow.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Move objects on a straight line.",
+  "eventsBasedBehaviorsCount": 2,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/linear-movement",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Move objects on a straight line.",
+      "fullName": "Linear movement",
+      "name": "LinearMovement",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "SpeedX",
+          "fullName": "Speed on X axis",
+          "description": "Compare the speed on X axis of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetSpeedX",
+          "fullName": "Speed on X axis",
+          "description": "Change the speed on X axis of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SpeedY",
+          "fullName": "Speed on Y axis",
+          "description": "Compare the speed on Y axis of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetSpeedY",
+          "fullName": "Speed on Y axis",
+          "description": "Change the speed on Y axis of the object.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Move objects ahead according to their angle.",
+      "fullName": "Linear movement by angle",
+      "name": "LinearMovementByAngle",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "Speed",
+          "fullName": "Speed",
+          "description": "Compare the speed of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetSpeed",
+          "fullName": "Speed",
+          "description": "Change the speed of the object.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Move objects on a straight line or according to their angle.\n\nIt can be used for simple enemies or bullets. It's usually not adapted for players (other behaviors are a better choice) or bullets fired with the actions provided by the \"Fire Bullet\" behavior (these bullets are already moved using a force).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXJheS1zdGFydC1hcnJvdyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0yMywxMkwxOSwxNlYxM0g2LjgzQzYuNDIsMTQuMTcgNS4zMSwxNSA0LDE1QTMsMyAwIDAsMSAxLDEyQTMsMyAwIDAsMSA0LDlDNS4zMSw5IDYuNDIsOS44MyA2LjgzLDExSDE5VjhMMjMsMTJaIiAvPjwvc3ZnPg=="
+}

@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "NuVWggGWyqcoSz9wvk7H8B2J44q1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "3D PBR Maps",
+  "name": "PBRMaps3D",
+  "version": "1.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/PBRMaps3D.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/PBRMaps3D-header.json",
+  "tags": "3d,pbr,normal,ao,ambient-occlusion,height,displacement,emissive,roughness,metalness,albedo,diffuse,map,texture",
+  "category": "Visual effect",
+  "previewIconUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM2NjlERkYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTIgM0w0IDkgNCAxNSAxMiAyMSAyMCAxNSAyMCA5eiIvPjxwYXRoIGQ9Ik0xMiAzTDEyIDIxIi8+PHBhdGggZD0iTTQgOUwxMiAxNSAyMCA5Ii8+PC9zdmc+",
+  "gdevelopVersion": "",
+  "shortDescription": "Apply PBR texture maps (albedo, normal, roughness, metalness, AO, height, emissive) to 3D objects",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 14,
+  "helpPath": "/extensions/pbrmaps3d",
+  "description": "Apply PBR texture maps (albedo/diffuse, normal, roughness, metalness, ambient occlusion, displacement/height and emissive) to 3D cubes and models. Supports PNG and WebP formats.",
+  "iconUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM2NjlERkYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTIgM0w0IDkgNCAxNSAxMiAyMSAyMCAxNSAyMCA5eiIvPjxwYXRoIGQ9Ik0xMiAzTDEyIDIxIi8+PHBhdGggZD0iTTQgOUwxMiAxNSAyMCA5Ii8+PC9zdmc+"
+}

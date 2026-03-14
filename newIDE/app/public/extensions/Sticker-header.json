@@ -1,0 +1,53 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Stick objects to others",
+  "name": "Sticker",
+  "version": "0.5.4",
+  "url": "https://resources.gdevelop-app.com/extensions/Sticker.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Sticker-header.json",
+  "tags": "sticker,stick,follow,skeleton,joint,pin,bind,glue,tie,attach,hold,paste,wear",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/sticker-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Stick objects to others, following position and rotation. For accessories/skeletons.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/sticker",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Stick the object to another. Use the action to stick the object, or unstick it later.",
+      "fullName": "Sticker",
+      "name": "Sticker",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "Stick",
+          "fullName": "Stick",
+          "description": "Stick on another object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Unstick",
+          "fullName": "Unstick",
+          "description": "Unstick from the object it was stuck to.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "name": "IsStuck",
+      "fullName": "Is stuck to another object",
+      "description": "Check if the object is stuck to another object.",
+      "functionType": "Condition"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "This extension can be useful to:\n- Stick accessories to moving objects\n- Animate a skeleton\n- Delete an object with another one\n\nAn example allows to check it out ([open the project online](https://editor.gdevelop.io/?project=example://stick-objects)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXN0aWNrZXItb3V0bGluZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik01LjUgMkMzLjYgMiAyIDMuNiAyIDUuNVYxOC41QzIgMjAuNCAzLjYgMjIgNS41IDIySDE2TDIyIDE2VjUuNUMyMiAzLjYgMjAuNCAyIDE4LjUgMkg1LjVNNS44IDRIMTguM0MxOS4zIDQgMjAuMSA0LjggMjAuMSA1LjhWMTVIMTguNkMxNi43IDE1IDE1LjEgMTYuNiAxNS4xIDE4LjVWMjBINS44QzQuOCAyMCA0IDE5LjIgNCAxOC4yVjUuOEM0IDQuOCA0LjggNCA1LjggNCIgLz48L3N2Zz4="
+}

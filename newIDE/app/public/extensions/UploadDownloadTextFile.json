@@ -1,0 +1,184 @@
+{
+  "author": "",
+  "category": "Network",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Upload Download Text File",
+  "helpPath": "https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXVwbG9hZCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik05LDE2VjEwSDVMMTIsM0wxOSwxMEgxNVYxNkg5TTUsMjBWMThIMTlWMjBINVoiIC8+PC9zdmc+",
+  "name": "UploadDownloadTextFile",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/16a8e2514d1c9a57f65f506bb7a420bf63e53dc56c58dfceff63178893031c69_upload.svg",
+  "shortDescription": "Allows users to upload/download text content to a filename and vice versa. ",
+  "version": "1.0.0",
+  "description": [
+    "Allows users to upload/download text content to a filename and vice versa. ",
+    "(The current gdevelop only supports desktop version, this one is compatible with browsers)",
+    "",
+    "[Open this example](https://editor.gdevelop.io/?project=https://resources.gdevelop-app.com/examples/extension-upload-download-text/extension-upload-download-text.json) to learn how to use this extension."
+  ],
+  "tags": "download,upload,text,file,browser,DOM apis",
+  "authorIds": [
+    "rotBq28wITdtfsrE7McHQri4k2w2"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Download file with text content.",
+      "fullName": "Download file with text content",
+      "functionType": "Action",
+      "name": "DownloadTextFile",
+      "sentence": "Download text with filename _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "function DownloadTextContent(filename, mimeType,content) {",
+            "    var link = document.createElement('a')",
+            "    var blob = new Blob([content], {type: mimeType})",
+            "    var url = URL.createObjectURL(blob);",
+            "",
+            "    link.setAttribute('href', url);",
+            "    link.setAttribute('download', filename);",
+            "    link.click();",
+            "    link.remove();",
+            "}",
+            "",
+            "const FileName = eventsFunctionContext.getArgument(\"FileName\");",
+            "const TextContent = eventsFunctionContext.getArgument(\"TextContent\");",
+            "",
+            "DownloadTextContent(FileName, \"text/plain\", TextContent);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "FileName",
+          "name": "FileName",
+          "type": "string"
+        },
+        {
+          "description": "TextContent",
+          "name": "TextContent",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Upload a text file to text input.",
+      "fullName": "Upload a text file to text input",
+      "functionType": "Action",
+      "name": "UploadTextFile",
+      "sentence": "Upload a text file to text input _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const allowedFileTypes = [\"text/plain\", \"application/json\"];",
+            "",
+            "const InputElement = document.createElement('input');",
+            "InputElement.type = \"file\";",
+            "",
+            "InputElement.addEventListener(\"change\", handleFiles, false);",
+            "InputElement.click();",
+            "",
+            "const SceneVariable = eventsFunctionContext.getArgument(\"SceneVariable\");",
+            "const Uploading = runtimeScene.getVariables().get(\"__UploadDownloadTextFile\");",
+            "",
+            "Uploading.fromJSObject({Uploading:false});",
+            "",
+            "async function handleFiles() {",
+            "  const files = this.files;",
+            "  ",
+            "  if (!files.length) {",
+            "    SceneVariable.setString(\"No Files Selected!\");",
+            "  } else if(!allowedFileTypes.includes(files[0].type)) {",
+            "    SceneVariable.setString(\"Please choose text files only.\");",
+            "  } else {",
+            "    SceneVariable.setString(await files[0].text());",
+            "  }",
+            "",
+            "  Uploading.fromJSObject({Uploading:true});",
+            "  InputElement.remove();",
+            "}"
+          ],
+          "parameterObjects": "TextInput",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "SceneVariable",
+          "name": "SceneVariable",
+          "type": "scenevar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Uploading text file finished.",
+      "fullName": "Uploading text file finished?",
+      "functionType": "Condition",
+      "name": "UploadFinished",
+      "sentence": "Uploading text file finished?",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "SceneVariableAsBoolean"
+              },
+              "parameters": [
+                "__UploadDownloadTextFile.Uploading",
+                "False"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "False"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "SceneVariableAsBoolean"
+              },
+              "parameters": [
+                "__UploadDownloadTextFile.Uploading",
+                "True"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

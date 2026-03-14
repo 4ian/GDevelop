@@ -1,0 +1,3240 @@
+{
+  "author": "Tristan Rhodes (https://victrisgames.itch.io/) and Entropy (https://www.youtube.com/channel/UClvkb12nOWFgWnQ56NF9Rcw)",
+  "category": "Visual effect",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Animate Shadow Clones",
+  "helpPath": "https://www.youtube.com/watch?v=2t4ANYgrrak",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZlY3Rvci1hcnJhbmdlLWFib3ZlIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTMsMUMxLjg5LDEgMSwxLjg5IDEsM1YxNEMxLDE1LjExIDEuODksMTYgMywxNkM2LjY3LDE2IDEwLjMzLDE2IDE0LDE2QzE1LjExLDE2IDE2LDE1LjExIDE2LDE0QzE2LDEwLjMzIDE2LDYuNjcgMTYsM0MxNiwxLjg5IDE1LjExLDEgMTQsMUgzTTMsM0gxNFYxNEgzVjNNMTgsN1Y5SDIwVjIwSDlWMThIN1YyMEM3LDIxLjExIDcuODksMjIgOSwyMkgyMEMyMS4xMSwyMiAyMiwyMS4xMSAyMiwyMFY5QzIyLDcuODkgMjEuMTEsNyAyMCw3SDE4WiIgLz48L3N2Zz4=",
+  "name": "ShadowClones",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/vector-arrange-above.svg",
+  "shortDescription": "Create fading shadow clone trail.",
+  "version": "0.7.0",
+  "description": [
+    "Select the primary object, the shadow clone object, the number of shadow clones, the number of frames between shadow clones, the rate that shadow clones will reduce opacity and size (if desired), the Z-value and the layer the shadow clones will be created on.",
+    "",
+    "This extension can be used to:",
+    "",
+    "- Make an object look faster, such as during a speed powerup.  ",
+    "- Give a 3D-like feel to a character",
+    "- Implement unique time-based elements, like teleporting a character back to a previous location",
+    "- Simulate the movement of a caterpillar or slinky",
+    "- Recreate games like snake or tron",
+    "",
+    "These object variables are provided to manage the shadow clones:",
+    "",
+    "- ShadowCloneOrder: Shadow clone identifier, where 1 is the shadow clone closest to the primary object",
+    "- FramesBehindPrimary: The number of frames that the shadow clone is behind the primary object",
+    "",
+    "Notes: ",
+    "- For shadow clones to work, this action must be run every frame.",
+    "- The ShadowCloneObject cannot be the PrimaryObject, but it can be a duplicate object. ",
+    "- For animations to work, the PrimaryObject and ShadowCloneObject must use the same animation numbers.",
+    "",
+    "Watch this [tutorial video](https://youtu.be/2t4ANYgrrak) to see examples of how to use this extension."
+  ],
+  "origin": {
+    "identifier": "ShadowClones",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "animate,create,object,shadow,clone,follow,echo",
+  "authorIds": [
+    "q8ubdigLvIRXLxsJDDTaokO41mc2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "m4hBMBTUilft4s1V4FQQPakVDGx1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Select the primary object, the shadow clone object, the number of shadow clones, the number of frames between shadow clones, the rate that shadow clones will fade away (if desired), the Z-value of the shadow clones, and the layer the shadow clones will be created on.",
+      "fullName": "Animate shadow clones that follow the path of a primary object",
+      "functionType": "Action",
+      "name": "AnimateShadowClones",
+      "sentence": "Create and animate _PARAM3_ copies of _PARAM2_ that follow the position of _PARAM1_, with _PARAM4_ empty frames between shadow clones, and fading the opacity of shadow clones by _PARAM5_ per clone.  Shrink scale of shadow clones by _PARAM6_ per clone. Shadow clones will be created on _PARAM7_ layer with a Z-value of _PARAM8_.  Match X scale: _PARAM9_  Match Y scale: _PARAM10_  Match angle: _PARAM11_  Match animation: _PARAM12_  Match animation frame: _PARAM13_  Match vertical flip: _PARAM14_ Match horizontal flip: _PARAM15_",
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Animate Shadow Clones",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "PrimaryObject",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Initialize variables",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Read input variables",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "TotalShadowClones",
+                            "=",
+                            "NumberOfShadowClones"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "FramesBetweenShadowClones",
+                            "=",
+                            "FramesBetweenShadowClones"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Fix default value (min=1)",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "FramesBetweenShadowClones",
+                                "<",
+                                "1"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "FramesBetweenShadowClones",
+                                "=",
+                                "1"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Calculate the max frames behind the primary that a shadow will exist",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "MaxFramesBehind",
+                                "=",
+                                "PrimaryObject.Variable(TotalShadowClones)*PrimaryObject.Variable(FramesBetweenShadowClones)"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Create Shadow Clones",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Create the right number of shadow clones (but only when there is position data)",
+                      "comment2": ""
+                    },
+                    {
+                      "infiniteLoopWarning": true,
+                      "type": "BuiltinCommonInstructions::While",
+                      "whileConditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ClonesCreated",
+                            "<",
+                            "PrimaryObject.Variable(TotalShadowClones)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "VarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString((PrimaryObject.Variable(ClonesCreated) + 1) * PrimaryObject.Variable(FramesBetweenShadowClones))].xpos",
+                                "!=",
+                                "0"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "VarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString((PrimaryObject.Variable(ClonesCreated) + 1) * PrimaryObject.Variable(FramesBetweenShadowClones))].ypos",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ClonesCreated",
+                            "+",
+                            "1"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Create shadow clones and link them to the primary object",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "ShadowCloneObject",
+                                "PrimaryObject.X()",
+                                "PrimaryObject.Y()",
+                                "ShadowCloneLayer"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "ShadowCloneOrder",
+                                "=",
+                                "PrimaryObject.Variable(ClonesCreated)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ChangePlan"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "ShadowCloneZValue"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "LinkedObjects::LinkObjects"
+                              },
+                              "parameters": [
+                                "",
+                                "PrimaryObject",
+                                "ShadowCloneObject"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Change shadow clones based on the history of the PrimaryObject",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "ShadowCloneObject",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "LinkedObjects::PickObjectsLinkedTo"
+                          },
+                          "parameters": [
+                            "",
+                            "PrimaryObject",
+                            "ShadowCloneObject"
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Move shadow clones ",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "MettreXY"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(ShadowCloneOrder)*PrimaryObject.Variable(FramesBetweenShadowClones))].xpos)",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(ShadowCloneOrder)*PrimaryObject.Variable(FramesBetweenShadowClones))].ypos)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "MatchAngle",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetAngle"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(ShadowCloneOrder)*PrimaryObject.Variable(FramesBetweenShadowClones))].angle)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Only change scale if ShrinkSpeed has not been set",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "MatchScaleX",
+                                "True",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "ShrinkSpeed",
+                                "=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ChangeScaleWidth"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(ShadowCloneOrder)*PrimaryObject.Variable(FramesBetweenShadowClones))].xscale)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Only change scale if ShrinkSpeed has not been set",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "MatchScaleY",
+                                "True",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "ShrinkSpeed",
+                                "=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ChangeScaleHeight"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(ShadowCloneOrder)*PrimaryObject.Variable(FramesBetweenShadowClones))].yscale)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "MatchAnimation",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ChangeAnimation"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(ShadowCloneOrder)*PrimaryObject.Variable(FramesBetweenShadowClones))].animation)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "MatchAnimationFrame",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ChangeSprite"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(ShadowCloneOrder)*PrimaryObject.Variable(FramesBetweenShadowClones))].frame)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "MatchHorizontalFlip",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "horizontalflip",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(ShadowCloneOrder)*PrimaryObject.Variable(FramesBetweenShadowClones))].horizontalflip)"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "ObjectVariableAsBoolean"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "horizontalflip",
+                                    "="
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "FlipX"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "no"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "ObjectVariableAsBoolean"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "horizontalflip",
+                                    "True"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "FlipX"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "yes"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "MatchVerticalFlip",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "verticalflip",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(ShadowCloneOrder)*PrimaryObject.Variable(FramesBetweenShadowClones))].verticalflip)"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "ObjectVariableAsBoolean"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "verticalflip",
+                                    "="
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "FlipY"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "no"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "ObjectVariableAsBoolean"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "verticalflip",
+                                    "True"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "FlipY"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "yes"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Change opacity of shadow clone (if requested)",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "FadeSpeed",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Opacity"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "PrimaryObject.Opacity()-FadeSpeed*ShadowCloneObject.Variable(ShadowCloneOrder)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "FadeSpeed",
+                                "=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Opacity"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "PrimaryObject.Opacity()"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Shrink shadow clones (if requested)",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "ShrinkSpeed",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ChangeScaleWidth"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "=",
+                                    "PrimaryObject.ScaleX()-(ShrinkSpeed*ShadowCloneObject.Variable(ShadowCloneOrder)/100)"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ChangeScaleHeight"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "=",
+                                    "PrimaryObject.ScaleY()-(ShrinkSpeed*ShadowCloneObject.Variable(ShadowCloneOrder)/100)"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Delete shadow clone if we have decreased number of shadow clones.  Reset counter variable.",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VarObjet"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "ShadowCloneOrder",
+                                ">",
+                                "PrimaryObject.Variable(TotalShadowClones)"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Delete"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ClonesCreated",
+                                "-",
+                                "1"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Update history of the PrimaryObject ",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Clean-up unused history",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "DataCleaningCounter",
+                            "=",
+                            "PrimaryObject.Variable(MaxFramesBehind)+1"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "infiniteLoopWarning": true,
+                      "type": "BuiltinCommonInstructions::While",
+                      "whileConditions": [
+                        {
+                          "type": {
+                            "value": "ObjectVariableChildExists"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory",
+                            "ToString(PrimaryObject.Variable(DataCleaningCounter))"
+                          ]
+                        }
+                      ],
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ObjectVariableRemoveChild"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory",
+                            "ToString(PrimaryObject.Variable(DataCleaningCounter))"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "DataCleaningCounter",
+                            "+",
+                            "1"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Reset temp variable for iterating through child objects",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "DataMoveCounter",
+                            "=",
+                            "PrimaryObject.Variable(MaxFramesBehind)"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Move position history to the next higher index, starting from the highest number (FramesBehind-1)",
+                      "comment2": ""
+                    },
+                    {
+                      "infiniteLoopWarning": true,
+                      "type": "BuiltinCommonInstructions::While",
+                      "whileConditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "DataMoveCounter",
+                            ">",
+                            "1"
+                          ]
+                        }
+                      ],
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Move object history to one higher frame",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].xpos",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].xpos)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].ypos",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].ypos)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].angle",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].angle)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].animation",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].animation)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].frame",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].frame)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].xscale",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].xscale)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].yscale",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].yscale)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].width",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].width)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].height",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].height)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].horizontalflip",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].horizontalflip)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].verticalflip",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].verticalflip)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "DataMoveCounter",
+                                "-",
+                                "1"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Record new current position in index = 1",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.xpos",
+                            "=",
+                            "PrimaryObject.X()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.ypos",
+                            "=",
+                            "PrimaryObject.Y()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.animation",
+                            "=",
+                            "PrimaryObject.Animation()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.frame",
+                            "=",
+                            "PrimaryObject.Sprite()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.angle",
+                            "=",
+                            "PrimaryObject.Angle()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.xscale",
+                            "=",
+                            "PrimaryObject.ScaleX()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.yscale",
+                            "=",
+                            "PrimaryObject.ScaleY()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.width",
+                            "=",
+                            "PrimaryObject.Width()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.height",
+                            "=",
+                            "PrimaryObject.Height()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "FlippedX"
+                          },
+                          "parameters": [
+                            "PrimaryObject"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.horizontalflip",
+                            "="
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "FlippedX"
+                          },
+                          "parameters": [
+                            "PrimaryObject"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.horizontalflip",
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "FlippedY"
+                          },
+                          "parameters": [
+                            "PrimaryObject"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.verticalflip",
+                            "="
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "FlippedY"
+                          },
+                          "parameters": [
+                            "PrimaryObject"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.verticalflip",
+                            "True"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": true,
+          "folded": true,
+          "name": "Animate Shadow Clones OLD VERSION",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "PrimaryObject",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Manage Shadows",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Read input variables",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "TotalShadowClones",
+                            "=",
+                            "NumberOfShadowClones"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "FramesBetweenShadowClones",
+                            "=",
+                            "FramesBetweenShadowClones"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Fix default value (min=1)",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "FramesBetweenShadowClones",
+                                "<",
+                                "1"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "FramesBetweenShadowClones",
+                                "=",
+                                "1"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Calculate the max frames behind the primary that a shadow will exist",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "MaxFramesBehind",
+                                "=",
+                                "PrimaryObject.Variable(TotalShadowClones)*PrimaryObject.Variable(FramesBetweenShadowClones)"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Create the right number of shadows",
+                      "comment2": ""
+                    },
+                    {
+                      "infiniteLoopWarning": true,
+                      "type": "BuiltinCommonInstructions::While",
+                      "whileConditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "FrameCounter",
+                            "<",
+                            "PrimaryObject.Variable(MaxFramesBehind)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "VarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(FrameCounter)+1)].xpos",
+                                "!=",
+                                "0"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "VarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(FrameCounter)+1)].ypos",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "FrameCounter",
+                            "+",
+                            "1"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Create shadow clones at proper intervals and link them to the primary object",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "mod(PrimaryObject.Variable(FrameCounter),PrimaryObject.Variable(FramesBetweenShadowClones))",
+                                "=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "ShadowCloneObject",
+                                "PrimaryObject.X()",
+                                "PrimaryObject.Y()",
+                                "ShadowCloneLayer"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "FramesBehindPrimary",
+                                "=",
+                                "PrimaryObject.Variable(FrameCounter)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "ShadowCloneOrder",
+                                "=",
+                                "PrimaryObject.Variable(FrameCounter)/PrimaryObject.Variable(FramesBetweenShadowClones)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjetTxt"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "ShadowCloneGroupID",
+                                "=",
+                                "ShadowCloneGroupID"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ChangePlan"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "ShadowCloneZValue"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "LinkedObjects::LinkObjects"
+                              },
+                              "parameters": [
+                                "",
+                                "PrimaryObject",
+                                "ShadowCloneObject"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Copy current state of PrimaryObject",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "MatchAngle",
+                                    "True",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetAngle"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "=",
+                                    "PrimaryObject.Angle()"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "MatchScaleX",
+                                    "True",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "Egal"
+                                  },
+                                  "parameters": [
+                                    "ShrinkSpeed",
+                                    "=",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ChangeScaleWidth"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "=",
+                                    "PrimaryObject.ScaleX()"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "MatchScaleY",
+                                    "True",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "Egal"
+                                  },
+                                  "parameters": [
+                                    "ShrinkSpeed",
+                                    "=",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ChangeScaleHeight"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "=",
+                                    "PrimaryObject.ScaleY()"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "MatchAnimation",
+                                    "True",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ChangeAnimation"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "=",
+                                    "PrimaryObject.Animation()"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "PauseAnimation"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "MatchAnimationFrame",
+                                    "True",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ChangeSprite"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "=",
+                                    "PrimaryObject.Sprite()"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "PauseAnimation"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Set fade",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "Egal"
+                                  },
+                                  "parameters": [
+                                    "FadeSpeed",
+                                    "!=",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "Opacity"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "=",
+                                    "255-FadeSpeed*ShadowCloneObject.Variable(ShadowCloneOrder)"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Set scale",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "Egal"
+                                  },
+                                  "parameters": [
+                                    "ShrinkSpeed",
+                                    "!=",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "ChangeScaleWidth"
+                                      },
+                                      "parameters": [
+                                        "ShadowCloneObject",
+                                        "=",
+                                        "PrimaryObject.ScaleX()-(ShrinkSpeed*ShadowCloneObject.Variable(ShadowCloneOrder)/100)"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "ChangeScaleHeight"
+                                      },
+                                      "parameters": [
+                                        "ShadowCloneObject",
+                                        "=",
+                                        "PrimaryObject.ScaleY()-(ShrinkSpeed*ShadowCloneObject.Variable(ShadowCloneOrder)/100)"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Move shadow clones ",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "ShadowCloneObject",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjetTxt"
+                          },
+                          "parameters": [
+                            "ShadowCloneObject",
+                            "ShadowCloneGroupID",
+                            "=",
+                            "ShadowCloneGroupID"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "LinkedObjects::PickObjectsLinkedTo"
+                          },
+                          "parameters": [
+                            "",
+                            "PrimaryObject",
+                            "ShadowCloneObject"
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Move shadow clones",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "MettreXY"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(FramesBehindPrimary))].xpos)",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(FramesBehindPrimary))].ypos)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "MatchAngle",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetAngle"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(FramesBehindPrimary))].angle)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Only change scale if ShrinkSpeed has not been set",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "MatchScaleX",
+                                "True",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "ShrinkSpeed",
+                                "=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ChangeScaleWidth"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(FramesBehindPrimary))].xscale)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Only change scale if ShrinkSpeed has not been set",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "MatchScaleY",
+                                "True",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "ShrinkSpeed",
+                                "=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ChangeScaleHeight"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(FramesBehindPrimary))].yscale)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "MatchAnimation",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ChangeAnimation"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(FramesBehindPrimary))].animation)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "MatchAnimationFrame",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ChangeSprite"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(ShadowCloneObject.Variable(FramesBehindPrimary))].frame)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Update FramesBehindPrimary if the FramesBetweenShadowClones has changed ",
+                          "comment2": ""
+                        },
+                        {
+                          "disabled": true,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject.Variable(FramesBehindPrimary) / ShadowCloneObject.Variable(ShadowCloneOrder)",
+                                "!=",
+                                "PrimaryObject.Variable(FramesBetweenShadowClones)"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "FramesBehindPrimary",
+                                "=",
+                                "ShadowCloneObject.Variable(ShadowCloneOrder) * PrimaryObject.Variable(FramesBetweenShadowClones)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Delete shadow clone if we have decreased number of shadow clones or changed distance between clones.  Reset counter variable.",
+                          "comment2": ""
+                        },
+                        {
+                          "disabled": true,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Or"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "VarObjet"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "ShadowCloneOrder",
+                                    ">",
+                                    "PrimaryObject.Variable(TotalShadowClones)"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "Egal"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject.Variable(FramesBehindPrimary) / ShadowCloneObject.Variable(ShadowCloneOrder)",
+                                    "!=",
+                                    "PrimaryObject.Variable(FramesBetweenShadowClones)"
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Delete"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "FrameCounter",
+                                "-",
+                                "min(ShadowCloneObject.Variable(FramesBehindPrimary) / ShadowCloneObject.Variable(ShadowCloneOrder),PrimaryObject.Variable(FramesBetweenShadowClones))"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Don't let counter go negative",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "VarObjet"
+                                  },
+                                  "parameters": [
+                                    "PrimaryObject",
+                                    "FrameCounter",
+                                    "<",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarObjet"
+                                  },
+                                  "parameters": [
+                                    "PrimaryObject",
+                                    "FrameCounter",
+                                    "=",
+                                    "0"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Or"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "VarObjet"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "FramesBehindPrimary",
+                                    ">",
+                                    "PrimaryObject.Variable(MaxFramesBehind)"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "Egal"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject.Variable(FramesBehindPrimary) / ShadowCloneObject.Variable(ShadowCloneOrder)",
+                                    "!=",
+                                    "PrimaryObject.Variable(FramesBetweenShadowClones)"
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Delete"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "FrameCounter",
+                                "-",
+                                "ShadowCloneObject.Variable(FramesBehindPrimary) / ShadowCloneObject.Variable(ShadowCloneOrder)"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Don't let counter go negative",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "VarObjet"
+                                  },
+                                  "parameters": [
+                                    "PrimaryObject",
+                                    "FrameCounter",
+                                    "<",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarObjet"
+                                  },
+                                  "parameters": [
+                                    "PrimaryObject",
+                                    "FrameCounter",
+                                    "=",
+                                    "0"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Change opacity of shadow clone",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "FadeSpeed",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Opacity"
+                              },
+                              "parameters": [
+                                "ShadowCloneObject",
+                                "=",
+                                "255-FadeSpeed*ShadowCloneObject.Variable(ShadowCloneOrder)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Set scale",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "ShrinkSpeed",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ChangeScaleWidth"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "=",
+                                    "PrimaryObject.ScaleX()-(ShrinkSpeed*ShadowCloneObject.Variable(ShadowCloneOrder)/100)"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ChangeScaleHeight"
+                                  },
+                                  "parameters": [
+                                    "ShadowCloneObject",
+                                    "=",
+                                    "PrimaryObject.ScaleY()-(ShrinkSpeed*ShadowCloneObject.Variable(ShadowCloneOrder)/100)"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Update PrimaryObject history",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Clean-up unused history",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "DataCleaningCounter",
+                            "=",
+                            "PrimaryObject.Variable(MaxFramesBehind)"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "infiniteLoopWarning": true,
+                      "type": "BuiltinCommonInstructions::While",
+                      "whileConditions": [
+                        {
+                          "type": {
+                            "value": "ObjectVariableChildExists"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory",
+                            "ToString(PrimaryObject.Variable(DataCleaningCounter)+1)"
+                          ]
+                        }
+                      ],
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ObjectVariableRemoveChild"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory",
+                            "ToString(PrimaryObject.Variable(DataCleaningCounter)+1)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "DataCleaningCounter",
+                            "+",
+                            "1"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Reset temp variable for iterating through child objects",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "DataMoveCounter",
+                            "=",
+                            "PrimaryObject.Variable(MaxFramesBehind)"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Move position history to the next higher index, starting from the highest number (FramesBehind-1)",
+                      "comment2": ""
+                    },
+                    {
+                      "infiniteLoopWarning": true,
+                      "type": "BuiltinCommonInstructions::While",
+                      "whileConditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "DataMoveCounter",
+                            ">",
+                            "1"
+                          ]
+                        }
+                      ],
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Move object history to one higher frame",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].xpos",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].xpos)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].ypos",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].ypos)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].angle",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].angle)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].animation",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].animation)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].frame",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].frame)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].xscale",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].xscale)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].yscale",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].yscale)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].width",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].width)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter))].height",
+                                "=",
+                                "PrimaryObject.Variable(ObjectHistory[ToString(PrimaryObject.Variable(DataMoveCounter)-1)].height)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "PrimaryObject",
+                                "DataMoveCounter",
+                                "-",
+                                "1"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Record new current position in index = 1",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.xpos",
+                            "=",
+                            "PrimaryObject.X()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.ypos",
+                            "=",
+                            "PrimaryObject.Y()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.animation",
+                            "=",
+                            "PrimaryObject.Animation()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.frame",
+                            "=",
+                            "PrimaryObject.Sprite()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.angle",
+                            "=",
+                            "PrimaryObject.Angle()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.xscale",
+                            "=",
+                            "PrimaryObject.ScaleX()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.yscale",
+                            "=",
+                            "PrimaryObject.ScaleY()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.width",
+                            "=",
+                            "PrimaryObject.Width()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "PrimaryObject",
+                            "ObjectHistory.1.height",
+                            "=",
+                            "PrimaryObject.Height()"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object that shadow clones will follow",
+          "name": "PrimaryObject",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "description": "Shadows clones will be made of this object (Cannot be the same object used for primary object)",
+          "name": "ShadowCloneObject",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "description": "Number of shadow clones (Default: 1)",
+          "name": "NumberOfShadowClones",
+          "type": "expression"
+        },
+        {
+          "description": "Number of empty frames between shadow clones (Default: 1)",
+          "name": "FramesBetweenShadowClones",
+          "type": "expression"
+        },
+        {
+          "description": "Fade speed (Range: 0 to 255) (Default: 0)",
+          "longDescription": "Decrease in opacity for each consecutive shadow clone ",
+          "name": "FadeSpeed",
+          "type": "expression"
+        },
+        {
+          "description": "Shrink speed (Range: 0 to 100) (Default: 0)",
+          "longDescription": "Decrease in scale for each consecutive shadow clone ",
+          "name": "ShrinkSpeed",
+          "type": "expression"
+        },
+        {
+          "description": "Shadow clones will be created on this layer. (Default: \"\") (Base Layer)",
+          "name": "ShadowCloneLayer",
+          "type": "layer"
+        },
+        {
+          "description": "Z value for created shadow clones",
+          "name": "ShadowCloneZValue",
+          "type": "expression"
+        },
+        {
+          "description": "Match X scale of primary object:",
+          "name": "MatchScaleX",
+          "type": "yesorno"
+        },
+        {
+          "description": "Match Y scale of primary object:",
+          "name": "MatchScaleY",
+          "type": "yesorno"
+        },
+        {
+          "description": "Match angle of primary object:",
+          "name": "MatchAngle",
+          "type": "yesorno"
+        },
+        {
+          "description": "Match animation of primary object:",
+          "name": "MatchAnimation",
+          "type": "yesorno"
+        },
+        {
+          "description": "Match animation frame of primary object:",
+          "name": "MatchAnimationFrame",
+          "type": "yesorno"
+        },
+        {
+          "description": "Match the vertical flip of primary object:",
+          "name": "MatchVerticalFlip",
+          "type": "yesorno"
+        },
+        {
+          "description": "Match the horizontal flip of primary object:",
+          "name": "MatchHorizontalFlip",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Delete shadow clone objects that are linked to a primary object.",
+      "fullName": "Delete shadow clone objects that are linked to a primary object",
+      "functionType": "Action",
+      "name": "DeleteShadowClones",
+      "sentence": "Delete all _PARAM2_ that are linked to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "ShadowClones",
+          "conditions": [
+            {
+              "type": {
+                "value": "LinkedObjects::PickObjectsLinkedTo"
+              },
+              "parameters": [
+                "",
+                "ShadowClones",
+                "PrimaryObject"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "Delete"
+              },
+              "parameters": [
+                "ShadowClones",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarObjet"
+              },
+              "parameters": [
+                "PrimaryObject",
+                "ClonesCreated",
+                "=",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarObjet"
+              },
+              "parameters": [
+                "PrimaryObject",
+                "TotalShadowClones",
+                "=",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "ObjectVariableClearChildren"
+              },
+              "parameters": [
+                "PrimaryObject",
+                "ObjectHistory"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Primary object",
+          "name": "PrimaryObject",
+          "type": "objectList"
+        },
+        {
+          "description": "Shadow clones",
+          "name": "ShadowClones",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

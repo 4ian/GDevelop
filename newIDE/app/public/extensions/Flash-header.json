@@ -1,0 +1,180 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "wWP8BSlAW0UP4NeaHa2LcmmDzmH2",
+    "q8ubdigLvIRXLxsJDDTaokO41mc2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Flash object",
+  "name": "Flash",
+  "version": "1.4.0",
+  "url": "https://resources.gdevelop-app.com/extensions/Flash.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Flash-header.json",
+  "tags": "tween,flash,blink,visible,invisible,hit,damage,fade,effect,color,tint",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/flash-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Flash/blink objects: toggle visibility, color tint, effect, or opacity over time.",
+  "eventsBasedBehaviorsCount": 4,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/flash",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Make the object flash (blink) for a period of time so it alternates between visible and invisible.",
+      "fullName": "Flash visibility (blink)",
+      "name": "Flash",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "Flash",
+          "fullName": "Flash visibility (blink)",
+          "description": "Make an object flash (blink) visibility for a period of time.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsFlashing",
+          "fullName": "Is object flashing visibility",
+          "description": "Check if an object is flashing visibility.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "Stop",
+          "fullName": "Stop flashing visibility (blink)",
+          "description": "Stop flashing visibility (blink) of an object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HalfPeriodTime",
+          "fullName": "Half period",
+          "description": "Compare the half period of the object (time the object is invisible).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHalfPeriodTime",
+          "fullName": "Half period",
+          "description": "Change the half period of the object (time the object is invisible).",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Make an object flash a color tint for a period of time.",
+      "fullName": "Flash color tint",
+      "name": "FlashColor",
+      "objectType": "Sprite",
+      "eventsFunctions": [
+        {
+          "name": "Flash",
+          "fullName": "Flash a color tint",
+          "description": "Make an object flash a color tint for a period of time.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsFlashing",
+          "fullName": "Is object flashing a color tint",
+          "description": "Check if an object is flashing a color tint.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "Stop",
+          "fullName": "Stop flashing color tint",
+          "description": "Stop flashing a color tint on an object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HalfPeriodTime",
+          "fullName": "Half period",
+          "description": "Compare the half period (time between flashes) of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHalfPeriodTime",
+          "fullName": "Half period",
+          "description": "Change the half period (time between flashes) of the object.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Flash opacity smoothly (fade) in a repeating loop.",
+      "fullName": "Flash opacity smothly (fade)",
+      "name": "FlashOpacity",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "Flash",
+          "fullName": "Flash the opacity (fade)",
+          "description": "Make an object flash opacity smoothly (fade) in a repeating loop.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsFlashing",
+          "fullName": "Is object flashing opacity",
+          "description": "Check if an object is flashing opacity.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "Stop",
+          "fullName": "Stop flashing opacity",
+          "description": "Stop flashing opacity of an object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HalfPeriodTime",
+          "fullName": "Half period",
+          "description": "Compare the half period (time between flashes) of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHalfPeriodTime",
+          "fullName": "Half period",
+          "description": "Change the half period (time between flashes) of the object.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Make the object flash an effect for a period of time.",
+      "fullName": "Flash effect",
+      "name": "FlashEffect",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "Flash",
+          "fullName": "Flash an effect",
+          "description": "Make an object flash an effect for a period of time.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsFlashing",
+          "fullName": "Is object flashing an effect",
+          "description": "Check if an object is flashing an effect.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "Stop",
+          "fullName": "Stop flashing an effect",
+          "description": "Stop flashing an effect of an object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HalfPeriodTime",
+          "fullName": "Half period",
+          "description": "Compare the half period (time between flashes) of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHalfPeriodTime",
+          "fullName": "Half period",
+          "description": "Change the half period (time between flashes) of the object.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Make a 2D object flash for a period of time so that it alternates between two different states.\nIncludes the ability to flash visibility (blink), color tint, object effect, or opacity (fade).\n\nAfter adding a behavior to an object, you **trigger the effect** by using the **Flash action**.\n\nThis can be used to:\n- Let players know they are invincible after being hit\n- Catch player attention on the interface (for instance a \"press start\" text)\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZsYXNoLW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNywySDE3TDEzLjUsOUgxN0wxMCwyMlYxNEg3VjJNOSw0VjEySDEyVjE0LjY2TDE0LDExSDEwLjI0TDEzLjc2LDRIOVoiIC8+PC9zdmc+"
+}

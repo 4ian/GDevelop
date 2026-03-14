@@ -1,0 +1,379 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "wWP8BSlAW0UP4NeaHa2LcmmDzmH2",
+    "xpwUwByyImTDcHEqDUqfyg0oRBt1",
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Fire bullets",
+  "name": "FireBullet",
+  "version": "0.9.2",
+  "url": "https://resources.gdevelop-app.com/extensions/FireBullet.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/FireBullet-header.json",
+  "tags": "fire,bullet,spawn,firerate,reload,weapon,ranged,ammo,overheat",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/bullet.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Fire bullets with ammo count, reload timer, and overheat management.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/fire-bullet/details",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Fire bullets with built-in cooldown, ammo, reloading, and overheating. Once added to your object that must shoot, use the behavior actions to fire another object as a bullet. These actions check all constraints internally (can be called without conditions, they will only fire when ready) and will make the bullet move (using a permanent force).",
+      "fullName": "Fire bullets",
+      "name": "FireBullet",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "FireTowardObject",
+          "fullName": "Fire bullets toward an object",
+          "description": "Fire bullets toward an object at a specified speed. Call this continuously, the action checks readiness internally — no extra timer or check needed.",
+          "functionType": "Action"
+        },
+        {
+          "name": "FireTowardPosition",
+          "fullName": "Fire bullets toward a position",
+          "description": "Fire bullets toward a position at a specified speed. Call this continuously, the action checks readiness internally — no extra timer or check needed.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Fire",
+          "fullName": "Fire bullets toward an angle",
+          "description": "Fire bullets in the direction of a given angle at a specified speed. Call this continuously, the action checks readiness internally — no extra timer or check needed.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ReloadAmmo",
+          "fullName": "Reload ammo",
+          "description": "Reload ammo.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HasJustFired",
+          "fullName": "Has just fired",
+          "description": "Check if the object has just fired something.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "BulletRotationEnabled",
+          "fullName": "Is bullet rotation enabled",
+          "description": "Check if bullet rotates to match trajectory.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "FiringArc",
+          "fullName": "Firing arc",
+          "description": "Compare the firing arc (in degrees) where bullets are shot. Bullets are evenly spaced out inside the firing arc.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFiringArcOp",
+          "fullName": "Firing arc",
+          "description": "Change the firing arc (in degrees) where bullets are shot. Bullets are evenly spaced out inside the firing arc.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AngleVariance",
+          "fullName": "Angle variance",
+          "description": "Compare the angle variance (in degrees) applied to each bullet.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetAngleVarianceOp",
+          "fullName": "Angle variance",
+          "description": "Change the angle variance (in degrees) applied to each bullet.",
+          "functionType": "Action"
+        },
+        {
+          "name": "BulletSpeedVariance",
+          "fullName": "Bullet speed variance",
+          "description": "Compare the bullet speed variance (pixels per second) applied to each bullet.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetBulletSpeedVarianceOp",
+          "fullName": "Bullet speed variance",
+          "description": "Change the bullet speed variance (pixels per second) applied to each bullet.",
+          "functionType": "Action"
+        },
+        {
+          "name": "BulletQuantity",
+          "fullName": "Bullets per shot",
+          "description": "Compare the number of bullets shot every time the \"fire bullet\" action is used.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetBulletQuantityOp",
+          "fullName": "Bullets per shot",
+          "description": "Change the number of bullets shot every time the \"fire bullet\" action is used.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetBulletLayer",
+          "fullName": "Set bullet layer",
+          "description": "Change the layer that bullets are created on.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetRotateBullet",
+          "fullName": "Enable (or disable) bullet rotation",
+          "description": "Enable bullet rotation.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetUnlimitedAmmo",
+          "fullName": "Enable (or disable) unlimited ammo",
+          "description": "Enable unlimited ammo.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Cooldown",
+          "fullName": "Firing cooldown",
+          "description": "Compare the firing cooldown (in seconds) also known as rate of fire.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetCooldownOp",
+          "fullName": "Firing cooldown",
+          "description": "Change the firing cooldown (in seconds) also known as rate of fire.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ReloadDuration",
+          "fullName": "Reload duration",
+          "description": "Compare the reload duration (in seconds).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetReloadDurationOp",
+          "fullName": "Reload duration",
+          "description": "Change the reload duration (in seconds).",
+          "functionType": "Action"
+        },
+        {
+          "name": "OverheatDuration",
+          "fullName": "Overheat duration",
+          "description": "Compare the overheat duration (in seconds). When an object is overheated, it can't fire for this duration.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetOverheatDurationOp",
+          "fullName": "Overheat duration",
+          "description": "Change the overheat duration (in seconds). When an object is overheated, it can't fire for this duration.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AmmoQuantity",
+          "fullName": "Ammo quantity",
+          "description": "Compare the ammo quantity.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetAmmoQuantityOp",
+          "fullName": "Ammo quantity",
+          "description": "Change the ammo quantity.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HeatIncreasePerShot",
+          "fullName": "Heat increase per shot",
+          "description": "Compare the heat increase per shot.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHeatPerShotOp",
+          "fullName": "Heat increase per shot",
+          "description": "Change the heat increase per shot.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MaxAmmo",
+          "fullName": "Max ammo",
+          "description": "Compare the max ammo.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetMaxAmmoOp",
+          "fullName": "Max ammo",
+          "description": "Change the max ammo.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ResetTotalShotsFired",
+          "fullName": "Reset total shots fired",
+          "description": "Reset total shots fired.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ResetTotalBulletsCreated",
+          "fullName": "Reset total bullets created",
+          "description": "Reset total bullets created.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ResetTotalReloadsCompleted",
+          "fullName": "Reset total reloads completed",
+          "description": "Reset total reloads completed.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ShotsPerReload",
+          "fullName": "Shots per reload",
+          "description": "Compare the number of shots per reload.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetShotsPerReloadOp",
+          "fullName": "Shots per reload",
+          "description": "Change the number of shots per reload.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetAutomaticReload",
+          "fullName": "Enable (or disable) automatic reloading",
+          "description": "Enable (or disable) automatic reloading.",
+          "functionType": "Action"
+        },
+        {
+          "name": "LinearCoolingRate",
+          "fullName": "Linear cooling rate",
+          "description": "Compare the linear cooling rate (per second).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetLinearCoolingRateOp",
+          "fullName": "Linear cooling rate",
+          "description": "Change the linear cooling rate (per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "ExponentialCoolingRate",
+          "fullName": "Exponential cooling rate",
+          "description": "Compare the exponential cooling rate, per second.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetExponentialCoolingRateOp",
+          "fullName": "Exponential cooling rate",
+          "description": "Change the exponential cooling rate, per second.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IncreaseAmmo",
+          "fullName": "Increase ammo",
+          "description": "Increase ammo quantity.",
+          "functionType": "Action"
+        },
+        {
+          "name": "BulletLayer",
+          "fullName": "Bullet layer",
+          "description": "Layer that bullets are created on.",
+          "functionType": "StringExpression"
+        },
+        {
+          "name": "HeatLevel",
+          "fullName": "Heat level",
+          "description": "Compare the heat level (range: 0 to 1).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "TotalShotsFired",
+          "fullName": "Shots fired",
+          "description": "Total shots fired (multi-bullet shots are considered one shot).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "TotalBulletsCreated",
+          "fullName": "Bullets created",
+          "description": "Total bullets created.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "TotalReloadsCompleted",
+          "fullName": "Reloads completed",
+          "description": "Reloads completed.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "ShotsBeforeNextReload",
+          "fullName": "Shots before next reload",
+          "description": "Compare the remaining shots before the next reload is required.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "CooldownTimeLeft",
+          "fullName": "Duration before cooldown end",
+          "description": "Compare the remaining duration before the cooldown will permit a bullet to be fired, in seconds.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "OverheatTimeLeft",
+          "fullName": "Duration before overheat end",
+          "description": "Compare the remaining duration before the overheat penalty ends, in seconds.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "ReloadTimeLeft",
+          "fullName": "Duration before the reload finishes",
+          "description": "Compare the remaining duration before the reload finishes, in seconds.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsReloadInProgress",
+          "fullName": "Is ammo reloading in progress",
+          "description": "Check if object is currently performing an ammo reload.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsReadyToShoot",
+          "fullName": "Is ready to shoot",
+          "description": "Check if object is ready to shoot.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsAutomaticReloadingEnabled",
+          "fullName": "Is automatic reloading enabled",
+          "description": "Check if automatic reloading is enabled.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsUnlimitedAmmo",
+          "fullName": "Is ammo unlimited",
+          "description": "Check if ammo is unlimited.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsOutOfAmmo",
+          "fullName": "Is out of ammo",
+          "description": "Check if object has no ammo available.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsReloadNeeded",
+          "fullName": "Is a reload needed",
+          "description": "Check if object needs to reload ammo.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsOverheated",
+          "fullName": "Is overheated",
+          "description": "Check if object is overheated.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsFiringCooldownActive",
+          "fullName": "Is firing cooldown active",
+          "description": "Check if firing cooldown is active.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "This extension allows objects to fire bullets. To use it, add the behavior to the object that will shoot, then use the provided action to launch another object as the bullet.\n\nThe properties of the behavior can be used to customize:\n- Cooldown between shots\n- Firing multiple bullets at a time ([open the project online](https://editor.gdevelop.io/?project=example://fire-bullet))\n- Ammo management\n- Overheat\n\nThe speed can be specified when using the actions to fire the bullets.\nThe bullets are automatically given a permanent force to make them move in the 2D plane (no need to use a linear movement or move them with another behavior).\n\nIt can be used for:\n- Twin-stick shooters ([open the project online](https://editor.gdevelop.io/?project=example://conviction-of-gun-dude-desktop))\n- Shoot'em up ([open the project online](https://editor.gdevelop.io/?project=example://space-shooter))\n\nA simple example shows how to make firing patterns ([open the project online](https://editor.gdevelop.io/?project=example://firing-patterns)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWJ1bGxldCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xNCwyMkgxMFYyMUgxNFYyMk0xMywxMFY3SDExVjEwTDEwLDExLjVWMjBIMTRWMTEuNUwxMywxME0xMiwyQzEyLDIgMTEsMyAxMSw1VjZIMTNWNUMxMyw1IDEzLDMgMTIsMloiIC8+PC9zdmc+"
+}

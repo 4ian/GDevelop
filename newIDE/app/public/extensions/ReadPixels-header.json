@@ -1,0 +1,50 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Read pixels",
+  "name": "ReadPixels",
+  "version": "0.0.6",
+  "url": "https://resources.gdevelop-app.com/extensions/ReadPixels.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ReadPixels-header.json",
+  "tags": "pixel,colors,screen,gl,webgl",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Computers and Hardware/Computers and Hardware_screen_computer_image.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Read the values of pixels on the screen.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 4,
+  "helpPath": "/extensions/read-pixels",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "ReadPixelAlpha",
+      "fullName": "Read pixel alpha",
+      "description": "Return the alpha component of the pixel at the specified position.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "ReadPixelBlue",
+      "fullName": "Read pixel blue",
+      "description": "Return the blue component of the pixel at the specified position.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "ReadPixelGreen",
+      "fullName": "Read pixel green",
+      "description": "Return the green component of the pixel at the specified position.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "ReadPixelRed",
+      "fullName": "Read pixel red",
+      "description": "Return the red component of the pixel at the specified position.",
+      "functionType": "Expression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Provides expressions allowing to read the RGB value of pixels on screen.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggZD0iTTIzLDI4Yy0xLjEsMC0yLjEtMC43LTIuNS0xLjhjMC0wLjEsMC0wLjItMC4xLTAuMmgtOC45YzAsMC4xLDAsMC4yLTAuMSwwLjJDMTEuMSwyNy4zLDEwLjEsMjgsOSwyOGMtMC42LDAtMSwwLjQtMSwxDQoJczAuNCwxLDEsMWgxNGMwLjYsMCwxLTAuNCwxLTFTMjMuNiwyOCwyMywyOHoiLz4NCjxwYXRoIGQ9Ik0yNywzSDVDMy4zLDMsMiw0LjMsMiw2djE1YzAsMS43LDEuMywzLDMsM2g2LjloOC4xSDI3YzEuNywwLDMtMS4zLDMtM1Y2QzMwLDQuMywyOC43LDMsMjcsM3ogTTEwLjQsMTlsNC42LTQuNmwxLjMsMS4zDQoJYzAuNCwwLjQsMSwwLjQsMS40LDBsMC4yLTAuMmwzLDMuNUgxMC40eiBNMjMsMThjMCwwLjEsMCwwLjIsMCwwLjJsLTQuMi00LjlDMTguNiwxMy4xLDE4LjMsMTMsMTgsMTNjLTAuMywwLTAuNSwwLjEtMC43LDAuMw0KCUwxNywxMy42bC0xLjMtMS4zYy0wLjQtMC40LTEtMC40LTEuNCwwTDksMTcuNlY5YzAtMC42LDAuNC0xLDEtMWgxMmMwLjYsMCwxLDAuNCwxLDFWMTh6Ii8+DQo8L3N2Zz4NCg=="
+}

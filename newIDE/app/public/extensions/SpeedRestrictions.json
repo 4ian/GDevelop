@@ -1,0 +1,341 @@
+{
+  "author": "",
+  "category": "Movement",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Speed restrictions",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNwZWVkb21ldGVyIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLDE2QTMsMyAwIDAsMSA5LDEzQzksMTEuODggOS42MSwxMC45IDEwLjUsMTAuMzlMMjAuMjEsNC43N0wxNC42OCwxNC4zNUMxNC4xOCwxNS4zMyAxMy4xNywxNiAxMiwxNk0xMiwzQzEzLjgxLDMgMTUuNSwzLjUgMTYuOTcsNC4zMkwxNC44Nyw1LjUzQzE0LDUuMTkgMTMsNSAxMiw1QTgsOCAwIDAsMCA0LDEzQzQsMTUuMjEgNC44OSwxNy4yMSA2LjM0LDE4LjY1SDYuMzVDNi43NCwxOS4wNCA2Ljc0LDE5LjY3IDYuMzUsMjAuMDZDNS45NiwyMC40NSA1LjMyLDIwLjQ1IDQuOTMsMjAuMDdWMjAuMDdDMy4xMiwxOC4yNiAyLDE1Ljc2IDIsMTNBMTAsMTAgMCAwLDEgMTIsM00yMiwxM0MyMiwxNS43NiAyMC44OCwxOC4yNiAxOS4wNywyMC4wN1YyMC4wN0MxOC42OCwyMC40NSAxOC4wNSwyMC40NSAxNy42NiwyMC4wNkMxNy4yNywxOS42NyAxNy4yNywxOS4wNCAxNy42NiwxOC42NVYxOC42NUMxOS4xMSwxNy4yIDIwLDE1LjIxIDIwLDEzQzIwLDEyIDE5LjgxLDExIDE5LjQ2LDEwLjFMMjAuNjcsOEMyMS41LDkuNSAyMiwxMS4xOCAyMiwxM1oiIC8+PC9zdmc+",
+  "name": "SpeedRestrictions",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/speedometer.svg",
+  "shortDescription": "Limit max movement and rotation speed for forces-based or Physics 2D.",
+  "dimension": "2D",
+  "version": "0.1.0",
+  "description": "Limit the maximum movement and rotation speed of an object from forces or the 2D Physics behavior.\n\nHow to use:\n- Add the behavior that matches the method used to move the object (forces or physics)\n- Set the maximum speed value in the behavior properties\n\nTips:\n- This only affects movement caused by forces or physics behavior\n- This may not affect movement caused by other behaviors (platformer, top-down, draggable, etc)",
+  "tags": "physics,maximum,speed,velocity,physics,force,limit",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Limit the maximum speed an object will move from (non-physics) forces.",
+      "fullName": "Enforce max movement speed",
+      "name": "MaxMovementSpeed_Forces",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Vitesse"
+                  },
+                  "parameters": [
+                    "Object",
+                    ">",
+                    "MaximumSpeed"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentSpeedX",
+                    "=",
+                    "Object.ForceX()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentSpeedY",
+                    "=",
+                    "Object.ForceY()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CurrentSpeed",
+                    "=",
+                    "Object.ForceLength()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Arreter"
+                  },
+                  "parameters": [
+                    "Object"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "AddForceXY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "CurrentSpeedX * MaximumSpeed / CurrentSpeed",
+                    "CurrentSpeedY * MaximumSpeed / CurrentSpeed",
+                    "1"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpeedRestrictions::MaxMovementSpeed_Forces",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Number",
+          "label": "Maximum speed (pixels/second)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "MaximumSpeed"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "CurrentSpeedX"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "CurrentSpeedY"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "CurrentSpeed"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Limit the maximum speed an object will move from physics forces.",
+      "fullName": "Enforce max movement speed (physics)",
+      "name": "MaxMovementSpeed_Physics",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Physics2::LinearVelocityLength"
+                  },
+                  "parameters": [
+                    "Object",
+                    "PhysicsBehavior",
+                    ">",
+                    "MaximumSpeed"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Physics2::LinearVelocityX"
+                  },
+                  "parameters": [
+                    "Object",
+                    "PhysicsBehavior",
+                    "*",
+                    "MaximumSpeed / Object. PhysicsBehavior::LinearVelocity()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Physics2::LinearVelocityY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "PhysicsBehavior",
+                    "*",
+                    "MaximumSpeed / Object. PhysicsBehavior::LinearVelocity()"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpeedRestrictions::MaxMovementSpeed_Physics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Physics Behavior (required)",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "Physics2::Physics2Behavior"
+          ],
+          "hidden": false,
+          "name": "PhysicsBehavior"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "Maximum speed (pixels/second)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "MaximumSpeed"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    },
+    {
+      "description": "Limit the maximum rotation speed of an object from physics forces.",
+      "fullName": "Enforce max rotation speed (physics)",
+      "name": "MaxRotationSpeed_Physics",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "abs(Object.PhysicsBehavior::AngularVelocity())",
+                    ">",
+                    "MaximumRotationSpeed"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Physics2::AngularVelocity"
+                  },
+                  "parameters": [
+                    "Object",
+                    "PhysicsBehavior",
+                    "*",
+                    "abs(MaximumRotationSpeed / Object.PhysicsBehavior::AngularVelocity())"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "SpeedRestrictions::MaxRotationSpeed_Physics",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Physics Behavior (required)",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "Physics2::Physics2Behavior"
+          ],
+          "hidden": false,
+          "name": "PhysicsBehavior"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "Maximum rotation speed (degrees/second)",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "MaximumRotationSpeed"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

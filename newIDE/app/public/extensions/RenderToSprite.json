@@ -1,0 +1,360 @@
+{
+  "author": "Arthur Pacaud (arthuro555)",
+  "category": "Advanced",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Sprite Snapshot",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNhbWVyYS1lbmhhbmNlIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTksM0w3LjE3LDVINEEyLDIgMCAwLDAgMiw3VjE5QTIsMiAwIDAsMCA0LDIxSDIwQTIsMiAwIDAsMCAyMiwxOVY3QTIsMiAwIDAsMCAyMCw1SDE2LjgzTDE1LDNNMTIsMThBNSw1IDAgMCwxIDcsMTNBNSw1IDAgMCwxIDEyLDhBNSw1IDAgMCwxIDE3LDEzQTUsNSAwIDAsMSAxMiwxOE0xMiwxN0wxMy4yNSwxNC4yNUwxNiwxM0wxMy4yNSwxMS43NUwxMiw5TDEwLjc1LDExLjc1TDgsMTNMMTAuNzUsMTQuMjUiIC8+PC9zdmc+",
+  "name": "RenderToSprite",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/camera-enhance.svg",
+  "shortDescription": "Capture objects, layers, or scene areas as images into sprite textures.",
+  "version": "0.0.4",
+  "description": [
+    "Allows rendering (creating an image) of objects, layers and the scene to display in a sprite. ",
+    "This allows to make optimizations by transforming the resulting image of a shape painter into a faster sprite, or to make viewports/cameras."
+  ],
+  "origin": {
+    "identifier": "RenderToSprite",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "experimental,non-public apis,visual,sprite,viewport,camera,render,texture,pixijs,snapshot",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1",
+    "PEzPAaWHgYgk5UwIPppsL6f2ugp2"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "gdjs._renderToSprite = {};",
+            "gdjs._renderToSprite.rt = PIXI.RenderTexture.create({ width: 100, height: 100 });",
+            "gdjs._renderToSprite.sprite = PIXI.Sprite.from(gdjs._renderToSprite.rt);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Renders an object and puts the rendered image into a sprite object.",
+      "fullName": "Render an object into a sprite",
+      "functionType": "Action",
+      "name": "RenderObject",
+      "sentence": "Render _PARAM1_ into sprite _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const source = eventsFunctionContext.getObjects(\"source\")[0].getRendererObject();",
+            "const renderTarget = eventsFunctionContext.getObjects(\"renderTarget\")[0].getRendererObject();",
+            "",
+            "// Reset position so that it is not offscreen while rendering",
+            "const { x: originalX, y: originalY } = source.position;",
+            "const { width, height, x, y } = source.getLocalBounds();",
+            "source.position = { x: -x, y: -y };",
+            "",
+            "// Ensure the target is a RenderTexture of the correct size",
+            "if (renderTarget.texture instanceof PIXI.RenderTexture) {",
+            "    renderTarget.texture.resize(width, height);",
+            "} else {",
+            "    renderTarget.texture = PIXI.RenderTexture.create({",
+            "        width,",
+            "        height,",
+            "        scaleMode: runtimeScene.getGame().getScaleMode() === \"linear\"",
+            "            ? PIXI.SCALE_MODES.LINEAR",
+            "            : PIXI.SCALE_MODES.NEAREST",
+            "    });",
+            "}",
+            "",
+            "// Render 😎",
+            "runtimeScene",
+            "    .getGame()",
+            "    .getRenderer()",
+            "    .getPIXIRenderer()",
+            "    .render(source, { renderTexture: renderTarget.texture });",
+            "",
+            "// Restore original position",
+            "source.position = { x: originalX, y: originalY };",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object to render",
+          "name": "source",
+          "type": "objectList"
+        },
+        {
+          "description": "The sprite to render to",
+          "name": "renderTarget",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Renders a layer and puts the rendered image into a sprite object.",
+      "fullName": "Render a layer into a sprite",
+      "functionType": "Action",
+      "name": "RenderLayer",
+      "sentence": "Render layer _PARAM1_ into sprite _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const source = runtimeScene.getLayer(eventsFunctionContext.getArgument(\"layer\")).getRenderer().getRendererObject();",
+            "const height = runtimeScene.getLayer(\"\").getCameraHeight();",
+            "const width = runtimeScene.getLayer(\"\").getCameraWidth();",
+            "/** @type {gdjs.SpriteRuntimeObject} */",
+            "const obj = objects[0];",
+            "/** @type {PIXI.Sprite} */",
+            "const renderTarget = obj.getRendererObject();",
+            "",
+            "// Prepare for render",
+            "runtimeScene._updateLayersPreRender();",
+            "runtimeScene._updateObjectsPreRender();",
+            "",
+            "// Ensure the target is a RenderTexture of the correct size",
+            "gdjs._renderToSprite.rt.resize(width, height)",
+            "if (renderTarget.texture instanceof PIXI.RenderTexture) {",
+            "    renderTarget.texture.resize(width, height);",
+            "} else {",
+            "    renderTarget.texture = PIXI.RenderTexture.create({",
+            "        width,",
+            "        height,",
+            "        scaleMode: runtimeScene.getGame().getScaleMode() === \"linear\"",
+            "            ? PIXI.SCALE_MODES.LINEAR",
+            "            : PIXI.SCALE_MODES.NEAREST",
+            "    });",
+            "}",
+            "",
+            "// Prerender to a temporary texture to prevent WebGL erroring out.",
+            "// See https://www.html5gamedevs.com/topic/45423-why-is-this-not-allowed/",
+            "runtimeScene",
+            "    .getGame()",
+            "    .getRenderer()",
+            "    .getPIXIRenderer()",
+            "    .render(source, { renderTexture: gdjs._renderToSprite.rt });",
+            "",
+            "// Actually render 😎",
+            "runtimeScene",
+            "    .getGame()",
+            "    .getRenderer()",
+            "    .getPIXIRenderer()",
+            "    .render(gdjs._renderToSprite.sprite, { renderTexture: renderTarget.texture });",
+            "",
+            "// Ensure the original width/heigth is restored",
+            "renderTarget.width = obj.getWidth();",
+            "renderTarget.height = obj.getHeight();",
+            ""
+          ],
+          "parameterObjects": "renderTarget",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The layer to render",
+          "name": "layer",
+          "supplementaryInformation": "Sprite",
+          "type": "layer"
+        },
+        {
+          "description": "The sprite to render to",
+          "name": "renderTarget",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Renders a scene and puts the rendered image into a sprite object.",
+      "fullName": "Render a scene into a sprite",
+      "functionType": "Action",
+      "name": "RenderScene",
+      "sentence": "Render the current scene into sprite _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const source = runtimeScene.getRenderer().getPIXIContainer();",
+            "const height = runtimeScene.getLayer(\"\").getCameraHeight();",
+            "const width = runtimeScene.getLayer(\"\").getCameraWidth();",
+            "/** @type {gdjs.SpriteRuntimeObject} */",
+            "const obj = objects[0];",
+            "/** @type {PIXI.Sprite} */",
+            "const renderTarget = obj.getRendererObject();",
+            "",
+            "// Prepare for render",
+            "runtimeScene._updateLayersPreRender();",
+            "runtimeScene._updateObjectsPreRender();",
+            "",
+            "// Ensure the target is a RenderTexture of the correct size",
+            "gdjs._renderToSprite.rt.resize(width, height);",
+            "if (renderTarget.texture instanceof PIXI.RenderTexture) {",
+            "    renderTarget.texture.resize(width, height);",
+            "} else {",
+            "    renderTarget.texture = PIXI.RenderTexture.create({",
+            "        width,",
+            "        height,",
+            "        scaleMode: runtimeScene.getGame().getScaleMode() === \"linear\"",
+            "            ? PIXI.SCALE_MODES.LINEAR",
+            "            : PIXI.SCALE_MODES.NEAREST",
+            "    });",
+            "}",
+            "",
+            "// Prerender to a temporary texture to prevent WebGL erroring out.",
+            "// See https://www.html5gamedevs.com/topic/45423-why-is-this-not-allowed/",
+            "runtimeScene",
+            "    .getGame()",
+            "    .getRenderer()",
+            "    .getPIXIRenderer()",
+            "    .render(source, { renderTexture: gdjs._renderToSprite.rt });",
+            "",
+            "// Actually render 😎",
+            "runtimeScene",
+            "    .getGame()",
+            "    .getRenderer()",
+            "    .getPIXIRenderer()",
+            "    .render(gdjs._renderToSprite.sprite, { renderTexture: renderTarget.texture });",
+            "",
+            "// Ensure the original width/heigth is restored",
+            "renderTarget.width = obj.getWidth();",
+            "renderTarget.height = obj.getHeight();",
+            ""
+          ],
+          "parameterObjects": "renderTarget",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The sprite to render to",
+          "name": "renderTarget",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Renders a defined area of a scene and puts the rendered image into a sprite object.",
+      "fullName": "Render an area of a scene into a sprite",
+      "functionType": "Action",
+      "name": "RenderSceneArea",
+      "sentence": "Render the area of a current scene into Sprite: _PARAM1_, from OriginX: _PARAM2_, OriginY: _PARAM3_, with Width: _PARAM4_, Height: _PARAM5_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const source = runtimeScene.getRenderer().getPIXIContainer();",
+            "source.x = eventsFunctionContext.getArgument(\"originPositionX\") * -1;",
+            "source.y = eventsFunctionContext.getArgument(\"originPositionY\") * -1;",
+            "const width = eventsFunctionContext.getArgument(\"areaWidth\");",
+            "const height = eventsFunctionContext.getArgument(\"areaHeight\");",
+            "/** @type {gdjs.SpriteRuntimeObject} */",
+            "const obj = objects[0];",
+            "/** @type {PIXI.Sprite} */",
+            "const renderTarget = obj.getRendererObject();",
+            "",
+            "// Prepare for render",
+            "runtimeScene._updateLayersPreRender();",
+            "runtimeScene._updateObjectsPreRender();",
+            "",
+            "// Ensure the target is a RenderTexture of the correct size",
+            "gdjs._renderToSprite.rt.resize(width, height);",
+            "if (renderTarget.texture instanceof PIXI.RenderTexture) {",
+            "    renderTarget.texture.resize(width, height);",
+            "} else {",
+            "    renderTarget.texture = PIXI.RenderTexture.create({",
+            "        width,",
+            "        height,",
+            "        scaleMode: runtimeScene.getGame().getScaleMode() === \"linear\"",
+            "            ? PIXI.SCALE_MODES.LINEAR",
+            "            : PIXI.SCALE_MODES.NEAREST",
+            "    });",
+            "}",
+            "",
+            "// Prerender to a temporary texture to prevent WebGL erroring out.",
+            "// See https://www.html5gamedevs.com/topic/45423-why-is-this-not-allowed/",
+            "runtimeScene",
+            "    .getGame()",
+            "    .getRenderer()",
+            "    .getPIXIRenderer()",
+            "    .render(source, { renderTexture: gdjs._renderToSprite.rt });",
+            "",
+            "// Actually render 😎",
+            "runtimeScene",
+            "    .getGame()",
+            "    .getRenderer()",
+            "    .getPIXIRenderer()",
+            "    .render(gdjs._renderToSprite.sprite, { renderTexture: renderTarget.texture });",
+            "",
+            "// Ensure the original width/heigth is restored",
+            "renderTarget.width = obj.getWidth();",
+            "renderTarget.height = obj.getHeight();",
+            "",
+            "//Return render area to original place",
+            "source.x = 0;",
+            "source.y = 0;",
+            ""
+          ],
+          "parameterObjects": "renderTarget",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The sprite to render to",
+          "name": "renderTarget",
+          "supplementaryInformation": "Sprite",
+          "type": "objectList"
+        },
+        {
+          "description": "Origin X position of the render area",
+          "name": "originPositionX",
+          "type": "expression"
+        },
+        {
+          "description": "Origin Y Position of the render area",
+          "name": "originPositionY",
+          "type": "expression"
+        },
+        {
+          "description": "Width of the are to render",
+          "name": "areaWidth",
+          "type": "expression"
+        },
+        {
+          "description": "Height of the area to render",
+          "name": "areaHeight",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

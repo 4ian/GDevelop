@@ -1,0 +1,23 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "vJeYciaE9tW37HzSPOyo9MLOI5E3",
+    "WsMG02DeF2bq4zWuRvTgmOXn9I82"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Slot system",
+  "name": "SlotSystem",
+  "version": "0.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/SlotSystem.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/SlotSystem-header.json",
+  "tags": "inventory,database,structure",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Glyphster Pack/Master/SVG/Construction/2bfb89e12371e03689db35c1a1be7cbbba1643b08acf79042c17be9262fb6512_Construction_wall_bricks.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Manage any kind of slots for your inventories, board games and tiled environments.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 90,
+  "helpPath": "/extensions/slot-system",
+  "description": "Store content in any kind of slots.\n\n## Usages\n- Add, count and remove items from slots\n- Check how many slots are filled or empty\n- Set a maximum or unlimited amount of items for every slot\n- Add and remove properties of a slot (weapon category, item class, object weight...)\n- Move a slot content to an other position\n- Sum a property (good for weight system)\n- Sort items using a property value (ascending alphabetical only)\n- Flood system : add items automatically and when they reach the maximum of the slot, they go in the next empty slot\n- Export/Import spaces as JSON\n\n## Systems\n- 3 systems available (Basic, Named slots and Grid)\n### Basic\nUse numbers as slot identifiers to retrieve your informations\n### Named slots\nUse texts as slot identifiers. Very useful when you want to put an item on a specific part of your character.\n### Grid\nUse a 2D grid position to retrieve your informations. It uses the basic slot system in a more handy way.\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNOSwxOXYtNGMwLTAuNi0wLjQtMS0xLTFIMWMtMC42LDAtMSwwLjQtMSwxdjRjMCwwLjYsMC40LDEsMSwxaDdDOC42LDIwLDksMTkuNiw5LDE5eiIvPg0KCTxwYXRoIGQ9Ik0zMSwxNGgtN2MtMC42LDAtMSwwLjQtMSwxdjRjMCwwLjYsMC40LDEsMSwxaDdjMC42LDAsMS0wLjQsMS0xdi00QzMyLDE0LjQsMzEuNiwxNCwzMSwxNHoiLz4NCgk8cGF0aCBkPSJNMTIsMTRjLTAuNiwwLTEsMC40LTEsMXY0YzAsMC42LDAuNCwxLDEsMWg4YzAuNiwwLDEtMC40LDEtMXYtNGMwLTAuNi0wLjQtMS0xLTFIMTJ6Ii8+DQoJPHBhdGggZD0iTTYsMTJoOGMwLjYsMCwxLTAuNCwxLTFWN2MwLTAuNi0wLjQtMS0xLTFINkM1LjQsNiw1LDYuNCw1LDd2NEM1LDExLjYsNS40LDEyLDYsMTJ6Ii8+DQoJPHBhdGggZD0iTTE4LDEyaDhjMC42LDAsMS0wLjQsMS0xVjdjMC0wLjYtMC40LTEtMS0xaC04Yy0wLjYsMC0xLDAuNC0xLDF2NEMxNywxMS42LDE3LjQsMTIsMTgsMTJ6Ii8+DQoJPHBhdGggZD0iTTE0LDIySDZjLTAuNiwwLTEsMC40LTEsMXY0YzAsMC42LDAuNCwxLDEsMWg4YzAuNiwwLDEtMC40LDEtMXYtNEMxNSwyMi40LDE0LjYsMjIsMTQsMjJ6Ii8+DQoJPHBhdGggZD0iTTI2LDIyaC04Yy0wLjYsMC0xLDAuNC0xLDF2NGMwLDAuNiwwLjQsMSwxLDFoOGMwLjYsMCwxLTAuNCwxLTF2LTRDMjcsMjIuNCwyNi42LDIyLDI2LDIyeiIvPg0KPC9nPg0KPC9zdmc+DQo="
+}

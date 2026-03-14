@@ -1,0 +1,106 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "m4hBMBTUilft4s1V4FQQPakVDGx1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Camera shake",
+  "name": "CameraShake",
+  "version": "3.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/CameraShake.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/CameraShake-header.json",
+  "tags": "shaking,camera,effect,screen,shake",
+  "category": "Camera",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/vector-difference-ab.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Shake layer cameras.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 13,
+  "helpPath": "/extensions/camera-shake",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "ShakeCamera",
+      "fullName": "Shake camera",
+      "description": "Shake the camera on layers chosen with configuration actions.",
+      "functionType": "Action"
+    },
+    {
+      "name": "StartShaking",
+      "fullName": "Start camera shaking",
+      "description": "Start shaking the camera indefinitely.",
+      "functionType": "Action"
+    },
+    {
+      "name": "StopShaking",
+      "fullName": "Stop camera shaking",
+      "description": "Stop shaking the camera.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetLayerShakable",
+      "fullName": "Shakable layer",
+      "description": "Mark a layer as shakable.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsShaking",
+      "fullName": "Camera is shaking",
+      "description": "Check if the camera is shaking.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "SetLayerTranslationAmplitude",
+      "fullName": "Layer translation amplitude",
+      "description": "Change the translation amplitude of the shaking (in pixels).",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetLayerRotationAmplitude",
+      "fullName": "Layer rotation amplitude",
+      "description": "Change the rotation amplitude of the shaking (in degrees).",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetLayerZoomAmplitude",
+      "fullName": "Layer zoom amplitude",
+      "description": "Change the zoom factor amplitude of the shaking. The shaking will zoom and unzoom by this factor (for instance 1.0625 is a valid value).",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetLayerShakingFrequency",
+      "fullName": "Layer shaking frequency",
+      "description": "Change the number of back and forth per seconds.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetDefaultTranslationAmplitude",
+      "fullName": "Default translation amplitude",
+      "description": "Change the default translation amplitude of the shaking (in pixels).",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetDefaultRotationAmplitude",
+      "fullName": "Default rotation amplitude",
+      "description": "Change the default rotation amplitude of the shaking (in degrees).",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetDefaultZoomAmplitude",
+      "fullName": "Default zoom amplitude",
+      "description": "Change the default zoom factor amplitude of the shaking. The shaking will zoom and unzoom by this factor (for instance 1.0625 is a valid value).",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetDefaultShakingFrequency",
+      "fullName": "Default shaking frequency",
+      "description": "Change the default number of back and forth per seconds.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Shake layer cameras with translation, rotation and zoom.\n\n- Short shaking can be used to give impact (explosion, hit)\n- Shaking can go indefinitely to set an ambiance (engine vibration, earthquake, pulsing)\n- Low frequency shaking allows to simulate slow moving objects (ship rocking back and forth)\n\nRelease notes:\n- Version 3.0.0\n    - No adaptation of the game events is needed.\n    - It fixes an issue when used with scrolling, the amplitude will feel bigger in this case.\n    - The shaking relies on noise which could feel a bit different.\n    - This extension can no longer do impulses. For this, another extension \"Camera impulse\" can be used.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZlY3Rvci1kaWZmZXJlbmNlLWFiIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTMsMUMxLjg5LDEgMSwxLjg5IDEsM1Y1SDNWM0g1VjFIM003LDFWM0gxMFYxSDdNMTIsMVYzSDE0VjVIMTZWM0MxNiwxLjg5IDE1LjExLDEgMTQsMUgxMk0xLDdWMTBIM1Y3SDFNMTQsN0MxNCw3IDE0LDExLjY3IDE0LDE0QzExLjY3LDE0IDcsMTQgNywxNEM3LDE0IDcsMTggNywyMEM3LDIxLjExIDcuODksMjIgOSwyMkgyMEMyMS4xMSwyMiAyMiwyMS4xMSAyMiwyMFY5QzIyLDcuODkgMjEuMTEsNyAyMCw3QzE4LDcgMTQsNyAxNCw3TTE2LDlIMjBWMjBIOVYxNkgxNEMxNS4xMSwxNiAxNiwxNS4xMSAxNiwxNFY5TTEsMTJWMTRDMSwxNS4xMSAxLjg5LDE2IDMsMTZINVYxNEgzVjEySDFaIiAvPjwvc3ZnPg=="
+}

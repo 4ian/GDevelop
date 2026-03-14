@@ -1,0 +1,450 @@
+{
+  "author": "",
+  "category": "Game mechanic",
+  "description": "This behavior tracks the object position and provides a condition to check if the object has been around the same position for a certain amount of time. It's useful to track objects that are not moving (or very little, at least staying around a position).\n\nTo use:\n* Add the behavior to your object.\n* Configure the distance tolerance and the amount of time before considering objects idle.\n* Use the conditions in your events to know when the object is idle (or when it has just moved).",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Idle object tracker",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE5LDRjMCwyLjItMS4zLDQtMyw0cy0zLTEuOC0zLTRzMS4zLTMsMy0zUzE5LDEuOCwxOSw0eiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE0LjUsNy41bC0yLjIsMC43Yy0xLjQsMC41LTIuNSwxLjctMi43LDMuM2wtMC40LDMuNEM5LjEsMTYsMTAsMTcsMTEuMiwxN2gwYzAuNSwwLDEtMC4yLDEuNC0wLjZMMTUsMTRoMS41DQoJYzAuOCwwLDEuNS0wLjcsMS41LTEuNXYwYzAtMC44LTAuNy0xLjUtMS41LTEuNUgxNGwtMiwyIi8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTcuNSw3LjRsMi40LDAuOGMxLjQsMC41LDIuNSwxLjcsMi43LDMuM2wwLjQsMy40djBjMCwxLjItMSwyLjItMi4yLDIuMmgtMy4zYy0wLjgsMC0xLjUtMC43LTEuNS0xLjV2MA0KCWMwLTAuOCwwLjctMS41LDEuNS0xLjVIMjAiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMiwxN2MwLDIsMC4zLDYsMC45LDcuOEwxMywyNXY0bC0yLDF2MWg1VjE1Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjAsMTdjMCwyLTAuMyw2LTAuOSw3LjhMMTksMjV2NGwyLDF2MWgtNVYxNSIvPg0KPC9zdmc+DQo=",
+  "name": "IdleTracker",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Movies and Entertainment/Movies and Entertainment_cinema_oscar_movies_award.svg",
+  "shortDescription": "Detect if object hasn't moved for a configurable duration.",
+  "dimension": "2D",
+  "version": "1.1.0",
+  "tags": "idle,tracking,position",
+  "authorIds": [
+    "wWP8BSlAW0UP4NeaHa2LcmmDzmH2"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Check if an object has not moved (with some tolerance, 20 pixels by default) for a certain duration (1 second by default).",
+      "fullName": "Idle tracker",
+      "name": "IdleTracker",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "description": "",
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsFarFromLastPosition",
+                    "False",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "DistanceBetweenPositions(Object.X(), Object.Y(), LastX, LastY)",
+                    ">",
+                    "IdleDistanceTolerance"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsFarFromLastPosition",
+                    "True",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "IdleTime",
+                    "+",
+                    "LayerTimeScale(Object.Layer())*TimeDelta()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsFarFromLastPosition",
+                    "True",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "LastX",
+                    "=",
+                    "Object.X()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "LastY",
+                    "=",
+                    "Object.Y()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "IdleTime",
+                    "=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Object",
+              "longDescription": "",
+              "name": "Object",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "object"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Behavior",
+              "longDescription": "",
+              "name": "Behavior",
+              "optional": false,
+              "supplementaryInformation": "IdleTracker::IdleTracker",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "",
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "LastX",
+                    "=",
+                    "Object.X()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "LastY",
+                    "=",
+                    "Object.Y()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Object",
+              "longDescription": "",
+              "name": "Object",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "object"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Behavior",
+              "longDescription": "",
+              "name": "Behavior",
+              "optional": false,
+              "supplementaryInformation": "IdleTracker::IdleTracker",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the object has just moved from its last position (using the tolerance configured in the behavior).",
+          "fullName": "Has just moved from last position",
+          "functionType": "Condition",
+          "name": "HasMovedFromLastPosition",
+          "private": false,
+          "sentence": "_PARAM0_ has moved from its last position",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsFarFromLastPosition",
+                    "True",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Object",
+              "longDescription": "",
+              "name": "Object",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "object"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Behavior",
+              "longDescription": "",
+              "name": "Behavior",
+              "optional": false,
+              "supplementaryInformation": "IdleTracker::IdleTracker",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the object is idle: it has not moved from its last position (or within the tolerance) for the time configured in the behavior.",
+          "fullName": "Is idle (since enough time)",
+          "functionType": "Condition",
+          "name": "IsIdle",
+          "private": false,
+          "sentence": "_PARAM0_ is idle",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "IdleTime",
+                    ">",
+                    "DurationBeforeIdle"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Object",
+              "longDescription": "",
+              "name": "Object",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "object"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Behavior",
+              "longDescription": "",
+              "name": "Behavior",
+              "optional": false,
+              "supplementaryInformation": "IdleTracker::IdleTracker",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "LastX"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "LastY"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "IsFarFromLastPosition"
+        },
+        {
+          "value": "1",
+          "type": "Number",
+          "label": "Time, in seconds, before considering the object as idle",
+          "description": "",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "DurationBeforeIdle"
+        },
+        {
+          "value": "20",
+          "type": "Number",
+          "label": "Distance, in pixels, allowed for the object to travel and still be considered idle",
+          "description": "",
+          "extraInformation": [],
+          "hidden": false,
+          "name": "IdleDistanceTolerance"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "IdleTime"
+        }
+      ]
+    }
+  ]
+}

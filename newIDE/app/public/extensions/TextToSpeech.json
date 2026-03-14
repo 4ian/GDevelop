@@ -1,0 +1,133 @@
+{
+  "author": "",
+  "category": "Audio",
+  "description": "Use the system's Text-to-Speech features to read any text aloud.",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Text-to-Speech",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjEsNGMtMi4yLDAtNCwxLjgtNCw0djZ2NGw2LTNoM2MyLjIsMCw0LTEuOCw0LTRWOGMwLTIuMi0xLjgtNC00LTRIMjF6Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMjEiIHkxPSI4IiB4Mj0iMjQiIHkyPSI4Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMjEiIHkxPSIxMSIgeDI9IjIyIiB5Mj0iMTEiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNyw4LjhjLTAuNi0wLjQtMS4zLTAuNy0yLTAuOGMtMS42LTAuMi0zLDAuNS0zLjksMS43QzEwLjQsOS41LDkuOCw5LjYsOSwxMC4yYy0wLjgsMC42LTEuMywxLjYtMS4zLDIuNg0KCWwwLDAuOHYxLjJ2MWMwLDEuOCwwLjksMy41LDIuNCw0LjRsMCwwYzAsMS44LTEuMywzLjQtMywzLjhDNSwyNC43LDMuNCwyNi4zLDMsMjguNUMzLDI4LjcsMy4yLDI5LDMuNCwyOWgxOC4xDQoJYzAuMywwLDAuNS0wLjMsMC40LTAuNWMtMC40LTIuMS0yLTMuOC00LjEtNC40Yy0xLjctMC40LTMtMi0zLTMuOCIvPg0KPC9zdmc+DQo=",
+  "name": "TextToSpeech",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Users/Users_user_chat_talk.svg",
+  "shortDescription": "Read text aloud using system Text-to-Speech. Configurable voice and speed.",
+  "version": "1.0.0",
+  "tags": "string,text,sound,tts,speech,speak,read",
+  "authorIds": [
+    "mETnDt21g4Mdq3sEASKkqjFOpDq2"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "",
+      "fullName": "",
+      "functionType": "Action",
+      "group": "",
+      "name": "onFirstSceneLoaded",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "// When calling getVoices, browsers return an empty list\n// while gathering the real list of available voices.\n// This forces to load the voices at the start of the scene.\nif (speechSynthesis.onvoiceschanged !== undefined) {\n    gdjs._ttsWait = true;\n    speechSynthesis.addEventListener(\"voiceschanged\", function listener() {\n        gdjs._ttsWait = false;\n        speechSynthesis.removeEventListener(\"voiceschanged\", listener);\n    });\n\n    // Trigger the loading of the voices\n    speechSynthesis.getVoices();\n}\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Speaks a text message aloud through the system text-to-speech.",
+      "fullName": "Speak out a message",
+      "functionType": "Action",
+      "group": "",
+      "name": "Speak",
+      "private": false,
+      "sentence": "Say _PARAM1_ with voice _PARAM2_, volume _PARAM3_%, rate _PARAM4_% and pitch _PARAM5_%",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) return;\n\nconst message = eventsFunctionContext.getArgument(\"Message\");\nconst voice = eventsFunctionContext.getArgument(\"Voice\").toLowerCase();\nlet volume = eventsFunctionContext.getArgument(\"Volume\") / 100;\nlet rate = eventsFunctionContext.getArgument(\"Rate\") / 100;\nlet pitch = eventsFunctionContext.getArgument(\"Pitch\") / 100;\n\n// Boundary checks for volume, rate, pitch\nif ((volume < 0) || (1 < volume))\n    volume = 1;\nif ((rate < 0.1) || (10 < rate))\n    rate = 1;\nif ((pitch < 0) || (2 < pitch))\n    pitch = 1;\n\n// Initialize speech settings\nconst speech = new SpeechSynthesisUtterance();\nspeech.lang = \"en\";\nspeech.text = message;\nspeech.voice =\n    speechSynthesis\n        .getVoices()\n        .find(({ name }) => name.toLowerCase().includes(voice));\nspeech.volume = volume;\nspeech.rate = rate;\nspeech.pitch = pitch;\n\nif (gdjs._ttsWait && !speech.voice) {\n    // The voices are not yet loaded (see onFirstSceneLoaded), let's wait \n    // for them to load before playing the sound for real.\n    speechSynthesis.addEventListener(\"voiceschanged\", function listener() {\n        // Set the voice anew now that we have all voices\n        speech.voice =\n            speechSynthesis\n                .getVoices()\n                .find(({ name }) => name.toLowerCase().includes(voice));\n        // Now, the text can finally be spoken.\n        speechSynthesis.speak(speech);\n        \n        speechSynthesis.removeEventListener(\"voiceschanged\", listener);\n    });\n} else speechSynthesis.speak(speech);\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The message to be spoken",
+          "longDescription": "",
+          "name": "Message",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The voice to be used",
+          "longDescription": "Voices vary depending on the operating system. \nHere is a list of windows voice names: https://bit.ly/windows-voices \nAnd here is a list of voice names for MacOS: https://bit.ly/mac-voices",
+          "name": "Voice",
+          "optional": false,
+          "supplementaryInformation": "[\"Samantha\",\"Agnes\",\"Albert\",\"Alex\",\"Alice\",\"Alva\",\"Amelie\",\"Anna\",\"Bad News\",\"Bahh\",\"Bells\",\"Boing\",\"Bruce\",\"Bubbles\",\"Carmit\",\"Cellos\",\"Damayanti\",\"Daniel\",\"Deranged\",\"Diego\",\"Ellen\",\"Fiona\",\"Fred\",\"Good News\",\"Hysterical\",\"Ioana\",\"Jorge\",\"Juan\",\"Junior\",\"Kanya\",\"Karen\",\"Kathy\",\"Kyoko\",\"Laura\",\"Lekha\",\"Luca\",\"Luciana\",\"Maged\",\"Mariska\",\"Mei-Jia\",\"Melina\",\"Milena\",\"Moira\",\"Monica\",\"Nora\",\"Paulina\",\"Pipe Organ\",\"Princess\",\"Ralph\",\"Rishi\",\"Sara\",\"Satu\",\"Sin-Ji\",\"Tessa\",\"Thomas\",\"Ting-Ting\",\"Trinoids\",\"Veena\",\"Vicki\",\"Victoria\",\"Whisper\",\"Xander\",\"Yelda\",\"Yuna\",\"Yuri\",\"Zarvox\",\"Zosia\",\"Zuzana\"]",
+          "type": "string"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Volume between 0% and 100%",
+          "longDescription": "",
+          "name": "Volume",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Speed between 10% and 1000%",
+          "longDescription": "",
+          "name": "Rate",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Pitch between 0% and 200%",
+          "longDescription": "",
+          "name": "Pitch",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Forces all Text-to-Speech to be stopped.",
+      "fullName": "Force stop speaking",
+      "functionType": "Action",
+      "group": "",
+      "name": "StopSpeaking",
+      "private": false,
+      "sentence": "Force stop speaking",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "window.speechSynthesis.cancel();\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

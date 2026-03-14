@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Top-down corner sliding",
+  "name": "TopDownCornerSliding",
+  "version": "0.1.1",
+  "url": "https://resources.gdevelop-app.com/extensions/TopDownCornerSliding.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/TopDownCornerSliding-header.json",
+  "tags": "top-down,movement,grid,align",
+  "category": "Movement",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/f1e89ff4f907ed2245e2d4ad2d5f52f9e1bb6d0127aa370d44cc77462e5be8e3_subdirectory-arrow-right.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Slide on corners of rectangular obstacles.",
+  "eventsBasedBehaviorsCount": 2,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/top-down-corner-sliding",
+  "description": "In top-down games, players may have to go though gaps the same size as their avatar. This is almost impossible to do without any assistance. This extension makes objects slide on obstacles to lead them in the right direction.\n\nIt's used in these examples:\n* a 3D Bomberman-like game ([open the project online](https://editor.gdevelop.io/?project=example://3d-bomber-bunny))\n* a 2D Bomberman-like game ([open the project online](https://editor.gdevelop.io/?project=example://goose-bomberman))\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXN1YmRpcmVjdG9yeS1hcnJvdy1yaWdodCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xOSwxNUwxMywyMUwxMS41OCwxOS41OEwxNS4xNywxNkg0VjRINlYxNEgxNS4xN0wxMS41OCwxMC40MkwxMyw5TDE5LDE1WiIgLz48L3N2Zz4="
+}

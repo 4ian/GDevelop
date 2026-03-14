@@ -1,0 +1,44 @@
+{
+  "tier": "reviewed",
+  "authorIds": [],
+  "extensionNamespace": "",
+  "fullName": "Flash and transition painter",
+  "name": "FlashTransitionPainter",
+  "version": "0.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/FlashTransitionPainter.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/FlashTransitionPainter-header.json",
+  "tags": "flash,transition,effect",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/movie-filter.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Screen transitions painted with plain color fill using Shape Painter.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/flash-transition-painter",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Paint all over the screen a color for a period of time.",
+      "fullName": "Flash and transition painter",
+      "name": "FlashTransitionPainter",
+      "objectType": "PrimitiveDrawing::Drawer",
+      "eventsFunctions": [
+        {
+          "name": "PaintEffect",
+          "fullName": "Paint Effect",
+          "description": "Paint Effect.",
+          "functionType": "Action"
+        },
+        {
+          "name": "PaintEffectIsEnd",
+          "fullName": "Paint effect ended ",
+          "description": "Paint effect ended.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Paint transition effects\n- Fade in, fade out\n- Right to left\n- Top to bottom\n- Circular\n\nA blur effect can be added to the painter layer to smooth the transition.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLW1vdmllLWZpbHRlciIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xOCA0TDIwIDdIMTdMMTUgNEgxM0wxNSA3SDEyTDEwIDRIOEwxMCA3SDdMNSA0SDRDMi45IDQgMiA0LjkgMiA2TDIgMThDMiAxOS4xIDIuOSAyMCA0IDIwSDIwQzIxLjEgMjAgMjIgMTkuMSAyMiAxOFY0SDE4TTExLjI1IDE1LjI1TDEwIDE4TDguNzUgMTUuMjVMNiAxNEw4Ljc1IDEyLjc1TDEwIDEwTDExLjI1IDEyLjc1TDE0IDE0TDExLjI1IDE1LjI1TTE2Ljk0IDExLjk0TDE2IDE0TDE1LjA2IDExLjk0TDEzIDExTDE1LjA2IDEwLjA2TDE2IDhMMTYuOTQgMTAuMDZMMTkgMTFMMTYuOTQgMTEuOTRaIiAvPjwvc3ZnPg=="
+}

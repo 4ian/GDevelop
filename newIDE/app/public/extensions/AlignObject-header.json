@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "I0kdjvsICFML0APq45CZjZ6PyEQ2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Align object on the screen",
+  "name": "AlignObject",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/AlignObject.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/AlignObject-header.json",
+  "tags": "align,alignment,center",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/format-vertical-align-center.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Align objects on the scene relatively to the window (or screen size).",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 14,
+  "helpPath": "/extensions/align-object",
+  "description": "Align objects on the scene relatively to the window (or screen size).\n\n**Be sure to put your object on a layer for which the camera position was not moved.**\n\nActions provided are:\n\n* ToSceneCentered: horizontally and vertically centered in scene\n* ToSceneTop: vertically to the top in scene\n* ToSceneMiddle: vertically to the middle in scene\n* ToSceneBottom: vertically to the bottom in scene\n* ToSceneLeft: horizontally to the left in scene\n* ToSceneRight: horizontally to the right in scene\n* ToSceneCenter: horizontally to the center in scene\n* ToScreenCentered: horizontally and vertically centered in screen\n* ToScreenTop: vertically to the top in screen\n* ToScreenMiddle: vertically to the middle in screen\n* ToScreenBottom: vertically to the bottom in screen\n* ToScreenLeft: horizontally to the left in screen\n* ToScreenRight: horizontally to the right in screen\n* ToScreenCenter: horizontally to the center in screen",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZvcm1hdC12ZXJ0aWNhbC1hbGlnbi1jZW50ZXIiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNOCwxOUgxMVYyM0gxM1YxOUgxNkwxMiwxNUw4LDE5TTE2LDVIMTNWMUgxMVY1SDhMMTIsOUwxNiw1TTQsMTFWMTNIMjBWMTFINFoiIC8+PC9zdmc+"
+}

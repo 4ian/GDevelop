@@ -1,0 +1,118 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Object spawner 2D area",
+  "name": "ObjectSpawner",
+  "version": "1.1.1",
+  "url": "https://resources.gdevelop-app.com/extensions/ObjectSpawner.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ObjectSpawner-header.json",
+  "tags": "spawn,spawner,objects,create,timer",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/plus-one.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Spawn objects periodically with configurable interval, capacity, and spawn area.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/object-spawner",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Spawn (create) objects periodically.",
+      "fullName": "Object spawner",
+      "name": "ObjectSpawner",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "SpawnObject",
+          "fullName": "Spawn objects periodically",
+          "description": "Spawn (create) objects periodically. This action must be run every frame to work. When the max quantity is reached and an instance is deleted, the spawner waits the duration of the spawn period before creating another instance. Spawned objects are automatically linked to the spawner.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetSpawnPeriod",
+          "fullName": "Spawn period",
+          "description": "Change the spawn period (in seconds).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SpawnPeriod",
+          "fullName": "Spawn period",
+          "description": "Return the spawn period (in seconds).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "ResetSpawnTimer",
+          "fullName": "Restart spawning cooldown",
+          "description": "Restart the cooldown of a spawner.",
+          "functionType": "Action"
+        },
+        {
+          "name": "TimeBeforeSpawn",
+          "fullName": "Time before the next spawn",
+          "description": "Return the remaining time before the next spawn (in seconds). Useful for triggering visual and sound effects.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "ObjectWasJustSpawned",
+          "fullName": "Object was just spawned",
+          "description": "Check if an object has just been created by this spawner. Useful for triggering visual and sound effects.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "MaxQuantity",
+          "fullName": "Max objects in the scene (per spawner)",
+          "description": "Compare the max objects in the scene (per spawner) of the object. Limits the number of objects in the scene that were created by this spawner. Set this to 0 for no limit.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetMaxQuantity",
+          "fullName": "Max objects in the scene (per spawner)",
+          "description": "Change the max objects in the scene (per spawner) of the object. Limits the number of objects in the scene that were created by this spawner. Set this to 0 for no limit.",
+          "functionType": "Action"
+        },
+        {
+          "name": "UnlimitedObjectCapacity",
+          "fullName": "Unlimited capacity",
+          "description": "Check if spawner has unlimited capacity.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetUnlimitedObjectCapacity",
+          "fullName": "Unlimited object capacity",
+          "description": "Change unlimited capacity of spawner.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SpawnerCapacity",
+          "fullName": "Spawner capacity",
+          "description": "Compare the number of objects that can be created by this spawner. This is reduced everytime an objects is spawned.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetSpawnerCapacity",
+          "fullName": "Spawner capacity",
+          "description": "Change the number of objects that can be created by this spawner. This is reduced everytime an objects is spawned.",
+          "functionType": "Action"
+        },
+        {
+          "name": "RandomPosition",
+          "fullName": "Use random positions",
+          "description": "Check if using random positions. Useful for making large spawner areas.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetRandomPosition",
+          "fullName": "Use random positions",
+          "description": "Enable (or disable) random positions. Useful for making large spawner areas.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Spawn objects periodically based on the 2D location of the spawner.  \n\nIf \"random position\" is enabled, objects will spawn in a random position inside the spawner object. \nThis allows the size of the spawner object to define an area where objects will spawn.\n\nIt can be used to create:\n- Enemies\n- NPCs\n- Environmental objects",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXBsdXMtb25lIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEwLDhWMTJIMTRWMTRIMTBWMThIOFYxNEg0VjEySDhWOEgxME0xNC41LDYuMDhMMTksNVYxOEgxN1Y3LjRMMTQuNSw3LjlWNi4wOFoiIC8+PC9zdmc+"
+}

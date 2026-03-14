@@ -1,0 +1,23 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "awmVXXKRprgezDutmfKXAinqtbO2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Advanced structure tools",
+  "name": "AdvancedStructureTools",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/AdvancedStructureTools.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/AdvancedStructureTools-header.json",
+  "tags": "structure,array,variable,copy,filter,sort,field,nested",
+  "category": "General",
+  "previewIconUrl": "",
+  "gdevelopVersion": ">=5.5.222",
+  "changelog": [],
+  "shortDescription": "Tools for working with structures and arrays of structures.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 3,
+  "helpPath": "/extensions/advanced-structure-tools",
+  "description": "This extension adds structure-oriented tools:\n- Copy variable: deep copy of a structure or array\n- Filter array: filter arrays of numbers, strings, or structures by field path and condition\n- Sort structures by field: sort an array of structures by a field or nested path",
+  "iconUrl": ""
+}

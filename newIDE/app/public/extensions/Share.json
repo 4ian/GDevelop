@@ -1,0 +1,142 @@
+{
+  "author": "",
+  "category": "User interface",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Share dialog and sharing options",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNoYXJlLXZhcmlhbnQiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTgsMTYuMDhDMTcuMjQsMTYuMDggMTYuNTYsMTYuMzggMTYuMDQsMTYuODVMOC45MSwxMi43QzguOTYsMTIuNDcgOSwxMi4yNCA5LDEyQzksMTEuNzYgOC45NiwxMS41MyA4LjkxLDExLjNMMTUuOTYsNy4xOUMxNi41LDcuNjkgMTcuMjEsOCAxOCw4QTMsMyAwIDAsMCAyMSw1QTMsMyAwIDAsMCAxOCwyQTMsMyAwIDAsMCAxNSw1QzE1LDUuMjQgMTUuMDQsNS40NyAxNS4wOSw1LjdMOC4wNCw5LjgxQzcuNSw5LjMxIDYuNzksOSA2LDlBMywzIDAgMCwwIDMsMTJBMywzIDAgMCwwIDYsMTVDNi43OSwxNSA3LjUsMTQuNjkgOC4wNCwxNC4xOUwxNS4xNiwxOC4zNEMxNS4xMSwxOC41NSAxNS4wOCwxOC43NyAxNS4wOCwxOUMxNS4wOCwyMC42MSAxNi4zOSwyMS45MSAxOCwyMS45MUMxOS42MSwyMS45MSAyMC45MiwyMC42MSAyMC45MiwxOUEyLjkyLDIuOTIgMCAwLDAgMTgsMTYuMDhaIiAvPjwvc3ZnPg==",
+  "name": "Share",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/share-variant.svg",
+  "shortDescription": "Share text/URL via system share dialog. Mobile browsers and apps only.",
+  "version": "0.0.1",
+  "description": [
+    "Actions and conditions to share a text and/or URL via the operating system share dialog.",
+    "",
+    "This will work for Android and iOS on browsers (Google Chrome, Safari...) and on mobile apps."
+  ],
+  "tags": "share,mobile",
+  "authorIds": [
+    "wWP8BSlAW0UP4NeaHa2LcmmDzmH2",
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "dependencies": [
+    {
+      "exportName": "cordova-plugin-web-share",
+      "name": "cordova-plugin-web-share",
+      "type": "cordova",
+      "version": "https://github.com/arthuro555/cordova-webshare-api.git"
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "async": true,
+      "description": "Share a link or text via another app using the system share dialog.",
+      "fullName": "Share",
+      "functionType": "Action",
+      "name": "Share",
+      "sentence": "Share text: _PARAM1_ and url: _PARAM2_ with title _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "gdjs._shareExtension = gdjs._shareExtension || {\r",
+            "    lastShareResult: '',\r",
+            "};\r",
+            "\r",
+            "if (!navigator.share) {\r",
+            "    gdjs._shareExtension.lastShareResult = 'unsupported';\r",
+            "    eventsFunctionContext.task.resolve()\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "navigator.share({\r",
+            "    title: eventsFunctionContext.getArgument(\"title\") || undefined,\r",
+            "    text: eventsFunctionContext.getArgument(\"text\") || undefined,\r",
+            "    url: eventsFunctionContext.getArgument(\"url\") || undefined,\r",
+            "})\r",
+            "    .then(() => {\r",
+            "        gdjs._shareExtension.lastShareResult = 'ok';\r",
+            "        eventsFunctionContext.task.resolve();\r",
+            "    })\r",
+            "    .catch(() => {\r",
+            "        gdjs._shareExtension.lastShareResult = 'canceled';\r",
+            "        eventsFunctionContext.task.resolve();\r",
+            "    });\r",
+            "\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Text to share",
+          "name": "text",
+          "type": "string"
+        },
+        {
+          "description": "Url to share",
+          "name": "url",
+          "type": "string"
+        },
+        {
+          "description": "Title to show in the Share dialog",
+          "name": "title",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the browser/operating system of the device supports sharing. Sharing is typically not supported on desktop browsers or desktop apps.",
+      "fullName": "Sharing is supported",
+      "functionType": "Condition",
+      "name": "IsSharingSupported",
+      "sentence": "The browser or system supports sharing",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = !!navigator.share;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "the result of the last share dialog.",
+      "fullName": "Result of the last share dialog",
+      "functionType": "ExpressionAndCondition",
+      "name": "LastShareResult",
+      "sentence": "the result of the last share dialog",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "gdjs._shareExtension = gdjs._shareExtension || {",
+            "    lastShareResult: '',",
+            "};",
+            "",
+            "eventsFunctionContext.returnValue = gdjs._shareExtension.lastShareResult;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "supplementaryInformation": "[\"unsupported\",\"ok\",\"canceled\"]",
+        "type": "stringWithSelector"
+      },
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

@@ -1,0 +1,228 @@
+{
+  "author": "@ddabrahim",
+  "category": "Camera",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Drag camera with the mouse (or touchscreen)",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWRyYWctdmFyaWFudCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0yMi42NywxMkwxOC4xOCwxNi41TDE1LjY3LDE0TDE3LjY1LDEyTDE1LjY3LDEwLjA0TDE4LjE4LDcuNTNMMjIuNjcsMTJNMTIsMS4zM0wxNi40Nyw1LjgyTDEzLjk2LDguMzNMMTIsNi4zNUwxMCw4LjMzTDcuNSw1LjgyTDEyLDEuMzNNMTIsMjIuNjdMNy41MywxOC4xOEwxMC4wNCwxNS42N0wxMiwxNy42NUwxNCwxNS42N0wxNi41LDE4LjE4TDEyLDIyLjY3TTEuMzMsMTJMNS44Miw3LjVMOC4zMywxMEw2LjM1LDEyTDguMzMsMTMuOTZMNS44MiwxNi40N0wxLjMzLDEyTTEyLDEwQTIsMiAwIDAsMSAxNCwxMkEyLDIgMCAwLDEgMTIsMTRBMiwyIDAgMCwxIDEwLDEyQTIsMiAwIDAsMSAxMiwxMFoiIC8+PC9zdmc+",
+  "name": "DragCameraWithPointer",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/drag-variant.svg",
+  "shortDescription": "Pan/drag camera with mouse or touch. Configurable inertia and bounds.",
+  "dimension": "2D",
+  "version": "1.2.0",
+  "description": [
+    "Move a camera by dragging the mouse (or touchscreen). ",
+    "",
+    "How to use:",
+    "- Run this action on every frame that you want the camera to be movable by the mouse (or touchscreen)",
+    "- Select the mouse button to use (choose \"left\" for touchscreen)",
+    "- Select which directions the camera will move (vertical, horizontal, or both) ",
+    "- Select the layer that will be moved",
+    "",
+    "Tips:",
+    "- If no parameters are selected, the camera will move in both directions when the left mouse button (or touchscreen) are dragged."
+  ],
+  "origin": {
+    "identifier": "DragCameraWithPointer",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "mouse,cursor,pointer,touch,drag,camera,scroll,gestures",
+  "authorIds": [
+    "GfzRsieyUFVnsRR8OZThsPR29oq2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [
+    {
+      "name": "ScrollStartX",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "ScrollStartY",
+      "type": "number",
+      "value": 0
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "description": "Move a camera by dragging the mouse (or touchscreen).",
+      "fullName": "Drag camera with the mouse",
+      "functionType": "Action",
+      "name": "DragCameraWithPointer",
+      "sentence": "Drag camera on layer _PARAM2_ in _PARAM3_ directions using _PARAM4_ mouse button",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Or"
+              },
+              "parameters": [],
+              "subInstructions": [
+                {
+                  "type": {
+                    "value": "MouseButtonFromTextPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "InputButton"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::And"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "value": "MouseButtonPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Left"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"InputButton\""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ScrollStartX",
+                    "=",
+                    "CursorX(Layer, Camera)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "ScrollStartY",
+                    "=",
+                    "CursorY(Layer, Camera)"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StrEqual"
+                  },
+                  "parameters": [
+                    "Direction",
+                    "!=",
+                    "\"vertical\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetCameraCenterX"
+                  },
+                  "parameters": [
+                    "",
+                    "-",
+                    "CursorX(Layer, Camera) - ScrollStartX",
+                    "Layer",
+                    "Camera"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StrEqual"
+                  },
+                  "parameters": [
+                    "Direction",
+                    "!=",
+                    "\"horizontal\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetCameraCenterY"
+                  },
+                  "parameters": [
+                    "",
+                    "-",
+                    "CursorY(Layer, Camera) - ScrollStartY",
+                    "Layer",
+                    "Camera"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Camera number (default: 0)",
+          "name": "Camera",
+          "type": "expression"
+        },
+        {
+          "description": "Camera layer (default: \"\")",
+          "name": "Layer",
+          "type": "layer"
+        },
+        {
+          "description": "Directions that the camera can move (horizontal, vertical, both)",
+          "name": "Direction",
+          "supplementaryInformation": "[\"vertical\",\"horizontal\",\"both\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Mouse button (use \"Left\" for touchscreen)",
+          "name": "InputButton",
+          "type": "mouse"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

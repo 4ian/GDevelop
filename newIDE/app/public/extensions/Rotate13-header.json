@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Rotate a string 13 characters",
+  "name": "Rotate13",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/Rotate13.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Rotate13-header.json",
+  "tags": "rotate string,rot13,rotate13,string",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/format-text-rotation-none.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "This extension rotates all alphabetic characters in a string by 13 characters.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/rotate13",
+  "description": "By passing a string to this expression, you can go from:\n\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\"\n\nto \n\n\"NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm\"\n\nThis can be used for basic secrets, passwords, or very insecure encryption of data.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZvcm1hdC10ZXh0LXJvdGF0aW9uLW5vbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjAuNSwxOEwxNy41LDIxVjE5SDVWMTdIMTcuNVYxNUwyMC41LDE4TTEwLjEzLDEwSDEzLjg4TDEyLDQuOTdMMTAuMTMsMTBNMTIuNzUsM0wxNy41LDE0SDE1LjQyTDE0LjUsMTEuODFIOS41TDguNTgsMTRINi41TDExLjI1LDNIMTIuNzVaIiAvPjwvc3ZnPg=="
+}

@@ -1,0 +1,24 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "dt0tRnf2kHWJnjkrpnzTzNj9Yc63",
+    "QjE1CI3drHNR9Wklz2gTC5WbEgh1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Scrollbar",
+  "name": "Scrollbar",
+  "version": "1.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/Scrollbar.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Scrollbar-header.json",
+  "tags": "scroll,bar",
+  "category": "User interface",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Interface Elements/c1313ac0735bd1c08d7327fd9a56b4d8cebf1b343f9ba82f1b141358433e1cdb_Interface Elements_interface_ui_scroll_bar_scrollbar.svg",
+  "gdevelopVersion": "",
+  "shortDescription": "A scrollbar to help making a scroll view.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/scrollbar",
+  "description": "A scrollbar to help making a scroll view.\n\nAn example of scroll view can be found in the [multiplayer custom lobbies](https://wiki.gdevelop.io/gdevelop5/extensions/multiplayer-custom-lobbies/) extension.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIxLDExSDExVjNjMC0xLjEsMC45LTIsMi0yaDZjMS4xLDAsMiwwLjksMiwyVjExeiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE5LDMxaC02Yy0xLjEsMC0yLTAuOS0yLTJ2LThoMTB2OEMyMSwzMC4xLDIwLjEsMzEsMTksMzF6Ii8+DQo8cmVjdCB4PSIxMSIgeT0iMTEiIGNsYXNzPSJzdDAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIvPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMTQsNyAxNiw1IDE4LDcgIi8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSIxOCwyNSAxNiwyNyAxNCwyNSAiLz4NCjwvc3ZnPg0K"
+}

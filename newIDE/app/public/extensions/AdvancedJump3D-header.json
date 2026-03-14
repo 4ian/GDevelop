@@ -1,0 +1,85 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "JD2xwvKWgodlqsGiL1GCH3tDEwq1",
+    "q8ubdigLvIRXLxsJDDTaokO41mc2",
+    "UMcf9dzu8pVV84ZSLaGAtUB8PyF2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Advanced movements for 3D physics characters",
+  "name": "AdvancedJump3D",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/AdvancedJump3D.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/AdvancedJump3D-header.json",
+  "tags": "3d,platformer,platform,jump,ledge tolerance,coyote time,air jump,wall jump,wall sliding,dash,dive",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Sports and Fitness/Sports and Fitness_training_running_run.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "3D character air jump and coyote time (ledge tolerance) behavior.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/advanced-jump3d",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Let 3D physics characters jump shortly after leaving a platform and also jump in mid-air.",
+      "fullName": "Coyote time and air jump for 3D",
+      "name": "AdvancedJump3D",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "SetCoyoteTime",
+          "fullName": "Coyote timeframe",
+          "description": "Change the coyote time duration of an object (in seconds).",
+          "functionType": "Action"
+        },
+        {
+          "name": "CanCoyoteJump",
+          "fullName": "Can coyote jump",
+          "description": "Check if a coyote jump can currently happen.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "AirJumpsMax",
+          "fullName": "Maximal jump number",
+          "description": "Number of jumps in mid-air that are allowed.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetAirJumpCountMaximum",
+          "fullName": "Air jumps",
+          "description": "Change the number of times the character can jump in mid-air.",
+          "functionType": "Action"
+        },
+        {
+          "name": "RemainingAirJumps",
+          "fullName": "Remaining jump",
+          "description": "Number of jumps in mid-air that are still allowed.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "RemoveOneRemainingAirJump",
+          "fullName": "Remove a remaining air jump",
+          "description": "Remove one of the remaining air jumps of a character.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ResetAirJumpCounter",
+          "fullName": "Reset air jumps",
+          "description": "Allow back all air jumps of a character.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AreFloorJumpCountedAsAirJump",
+          "fullName": "Floor jumps count as air jumps",
+          "description": "Check if floor jumps are counted as air jumps for an object.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "This extension provides behaviors to:\n\n* Jump in mid-air\n* Do coyote time, also known as \"ledge tolerance\". It lets players jumping even after their character is no longer touching the ground for a given amount of time. It aims to give players a feeling of control and reduce frustration.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMjMiIGN5PSI3IiByPSIzIi8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNOCwxMGwyLjgtMi44QzEyLDYsMTQsNiwxNS4yLDcuMmw3LjksNy45YzEuMSwxLjEsMi44LDEuMiw0LjEsMC4yTDMwLDEzIi8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTcsMTBsLTQuNyw0LjdjLTEuNSwxLjUtMSw0LjIsMSw1bDMuOSwxLjVjMS4xLDAuNCwxLjksMS41LDEuOSwyLjd2NiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE0LDIwbC0yLjYsMi42Yy0wLjgsMC44LTIuMSwwLjgtMi44LDBMNSwxOSIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjE2IiB5MT0iMTgiIHgyPSIyMSIgeTI9IjEzIi8+DQo8L3N2Zz4NCg=="
+}

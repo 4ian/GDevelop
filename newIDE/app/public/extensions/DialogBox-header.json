@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "Zu55H5hcb9YmZTltIVOTAFDJQyB2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Dialog Box",
+  "name": "DialogBox",
+  "version": "1.0.1",
+  "url": "https://resources.gdevelop-app.com/extensions/DialogBox.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/DialogBox-header.json",
+  "tags": "dialog",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/UI Essentials/UI Essentials_chat_message_sms.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Dialog Boxes that can be used for RPGs, visual novels, and more.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/dialog-box",
+  "description": "This extension is deprecated. [Custom objects](https://wiki.gdevelop.io/gdevelop5/objects/custom-objects-prefab-template) are now the prefered way to make dialog boxes.\n\n## Summary\nThis extension adds Dialog Box functionality that can be used for RPGs, visual novels, and more.\n\n## How to use:\n1. You will need a background **sprite**, a character **sprite**, a **BBText** to display the name, a **BBText** to display the text, and a **sprite** for the icon to prompt the player for action.\n1. Add the \"Dialog Box\" behavior to the background object.\n1. Place each object in the scene.\n1. Execute the \"Setup Dialog Box\" action only once in the event.\n1. After that, execute the \"Open Dialog Box\" action, \"Close Dialog Box\" action, etc.\n\n## This extension add:\n**Dialog Box** - behavior\n**Setup Dialog Box** - action\n**Open Dialog Box** - action\n**Close Dialog Box** - action\n**Change Dialog Box Text** - action\n**Change Dialog Box contents** - action\n**Change Dialog Box typing sound** - action\n**Change Dialog Box typing interval** - action\n**Skip Dialog Box typing** - action\n**Dialog Box is open** - condition\n**Dialog Box is typing** - condition\n**Dialog Box is close** - condition\n**Number of times the Text in Dialog Box has changed** - condition\n**Number of times the Text in Dialog Box has changed** - expression\n\n## Tips\nThis Dialog Box has a useful counter function.\nIt is zero when the dialog box is opened, and increases by one each time the text changes.\n(However, it will not increase until the frame advances).\nThis feature is useful for keeping track of the progress of a conversation.\n\n## Note\nIn typing, style tags in BBText OBjects are also counted as characters.\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjEyIiB5MT0iMTQiIHgyPSIxMiIgeTI9IjE0Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMTYiIHkxPSIxNCIgeDI9IjE2IiB5Mj0iMTQiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyMCIgeTE9IjE0IiB4Mj0iMjAiIHkyPSIxNCIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTExLDRjLTQuNCwwLTgsMy42LTgsOHYxMnY1bDAsMGMzLjctMy4yLDguNC01LDEzLjMtNUgyMWM0LjQsMCw4LTMuNiw4LTh2LTRjMC00LjQtMy42LTgtOC04SDExeiIvPg0KPC9zdmc+DQo="
+}

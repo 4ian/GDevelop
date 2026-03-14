@@ -1,0 +1,4440 @@
+{
+  "author": "Arthur Pacaud (arthuro555)",
+  "category": "General",
+  "extensionNamespace": "",
+  "fullName": "Array tools",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjExIiB5MT0iNyIgeDI9IjI5IiB5Mj0iNyIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjExIiB5MT0iMTYiIHgyPSIyMiIgeTI9IjE2Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMTEiIHkxPSIyNSIgeDI9IjI5IiB5Mj0iMjUiLz4NCjxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjUiIGN5PSI3IiByPSIyIi8+DQo8Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSI1IiBjeT0iMTYiIHI9IjIiLz4NCjxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjUiIGN5PSIyNSIgcj0iMiIvPg0KPC9zdmc+DQo=",
+  "name": "ArrayTools",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Text Editing/9bfb52500e68d0fd164b1e30bc696e40566187245b80c345848379f40bb6fad7_Text Editing_bullet_points_list.svg",
+  "shortDescription": "Array utilities: search, sort, shuffle, slice, concat, reverse, pop, random element access.",
+  "version": "3.0.1",
+  "description": [
+    "This extension adds features like:",
+    "- Combining arrays (concatenate into new array, append all children to another array)",
+    "- Finding a value in an array (find index expression, contains condition)",
+    "- Reversing arrays",
+    "- Get a portion of an array (slice)",
+    "- Add and remove lots of children at specific indices at once (fill, splice, shift, pop, add at index)",
+    "- Randomness (shuffle children, get a random child)",
+    "- Mathematical operations using arrays (sum of all numbers, biggest/smallest number, average number, median number)",
+    "- Sort numbers in an array",
+    "- String inter-operation (split string into array, join array array children to string)"
+  ],
+  "origin": {
+    "identifier": "ArrayTools",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "array,variable,index,tool,math,string,sort,find,slice,cut,random,copy,combine,concat,append,insert",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "changelog": [
+    {
+      "version": "3.0.0",
+      "breaking": "- Variables have to be declared"
+    }
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [
+    {
+      "name": "Temp",
+      "type": "array",
+      "children": []
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "description": "The index of the first variable that equals to a specific number in an array.",
+      "fullName": "Index of number",
+      "functionType": "ExpressionAndCondition",
+      "group": "Scene variables/Array search",
+      "name": "IndexOf",
+      "sentence": "The first index where _PARAM2_ can be found in _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "eventsFunctionContext.returnValue =",
+            "    array.getAllChildrenArray().findIndex(child => child.getAsNumber() === value);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "Number to search in the array",
+          "name": "Value",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The index of the first variable that equals to a specific text in an array.",
+      "fullName": "Index of text",
+      "functionType": "ExpressionAndCondition",
+      "group": "Scene variables/Array search",
+      "name": "IndexOfStr",
+      "sentence": "The first index where _PARAM2_ can be found in _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "eventsFunctionContext.returnValue =",
+            "    array.getAllChildrenArray().findIndex(child => child.getAsString() === value);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "String to search in the array",
+          "name": "Value",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The index of the last variable that equals to a specific number in an array.",
+      "fullName": "Last index of number",
+      "functionType": "ExpressionAndCondition",
+      "group": "Scene variables/Array search",
+      "name": "LastIndexOf",
+      "sentence": "The last index where _PARAM2_ can be found in _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "eventsFunctionContext.returnValue = ",
+            "    array.getAllChildrenArray().findLastIndex(child => child.getAsNumber() === value);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "Number to search in the array",
+          "name": "Value",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The index of the last variable that equals to a specific text in an array.",
+      "fullName": "Last index of text",
+      "functionType": "ExpressionAndCondition",
+      "group": "Scene variables/Array search",
+      "name": "LastIndexOfStr",
+      "sentence": "The last index where _PARAM2_ can be found in _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "eventsFunctionContext.returnValue =",
+            "    array.getAllChildrenArray().findLastIndex(child => child.getAsString() === value);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "String to search in the array",
+          "name": "Value",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns a random number of an array of numbers.",
+      "fullName": "Random number in array",
+      "functionType": "ExpressionAndCondition",
+      "group": "Scene variables/Array access",
+      "name": "RandomNumberInArray",
+      "sentence": "A randomly picked number of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const internalArray = array.getAllChildrenArray();",
+            "",
+            "eventsFunctionContext.returnValue = internalArray.length === 0",
+            "    ? 0",
+            "    : internalArray[Math.floor(Math.random() * internalArray.length)].getAsNumber();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Array to get a number from",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "a random string of an array of strings.",
+      "fullName": "Random string in array",
+      "functionType": "ExpressionAndCondition",
+      "group": "Scene variables/Array access",
+      "name": "RandomStringInArray",
+      "sentence": "A randomly picked string of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const internalArray = array.getAllChildrenArray();",
+            "",
+            "eventsFunctionContext.returnValue = internalArray.length === 0",
+            "    ? \"\"",
+            "    : internalArray[Math.floor(Math.random() * internalArray.length)].getAsString();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Array to get a string from",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the last array child of an array, and return it as a number.",
+      "fullName": "Get and remove last variable from array (as number)",
+      "functionType": "ExpressionAndCondition",
+      "group": "Scene variables/Array access",
+      "name": "PopNumber",
+      "sentence": "Remove last child of _PARAM1_ and store it in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "eventsFunctionContext.returnValue = array.getAllChildrenArray().pop().getAsNumber();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Array to pop a child from",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the last array child of an array, and return it as a string.",
+      "fullName": "Pop string from array",
+      "functionType": "StringExpression",
+      "group": "Scene variables/Array access",
+      "name": "PopString",
+      "sentence": "Remove last child of _PARAM1_ and store it in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "eventsFunctionContext.returnValue = array.getAllChildrenArray().pop().getAsString();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Array to pop a child from",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the first array child of an array, and return it as a number.",
+      "fullName": "Shift number from array",
+      "functionType": "Expression",
+      "group": "Scene variables/Array access",
+      "name": "ShiftNumber",
+      "sentence": "Remove last child of _PARAM1_ and store it in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "eventsFunctionContext.returnValue = array.getAllChildrenArray().shift().getAsNumber();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Array to shift a child from",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the first array child of an array, and return it as a string.",
+      "fullName": "Shift string from array",
+      "functionType": "StringExpression",
+      "group": "Scene variables/Array access",
+      "name": "ShiftString",
+      "sentence": "Remove last child of _PARAM1_ and store it in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "eventsFunctionContext.returnValue = array.getAllChildrenArray().shift().getAsString();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Array to shift a child from",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if an array contains a specific number.",
+      "fullName": "Array has number",
+      "functionType": "Condition",
+      "group": "Scene variables/Array search",
+      "name": "HasNumber",
+      "sentence": "Array _PARAM1_ has number _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CopyArgumentToVariable2"
+              },
+              "parameters": [
+                "\"Array\"",
+                "Temp"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::CompareNumbers"
+              },
+              "parameters": [
+                "ArrayTools::IndexOf(Temp, Value)",
+                "!=",
+                "-1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "The number to search",
+          "name": "Value",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if an array contains a specific string.",
+      "fullName": "Array has string",
+      "functionType": "Condition",
+      "group": "Scene variables/Array search",
+      "name": "HasString",
+      "sentence": "Array _PARAM1_ has string _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CopyArgumentToVariable2"
+              },
+              "parameters": [
+                "\"Array\"",
+                "Temp"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::CompareNumbers"
+              },
+              "parameters": [
+                "ArrayTools::IndexOfStr(Temp, Value)",
+                "!=",
+                "-1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "The text to search",
+          "name": "Value",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Copies a portion of a scene array variable into a new scene array variable.",
+      "fullName": "Slice an array",
+      "functionType": "Action",
+      "group": "Scene variables/Array creation",
+      "name": "Slice",
+      "sentence": "Slice array _PARAM1_ from indices _PARAM3_ to _PARAM4_ into _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Ensure the target is a clean new array",
+            "target.castTo(\"array\");",
+            "target.clearChildren();",
+            "",
+            "// Slice the original array",
+            "const slice = array",
+            "    .getAllChildrenArray()",
+            "    .slice(",
+            "        eventsFunctionContext.getArgument(\"Begin\"),",
+            "        // The `|| undefined` replaces 0 with undefined, as having the argument as 0 ",
+            "        // would make the array empty and is therefore useless.",
+            "        // With undefined though, it doesn't stop until the end of the array,",
+            "        // which is purposeful.",
+            "        eventsFunctionContext.getArgument(\"End\") || undefined",
+            "    );",
+            "",
+            "// Copy each variable of the slice into the new array",
+            "for (const variable of slice)",
+            "    target.pushVariableCopy(variable);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to take a slice from",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "The array to store the slice into",
+          "name": "Target",
+          "type": "variable"
+        },
+        {
+          "description": "The index to start the slice from",
+          "name": "Begin",
+          "type": "expression"
+        },
+        {
+          "description": "The index to end the slice at",
+          "longDescription": "Set to 0 to copy all of the array. If you use a negative value, the index will be selected beginning from the end.  \nFor example, slicing an array with 5 elements from 0 to -1 would take only elements from indices 0 to 3.",
+          "name": "End",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Cuts a portion of an array off.",
+      "fullName": "Splice an array",
+      "functionType": "Action",
+      "group": "Scene variables/Array manipulation",
+      "name": "Splice",
+      "sentence": "Remove _PARAM3_ items from array _PARAM1_ starting from index _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "const internalArray = array.getAllChildrenArray();",
+            "",
+            "internalArray.splice(",
+            "    eventsFunctionContext.getArgument(\"Begin\"),",
+            "    // Replaces 0 with the legth of the array, as having the argument as 0 ",
+            "    // would not remove anything and is therefore useless.",
+            "    eventsFunctionContext.getArgument(\"Count\") || internalArray.length",
+            ");",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to remove items from",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "The index to start removing from",
+          "longDescription": "If you use a negative value, the index will be selected beginning from the end.",
+          "name": "Begin",
+          "type": "expression"
+        },
+        {
+          "description": "The amount of elements to remove",
+          "longDescription": "Set to 0 to remove until the end of the array.",
+          "name": "Count",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Combines all elements of 2 scene arrays into one new scene array.",
+      "fullName": "Combine 2 arrays",
+      "functionType": "Action",
+      "group": "Scene variables/Array creation",
+      "name": "Concatenate",
+      "sentence": "Combine array _PARAM1_ and _PARAM2_ into _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const otherArray = eventsFunctionContext.getArgument(\"OtherArray\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Ensure the target is a clean new array",
+            "target.castTo(\"array\");",
+            "target.clearChildren();",
+            "",
+            "// Copy both arrays inside the new one",
+            "for (const variable of array.getAllChildrenArray())",
+            "    target.pushVariableCopy(variable);",
+            "",
+            "for (const variable of otherArray.getAllChildrenArray())",
+            "    target.pushVariableCopy(variable);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The first array",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "The second array",
+          "name": "OtherArray",
+          "type": "variable"
+        },
+        {
+          "description": "The variable to store the new array in",
+          "name": "Target",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Appends a copy of all variables of one array to another array.",
+      "fullName": "Append all variable to another array",
+      "functionType": "Action",
+      "group": "Scene variables/Array manipulation",
+      "name": "AppendAll",
+      "sentence": "Append all elements from array _PARAM1_ into _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Copy both arrays inside the new one",
+            "for (const variable of array.getAllChildrenArray())",
+            "    target.pushVariableCopy(variable);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to get the variables from",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "The variable to append the variables in",
+          "name": "Target",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Reverses children of an array. The first array child becomes the last, and the last array child becomes the first.",
+      "fullName": "Reverse an array",
+      "functionType": "Action",
+      "group": "Scene variables/Array manipulation",
+      "name": "Reverse",
+      "sentence": "Reverse array _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "array.getAllChildrenArray().reverse();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to reverse",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Fill an element with a number.",
+      "fullName": "Fill array with number",
+      "functionType": "Action",
+      "group": "Scene variables/Array creation",
+      "name": "FillNumber",
+      "sentence": "Fill array _PARAM1_ with _PARAM2_ from index _PARAM3_ to index _PARAM4_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "const internalArray = array.getAllChildrenArray();",
+            "const end = eventsFunctionContext.getArgument(\"End\") || internalArray.length - 1;",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "for (let i = eventsFunctionContext.getArgument(\"Begin\"); i <= end; i++)",
+            "    internalArray[i] = new gdjs.Variable({",
+            "        type: \"number\",",
+            "        value,",
+            "    });",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to fill",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "The number to fill",
+          "name": "Value",
+          "type": "expression"
+        },
+        {
+          "description": "The index to start filling from",
+          "name": "Begin",
+          "type": "expression"
+        },
+        {
+          "description": "The index to stop filling at",
+          "longDescription": "Set to 0 to fill until the end of the array.",
+          "name": "End",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Shuffles all children of an array.",
+      "fullName": "Shuffle array",
+      "functionType": "Action",
+      "group": "Scene variables/Array manipulation",
+      "name": "Shuffle",
+      "sentence": "Shuffle array _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "array.getAllChildrenArray().sort(() => Math.random() - 0.5);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to shuffle",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Replaces all arrays inside of an array with their children. For example, [[1,2], [3,4]] becomes [1,2,3,4].",
+      "fullName": "Flatten array",
+      "functionType": "Action",
+      "group": "Scene variables/Array manipulation",
+      "name": "Flatten",
+      "sentence": "Flatten array _PARAM1_ (Deeply flatten: _PARAM2_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "const internalArray = array.getAllChildrenArray();",
+            "const deep = eventsFunctionContext.getArgument(\"Deep\");",
+            "",
+            "for (let i = 0; i < internalArray.length; i++) {",
+            "    if (internalArray[i].getType() === \"array\") {",
+            "        const childArray = internalArray[i].getAllChildrenArray();",
+            "        // At the position of the array (i), remove 1 element (the array), ",
+            "        // and insert elements of b (the contents of the array) in-place of the array.",
+            "        internalArray.splice(i, 1, ...childArray);",
+            "        // Skip over the elements that were just added as we are flattening only 1 level deep ",
+            "        if (!deep) i += childArray.length;",
+            "        // If deep, the current element has been replaced with another, we need to recheck it on next iteration.",
+            "        // If not deep, the current element is now the one after the array elements and needs to be checked too.",
+            "        // In both case, decreasing by 1 is necessary.",
+            "        i--;",
+            "    }",
+            "}",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to flatten",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "Deeply flatten",
+          "longDescription": "If yes, will continue flattening until there is no arrays in the array anymore.",
+          "name": "Deep",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the last array child of an array, and stores it in another variable.",
+      "fullName": "Pop array child",
+      "functionType": "Action",
+      "group": "Scene variables/Array access",
+      "name": "Pop",
+      "sentence": "Remove last child of _PARAM1_ and store it in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "gdjs.Variable.copy(array.getAllChildrenArray().pop(), target, false);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to pop a child from",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "The variable to store the popped value into",
+          "name": "Target",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the first array child of an array, and stores it in another variable.",
+      "fullName": "Shift array child",
+      "functionType": "Action",
+      "group": "Scene variables/Array access",
+      "name": "Shift",
+      "sentence": "Remove first child of _PARAM1_ and store it in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "gdjs.Variable.copy(array.getAllChildrenArray().shift(), target, false);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to shift a child from",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "The variable to store the shifted value into",
+          "name": "Target",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Insert a variable at a specific index of an array.",
+      "fullName": "Insert variable at",
+      "functionType": "Action",
+      "group": "Scene variables/Array manipulation",
+      "name": "InsertAt",
+      "sentence": "Insert variable _PARAM3_ in _PARAM1_ at index _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */\r",
+            "const array = eventsFunctionContext.getArgument(\"Array\");\r",
+            "/** @type {gdjs.Variable} */\r",
+            "const target = eventsFunctionContext.getArgument(\"Target\");\r",
+            "\r",
+            "// Cast to array to ensure getAllChildrenArray returns the real array\r",
+            "array.castTo(\"array\");\r",
+            "\r",
+            "array\r",
+            "    .getAllChildrenArray()\r",
+            "    .splice(eventsFunctionContext.getArgument(\"Index\"), 0, target.clone());\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to insert a variable in",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "The index to insert the variable at",
+          "name": "Index",
+          "type": "expression"
+        },
+        {
+          "description": "The name of the variable to insert",
+          "name": "Target",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Split a string into an array of strings via a separator.",
+      "fullName": "Split string into array",
+      "functionType": "Action",
+      "group": "Scene variables/Array creation",
+      "name": "SplitString",
+      "sentence": "Split string _PARAM1_ via separator _PARAM2_ into array _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const stringToSplit = eventsFunctionContext.getArgument(\"String\");",
+            "const separator = eventsFunctionContext.getArgument(\"Separator\");",
+            "",
+            "// Ensure the target is a clean new array",
+            "array.castTo(\"array\");",
+            "array.clearChildren();",
+            "",
+            "for (const stringFragment of stringToSplit.split(separator))",
+            "    array.pushValue(stringFragment);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The string to split",
+          "name": "String",
+          "type": "string"
+        },
+        {
+          "description": "The separator to use to split the string",
+          "longDescription": "For example, if you have a string \"Hello World\", and the separator is a space (\" \"), the resulting array would be [\"Hello\", \"World\"]. If the separator is an empty string (\"\"), it will make an element per character ([\"H\", \"e\", \"l\", \"l\", \"o\", \" \", \"W\", \"o\", \"r\", \"l\", \"d\"]).",
+          "name": "Separator",
+          "type": "string"
+        },
+        {
+          "description": "Array where to store the results",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns a string made from all strings in an array.",
+      "fullName": "Join all elements of an array together into a string",
+      "functionType": "StringExpression",
+      "group": "Scene variables/String arrays",
+      "name": "Join",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */\r",
+            "const array = eventsFunctionContext.getArgument(\"Array\");\r",
+            "const separator = eventsFunctionContext.getArgument(\"Separator\");\r",
+            "\r",
+            "eventsFunctionContext.returnValue = array\r",
+            "    .getAllChildrenArray()\r",
+            "    .reduce((accumulator, current) => accumulator + separator + current.getAsString(), \"\")\r",
+            "    // Remove first separator as it should be only between the strings\r",
+            "    .slice(separator.length);\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "The name of the array to join into a string",
+          "name": "Array",
+          "type": "variable"
+        },
+        {
+          "description": "Optional separator text between each element",
+          "name": "Separator",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the sum of all numbers in an array.",
+      "fullName": "Sum of array children",
+      "functionType": "Expression",
+      "group": "Scene variables/Number arrays",
+      "name": "Sum",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue =",
+            "    eventsFunctionContext.getArgument(\"Array\")",
+            "        .getAllChildrenArray()",
+            "        .reduce((accumulator, current) => accumulator + current.getAsNumber(), 0);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the smallest number in an array.",
+      "fullName": "Smallest value",
+      "functionType": "Expression",
+      "group": "Scene variables/Number arrays",
+      "name": "Min",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable[]} */\r",
+            "const internalArray = eventsFunctionContext.getArgument(\"Array\").getAllChildrenArray();\r",
+            "const len = internalArray.length;\r",
+            "\r",
+            "if (len === 0) {\r",
+            "    eventsFunctionContext.returnValue = 0;\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "let min = internalArray[0].getAsNumber();\r",
+            "\r",
+            "if (len === 1) {\r",
+            "    eventsFunctionContext.returnValue = min;\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "for (let i = 1; i < len; i++) {\r",
+            "    const num = internalArray[i].getAsNumber();\r",
+            "    if (num < min) min = num;\r",
+            "}\r",
+            "\r",
+            "eventsFunctionContext.returnValue = min;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the biggest number in an array.",
+      "fullName": "Biggest value",
+      "functionType": "Expression",
+      "group": "Scene variables/Number arrays",
+      "name": "Max",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable[]} */\r",
+            "const internalArray = eventsFunctionContext.getArgument(\"Array\").getAllChildrenArray();\r",
+            "const len = internalArray.length;\r",
+            "\r",
+            "if (len === 0) {\r",
+            "    eventsFunctionContext.returnValue = 0;\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "let max = internalArray[0].getAsNumber();\r",
+            "\r",
+            "if (len === 1) {\r",
+            "    eventsFunctionContext.returnValue = max;\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "for (let i = 1; i < len; i++) {\r",
+            "    const num = internalArray[i].getAsNumber();\r",
+            "    if (num > max) max = num;\r",
+            "}\r",
+            "\r",
+            "eventsFunctionContext.returnValue = max;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the average number in an array.",
+      "fullName": "Average value",
+      "functionType": "Expression",
+      "group": "Scene variables/Number arrays",
+      "name": "Mean",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable[]} */\r",
+            "const internalArray = eventsFunctionContext.getArgument(\"Array\").getAllChildrenArray();\r",
+            "\r",
+            "eventsFunctionContext.returnValue =\r",
+            "    internalArray.reduce(\r",
+            "        (accumulator, current) => accumulator + current.getAsNumber(), 0\r",
+            "    ) / internalArray.length;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the median number in an array.",
+      "fullName": "Median value",
+      "functionType": "Expression",
+      "group": "Scene variables/Number arrays",
+      "name": "Median",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable[]} */\r",
+            "const internalArray = eventsFunctionContext.getArgument(\"Array\").getAllChildrenArray();\r",
+            "\r",
+            "const sortedCopy = internalArray.slice().sort((a, b) => {\r",
+            "    const na = a.getAsNumber();\r",
+            "    const nb = b.getAsNumber();\r",
+            "    return na < nb ? -1 : na > nb ? 1 : 0;\r",
+            "})\r",
+            "const i = sortedCopy.length / 2;\r",
+            "\r",
+            "eventsFunctionContext.returnValue =\r",
+            "    i % 1 === 0\r",
+            "        ? (sortedCopy[i - 1].getAsNumber() + sortedCopy[i].getAsNumber()) / 2\r",
+            "        : sortedCopy[Math.trunc(i)].getAsNumber();\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Sort an array of number from smallest to biggest.",
+      "fullName": "Sort an array",
+      "functionType": "Action",
+      "group": "Scene variables/Number arrays",
+      "name": "Sort",
+      "sentence": "Sort array _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "array.getAllChildrenArray()",
+            "    .sort((a, b) => {",
+            "        const na = a.getAsNumber();",
+            "        const nb = b.getAsNumber();",
+            "        return na < nb ? -1 : na > nb ? 1 : 0;",
+            "    });",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to sort",
+          "name": "Array",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The index of the first variable that equals to a specific number in an array.",
+      "fullName": "Index of number",
+      "functionType": "ExpressionAndCondition",
+      "group": "Global variables/Array search",
+      "name": "GlobalIndexOf",
+      "private": true,
+      "sentence": "The first index where _PARAM2_ can be found in _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "eventsFunctionContext.returnValue =",
+            "    array.getAllChildrenArray().findIndex(child => child.getAsNumber() === value);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "Number to search in the array",
+          "name": "Value",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The index of the first variable that equals to a specific text in an array.",
+      "fullName": "Index of text",
+      "functionType": "ExpressionAndCondition",
+      "group": "Global variables/Array search",
+      "name": "GlobalIndexOfStr",
+      "private": true,
+      "sentence": "The first index where _PARAM2_ can be found in _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "eventsFunctionContext.returnValue =",
+            "    array.getAllChildrenArray().findIndex(child => child.getAsString() === value);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "String to search in the array",
+          "name": "Value",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The index of the last variable that equals to a specific number in an array.",
+      "fullName": "Last index of number",
+      "functionType": "ExpressionAndCondition",
+      "group": "Global variables/Array search",
+      "name": "GlobalLastIndexOf",
+      "private": true,
+      "sentence": "The last index where _PARAM2_ can be found in _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "eventsFunctionContext.returnValue = ",
+            "    array.getAllChildrenArray().findLastIndex(child => child.getAsNumber() === value);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "Number to search in the array",
+          "name": "Value",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The index of the last variable that equals to a specific text in an array.",
+      "fullName": "Last index of text",
+      "functionType": "ExpressionAndCondition",
+      "group": "Global variables/Array search",
+      "name": "GlobalLastIndexOfStr",
+      "private": true,
+      "sentence": "The last index where _PARAM2_ can be found in _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "eventsFunctionContext.returnValue =",
+            "    array.getAllChildrenArray().findLastIndex(child => child.getAsString() === value);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "String to search in the array",
+          "name": "Value",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns a random number of an array of numbers.",
+      "fullName": "Random number in array",
+      "functionType": "ExpressionAndCondition",
+      "group": "Global variables/Array access",
+      "name": "GlobalRandomNumberInArray",
+      "private": true,
+      "sentence": "A randomly picked number of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const internalArray = array.getAllChildrenArray();",
+            "",
+            "eventsFunctionContext.returnValue = internalArray.length === 0",
+            "    ? 0",
+            "    : internalArray[Math.floor(Math.random() * internalArray.length)].getAsNumber();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Array to get a number from",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "a random string of an array of strings.",
+      "fullName": "Random string in array",
+      "functionType": "ExpressionAndCondition",
+      "group": "Global variables/Array access",
+      "name": "GlobalRandomStringInArray",
+      "private": true,
+      "sentence": "A randomly picked string of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const internalArray = array.getAllChildrenArray();",
+            "",
+            "eventsFunctionContext.returnValue = internalArray.length === 0",
+            "    ? \"\"",
+            "    : internalArray[Math.floor(Math.random() * internalArray.length)].getAsString();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Array to get a string from",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the last array child of an array, and return it as a number.",
+      "fullName": "Get and remove last variable from array (as number)",
+      "functionType": "ExpressionAndCondition",
+      "group": "Global variables/Array access",
+      "name": "GlobalPopNumber",
+      "private": true,
+      "sentence": "Remove last child of _PARAM1_ and store it in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "eventsFunctionContext.returnValue = array.getAllChildrenArray().pop().getAsNumber();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Array to pop a child from",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the last array child of an array, and return it as a string.",
+      "fullName": "Pop string from array",
+      "functionType": "StringExpression",
+      "group": "Global variables/Array access",
+      "name": "GlobalPopString",
+      "private": true,
+      "sentence": "Remove last child of _PARAM1_ and store it in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "eventsFunctionContext.returnValue = array.getAllChildrenArray().pop().getAsString();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Array to pop a child from",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the first array child of an array, and return it as a number.",
+      "fullName": "Shift number from array",
+      "functionType": "Expression",
+      "group": "Global variables/Array access",
+      "name": "GlobalShiftNumber",
+      "private": true,
+      "sentence": "Remove last child of _PARAM1_ and store it in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "eventsFunctionContext.returnValue = array.getAllChildrenArray().shift().getAsNumber();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Array to shift a child from",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the first array child of an array, and return it as a string.",
+      "fullName": "Shift string from array",
+      "functionType": "StringExpression",
+      "group": "Global variables/Array access",
+      "name": "GlobalShiftString",
+      "private": true,
+      "sentence": "Remove last child of _PARAM1_ and store it in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "eventsFunctionContext.returnValue = array.getAllChildrenArray().shift().getAsString();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "Array to shift a child from",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if an array contains a specific number.",
+      "fullName": "Array has number",
+      "functionType": "Condition",
+      "group": "Global variables/Array search",
+      "name": "GlobalHasNumber",
+      "private": true,
+      "sentence": "Array _PARAM1_ has number _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CopyArgumentToVariable2"
+              },
+              "parameters": [
+                "\"Array\"",
+                "Temp"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Egal"
+              },
+              "parameters": [
+                "ArrayTools::IndexOf(Temp, Value)",
+                "!=",
+                "-1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "The number to search",
+          "name": "Value",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if an array contains a specific string.",
+      "fullName": "Array has string",
+      "functionType": "Condition",
+      "group": "Global variables/Array search",
+      "name": "GlobalHasString",
+      "private": true,
+      "sentence": "Array _PARAM1_ has string _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CopyArgumentToVariable2"
+              },
+              "parameters": [
+                "\"Array\"",
+                "Temp"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Egal"
+              },
+              "parameters": [
+                "ArrayTools::IndexOfStr(Temp, Value)",
+                "!=",
+                "-1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "The text to search",
+          "name": "Value",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Copies a portion of a scene array variable into a new scene array variable.",
+      "fullName": "Slice an array",
+      "functionType": "Action",
+      "group": "Global variables/Array creation",
+      "name": "GlobalSlice",
+      "private": true,
+      "sentence": "Slice array _PARAM1_ from indices _PARAM3_ to _PARAM4_ into _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Ensure the target is a clean new array",
+            "target.castTo(\"array\");",
+            "target.clearChildren();",
+            "",
+            "// Slice the original array",
+            "const slice = array",
+            "    .getAllChildrenArray()",
+            "    .slice(",
+            "        eventsFunctionContext.getArgument(\"Begin\"),",
+            "        // The `|| undefined` replaces 0 with undefined, as having the argument as 0 ",
+            "        // would make the array empty and is therefore useless.",
+            "        // With undefined though, it doesn't stop until the end of the array,",
+            "        // which is purposeful.",
+            "        eventsFunctionContext.getArgument(\"End\") || undefined",
+            "    );",
+            "",
+            "// Copy each variable of the slice into the new array",
+            "for (const variable of slice)",
+            "    target.pushVariableCopy(variable);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to take a slice from",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "The array to store the slice into",
+          "name": "Target",
+          "type": "globalvar"
+        },
+        {
+          "description": "The index to start the slice from",
+          "name": "Begin",
+          "type": "expression"
+        },
+        {
+          "description": "The index to end the slice at",
+          "longDescription": "Set to 0 to copy all of the array. If you use a negative value, the index will be selected beginning from the end.  \nFor example, slicing an array with 5 elements from 0 to -1 would take only elements from indices 0 to 3.",
+          "name": "End",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Cuts a portion of an array off.",
+      "fullName": "Splice an array",
+      "functionType": "Action",
+      "group": "Global variables/Array manipulation",
+      "name": "GlobalSplice",
+      "private": true,
+      "sentence": "Remove _PARAM3_ items from array _PARAM1_ starting from index _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "const internalArray = array.getAllChildrenArray();",
+            "",
+            "internalArray.splice(",
+            "    eventsFunctionContext.getArgument(\"Begin\"),",
+            "    // Replaces 0 with the legth of the array, as having the argument as 0 ",
+            "    // would not remove anything and is therefore useless.",
+            "    eventsFunctionContext.getArgument(\"Count\") || internalArray.length",
+            ");",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to remove items from",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "The index to start removing from",
+          "longDescription": "If you use a negative value, the index will be selected beginning from the end.",
+          "name": "Begin",
+          "type": "expression"
+        },
+        {
+          "description": "The amount of elements to remove",
+          "longDescription": "Set to 0 to remove until the end of the array.",
+          "name": "Count",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Combines all elements of 2 scene arrays into one new scene array.",
+      "fullName": "Combine 2 arrays",
+      "functionType": "Action",
+      "group": "Global variables/Array creation",
+      "name": "GlobalConcatenate",
+      "private": true,
+      "sentence": "Combine array _PARAM1_ and _PARAM2_ into _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const otherArray = eventsFunctionContext.getArgument(\"OtherArray\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Ensure the target is a clean new array",
+            "target.castTo(\"array\");",
+            "target.clearChildren();",
+            "",
+            "// Copy both arrays inside the new one",
+            "for (const variable of array.getAllChildrenArray())",
+            "    target.pushVariableCopy(variable);",
+            "",
+            "for (const variable of otherArray.getAllChildrenArray())",
+            "    target.pushVariableCopy(variable);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The first array",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "The second array",
+          "name": "OtherArray",
+          "type": "globalvar"
+        },
+        {
+          "description": "The variable to store the new array in",
+          "name": "Target",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Appends a copy of all variables of one array to another array.",
+      "fullName": "Append all variable to another array",
+      "functionType": "Action",
+      "group": "Global variables/Array manipulation",
+      "name": "GlobalAppendAll",
+      "private": true,
+      "sentence": "Append all elements from array _PARAM1_ into _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Copy both arrays inside the new one",
+            "for (const variable of array.getAllChildrenArray())",
+            "    target.pushVariableCopy(variable);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to get the variables from",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "The variable to append the variables in",
+          "name": "Target",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Reverses children of an array. The first array child becomes the last, and the last array child becomes the first.",
+      "fullName": "Reverse an array",
+      "functionType": "Action",
+      "group": "Global variables/Array manipulation",
+      "name": "GlobalReverse",
+      "private": true,
+      "sentence": "Reverse array _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "array.getAllChildrenArray().reverse();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to reverse",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Fill an element with a number.",
+      "fullName": "Fill array with number",
+      "functionType": "Action",
+      "group": "Global variables/Array creation",
+      "name": "GlobalFillNumber",
+      "private": true,
+      "sentence": "Fill array _PARAM1_ with _PARAM2_ from index _PARAM3_ to index _PARAM4_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "const internalArray = array.getAllChildrenArray();",
+            "const end = eventsFunctionContext.getArgument(\"End\") || internalArray.length - 1;",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "for (let i = eventsFunctionContext.getArgument(\"Begin\"); i <= end; i++)",
+            "    internalArray[i] = new gdjs.Variable({",
+            "        type: \"number\",",
+            "        value,",
+            "    });",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to fill",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "The number to fill",
+          "name": "Value",
+          "type": "expression"
+        },
+        {
+          "description": "The index to start filling from",
+          "name": "Begin",
+          "type": "expression"
+        },
+        {
+          "description": "The index to stop filling at",
+          "longDescription": "Set to 0 to fill until the end of the array.",
+          "name": "End",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Shuffles all children of an array.",
+      "fullName": "Shuffle array",
+      "functionType": "Action",
+      "group": "Global variables/Array manipulation",
+      "name": "GlobalShuffle",
+      "private": true,
+      "sentence": "Shuffle array _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "array.getAllChildrenArray().sort(() => Math.random() - 0.5);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to shuffle",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Replaces all arrays inside of an array with their children. For example, [[1,2], [3,4]] becomes [1,2,3,4].",
+      "fullName": "Flatten array",
+      "functionType": "Action",
+      "group": "Global variables/Array manipulation",
+      "name": "GlobalFlatten",
+      "private": true,
+      "sentence": "Flatten array _PARAM1_ (Deeply flatten: _PARAM2_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "const internalArray = array.getAllChildrenArray();",
+            "const deep = eventsFunctionContext.getArgument(\"Deep\");",
+            "",
+            "for (let i = 0; i < internalArray.length; i++) {",
+            "    if (internalArray[i].getType() === \"array\") {",
+            "        const childArray = internalArray[i].getAllChildrenArray();",
+            "        // At the position of the array (i), remove 1 element (the array), ",
+            "        // and insert elements of b (the contents of the array) in-place of the array.",
+            "        internalArray.splice(i, 1, ...childArray);",
+            "        // Skip over the elements that were just added as we are flattening only 1 level deep ",
+            "        if (!deep) i += childArray.length;",
+            "        // If deep, the current element has been replaced with another, we need to recheck it on next iteration.",
+            "        // If not deep, the current element is now the one after the array elements and needs to be checked too.",
+            "        // In both case, decreasing by 1 is necessary.",
+            "        i--;",
+            "    }",
+            "}",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to flatten",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "Deeply flatten",
+          "longDescription": "If yes, will continue flattening until there is no arrays in the array anymore.",
+          "name": "Deep",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the last array child of an array, and stores it in another variable.",
+      "fullName": "Pop array child",
+      "functionType": "Action",
+      "group": "Global variables/Array access",
+      "name": "GlobalPop",
+      "private": true,
+      "sentence": "Remove last child of _PARAM1_ and store it in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "gdjs.Variable.copy(array.getAllChildrenArray().pop(), target, false);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to pop a child from",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "The variable to store the popped value into",
+          "name": "Target",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the first array child of an array, and stores it in another variable.",
+      "fullName": "Shift array child",
+      "functionType": "Action",
+      "group": "Global variables/Array access",
+      "name": "GlobalShift",
+      "private": true,
+      "sentence": "Remove first child of _PARAM1_ and store it in _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "gdjs.Variable.copy(array.getAllChildrenArray().shift(), target, false);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to shift a child from",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "The variable to store the shifted value into",
+          "name": "Target",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Insert a variable at a specific index of an array.",
+      "fullName": "Insert variable at",
+      "functionType": "Action",
+      "group": "Global variables/Array manipulation",
+      "name": "GlobalInsertAt",
+      "private": true,
+      "sentence": "Insert variable _PARAM3_ in _PARAM1_ at index _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */\r",
+            "const array = eventsFunctionContext.getArgument(\"Array\");\r",
+            "/** @type {gdjs.Variable} */\r",
+            "const target = eventsFunctionContext.getArgument(\"Target\");\r",
+            "\r",
+            "// Cast to array to ensure getAllChildrenArray returns the real array\r",
+            "array.castTo(\"array\");\r",
+            "\r",
+            "array\r",
+            "    .getAllChildrenArray()\r",
+            "    .splice(eventsFunctionContext.getArgument(\"Index\"), 0, target.clone());\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to insert a variable in",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "The index to insert the variable at",
+          "name": "Index",
+          "type": "expression"
+        },
+        {
+          "description": "The name of the variable to insert",
+          "name": "Target",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Split a string into an array of strings via a separator.",
+      "fullName": "Split string into array",
+      "functionType": "Action",
+      "group": "Global variables/Array creation",
+      "name": "GlobalSplitString",
+      "private": true,
+      "sentence": "Split string _PARAM1_ via separator _PARAM2_ into array _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const stringToSplit = eventsFunctionContext.getArgument(\"String\");",
+            "const separator = eventsFunctionContext.getArgument(\"Separator\");",
+            "",
+            "// Ensure the target is a clean new array",
+            "array.castTo(\"array\");",
+            "array.clearChildren();",
+            "",
+            "for (const stringFragment of stringToSplit.split(separator))",
+            "    array.pushValue(stringFragment);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The string to split",
+          "name": "String",
+          "type": "string"
+        },
+        {
+          "description": "The separator to use to split the string",
+          "longDescription": "For example, if you have a string \"Hello World\", and the separator is a space (\" \"), the resulting array would be [\"Hello\", \"World\"]. If the separator is an empty string (\"\"), it will make an element per character ([\"H\", \"e\", \"l\", \"l\", \"o\", \" \", \"W\", \"o\", \"r\", \"l\", \"d\"]).",
+          "name": "Separator",
+          "type": "string"
+        },
+        {
+          "description": "Array where to store the results",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns a string made from all strings in an array.",
+      "fullName": "Join all elements of an array together into a string",
+      "functionType": "StringExpression",
+      "group": "Global variables/String arrays",
+      "name": "GlobalJoin",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */\r",
+            "const array = eventsFunctionContext.getArgument(\"Array\");\r",
+            "const separator = eventsFunctionContext.getArgument(\"Separator\");\r",
+            "\r",
+            "eventsFunctionContext.returnValue = array\r",
+            "    .getAllChildrenArray()\r",
+            "    .reduce((accumulator, current) => accumulator + separator + current.getAsString(), \"\")\r",
+            "    // Remove first separator as it should be only between the strings\r",
+            "    .slice(separator.length);\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "The name of the array to join into a string",
+          "name": "Array",
+          "type": "globalvar"
+        },
+        {
+          "description": "Optional separator text between each element",
+          "name": "Separator",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the sum of all numbers in an array.",
+      "fullName": "Sum of array children",
+      "functionType": "Expression",
+      "group": "Global variables/Number arrays",
+      "name": "GlobalSum",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue =",
+            "    eventsFunctionContext.getArgument(\"Array\")",
+            "        .getAllChildrenArray()",
+            "        .reduce((accumulator, current) => accumulator + current.getAsNumber(), 0);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the smallest number in an array.",
+      "fullName": "Smallest value",
+      "functionType": "Expression",
+      "group": "Global variables/Number arrays",
+      "name": "GlobalMin",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable[]} */\r",
+            "const internalArray = eventsFunctionContext.getArgument(\"Array\").getAllChildrenArray();\r",
+            "const len = internalArray.length;\r",
+            "\r",
+            "if (len === 0) {\r",
+            "    eventsFunctionContext.returnValue = 0;\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "let min = internalArray[0].getAsNumber();\r",
+            "\r",
+            "if (len === 1) {\r",
+            "    eventsFunctionContext.returnValue = min;\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "for (let i = 1; i < len; i++) {\r",
+            "    const num = internalArray[i].getAsNumber();\r",
+            "    if (num < min) min = num;\r",
+            "}\r",
+            "\r",
+            "eventsFunctionContext.returnValue = min;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the biggest number in an array.",
+      "fullName": "Biggest value",
+      "functionType": "Expression",
+      "group": "Global variables/Number arrays",
+      "name": "GlobalMax",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable[]} */\r",
+            "const internalArray = eventsFunctionContext.getArgument(\"Array\").getAllChildrenArray();\r",
+            "const len = internalArray.length;\r",
+            "\r",
+            "if (len === 0) {\r",
+            "    eventsFunctionContext.returnValue = 0;\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "let max = internalArray[0].getAsNumber();\r",
+            "\r",
+            "if (len === 1) {\r",
+            "    eventsFunctionContext.returnValue = max;\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "for (let i = 1; i < len; i++) {\r",
+            "    const num = internalArray[i].getAsNumber();\r",
+            "    if (num > max) max = num;\r",
+            "}\r",
+            "\r",
+            "eventsFunctionContext.returnValue = max;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the average number in an array.",
+      "fullName": "Average value",
+      "functionType": "Expression",
+      "group": "Global variables/Number arrays",
+      "name": "GlobalMean",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable[]} */\r",
+            "const internalArray = eventsFunctionContext.getArgument(\"Array\").getAllChildrenArray();\r",
+            "\r",
+            "eventsFunctionContext.returnValue =\r",
+            "    internalArray.reduce(\r",
+            "        (accumulator, current) => accumulator + current.getAsNumber(), 0\r",
+            "    ) / internalArray.length;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the median number in an array.",
+      "fullName": "Median value",
+      "functionType": "Expression",
+      "group": "Global variables/Number arrays",
+      "name": "GlobalMedian",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable[]} */\r",
+            "const internalArray = eventsFunctionContext.getArgument(\"Array\").getAllChildrenArray();\r",
+            "\r",
+            "const sortedCopy = internalArray.slice().sort((a, b) => {\r",
+            "    const na = a.getAsNumber();\r",
+            "    const nb = b.getAsNumber();\r",
+            "    return na < nb ? -1 : na > nb ? 1 : 0;\r",
+            "})\r",
+            "const i = sortedCopy.length / 2;\r",
+            "\r",
+            "eventsFunctionContext.returnValue =\r",
+            "    i % 1 === 0\r",
+            "        ? (sortedCopy[i - 1].getAsNumber() + sortedCopy[i].getAsNumber()) / 2\r",
+            "        : sortedCopy[Math.trunc(i)].getAsNumber();\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Sort an array of number from smallest to biggest.",
+      "fullName": "Sort an array",
+      "functionType": "Action",
+      "group": "Global variables/Number arrays",
+      "name": "GlobalSort",
+      "private": true,
+      "sentence": "Sort array _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "array.getAllChildrenArray()",
+            "    .sort((a, b) => {",
+            "        const na = a.getAsNumber();",
+            "        const nb = b.getAsNumber();",
+            "        return na < nb ? -1 : na > nb ? 1 : 0;",
+            "    });",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The array to sort",
+          "name": "Array",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The index of the first variable that equals to a specific number in an array.",
+      "fullName": "Index of number",
+      "functionType": "ExpressionAndCondition",
+      "group": "Object variables/Array search",
+      "name": "ObjectIndexOf",
+      "sentence": "The first index where _PARAM3_ can be found in _PARAM2_ of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "eventsFunctionContext.returnValue =",
+            "    array.getAllChildrenArray().findIndex(child => child.getAsNumber() === value);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "Number to search in the array",
+          "name": "Value",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The index of the first variable that equals to a specific text in an array.",
+      "fullName": "Index of text",
+      "functionType": "ExpressionAndCondition",
+      "group": "Object variables/Array search",
+      "name": "ObjectIndexOfStr",
+      "sentence": "The first index where _PARAM3_ can be found in _PARAM2_ of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "eventsFunctionContext.returnValue =",
+            "    array.getAllChildrenArray().findIndex(child => child.getAsString() === value);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "String to search in the array",
+          "name": "Value",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The index of the last variable that equals to a specific number in an array.",
+      "fullName": "Last index of number",
+      "functionType": "ExpressionAndCondition",
+      "group": "Object variables/Array search",
+      "name": "ObjectLastIndexOf",
+      "sentence": "The last index where _PARAM3_ can be found in _PARAM2_ of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "eventsFunctionContext.returnValue = ",
+            "    array.getAllChildrenArray().findLastIndex(child => child.getAsNumber() === value);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "Number to search in the array",
+          "name": "Value",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "The index of the last variable that equals to a specific text in an array.",
+      "fullName": "Last index of text",
+      "functionType": "ExpressionAndCondition",
+      "group": "Object variables/Array search",
+      "name": "ObjectLastIndexOfStr",
+      "sentence": "The last index where _PARAM3_ can be found in _PARAM2_ of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "eventsFunctionContext.returnValue =",
+            "    array.getAllChildrenArray().findLastIndex(child => child.getAsString() === value);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "String to search in the array",
+          "name": "Value",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns a random number of an array of numbers.",
+      "fullName": "Random number in array",
+      "functionType": "ExpressionAndCondition",
+      "group": "Object variables/Array access",
+      "name": "ObjectRandomNumberInArray",
+      "sentence": "A randomly picked number of _PARAM2_ of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const internalArray = array.getAllChildrenArray();",
+            "",
+            "eventsFunctionContext.returnValue = internalArray.length === 0",
+            "    ? 0",
+            "    : internalArray[Math.floor(Math.random() * internalArray.length)].getAsNumber();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Array to get a number from",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "a random string of an array of strings.",
+      "fullName": "Random string in array",
+      "functionType": "ExpressionAndCondition",
+      "group": "Object variables/Array access",
+      "name": "ObjectRandomStringInArray",
+      "sentence": "A randomly picked string of _PARAM2_ of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const internalArray = array.getAllChildrenArray();",
+            "",
+            "eventsFunctionContext.returnValue = internalArray.length === 0",
+            "    ? \"\"",
+            "    : internalArray[Math.floor(Math.random() * internalArray.length)].getAsString();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Array to get a string from",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the last array child of an array, and return it as a number.",
+      "fullName": "Get and remove last variable from array (as number)",
+      "functionType": "ExpressionAndCondition",
+      "group": "Object variables/Array access",
+      "name": "ObjectPopNumber",
+      "sentence": "Remove last child of _PARAM2_ of _PARAM1_ and store it in _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "eventsFunctionContext.returnValue = array.getAllChildrenArray().pop().getAsNumber();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Array to pop a child from",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the last array child of an array, and return it as a string.",
+      "fullName": "Pop string from array",
+      "functionType": "StringExpression",
+      "group": "Object variables/Array access",
+      "name": "ObjectPopString",
+      "sentence": "Remove last child of _PARAM2_ of _PARAM1_ and store it in _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "eventsFunctionContext.returnValue = array.getAllChildrenArray().pop().getAsString();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Array to pop a child from",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the first array child of an array, and return it as a number.",
+      "fullName": "Shift number from array",
+      "functionType": "Expression",
+      "group": "Object variables/Array access",
+      "name": "ObjectShiftNumber",
+      "sentence": "Remove last child of _PARAM2_ of _PARAM1_ and store it in _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "eventsFunctionContext.returnValue = array.getAllChildrenArray().shift().getAsNumber();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Array to shift a child from",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the first array child of an array, and return it as a string.",
+      "fullName": "Shift string from array",
+      "functionType": "StringExpression",
+      "group": "Object variables/Array access",
+      "name": "ObjectShiftString",
+      "sentence": "Remove last child of _PARAM2_ of _PARAM1_ and store it in _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "eventsFunctionContext.returnValue = array.getAllChildrenArray().shift().getAsString();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Array to shift a child from",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if an array contains a specific number.",
+      "fullName": "Array has number",
+      "functionType": "Condition",
+      "group": "Object variables/Array search",
+      "name": "ObjectHasNumber",
+      "sentence": "Array _PARAM2_ of _PARAM1_ has number _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CopyArgumentToVariable2"
+              },
+              "parameters": [
+                "\"Array\"",
+                "Temp"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Egal"
+              },
+              "parameters": [
+                "ArrayTools::IndexOf(Temp, Value)",
+                "!=",
+                "-1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "The number to search",
+          "name": "Value",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks if an array contains a specific string.",
+      "fullName": "Array has string",
+      "functionType": "Condition",
+      "group": "Object variables/Array search",
+      "name": "ObjectHasString",
+      "sentence": "Array _PARAM2_ of _PARAM1_ has string _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "CopyArgumentToVariable2"
+              },
+              "parameters": [
+                "\"Array\"",
+                "Temp"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Egal"
+              },
+              "parameters": [
+                "ArrayTools::IndexOfStr(Temp, Value)",
+                "!=",
+                "-1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Array to search the value in",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "The text to search",
+          "name": "Value",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Copies a portion of a scene array variable into a new scene array variable.",
+      "fullName": "Slice an array",
+      "functionType": "Action",
+      "group": "Object variables/Array creation",
+      "name": "ObjectSlice",
+      "sentence": "Slice array _PARAM2_ of _PARAM1_ from indices _PARAM5_ to _PARAM6_ into _PARAM4_ of _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Ensure the target is a clean new array",
+            "target.castTo(\"array\");",
+            "target.clearChildren();",
+            "",
+            "// Slice the original array",
+            "const slice = array",
+            "    .getAllChildrenArray()",
+            "    .slice(",
+            "        eventsFunctionContext.getArgument(\"Begin\"),",
+            "        // The `|| undefined` replaces 0 with undefined, as having the argument as 0 ",
+            "        // would make the array empty and is therefore useless.",
+            "        // With undefined though, it doesn't stop until the end of the array,",
+            "        // which is purposeful.",
+            "        eventsFunctionContext.getArgument(\"End\") || undefined",
+            "    );",
+            "",
+            "// Copy each variable of the slice into the new array",
+            "for (const variable of slice)",
+            "    target.pushVariableCopy(variable);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array to take a slice from",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array to store the slice into",
+          "name": "Target",
+          "type": "objectvar"
+        },
+        {
+          "description": "The index to start the slice from",
+          "name": "Begin",
+          "type": "expression"
+        },
+        {
+          "description": "The index to end the slice at",
+          "longDescription": "Set to 0 to copy all of the array. If you use a negative value, the index will be selected beginning from the end.  \nFor example, slicing an array with 5 elements from 0 to -1 would take only elements from indices 0 to 3.",
+          "name": "End",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Cuts a portion of an array off.",
+      "fullName": "Splice an array",
+      "functionType": "Action",
+      "group": "Object variables/Array manipulation",
+      "name": "ObjectSplice",
+      "sentence": "Remove _PARAM4_ items from array _PARAM2_ of _PARAM1_ starting from index _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "const internalArray = array.getAllChildrenArray();",
+            "",
+            "internalArray.splice(",
+            "    eventsFunctionContext.getArgument(\"Begin\"),",
+            "    // Replaces 0 with the legth of the array, as having the argument as 0 ",
+            "    // would not remove anything and is therefore useless.",
+            "    eventsFunctionContext.getArgument(\"Count\") || internalArray.length",
+            ");",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array to remove items from",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "The index to start removing from",
+          "longDescription": "If you use a negative value, the index will be selected beginning from the end.",
+          "name": "Begin",
+          "type": "expression"
+        },
+        {
+          "description": "The amount of elements to remove",
+          "longDescription": "Set to 0 to remove until the end of the array.",
+          "name": "Count",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Combines all elements of 2 scene arrays into one new scene array.",
+      "fullName": "Combine 2 arrays",
+      "functionType": "Action",
+      "group": "Object variables/Array creation",
+      "name": "ObjectConcatenate",
+      "sentence": "Combine array _PARAM2_ of _PARAM1_ and _PARAM4_ of _PARAM3_ into _PARAM6_ of _PARAM5_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const otherArray = eventsFunctionContext.getArgument(\"OtherArray\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Ensure the target is a clean new array",
+            "target.castTo(\"array\");",
+            "target.clearChildren();",
+            "",
+            "// Copy both arrays inside the new one",
+            "for (const variable of array.getAllChildrenArray())",
+            "    target.pushVariableCopy(variable);",
+            "",
+            "for (const variable of otherArray.getAllChildrenArray())",
+            "    target.pushVariableCopy(variable);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The first array",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The second array",
+          "name": "OtherArray",
+          "type": "objectvar"
+        },
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The variable to store the new array in",
+          "name": "Target",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Appends a copy of all variables of one array to another array.",
+      "fullName": "Append all variable to another array",
+      "functionType": "Action",
+      "group": "Object variables/Array manipulation",
+      "name": "ObjectAppendAll",
+      "sentence": "Append all elements from array _PARAM2_ of _PARAM1_ into _PARAM4_ of _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Copy both arrays inside the new one",
+            "for (const variable of array.getAllChildrenArray())",
+            "    target.pushVariableCopy(variable);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array to get the variables from",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The variable to append the variables in",
+          "name": "Target",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Reverses children of an array. The first array child becomes the last, and the last array child becomes the first.",
+      "fullName": "Reverse an array",
+      "functionType": "Action",
+      "group": "Object variables/Array manipulation",
+      "name": "ObjectReverse",
+      "sentence": "Reverse array _PARAM2_ of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "array.getAllChildrenArray().reverse();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array to reverse",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Fill an element with a number.",
+      "fullName": "Fill array with number",
+      "functionType": "Action",
+      "group": "Object variables/Array creation",
+      "name": "ObjectFillNumber",
+      "sentence": "Fill array _PARAM2_ of _PARAM1_ with _PARAM3_ from index _PARAM4_ to index _PARAM5_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "const internalArray = array.getAllChildrenArray();",
+            "const end = eventsFunctionContext.getArgument(\"End\") || internalArray.length - 1;",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "",
+            "for (let i = eventsFunctionContext.getArgument(\"Begin\"); i <= end; i++)",
+            "    internalArray[i] = new gdjs.Variable({",
+            "        type: \"number\",",
+            "        value,",
+            "    });",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array to fill",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "The number to fill",
+          "name": "Value",
+          "type": "expression"
+        },
+        {
+          "description": "The index to start filling from",
+          "name": "Begin",
+          "type": "expression"
+        },
+        {
+          "description": "The index to stop filling at",
+          "longDescription": "Set to 0 to fill until the end of the array.",
+          "name": "End",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Shuffles all children of an array.",
+      "fullName": "Shuffle array",
+      "functionType": "Action",
+      "group": "Object variables/Array manipulation",
+      "name": "ObjectShuffle",
+      "sentence": "Shuffle array _PARAM2_ of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "array.getAllChildrenArray().sort(() => Math.random() - 0.5);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array to shuffle",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Replaces all arrays inside of an array with their children. For example, [[1,2], [3,4]] becomes [1,2,3,4].",
+      "fullName": "Flatten array",
+      "functionType": "Action",
+      "group": "Object variables/Array manipulation",
+      "name": "ObjectFlatten",
+      "sentence": "Flatten array _PARAM2_ of _PARAM1_ (Deeply flatten: _PARAM3_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "const internalArray = array.getAllChildrenArray();",
+            "const deep = eventsFunctionContext.getArgument(\"Deep\");",
+            "",
+            "for (let i = 0; i < internalArray.length; i++) {",
+            "    if (internalArray[i].getType() === \"array\") {",
+            "        const childArray = internalArray[i].getAllChildrenArray();",
+            "        // At the position of the array (i), remove 1 element (the array), ",
+            "        // and insert elements of b (the contents of the array) in-place of the array.",
+            "        internalArray.splice(i, 1, ...childArray);",
+            "        // Skip over the elements that were just added as we are flattening only 1 level deep ",
+            "        if (!deep) i += childArray.length;",
+            "        // If deep, the current element has been replaced with another, we need to recheck it on next iteration.",
+            "        // If not deep, the current element is now the one after the array elements and needs to be checked too.",
+            "        // In both case, decreasing by 1 is necessary.",
+            "        i--;",
+            "    }",
+            "}",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array to flatten",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "Deeply flatten",
+          "longDescription": "If yes, will continue flattening until there is no arrays in the array anymore.",
+          "name": "Deep",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the last array child of an array, and stores it in another variable.",
+      "fullName": "Pop array child",
+      "functionType": "Action",
+      "group": "Object variables/Array access",
+      "name": "ObjectPop",
+      "sentence": "Remove last child of _PARAM2_ of _PARAM1_ and store it in _PARAM4_ of _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "gdjs.Variable.copy(array.getAllChildrenArray().pop(), target, false);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array to pop a child from",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The variable to store the popped value into",
+          "name": "Target",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Removes the first array child of an array, and stores it in another variable.",
+      "fullName": "Shift array child",
+      "functionType": "Action",
+      "group": "Object variables/Array access",
+      "name": "ObjectShift",
+      "sentence": "Remove first child of _PARAM2_ of _PARAM1_ and store it in _PARAM4_ of _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "/** @type {gdjs.Variable} */",
+            "const target = eventsFunctionContext.getArgument(\"Target\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "gdjs.Variable.copy(array.getAllChildrenArray().shift(), target, false);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array to shift a child from",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The variable to store the shifted value into",
+          "name": "Target",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Insert a variable at a specific index of an array.",
+      "fullName": "Insert variable at",
+      "functionType": "Action",
+      "group": "Object variables/Array manipulation",
+      "name": "ObjectInsertAt",
+      "sentence": "Insert variable _PARAM5_ of _PARAM4_ in _PARAM2_ of _PARAM1_ at index _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */\r",
+            "const array = eventsFunctionContext.getArgument(\"Array\");\r",
+            "/** @type {gdjs.Variable} */\r",
+            "const target = eventsFunctionContext.getArgument(\"Target\");\r",
+            "\r",
+            "// Cast to array to ensure getAllChildrenArray returns the real array\r",
+            "array.castTo(\"array\");\r",
+            "\r",
+            "array\r",
+            "    .getAllChildrenArray()\r",
+            "    .splice(eventsFunctionContext.getArgument(\"Index\"), 0, target.clone());\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array to insert a variable in",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "The index to insert the variable at",
+          "name": "Index",
+          "type": "expression"
+        },
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The name of the variable to insert",
+          "name": "Target",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Split a string into an array of strings via a separator.",
+      "fullName": "Split string into array",
+      "functionType": "Action",
+      "group": "Object variables/Array creation",
+      "name": "ObjectSplitString",
+      "sentence": "Split string _PARAM1_ via separator _PARAM2_ into array _PARAM4_ of _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "const stringToSplit = eventsFunctionContext.getArgument(\"String\");",
+            "const separator = eventsFunctionContext.getArgument(\"Separator\");",
+            "",
+            "// Ensure the target is a clean new array",
+            "array.castTo(\"array\");",
+            "array.clearChildren();",
+            "",
+            "for (const stringFragment of stringToSplit.split(separator))",
+            "    array.pushValue(stringFragment);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The string to split",
+          "name": "String",
+          "type": "string"
+        },
+        {
+          "description": "The separator to use to split the string",
+          "longDescription": "For example, if you have a string \"Hello World\", and the separator is a space (\" \"), the resulting array would be [\"Hello\", \"World\"]. If the separator is an empty string (\"\"), it will make an element per character ([\"H\", \"e\", \"l\", \"l\", \"o\", \" \", \"W\", \"o\", \"r\", \"l\", \"d\"]).",
+          "name": "Separator",
+          "type": "string"
+        },
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Array where to store the results",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns a string made from all strings in an array.",
+      "fullName": "Join all elements of an array together into a string",
+      "functionType": "StringExpression",
+      "group": "Object variables/String arrays",
+      "name": "ObjectJoin",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */\r",
+            "const array = eventsFunctionContext.getArgument(\"Array\");\r",
+            "const separator = eventsFunctionContext.getArgument(\"Separator\");\r",
+            "\r",
+            "eventsFunctionContext.returnValue = array\r",
+            "    .getAllChildrenArray()\r",
+            "    .reduce((accumulator, current) => accumulator + separator + current.getAsString(), \"\")\r",
+            "    // Remove first separator as it should be only between the strings\r",
+            "    .slice(separator.length);\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The name of the array to join into a string",
+          "name": "Array",
+          "type": "objectvar"
+        },
+        {
+          "description": "Optional separator text between each element",
+          "name": "Separator",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the sum of all numbers in an array.",
+      "fullName": "Sum of array children",
+      "functionType": "Expression",
+      "group": "Object variables/Number arrays",
+      "name": "ObjectSum",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "eventsFunctionContext.returnValue =",
+            "    eventsFunctionContext.getArgument(\"Array\")",
+            "        .getAllChildrenArray()",
+            "        .reduce((accumulator, current) => accumulator + current.getAsNumber(), 0);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the smallest number in an array.",
+      "fullName": "Smallest value",
+      "functionType": "Expression",
+      "group": "Object variables/Number arrays",
+      "name": "ObjectMin",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable[]} */\r",
+            "const internalArray = eventsFunctionContext.getArgument(\"Array\").getAllChildrenArray();\r",
+            "const len = internalArray.length;\r",
+            "\r",
+            "if (len === 0) {\r",
+            "    eventsFunctionContext.returnValue = 0;\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "let min = internalArray[0].getAsNumber();\r",
+            "\r",
+            "if (len === 1) {\r",
+            "    eventsFunctionContext.returnValue = min;\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "for (let i = 1; i < len; i++) {\r",
+            "    const num = internalArray[i].getAsNumber();\r",
+            "    if (num < min) min = num;\r",
+            "}\r",
+            "\r",
+            "eventsFunctionContext.returnValue = min;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the biggest number in an array.",
+      "fullName": "Biggest value",
+      "functionType": "Expression",
+      "group": "Object variables/Number arrays",
+      "name": "ObjectMax",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable[]} */\r",
+            "const internalArray = eventsFunctionContext.getArgument(\"Array\").getAllChildrenArray();\r",
+            "const len = internalArray.length;\r",
+            "\r",
+            "if (len === 0) {\r",
+            "    eventsFunctionContext.returnValue = 0;\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "let max = internalArray[0].getAsNumber();\r",
+            "\r",
+            "if (len === 1) {\r",
+            "    eventsFunctionContext.returnValue = max;\r",
+            "    return;\r",
+            "}\r",
+            "\r",
+            "for (let i = 1; i < len; i++) {\r",
+            "    const num = internalArray[i].getAsNumber();\r",
+            "    if (num > max) max = num;\r",
+            "}\r",
+            "\r",
+            "eventsFunctionContext.returnValue = max;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the average number in an array.",
+      "fullName": "Average value",
+      "functionType": "Expression",
+      "group": "Object variables/Number arrays",
+      "name": "ObjectMean",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable[]} */\r",
+            "const internalArray = eventsFunctionContext.getArgument(\"Array\").getAllChildrenArray();\r",
+            "\r",
+            "eventsFunctionContext.returnValue =\r",
+            "    internalArray.reduce(\r",
+            "        (accumulator, current) => accumulator + current.getAsNumber(), 0\r",
+            "    ) / internalArray.length;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the median number in an array.",
+      "fullName": "Median value",
+      "functionType": "Expression",
+      "group": "Object variables/Number arrays",
+      "name": "ObjectMedian",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable[]} */\r",
+            "const internalArray = eventsFunctionContext.getArgument(\"Array\").getAllChildrenArray();\r",
+            "\r",
+            "const sortedCopy = internalArray.slice().sort((a, b) => {\r",
+            "    const na = a.getAsNumber();\r",
+            "    const nb = b.getAsNumber();\r",
+            "    return na < nb ? -1 : na > nb ? 1 : 0;\r",
+            "})\r",
+            "const i = sortedCopy.length / 2;\r",
+            "\r",
+            "eventsFunctionContext.returnValue =\r",
+            "    i % 1 === 0\r",
+            "        ? (sortedCopy[i - 1].getAsNumber() + sortedCopy[i].getAsNumber()) / 2\r",
+            "        : sortedCopy[Math.trunc(i)].getAsNumber();\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Sort an array of number from smallest to biggest.",
+      "fullName": "Sort an array",
+      "functionType": "Action",
+      "group": "Object variables/Number arrays",
+      "name": "ObjectSort",
+      "sentence": "Sort array _PARAM2_ of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "/** @type {gdjs.Variable} */",
+            "const array = eventsFunctionContext.getArgument(\"Array\");",
+            "",
+            "// Cast to array to ensure getAllChildrenArray returns the real array",
+            "array.castTo(\"array\");",
+            "",
+            "array.getAllChildrenArray()",
+            "    .sort((a, b) => {",
+            "        const na = a.getAsNumber();",
+            "        const nb = b.getAsNumber();",
+            "        return na < nb ? -1 : na > nb ? 1 : 0;",
+            "    });",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The object the variable is from",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "The array to sort",
+          "name": "Array",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

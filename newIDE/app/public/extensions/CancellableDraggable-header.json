@@ -1,0 +1,46 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Cancellable draggable object",
+  "name": "CancellableDraggable",
+  "version": "0.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/CancellableDraggable.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/CancellableDraggable-header.json",
+  "tags": "drag,drop",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/step-backward.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Cancel drag and smoothly tween object back to original position.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/cancellable-draggable",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Allow to cancel the drag of an object and make it smoothly return to its original position (with a tween).",
+      "fullName": "Cancellable Draggable object",
+      "name": "CancellableDraggable",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "CancelLastDraggingS",
+          "fullName": "Cancel drag",
+          "description": "Cancel last drag.",
+          "functionType": "Action"
+        },
+        {
+          "name": "DraggingIsCancelled",
+          "fullName": "Dragging is cancelled",
+          "description": "Dragging is cancelled, the object is returning to its original position.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Add this behavior on an object with the Draggable behavior and the Tween behavior. \nUse then the action to cancel the drag, and the behavior will smoothly animate the object back to its original position, using a tween animation.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXN0ZXAtYmFja3dhcmQiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTksNVYxOUgxNlY1TTE0LDVWMTlMMywxMiIgLz48L3N2Zz4="
+}

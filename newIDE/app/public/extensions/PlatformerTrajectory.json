@@ -1,0 +1,1178 @@
+{
+  "author": "",
+  "category": "Movement",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Platformer trajectory",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNoYXJ0LWJlbGwtY3VydmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNOS45NiwxMS4zMUMxMC44Miw4LjEgMTEuNSw2IDEzLDZDMTQuNSw2IDE1LjE4LDguMSAxNi4wNCwxMS4zMUMxNywxNC45MiAxOC4xLDE5IDIyLDE5VjE3QzE5LjgsMTcgMTksMTQuNTQgMTcuOTcsMTAuOEMxNy4wOCw3LjQ2IDE2LjE1LDQgMTMsNEM5Ljg1LDQgOC45Miw3LjQ2IDguMDMsMTAuOEM3LjAzLDE0LjU0IDYuMiwxNyA0LDE3VjJIMlYyMkgyMlYyMEg0VjE5QzcuOSwxOSA5LDE0LjkyIDkuOTYsMTEuMzFaIiAvPjwvc3ZnPg==",
+  "name": "PlatformerTrajectory",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/chart-bell-curve.svg",
+  "shortDescription": "Configure jumps by height/duration. AI tools for gap and ledge detection.",
+  "dimension": "2D",
+  "version": "0.1.0",
+  "description": [
+    "For objects having the 2D platformer character behavior, this provides a behavior allowing to:",
+    "* Configure the height of a jump by automatically choosing the right jump speed ([open the project online](https://editor.gdevelop.io/?project=example://platformer-jump-evaluator)).",
+    "* Know when to jump to reach a platform (can be useful for AI).",
+    "* Draw jump trajectories to check a level design."
+  ],
+  "origin": {
+    "identifier": "PlatformerTrajectory",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "jump,platform,platformer,artificial inteligence,ai",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Configure the height of a jump and evaluate the jump trajectory.",
+      "fullName": "Platformer trajectory evaluator",
+      "name": "PlatformerEvaluator",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "JumpHeight",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PlatformerTrajectory::PlatformerEvaluator::SetJumpHeight"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "JumpHeight",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the jump speed to reach a given height.",
+          "fullName": "Jump height",
+          "functionType": "Action",
+          "name": "SetJumpHeight",
+          "sentence": "Change the jump height of _PARAM0_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "JumpHeight",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "// Formulas used in this extension were generated from a math model.",
+                "// They are probably not understandable on their own.",
+                "// If you need to modify them or need to write new feature,",
+                "// please take a look to the platformer extension documentation:",
+                "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                "",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = objects[0].getBehavior(behaviorName);",
+                "/** @type {float} */",
+                "const jumpHeight = -Math.abs(eventsFunctionContext.getArgument(\"Value\"));",
+                "",
+                "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                "/** @type {float} */",
+                "const gravity = character.getGravity();",
+                "/** @type {float} */",
+                "const maxFallingSpeed = character.getMaxFallingSpeed();",
+                "/** @type {float} */",
+                "const jumpSustainTime = character.getJumpSustainTime();",
+                "",
+                "const maxFallingSpeedReachedTime = maxFallingSpeed / gravity;",
+                "",
+                "// The implementation jumps from one quadratic resolution to another",
+                "// to find the right formula to use as the time is unknown.",
+                "",
+                "const sustainCase = (jumpHeight) => Math.sqrt(-jumpHeight * gravity * 2);",
+                "const maxFallingCase = (jumpHeight) => -gravity * jumpSustainTime + maxFallingSpeed",
+                "    + Math.sqrt(gravity * gravity * jumpSustainTime * jumpSustainTime - 2 * jumpHeight * gravity - maxFallingSpeed * maxFallingSpeed);",
+                "",
+                "let jumpSpeed = 0;",
+                "let peakTime = 0;",
+                "if (maxFallingSpeedReachedTime > jumpSustainTime) {",
+                "    // common case",
+                "    jumpSpeed = -gravity * jumpSustainTime + Math.sqrt(2 * gravity * gravity * jumpSustainTime * jumpSustainTime - 4 * jumpHeight * gravity);",
+                "    peakTime = (gravity * jumpSustainTime + jumpSpeed) / (2 * gravity);",
+                "    if (peakTime < jumpSustainTime) {",
+                "        jumpSpeed = sustainCase(jumpHeight);",
+                "    }",
+                "    else if (peakTime > maxFallingSpeedReachedTime) {",
+                "        jumpSpeed = maxFallingCase(jumpHeight);",
+                "    }",
+                "}",
+                "else {",
+                "    // affine case can't have a maximum",
+                "",
+                "    // sustain case",
+                "    jumpSpeed = sustainCase(jumpHeight);",
+                "    peakTime = jumpSpeed / gravity;",
+                "    if (peakTime > maxFallingSpeedReachedTime) {",
+                "        jumpSpeed = maxFallingCase(jumpHeight);",
+                "    }",
+                "}",
+                "",
+                "if (jumpSpeed >= 0) {",
+                "    character.setJumpSpeed(jumpSpeed);",
+                "}",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+              "type": "behavior"
+            },
+            {
+              "description": "Jump height",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Draw the jump trajectories from no sustain to full sustain.",
+          "fullName": "Draw jump",
+          "functionType": "Action",
+          "name": "DrawJump",
+          "sentence": "Draw the jump trajectory of _PARAM0_ on _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "The trajectory with full jump sustaining"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Time",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::BeginFillPath"
+                  },
+                  "parameters": [
+                    "ShapePainter",
+                    "0",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Duration",
+                    "=",
+                    "Object.Behavior::JumpDownTime(0, Object.PlatformerCharacter::JumpSustainTime())"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Duration",
+                    "=",
+                    "3"
+                  ]
+                }
+              ]
+            },
+            {
+              "infiniteLoopWarning": true,
+              "type": "BuiltinCommonInstructions::While",
+              "whileConditions": [
+                {
+                  "type": {
+                    "value": "PlatformerTrajectory::PlatformerEvaluator::PropertyTime"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "<",
+                    "Duration"
+                  ]
+                }
+              ],
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::PathLineTo"
+                  },
+                  "parameters": [
+                    "ShapePainter",
+                    "Object.PlatformerCharacter::MaxSpeed() * Time",
+                    "Object.Behavior::JumpY(Time, Object.PlatformerCharacter::JumpSustainTime())"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Time",
+                    "+",
+                    "1/30"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "The trajectory without jump sustaining (impossible to do in practice as sustain happens at least one frame)"
+            },
+            {
+              "infiniteLoopWarning": true,
+              "type": "BuiltinCommonInstructions::While",
+              "whileConditions": [
+                {
+                  "type": {
+                    "value": "PlatformerTrajectory::PlatformerEvaluator::PropertyTime"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ">",
+                    "0"
+                  ]
+                }
+              ],
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Time",
+                    "-",
+                    "1/30"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::PathLineTo"
+                  },
+                  "parameters": [
+                    "ShapePainter",
+                    "Object.PlatformerCharacter::MaxSpeed() * Time",
+                    "Object.Behavior::JumpY(Time, 0)"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::closePath"
+                  },
+                  "parameters": [
+                    "ShapePainter"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+              "type": "behavior"
+            },
+            {
+              "description": "Shape painter",
+              "name": "ShapePainter",
+              "supplementaryInformation": "PrimitiveDrawing::Drawer",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The jump Y displacement at a given time from the start of the jump.",
+          "fullName": "Jump Y",
+          "functionType": "Expression",
+          "name": "JumpY",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "// Formulas used in this extension were generated from a math model.",
+                "// They are probably not understandable on their own.",
+                "// If you need to modify them or need to write new feature,",
+                "// please take a look to the platformer extension documentation:",
+                "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                "",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = objects[0].getBehavior(behaviorName);",
+                "/** @type {float} */",
+                "const t = eventsFunctionContext.getArgument(\"Time\");",
+                "/** @type {float} */",
+                "const jumpSustainTime = eventsFunctionContext.getArgument(\"JumpSustainTime\");",
+                "",
+                "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                "/** @type {float} */",
+                "const gravity = character.getGravity();",
+                "/** @type {float} */",
+                "const maxFallingSpeed = character.getMaxFallingSpeed();",
+                "/** @type {float} */",
+                "const jumpSpeed = character.getJumpSpeed();",
+                "",
+                "// Falling and jump speed are integrated independently",
+                "// and summed at the end to get the Y displacement.",
+                "",
+                "const maxFallingSpeedReachedTime = maxFallingSpeed / gravity;",
+                "let fallingY = 0;",
+                "if (t < maxFallingSpeedReachedTime) {",
+                "    fallingY = gravity * t * t / 2;",
+                "}",
+                "else {",
+                "    fallingY = maxFallingSpeed * (t - maxFallingSpeed / (2 * gravity));",
+                "}",
+                "",
+                "const jumpEndTime = jumpSustainTime + jumpSpeed / gravity;",
+                "let jumpingY = 0;",
+                "if (t < jumpSustainTime) {",
+                "    jumpingY = -jumpSpeed * t;",
+                "}",
+                "else if (t < jumpEndTime) {",
+                "    jumpingY = gravity * jumpSustainTime * jumpSustainTime / 2 + gravity * t * t / 2",
+                "        - (gravity * jumpSustainTime + jumpSpeed) * t;",
+                "}",
+                "else {",
+                "    jumpingY = (jumpEndTime * jumpEndTime + jumpSustainTime * jumpSustainTime) * gravity / 2",
+                "        - (gravity * jumpSustainTime + jumpSpeed) * jumpEndTime;",
+                "}",
+                "",
+                "eventsFunctionContext.returnValue = fallingY + jumpingY;",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+              "type": "behavior"
+            },
+            {
+              "description": "Time",
+              "name": "Time",
+              "type": "expression"
+            },
+            {
+              "description": "Jump sustaining duration",
+              "name": "JumpSustainTime",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The maximum Y displacement.",
+          "fullName": "Peak Y",
+          "functionType": "Expression",
+          "name": "JumpPeakY",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Behavior::JumpY(Object.Behavior::JumpPeakTime(JumpSustainTime), JumpSustainTime)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+              "type": "behavior"
+            },
+            {
+              "description": "Jump sustaining duration",
+              "name": "JumpSustainTime",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The time from the start of the jump when it reaches the maximum Y displacement.",
+          "fullName": "Peak time",
+          "functionType": "Expression",
+          "name": "JumpPeakTime",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "// Formulas used in this extension were generated from a math model.",
+                "// They are probably not understandable on their own.",
+                "// If you need to modify them or need to write new feature,",
+                "// please take a look to the platformer extension documentation:",
+                "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                "",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = objects[0].getBehavior(behaviorName);",
+                "/** @type {float} */",
+                "const y = eventsFunctionContext.getArgument(\"PositionY\");",
+                "/** @type {float} */",
+                "const jumpSustainTime = eventsFunctionContext.getArgument(\"JumpSustainTime\");",
+                "",
+                "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                "/** @type {float} */",
+                "const gravity = character.getGravity();",
+                "/** @type {float} */",
+                "const maxFallingSpeed = character.getMaxFallingSpeed();",
+                "/** @type {float} */",
+                "const jumpSpeed = character.getJumpSpeed();",
+                "",
+                "const maxFallingSpeedReachedTime = maxFallingSpeed / gravity;",
+                "",
+                "// The implementation jumps from one quadratic resolution to another",
+                "// to find the right formula to use as the time is unknown.",
+                "let peakTime = 0;",
+                "",
+                "if (maxFallingSpeedReachedTime > jumpSustainTime) {",
+                "    // common case",
+                "    peakTime = (gravity * jumpSustainTime + jumpSpeed) / (2 * gravity);",
+                "    if (peakTime < jumpSustainTime) {",
+                "        // sustain case",
+                "        peakTime = jumpSpeed / gravity;",
+                "    }",
+                "    else if (peakTime > maxFallingSpeedReachedTime) {",
+                "        // max falling case",
+                "        peakTime = jumpSustainTime + (jumpSpeed - maxFallingSpeed) / gravity;",
+                "    }",
+                "}",
+                "else {",
+                "    // affine case can't have a maximum",
+                "",
+                "    // sustain case",
+                "    peakTime = jumpSpeed / gravity;",
+                "    if (peakTime > maxFallingSpeedReachedTime) {",
+                "        // max falling case",
+                "        peakTime = jumpSustainTime + (jumpSpeed - maxFallingSpeed) / gravity;",
+                "    }",
+                "}",
+                "",
+                "//console.log(\"peakTime: \" + peakTime);",
+                "eventsFunctionContext.returnValue = peakTime;",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+              "type": "behavior"
+            },
+            {
+              "description": "Jump sustaining duration",
+              "name": "JumpSustainTime",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The time from the start of the jump when it reaches a given Y displacement moving upward.",
+          "fullName": "Jump up time",
+          "functionType": "Expression",
+          "name": "JumpUpTime",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Behavior::JumpPeakTime(JumpSustainTime)"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "PositionY",
+                    ">=",
+                    "Object.Behavior::JumpPeakY(JumpSustainTime)"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "// Formulas used in this extension were generated from a math model.",
+                    "// They are probably not understandable on their own.",
+                    "// If you need to modify them or need to write new feature,",
+                    "// please take a look to the platformer extension documentation:",
+                    "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                    "",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = objects[0].getBehavior(behaviorName);",
+                    "/** @type {float} */",
+                    "const y = eventsFunctionContext.getArgument(\"PositionY\");",
+                    "/** @type {float} */",
+                    "const jumpSustainTime = eventsFunctionContext.getArgument(\"JumpSustainTime\");",
+                    "",
+                    "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                    "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                    "/** @type {float} */",
+                    "const gravity = character.getGravity();",
+                    "/** @type {float} */",
+                    "const maxFallingSpeed = character.getMaxFallingSpeed();",
+                    "/** @type {float} */",
+                    "const jumpSpeed = character.getJumpSpeed();",
+                    "",
+                    "const maxFallingSpeedReachedTime = maxFallingSpeed / gravity;",
+                    "const jumpEndTime = jumpSustainTime + jumpSpeed / gravity;",
+                    "",
+                    "// The implementation jumps from one quadratic resolution to another",
+                    "// to find the right formula to use as the time is unknown.",
+                    "const sustainCase = (y) => (jumpSpeed - Math.sqrt(jumpSpeed * jumpSpeed + 2 * gravity * y)) / gravity;",
+                    "const affineCase = (y) => -(maxFallingSpeed * maxFallingSpeed + 2 * gravity * y) / (gravity * jumpSpeed - gravity * maxFallingSpeed) / 2;",
+                    "const commonCase = (y) => (gravity * jumpSustainTime + jumpSpeed - Math.sqrt(-gravity * gravity * jumpSustainTime * jumpSustainTime",
+                    "    + 2 * gravity * jumpSpeed * jumpSustainTime + jumpSpeed * jumpSpeed + 4 * gravity * y)) / (2 * gravity);",
+                    "const maxFallingCase = (y) => (gravity * jumpSustainTime + jumpSpeed - maxFallingSpeed - Math.sqrt(2 * gravity * jumpSpeed * jumpSustainTime",
+                    "    + jumpSpeed * jumpSpeed - 2 * (gravity * jumpSustainTime + jumpSpeed) * maxFallingSpeed + 2 * maxFallingSpeed * maxFallingSpeed + 2 * gravity * y)) / gravity;",
+                    "const freeFallCase = (y) => -Math.sqrt(2 * gravity * jumpSpeed * jumpSustainTime + jumpSpeed * jumpSpeed + 2 * gravity * y) / gravity;",
+                    "//const gladdingCase = (y) => (2 * gravity * jumpSpeed * jumpSustainTime + jumpSpeed * jumpSpeed + maxFallingSpeed * maxFallingSpeed + 2 * gravity * y) / (2 * gravity * maxFallingSpeed);",
+                    "",
+                    "let time = 0;",
+                    "if (maxFallingSpeedReachedTime > jumpEndTime) {",
+                    "    time = sustainCase(y);",
+                    "    if (time > jumpSustainTime || Number.isNaN(time)) {",
+                    "        time = commonCase(y);",
+                    "        if (time > jumpEndTime || Number.isNaN(time)) {",
+                    "            time = freeFallCase(y);",
+                    "        }",
+                    "    }",
+                    "}",
+                    "else if (maxFallingSpeedReachedTime > jumpSustainTime) {",
+                    "    time = sustainCase(y);",
+                    "    if (time > jumpSustainTime || Number.isNaN(time)) {",
+                    "        time = commonCase(y);",
+                    "        if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {",
+                    "            time = maxFallingCase(y);",
+                    "        }",
+                    "    }",
+                    "}",
+                    "else {",
+                    "    time = sustainCase(y);",
+                    "    if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {",
+                    "        time = maxFallingSpeed <= jumpSpeed ? affineCase(y) : time = Number.MAX_VALUE",
+                    "        if (time > jumpSustainTime || Number.isNaN(time)) {",
+                    "            time = maxFallingCase(y);",
+                    "        }",
+                    "    }",
+                    "}",
+                    "",
+                    "eventsFunctionContext.returnValue = time;",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+              "type": "behavior"
+            },
+            {
+              "description": "Y position",
+              "name": "PositionY",
+              "type": "expression"
+            },
+            {
+              "description": "Jump sustaining duration",
+              "name": "JumpSustainTime",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The time from the start of the jump when it reaches a given Y displacement moving downward.",
+          "fullName": "Jump down time",
+          "functionType": "Expression",
+          "name": "JumpDownTime",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Behavior::JumpPeakTime(JumpSustainTime)"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "PositionY",
+                    ">=",
+                    "Object.Behavior::JumpPeakY(JumpSustainTime)"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "// Formulas used in this extension were generated from a math model.",
+                    "// They are probably not understandable on their own.",
+                    "// If you need to modify them or need to write new feature,",
+                    "// please take a look to the platformer extension documentation:",
+                    "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                    "",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = objects[0].getBehavior(behaviorName);",
+                    "/** @type {float} */",
+                    "const y = eventsFunctionContext.getArgument(\"PositionY\");",
+                    "/** @type {float} */",
+                    "const jumpSustainTime = eventsFunctionContext.getArgument(\"JumpSustainTime\");",
+                    "",
+                    "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                    "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                    "/** @type {float} */",
+                    "const gravity = character.getGravity();",
+                    "/** @type {float} */",
+                    "const maxFallingSpeed = character.getMaxFallingSpeed();",
+                    "/** @type {float} */",
+                    "const jumpSpeed = character.getJumpSpeed();",
+                    "",
+                    "const maxFallingSpeedReachedTime = maxFallingSpeed / gravity;",
+                    "const jumpEndTime = jumpSustainTime + jumpSpeed / gravity;",
+                    "",
+                    "//console.log(\"y: \" + y);",
+                    "",
+                    "// The implementation jumps from one quadratic resolution to another",
+                    "// to find the right formula to use as the time is unknown.",
+                    "const sustainCase = (y) => (jumpSpeed + Math.sqrt(jumpSpeed * jumpSpeed + 2 * gravity * y)) / gravity;",
+                    "const affineCase = (y) => -(maxFallingSpeed * maxFallingSpeed + 2 * gravity * y) / (gravity * jumpSpeed - gravity * maxFallingSpeed) / 2;",
+                    "const commonCase = (y) => (gravity * jumpSustainTime + jumpSpeed + Math.sqrt(-gravity * gravity * jumpSustainTime * jumpSustainTime",
+                    "    + 2 * gravity * jumpSpeed * jumpSustainTime + jumpSpeed * jumpSpeed + 4 * gravity * y)) / (2 * gravity);",
+                    "const maxFallingCase = (y) => (gravity * jumpSustainTime + jumpSpeed - maxFallingSpeed + Math.sqrt(2 * gravity * jumpSpeed * jumpSustainTime",
+                    "    + jumpSpeed * jumpSpeed - 2 * (gravity * jumpSustainTime + jumpSpeed) * maxFallingSpeed + 2 * maxFallingSpeed * maxFallingSpeed + 2 * gravity * y)) / gravity;",
+                    "const freeFallCase = (y) => Math.sqrt(2 * gravity * jumpSpeed * jumpSustainTime + jumpSpeed * jumpSpeed + 2 * gravity * y) / gravity;",
+                    "const gladdingCase = (y) => (2 * gravity * jumpSpeed * jumpSustainTime + jumpSpeed * jumpSpeed + maxFallingSpeed * maxFallingSpeed + 2 * gravity * y) / (2 * gravity * maxFallingSpeed);",
+                    "",
+                    "let time = 0;",
+                    "if (maxFallingSpeedReachedTime > jumpEndTime) {",
+                    "    time = sustainCase(y);",
+                    "    if (time > jumpSustainTime || Number.isNaN(time)) {",
+                    "        time = commonCase(y);",
+                    "        if (time > jumpEndTime || Number.isNaN(time)) {",
+                    "            time = freeFallCase(y);",
+                    "            if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {",
+                    "                time = gladdingCase(y);",
+                    "            }",
+                    "        }",
+                    "    }",
+                    "}",
+                    "else if (maxFallingSpeedReachedTime > jumpSustainTime) {",
+                    "    time = sustainCase(y);",
+                    "    if (time > jumpSustainTime || Number.isNaN(time)) {",
+                    "        time = commonCase(y);",
+                    "        if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {",
+                    "            time = maxFallingCase(y);",
+                    "            if (time > jumpEndTime || Number.isNaN(time)) {",
+                    "                time = gladdingCase(y);",
+                    "            }",
+                    "        }",
+                    "    }",
+                    "}",
+                    "else {",
+                    "    time = sustainCase(y);",
+                    "    if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {",
+                    "        time = maxFallingSpeed >= jumpSpeed ? affineCase(y) : time = Number.MAX_VALUE;",
+                    "        if (time > jumpSustainTime || Number.isNaN(time)) {",
+                    "            time = maxFallingCase(y);",
+                    "            if (time > jumpEndTime || Number.isNaN(time)) {",
+                    "                time = gladdingCase(y);",
+                    "            }",
+                    "        }",
+                    "    }",
+                    "}",
+                    "",
+                    "eventsFunctionContext.returnValue = time;",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+              "type": "behavior"
+            },
+            {
+              "description": "Y position",
+              "name": "PositionY",
+              "type": "expression"
+            },
+            {
+              "description": "Jump sustaining duration",
+              "name": "JumpSustainTime",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The X displacement before the character stops (always positive).",
+          "fullName": "Stop distance",
+          "functionType": "Expression",
+          "name": "StopXDistance",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "// Formulas used in this extension were generated from a math model.",
+                "// They are probably not understandable on their own.",
+                "// If you need to modify them or need to write new feature,",
+                "// please take a look to the platformer extension documentation:",
+                "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                "",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = objects[0].getBehavior(behaviorName);",
+                "/** @type {float} */",
+                "const t = eventsFunctionContext.getArgument(\"Time\");",
+                "",
+                "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                "/** @type {float} */",
+                "const decelerationX = character.getDeceleration();",
+                "/** @type {float} */",
+                "const currentSpeedX = Math.abs(character.getCurrentSpeed());",
+                "",
+                "let x = 0;",
+                "if (currentSpeedX === 0) {",
+                "    x = 0;",
+                "}",
+                "else {",
+                "    const stopXTime = currentSpeedX / decelerationX;",
+                "    t = stopXTime;",
+                "    x = currentSpeedX * t - decelerationX * t * t / 2;",
+                "}",
+                "eventsFunctionContext.returnValue = x;",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+              "type": "behavior"
+            },
+            {
+              "description": "Time",
+              "name": "Time",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The X displacement at a given time from now if decelerating (always positive).",
+          "fullName": "Stopping X",
+          "functionType": "Expression",
+          "name": "StoppingX",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "// Formulas used in this extension were generated from a math model.",
+                "// They are probably not understandable on their own.",
+                "// If you need to modify them or need to write new feature,",
+                "// please take a look to the platformer extension documentation:",
+                "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                "",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = objects[0].getBehavior(behaviorName);",
+                "/** @type {float} */",
+                "const t = eventsFunctionContext.getArgument(\"Time\");",
+                "",
+                "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                "/** @type {float} */",
+                "const decelerationX = character.getDeceleration();",
+                "/** @type {float} */",
+                "const currentSpeedX = Math.abs(character.getCurrentSpeed());",
+                "",
+                "let x = 0;",
+                "if (currentSpeedX === 0) {",
+                "    x = 0;",
+                "}",
+                "else {",
+                "    const stopXTime = currentSpeedX / decelerationX;",
+                "    t = Math.min(t, stopXTime);",
+                "    x = currentSpeedX * t - decelerationX * t * t / 2;",
+                "}",
+                "eventsFunctionContext.returnValue = x;",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+              "type": "behavior"
+            },
+            {
+              "description": "Time",
+              "name": "Time",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "The X displacement at a given time from now if accelerating (always positive).",
+          "fullName": "Moving X",
+          "functionType": "Expression",
+          "name": "MovingX",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "// Formulas used in this extension were generated from a math model.",
+                "// They are probably not understandable on their own.",
+                "// If you need to modify them or need to write new feature,",
+                "// please take a look to the platformer extension documentation:",
+                "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                "",
+                "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                "const behavior = objects[0].getBehavior(behaviorName);",
+                "/** @type {float} */",
+                "const t = eventsFunctionContext.getArgument(\"Time\");",
+                "",
+                "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                "/** @type {float} */",
+                "const accelerationX = character.getAcceleration();",
+                "/** @type {float} */",
+                "const maxSpeedX = character.getMaxSpeed();",
+                "/** @type {float} */",
+                "const currentSpeedX = Math.abs(character.getCurrentSpeed());",
+                "",
+                "let x = 0;",
+                "if (currentSpeedX === maxSpeedX) {",
+                "    x = maxSpeedX * t;",
+                "}",
+                "else {",
+                "    const maxSpeedXTime = Math.min(0, (maxSpeedX - currentSpeedX) / accelerationX);",
+                "    if (t < maxSpeedXTime) {",
+                "        x = currentSpeedX * t + accelerationX * t * t / 2",
+                "    }",
+                "    else {",
+                "        x = currentSpeedX * maxSpeedXTime",
+                "            + accelerationX * maxSpeedXTime * maxSpeedXTime / 2",
+                "            + maxSpeedX * (t - maxSpeedXTime);",
+                "    }",
+                "}",
+                "eventsFunctionContext.returnValue = x;",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+              "type": "behavior"
+            },
+            {
+              "description": "Time",
+              "name": "Time",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Platformer character",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "PlatformBehavior::PlatformerObjectBehavior"
+          ],
+          "name": "PlatformerCharacter"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "Jump height",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "JumpHeight"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "Time"
+        },
+        {
+          "value": "",
+          "type": "Number",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "Duration"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

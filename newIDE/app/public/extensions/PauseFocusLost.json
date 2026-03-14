@@ -1,0 +1,42 @@
+{
+  "author": "",
+  "category": "User interface",
+  "description": "When the game loses focus, either because you switch windows, open another tab in the browser or for any other reason, the game is paused and muted.\n\nWhen focus is regained, the game continues.",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Pause when losing focus",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXBsYXktcGF1c2UiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMyw1VjE5TDExLDEyTTEzLDE5SDE2VjVIMTNNMTgsNVYxOUgyMVY1IiAvPjwvc3ZnPg==",
+  "name": "PauseFocusLost",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/play-pause.svg",
+  "shortDescription": "Pauses when focus is lost, restarts when focus is regained.",
+  "version": "0.0.2",
+  "tags": "Pause,focus",
+  "authorIds": [
+    "6gSSmzTTyVOHCx0jw8I9OFeI0aR2"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Pause when game lost focus.",
+      "fullName": "Active pause on blur",
+      "functionType": "Action",
+      "group": "",
+      "name": "Active",
+      "private": false,
+      "sentence": "Pause when game lost focus",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "var sound_manager = runtimeScene.getGame().getSoundManager();\r\nvar volumen = sound_manager.getGlobalVolume();\r\n\r\nwindow.addEventListener('focus', function (event) {\r\nsound_manager.setGlobalVolume(volumen);\r\nruntimeScene.getGame().pause(false);\r\n});\r\n\r\nwindow.addEventListener('blur', function (event) {\r\nsound_manager.setGlobalVolume(0);\r\nruntimeScene.getGame().pause(true);\r\n});",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

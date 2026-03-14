@@ -1,0 +1,182 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "AlZ3D1xkH0QDao7T37VZZUeYNpn1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Record",
+  "name": "Record",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/Record.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Record-header.json",
+  "tags": "dom apis,record,capture,video",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/video-vintage.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Record gameplay as video clips for download.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 26,
+  "helpPath": "/extensions/record",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "Start",
+      "fullName": "Start recording",
+      "description": "Start the recording.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Stop",
+      "fullName": "Stop recording",
+      "description": "End the recording.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Pause",
+      "fullName": "Pause recording",
+      "description": "Pause recording.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Resume",
+      "fullName": "Resume recording",
+      "description": "Resume recording.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Save",
+      "fullName": "Save recording",
+      "description": "Save recording to the file system on destop, or to the downloads folder for web. Always ask for permission to save a file.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Status",
+      "fullName": "Get current state",
+      "description": "Returns the current status of the reccorder: inactive (not recording), recording, or paused.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "FrameRate",
+      "fullName": "Get frame rate",
+      "description": "Get the current framerate.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "SetFrameRate",
+      "fullName": "Set frame rate",
+      "description": "Set the frame rate, must be set before starting a recording. Defaults to the min FPS set in the game properties.",
+      "functionType": "Action"
+    },
+    {
+      "name": "VideoBitRate",
+      "fullName": "Get video bit rate per second",
+      "description": "Returns the current video bit rate per second.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "SetVideoBitRate",
+      "fullName": "Set video bit rate",
+      "description": "Set the video bit rate, must be set before starting a recording. Defaults to 2500000.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetFormat",
+      "fullName": "Set file format",
+      "description": "Set the file format, if a selected file format is unsupported on the users platform a supported one will be picked by deafult.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Format",
+      "fullName": "Get codec",
+      "description": "Returns the current video format.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "SetCodec",
+      "fullName": "Set codec",
+      "description": "Set the video codec, if a selected codec is unsupported on the users platform a supported one will be picked by deafult.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Codec",
+      "fullName": "Get video codec",
+      "description": "Returns the current video codec.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "ErrorType",
+      "fullName": "Error type",
+      "description": "When an error occurs this method will return what type of error it is.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "OnError",
+      "fullName": "When an errror has occurred ",
+      "description": "Check if an error has occurred.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnPause",
+      "fullName": "When recording has paused",
+      "description": "Check if a recording has just been paused.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnResume",
+      "fullName": "When recording has resumed",
+      "description": "Check if a recording has just been resumed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnStart",
+      "fullName": "When recording has started",
+      "description": "Check if recording has just started.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnStop",
+      "fullName": "When recording has stopped",
+      "description": "Check if recording has just stopped.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "OnSave",
+      "fullName": "When recording has saved",
+      "description": "Check if recording has just been saved.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsFormatSupported",
+      "fullName": "Is format supported on user device",
+      "description": "Check if the specified format is available on the users device. To avoid unsupported formats pick commons ones like MP4 or WebM.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "Quality",
+      "fullName": "Get frame rate",
+      "description": "Get the current GIF quality.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "SetQuality",
+      "fullName": "Set GIF quality",
+      "description": "Set the GIF quality, must be set before starting a recording. Defaults to 10.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Dithering",
+      "fullName": "Get frame rate",
+      "description": "Returns whether or not dithering is enabled for GIFs.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "SetDithering",
+      "fullName": "Set GIF Dithering",
+      "description": "Enable dithering in GIF, must be set before starting a recording. Defaults to false.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Actions to record the game and let players download the clips. Includes options to pause and resume recordings. Additionally, frame rate and file format can be chosen.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZpZGVvLXZpbnRhZ2UiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTgsMTQuNVYxMUExLDEgMCAwLDAgMTcsMTBIMTZDMTguMjQsOC4zOSAxOC43Niw1LjI3IDE3LjE1LDNDMTUuNTQsMC43OCAxMi40MiwwLjI2IDEwLjE3LDEuODdDOS41LDIuMzUgOC45NiwzIDguNiwzLjczQzYuMjUsMi4yOCAzLjE3LDMgMS43Miw1LjM3QzAuMjgsNy43MiAxLDEwLjggMy4zNiwxMi4yNUMzLjU3LDEyLjM3IDMuNzgsMTIuNSA0LDEyLjU4VjIxQTEsMSAwIDAsMCA1LDIySDE3QTEsMSAwIDAsMCAxOCwyMVYxNy41TDIyLDIxLjVWMTAuNUwxOCwxNC41TTEzLDRBMiwyIDAgMCwxIDE1LDZBMiwyIDAgMCwxIDEzLDhBMiwyIDAgMCwxIDExLDZBMiwyIDAgMCwxIDEzLDRNNiw2QTIsMiAwIDAsMSA4LDhBMiwyIDAgMCwxIDYsMTBBMiwyIDAgMCwxIDQsOEEyLDIgMCAwLDEgNiw2WiIgLz48L3N2Zz4="
+}

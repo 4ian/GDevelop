@@ -1,0 +1,23 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Unpicks all instances",
+  "name": "ObjectPickingTools",
+  "version": "2.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/ObjectPickingTools.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ObjectPickingTools-header.json",
+  "tags": "",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/selection-ellipse-arrow-inside.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Unpick all instances of an object.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/object-picking-tools",
+  "description": "Unpick all instances of an object to only pick objects created by following actions.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNlbGVjdGlvbi1lbGxpcHNlLWFycm93LWluc2lkZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMS4yIDRDOS45NCA0LjEyIDguNzIgNC41MyA3LjY0IDUuMkw2LjY0IDMuNDdDNy45NSAyLjY0IDkuNDUgMi4xMyAxMSAyTTE3LjUzIDYuMjVDMTYuNjIgNS4zOSAxNS41MyA0LjczIDE0LjM0IDQuMzNMMTUgMi4zOUMxNi41IDIuODQgMTcuODkgMy42NiAxOSA0Ljc4TTUuMzQgNy40MUM0LjY0IDguNDQgNC4xOSA5LjYgNCAxMC44M0wyIDEwLjU1QzIuMiA5IDIuNzkgNy41IDMuNyA2LjIzTTIyIDEyVjEyLjY2TDIwIDEyLjVWMTJDMjAgMTAuOTIgMTkuODEgOS44NiAxOS4zOSA4Ljg2TDIxLjIyIDguMDZDMjEuNzUgOS4zMSAyMiAxMC42NSAyMiAxMk02IDE3LjNMNC41IDE4LjYxQzMuNDcgMTcuNDMgMi43MiAxNi4wNCAyLjMgMTQuNTNMNC4xNyAxNEM0LjUzIDE1LjIyIDUuMTYgMTYuMzUgNiAxNy4zTTEyLjE0IDIySDEyQzEwLjUgMjIgOSAyMS42OCA3LjY0IDIxLjA3TDguNTMgMTkuMjRDOS42MiAxOS43NSAxMC44IDIwIDEyIDIwSDEyLjE5TTE3IDIxSDE1VjE1SDIxVjE3SDE4LjQyTDIxLjE0IDE5Ljc2TDE5LjczIDIxLjE3TDE3IDE4LjUiIC8+PC9zdmc+"
+}

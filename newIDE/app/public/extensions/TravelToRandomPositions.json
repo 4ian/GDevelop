@@ -1,0 +1,267 @@
+{
+  "author": "Tristan Rhodes (tristan@victrisgames.com)",
+  "category": "Movement",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Make object travel to random positions",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWF4aXMtYXJyb3ciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIsMkwxNiw2SDEzVjEzLjg1TDE5LjUzLDE3LjYxTDIxLDE1LjAzTDIyLjUsMjAuNUwxNywyMS45NkwxOC41MywxOS4zNUwxMiwxNS41OEw1LjQ3LDE5LjM1TDcsMjEuOTZMMS41LDIwLjVMMywxNS4wM0w0LjQ3LDE3LjYxTDExLDEzLjg1VjZIOEwxMiwyWiIgLz48L3N2Zz4=",
+  "name": "TravelToRandomPositions",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/axis-arrow.svg",
+  "shortDescription": "Move objects to random nearby positions using Pathfinding. Optional direction bias.",
+  "dimension": "2D",
+  "version": "0.4.2",
+  "description": [
+    "When the action is used, the object(s) will select a random nearby 2D location and begin moving towards it (using the 2D Pathfinding behavior). ",
+    "",
+    "If desired, choose a direction and how closely you want the object to follow it.  This can be used to make objects chase (or run away from) the player, or to make objects cross the screen using a meandering path.",
+    "",
+    "If you keep using the action, once the object reaches a destination, it will select a new random location and begin moving towards it.",
+    "",
+    "If you want to modify the speed of the object, edit the Pathfinding behavior of the object."
+  ],
+  "origin": {
+    "identifier": "TravelToRandomPositions",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "random,move,pathfinding,travel,object,direction,angle",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Make object travel to a random position around the object current position. The movement is initiated only when the object is not moving already (its Pathfinding behavior speed is 0).  Move towards a specified angle, if desired.",
+      "fullName": "Make object travel to a random position, with optional direction",
+      "functionType": "Action",
+      "name": "TravelToRandomPositions",
+      "sentence": "Move _PARAM1_ to random positions, where each stop is at least _PARAM3_px and at most _PARAM4_px from the current position. Move towards angle _PARAM5_ with a bias of _PARAM6_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Create a new destination every time the object stops"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "PathfindingBehavior::Speed"
+              },
+              "parameters": [
+                "Object",
+                "Pathfinding",
+                "=",
+                "0"
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Min",
+                    "=",
+                    "abs(MinDistanceBetweenPositions)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Max",
+                    "=",
+                    "abs(MaxDistanceBetweenPositions)"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Use default values if needed"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "Min",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "Min",
+                        "=",
+                        "100"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "Max",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "Min",
+                        "=",
+                        "200"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "DistanceSelected",
+                        "=",
+                        "RandomInRange(Min, Max)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "DirectionSelected",
+                        "=",
+                        "Direction + RandomInRange(-180, 180) * (1 - DirectionBias)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PathfindingBehavior::SetDestination"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Pathfinding",
+                        "",
+                        "Object.X() + XFromAngleAndDistance(DirectionSelected, DistanceSelected)",
+                        "Object.Y() + YFromAngleAndDistance(DirectionSelected, DistanceSelected)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "variables": [
+                {
+                  "name": "Min",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "name": "Max",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "name": "DistanceSelected",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "name": "DirectionSelected",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Object that will be travelling (must have Pathfinding behavior)",
+          "name": "Object",
+          "type": "objectList"
+        },
+        {
+          "description": "Pathfinding Behavior (required)",
+          "name": "Pathfinding",
+          "supplementaryInformation": "PathfindingBehavior::PathfindingBehavior",
+          "type": "behavior"
+        },
+        {
+          "description": "Minimum distance between each position (Default: 100px)",
+          "name": "MinDistanceBetweenPositions",
+          "type": "expression"
+        },
+        {
+          "description": "Maximum distance between each position (Default: 200px)",
+          "name": "MaxDistanceBetweenPositions",
+          "type": "expression"
+        },
+        {
+          "description": "Direction (in degrees) the object will move towards (Range: 0-360)",
+          "name": "Direction",
+          "type": "expression"
+        },
+        {
+          "description": "Direction bias (Range: 0-1) ",
+          "longDescription": "For example: \"0\" picks a completely random direction, \"0.5\" will select a direction within the half-circle that faces the specified direction, and \"1\" simply uses the specified direction.",
+          "name": "DirectionBias",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

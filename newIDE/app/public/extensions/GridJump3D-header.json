@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "dt0tRnf2kHWJnjkrpnzTzNj9Yc63"
+  ],
+  "extensionNamespace": "",
+  "fullName": "3D grid jump",
+  "name": "GridJump3D",
+  "version": "0.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/GridJump3D.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/GridJump3D-header.json",
+  "tags": "jump,3d,grid",
+  "category": "Movement",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/ddec4ab4b06e61ce74c078d206fe51e13de336850eb99761d036c818d10818be_arrow-up-bold-box-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Move objects by jumping on a grid like a frog.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/grid-jump3d",
+  "description": "It can be used for board games.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWFycm93LXVwLWJvbGQtYm94LW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIsN0wxNywxMkgxNFYxNkgxMFYxMkg3TDEyLDdNMTksMjFINUEyLDIgMCAwLDEgMywxOVY1QTIsMiAwIDAsMSA1LDNIMTlBMiwyIDAgMCwxIDIxLDVWMTlBMiwyIDAgMCwxIDE5LDIxTTE5LDE5VjVINVYxOUgxOVoiIC8+PC9zdmc+"
+}

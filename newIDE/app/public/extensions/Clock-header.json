@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "N4sZ052zwPVw6Y9n4y9yfRF8ilA2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Clock",
+  "name": "Clock",
+  "version": "0.4.0",
+  "url": "https://resources.gdevelop-app.com/extensions/Clock.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Clock-header.json",
+  "tags": "clock,time,date,month,year,javascript",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/clock-time-eight.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Add clocks into your game.",
+  "eventsBasedBehaviorsCount": 3,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/clock",
+  "description": "Add clocks to your game with ease including\n\n    12 - hour time\n    24 - hour time\n    English date\n    Numeral date\n.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNsb2NrLXRpbWUtZWlnaHQiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIgMkM2LjUgMiAyIDYuNSAyIDEyQzIgMTcuNSA2LjUgMjIgMTIgMjJDMTcuNSAyMiAyMiAxNy41IDIyIDEyUzE3LjUgMiAxMiAyTTcuNyAxNS41TDcgMTQuMkwxMSAxMS45VjdIMTIuNVYxMi44TDcuNyAxNS41WiIgLz48L3N2Zz4="
+}

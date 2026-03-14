@@ -1,0 +1,312 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "wWP8BSlAW0UP4NeaHa2LcmmDzmH2",
+    "xpwUwByyImTDcHEqDUqfyg0oRBt1",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Health points and damage",
+  "name": "Health",
+  "version": "0.4.0",
+  "url": "https://resources.gdevelop-app.com/extensions/Health.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Health-header.json",
+  "tags": "health,life,damage,hit,heal,shield,regeneration,armor",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/heart-half-full.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Health/life system: damage, shield, armor, regeneration, cooldown, and over-healing.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/health",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Manage health (life) points, shield and armor.",
+      "fullName": "Health",
+      "name": "Health",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "Hit",
+          "fullName": "Apply damage to an object",
+          "description": "Apply damage to the object. Shield and armor can reduce this damage if enabled.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Health",
+          "fullName": "Health points",
+          "description": "Compare current health points of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHealth",
+          "fullName": "Change health points",
+          "description": "Change the health points of the object. Will not trigger damage cooldown.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Heal",
+          "fullName": "Heal object",
+          "description": "Heal the object by increasing its health points.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MaxHealth",
+          "fullName": "Maximum health points",
+          "description": "Compare the maximum health points of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetMaxHealthOp",
+          "fullName": "Maximum health points",
+          "description": "Change the maximum health points of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HealthRegenRate",
+          "fullName": "Rate of health regeneration",
+          "description": "Compare the rate of health regeneration (points per second).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHealthRegenRateOp",
+          "fullName": "Rate of health regeneration",
+          "description": "Change the rate of health regeneration (points per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "DamageCooldownDuration",
+          "fullName": "Damage cooldown",
+          "description": "Compare the duration of damage cooldown (seconds).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetCooldownDurationOp",
+          "fullName": "Damage cooldown",
+          "description": "Change the duration of damage cooldown (seconds).",
+          "functionType": "Action"
+        },
+        {
+          "name": "HealthRegenDelay",
+          "fullName": "Health regeneration delay",
+          "description": "Compare the delay before health regeneration starts after last being hit (seconds).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetHealthRegenDelayOp",
+          "fullName": "Health regeneration delay",
+          "description": "Change the delay before health regeneration starts after last being hit (seconds).",
+          "functionType": "Action"
+        },
+        {
+          "name": "ChanceToDodge",
+          "fullName": "Dodge chance",
+          "description": "Compare the chance to dodge incoming damage (range: 0 to 1).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetChanceToDodgeOp",
+          "fullName": "Dodge chance",
+          "description": "Change the chance to dodge incoming damage (range: 0 to 1).",
+          "functionType": "Action"
+        },
+        {
+          "name": "FlatDamageReduction",
+          "fullName": "Armor flat damage reduction",
+          "description": "Compare the flat damage reduction from the armor. Incoming damage is reduced by this value.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetFlatDamageReductionOp",
+          "fullName": "Armor flat damage reduction",
+          "description": "Change the flat damage reduction from the armor. Incoming damage is reduced by this value.",
+          "functionType": "Action"
+        },
+        {
+          "name": "PercentDamageReduction",
+          "fullName": "Armor percent damage reduction",
+          "description": "Compare the percent damage reduction from armor (range: 0 to 1).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetPercentDamageReductionOp",
+          "fullName": "Armor percent damage reduction",
+          "description": "Change the percent damage reduction from armor (range: 0 to 1).",
+          "functionType": "Action"
+        },
+        {
+          "name": "AllowOverHealing",
+          "fullName": "Allow over-healing",
+          "description": "Allow heals to increase health above max health.  Regeneration will not exceed max health.",
+          "functionType": "Action"
+        },
+        {
+          "name": "TriggerDamageCooldown",
+          "fullName": "Trigger damage cooldown",
+          "description": "Trigger damage cooldown.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsJustDamaged",
+          "fullName": "Is health just damaged",
+          "description": "Check if health was just damaged previously in the events.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsJustHealed",
+          "fullName": "Is just healed",
+          "description": "Check if the object was just healed previously in the events.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsDamageCooldownActive",
+          "fullName": "Is damage cooldown active",
+          "description": "Check if damage cooldown is active. Object and shield cannot be damaged while this is active.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "DamageCooldownRemaining",
+          "fullName": "Time remaining in damage cooldown",
+          "description": "Compare the time before damage cooldown ends (seconds).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsDead",
+          "fullName": "Is dead",
+          "description": "Check if the object is considered dead (no health points).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "TimeSinceLastHit",
+          "fullName": "Time since last hit",
+          "description": "Compare the time since last taken hit (seconds).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "PreviousDamageTaken",
+          "fullName": "Health damage taken from most recent hit",
+          "description": "Compare the health damage taken from most recent hit.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "MaxShield",
+          "fullName": "Maximum shield points",
+          "description": "Compare the maximum shield points of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetMaxShieldOp",
+          "fullName": "Maximum shield points",
+          "description": "Change the maximum shield points of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ShieldPoints",
+          "fullName": "Shield points",
+          "description": "Compare the current shield points of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetShieldPointsOp",
+          "fullName": "Shield points",
+          "description": "Change the current shield points of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ShieldRegenRate",
+          "fullName": "Rate of shield regeneration",
+          "description": "Compare the rate of shield regeneration (points per second).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetShieldRegenRateOp",
+          "fullName": "Rate of shield regeneration",
+          "description": "Change the rate of shield regeneration (points per second).",
+          "functionType": "Action"
+        },
+        {
+          "name": "ShieldRegenDelay",
+          "fullName": "Shield regeneration delay",
+          "description": "Compare the delay before shield regeneration starts after being hit (seconds).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetShieldRegenDelayOp",
+          "fullName": "Shield regeneration delay",
+          "description": "Change the delay before shield regeneration starts after being hit (seconds).",
+          "functionType": "Action"
+        },
+        {
+          "name": "ShieldDuration",
+          "fullName": "Duration of shield",
+          "description": "Compare the duration of the shield (seconds). A value of \"0\" means the shield is permanent.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetShieldDurationOp",
+          "fullName": "Duration of shield",
+          "description": "Change the duration of the shield (seconds). A value of \"0\" means the shield is permanent.",
+          "functionType": "Action"
+        },
+        {
+          "name": "RenewShieldDuration",
+          "fullName": "Renew shield duration",
+          "description": "Renew shield duration to it's full value.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ActivateShield",
+          "fullName": "Activate shield",
+          "description": "Activate the shield by setting the shield points and renewing the shield duration (optional).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetShieldBlockExcessDamage",
+          "fullName": "Block excess damage when shield breaks",
+          "description": "Enable (or disable) blocking excess damage when shield breaks.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsShieldJustDamaged",
+          "fullName": "Is shield just damaged",
+          "description": "Check if the shield was just damaged previously in the events.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsJustDodged",
+          "fullName": "Damage was just dodged",
+          "description": "Check if incoming damage was just dodged.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsShieldActive",
+          "fullName": "Is shield active",
+          "description": "Check if the shield is active (based on shield points and duration).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "ShieldTimeRemaining",
+          "fullName": "Time before shield duration ends",
+          "description": "Compare the time before the shield duration ends (seconds).",
+          "functionType": "Condition"
+        },
+        {
+          "name": "PreviousDamageToShield",
+          "fullName": "Shield damage taken from most recent hit",
+          "description": "Compare the shield damage taken from most recent hit.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "PreviousHealAmount",
+          "fullName": "Health points gained from previous heal",
+          "description": "Compare the health points gained from previous heal.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Manage health (life) points, shield and armor of instances of an object. \n\nIt handles:\n- Damage cooldown\n- Health and shield regeneration\n- Over healing\n\nIt can be used on:\n- Players\n- Enemies\n- NPCs\n- Inanimate objects (for insance breakable doors or mining rocks)\n\nThe top-down RPG example uses this extension ([open the project online](https://editor.gdevelop.io/?project=example://top-down-rpg)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWhlYXJ0LWhhbGYtZnVsbCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xNi41LDVDMTUsNSAxMy41OCw1LjkxIDEzLDcuMlYxNy43NEMxNy4yNSwxMy44NyAyMCwxMS4yIDIwLDguNUMyMCw2LjUgMTguNSw1IDE2LjUsNU0xNi41LDNDMTkuNTgsMyAyMiw1LjQxIDIyLDguNUMyMiwxMi4yNyAxOC42LDE1LjM2IDEzLjQ1LDIwLjAzTDEyLDIxLjM1TDEwLjU1LDIwLjAzQzUuNCwxNS4zNiAyLDEyLjI3IDIsOC41QzIsNS40MSA0LjQyLDMgNy41LDNDOS4yNCwzIDEwLjkxLDMuODEgMTIsNS4wOEMxMy4wOSwzLjgxIDE0Ljc2LDMgMTYuNSwzWiIgLz48L3N2Zz4="
+}

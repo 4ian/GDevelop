@@ -1,0 +1,256 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Toggle switch (for Shape Painter)",
+  "name": "ToggleSwitch",
+  "version": "0.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/ToggleSwitch.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ToggleSwitch-header.json",
+  "tags": "draggable,control,shape painter,ui,widget,toggle,switch",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Interface Elements/Interface Elements_interface_ui_toggle_switch.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Shape Painter toggle switch. Click/touch to toggle on/off with hover halo.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/toggle-switch",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Use a shape-painter object to draw a toggle switch that users can click or touch.",
+      "fullName": "Toggle switch",
+      "name": "ToggleSwitch",
+      "objectType": "PrimitiveDrawing::Drawer",
+      "eventsFunctions": [
+        {
+          "name": "SetTrackWidth",
+          "fullName": "Track width",
+          "description": "Change the track width.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetTrackHeight",
+          "fullName": "Track height",
+          "description": "Change the track height.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetThumbOpacity",
+          "fullName": "Thumb opacity",
+          "description": "Change the thumb opacity.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetInactiveTrackOpacity",
+          "fullName": "Inactive track opacity",
+          "description": "Change the inactive track opacity.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetActiveTrackOpacity",
+          "fullName": "Active track opacity",
+          "description": "Change the active track opacity.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetHaloOpacityPressed",
+          "fullName": "Halo opacity (pressed)",
+          "description": "Change the halo opacity when the thumb is pressed.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetHaloOpacityHover",
+          "fullName": "Halo opacity (hover)",
+          "description": "Change opacity of the halo when the thumb is hovered.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetThumbShadowOffsetY",
+          "fullName": "Thumb shadow offset on Y axis",
+          "description": "Change the offset on Y axis of the thumb shadow.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetThumbShadowOffsetX",
+          "fullName": "Thumb shadow offset on X axis",
+          "description": "Change the offset on X axis of the thumb shadow.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetThumbShadowOpacity",
+          "fullName": "Thumb shadow opacity",
+          "description": "Change the thumb shadow opacity.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetThumbRadius",
+          "fullName": "Thumb radius",
+          "description": "Change the thumb radius.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetHaloRadius",
+          "fullName": "Halo radius",
+          "description": "Change the halo radius.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetActiveTrackColor",
+          "fullName": "Active track color",
+          "description": "Change the active track color (the part on the thumb left).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetInactiveTrackColor",
+          "fullName": "Inactive track color",
+          "description": "Change the inactive track color (the part on the thumb right).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetInactiveThumbColor",
+          "fullName": "Thumb color (when unchecked)",
+          "description": "Change the thumb color (when unchecked).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetActiveThumbColor",
+          "fullName": "Thumb color (when checked)",
+          "description": "Change the thumb color (when checked).",
+          "functionType": "Action"
+        },
+        {
+          "name": "ToggleChecked",
+          "fullName": "Toggle the switch",
+          "description": "If checked, change to unchecked. If unchecked, change to checked.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetDisabled",
+          "fullName": "Disable (or enable) the toggle switch",
+          "description": "Disable (or enable) the toggle switch.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetChecked",
+          "fullName": "Check (or uncheck) the toggle switch",
+          "description": "Check (or uncheck) the toggle switch.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsHoveredOver",
+          "fullName": "Is mouse hovered over toggle switch?",
+          "description": "Check if mouse is hovering over toggle switch.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "TrackWidth",
+          "fullName": "Track width",
+          "description": "Track width.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "TrackHeight",
+          "fullName": "Track height",
+          "description": "Track height.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "ThumbShadowOffsetY",
+          "fullName": "Offset (Y) of shadow on thumb",
+          "description": "Offset (Y) of shadow on thumb.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "ThumbShadowOffsetX",
+          "fullName": "Offset (X) of shadow on thumb",
+          "description": "Offset (X) of shadow on thumb.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "ThumbShadowOpacity",
+          "fullName": "Opacity of shadow on thumb",
+          "description": "Opacity of shadow on thumb.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "ThumbOpacity",
+          "fullName": "Thumb opacity",
+          "description": "Thumb opacity.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "ActiveTrackOpacity",
+          "fullName": "Active track opacity",
+          "description": "Active track opacity.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "InactiveTrackOpacity",
+          "fullName": "Inactive track opacity",
+          "description": "Inactive track opacity.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "HaloOpacityPressed",
+          "fullName": "Halo opacity (pressed)",
+          "description": "Halo opacity (pressed).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "HaloOpacityHover",
+          "fullName": "Halo opacity (hover)",
+          "description": "Halo opacity (hover).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "HaloRadius",
+          "fullName": "Halo radius",
+          "description": "Halo radius (pixels).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "ActiveTrackColor",
+          "fullName": "Active track color",
+          "description": "Active track color.",
+          "functionType": "StringExpression"
+        },
+        {
+          "name": "InactiveTrackColor",
+          "fullName": "Inactive track color",
+          "description": "Inactive track color.",
+          "functionType": "StringExpression"
+        },
+        {
+          "name": "ActiveThumbColor",
+          "fullName": "Active thumb color",
+          "description": "Active thumb color.",
+          "functionType": "StringExpression"
+        },
+        {
+          "name": "IsDisabled",
+          "fullName": "Is disabled",
+          "description": "Check if the toggle switch is disabled.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsChecked",
+          "fullName": "Is checked",
+          "description": "Check if the toggle switch is checked.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "InactiveThumbColor",
+          "fullName": "Inactive thumb color",
+          "description": "Inactive thumb color.",
+          "functionType": "StringExpression"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Add this behavior to a shape painter object.\n\nWhen the toggle switch is in the *left* position, the condition `Checked` is \"false\". If it is in the *right* position, the condition `Checked` is true.\nA halo appears when the mouse hovers near the toggle switch.\n\nToggle switch cannot be toggled by users if any of these are true:\n- Toggle switch is hidden\n- Toggle switch's layer is hidden\n- Toggle switch is disabled\n\nToggle switch can always be changed by an action.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8cGF0aCBkPSJNMjIsMUgxMEM2LjEsMSwzLDQuMSwzLDhzMy4xLDcsNyw3aDEyYzMuOSwwLDctMy4xLDctN1MyNS45LDEsMjIsMXogTTIyLDEyYy0yLjIsMC00LTEuOC00LTRzMS44LTQsNC00czQsMS44LDQsNA0KCVMyNC4yLDEyLDIyLDEyeiIvPg0KPHBhdGggZD0iTTIyLDE3SDEwYy0zLjksMC03LDMuMS03LDdzMy4xLDcsNyw3aDEyYzMuOSwwLDctMy4xLDctN1MyNS45LDE3LDIyLDE3eiBNMTAsMjhjLTIuMiwwLTQtMS44LTQtNHMxLjgtNCw0LTRzNCwxLjgsNCw0DQoJUzEyLjIsMjgsMTAsMjh6Ii8+DQo8L3N2Zz4NCg=="
+}

@@ -1,0 +1,245 @@
+{
+  "author": "",
+  "category": "Input",
+  "extensionNamespace": "",
+  "fullName": "3D car keyboard mapper",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggZD0iTTI5LDE0aC00LjJjMC4xLTAuMywwLjItMC42LDAuMi0xYzAtMS43LTEuMy0zLTMtM0g4Yy0wLjYsMC0xLTAuNC0xLTFzMC40LTEsMS0xaDZjMS43LDAsMy0xLjMsMy0zVjJjMC0wLjYtMC40LTEtMS0xDQoJcy0xLDAuNC0xLDF2M2MwLDAuNi0wLjQsMS0xLDFIOEM2LjMsNiw1LDcuMyw1LDlzMS4zLDMsMywzaDE0YzAuNiwwLDEsMC40LDEsMXMtMC40LDEtMSwxSDNjLTAuNiwwLTEsMC40LTEsMXYxNGMwLDAuNiwwLjQsMSwxLDENCgloMjZjMC42LDAsMS0wLjQsMS0xVjE1QzMwLDE0LjQsMjkuNiwxNCwyOSwxNHogTTcsMThoMmMwLjYsMCwxLDAuNCwxLDFjMC0wLjYsMC40LTEsMS0xaDJjMC42LDAsMSwwLjQsMSwxYzAtMC42LDAuNC0xLDEtMWgyDQoJYzAuNiwwLDEsMC40LDEsMWMwLTAuNiwwLjQtMSwxLTFoMmMwLjYsMCwxLDAuNCwxLDFjMC0wLjYsMC40LTEsMS0xaDJjMC42LDAsMSwwLjQsMSwxcy0wLjQsMS0xLDFoLTJjLTAuNiwwLTEtMC40LTEtMQ0KCWMwLDAuNi0wLjQsMS0xLDFoLTJjLTAuNiwwLTEtMC40LTEtMWMwLDAuNi0wLjQsMS0xLDFoLTJjLTAuNiwwLTEtMC40LTEtMWMwLDAuNi0wLjQsMS0xLDFoLTJjLTAuNiwwLTEtMC40LTEtMWMwLDAuNi0wLjQsMS0xLDFINw0KCWMtMC42LDAtMS0wLjQtMS0xUzYuNCwxOCw3LDE4eiBNMTksMjJjMCwwLjEsMCwwLjMtMC4xLDAuNHMtMC4xLDAuMi0wLjIsMC4zYzAsMC0wLjEsMC4xLTAuMiwwLjFjMCwwLTAuMSwwLjEtMC4yLDAuMQ0KCWMtMC4xLDAtMC4xLDAtMC4yLDAuMWMtMC4xLDAtMC4xLDAtMC4yLDBjLTAuMSwwLTAuMSwwLTAuMiwwYy0wLjEsMC0wLjEsMC0wLjItMC4xYy0wLjEsMC0wLjEtMC4xLTAuMi0wLjFjMCwwLTAuMS0wLjEtMC4xLTAuMQ0KCWMtMC4xLTAuMS0wLjItMC4yLTAuMi0wLjNDMTcsMjIuMywxNywyMi4xLDE3LDIyYzAtMC4xLDAtMC4zLDAuMS0wLjRjMC0wLjEsMC4xLTAuMiwwLjItMC4zYzAsMCwwLjEtMC4xLDAuMS0wLjENCgljMC4xLDAsMC4xLTAuMSwwLjItMC4xYzAuMSwwLDAuMSwwLDAuMi0wLjFjMC4xLDAsMC4zLDAsMC40LDBjMC4xLDAsMC4xLDAsMC4yLDAuMWMwLjEsMCwwLjEsMC4xLDAuMiwwLjFjMC4xLDAsMC4xLDAuMSwwLjIsMC4xDQoJYzAuMSwwLjEsMC4yLDAuMiwwLjIsMC4zQzE5LDIxLjcsMTksMjEuOSwxOSwyMnogTTE1LDIyYzAsMC4xLDAsMC4zLTAuMSwwLjRzLTAuMSwwLjItMC4yLDAuM2MwLDAtMC4xLDAuMS0wLjIsMC4xDQoJYzAsMC0wLjEsMC4xLTAuMiwwLjFjLTAuMSwwLTAuMSwwLTAuMiwwLjFjLTAuMSwwLTAuMSwwLTAuMiwwYy0wLjMsMC0wLjUtMC4xLTAuNy0wLjNjLTAuMS0wLjEtMC4yLTAuMi0wLjItMC4zDQoJQzEzLDIyLjMsMTMsMjIuMSwxMywyMmMwLTAuMSwwLTAuMSwwLTAuMmMwLTAuMSwwLTAuMSwwLjEtMC4yYzAtMC4xLDAtMC4xLDAuMS0wLjJjMC0wLjEsMC4xLTAuMSwwLjEtMC4xYzAuMi0wLjIsMC42LTAuMywwLjktMC4zDQoJYzAuMSwwLDAuMSwwLDAuMiwwLjFjMC4xLDAsMC4xLDAuMSwwLjIsMC4xYzAuMSwwLDAuMSwwLjEsMC4yLDAuMWMwLDAsMC4xLDAuMSwwLjEsMC4xYzAsMC4xLDAuMSwwLjEsMC4xLDAuMmMwLDAuMSwwLDAuMSwwLjEsMC4yDQoJQzE1LDIxLjksMTUsMjEuOSwxNSwyMnogTTUsMjJjMC0wLjEsMC0wLjMsMC4xLTAuNGMwLTAuMSwwLjEtMC4yLDAuMi0wLjNjMC4yLTAuMiwwLjYtMC4zLDAuOS0wLjNjMC4xLDAsMC4xLDAsMC4yLDAuMQ0KCWMwLjEsMCwwLjEsMC4xLDAuMiwwLjFjMCwwLDAuMSwwLjEsMC4yLDAuMWMwLjEsMC4xLDAuMiwwLjIsMC4yLDAuM0M3LDIxLjcsNywyMS45LDcsMjJjMCwwLjMtMC4xLDAuNS0wLjMsMC43YzAsMC0wLjEsMC4xLTAuMiwwLjENCgljLTAuMSwwLTAuMSwwLjEtMC4yLDAuMWMtMC4xLDAtMC4xLDAtMC4yLDAuMWMtMC4xLDAtMC4xLDAtMC4yLDBjLTAuMywwLTAuNS0wLjEtMC43LTAuM0M1LjEsMjIuNSw1LDIyLjMsNSwyMnogTTgsMjZINw0KCWMtMC42LDAtMS0wLjQtMS0xczAuNC0xLDEtMWgxYzAuNiwwLDEsMC40LDEsMVM4LjYsMjYsOCwyNnogTTEwLjksMjIuNGMwLDAuMSwwLDAuMS0wLjEsMC4yYzAsMC0wLjEsMC4xLTAuMSwwLjENCglDMTAuNSwyMi45LDEwLjMsMjMsMTAsMjNjLTAuMSwwLTAuMywwLTAuNC0wLjFjLTAuMS0wLjEtMC4yLTAuMS0wLjMtMC4yYzAtMC4xLTAuMS0wLjEtMC4xLTAuMWMwLTAuMS0wLjEtMC4xLTAuMS0wLjINCgljMC0wLjEsMC0wLjEtMC4xLTAuMmMwLTAuMSwwLTAuMSwwLTAuMmMwLTAuMywwLjEtMC41LDAuMy0wLjdjMC4xLTAuMSwwLjItMC4yLDAuMy0wLjJjMC40LTAuMiwwLjgtMC4xLDEuMSwwLjINCgljMC4yLDAuMiwwLjMsMC40LDAuMywwLjdjMCwwLjEsMCwwLjEsMCwwLjJDMTEsMjIuMywxMSwyMi4zLDEwLjksMjIuNHogTTIwLDI2aC04Yy0wLjYsMC0xLTAuNC0xLTFzMC40LTEsMS0xaDhjMC42LDAsMSwwLjQsMSwxDQoJUzIwLjYsMjYsMjAsMjZ6IE0yMi45LDIyLjRjMCwwLjEsMCwwLjEtMC4xLDAuMmMwLDAtMC4xLDAuMS0wLjEsMC4xYzAsMC0wLjEsMC4xLTAuMiwwLjFjMCwwLTAuMSwwLjEtMC4yLDAuMWMtMC4xLDAtMC4xLDAtMC4yLDAuMQ0KCWMtMC4xLDAtMC4xLDAtMC4yLDBjLTAuMSwwLTAuMSwwLTAuMiwwYy0wLjEsMC0wLjEsMC0wLjItMC4xYy0wLjEsMC0wLjEtMC4xLTAuMi0wLjFjMCwwLTAuMS0wLjEtMC4xLTAuMWMwLTAuMS0wLjEtMC4xLTAuMS0wLjENCgljMC0wLjEtMC4xLTAuMS0wLjEtMC4yYzAtMC4xLDAtMC4xLTAuMS0wLjJjMC0wLjEsMC0wLjEsMC0wLjJjMC0wLjMsMC4xLTAuNSwwLjMtMC43YzAsMCwwLjEtMC4xLDAuMS0wLjFjMC4xLDAsMC4xLTAuMSwwLjItMC4xDQoJYzAuMSwwLDAuMSwwLDAuMi0wLjFjMC4xLDAsMC4zLDAsMC40LDBjMC4xLDAsMC4xLDAsMC4yLDAuMWMwLjEsMCwwLjEsMC4xLDAuMiwwLjFjMC4xLDAsMC4xLDAuMSwwLjIsMC4xYzAuMiwwLjIsMC4zLDAuNCwwLjMsMC43DQoJYzAsMC4xLDAsMC4xLDAsMC4yQzIzLDIyLjMsMjMsMjIuMywyMi45LDIyLjR6IE0yNSwyNmgtMWMtMC42LDAtMS0wLjQtMS0xczAuNC0xLDEtMWgxYzAuNiwwLDEsMC40LDEsMVMyNS42LDI2LDI1LDI2eiBNMjYuNywyMi43DQoJQzI2LjUsMjIuOSwyNi4zLDIzLDI2LDIzYy0wLjEsMC0wLjEsMC0wLjIsMGMtMC4xLDAtMC4xLDAtMC4yLTAuMWMtMC4xLDAtMC4xLTAuMS0wLjItMC4xYy0wLjEsMC0wLjEtMC4xLTAuMi0wLjENCglDMjUuMSwyMi41LDI1LDIyLjMsMjUsMjJjMC0wLjEsMC0wLjMsMC4xLTAuNGMwLTAuMSwwLjEtMC4yLDAuMi0wLjNjMCwwLDAuMS0wLjEsMC4yLTAuMWMwLDAsMC4xLTAuMSwwLjItMC4xYzAuMSwwLDAuMSwwLDAuMi0wLjENCgljMC4zLTAuMSwwLjcsMCwwLjksMC4zYzAuMiwwLjIsMC4zLDAuNCwwLjMsMC43QzI3LDIyLjMsMjYuOSwyMi41LDI2LjcsMjIuN3oiLz4NCjwvc3ZnPg0K",
+  "name": "PhysicsCar3DKeyMapper",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Glyphster Pack/Master/SVG/Computers and Hardware/3e5871434a72821bf3ecb44a6857e62a438cf23dc8f95966f56ae97e95315468_Computers and Hardware_keyboard.svg",
+  "shortDescription": "3D car keyboard controls.",
+  "dimension": "3D",
+  "version": "1.0.1",
+  "description": "3D physics car keyboard controls. Add this \"mapper\" behavior on the object having the 3D Physics Car behavior so that it's automatically controlled by the keyboard.",
+  "origin": {
+    "identifier": "PhysicsCharacter3DKeyMapper",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "3d",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Control a 3D physics car with a keyboard.",
+      "fullName": "3D car keyboard mapper",
+      "name": "PhysicsCar3DKeyboardMapper",
+      "objectType": "",
+      "quickCustomizationVisibility": "hidden",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyFromTextPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Down"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Physics3D::PhysicsCar3D::SimulateBackwardKey"
+                  },
+                  "parameters": [
+                    "Object",
+                    "PhysicsCar3D"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyFromTextPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Up"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Physics3D::PhysicsCar3D::SimulateForwardKey"
+                  },
+                  "parameters": [
+                    "Object",
+                    "PhysicsCar3D"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyFromTextPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Left"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Physics3D::PhysicsCar3D::SimulateLeftKey"
+                  },
+                  "parameters": [
+                    "Object",
+                    "PhysicsCar3D"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyFromTextPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Right"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Physics3D::PhysicsCar3D::SimulateRightKey"
+                  },
+                  "parameters": [
+                    "Object",
+                    "PhysicsCar3D"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyFromTextPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "HandBrake"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Physics3D::PhysicsCar3D::SimulateHandBrakeKey"
+                  },
+                  "parameters": [
+                    "Object",
+                    "PhysicsCar3D"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar3DKeyMapper::PhysicsCar3DKeyboardMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "3D physics car",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "Physics3D::PhysicsCar3D"
+          ],
+          "name": "PhysicsCar3D"
+        },
+        {
+          "value": "Space",
+          "type": "KeyboardKey",
+          "label": "Hand brake key",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "HandBrake"
+        },
+        {
+          "value": "Up",
+          "type": "KeyboardKey",
+          "label": "Up key",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "Up"
+        },
+        {
+          "value": "Left",
+          "type": "KeyboardKey",
+          "label": "Left key",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "Left"
+        },
+        {
+          "value": "Down",
+          "type": "KeyboardKey",
+          "label": "Down key",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "Down"
+        },
+        {
+          "value": "Right",
+          "type": "KeyboardKey",
+          "label": "Right key",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "name": "Right"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

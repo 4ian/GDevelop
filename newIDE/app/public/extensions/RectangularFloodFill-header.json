@@ -1,0 +1,44 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Rectangular flood fill",
+  "name": "RectangularFloodFill",
+  "version": "2.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/RectangularFloodFill.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/RectangularFloodFill-header.json",
+  "tags": "create,grid",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Graphic Design/Graphic Design_grid.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "changelog": [
+    {
+      "version": "2.0.0",
+      "breaking": "- The action no longer set \"BatchID\" variables. It can be done on the created objects after calling the action.\n- Spacing parameters have been inverted."
+    }
+  ],
+  "shortDescription": "Create objects as a grid to cover a rectangular area or an other object.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/rectangular-flood-fill",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "RectangularFloodFill",
+      "fullName": "Create objects to flood fill other objects",
+      "description": "Create fill objects that cover the rectangular area of target objects.",
+      "functionType": "Action"
+    },
+    {
+      "name": "CreateObjectsOverRectangle",
+      "fullName": "Create objects to flood fill a rectanglular area",
+      "description": "Create multiple copies of an object.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "This extension can be used to create multiple copies of an object in a wide variety of 2D arrangements, including:\n- horizontal row(s)\n- vertical column(s)\n- a solid rectangle or square\n- an evenly spaced grid\n- a grid with different spacing between rows and columns\n\nHow To Use:\n- Place target objects in the scene in the places you want fill objects to be created\n- This action only needs to be run once (at the beginning of the scene or using \"Trigger Once\")\n\nObject variables (automatically added on Fill objects): \n- \"CreationID\" (number)\n- \"RowID\" (number)\n- \"ColumnID\" (number)\n\nTips:\n- Use fill objects that are the same size as the scene editor grid.  This will make sure the fill objects fit exactly inside the target objects.\n- Hide target objects at the beginning of the scene if you don't want them to be visible.\n- Keep the default origin point (top-left corner) on fill objects them to line up exactly with target objects.\n\nWatch this [tutorial video](https://youtu.be/rlGSlNSRR9w) to see examples of how to use this extension.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGc+DQoJPHJlY3QgeD0iMTIiIHk9IjIiIHdpZHRoPSI4IiBoZWlnaHQ9IjgiLz4NCgk8cmVjdCB4PSIxMiIgeT0iMTIiIHdpZHRoPSI4IiBoZWlnaHQ9IjgiLz4NCgk8cmVjdCB4PSIyIiB5PSIxMiIgd2lkdGg9IjgiIGhlaWdodD0iOCIvPg0KCTxyZWN0IHg9IjEyIiB5PSIyMiIgd2lkdGg9IjgiIGhlaWdodD0iOCIvPg0KCTxyZWN0IHg9IjIyIiB5PSIxMiIgd2lkdGg9IjgiIGhlaWdodD0iOCIvPg0KCTxwYXRoIGQ9Ik0yMiwyMnY4aDdjMC42LDAsMS0wLjQsMS0xdi03SDIyeiIvPg0KCTxwYXRoIGQ9Ik0xMCwyMkgydjdjMCwwLjYsMC40LDEsMSwxaDdWMjJ6Ii8+DQoJPHBhdGggZD0iTTEwLDEwVjJIM0MyLjQsMiwyLDIuNCwyLDN2N0gxMHoiLz4NCgk8cGF0aCBkPSJNMjIsMTBoOFYzYzAtMC42LTAuNC0xLTEtMWgtN1YxMHoiLz4NCjwvZz4NCjwvc3ZnPg0K"
+}

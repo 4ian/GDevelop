@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
-import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
+import {
+  type ExtensionShortHeader,
+  getExtensionAuthor,
+} from '../../Utils/GDevelopServices/Extension';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
@@ -26,6 +29,24 @@ const styles = {
   },
 };
 
+const getAuthorNameFromHeader = (
+  extensionShortHeader: ExtensionShortHeader
+): ?string => {
+  if (extensionShortHeader.author) return extensionShortHeader.author;
+
+  if (
+    !extensionShortHeader.authors ||
+    extensionShortHeader.authors.length === 0
+  )
+    return null;
+
+  const authorNames = extensionShortHeader.authors
+    .map(author => author.username || author.id)
+    .filter(Boolean);
+
+  return authorNames.length > 0 ? authorNames.join(', ') : null;
+};
+
 type Props = {|
   id?: string,
   project: gdProject,
@@ -44,6 +65,9 @@ export const ExtensionListItem = ({
   onHeightComputed,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const [authorName, setAuthorName] = React.useState<?string>(
+    getAuthorNameFromHeader(extensionShortHeader)
+  );
 
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
@@ -64,6 +88,26 @@ export const ExtensionListItem = ({
         Math.ceil(containerRef.current.getBoundingClientRect().height)
       );
   });
+
+  React.useEffect(
+    () => {
+      let isCancelled = false;
+      const headerAuthorName = getAuthorNameFromHeader(extensionShortHeader);
+      setAuthorName(headerAuthorName);
+
+      if (!headerAuthorName) {
+        getExtensionAuthor(extensionShortHeader).then(loadedAuthorName => {
+          if (isCancelled) return;
+          setAuthorName(loadedAuthorName);
+        });
+      }
+
+      return () => {
+        isCancelled = true;
+      };
+    },
+    [extensionShortHeader]
+  );
 
   const renderExtensionField = (field: 'shortDescription' | 'fullName') => {
     const originalField = extensionShortHeader[field];
@@ -157,6 +201,17 @@ export const ExtensionListItem = ({
                 </Tooltip>
               )}
             </LineStackLayout>
+            {authorName && (
+              <Text
+                noMargin
+                size="body2"
+                allowBrowserAutoTranslate={false}
+                displayInlineAsSpan
+                color={'secondary'}
+              >
+                <Trans>By {authorName}</Trans>
+              </Text>
+            )}
             <Text
               noMargin
               size="body2"

@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Flexbox",
+  "name": "FlexBox",
+  "version": "0.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/FlexBox.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/FlexBox-header.json",
+  "tags": "flexbox,layout,css,items,container,html,dom apis",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/page-layout-body.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Allows using flexbox for positioning objects.",
+  "eventsBasedBehaviorsCount": 2,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/flex-box",
+  "description": "A behavior to position objects using the CSS Flexible Box layout. Find more information at https://css-tricks.com/snippets/css/a-guide-to-flexbox/\n\nKnown bugs:\n\n- This extension leaks memory at scene changes. It can result to heavy CPU usage and error messages.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXBhZ2UtbGF5b3V0LWJvZHkiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNiwySDE4QTIsMiAwIDAsMSAyMCw0VjIwQTIsMiAwIDAsMSAxOCwyMkg2QTIsMiAwIDAsMSA0LDIwVjRBMiwyIDAgMCwxIDYsMk02LDhWMTZIMThWOEg2WiIgLz48L3N2Zz4="
+}

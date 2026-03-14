@@ -1,0 +1,215 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Draggable slider (for Shape Painter)",
+  "name": "DraggableSliderControl",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/DraggableSliderControl.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/DraggableSliderControl-header.json",
+  "tags": "draggable,slider,shape painter,ui,widget",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/UI Essentials/UI Essentials_sliders_options.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "breaking": "- Track thickness and length properties replaced track width and height. These 2 properties must be set again if they were different from the default size.\n- Hidden sliders can be dragged. The \"enable\" action must be used to disable them."
+    }
+  ],
+  "shortDescription": "Shape Painter slider for selecting numerical values.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/draggable-slider-control",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Let users select a numerical value by dragging a slider.",
+      "fullName": "Draggable slider",
+      "name": "DraggableSliderControl",
+      "objectType": "PrimitiveDrawing::Drawer",
+      "eventsFunctions": [
+        {
+          "name": "IsBeingDragged",
+          "fullName": "Being dragged",
+          "description": "Check if the slider is being dragged.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsEnabled",
+          "fullName": "Interactions enabled",
+          "description": "Check if the slider interations are enabled.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetEnabled",
+          "fullName": "Enable interactions",
+          "description": "Enable or disable the slider. Users cannot interact while it is disabled.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Value",
+          "fullName": "Slider value",
+          "description": "The value of the slider (based on position of the thumb).",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetValue",
+          "fullName": "Slider value",
+          "description": "Change the value of a slider (this will move the thumb to the correct position).",
+          "functionType": "Action"
+        },
+        {
+          "name": "ValueMin",
+          "fullName": "Slider minimum value",
+          "description": "The minimum value of a slider.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetValueMin",
+          "fullName": "Slider minimum value",
+          "description": "Change the minimum value of a slider.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ValueMax",
+          "fullName": "Slider maximum value",
+          "description": "The maximum value of a slider.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "TrackThickness",
+          "fullName": "Slider track thickness",
+          "description": "Thickness of track.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "TrackLength",
+          "fullName": "Slider track length",
+          "description": "Length of track.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "ThumbHeight",
+          "fullName": "Slider thumb height",
+          "description": "Height of thumb.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetValueMax",
+          "fullName": "Slider maximum value",
+          "description": "Change the maximum value of a slider.",
+          "functionType": "Action"
+        },
+        {
+          "name": "TickSpacing",
+          "fullName": "Tick spacing",
+          "description": "The tick spacing of a slider.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "SetTickSpacing",
+          "fullName": "Tick spacing",
+          "description": "Change the tick spacing of a slider.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetTrackLength",
+          "fullName": "Track length",
+          "description": "Change length of track.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetTrackThickness",
+          "fullName": "Track thickness",
+          "description": "Change thickness of track.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetThumbWidth",
+          "fullName": "Thumb width",
+          "description": "Change width of thumb.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetThumbHeight",
+          "fullName": "Thumb height",
+          "description": "Change height of thumb.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetHaloRadius",
+          "fullName": "Halo radius",
+          "description": "Change radius of the halo around the thumb.  This size is also used to detect interaction with the slider.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetHaloOpacityHover",
+          "fullName": "Halo opacity (hover)",
+          "description": "Change the halo opacity when the thumb is hovered.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetHaloOpacityPressed",
+          "fullName": "Halo opacity (pressed)",
+          "description": "Change opacity of halo when pressed.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetThumbShape",
+          "fullName": "Thumb shape",
+          "description": "Change shape of thumb (circle or rectangle).",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetRoundedTrack",
+          "fullName": "Rounded track ends",
+          "description": "Make track use rounded ends.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetThumbOpacity",
+          "fullName": "Thumb opacity",
+          "description": "Change opacity of thumb.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetInactiveTrackOpacity",
+          "fullName": "Inactive track opacity",
+          "description": "Change opacity of inactive track.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetActiveTrackOpacity",
+          "fullName": "Active track opacity",
+          "description": "Change opacity of active track.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetActiveTrackColor",
+          "fullName": "Active track color ",
+          "description": "Change the color of the track that is LEFT of the thumb.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetInactiveTrackColor",
+          "fullName": "Inactive track color",
+          "description": "Change the color of the track that is RIGHT of the thumb.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetThumbColor",
+          "fullName": "Thumb color",
+          "description": "Change the thumb color to a specific value.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Draws a draggable slider that users can move to select a numerical value.\nThe value range, tick spacing, and the appearance of the slider can be defined with properties.\n\nHow to use:\n- Add this behavior a **Shape Painter** object\n- Place an instance of that shape painter on the screen where you want the slider to appear\n- Use the \"Value\" expression to find the Value based on the position of the slider\n\nTips:\n- You can disable the slider to prevent a user from interacting with it\n- You can set the Value of the slider and the slider will move to the correct position\n\nFurther details can be found in [this tutorial video](https://youtu.be/iiTUwdAT_hs).\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMjMiIGN5PSI3IiByPSIzIi8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMyIgeTE9IjciIHgyPSIyMCIgeTI9IjciLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyOSIgeTE9IjciIHgyPSIyNiIgeTI9IjciLz4NCjxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjEyIiBjeT0iMTYiIHI9IjMiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIzIiB5MT0iMTYiIHgyPSI5IiB5Mj0iMTYiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyOSIgeTE9IjE2IiB4Mj0iMTUiIHkyPSIxNiIvPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMjMiIGN5PSIyNSIgcj0iMyIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjMiIHkxPSIyNSIgeDI9IjIwIiB5Mj0iMjUiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyOSIgeTE9IjI1IiB4Mj0iMjYiIHkyPSIyNSIvPg0KPC9zdmc+DQo="
+}

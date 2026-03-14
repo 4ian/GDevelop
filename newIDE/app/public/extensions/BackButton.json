@@ -1,0 +1,106 @@
+{
+  "author": "Arthur Pacaud (arthuro555)",
+  "category": "Input",
+  "description": "Prevents the Android phone/tablet back button from quitting the game and provides a condition to check when it's pressed (to allow customising its behavior). Works only for games published on Android.",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Android back button",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWtleWJvYXJkLWJhY2tzcGFjZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0yMSwxMUg2LjgzTDEwLjQxLDcuNDFMOSw2TDMsMTJMOSwxOEwxMC40MSwxNi41OEw2LjgzLDEzSDIxVjExWiIgLz48L3N2Zz4=",
+  "name": "BackButton",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/keyboard-backspace.svg",
+  "shortDescription": "Customize Android back button: prevent default quit, detect presses. Android only.",
+  "version": "1.0.0",
+  "tags": "back,mobile,button,input",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "",
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "gdjs.evtTools.back_button = {\n    triggered: false,\n    _popStateListener: (event) => {\n        gdjs.evtTools.back_button.triggered = true;\n        history.pushState(\"\", \"\"); // Push a new fake state as the old one was popped\n    }\n};\n\n// Handle back button on the web\nhistory.pushState(\"\", \"\"); // Push a fake state to prevent switching page when clicking on back\nwindow.addEventListener('popstate', gdjs.evtTools.back_button._popStateListener);\n\n// Handle back button on cordova\ndocument.addEventListener(\"backbutton\", e => {\n    e.preventDefault();\n    gdjs.evtTools.back_button.triggered = true;\n}, false); \n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Triggers whenever the player presses the back button.",
+      "fullName": "Back button is pressed",
+      "functionType": "Condition",
+      "name": "onBackButtonPressed",
+      "private": false,
+      "sentence": "Back button is pressed",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs.evtTools.back_button.triggered;\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "This simulates the normal action of the back button. \nThis action will quit the app when in a mobile app, and go back to the previous page when in a web browser.",
+      "fullName": "Trigger back button",
+      "functionType": "Action",
+      "name": "doDefault",
+      "private": false,
+      "sentence": "Simulate back button press",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "// Close the app on cordova, as this is the default behavior\nif (navigator.app) {\n    navigator.app.exitApp();\n} else if (navigator.device && navigator.device.exitApp) {\n    navigator.device.exitApp();\n} else {\n    // Go to previous page as it is the default on browsers\n    // Remove the listener so new fake states don't get pushed\n    window.removeEventListener('popstate', gdjs.evtTools.back_button._popStateListener);\n    history.back(); // Remove the state that prevents going back\n    history.back(); // Actually go back\n}\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "",
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onScenePostEvents",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "gdjs.evtTools.back_button.triggered = false;\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

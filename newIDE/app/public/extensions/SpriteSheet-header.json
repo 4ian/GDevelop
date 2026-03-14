@@ -1,0 +1,140 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Sprite Sheet Animations",
+  "name": "SpriteSheet",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/SpriteSheet.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/SpriteSheet-header.json",
+  "tags": "sprite,sheet,animation",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/google-spreadsheet.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Animate a tiled sprite from a sprite sheet.",
+  "eventsBasedBehaviorsCount": 3,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/sprite-sheet",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Animates a sprite sheet using JSON (see extension description).",
+      "fullName": "JSON sprite sheet animator",
+      "name": "JSONSpriteSheetAnimator",
+      "objectType": "TiledSpriteObject::TiledSprite",
+      "eventsFunctions": [
+        {
+          "name": "LoadFromJSON",
+          "fullName": "Load data from a JSON resource",
+          "description": "Loads a new JSON spritesheet data into the behavior.",
+          "functionType": "Action"
+        },
+        {
+          "name": "DisplayFrame",
+          "fullName": "Display a frame",
+          "description": "Display one frame without animating the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "PlayAnimation",
+          "fullName": "Play Animation",
+          "description": "Play an animation from the sprite sheet.",
+          "functionType": "Action"
+        },
+        {
+          "name": "CurrentAnimation",
+          "fullName": "Current animation",
+          "description": "The name of the current animation. __null if no animation is playing.",
+          "functionType": "StringExpression"
+        },
+        {
+          "name": "CurrentFrame",
+          "fullName": "Current frame",
+          "description": "The name of the currently displayed frame.",
+          "functionType": "StringExpression"
+        },
+        {
+          "name": "PauseAnimation",
+          "fullName": "Pause animation",
+          "description": "Pause the animation of a sprite sheet.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ResumeAnimation",
+          "fullName": "Resume animation",
+          "description": "Resume a paused animation of a sprite sheet.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Animates a vertical (top to bottom) sprite sheet.",
+      "fullName": "Vertical sprite sheet animator",
+      "name": "VerticalSpriteSheetAnimator",
+      "objectType": "TiledSpriteObject::TiledSprite",
+      "eventsFunctions": [
+        {
+          "name": "PlayAnimation",
+          "fullName": "Play animation",
+          "description": "Play an animation from the sprite sheet.",
+          "functionType": "Action"
+        },
+        {
+          "name": "CurrentFrame",
+          "fullName": "Current frame",
+          "description": "The current frame of the current animation.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "PauseAnimation",
+          "fullName": "Pause animation",
+          "description": "Pause the animation of a sprite sheet.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ResumeAnimation",
+          "fullName": "Resume animation",
+          "description": "Resume a paused animation of a sprite sheet.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Animates a horizontal (left to right) sprite sheet.",
+      "fullName": "Horizontal sprite sheet animator",
+      "name": "HorizontalSpriteSheetAnimator",
+      "objectType": "TiledSpriteObject::TiledSprite",
+      "eventsFunctions": [
+        {
+          "name": "PlayAnimation",
+          "fullName": "Play animation",
+          "description": "Play an animation from the sprite sheet.",
+          "functionType": "Action"
+        },
+        {
+          "name": "CurrentFrame",
+          "fullName": "Current frame",
+          "description": "The current frame of the current animation.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "PauseAnimation",
+          "fullName": "Pause animation",
+          "description": "Pause the animation of a sprite sheet.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ResumeAnimation",
+          "fullName": "Resume animation",
+          "description": "Resume a paused animation of a sprite sheet.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "\nAnimate images from a sprite sheet by using a tiled sprite.\n\n## How to use\n\n1. Create a tiled sprite object.\n2. Set the tiled sprite image to the sprite sheet image.\n3. Add the behavior (horizontal, vertical, or JSON animator) to the tiled sprite.\n4. Set up the behaviors:\n    - For directional animators: Edit the object \"Default width\" and \"Default height\" to match the size of a frame.\n    - For the JSON animator: Set the sprite sheet JSON data in the behavior properties.\n5. Use the behaviors action to start the animation (only needs to be run once, like sprite animations).\n\n## Vertical and horizontal spritesheet animators\n\nThese behaviors will animate a spritesheet with the images distributed from left to right or from top to bottom. Offsets, row/column, animation speed and frame ranges can be specified to target the desired images.\n\n## JSON spritesheet displayer\n\nThis behavior allows displaying frames or animations from a more intelligent spritesheet. You can generate a compatible JSON and sprite sheet via TexturePacker using the pixi.js preset. The JSON is formatted like this:\n```json\n{\n  \"frames\": {\n    \"frame1\": {\n      \"frame\": {\n        \"x\": 0,\n        \"y\": 0,\n        \"h\": 10,\n        \"w\": 10,\n      }\n    },\n    \"frame1\": {\n      \"frame\": {\n        \"x\": 10,\n        \"y\": 0,\n        \"h\": 10,\n        \"w\": 10,\n      }\n    },\n    \"frame2\": {\n      \"frame\": {\n        \"x\": 0,\n        \"y\": 10,\n        \"h\": 20,\n        \"w\": 20,\n      }\n    }\n  },\n  \"animations\": {\n    \"animationName1\": [\"frame1\", \"frame2\"],\n    \"animationName2\": [\"frame2\", \"frame3\"]\n  }\n}\n```\n`frames` define each image inside the spritesheet and `animations` are the set of frames that form an animation. For compatibility with the TexturePacker pixi.js preset, the JSON doesn't contain the animation speed, so it has to be specified in the behavior properties.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdvb2dsZS1zcHJlYWRzaGVldCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xOSwxMVY5SDExVjVIOVY5SDVWMTFIOVYxOUgxMVYxMUgxOU0xOSwzQzE5LjUsMyAyMCwzLjIgMjAuMzksMy42MUMyMC44LDQgMjEsNC41IDIxLDVWMTlDMjEsMTkuNSAyMC44LDIwIDIwLjM5LDIwLjM5QzIwLDIwLjggMTkuNSwyMSAxOSwyMUg1QzQuNSwyMSA0LDIwLjggMy42MSwyMC4zOUMzLjIsMjAgMywxOS41IDMsMTlWNUMzLDQuNSAzLjIsNCAzLjYxLDMuNjFDNCwzLjIgNC41LDMgNSwzSDE5WiIgLz48L3N2Zz4="
+}

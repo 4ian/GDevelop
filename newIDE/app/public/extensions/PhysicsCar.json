@@ -1,0 +1,2424 @@
+{
+  "author": "",
+  "category": "Movement",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "2D Top-Down Physics Car",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNhci1iYWNrIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTYsMTFMNyw3SDE3TDE4LDExTTE4LjkyLDZDMTguNzEsNS40IDE4LjE0LDUgMTcuNSw1SDYuNUM1Ljg2LDUgNS4yOSw1LjQgNS4wOCw2TDMsMTJWMjBBMSwxIDAgMCwwIDQsMjFINUExLDEgMCAwLDAgNiwyMFYxOEgxOFYyMEExLDEgMCAwLDAgMTksMjFIMjBBMSwxIDAgMCwwIDIxLDIwVjEyTDE4LjkyLDZNNywxNkg1VjE0SDdWMTZNMTksMTZIMTdWMTRIMTlWMTZNMTQsMTZIMTBWMTRIMTRWMTZaIiAvPjwvc3ZnPg==",
+  "name": "PhysicsCar",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/b4a3bb68575adbecb4418e0397ef8c05913e1f0757dfd111de7e6a4ff31eb149_car-back.svg",
+  "shortDescription": "Simulate top-down car motion with drifting.",
+  "dimension": "2D",
+  "version": "0.2.0",
+  "description": [
+    "Simulate car motion, from a top-down view, with the 2D Physics Engine behavior."
+  ],
+  "tags": "race",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Simulate 2D car motion, from a top-down view.",
+      "fullName": "Physics car",
+      "name": "PhysicsCar",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onCreated",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Physics2::AngularDamping"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Physics2",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsDebug",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ObjectVariableClearChildren"
+                  },
+                  "parameters": [
+                    "Object",
+                    "_PhysicsCarExtension.Forces"
+                  ]
+                }
+              ]
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Steering inputs",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsLeftPressed",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "SteeringStickValue",
+                        "=",
+                        "-1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsRightPressed",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "SteeringStickValue",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "SteeringStickValue",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "SteeringAngle",
+                            "<",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "SteeringAngle",
+                            "=",
+                            "min(0, SteeringAngle + SteeringBackSpeed * TimeDelta())"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "SteeringAngle",
+                            ">",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "SteeringAngle",
+                            "=",
+                            "max(0, SteeringAngle - SteeringBackSpeed * TimeDelta())"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "SteeringStickValue",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "SteeringAngle",
+                            "<",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "SteeringAngle",
+                            "=",
+                            "min(SteeringAngleMax, SteeringAngle + SteeringBackSpeed * TimeDelta())"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "SteeringAngle",
+                            ">=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "SteeringAngle",
+                            "=",
+                            "min(SteeringAngleMax, SteeringAngle + SteeringSpeed * TimeDelta() * SteeringStickValue)"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "SteeringStickValue",
+                        "<",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "SteeringAngle",
+                            "<=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "SteeringAngle",
+                            "=",
+                            "max(-SteeringAngleMax, SteeringAngle + SteeringSpeed * TimeDelta() * SteeringStickValue)"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "SteeringAngle",
+                            ">",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "SteeringAngle",
+                            "=",
+                            "max(-SteeringAngleMax, SteeringAngle - SteeringBackSpeed * TimeDelta())"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "FrontWheelX",
+                    "=",
+                    "Object.CenterX() + XFromAngleAndDistance(Object.Angle(), FrontWheelsPosition * Object.Width() / 2)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "FrontWheelY",
+                    "=",
+                    "Object.CenterY() + YFromAngleAndDistance(Object.Angle(), FrontWheelsPosition * Object.Width() / 2)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "FrontWheelAngle",
+                    "=",
+                    "Object.Angle() + SteeringAngle"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "RearWheelX",
+                    "=",
+                    "Object.CenterX() - XFromAngleAndDistance(Object.Angle(), RearWheelsPosition * Object.Width() / 2)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "RearWheelY",
+                    "=",
+                    "Object.CenterY() - YFromAngleAndDistance(Object.Angle(), RearWheelsPosition * Object.Width() / 2)"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Engine"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsUpPressed",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "AccelerationStickValue",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsDownPressed",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "AccelerationStickValue",
+                        "=",
+                        "-1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PhysicsCar::PhysicsCar::ApplyPolarForce"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "FrontWheelAngle",
+                        "AccelerationStickValue * Acceleration * Object.Physics2::Mass()",
+                        "FrontWheelX",
+                        "FrontWheelY",
+                        "FrontWheelY"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Wheels grip\nOnly 2 wheels are simulated instead of 4 to simplify calculus."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PhysicsCar::PhysicsCar::ApplyWheelForces"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "FrontWheelX",
+                        "FrontWheelY",
+                        "FrontWheelAngle",
+                        "Debug",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PhysicsCar::PhysicsCar::ApplyWheelForces"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "RearWheelX",
+                        "RearWheelY",
+                        "Object.Angle()",
+                        "Debug",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "variables": [
+                {
+                  "folded": true,
+                  "name": "FrontWheelX",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "folded": true,
+                  "name": "FrontWheelY",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "folded": true,
+                  "name": "FrontWheelAngle",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "folded": true,
+                  "name": "RearWheelX",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "folded": true,
+                  "name": "RearWheelY",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Physics2::LinearVelocityLength"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Physics2",
+                    ">",
+                    "SpeedMax"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Physics2::LinearVelocityAngle"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Physics2",
+                    "Object.Physics2::LinearVelocityAngle()",
+                    "SpeedMax"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsLeftPressed",
+                    "False",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsRightPressed",
+                    "False",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsUpPressed",
+                    "False",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsDownPressed",
+                    "False",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "AccelerationStickValue",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SteeringStickValue",
+                    "=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsDebug",
+                    "False",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Simulate a press of the right key.",
+          "fullName": "Simulate right key press",
+          "functionType": "Action",
+          "name": "SimulateRightKey",
+          "sentence": "Simulate pressing right for _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsRightPressed",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Simulate a press of the left key.",
+          "fullName": "Simulate left key press",
+          "functionType": "Action",
+          "name": "SimulateLeftKey",
+          "sentence": "Simulate pressing left for _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsLeftPressed",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Simulate a press of the up key.",
+          "fullName": "Simulate up key press",
+          "functionType": "Action",
+          "name": "SimulateUpKey",
+          "sentence": "Simulate pressing up for _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsUpPressed",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Simulate a press of the down key.",
+          "fullName": "Simulate down key press",
+          "functionType": "Action",
+          "name": "SimulateDownKey",
+          "sentence": "Simulate pressing down for _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsDownPressed",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Simulate a steering stick for a given axis force.",
+          "fullName": "Simulate steering stick",
+          "functionType": "Action",
+          "name": "SimulateSteeringStick",
+          "sentence": "Simulate a steering stick for _PARAM0_ with a force of _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SteeringStickValue",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            },
+            {
+              "description": "Stick force",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Simulate an acceleration stick for a given axis force.",
+          "fullName": "Simulate acceleration stick",
+          "functionType": "Action",
+          "name": "SimulateAccelerationStick",
+          "sentence": "Simulate an acceleration stick for _PARAM0_ with a force of _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "AccelerationStickValue",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            },
+            {
+              "description": "Stick force",
+              "name": "Value",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "Apply wheel forces",
+          "functionType": "Action",
+          "name": "ApplyWheelForces",
+          "private": true,
+          "sentence": "Apply forces on the wheel at _PARAM2_ ; _PARAM3_ and _PARAM4_° of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "When cars don't slip (WheelGripRatio = 1), there is no motion orthogonally to wheels direction.\n\nSo, we project the velocity orthogonally to the wheel to find the velocity to fight:\nVelocity * sin(VelocityAngle - WheelAngle)\n\nNow, we have the velocity that we want to fight, but we need to apply a force to the object.\nSo, we need find how much force must be applied to have the velocity change we want.\n\nConsidering that:\n- there are only 1 wheel at the front and 1 wheel at the back\n- the wheels are considered to be in the same direction as the car (even if the front one car actually turn)\n\nWe have:\nAngularAcceleration = Force * Distance / Inertia\nAcceleration = AngularAcceleration * Distance\nVelocityDelta = Acceleration * TimeDelta\n\nWhich results to:\nVelocityDelta = Force / Inertia * Distance * TimeDelta\n\nWe find the force to apply to fight the velocity:\nForce = VelocityDelta * Inertia / (Distance * TimeDelta)\n\nFinally, there is a division by 2 because the car has 2 wheels and they probably fight the same velocity.\nTo check the equilibrium, you can set the WheelGripRatio around 2. The velocity will go back and forth and either converge (<2) or diverge (>2)."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "DistanceSquared",
+                    "=",
+                    "(WheelX - Object.Physics2::MassCenterX()) * (WheelX - Object.Physics2::MassCenterX()) + (WheelY - Object.Physics2::MassCenterY()) * (WheelY - Object.CenterY())"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PhysicsCar::PhysicsCar::ApplyPolarForce"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    "WheelAngle + 90",
+                    "-WheelGripRatio * Object.Behavior::LinearVelocityAt(WheelX, WheelY) * sin(ToRad(Object.Behavior::LinearVelocityAngleAt(WheelX, WheelY) - WheelAngle)) * Object.Behavior::Inertia() / (DistanceSquared * TimeDelta()) / 2",
+                    "WheelX",
+                    "WheelY",
+                    "WheelY"
+                  ]
+                }
+              ],
+              "variables": [
+                {
+                  "folded": true,
+                  "name": "DistanceSquared",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            },
+            {
+              "description": "Wheel X",
+              "name": "WheelX",
+              "type": "expression"
+            },
+            {
+              "description": "Wheel Y",
+              "name": "WheelY",
+              "type": "expression"
+            },
+            {
+              "description": "Wheel angle",
+              "name": "WheelAngle",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Expression",
+          "name": "LinearVelocityXAt",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Physics2::LinearVelocityX() - ToRad(Object.Physics2::AngularVelocity()) * (PositionY - Object.CenterY())"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            },
+            {
+              "description": "",
+              "name": "PositionX",
+              "type": "expression"
+            },
+            {
+              "description": "",
+              "name": "PositionY",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Expression",
+          "name": "LinearVelocityYAt",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Physics2::LinearVelocityY() + ToRad(Object.Physics2::AngularVelocity()) * (PositionX - Object.CenterX())"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            },
+            {
+              "description": "",
+              "name": "PositionX",
+              "type": "expression"
+            },
+            {
+              "description": "",
+              "name": "PositionY",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Expression",
+          "name": "LinearVelocityAt",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "DistanceBetweenPositions(0, 0, Object.Behavior::LinearVelocityXAt(PositionX, PositionY), Object.Behavior::LinearVelocityYAt(PositionX, PositionY))"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            },
+            {
+              "description": "",
+              "name": "PositionX",
+              "type": "expression"
+            },
+            {
+              "description": "",
+              "name": "PositionY",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Expression",
+          "name": "LinearVelocityAngleAt",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "AngleBetweenPositions(0, 0, Object.Behavior::LinearVelocityXAt(PositionX, PositionY), Object.Behavior::LinearVelocityYAt(PositionX, PositionY))"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            },
+            {
+              "description": "",
+              "name": "PositionX",
+              "type": "expression"
+            },
+            {
+              "description": "",
+              "name": "PositionY",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the momentum of inertia (in kg ⋅ pixel²)",
+          "fullName": "Momentum of inertia",
+          "functionType": "Expression",
+          "name": "Inertia",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "// TODO Remove this function when the engine uses pixels instead of meters.",
+                "",
+                "const object = objects[0];",
+                "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
+                "const physics2 = object.getBehavior(behavior._getPhysics2());",
+                "",
+                "// If there is no body, set a new one",
+                "if (physics2._body === null) {",
+                "    if (!physics2.createBody()) return 0;",
+                "}",
+                "// Wake up the object",
+                "physics2._body.SetAwake(true);",
+                "// scaleX or scaleY doesn't matter as they can't be different or it breaks any physics law.",
+                "eventsFunctionContext.returnValue = physics2._body.GetInertia() * physics2._sharedData.scaleX * physics2._sharedData.scaleX;"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "Apply a polar force",
+          "functionType": "Action",
+          "name": "ApplyPolarForce",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsDebug",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "Index",
+                        "=",
+                        "Object.VariableChildCount(_PhysicsCarExtension.Forces)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_PhysicsCarExtension.Forces[Index].Angle",
+                        "=",
+                        "Angle"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_PhysicsCarExtension.Forces[Index].Length",
+                        "=",
+                        "Length"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_PhysicsCarExtension.Forces[Index].OriginX",
+                        "=",
+                        "OriginX"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_PhysicsCarExtension.Forces[Index].OriginY",
+                        "=",
+                        "OriginY"
+                      ]
+                    }
+                  ],
+                  "variables": [
+                    {
+                      "folded": true,
+                      "name": "Index",
+                      "type": "number",
+                      "value": 0
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "// TODO Remove this function when the engine uses pixels instead of meters.",
+                "",
+                "const object = objects[0];",
+                "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
+                "const physics2 = object.getBehavior(behavior._getPhysics2());",
+                "const angle = gdjs.toRad(eventsFunctionContext.getArgument(\"Angle\"));",
+                "// scaleX or scaleY doesn't matter as they can't be different or it breaks any physics law.",
+                "const length = eventsFunctionContext.getArgument(\"Length\") * physics2._sharedData.invScaleX;",
+                "const originX = eventsFunctionContext.getArgument(\"OriginX\") * physics2._sharedData.invScaleX;",
+                "const originY = eventsFunctionContext.getArgument(\"OriginY\") * physics2._sharedData.invScaleX;",
+                "",
+                "// If there is no body, set a new one",
+                "if (physics2._body === null) {",
+                "  if (!physics2.createBody()) return;",
+                "}",
+                "",
+                "// Wake up the object",
+                "physics2._body.SetAwake(true);",
+                "",
+                "// Apply the force",
+                "physics2._body.ApplyForce(",
+                "  physics2.b2Vec2(length * Math.cos(angle), length * Math.sin(angle)),",
+                "  physics2.b2Vec2Sec(originX, originY),",
+                "  false",
+                ");"
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            },
+            {
+              "description": "",
+              "name": "Angle",
+              "type": "expression"
+            },
+            {
+              "description": "Length (in kg ⋅ pixels ⋅ s^−2)",
+              "name": "Length",
+              "type": "expression"
+            },
+            {
+              "description": "",
+              "name": "OriginX",
+              "type": "expression"
+            },
+            {
+              "description": "",
+              "name": "OriginY",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Draw forces applying on the car for debug purpose.",
+          "fullName": "Draw forces for debug",
+          "functionType": "Action",
+          "name": "DrawDebug",
+          "sentence": "Draw forces of car _PARAM0_ on _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsDebug",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PrimitiveDrawing::Rectangle"
+                  },
+                  "parameters": [
+                    "ShapePainter",
+                    "-Object.Width() / 2",
+                    "-Object.Height() / 2",
+                    "Object.Width() / 2",
+                    "Object.Height() / 2"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Repeat",
+                  "repeatExpression": "Object.VariableChildCount(_PhysicsCarExtension.Forces)",
+                  "conditions": [],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "DeltaAngle",
+                            "=",
+                            "AngleBetweenPositions(Object.CenterX(), Object.CenterY(), Object.Variable(_PhysicsCarExtension.Forces[Index].OriginX), Object.Variable(_PhysicsCarExtension.Forces[Index].OriginY)) - Object.Angle()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "DeltaLength",
+                            "=",
+                            "DistanceBetweenPositions(Object.CenterX(), Object.CenterY(), Object.Variable(_PhysicsCarExtension.Forces[Index].OriginX), Object.Variable(_PhysicsCarExtension.Forces[Index].OriginY))"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "LineX",
+                            "=",
+                            "XFromAngleAndDistance(DeltaAngle, DeltaLength)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "LineY",
+                            "=",
+                            "YFromAngleAndDistance(DeltaAngle, DeltaLength)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "LineAngle",
+                            "=",
+                            "Object.Variable(_PhysicsCarExtension.Forces[Index].Angle) - Object.Angle()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "LineLength",
+                            "=",
+                            "Object.Variable(_PhysicsCarExtension.Forces[Index].Length)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PrimitiveDrawing::LineV2"
+                          },
+                          "parameters": [
+                            "ShapePainter",
+                            "LineX",
+                            "LineY",
+                            "LineX + XFromAngleAndDistance(LineAngle, LineLength)",
+                            "LineY + YFromAngleAndDistance(LineAngle, LineLength)",
+                            "2"
+                          ]
+                        }
+                      ],
+                      "variables": [
+                        {
+                          "folded": true,
+                          "name": "LineX",
+                          "type": "number",
+                          "value": 0
+                        },
+                        {
+                          "folded": true,
+                          "name": "LineY",
+                          "type": "number",
+                          "value": 0
+                        },
+                        {
+                          "folded": true,
+                          "name": "LineAngle",
+                          "type": "number",
+                          "value": 0
+                        },
+                        {
+                          "folded": true,
+                          "name": "LineLength",
+                          "type": "number",
+                          "value": 0
+                        },
+                        {
+                          "folded": true,
+                          "name": "DeltaAngle",
+                          "type": "number",
+                          "value": 0
+                        },
+                        {
+                          "folded": true,
+                          "name": "DeltaLength",
+                          "type": "number",
+                          "value": 0
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "Index",
+                            "+",
+                            "1"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "variables": [
+                {
+                  "name": "Index",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            },
+            {
+              "description": "Shape painter",
+              "name": "ShapePainter",
+              "supplementaryInformation": "PrimitiveDrawing::Drawer",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the steering angle of the object.",
+          "fullName": "Steering angle",
+          "functionType": "ExpressionAndCondition",
+          "name": "SteeringAngle",
+          "sentence": "the steering angle",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "SteeringAngle"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "SteeringAngle",
+          "name": "SetSteeringAngle",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SteeringAngle",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the acceleration of the object.",
+          "fullName": "Acceleration",
+          "functionType": "ExpressionAndCondition",
+          "group": "Physics car speed configuration",
+          "name": "Acceleration",
+          "sentence": "the acceleration",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Acceleration"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "Acceleration",
+          "name": "SetAcceleration",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Acceleration",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the maximum speed of the object.",
+          "fullName": "Maximum speed",
+          "functionType": "ExpressionAndCondition",
+          "group": "Physics car speed configuration",
+          "name": "SpeedMax",
+          "sentence": "the maximum speed",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "SpeedMax"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "SpeedMax",
+          "name": "SetSpeedMax",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SpeedMax",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the wheel grip ratio of the object (from 0 to 1). A ratio of 0 is like driving on ice.",
+          "fullName": "Wheel grip ratio",
+          "functionType": "ExpressionAndCondition",
+          "group": "Physics car steering configuration",
+          "name": "WheelGripRatio",
+          "sentence": "the wheel grip ratio",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "WheelGripRatio"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "WheelGripRatio",
+          "name": "SetWheelGripRatio",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "WheelGripRatio",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the maximum steering angle of the object.",
+          "fullName": "Maximum steering angle",
+          "functionType": "ExpressionAndCondition",
+          "group": "Physics car steering configuration",
+          "name": "SteeringAngleMax",
+          "sentence": "the maximum steering angle",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "SteeringAngleMax"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "SteeringAngleMax",
+          "name": "SetSteeringAngleMax",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SteeringAngleMax",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the steering speed of the object.",
+          "fullName": "Steering speed",
+          "functionType": "ExpressionAndCondition",
+          "group": "Physics car steering configuration",
+          "name": "SteeringSpeed",
+          "sentence": "the steering speed",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "SteeringSpeed"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "SteeringSpeed",
+          "name": "SetSteeringSpeed",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SteeringSpeed",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the sterring speed when turning back of the object.",
+          "fullName": "Sterring back speed",
+          "functionType": "ExpressionAndCondition",
+          "group": "Physics car steering configuration",
+          "name": "SteeringBackSpeed",
+          "sentence": "the sterring speed when turning back",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "SteeringBackSpeed"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "SteeringBackSpeed",
+          "name": "SetSteeringBackSpeed",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "SteeringBackSpeed",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "PhysicsCar::PhysicsCar",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "Physics Engine 2.0",
+          "description": "",
+          "group": "",
+          "extraInformation": [
+            "Physics2::Physics2Behavior"
+          ],
+          "name": "Physics2"
+        },
+        {
+          "value": "500",
+          "type": "Number",
+          "unit": "PixelAcceleration",
+          "label": "Acceleration",
+          "description": "",
+          "group": "Speed",
+          "extraInformation": [],
+          "name": "Acceleration"
+        },
+        {
+          "value": "800",
+          "type": "Number",
+          "unit": "PixelSpeed",
+          "label": "Maximum speed",
+          "description": "",
+          "group": "Speed",
+          "extraInformation": [],
+          "name": "SpeedMax"
+        },
+        {
+          "value": "0.5",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "Wheel grip ratio (from 0 to 1)",
+          "description": "A ratio of 0 is like driving on ice.",
+          "group": "Steering",
+          "extraInformation": [],
+          "name": "WheelGripRatio"
+        },
+        {
+          "value": "50",
+          "type": "Number",
+          "unit": "AngularSpeed",
+          "label": "Steering speed",
+          "description": "",
+          "group": "Steering",
+          "extraInformation": [],
+          "name": "SteeringSpeed"
+        },
+        {
+          "value": "240",
+          "type": "Number",
+          "unit": "AngularSpeed",
+          "label": "Sterring speed when turning back",
+          "description": "",
+          "group": "Steering",
+          "extraInformation": [],
+          "name": "SteeringBackSpeed"
+        },
+        {
+          "value": "30",
+          "type": "Number",
+          "unit": "DegreeAngle",
+          "label": "Maximum steering angle",
+          "description": "",
+          "group": "Steering",
+          "extraInformation": [],
+          "name": "SteeringAngleMax"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "DegreeAngle",
+          "label": "Steering angle",
+          "description": "",
+          "group": "Steering",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "SteeringAngle"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "IsRightPressed"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "IsLeftPressed"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "IsUpPressed"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "IsDownPressed"
+        },
+        {
+          "value": "0.8",
+          "type": "Number",
+          "label": "Front wheels position",
+          "description": "0 means at the center, 1 means at the front",
+          "group": "Wheels",
+          "extraInformation": [],
+          "advanced": true,
+          "name": "FrontWheelsPosition"
+        },
+        {
+          "value": "0.8",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "Rear wheels position",
+          "description": "0 means at the center, 1 means at the back",
+          "group": "Wheels",
+          "extraInformation": [],
+          "advanced": true,
+          "name": "RearWheelsPosition"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "AccelerationStickValue"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "SteeringStickValue"
+        },
+        {
+          "value": "",
+          "type": "Boolean",
+          "label": "",
+          "description": "",
+          "group": "",
+          "extraInformation": [],
+          "hidden": true,
+          "name": "IsDebug"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

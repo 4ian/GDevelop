@@ -1,0 +1,213 @@
+{
+  "author": "",
+  "category": "Network",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Platforms Validation",
+  "helpPath": "https://oxey405.com/projects/execution-context/index.html",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNoZWNrLWRlY2FncmFtIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTIzLDEyTDIwLjU2LDkuMjJMMjAuOSw1LjU0TDE3LjI5LDQuNzJMMTUuNCwxLjU0TDEyLDNMOC42LDEuNTRMNi43MSw0LjcyTDMuMSw1LjUzTDMuNDQsOS4yMUwxLDEyTDMuNDQsMTQuNzhMMy4xLDE4LjQ3TDYuNzEsMTkuMjlMOC42LDIyLjQ3TDEyLDIxTDE1LjQsMjIuNDZMMTcuMjksMTkuMjhMMjAuOSwxOC40NkwyMC41NiwxNC43OEwyMywxMk0xMCwxN0w2LDEzTDcuNDEsMTEuNTlMMTAsMTQuMTdMMTYuNTksNy41OEwxOCw5TDEwLDE3WiIgLz48L3N2Zz4=",
+  "name": "AuthorizedPlatformsValidation",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/0d42bc9711bc135b0dfb0084a37469540468e243a560339b99e399bd77f48010_check-decagram.svg",
+  "shortDescription": "Verify web game runs on authorized domains to prevent unauthorized hosting/piracy.",
+  "version": "1.0.1",
+  "description": [
+    "# About",
+    "**Checks if your web game is being played on a platform your intended to publish on.**",
+    "Some web game platforms may steal your game to publish it on their own without your knowledge or consent!",
+    "This extension is here to check if the game is being played from a platform you intended!",
+    "You can for example prevents users from playing your game on a platform that republished it without your consent. ",
+    "",
+    "# How to use",
+    "An authorized platform is a domain name of a website where the game is supposed to run, for example : gd.games.",
+    "1. You can get the current domain where the game is being played by using getReferrer()",
+    "2. You can add an authorized platform domain name (it's recommended to do this at the beginning of the scene)",
+    "3. You can then check if the game is running on an authorized platform and make the game react accordingly",
+    "",
+    "# Example",
+    "[Download an example here](https://oxey405.com/projects/execution-context)."
+  ],
+  "tags": "drm,copyright,origin,referrer,execution context,platform,copy,protect,anti-theft,steal,theft",
+  "authorIds": [
+    "Mk7N5tFrpcePEmbe3ZLC4peEULY2"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Checks if the game is executed on an authorized platform (preferably, run this only once at beginning of the game).",
+      "fullName": "Is the game running on an authorized platform",
+      "functionType": "Condition",
+      "name": "CheckExecution",
+      "sentence": "The game is running on a authorized platform",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Default return value is false",
+          "comment2": ""
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Or"
+              },
+              "parameters": [],
+              "subInstructions": [
+                {
+                  "type": {
+                    "value": "AuthorizedPlatformsValidation::Includes"
+                  },
+                  "parameters": [
+                    "",
+                    "AuthorizedPlatformsValidation::CurrentRefferer()",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SystemInfo::IsPreview"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SystemInfo::IsNativeMobileApp"
+                  },
+                  "parameters": []
+                },
+                {
+                  "type": {
+                    "value": "SystemInfo::IsNativeDesktopApp"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the referrer's location (the domain of the website that hosts your game).",
+      "fullName": "Get referrer location",
+      "functionType": "StringExpression",
+      "name": "CurrentRefferer",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "// If the document referrer is not empty, return the hostname (the domain name) else, return an empty string.\r",
+            "eventsFunctionContext.returnValue = document.referrer ? new URL(document.referrer).hostname : \"\" ;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Adds a new valid platform (domain name where the game is expected to be played, for example, gd.games).",
+      "fullName": "Add a valid platform",
+      "functionType": "Action",
+      "name": "AddExecution",
+      "sentence": "Add _PARAM1_ as valid platform",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "GlobalVariablePushString"
+              },
+              "parameters": [
+                "__AuthorizedPlatformsValidation.AuthorizedPlatforms",
+                "Domain"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Domain name (e.g : gd.games)",
+          "name": "Domain",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if a domain is contained in the authorized list array.",
+      "fullName": "Check if a domain is contained in the authorized list",
+      "functionType": "Condition",
+      "name": "Includes",
+      "private": true,
+      "sentence": "Check if _PARAM1_ is in the list of authorized platforms",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const authorizedPlatformsVariableReference = runtimeScene.getGame()\r",
+            "    .getVariables()\r",
+            "    .get(\"__AuthorizedPlatformsValidation\")\r",
+            "    .getChild(\"AuthorizedPlatforms\");\r",
+            "    \r",
+            "authorizedPlatformsVariableReference.castTo(\"array\");\r",
+            "\r",
+            "eventsFunctionContext.returnValue = \r",
+            "    authorizedPlatformsVariableReference.toJSObject()\r",
+            "    .includes(\r",
+            "        eventsFunctionContext.getArgument(\"DomainToCheck\")\r",
+            "        );\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Domain to check",
+          "name": "DomainToCheck",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

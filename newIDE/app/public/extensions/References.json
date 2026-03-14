@@ -1,0 +1,155 @@
+{
+  "author": "Arthur Pacaud (arthuro555)",
+  "category": "",
+  "description": "Adds actions to use references (variable that redirect any read/write to another variable) and pointers (unique numbers identifying a variable that can be resolved to a reference). Some usages are for callback variables in events based functions (getting a variable with a fixed name referring to a variable with a name passed as parameter), pointers to make advanced data structures like linked lists, and getting a top level variable dynamically.",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Variables/References",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZhcmlhYmxlLWJveCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xOSAzSDVDMy45IDMgMyAzLjkgMyA1VjE5QzMgMjAuMSAzLjkgMjEgNSAyMUgxOUMyMC4xIDIxIDIxIDIwLjEgMjEgMTlWNUMyMSAzLjkgMjAuMSAzIDE5IDNNNy40IDE4QzUuOSAxNi41IDUgMTQuMyA1IDEyUzUuOSA3LjUgNy40IDZMOSA2LjdDNy43IDcuOSA3IDkuOSA3IDEyUzcuNyAxNi4xIDkgMTcuM0w3LjQgMThNMTIuNyAxNUwxMS45IDEzTDEwLjUgMTVIOUwxMS4zIDExLjlMMTAgOUgxMS4zTDEyLjEgMTFMMTMuNSA5SDE1TDEyLjggMTJMMTQuMSAxNUgxMi43TTE2LjYgMThMMTUgMTcuM0MxNi4zIDE2IDE3IDE0LjEgMTcgMTJTMTYuMyA3LjkgMTUgNi43TDE2LjYgNkMxOC4xIDcuNSAxOSA5LjcgMTkgMTJTMTguMSAxNi41IDE2LjYgMThaIiAvPjwvc3ZnPg==",
+  "name": "References",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/variable-box.svg",
+  "shortDescription": "Adds references and pointers for variables.",
+  "version": "1.0.0",
+  "tags": "advanced,variables,reference,pointer,ref,memory,callback",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Transforms a scene variable into a reference to another scene variable.",
+      "fullName": "Create reference to scene variable",
+      "functionType": "Action",
+      "group": "",
+      "name": "CreateReference",
+      "private": false,
+      "sentence": "Make variable _PARAM1_ a reference to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const reference = eventsFunctionContext.getArgument(\"reference\");\nconst source = eventsFunctionContext.getArgument(\"source\");\n\n// Override each method \nfor (let func of Object.getOwnPropertyNames(gdjs.Variable.prototype))\n    reference[func] = gdjs.Variable.prototype[func].bind(source);\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The scene variable to turn into a reference",
+          "longDescription": "",
+          "name": "reference",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "scenevar"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The scene variable the reference will refer to",
+          "longDescription": "",
+          "name": "source",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "scenevar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Transforms a scene variable into a reference to a global variable.",
+      "fullName": "Create reference to global variable",
+      "functionType": "Action",
+      "group": "",
+      "name": "CreateGlobalReference",
+      "private": false,
+      "sentence": "Make variable _PARAM1_ a reference to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const reference = eventsFunctionContext.getArgument(\"reference\");\nconst source = eventsFunctionContext.getArgument(\"source\");\n\n// Override each method \nfor (let func of Object.getOwnPropertyNames(gdjs.Variable.prototype))\n    reference[func] = gdjs.Variable.prototype[func].bind(source);\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The scene variable to turn into a reference",
+          "longDescription": "",
+          "name": "reference",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "scenevar"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The global variable the reference will refer to",
+          "longDescription": "",
+          "name": "source",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "globalvar"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Transforms a scene variable into a reference to an object's variable.",
+      "fullName": "Create reference to object variable",
+      "functionType": "Action",
+      "group": "",
+      "name": "CreateObjectReference",
+      "private": false,
+      "sentence": "Make variable _PARAM2_ a reference to variable _PARAM3_ of _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const reference = eventsFunctionContext.getArgument(\"reference\");\nconst source = eventsFunctionContext.getArgument(\"source\");\n\nconsole.log(reference, source)\n\n// Override each method \nfor (let func of Object.getOwnPropertyNames(gdjs.Variable.prototype))\n    reference[func] = gdjs.Variable.prototype[func].bind(source);\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The object that possesses the variable to refer to",
+          "longDescription": "",
+          "name": "Object",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectList"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The scene variable to turn into a reference",
+          "longDescription": "",
+          "name": "reference",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "scenevar"
+        },
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The object variable the reference will refer to",
+          "longDescription": "",
+          "name": "source",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "objectvar"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

@@ -1,0 +1,125 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Object Stack",
+  "name": "ObjectStack",
+  "version": "0.2.1",
+  "url": "https://resources.gdevelop-app.com/extensions/ObjectStack.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ObjectStack-header.json",
+  "tags": "card,stack,pick,list,queue",
+  "category": "Game mechanic",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Videogames/Videogames_cards_game_solitaire_poker_blackjack_casino.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "An ordered list of objects and a shuffle action.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 4,
+  "helpPath": "/extensions/object-stack",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Hold an ordered list of objects.",
+      "fullName": "Object Stack",
+      "name": "ObjectStack",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "AddOnTop",
+          "fullName": "Add on top",
+          "description": "Add the object on the top of the stack.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Insert",
+          "fullName": "Insert into the stack",
+          "description": "Insert the object into the stack.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Remove",
+          "fullName": "Remove from the stack",
+          "description": "Remove the object from the stack.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Clear",
+          "fullName": "Clear",
+          "description": "Remove any object from the stack.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MoveInto",
+          "fullName": "Move into the stack",
+          "description": "Move the objects from a stack into another.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MoveAllInto",
+          "fullName": "Move all into the stack",
+          "description": "Move all the object from a stack into another.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MoveAllOnTop",
+          "fullName": "Move all on top of the stack",
+          "description": "Move all the object from a stack into another one at the top.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Shuffle",
+          "fullName": "Shuffle",
+          "description": "Shuffle the stack.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HeightOf",
+          "fullName": "Height of a stack element",
+          "description": "The height of an element in the stack.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "Height",
+          "fullName": "Stack height",
+          "description": "Compare the number of objects in the stack.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsEmpty",
+          "fullName": "Is empty",
+          "description": "Check if the stack is empty.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "name": "ContainsBetween",
+      "fullName": "Contain between a range",
+      "description": "Check if the stack contains the object between a range. The lower and upper bounds are included.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "ContainsAt",
+      "fullName": "Contain at",
+      "description": "Check if the stack contains the object at a height.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "HasOnTop",
+      "fullName": "Stack top",
+      "description": "Check if an object is on the stack top.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "Contains",
+      "fullName": "Contain",
+      "description": "Check if the stack contains the object.",
+      "functionType": "Condition"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "This keep in memory a stack of object instances, with:\n* Actions to modify the stack,\n* Conditions to access the objects of a stack,\n* A shuffle action.\n\nIt can be helpful for:\n* Card games\n* Fair randomness (for instance, to create a stack of predetermined bonus and randomize the order they appear)\n\n3 examples use it:\n* a card system demonstration ([open the project online](https://editor.gdevelop.io/?project=example://card-system))\n* a Klondike solitaire ([open the project online](https://editor.gdevelop.io/?project=example://klondike-solitaire))\n* a Zuma-like ([open the project online](https://editor.gdevelop.io/?project=example://smoothy))",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE4LDI5SDhjLTIuMiwwLTQtMS44LTQtNFY3YzAtMi4yLDEuOC00LDQtNGgxMGMyLjIsMCw0LDEuOCw0LDR2MThDMjIsMjcuMiwyMC4yLDI5LDE4LDI5eiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIyLDYuNGw1LDNjMS45LDEuMSwyLjUsMy42LDEuMyw1LjVMMjIsMjUuNSIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI4LDE2bDAuNSwwLjdjMS4zLDEuOCwwLjgsNC4zLTEsNS42bC01LjcsNCIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjgiIHkxPSI3IiB4Mj0iOCIgeTI9IjkiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIxOCIgeTE9IjIzIiB4Mj0iMTgiIHkyPSIyNSIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTEwLjQsMTYuNmMwLjUsMC41LDEuMywwLjUsMS44LDBsMC44LTAuOGwwLjgsMC44YzAuNSwwLjUsMS4zLDAuNSwxLjgsMGMwLjUtMC41LDAuNS0xLjQsMC0xLjlsLTAuOC0wLjhMMTMsMTINCglsLTEuOCwxLjlsLTAuOCwwLjhDOS45LDE1LjIsOS45LDE2LjEsMTAuNCwxNi42eiIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjEyIiB5MT0iMjAiIHgyPSIxNCIgeTI9IjIwIi8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMTMiIHkxPSIxNyIgeDI9IjEzIiB5Mj0iMTkiLz4NCjwvc3ZnPg0K"
+}

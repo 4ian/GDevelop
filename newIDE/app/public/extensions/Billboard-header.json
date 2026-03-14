@@ -1,0 +1,76 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "3D Billboard",
+  "name": "Billboard",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/Billboard.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Billboard-header.json",
+  "tags": "3d",
+  "category": "Visual effect",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/b46f9cf1fc6b0ef59a461c7831003d1fb091137cbedbae876774f40f8b7dea97_pine-tree.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Make 3D objects always face camera, appearing as 2D sprites in 3D scenes.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/billboard",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Rotate to always face the camera (only the front face of the cube should be enabled).",
+      "fullName": "Billboard",
+      "name": "Billboard",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "FaceCamera",
+          "fullName": "Rotate to face the camera",
+          "description": "Rotate the object to the camera. This is also done automatically at the end of the scene events.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ShouldRotateX",
+          "fullName": "Should rotate on X axis",
+          "description": "Check if the object should rotate on X axis.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetShouldRotateX",
+          "fullName": "Should rotate on X axis",
+          "description": "Change if the object should rotate on X axis.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ShouldRotateY",
+          "fullName": "Should rotate on Y axis",
+          "description": "Check if the object should rotate on Y axis.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetShouldRotateY",
+          "fullName": "Should rotate on Y axis",
+          "description": "Change if the object should rotate on Y axis.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ShouldRotateZ",
+          "fullName": "Should rotate on Z axis",
+          "description": "Check if the object should rotate on Z axis.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetShouldRotateZ",
+          "fullName": "Should rotate on Z axis",
+          "description": "Change if the object should rotate on Z axis.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Rotate 3D objects to make them face the camera and appear like 2D sprite.\n\nThe 3D racing game example uses this extension ([open the project online](https://editor.gdevelop.io/?project=example://3d-racing-game)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXBpbmUtdHJlZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMCwyMVYxOEgzTDgsMTNINUwxMCw4SDdMMTIsM0wxNyw4SDE0TDE5LDEzSDE2TDIxLDE4SDE0VjIxSDEwWiIgLz48L3N2Zz4="
+}

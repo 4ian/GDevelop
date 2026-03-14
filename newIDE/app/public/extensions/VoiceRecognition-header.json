@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "rotBq28wITdtfsrE7McHQri4k2w2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Voice Recognition API",
+  "name": "VoiceRecognition",
+  "version": "0.1.2",
+  "url": "https://resources.gdevelop-app.com/extensions/VoiceRecognition.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/VoiceRecognition-header.json",
+  "tags": "network,voicetotext",
+  "category": "Device",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Music/Music_microphone_sing_voice_studio_record_vintage.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Converts voice to text.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 6,
+  "helpPath": "https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API",
+  "description": "Listens from the browser microphone then returns a text\n\nLimitations: Voice recognition is only supported in https for security reasons\n\nCan be used for:\n   - Voice Based Games\n   - Voice Mobile App\n\nFeatures:\n- Conditions:\n    - OnSuccess\n    - OnError\n\n- Actions:\n    - Start listening\n\n- StringExpressions:\n    - RetrieveResultText\n    - RetrieveStatus\n    - RetrieveError\n\n[Example link](https://gdevelop.io/game-example/voice-recognition).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNMTMsMTZjMCwwLjYtMC40LDEtMSwxSDljMC4xLDIuOCwyLjQsNSw1LjIsNWgzLjdjMi44LDAsNS4xLTIuMiw1LjItNWgtN2MtMC42LDAtMS0wLjQtMS0xczAuNC0xLDEtMWg3di0yaC03DQoJCWMtMC42LDAtMS0wLjQtMS0xczAuNC0xLDEtMWg3VjloLTdjLTAuNiwwLTEtMC40LTEtMXMwLjQtMSwxLTFoN2MtMC4xLTIuOC0yLjQtNS01LjItNWgtMy43QzExLjQsMiw5LjEsNC4yLDksN2gzYzAuNiwwLDEsMC40LDEsMQ0KCQlzLTAuNCwxLTEsMUg5djJoM2MwLjYsMCwxLDAuNCwxLDFzLTAuNCwxLTEsMUg5djJoM0MxMi42LDE1LDEzLDE1LjQsMTMsMTZ6Ii8+DQoJPHBhdGggZD0iTTI4LDExaC0yYy0wLjYsMC0xLDAuNC0xLDF2NC44YzAsMy45LTMuMiw3LjItNy4yLDcuMmgtMy43QzEwLjIsMjQsNywyMC44LDcsMTYuOFYxMmMwLTAuNi0wLjQtMS0xLTFINGMtMC42LDAtMSwwLjQtMSwxDQoJCXMwLjQsMSwxLDFoMXYzLjhjMCw1LDQuMSw5LjIsOS4yLDkuMmgzLjdjNSwwLDkuMi00LjEsOS4yLTkuMlYxM2gxYzAuNiwwLDEtMC40LDEtMVMyOC42LDExLDI4LDExeiIvPg0KCTxwYXRoIGQ9Ik0yMi40LDI4LjFjLTEuOC0wLjctNC0xLjEtNi40LTEuMXMtNC41LDAuNC02LjQsMS4xYy0wLjUsMC4yLTAuOCwwLjgtMC42LDEuM2MwLjIsMC41LDAuOCwwLjgsMS4zLDAuNg0KCQljMy4yLTEuMiw4LjEtMS4yLDExLjMsMGMwLjEsMCwwLjIsMC4xLDAuNCwwLjFjMC40LDAsMC44LTAuMiwwLjktMC42QzIzLjEsMjguOCwyMi45LDI4LjMsMjIuNCwyOC4xeiIvPg0KPC9nPg0KPC9zdmc+DQo="
+}

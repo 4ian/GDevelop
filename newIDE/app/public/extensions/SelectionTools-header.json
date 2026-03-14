@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "TJLmS4MUFJSWNNietFUWDxVSKnB3"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Selection tools",
+  "name": "SelectionTools",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/SelectionTools.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/SelectionTools-header.json",
+  "tags": "select,selection,tool,lasso,marquee,polygon,rectangle",
+  "category": "Input",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/9183b1a2c466ffc831a749b3a2692200b070a88f807696d99caa662632c2ed73_selection-drag.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Select object instances by drawing rectangular, polygonal or lasso selection.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 8,
+  "helpPath": "/extensions/selection-tools",
+  "description": "### How to use:\n\n- Activate SelectionTools using the `De/Activate selection tools` action.\n- Create a shape painter object and add the `Selection painter` behavior. Create a single instance of this object.\n- Use `Activate rectangular selection`, `Activate polygonal selection`, or `Activate lasso selection` action to activate the type of selection you need.\n- Use the `Select` condition to check which object instances are inside the selection.\n\n---\n\n### Tips:\n\n- None of the actions require you to call them each frame. Use them with the `At the beginning of the scene` condition or `Triggred Once`.\n- If you set `Pre-select?` to `Yes` in the `Select` condition, do not add a `Triggred Once` to that event.\n\n---\n\n#### Actions:\n\n- `De/Activate selection tools`\n- `Activate rectangular selection`\n- `Activate polygonal selection`\n- `Activate lasso selection`\n- `Clear selection`\n\n#### Condition:\n\n- `Select`\n- `Selection activated`\n- `Current selection type`\n\n#### Behavior:\n\n- `Selection painter`",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNlbGVjdGlvbi1kcmFnIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE0LDE3SDE3VjE0SDE5VjE3SDIyVjE5SDE5VjIySDE3VjE5SDE0VjE3TTEyLDE3VjE5SDlWMTdIMTJNNywxN1YxOUgzVjE1SDVWMTdIN00zLDEzVjEwSDVWMTNIM00zLDhWNEg3VjZINVY4SDNNOSw0SDEyVjZIOVY0TTE1LDRIMTlWOEgxN1Y2SDE1VjRNMTksMTBWMTJIMTdWMTBIMTlaIiAvPjwvc3ZnPg=="
+}

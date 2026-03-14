@@ -1,0 +1,135 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "ZbWY0gyCDgMG9QdiCs0SAHeJ9Hp1",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Swipe Gesture",
+  "name": "SwipeGesture",
+  "version": "1.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/SwipeGesture.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/SwipeGesture-header.json",
+  "tags": "swipe,mobile,touch,screen,gesture",
+  "category": "Input",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/gesture-swipe-right.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Detect swipe gestures with angle, distance, and duration. Single-touch only.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 18,
+  "helpPath": "/extensions/swipe-gesture",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "EnableSwipeDetection",
+      "fullName": "Enable (or disable) swipe gesture detection",
+      "description": "Enable (or disable) swipe gesture detection.",
+      "functionType": "Action"
+    },
+    {
+      "name": "DrawSwipe",
+      "fullName": "Draw swipe gesture",
+      "description": "Draw a line that indicates the current swipe gesture.  Edit \"Outline Size\" of the shape painter to adjust the thickness of the line.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SetLayer",
+      "fullName": "Layer used to detect swipe gestures",
+      "description": "Change the Layer used to detect swipe gestures.",
+      "functionType": "Action"
+    },
+    {
+      "name": "Layer",
+      "fullName": "Layer used to detect swipe gestures",
+      "description": "Compare the Layer used to detect swipe gestures.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "Angle",
+      "fullName": "Swipe angle (degrees)",
+      "description": "Compare Swipe angle (degrees).",
+      "functionType": "Condition"
+    },
+    {
+      "name": "Distance",
+      "fullName": "Swipe distance (pixels)",
+      "description": "Compare Swipe distance (pixels).",
+      "functionType": "Condition"
+    },
+    {
+      "name": "DistanceX",
+      "fullName": "Swipe distance in horizontal direction (pixels)",
+      "description": "Compare Swipe distance in horizontal direction (pixels).",
+      "functionType": "Condition"
+    },
+    {
+      "name": "DistanceY",
+      "fullName": "Swipe distance in vertical direction (pixels)",
+      "description": "Compare Swipe distance in vertical direction (pixels).",
+      "functionType": "Condition"
+    },
+    {
+      "name": "StartX",
+      "fullName": "Start point of the swipe X position",
+      "description": "Compare Start point of the swipe X position.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "StartY",
+      "fullName": "Start point of the swipe Y position",
+      "description": "Compare Start point of the swipe Y position.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "EndX",
+      "fullName": "End point of the swipe X position",
+      "description": "Compare End point of the swipe X position.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "EndY",
+      "fullName": "End point of the swipe Y position",
+      "description": "Compare End point of the swipe Y position.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "Duration",
+      "fullName": "Swipe duration (seconds)",
+      "description": "Compare Swipe duration (seconds).",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsSwipeInProgress",
+      "fullName": "Swipe is in progress",
+      "description": "Check if a swipe is currently in progress.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "IsSwipeDetectionEnabled",
+      "fullName": "Is swipe detection enabled",
+      "description": "Check if swipe detection is enabled.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "HasSwipeJustEnded",
+      "fullName": "Swipe just ended",
+      "description": "Check if the swipe has just ended.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "SwipeDirection_4way",
+      "fullName": "Swipe moved in a direction (4-way movement)",
+      "description": "Check if swipe moved in a given direction.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "SwipeDirection_8way",
+      "fullName": "Swipe moved in a direction (8-way movement)",
+      "description": "Check if swipe moved in a given direction.",
+      "functionType": "Condition"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Use the \"Enable swipe detection\" action at the beginning of your scene.\n\nNote: This extension does NOT support multitouch.\n\nExpressions:\n\n- `StartX`, `StartY`: Position where the swipe started\n- `EndX`, `EndY`: Position where the swipe ended\n- `Distance`: Length of the swipe, in pixels\n- `DistanceX`, `DistanceY`: Distance the swipe moved in each axis\n- `Angle`: Direction the swipe moved towards. Range (-180, 180)\n- `Layer`: Layer used to detect swipe gestures\n\nConditions:\n\n- `Is swipe detection enabled`\n- `Is swipe in progress?` - A swipe starts when the mouse click or touch begins\n- `Has swipe just ended?` - When the mouse or touch is released, this condition is true for one frame \n- `Swipe moved in a direction (4-way movement)` - the direction value for 4 sides (UP, DOWN, LEFT, RIGHT). In this case, the “circle” is divided into 4 segments of 90 degrees\n- `Swipe moved in a direction (8-way movement)` - the direction value for 8 sides (UP, DOWN, LEFT, RIGHT, UP-LEFT, UP-RIGHT, DOWN-LEFT, DOWN-RIGHT). In this case, the “circle” is divided into 8 segments of 45 degrees.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdlc3R1cmUtc3dpcGUtcmlnaHQiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTAsOUExLDEgMCAwLDEgMTEsOEExLDEgMCAwLDEgMTIsOVYxMy40N0wxMy4yMSwxMy42TDE4LjE1LDE1Ljc5QzE4LjY4LDE2LjAzIDE5LDE2LjU2IDE5LDE3LjE0VjIxLjVDMTguOTcsMjIuMzIgMTguMzIsMjIuOTcgMTcuNSwyM0gxMUMxMC42MiwyMyAxMC4yNiwyMi44NSAxMCwyMi41N0w1LjEsMTguMzdMNS44NCwxNy42QzYuMDMsMTcuMzkgNi4zLDE3LjI4IDYuNTgsMTcuMjhINi44TDEwLDE5VjlNMTIsNEw5LDFWM0gzVjVIOVY3TDEyLDRaIiAvPjwvc3ZnPg=="
+}

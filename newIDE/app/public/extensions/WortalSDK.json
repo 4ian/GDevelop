@@ -1,0 +1,2870 @@
+{
+  "author": "",
+  "category": "Third-party",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Wortal SDK",
+  "helpPath": "https://docs.games-api.ai",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIxNjgiPgo8cGF0aCBkPSJNMCAwIEM0LjQxODkzNDYxIDEuMDMzNTA1NTcgNi4wNzQ2MTY2MiAzLjcxOTk1MjgyIDguNTI3MzQzNzUgNy4yODUxNTYyNSBDOS4wMzQ2NzA0MSA3Ljk5MzMzNDk2IDkuNTQxOTk3MDcgOC43MDE1MTM2NyAxMC4wNjQ2OTcyNyA5LjQzMTE1MjM0IEMxMS43NzA2MzE3OSAxMS44NDE3Mzk5NiAxMy40MzQ3ODQwNiAxNC4yNzY4NzY4OSAxNS4wODk4NDM3NSAxNi43MjI2NTYyNSBDMTUuNjg1MzkwNjIgMTcuNjAwNjY4OTUgMTYuMjgwOTM3NSAxOC40Nzg2ODE2NCAxNi44OTQ1MzEyNSAxOS4zODMzMDA3OCBDMjYuMTc4MDkwMTUgMzMuMTY5MDkxOTcgMzQuODQ0MjYwOTUgNDcuMjk1MzIwMTEgNDMuMDg5ODQzNzUgNjEuNzIyNjU2MjUgQzQzLjY5NzYzNjcyIDYyLjc3MzI0MjE5IDQ0LjMwNTQyOTY5IDYzLjgyMzgyODEyIDQ0LjkzMTY0MDYyIDY0LjkwNjI1IEM0Ni43OTc4ODE5MyA2OC4xNDU2OTA1MiA0OC42MzUwOTA3OSA3MS4zOTk5OTEzIDUwLjQ2NDg0Mzc1IDc0LjY2MDE1NjI1IEM1MS4wNDMxNDk0MSA3NS42NjEwMzI3MSA1MS42MjE0NTUwOCA3Ni42NjE5MDkxOCA1Mi4yMTcyODUxNiA3Ny42OTMxMTUyMyBDNTQuNTQ4NzQyMTYgODEuOTE3ODQ3NiA1Ni4wODA3Mzg4NiA4NC43MTgwODMyOSA1Ni4xMjUgODkuNjAxNTYyNSBDNTIuNjQyOTgxNzUgMTAwLjEwMDE3NjAyIDQ0LjgzOTc4NzYzIDEwNi4yNDM0MDE0NyAzNS4zMDg1OTM3NSAxMTEuMTU2MjUgQzI1LjMxNTkxNzQ4IDExNS42ODI1MDI1NiAxNC4wOTc0MTM2NyAxMTguMzk2NTg5MSAzLjA4OTg0Mzc1IDExNy43MjI2NTYyNSBDMi4zMTQ1NTg5NiAxMTQuMjk2OTE2ODggMS45NzA2NTU5NyAxMTEuMTUwMjYzOCAxLjk5MjE4NzUgMTA3LjY0MDYyNSBDMS45OTU0MTAxNiAxMDYuNzA5Mjc3MzQgMS45OTg2MzI4MSAxMDUuNzc3OTI5NjkgMi4wMDE5NTMxMiAxMDQuODE4MzU5MzggQzIuMDE0NTIxNDggMTAzLjM3ODc5ODgzIDIuMDE0NTIxNDggMTAzLjM3ODc5ODgzIDIuMDI3MzQzNzUgMTAxLjkxMDE1NjI1IEMyLjAzMTg1NTQ3IDEwMC45MzExMTMyOCAyLjAzNjM2NzE5IDk5Ljk1MjA3MDMxIDIuMDQxMDE1NjIgOTguOTQzMzU5MzggQzIuMDUyNzU2OTEgOTYuNTM2Mzk1MTQgMi4wNjkxNzk1NiA5NC4xMjk1NTc2OCAyLjA4OTg0Mzc1IDkxLjcyMjY1NjI1IEMyLjc0NDI4NDY3IDkxLjU0NTI0OTAyIDMuMzk4NzI1NTkgOTEuMzY3ODQxOCA0LjA3Mjk5ODA1IDkxLjE4NTA1ODU5IEMxMy42NjUyMTI3MiA4OC40Njg2MzIzNiAyMS4yNTEzMDg3OCA4NC4wMDIzODcwMiAyOC4wODk4NDM3NSA3Ni43MjI2NTYyNSBDMjguNzQ5ODQzNzUgNzYuNzIyNjU2MjUgMjkuNDA5ODQzNzUgNzYuNzIyNjU2MjUgMzAuMDg5ODQzNzUgNzYuNzIyNjU2MjUgQzIzLjYxMjg4MDA2IDYyLjY1MTI5NzQzIDE1LjQ1MzgxMDMxIDQ5LjczNjk3ODY4IDcuMDg5ODQzNzUgMzYuNzIyNjU2MjUgQzYuNjE4NTMwMjcgMzUuOTgyMDg5ODQgNi4xNDcyMTY4IDM1LjI0MTUyMzQ0IDUuNjYxNjIxMDkgMzQuNDc4NTE1NjIgQzIuNTQ0MzEwMzEgMjkuNDgxNTcwNzYgMi41NDQzMTAzMSAyOS40ODE1NzA3NiAtMC45MTAxNTYyNSAyNC43MjI2NTYyNSBDLTEuNTcwMTU2MjUgMjQuNzIyNjU2MjUgLTIuMjMwMTU2MjUgMjQuNzIyNjU2MjUgLTIuOTEwMTU2MjUgMjQuNzIyNjU2MjUgQy00LjQ2NzY0MTYyIDI2LjY2NTU2Mzk2IC01Ljg1MDkzNzkgMjguNTg4Njc1MjcgLTcuMjIyNjU2MjUgMzAuNjYwMTU2MjUgQy03Ljg2NjY2MzgyIDMxLjYyOTAwNzU3IC03Ljg2NjY2MzgyIDMxLjYyOTAwNzU3IC04LjUyMzY4MTY0IDMyLjYxNzQzMTY0IEMtMTIuNjk2NDMyMDIgMzkuMDgzODI3NzEgLTE2LjI5NDIwMTI2IDQ1LjgzODY2MjMzIC0xOS44NDc2NTYyNSA1Mi42NjAxNTYyNSBDLTIwLjY4MDY3MjYxIDU0LjI1ODE1MDYzIC0yMC42ODA2NzI2MSA1NC4yNTgxNTA2MyAtMjEuNTMwNTE3NTggNTUuODg4NDI3NzMgQy0yNi44MjYwMjgxMyA2NS4yMzc5MjYgLTI2LjgyNjAyODEzIDY1LjIzNzkyNiAtMjguODA4NTkzNzUgNzUuNTA3ODEyNSBDLTI1LjY4MzQzMDIyIDgzLjIxMjAxOTk4IC0xNS44Nzk1Mzk3OCA4Ny4yMjUxNTMxMiAtOC45MTAxNTYyNSA5MC43MjI2NTYyNSBDLTguODUxODgwNjcgOTQuMjg1MDg3MDUgLTguODE2NDY3NCA5Ny44NDczOTQ0NCAtOC43ODUxNTYyNSAxMDEuNDEwMTU2MjUgQy04Ljc2ODM5ODQ0IDEwMi40MTc1NTg1OSAtOC43NTE2NDA2MiAxMDMuNDI0OTYwOTQgLTguNzM0Mzc1IDEwNC40NjI4OTA2MiBDLTguNzI0NzA3MDMgMTA1LjkyNzU4Nzg5IC04LjcyNDcwNzAzIDEwNS45Mjc1ODc4OSAtOC43MTQ4NDM3NSAxMDcuNDIxODc1IEMtOC42OTkxMzMzIDEwOC43NjUxMTg0MSAtOC42OTkxMzMzIDEwOC43NjUxMTg0MSAtOC42ODMxMDU0NyAxMTAuMTM1NDk4MDUgQy04LjkzMzEyMTY5IDExMi45ODQzMzg4MiAtOS43Mjk5OTExMyAxMTUuMTMxNjAxNjggLTEwLjkxMDE1NjI1IDExNy43MjI2NTYyNSBDLTIzLjg4NTc4ODg2IDExNC44NjE0OTE2MSAtMzMuNjIyNzQ2NjcgMTA5LjI0MTgzNzE5IC00Mi45MTAxNTYyNSA5OS43MjI2NTYyNSBDLTQ0LjA5MTU4MjAzIDk4LjU3MDIzNDM3IC00NC4wOTE1ODIwMyA5OC41NzAyMzQzNyAtNDUuMjk2ODc1IDk3LjM5NDUzMTI1IEMtNDYuOTEwMTU2MjUgOTQuNzIyNjU2MjUgLTQ2LjkxMDE1NjI1IDk0LjcyMjY1NjI1IC00Ni41NTg1OTM3NSA5MS40Mjk2ODc1IEMtNDYuMTYzMjE0MiA5MC4xMjIzNTM4MyAtNDUuNzM1ODgyOTggODguODI0NDU1MTcgLTQ1LjI4NTE1NjI1IDg3LjUzNTE1NjI1IEMtNDUuMDQ5MzM4MzggODYuODA4MTI1IC00NC44MTM1MjA1MSA4Ni4wODEwOTM3NSAtNDQuNTcwNTU2NjQgODUuMzMyMDMxMjUgQy00My43MjEzNDcxNCA4Mi43ODA5ODgwNSAtNDIuODIxNDA4MjkgODAuMjUyMTg5ODEgLTQxLjkxMDE1NjI1IDc3LjcyMjY1NjI1IEMtNDEuNTY2MTM3NyA3Ni43NTUwNTM3MSAtNDEuMjIyMTE5MTQgNzUuNzg3NDUxMTcgLTQwLjg2NzY3NTc4IDc0Ljc5MDUyNzM0IEMtMzIuMTA3ODMzODIgNTAuNDIyNTIgLTIxLjM5NTcwOTYgMjcuMjM4NTg4MTMgLTYuOTEwMTU2MjUgNS43MjI2NTYyNSBDLTYuMjUwMTU2MjUgNC43MDY4NzUgLTUuNTkwMTU2MjUgMy42OTEwOTM3NSAtNC45MTAxNTYyNSAyLjY0NDUzMTI1IEMtMi45MTAxNTYyNSAwLjcyMjY1NjI1IC0yLjkxMDE1NjI1IDAuNzIyNjU2MjUgMCAwIFogIiBmaWxsPSIjMUMxRDIyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5Ni45MTAxNTYyNSwtMC43MjI2NTYyNSkiLz4KPHBhdGggZD0iTTAgMCBDNS4yOCAwIDEwLjU2IDAgMTYgMCBDMTYuMzMgMS45OCAxNi42NiAzLjk2IDE3IDYgQzE3Ljk5IDQuMDIgMTguOTggMi4wNCAyMCAwIEMyMy4zIDAgMjYuNiAwIDMwIDAgQzMwLjIyNzg2NDU4IDIuMDUwNzgxMjUgMzAuNDU1NzI5MTcgNC4xMDE1NjI1IDMwLjY4MzU5Mzc1IDYuMTUyMzQzNzUgQzMwLjgxODg2NjE0IDguMDExNDAyMjkgMzAuODE4ODY2MTQgOC4wMTE0MDIyOSAzMiA5IEMzMi45OSA2LjAzIDMzLjk4IDMuMDYgMzUgMCBDNjkuMzMzMzMzMzMgMCAxMDMuNjY2NjY2NjcgMCAxMzggMCBDMTM3LjY3IDIuMzEgMTM3LjM0IDQuNjIgMTM3IDcgQzEzNC42OSA3IDEzMi4zOCA3IDEzMCA3IEMxMjkuOTI2NTIzNDQgOC4zMDMyNDIxOSAxMjkuOTI2NTIzNDQgOC4zMDMyNDIxOSAxMjkuODUxNTYyNSA5LjYzMjgxMjUgQzEyOS43NzY3OTY4OCAxMC43ODUyMzQzNyAxMjkuNzAyMDMxMjUgMTEuOTM3NjU2MjUgMTI5LjYyNSAxMy4xMjUgQzEyOS41NTUzOTA2MyAxNC4yNjE5NTMxMiAxMjkuNDg1NzgxMjUgMTUuMzk4OTA2MjUgMTI5LjQxNDA2MjUgMTYuNTcwMzEyNSBDMTI4Ljk4NzkwMjI1IDIwLjEwMDIwNTkgMTI4LjYxMzE1MTkxIDIyLjgxOTkxODI5IDEyNyAyNiBDMTI0LjA2NjQwNjI1IDI3LjI0MjE4NzUgMTI0LjA2NjQwNjI1IDI3LjI0MjE4NzUgMTIwLjU2MjUgMjcuODc1IEMxMTkuNDA4Nzg5MDYgMjguMDk5Mjk2ODcgMTE4LjI1NTA3ODEyIDI4LjMyMzU5Mzc1IDExNy4wNjY0MDYyNSAyOC41NTQ2ODc1IEMxMTQgMjkgMTE0IDI5IDExMSAyOSBDMTExLjk5IDIxLjc0IDExMi45OCAxNC40OCAxMTQgNyBDMTEyLjM1IDcgMTEwLjcgNyAxMDkgNyBDMTA4LjYyODc1IDguMTQ0Njg3NSAxMDguNjI4NzUgOC4xNDQ2ODc1IDEwOC4yNSA5LjMxMjUgQzEwNi44OTAwNDQ0MiAxMi4yMzY0MDQ1IDEwNS42ODQxNDE3NCAxMy4zMDAwNDM1NiAxMDMgMTUgQzEwMy4yODg3NSAxNS41NDI2OTUzMSAxMDMuNTc3NSAxNi4wODUzOTA2MyAxMDMuODc1IDE2LjY0NDUzMTI1IEMxMDQuMjQ2MjUgMTcuMzU5OTYwOTQgMTA0LjYxNzUgMTguMDc1MzkwNjMgMTA1IDE4LjgxMjUgQzEwNS4zNzEyNSAxOS41MjAxOTUzMSAxMDUuNzQyNSAyMC4yMjc4OTA2MiAxMDYuMTI1IDIwLjk1NzAzMTI1IEMxMDcgMjMgMTA3IDIzIDEwNyAyNiBDMTAxLjkyNTIzMjA2IDI3LjI2MzA1MzM1IDk3LjI3MjAzNjQ2IDI4LjI3MDM2MDg0IDkyIDI4IEM5MS4wMSAyNS4zNiA5MC4wMiAyMi43MiA4OSAyMCBDODguODE4MjQyMTkgMjAuOTM5NzI2NTYgODguODE4MjQyMTkgMjAuOTM5NzI2NTYgODguNjMyODEyNSAyMS44OTg0Mzc1IEM4OC40NjUyMzQzNyAyMi43MTU3MDMxMyA4OC4yOTc2NTYyNSAyMy41MzI5Njg3NSA4OC4xMjUgMjQuMzc1IEM4Ny45NjI1NzgxMiAyNS4xODcxMDkzOCA4Ny44MDAxNTYyNSAyNS45OTkyMTg3NSA4Ny42MzI4MTI1IDI2LjgzNTkzNzUgQzg3IDI5IDg3IDI5IDg1IDMxIEM4MC4wODM5MzM3NyAzMi41OTI4MDU0NiA3NS4xNjM0MjQxMyAzMy4yNjQ3OTA5OCA3MCAzMyBDNzAgMzAuMzYgNzAgMjcuNzIgNzAgMjUgQzY4LjUxNSAyNS40OTUgNjguNTE1IDI1LjQ5NSA2NyAyNiBDNjIuODU4NDIwOTEgMjYuMjU5NDYyOTUgNTguNzExMzM3NjYgMjYuMjMxMzg0OTEgNTQuNTYyNSAyNi4yNSBDNTMuNDE3MTY3OTcgMjYuMjcwNjI1IDUyLjI3MTgzNTk0IDI2LjI5MTI1IDUxLjA5MTc5Njg4IDI2LjMxMjUgQzQ5Ljk5MDI5Mjk3IDI2LjMxNzY1NjI1IDQ4Ljg4ODc4OTA2IDI2LjMyMjgxMjUgNDcuNzUzOTA2MjUgMjYuMzI4MTI1IEM0Ni4yNDI5MjM1OCAyNi4zNDIxNDM1NSA0Ni4yNDI5MjM1OCAyNi4zNDIxNDM1NSA0NC43MDE0MTYwMiAyNi4zNTY0NDUzMSBDNDEuNTg4NDgzODEgMjUuOTQ1NzAxNDMgNDAuMjEzMzE1MDMgMjUuMjAxODk0NDIgMzggMjMgQzM3Ljc1IDIwLjMxMjUgMzcuNzUgMjAuMzEyNSAzOCAxOCBDMzcuNTYzMDQyMDMgMjIuNjMxNzU0NSAzNy41NjMwNDIwMyAyMi42MzE3NTQ1IDM2IDI1IEMzMS4xNTg0Mzg5OSAyNy4yNDY0ODQzMSAyNi4zMDMzMTgxIDI4IDIxIDI4IEMyMC42NyAyNS4wMyAyMC4zNCAyMi4wNiAyMCAxOSBDMTcuMjI1MjA1NjQgMjEuNzc0Nzk0MzYgMTYuNDI0NTMxMjMgMjMuMTMwNDU0NTQgMTQuOTM3NSAyNi41NjI1IEMxMy40MTgyOTY2IDI5LjM5ODM0NjM0IDEyLjYzNDU2MTU5IDMwLjcxOTg1OTEgOS42NjQwNjI1IDMyLjAzMTI1IEM1LjE0MTIxNzc4IDMyLjk1NDgzMzkxIDAuNjEzODUyOSAzMy4yNDI4MzQzNiAtNCAzMyBDLTQuMjQ5MzM4NjEgMjUuNTg5OTY4MjkgLTMuMzAwMDAwNDkgMTguNzIzNjUxNCAtMiAxMS40Mzc1IEMtMS44MDkyMTg3NSAxMC4zMzM0MTc5NyAtMS42MTg0Mzc1IDkuMjI5MzM1OTQgLTEuNDIxODc1IDguMDkxNzk2ODggQy0wLjk1NDYxMzczIDUuMzkzMzYzMDIgLTAuNDc4MjQwODIgMi42OTY1MDk2MSAwIDAgWiBNNTYgNSBDNTUuMzQgOS45NSA1NC42OCAxNC45IDU0IDIwIEM1NC45OSAyMCA1NS45OCAyMCA1NyAyMCBDNTcuNjYgMTUuMDUgNTguMzIgMTAuMSA1OSA1IEM1OC4wMSA1IDU3LjAyIDUgNTYgNSBaIE05MCA1IEM4OS42NyA2Ljk4IDg5LjM0IDguOTYgODkgMTEgQzg5Ljk5IDExIDkwLjk4IDExIDkyIDExIEM5Mi4zMyA5LjAyIDkyLjY2IDcuMDQgOTMgNSBDOTIuMDEgNSA5MS4wMiA1IDkwIDUgWiBNMTUgOCBDMTYgMTAgMTYgMTAgMTYgMTAgWiBNMzkgMTEgQzQwIDEzIDQwIDEzIDQwIDEzIFogIiBmaWxsPSIjMUMxRDIyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0LDEzNSkiLz4KPHBhdGggZD0iTTAgMCBDMC42MzQ3NTczIDEuNTM4MDY1NzggMS4yMDE0MjM1NiAzLjEwNDczNTg1IDEuNzI2NTYyNSA0LjY4MzU5Mzc1IEMyLjAzNTkzNzUgNS42MTEwNzQyMiAyLjM0NTMxMjUgNi41Mzg1NTQ2OSAyLjY2NDA2MjUgNy40OTQxNDA2MiBDMi45ODExNzE4OCA4LjQ2NTQ0OTIyIDMuMjk4MjgxMjUgOS40MzY3NTc4MSAzLjYyNSAxMC40Mzc1IEM0LjExMjI2NTYyIDExLjg4ODY2MjExIDQuMTEyMjY1NjIgMTEuODg4NjYyMTEgNC42MDkzNzUgMTMuMzY5MTQwNjIgQzcgMjAuNjA2MzA1OCA3IDIwLjYwNjMwNTggNyAyNCBDNy42NiAyNCA4LjMyIDI0IDkgMjQgQzkuMDQ4OTg0MzggMjMuMTY1OTc2NTYgOS4wOTc5Njg3NSAyMi4zMzE5NTMxMiA5LjE0ODQzNzUgMjEuNDcyNjU2MjUgQzkuNTkzMTcyNjggMTQuNzc4NjI0OTkgMTAuMzQ2ODIwNCA4LjUwMjUwNjQxIDEyIDIgQzE0LjA2MDgxMzYxIDEuNDkzMDk0MTYgMTYuMTIzNzM1MjYgMC45OTQ3NTM4MSAxOC4xODc1IDAuNSBDMTkuMzM2MDU0NjkgMC4yMjE1NjI1IDIwLjQ4NDYwOTM3IC0wLjA1Njg3NSAyMS42Njc5Njg3NSAtMC4zNDM3NSBDMjUgLTEgMjUgLTEgMzAgLTEgQzI5LjAxIDUuOTMgMjguMDIgMTIuODYgMjcgMjAgQzI5LjMxIDIwLjMzIDMxLjYyIDIwLjY2IDM0IDIxIEMzNC4wNDI1NDM1NiAyMi45OTk1NDc0NiAzNC4wNDA4MDc4MyAyNS4wMDA0MTYzNiAzNCAyNyBDMzIuNDQzMzQxMiAyOC41NTY2NTg4IDMwLjk1MTQ4MjkxIDI4LjEyNzIxODI5IDI4Ljc4NzM1MzUyIDI4LjEyOTM5NDUzIEMyNy44OTI5NTA1OSAyOC4xMzI1NDY2OSAyNi45OTg1NDc2NyAyOC4xMzU2OTg4NSAyNi4wNzcwNDE2MyAyOC4xMzg5NDY1MyBDMjUuMTA0MTU2OTUgMjguMTM2OTIyMyAyNC4xMzEyNzIyOCAyOC4xMzQ4OTgwNyAyMy4xMjg5MDYyNSAyOC4xMzI4MTI1IEMyMi4xMzYyNDI1MiAyOC4xMzM3NjkyMyAyMS4xNDM1Nzg4IDI4LjEzNDcyNTk1IDIwLjEyMDgzNDM1IDI4LjEzNTcxMTY3IEMxOC4wMTY2NzIxMyAyOC4xMzYzOTM2NiAxNS45MTI1MDc4MiAyOC4xMzQ1MzgwNiAxMy44MDgzNDk2MSAyOC4xMzAzNzEwOSBDMTAuNTc5ODY3NCAyOC4xMjUwMjg3NCA3LjM1MTUyNDY5IDI4LjEzMDMxMjU1IDQuMTIzMDQ2ODggMjguMTM2NzE4NzUgQzIuMDgzMzMzMDIgMjguMTM2MDU3ODYgMC4wNDM2MTkyNiAyOC4xMzQ3NzY0OCAtMS45OTYwOTM3NSAyOC4xMzI4MTI1IEMtMi45NjY5NTQxOSAyOC4xMzQ4MzY3MyAtMy45Mzc4MTQ2NCAyOC4xMzY4NjA5NiAtNC45MzgwOTUwOSAyOC4xMzg5NDY1MyBDLTUuODM1NjUwMTggMjguMTM1Nzk0MzcgLTYuNzMzMjA1MjYgMjguMTMyNjQyMjEgLTcuNjU3OTU4OTggMjguMTI5Mzk0NTMgQy04Ljg0NTkwMzA5IDI4LjEyODIwMTE0IC04Ljg0NTkwMzA5IDI4LjEyODIwMTE0IC0xMC4wNTc4NDYwNyAyOC4xMjY5ODM2NCBDLTEyIDI4IC0xMiAyOCAtMTQgMjcgQy0xNCAyNi4wMSAtMTQgMjUuMDIgLTE0IDI0IEMtMTcuNjMgMjQgLTIxLjI2IDI0IC0yNSAyNCBDLTI1LjY2IDI1LjMyIC0yNi4zMiAyNi42NCAtMjcgMjggQy0yOC42NSAyOCAtMzAuMyAyOCAtMzIgMjggQy0zMC40OTc0ODc1NyAxOC42Mjg4NzQ4NSAtMjQuMzY4MzMzOTkgOC45MDcwMjYzMiAtMTggMiBDLTEzLjMyMjU4NjQ4IC0xLjA0MTA2MjU4IC00LjM4NjU4NDg2IC00LjM4NjU4NDg2IDAgMCBaIE0tMTkgMTQgQy0xOS42NiAxNS42NSAtMjAuMzIgMTcuMyAtMjEgMTkgQy0xOS4zNSAxOSAtMTcuNyAxOSAtMTYgMTkgQy0xNi42NiAxNy4zNSAtMTcuMzIgMTUuNyAtMTggMTQgQy0xOC4zMyAxNCAtMTguNjYgMTQgLTE5IDE0IFogIiBmaWxsPSIjMUMxRDIyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNjYsMTMzKSIvPgo8cGF0aCBkPSJNMCAwIEMxLjMyIDAuMzMgMi42NCAwLjY2IDQgMSBDNC43OTk1MzEzOCA0LjI4Njk2MjMzIDUuMDk2NTg5MzYgNS43MTAyMzE5MiA0IDkgQzMuMDEgOS4zMyAyLjAyIDkuNjYgMSAxMCBDMC4zNCA5LjY3IC0wLjMyIDkuMzQgLTEgOSBDLTEuOTQ5MzQyMDIgNi4wNzI4NjIxMiAtMi4yMzE3NjQ3MyA0LjU3MTY4NjMyIC0xLjA2MjUgMS42ODc1IEMtMC43MTE4NzUgMS4xMzA2MjUgLTAuMzYxMjUgMC41NzM3NSAwIDAgWiAiIGZpbGw9IiMxQzFEMjIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDc3LDU5KSIvPgo8cGF0aCBkPSJNMCAwIEMxLjMyIDAuNjYgMi42NCAxLjMyIDQgMiBDNCAzLjk4IDQgNS45NiA0IDggQzIuMDIgOC45OSAyLjAyIDguOTkgMCAxMCBDLTIuMTQ5MTU3ODUgNi43NzYyNjMyMyAtMi4zODI4NjgwMyA1LjczMjk2MzI2IC0yIDIgQy0xLjM0IDEuMzQgLTAuNjggMC42OCAwIDAgWiAiIGZpbGw9IiMxQzFEMjIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDExMiw1OSkiLz4KPC9zdmc+Cg==",
+  "name": "WortalSDK",
+  "previewIconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIxNjgiPgo8cGF0aCBkPSJNMCAwIEM0LjQxODkzNDYxIDEuMDMzNTA1NTcgNi4wNzQ2MTY2MiAzLjcxOTk1MjgyIDguNTI3MzQzNzUgNy4yODUxNTYyNSBDOS4wMzQ2NzA0MSA3Ljk5MzMzNDk2IDkuNTQxOTk3MDcgOC43MDE1MTM2NyAxMC4wNjQ2OTcyNyA5LjQzMTE1MjM0IEMxMS43NzA2MzE3OSAxMS44NDE3Mzk5NiAxMy40MzQ3ODQwNiAxNC4yNzY4NzY4OSAxNS4wODk4NDM3NSAxNi43MjI2NTYyNSBDMTUuNjg1MzkwNjIgMTcuNjAwNjY4OTUgMTYuMjgwOTM3NSAxOC40Nzg2ODE2NCAxNi44OTQ1MzEyNSAxOS4zODMzMDA3OCBDMjYuMTc4MDkwMTUgMzMuMTY5MDkxOTcgMzQuODQ0MjYwOTUgNDcuMjk1MzIwMTEgNDMuMDg5ODQzNzUgNjEuNzIyNjU2MjUgQzQzLjY5NzYzNjcyIDYyLjc3MzI0MjE5IDQ0LjMwNTQyOTY5IDYzLjgyMzgyODEyIDQ0LjkzMTY0MDYyIDY0LjkwNjI1IEM0Ni43OTc4ODE5MyA2OC4xNDU2OTA1MiA0OC42MzUwOTA3OSA3MS4zOTk5OTEzIDUwLjQ2NDg0Mzc1IDc0LjY2MDE1NjI1IEM1MS4wNDMxNDk0MSA3NS42NjEwMzI3MSA1MS42MjE0NTUwOCA3Ni42NjE5MDkxOCA1Mi4yMTcyODUxNiA3Ny42OTMxMTUyMyBDNTQuNTQ4NzQyMTYgODEuOTE3ODQ3NiA1Ni4wODA3Mzg4NiA4NC43MTgwODMyOSA1Ni4xMjUgODkuNjAxNTYyNSBDNTIuNjQyOTgxNzUgMTAwLjEwMDE3NjAyIDQ0LjgzOTc4NzYzIDEwNi4yNDM0MDE0NyAzNS4zMDg1OTM3NSAxMTEuMTU2MjUgQzI1LjMxNTkxNzQ4IDExNS42ODI1MDI1NiAxNC4wOTc0MTM2NyAxMTguMzk2NTg5MSAzLjA4OTg0Mzc1IDExNy43MjI2NTYyNSBDMi4zMTQ1NTg5NiAxMTQuMjk2OTE2ODggMS45NzA2NTU5NyAxMTEuMTUwMjYzOCAxLjk5MjE4NzUgMTA3LjY0MDYyNSBDMS45OTU0MTAxNiAxMDYuNzA5Mjc3MzQgMS45OTg2MzI4MSAxMDUuNzc3OTI5NjkgMi4wMDE5NTMxMiAxMDQuODE4MzU5MzggQzIuMDE0NTIxNDggMTAzLjM3ODc5ODgzIDIuMDE0NTIxNDggMTAzLjM3ODc5ODgzIDIuMDI3MzQzNzUgMTAxLjkxMDE1NjI1IEMyLjAzMTg1NTQ3IDEwMC45MzExMTMyOCAyLjAzNjM2NzE5IDk5Ljk1MjA3MDMxIDIuMDQxMDE1NjIgOTguOTQzMzU5MzggQzIuMDUyNzU2OTEgOTYuNTM2Mzk1MTQgMi4wNjkxNzk1NiA5NC4xMjk1NTc2OCAyLjA4OTg0Mzc1IDkxLjcyMjY1NjI1IEMyLjc0NDI4NDY3IDkxLjU0NTI0OTAyIDMuMzk4NzI1NTkgOTEuMzY3ODQxOCA0LjA3Mjk5ODA1IDkxLjE4NTA1ODU5IEMxMy42NjUyMTI3MiA4OC40Njg2MzIzNiAyMS4yNTEzMDg3OCA4NC4wMDIzODcwMiAyOC4wODk4NDM3NSA3Ni43MjI2NTYyNSBDMjguNzQ5ODQzNzUgNzYuNzIyNjU2MjUgMjkuNDA5ODQzNzUgNzYuNzIyNjU2MjUgMzAuMDg5ODQzNzUgNzYuNzIyNjU2MjUgQzIzLjYxMjg4MDA2IDYyLjY1MTI5NzQzIDE1LjQ1MzgxMDMxIDQ5LjczNjk3ODY4IDcuMDg5ODQzNzUgMzYuNzIyNjU2MjUgQzYuNjE4NTMwMjcgMzUuOTgyMDg5ODQgNi4xNDcyMTY4IDM1LjI0MTUyMzQ0IDUuNjYxNjIxMDkgMzQuNDc4NTE1NjIgQzIuNTQ0MzEwMzEgMjkuNDgxNTcwNzYgMi41NDQzMTAzMSAyOS40ODE1NzA3NiAtMC45MTAxNTYyNSAyNC43MjI2NTYyNSBDLTEuNTcwMTU2MjUgMjQuNzIyNjU2MjUgLTIuMjMwMTU2MjUgMjQuNzIyNjU2MjUgLTIuOTEwMTU2MjUgMjQuNzIyNjU2MjUgQy00LjQ2NzY0MTYyIDI2LjY2NTU2Mzk2IC01Ljg1MDkzNzkgMjguNTg4Njc1MjcgLTcuMjIyNjU2MjUgMzAuNjYwMTU2MjUgQy03Ljg2NjY2MzgyIDMxLjYyOTAwNzU3IC03Ljg2NjY2MzgyIDMxLjYyOTAwNzU3IC04LjUyMzY4MTY0IDMyLjYxNzQzMTY0IEMtMTIuNjk2NDMyMDIgMzkuMDgzODI3NzEgLTE2LjI5NDIwMTI2IDQ1LjgzODY2MjMzIC0xOS44NDc2NTYyNSA1Mi42NjAxNTYyNSBDLTIwLjY4MDY3MjYxIDU0LjI1ODE1MDYzIC0yMC42ODA2NzI2MSA1NC4yNTgxNTA2MyAtMjEuNTMwNTE3NTggNTUuODg4NDI3NzMgQy0yNi44MjYwMjgxMyA2NS4yMzc5MjYgLTI2LjgyNjAyODEzIDY1LjIzNzkyNiAtMjguODA4NTkzNzUgNzUuNTA3ODEyNSBDLTI1LjY4MzQzMDIyIDgzLjIxMjAxOTk4IC0xNS44Nzk1Mzk3OCA4Ny4yMjUxNTMxMiAtOC45MTAxNTYyNSA5MC43MjI2NTYyNSBDLTguODUxODgwNjcgOTQuMjg1MDg3MDUgLTguODE2NDY3NCA5Ny44NDczOTQ0NCAtOC43ODUxNTYyNSAxMDEuNDEwMTU2MjUgQy04Ljc2ODM5ODQ0IDEwMi40MTc1NTg1OSAtOC43NTE2NDA2MiAxMDMuNDI0OTYwOTQgLTguNzM0Mzc1IDEwNC40NjI4OTA2MiBDLTguNzI0NzA3MDMgMTA1LjkyNzU4Nzg5IC04LjcyNDcwNzAzIDEwNS45Mjc1ODc4OSAtOC43MTQ4NDM3NSAxMDcuNDIxODc1IEMtOC42OTkxMzMzIDEwOC43NjUxMTg0MSAtOC42OTkxMzMzIDEwOC43NjUxMTg0MSAtOC42ODMxMDU0NyAxMTAuMTM1NDk4MDUgQy04LjkzMzEyMTY5IDExMi45ODQzMzg4MiAtOS43Mjk5OTExMyAxMTUuMTMxNjAxNjggLTEwLjkxMDE1NjI1IDExNy43MjI2NTYyNSBDLTIzLjg4NTc4ODg2IDExNC44NjE0OTE2MSAtMzMuNjIyNzQ2NjcgMTA5LjI0MTgzNzE5IC00Mi45MTAxNTYyNSA5OS43MjI2NTYyNSBDLTQ0LjA5MTU4MjAzIDk4LjU3MDIzNDM3IC00NC4wOTE1ODIwMyA5OC41NzAyMzQzNyAtNDUuMjk2ODc1IDk3LjM5NDUzMTI1IEMtNDYuOTEwMTU2MjUgOTQuNzIyNjU2MjUgLTQ2LjkxMDE1NjI1IDk0LjcyMjY1NjI1IC00Ni41NTg1OTM3NSA5MS40Mjk2ODc1IEMtNDYuMTYzMjE0MiA5MC4xMjIzNTM4MyAtNDUuNzM1ODgyOTggODguODI0NDU1MTcgLTQ1LjI4NTE1NjI1IDg3LjUzNTE1NjI1IEMtNDUuMDQ5MzM4MzggODYuODA4MTI1IC00NC44MTM1MjA1MSA4Ni4wODEwOTM3NSAtNDQuNTcwNTU2NjQgODUuMzMyMDMxMjUgQy00My43MjEzNDcxNCA4Mi43ODA5ODgwNSAtNDIuODIxNDA4MjkgODAuMjUyMTg5ODEgLTQxLjkxMDE1NjI1IDc3LjcyMjY1NjI1IEMtNDEuNTY2MTM3NyA3Ni43NTUwNTM3MSAtNDEuMjIyMTE5MTQgNzUuNzg3NDUxMTcgLTQwLjg2NzY3NTc4IDc0Ljc5MDUyNzM0IEMtMzIuMTA3ODMzODIgNTAuNDIyNTIgLTIxLjM5NTcwOTYgMjcuMjM4NTg4MTMgLTYuOTEwMTU2MjUgNS43MjI2NTYyNSBDLTYuMjUwMTU2MjUgNC43MDY4NzUgLTUuNTkwMTU2MjUgMy42OTEwOTM3NSAtNC45MTAxNTYyNSAyLjY0NDUzMTI1IEMtMi45MTAxNTYyNSAwLjcyMjY1NjI1IC0yLjkxMDE1NjI1IDAuNzIyNjU2MjUgMCAwIFogIiBmaWxsPSIjMUMxRDIyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5Ni45MTAxNTYyNSwtMC43MjI2NTYyNSkiLz4KPHBhdGggZD0iTTAgMCBDNS4yOCAwIDEwLjU2IDAgMTYgMCBDMTYuMzMgMS45OCAxNi42NiAzLjk2IDE3IDYgQzE3Ljk5IDQuMDIgMTguOTggMi4wNCAyMCAwIEMyMy4zIDAgMjYuNiAwIDMwIDAgQzMwLjIyNzg2NDU4IDIuMDUwNzgxMjUgMzAuNDU1NzI5MTcgNC4xMDE1NjI1IDMwLjY4MzU5Mzc1IDYuMTUyMzQzNzUgQzMwLjgxODg2NjE0IDguMDExNDAyMjkgMzAuODE4ODY2MTQgOC4wMTE0MDIyOSAzMiA5IEMzMi45OSA2LjAzIDMzLjk4IDMuMDYgMzUgMCBDNjkuMzMzMzMzMzMgMCAxMDMuNjY2NjY2NjcgMCAxMzggMCBDMTM3LjY3IDIuMzEgMTM3LjM0IDQuNjIgMTM3IDcgQzEzNC42OSA3IDEzMi4zOCA3IDEzMCA3IEMxMjkuOTI2NTIzNDQgOC4zMDMyNDIxOSAxMjkuOTI2NTIzNDQgOC4zMDMyNDIxOSAxMjkuODUxNTYyNSA5LjYzMjgxMjUgQzEyOS43NzY3OTY4OCAxMC43ODUyMzQzNyAxMjkuNzAyMDMxMjUgMTEuOTM3NjU2MjUgMTI5LjYyNSAxMy4xMjUgQzEyOS41NTUzOTA2MyAxNC4yNjE5NTMxMiAxMjkuNDg1NzgxMjUgMTUuMzk4OTA2MjUgMTI5LjQxNDA2MjUgMTYuNTcwMzEyNSBDMTI4Ljk4NzkwMjI1IDIwLjEwMDIwNTkgMTI4LjYxMzE1MTkxIDIyLjgxOTkxODI5IDEyNyAyNiBDMTI0LjA2NjQwNjI1IDI3LjI0MjE4NzUgMTI0LjA2NjQwNjI1IDI3LjI0MjE4NzUgMTIwLjU2MjUgMjcuODc1IEMxMTkuNDA4Nzg5MDYgMjguMDk5Mjk2ODcgMTE4LjI1NTA3ODEyIDI4LjMyMzU5Mzc1IDExNy4wNjY0MDYyNSAyOC41NTQ2ODc1IEMxMTQgMjkgMTE0IDI5IDExMSAyOSBDMTExLjk5IDIxLjc0IDExMi45OCAxNC40OCAxMTQgNyBDMTEyLjM1IDcgMTEwLjcgNyAxMDkgNyBDMTA4LjYyODc1IDguMTQ0Njg3NSAxMDguNjI4NzUgOC4xNDQ2ODc1IDEwOC4yNSA5LjMxMjUgQzEwNi44OTAwNDQ0MiAxMi4yMzY0MDQ1IDEwNS42ODQxNDE3NCAxMy4zMDAwNDM1NiAxMDMgMTUgQzEwMy4yODg3NSAxNS41NDI2OTUzMSAxMDMuNTc3NSAxNi4wODUzOTA2MyAxMDMuODc1IDE2LjY0NDUzMTI1IEMxMDQuMjQ2MjUgMTcuMzU5OTYwOTQgMTA0LjYxNzUgMTguMDc1MzkwNjMgMTA1IDE4LjgxMjUgQzEwNS4zNzEyNSAxOS41MjAxOTUzMSAxMDUuNzQyNSAyMC4yMjc4OTA2MiAxMDYuMTI1IDIwLjk1NzAzMTI1IEMxMDcgMjMgMTA3IDIzIDEwNyAyNiBDMTAxLjkyNTIzMjA2IDI3LjI2MzA1MzM1IDk3LjI3MjAzNjQ2IDI4LjI3MDM2MDg0IDkyIDI4IEM5MS4wMSAyNS4zNiA5MC4wMiAyMi43MiA4OSAyMCBDODguODE4MjQyMTkgMjAuOTM5NzI2NTYgODguODE4MjQyMTkgMjAuOTM5NzI2NTYgODguNjMyODEyNSAyMS44OTg0Mzc1IEM4OC40NjUyMzQzNyAyMi43MTU3MDMxMyA4OC4yOTc2NTYyNSAyMy41MzI5Njg3NSA4OC4xMjUgMjQuMzc1IEM4Ny45NjI1NzgxMiAyNS4xODcxMDkzOCA4Ny44MDAxNTYyNSAyNS45OTkyMTg3NSA4Ny42MzI4MTI1IDI2LjgzNTkzNzUgQzg3IDI5IDg3IDI5IDg1IDMxIEM4MC4wODM5MzM3NyAzMi41OTI4MDU0NiA3NS4xNjM0MjQxMyAzMy4yNjQ3OTA5OCA3MCAzMyBDNzAgMzAuMzYgNzAgMjcuNzIgNzAgMjUgQzY4LjUxNSAyNS40OTUgNjguNTE1IDI1LjQ5NSA2NyAyNiBDNjIuODU4NDIwOTEgMjYuMjU5NDYyOTUgNTguNzExMzM3NjYgMjYuMjMxMzg0OTEgNTQuNTYyNSAyNi4yNSBDNTMuNDE3MTY3OTcgMjYuMjcwNjI1IDUyLjI3MTgzNTk0IDI2LjI5MTI1IDUxLjA5MTc5Njg4IDI2LjMxMjUgQzQ5Ljk5MDI5Mjk3IDI2LjMxNzY1NjI1IDQ4Ljg4ODc4OTA2IDI2LjMyMjgxMjUgNDcuNzUzOTA2MjUgMjYuMzI4MTI1IEM0Ni4yNDI5MjM1OCAyNi4zNDIxNDM1NSA0Ni4yNDI5MjM1OCAyNi4zNDIxNDM1NSA0NC43MDE0MTYwMiAyNi4zNTY0NDUzMSBDNDEuNTg4NDgzODEgMjUuOTQ1NzAxNDMgNDAuMjEzMzE1MDMgMjUuMjAxODk0NDIgMzggMjMgQzM3Ljc1IDIwLjMxMjUgMzcuNzUgMjAuMzEyNSAzOCAxOCBDMzcuNTYzMDQyMDMgMjIuNjMxNzU0NSAzNy41NjMwNDIwMyAyMi42MzE3NTQ1IDM2IDI1IEMzMS4xNTg0Mzg5OSAyNy4yNDY0ODQzMSAyNi4zMDMzMTgxIDI4IDIxIDI4IEMyMC42NyAyNS4wMyAyMC4zNCAyMi4wNiAyMCAxOSBDMTcuMjI1MjA1NjQgMjEuNzc0Nzk0MzYgMTYuNDI0NTMxMjMgMjMuMTMwNDU0NTQgMTQuOTM3NSAyNi41NjI1IEMxMy40MTgyOTY2IDI5LjM5ODM0NjM0IDEyLjYzNDU2MTU5IDMwLjcxOTg1OTEgOS42NjQwNjI1IDMyLjAzMTI1IEM1LjE0MTIxNzc4IDMyLjk1NDgzMzkxIDAuNjEzODUyOSAzMy4yNDI4MzQzNiAtNCAzMyBDLTQuMjQ5MzM4NjEgMjUuNTg5OTY4MjkgLTMuMzAwMDAwNDkgMTguNzIzNjUxNCAtMiAxMS40Mzc1IEMtMS44MDkyMTg3NSAxMC4zMzM0MTc5NyAtMS42MTg0Mzc1IDkuMjI5MzM1OTQgLTEuNDIxODc1IDguMDkxNzk2ODggQy0wLjk1NDYxMzczIDUuMzkzMzYzMDIgLTAuNDc4MjQwODIgMi42OTY1MDk2MSAwIDAgWiBNNTYgNSBDNTUuMzQgOS45NSA1NC42OCAxNC45IDU0IDIwIEM1NC45OSAyMCA1NS45OCAyMCA1NyAyMCBDNTcuNjYgMTUuMDUgNTguMzIgMTAuMSA1OSA1IEM1OC4wMSA1IDU3LjAyIDUgNTYgNSBaIE05MCA1IEM4OS42NyA2Ljk4IDg5LjM0IDguOTYgODkgMTEgQzg5Ljk5IDExIDkwLjk4IDExIDkyIDExIEM5Mi4zMyA5LjAyIDkyLjY2IDcuMDQgOTMgNSBDOTIuMDEgNSA5MS4wMiA1IDkwIDUgWiBNMTUgOCBDMTYgMTAgMTYgMTAgMTYgMTAgWiBNMzkgMTEgQzQwIDEzIDQwIDEzIDQwIDEzIFogIiBmaWxsPSIjMUMxRDIyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0LDEzNSkiLz4KPHBhdGggZD0iTTAgMCBDMC42MzQ3NTczIDEuNTM4MDY1NzggMS4yMDE0MjM1NiAzLjEwNDczNTg1IDEuNzI2NTYyNSA0LjY4MzU5Mzc1IEMyLjAzNTkzNzUgNS42MTEwNzQyMiAyLjM0NTMxMjUgNi41Mzg1NTQ2OSAyLjY2NDA2MjUgNy40OTQxNDA2MiBDMi45ODExNzE4OCA4LjQ2NTQ0OTIyIDMuMjk4MjgxMjUgOS40MzY3NTc4MSAzLjYyNSAxMC40Mzc1IEM0LjExMjI2NTYyIDExLjg4ODY2MjExIDQuMTEyMjY1NjIgMTEuODg4NjYyMTEgNC42MDkzNzUgMTMuMzY5MTQwNjIgQzcgMjAuNjA2MzA1OCA3IDIwLjYwNjMwNTggNyAyNCBDNy42NiAyNCA4LjMyIDI0IDkgMjQgQzkuMDQ4OTg0MzggMjMuMTY1OTc2NTYgOS4wOTc5Njg3NSAyMi4zMzE5NTMxMiA5LjE0ODQzNzUgMjEuNDcyNjU2MjUgQzkuNTkzMTcyNjggMTQuNzc4NjI0OTkgMTAuMzQ2ODIwNCA4LjUwMjUwNjQxIDEyIDIgQzE0LjA2MDgxMzYxIDEuNDkzMDk0MTYgMTYuMTIzNzM1MjYgMC45OTQ3NTM4MSAxOC4xODc1IDAuNSBDMTkuMzM2MDU0NjkgMC4yMjE1NjI1IDIwLjQ4NDYwOTM3IC0wLjA1Njg3NSAyMS42Njc5Njg3NSAtMC4zNDM3NSBDMjUgLTEgMjUgLTEgMzAgLTEgQzI5LjAxIDUuOTMgMjguMDIgMTIuODYgMjcgMjAgQzI5LjMxIDIwLjMzIDMxLjYyIDIwLjY2IDM0IDIxIEMzNC4wNDI1NDM1NiAyMi45OTk1NDc0NiAzNC4wNDA4MDc4MyAyNS4wMDA0MTYzNiAzNCAyNyBDMzIuNDQzMzQxMiAyOC41NTY2NTg4IDMwLjk1MTQ4MjkxIDI4LjEyNzIxODI5IDI4Ljc4NzM1MzUyIDI4LjEyOTM5NDUzIEMyNy44OTI5NTA1OSAyOC4xMzI1NDY2OSAyNi45OTg1NDc2NyAyOC4xMzU2OTg4NSAyNi4wNzcwNDE2MyAyOC4xMzg5NDY1MyBDMjUuMTA0MTU2OTUgMjguMTM2OTIyMyAyNC4xMzEyNzIyOCAyOC4xMzQ4OTgwNyAyMy4xMjg5MDYyNSAyOC4xMzI4MTI1IEMyMi4xMzYyNDI1MiAyOC4xMzM3NjkyMyAyMS4xNDM1Nzg4IDI4LjEzNDcyNTk1IDIwLjEyMDgzNDM1IDI4LjEzNTcxMTY3IEMxOC4wMTY2NzIxMyAyOC4xMzYzOTM2NiAxNS45MTI1MDc4MiAyOC4xMzQ1MzgwNiAxMy44MDgzNDk2MSAyOC4xMzAzNzEwOSBDMTAuNTc5ODY3NCAyOC4xMjUwMjg3NCA3LjM1MTUyNDY5IDI4LjEzMDMxMjU1IDQuMTIzMDQ2ODggMjguMTM2NzE4NzUgQzIuMDgzMzMzMDIgMjguMTM2MDU3ODYgMC4wNDM2MTkyNiAyOC4xMzQ3NzY0OCAtMS45OTYwOTM3NSAyOC4xMzI4MTI1IEMtMi45NjY5NTQxOSAyOC4xMzQ4MzY3MyAtMy45Mzc4MTQ2NCAyOC4xMzY4NjA5NiAtNC45MzgwOTUwOSAyOC4xMzg5NDY1MyBDLTUuODM1NjUwMTggMjguMTM1Nzk0MzcgLTYuNzMzMjA1MjYgMjguMTMyNjQyMjEgLTcuNjU3OTU4OTggMjguMTI5Mzk0NTMgQy04Ljg0NTkwMzA5IDI4LjEyODIwMTE0IC04Ljg0NTkwMzA5IDI4LjEyODIwMTE0IC0xMC4wNTc4NDYwNyAyOC4xMjY5ODM2NCBDLTEyIDI4IC0xMiAyOCAtMTQgMjcgQy0xNCAyNi4wMSAtMTQgMjUuMDIgLTE0IDI0IEMtMTcuNjMgMjQgLTIxLjI2IDI0IC0yNSAyNCBDLTI1LjY2IDI1LjMyIC0yNi4zMiAyNi42NCAtMjcgMjggQy0yOC42NSAyOCAtMzAuMyAyOCAtMzIgMjggQy0zMC40OTc0ODc1NyAxOC42Mjg4NzQ4NSAtMjQuMzY4MzMzOTkgOC45MDcwMjYzMiAtMTggMiBDLTEzLjMyMjU4NjQ4IC0xLjA0MTA2MjU4IC00LjM4NjU4NDg2IC00LjM4NjU4NDg2IDAgMCBaIE0tMTkgMTQgQy0xOS42NiAxNS42NSAtMjAuMzIgMTcuMyAtMjEgMTkgQy0xOS4zNSAxOSAtMTcuNyAxOSAtMTYgMTkgQy0xNi42NiAxNy4zNSAtMTcuMzIgMTUuNyAtMTggMTQgQy0xOC4zMyAxNCAtMTguNjYgMTQgLTE5IDE0IFogIiBmaWxsPSIjMUMxRDIyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNjYsMTMzKSIvPgo8cGF0aCBkPSJNMCAwIEMxLjMyIDAuMzMgMi42NCAwLjY2IDQgMSBDNC43OTk1MzEzOCA0LjI4Njk2MjMzIDUuMDk2NTg5MzYgNS43MTAyMzE5MiA0IDkgQzMuMDEgOS4zMyAyLjAyIDkuNjYgMSAxMCBDMC4zNCA5LjY3IC0wLjMyIDkuMzQgLTEgOSBDLTEuOTQ5MzQyMDIgNi4wNzI4NjIxMiAtMi4yMzE3NjQ3MyA0LjU3MTY4NjMyIC0xLjA2MjUgMS42ODc1IEMtMC43MTE4NzUgMS4xMzA2MjUgLTAuMzYxMjUgMC41NzM3NSAwIDAgWiAiIGZpbGw9IiMxQzFEMjIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDc3LDU5KSIvPgo8cGF0aCBkPSJNMCAwIEMxLjMyIDAuNjYgMi42NCAxLjMyIDQgMiBDNCAzLjk4IDQgNS45NiA0IDggQzIuMDIgOC45OSAyLjAyIDguOTkgMCAxMCBDLTIuMTQ5MTU3ODUgNi43NzYyNjMyMyAtMi4zODI4NjgwMyA1LjczMjk2MzI2IC0yIDIgQy0xLjM0IDEuMzQgLTAuNjggMC42OCAwIDAgWiAiIGZpbGw9IiMxQzFEMjIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDExMiw1OSkiLz4KPC9zdmc+Cg==",
+  "shortDescription": "Wortal SDK for GDevelop 5.",
+  "version": "1.0.0",
+  "description": "Allow developer to use one SDK to deliver their games everywhere. To learn more about Wortal please visit our to [Official site](https://wortal.ai) and our [SDK Documentation](https://docs.games-api.ai/).",
+  "tags": "SDK,HTML5",
+  "authorIds": [
+    "jSwIVHwOdwWxF9zEtBm3knk782G2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const gdevelopToJsObject = (structureVar) => {",
+            "    const result = {};",
+            "    for (const key in structureVar._children) {",
+            "        if (structureVar.hasChild(key)) {",
+            "            const child = structureVar.getChild(key);",
+            "",
+            "            if (child.isStructure()) {",
+            "                result[key] = gdevelopToJsObject(child);",
+            "            } else {",
+            "                result[key] = child.getValue();",
+            "            }",
+            "        }",
+            "    }",
+            "",
+            "    return result;",
+            "};",
+            "const isObjectEmpty = (obj) => {",
+            "    return obj && Object.keys(obj).length === 0 && obj.constructor === Object;",
+            "}",
+            "function setResultValues(resultVarChild, result) {",
+            "    Object.keys(result).forEach(key => {",
+            "        const value = result[key];",
+            "        const valueType = typeof value;",
+            "        switch(valueType) {",
+            "            case \"string\":",
+            "                resultVarChild.getChild(key).setString(value);",
+            "                break;",
+            "            case \"number\":",
+            "                resultVarChild.getChild(key).setNumber(value);",
+            "                break;",
+            "            case \"boolean\":",
+            "                resultVarChild.getChild(key).setBoolean(value);",
+            "                break;",
+            "            case \"object\":",
+            "                setResultValues(resultVarChild, value);",
+            "                break;",
+            "            default:",
+            "                console.warn(`Unsupported data type for key: ${key}`);",
+            "                resultVarChild.getChild(key).setString(\"\");",
+            "        }",
+            "    });",
+            "}",
+            "function setResultToVarableCallback(results, resultsVar) {",
+            "    if (results && results.length) {",
+            "        resultsVar.clearChildren();",
+            "        results.forEach((result, index) => {",
+            "            const resultVarChild = resultsVar.getChild(index.toString());",
+            "            setResultValues(resultVarChild, result);",
+            "        });",
+            "    }",
+            "}",
+            "gdjs._wortalExtension = {",
+            "    isSdkReady: false,",
+            "    isShowingAd: false,",
+            "    hasAdJustFinishedShowing: false,",
+            "    shouldRewardPlayer: false,",
+            "    gdevelopToJsObject,",
+            "    isObjectEmpty,",
+            "    setResultToVarableCallback,",
+            "    setResultValues,",
+            "};",
+            "const script = document.createElement('script');",
+            "script.src = 'https://storage.googleapis.com/cdn-wortal-ai/v2/wortal-core.js';",
+            "script.async = true;",
+            "document.head.appendChild(script);",
+            "script.onload = function() {",
+            "    Wortal.initializeAsync().then(() => {",
+            "        gdjs._wortalExtension.isSdkReady = true;",
+            "    });",
+            "};"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Set the loading progress of your game.",
+      "fullName": "Set Wortal loading progress",
+      "functionType": "Action",
+      "group": "Core",
+      "name": "SetLoadingProgress",
+      "sentence": "Set Wortal loading progress to _PARAM1_ ",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "WortalSDK::IsWortalInitialized"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "Wortal.setLoadingProgress(eventsFunctionContext.getArgument(\"Progress\"));",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Progress (0-100)",
+          "name": "Progress",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if Wortal SDK is ready.",
+      "fullName": "Wortal SDK is ready",
+      "functionType": "Condition",
+      "group": "Core",
+      "name": "IsWortalInitialized",
+      "sentence": "Wortal SDK is ready",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._wortalExtension.isSdkReady;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Start Game.",
+      "fullName": "Start Game",
+      "functionType": "Action",
+      "group": "Core",
+      "name": "StartGameAsync",
+      "sentence": "Start Game",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "WortalSDK::IsWortalInitialized"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "BuiltinAsync::ResolveAsyncEventsFunction"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "Wortal.startGameAsync();",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Tracks the start of a gameplay session.",
+      "fullName": "Start the gameplay session",
+      "functionType": "Action",
+      "group": "Session",
+      "name": "GamePlayStart",
+      "sentence": "Start the gameplay session",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "Wortal.session.gameplayStart();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Tracks the end of a gameplay session.",
+      "fullName": "Stop the gameplay session",
+      "functionType": "Action",
+      "group": "Session",
+      "name": "GamePlayStop",
+      "sentence": "Stop the gameplay session",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "Wortal.session.gameplayStop();",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Get user device.",
+      "fullName": "Device",
+      "functionType": "StringExpression",
+      "group": "Session",
+      "name": "Device",
+      "sentence": "Get User Device",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Wortal.session.getDevice();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "supplementaryInformation": "[\"ANDROID\",\"IOS\",\"DESKTOP\",\"WEB\"]",
+        "type": "stringWithSelector"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Get entry point that the game was launched from asynchronously.",
+      "fullName": "Get entry point asynchronously",
+      "functionType": "Action",
+      "group": "Session",
+      "name": "GetEntryPointAsync",
+      "sentence": "Get entry point that the game was launched from and set it to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "Wortal.session.getEntryPointAsync().then((entryPoint) => {",
+            "    const resultVar = eventsFunctionContext.getArgument(\"Result\");",
+            "    resultVar.setString(entryPoint);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "String variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Get any data object associated with the entry point that the game was launched from.",
+      "fullName": "Get entry point data",
+      "functionType": "Action",
+      "group": "Session",
+      "name": "GetEntryPointData",
+      "sentence": "Get any data object associated with the entry point and set result to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const entryPointData = Wortal.session.getEntryPointData();\r",
+            "const resultVar = eventsFunctionContext.getArgument(\"Result\");\r",
+            "gdjs._wortalExtension.setResultValues(resultVar, entryPointData);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Structure variable callback to set the result",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Get user locale in BCP47 format.",
+      "fullName": "Locale",
+      "functionType": "StringExpression",
+      "group": "Session",
+      "name": "Locale",
+      "sentence": "Get Locale",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Wortal.session.getLocale();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the orientation of the device the player is using.",
+      "fullName": "Device orientation",
+      "functionType": "StringExpression",
+      "group": "Session",
+      "name": "Orientation",
+      "sentence": "Get orientation",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Wortal.session.getOrientation();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the platform the game is running on. This is useful for platform specific code. For example, if you want to show a different social share asset on Facebook than on Link.",
+      "fullName": "Platform",
+      "functionType": "StringExpression",
+      "group": "Session",
+      "name": "Platform",
+      "sentence": "Get platform",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Wortal.session.getPlatform();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the traffic source info for the game. This is useful for tracking where players are coming from.",
+      "fullName": "Get traffic source",
+      "functionType": "Action",
+      "group": "Session",
+      "name": "GetTrafficSource",
+      "sentence": "Get traffic source and set it to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const resultVariable = eventsFunctionContext.getArgument(\"Result\");\r",
+            "const data = Wortal.session.getTrafficSource();\r",
+            "gdjs._wortalExtension.setResultValues(resultVariable, data);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Structure variable to set traffic source",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Can be called on various player achievements (beating a boss, reaching a high score, etc.). It makes the website celebrate (for example by launching some confetti).",
+      "fullName": "Show happy time",
+      "functionType": "Action",
+      "group": "Session",
+      "name": "ShowHappyTime",
+      "sentence": "Show happy time",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "Wortal.session.happyTime();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Set the data associated with the individual gameplay session for the current context.",
+      "fullName": "Set session data",
+      "functionType": "Action",
+      "group": "Session",
+      "name": "SetSessionData",
+      "sentence": "Set session data to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const dataAsStructure = eventsFunctionContext.getArgument(\"Data\");\r",
+            "const dataAsObj = gdjs._wortalExtension.gdevelopToJsObject(dataAsStructure);\r",
+            "Wortal.session.setSessionData(dataAsObj);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Structure Variable to set the session data",
+          "name": "Data",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Switch to another game. The API will reject if the switch fails - else, the client will load the new game.",
+      "fullName": "Switch game async",
+      "functionType": "Action",
+      "group": "Session",
+      "name": "SwitchGameAsync",
+      "sentence": "Switch game async with with game id _PARAM1_ and optional payload _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const dataAsStructure = eventsFunctionContext.getArgument(\"Payload\");",
+            "const dataAsObj = gdjs._wortalExtension.gdevelopToJsObject(dataAsStructure);",
+            "const gameID = eventsFunctionContext.getArgument(\"GameID\");",
+            "Wortal.session.switchGameAsync(gameID, dataAsObj)",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "ID of game",
+          "name": "GameID",
+          "type": "string"
+        },
+        {
+          "description": "Optional payload structure variable",
+          "name": "Payload",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns whether the audio is enabled for the player.",
+      "fullName": "Audio is enabled",
+      "functionType": "Condition",
+      "group": "Session",
+      "name": "IsAudioEnabled",
+      "sentence": "Audio is enabled",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Wortal.session.isAudioEnabled();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Gets a player's achievements. This method returns all achievements, regardless of whether they are unlocked or not.",
+      "fullName": "Get achievements async",
+      "functionType": "Action",
+      "group": "Achivements",
+      "name": "GetAchievementsAsync",
+      "sentence": "Get achievements async and set it to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "Wortal.achievements.getAchievementsAsync()",
+            ".then(results => {",
+            "    const resultsVar = eventsFunctionContext.getArgument(\"Result\");",
+            "    gdjs._wortalExtension.setResultToVarableCallback(results, resultsVar);",
+            "})",
+            ".catch(error => {",
+            "    console.warn(\"Failed to retrieve achivements:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Array of Achivement structure variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Unlocks an achievement for the player. This method will only unlock the achievement if it has not already been unlocked.",
+      "fullName": "Unlock achivement",
+      "functionType": "Action",
+      "group": "Achivements",
+      "name": "UnlockAchivementAsync",
+      "sentence": "Unlocks achievement _PARAM1_ and set if unlocked to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const achievementName = eventsFunctionContext.getArgument(\"AchievementName\");",
+            "const isUnclocked = eventsFunctionContext.getArgument(\"IsUnlockedVariable\");",
+            "Wortal.achievements.unlockAchievementAsync(achievementName)",
+            ".then((unlocked) => {",
+            "    if(unlocked) {",
+            "        isUnclocked.setBoolean(true);",
+            "    } else {",
+            "        isUnclocked.setBoolean(false);",
+            "    }",
+            "})",
+            ".catch(error => {",
+            "    console.warn(\"Failed to unlock achivement:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Achivement name",
+          "name": "AchievementName",
+          "type": "string"
+        },
+        {
+          "description": "Is unlocked variable callback",
+          "name": "IsUnlockedVariable",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Checks if the current user can subscribe to the game's bot.",
+      "fullName": "Can subscribe to bot asynchronously",
+      "functionType": "Action",
+      "group": "Player",
+      "name": "CanSubscribeBotAsync",
+      "sentence": "Check if player can subscribe to bot and set it to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "console.log(\"Can you?\");",
+            "const canSub = eventsFunctionContext.getArgument(\"Result\");",
+            "Wortal.player.canSubscribeBotAsync()",
+            ".then(canSubscribe => canSub.setBoolean(canSubscribe))",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Boolean variable to set the result",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Flushes any unsaved data to the platform's storage. This function is expensive, and should primarily be used for critical changes where persistence needs to be immediate and known by the game. Non-critical changes should rely on the platform to persist them in the background.",
+      "fullName": "Flush data asynchronously",
+      "functionType": "Action",
+      "group": "Player",
+      "name": "FlushDataAsync",
+      "sentence": "Flush data asynchronously",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "Wortal.player.flushDataAsync().then(() => console.log(\"Data flushed.\")).finally(() => eventsFunctionContext.task.resolve());",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "A unique identifier for the player. This is the standard Facebook Application-Scoped ID which is used for all Graph API calls. If your game shares an AppID with a native game this is the ID you will see in the native game too.",
+      "fullName": "Get ASID asynchronously",
+      "functionType": "Action",
+      "group": "Player",
+      "name": "GetASIDAsync",
+      "sentence": "Get ASID and set the result to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "Wortal.player.getASIDAsync()\r",
+            ".then((asid) => {\r",
+            "    const asidVar = eventsFunctionContext.getArgument(\"ASIDVariable\");\r",
+            "    asidVar.setString(asid);\r",
+            "})\r",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "String variable to save ASID",
+          "name": "ASIDVariable",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Gets ConnectedPlayers containing information about active players that are connected to the current player.",
+      "fullName": "Get connected players async",
+      "functionType": "Action",
+      "group": "Player",
+      "name": "GetConnectedPlayersAsync",
+      "sentence": "Get connected players with payload _PARAM1_ and set the result to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const payloadVar = eventsFunctionContext.getArgument(\"Payload\");",
+            "const dataAdObj = gdjs._wortalExtension.gdevelopToJsObject(payloadVar);",
+            "const resultsVar = eventsFunctionContext.getArgument(\"Result\");",
+            "Wortal.player.getConnectedPlayersAsync(payloadVar)",
+            ".then(results => {",
+            "    const resultsVar = eventsFunctionContext.getArgument(\"Result\");",
+            "    gdjs._wortalExtension.setResultToVarableCallback(results, resultsVar);",
+            "})",
+            ".catch(error => {",
+            "    console.warn(\"Error while get connected players:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Payload variable with structure type",
+          "name": "Payload",
+          "type": "variable"
+        },
+        {
+          "description": "Array of connected player",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Retrieve data from the designated cloud storage of the current player.",
+      "fullName": "Get player data async",
+      "functionType": "Action",
+      "group": "Player",
+      "name": "GetDataAsync",
+      "sentence": "Get player data with keys in _PARAM1_ and set the result to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const keyString = eventsFunctionContext.getArgument(\"DataKeyString\");",
+            "const keys = keyString.split(\",\");",
+            "const resultVariable = eventsFunctionContext.getArgument(\"Result\");",
+            "Wortal.player.getDataAsync(keys)",
+            ".then((data) => {",
+            "    gdjs._wortalExtension.setResultValues(resultVariable, data);",
+            "})",
+            ".catch((error) => {",
+            "    console.log(\"Failed to get data: \", error)",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "String of data keys (separated them with comma for multiple data points)",
+          "name": "DataKeyString",
+          "type": "string"
+        },
+        {
+          "description": "Variable to save data received from server",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the player's ID from the platform.",
+      "fullName": "Player ID",
+      "functionType": "StringExpression",
+      "group": "Player",
+      "name": "PlayerID",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Wortal.player.getID();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the player's name on the platform.",
+      "fullName": "Player's Name",
+      "functionType": "StringExpression",
+      "group": "Player",
+      "name": "PlayerName",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Wortal.player.getName();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the player's photo from the platform.",
+      "fullName": "Player photo url",
+      "functionType": "StringExpression",
+      "group": "Player",
+      "name": "PlayerPhotoURL",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Wortal.player.getPhoto();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "A unique identifier for the player. This is the standard Facebook Application-Scoped ID which is used for all Graph API calls. If your game shares an AppID with a native game this is the ID you will see in the native game too.",
+      "fullName": "Get signed ASID async",
+      "functionType": "Action",
+      "group": "Player",
+      "name": "GetSignedASIDAsync",
+      "sentence": "Get signed asid and set the result to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const resultVariable = eventsFunctionContext.getArgument(\"Result\");\r",
+            "Wortal.player.getSignedASIDAsync()\r",
+            ".then(result => {\r",
+            "    gdjs._wortalExtension.setResultValues(resultVariable, result);\r",
+            "})\r",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Signed ASID Structure variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Set data to be saved to the designated cloud storage of the current player.",
+      "fullName": "Save data async",
+      "functionType": "Action",
+      "group": "Player",
+      "name": "SetDataAsync",
+      "sentence": "Save data _PARAM1_ asynchronously",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const dataAsStructure = eventsFunctionContext.getArgument(\"Data\");\r",
+            "const dataAdObj = gdjs._wortalExtension.gdevelopToJsObject(dataAsStructure);\r",
+            "Wortal.player.setDataAsync(dataAdObj)\r",
+            ".then(() => {\r",
+            "  console.log(\"Success to set data\");\r",
+            "})\r",
+            ".catch((error) => {\r",
+            "    console.log(\"Failed to set data: \", error);\r",
+            "})\r",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Game progress structure variable",
+          "name": "Data",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks whether this is the first time the player has played this game.",
+      "fullName": "Player is playing for first time",
+      "functionType": "Condition",
+      "group": "Player",
+      "name": "IsFirstPlay",
+      "sentence": "Player is playing for first time",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Wortal.player.isFirstPlay();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Shows the authentication prompt to the player. This allows the player to log in or register for an account. If the player successfully logs in or registers, the player API will be updated with the new player information.",
+      "fullName": "Show auth prompt async",
+      "functionType": "Action",
+      "group": "Player",
+      "name": "ShowAuthPromptAsync",
+      "sentence": "Show auth prompt",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "WortalSDK::IsWortalInitialized"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "Wortal.player.showAuthPromptAsync()",
+                ".finally(() => eventsFunctionContext.task.resolve())"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Shows the link account prompt to the player. This allows the player to link their account to a different platform.",
+      "fullName": "Show link account prompt async",
+      "functionType": "Action",
+      "group": "Player",
+      "name": "ShowLinkAccountPromptAsync",
+      "sentence": "Show prompt to link account to different platform",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "WortalSDK::IsWortalInitialized"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "Wortal.player.showLinkAccountPromptAsync()",
+                ".finally(() => eventsFunctionContext.task.resolve())",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Request that the player subscribe the bot associated to the game. The API will reject if the subscription fails - else, the player will subscribe the game bot.",
+      "fullName": "Subscribe bot async",
+      "functionType": "Action",
+      "group": "Player",
+      "name": "SubscribeBotAsync",
+      "sentence": "Subscribe to the bot",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "Wortal.player.subscribeBotAsync()",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Opens a context selection dialog for the player. If the player selects an available context, the client will attempt to switch into that context, and resolve if successful. Otherwise, if the player exits the menu or the client fails to switch into the new context, this function will reject.",
+      "fullName": "Choose context async",
+      "functionType": "Action",
+      "group": "Context",
+      "name": "ChooseContextAsync",
+      "sentence": "Opens a context selection dialog",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "Wortal.context.chooseAsync()\r",
+            ".then(() => {\r",
+            "    console.error(\"Context chosen\");\r",
+            "})\r",
+            ".catch(error => {\r",
+            "    console.error(\"Error while choosing context:\", error);\r",
+            "})\r",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Attempts to create a context between the current player and a specified player or a list of players.",
+      "fullName": "Create context async",
+      "functionType": "Action",
+      "group": "Context",
+      "name": "CreateContextAsync",
+      "sentence": "Create a context with specified players with id _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const playerIds = eventsFunctionContext.getArgument(\"PlayerIDs\");\r",
+            "const ids = playerIds.split(\",\");\r",
+            "Wortal.context.createAsync(ids)\r",
+            ".then(() => {\r",
+            "    console.error(\"Context created\");\r",
+            "})\r",
+            ".catch(error => {\r",
+            "    console.error(\"Error while creating context:\", error);\r",
+            "})\r",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "ID of players separated by comma",
+          "name": "PlayerIDs",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Get current context id.",
+      "fullName": "Context ID",
+      "functionType": "StringExpression",
+      "group": "Context",
+      "name": "ContextID",
+      "sentence": "Get context id",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Wortal.context.getId();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "string"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Gets an array of ConnectedPlayer objects containing information about active players in the current context (people who played the game in the current context in the last 90 days).",
+      "fullName": "Get players async",
+      "functionType": "Action",
+      "group": "Context",
+      "name": "GetPlayersAsync",
+      "sentence": "Get connected players and set the result to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const playersVar = eventsFunctionContext.getArgument(\"ConnectedPlayersVariable\");\r",
+            "Wortal.context.getPlayersAsync().then((players) => {\r",
+            "    if(players && players.length) {\r",
+            "        gdjs._wortalExtension.setResultToVarableCallback(players, playersVar);       \r",
+            "    }\r",
+            "})\r",
+            ".catch(error => {\r",
+            "    console.error(\"Error while getting connected players:\", error);\r",
+            "})\r",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Variable to save the result of connected players of current context",
+          "name": "ConnectedPlayersVariable",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Gets the type of the current context.",
+      "fullName": "Context type",
+      "functionType": "StringExpression",
+      "group": "Context",
+      "name": "ContextType",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Wortal.context.getType();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "supplementaryInformation": "[\"SOLO\",\"THREAD\",\"GROUP\",\"POST\"]",
+        "type": "stringWithSelector"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "This invokes a dialog to let the user invite one or more people to the game.",
+      "fullName": "Invite Async",
+      "functionType": "Action",
+      "group": "Context",
+      "name": "InviteAsync",
+      "sentence": "Show a dialog to invite people to the game with payload _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const payloadAsStructure = eventsFunctionContext.getArgument(\"Payload\");",
+            "const dataAsObj = gdjs._wortalExtension.gdevelopToJsObject(payloadAsStructure);",
+            "Wortal.context.inviteAsync(dataAsObj)",
+            ".then(() => console.log(\"Invitation sent!\"))",
+            ".catch(error => {",
+            "    console.error(\"Error while sending invitation\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Invite players payload",
+          "name": "Payload",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "This invokes a dialog to let the user share specified content, as a post on the user's timeline.",
+      "fullName": "Share async",
+      "functionType": "Action",
+      "group": "Context",
+      "name": "ShareAsync",
+      "sentence": "Show prompt to share content with payload _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const payloadAsStructure = eventsFunctionContext.getArgument(\"Payload\");",
+            "const dataAsObj = gdjs._wortalExtension.gdevelopToJsObject(payloadAsStructure);",
+            "Wortal.context.shareAsync(dataAsObj)",
+            ".then(() => console.log(\"Shared!\"))",
+            ".catch(error => {",
+            "    console.error(\"Error while sharing game link\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Share payload structure variable",
+          "name": "Payload",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "This invokes a dialog that contains a custom game link that users can copy to their clipboard, or share.",
+      "fullName": "Share link async",
+      "functionType": "Action",
+      "group": "Context",
+      "name": "ShareLinkAsync",
+      "sentence": "Show share link dialog with payload _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const payloadAsStructure = eventsFunctionContext.getArgument(\"Payload\");",
+            "const dataAsObj = gdjs._wortalExtension.gdevelopToJsObject(payloadAsStructure);",
+            "Wortal.context.shareLinkAsync(dataAsObj)",
+            ".then(() => console.log(\"Shared!\"))",
+            ".catch(error => {",
+            "    console.error(\"Error while sharing game link\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Payload structure variable",
+          "name": "Payload",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Request a switch into a specific context.",
+      "fullName": "Swith context async",
+      "functionType": "Action",
+      "group": "Context",
+      "name": "SwitchContextAsync",
+      "sentence": "Switch to context id _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const contextId = eventsFunctionContext.getArgument(\"ContextID\");\r",
+            "Wortal.context.switchAsync(contextId)\r",
+            ".catch(error => {\r",
+            "    console.error(\"Error while switching context\", error);\r",
+            "})\r",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "ID of context",
+          "name": "ContextID",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Posts an update to the current context.",
+      "fullName": "Update context async",
+      "functionType": "Action",
+      "group": "Context",
+      "name": "UpdateContextAsync",
+      "sentence": "Post update to currenct context with payload _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const payloadAsStructure = eventsFunctionContext.getArgument(\"Payload\");\r",
+            "const dataAsObj = gdjs._wortalExtension.gdevelopToJsObject(payloadAsStructure);\r",
+            "Wortal.context.updateAsync(dataAsObj)\r",
+            ".catch(error => {\r",
+            "    console.error(\"Error while updating context\", error);\r",
+            "})\r",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Payload structure variable",
+          "name": "Payload",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Gets a player's stats.",
+      "fullName": "Get stats async",
+      "functionType": "Action",
+      "group": "Stats",
+      "name": "GetStatsAsync",
+      "sentence": "Gets a player's stats for level _PARAM1_ and period _PARAM2_ and set the result to _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const level = eventsFunctionContext.getArgument(\"Level\");\r",
+            "const statPeriod = eventsFunctionContext.getArgument(\"StatPeriod\");\r",
+            "\r",
+            "Wortal.stats.getStatsAsync(level, {\"period\": statPeriod})\r",
+            ".then(results => {\r",
+            "    const resultsVar = eventsFunctionContext.getArgument(\"Result\");\r",
+            "    gdjs._wortalExtension.setResultToVarableCallback(results, resultsVar);\r",
+            "})\r",
+            ".catch(error => {\r",
+            "    console.warn(\"Failed to retrieve stats:\", error);\r",
+            "})\r",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Level",
+          "name": "Level",
+          "type": "string"
+        },
+        {
+          "description": "Period of stat",
+          "name": "StatPeriod",
+          "supplementaryInformation": "[\"alltime\",\"daily\",\"monthly\",\"weekly\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Variable to save the result (Array)",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Posts a player's stats.",
+      "fullName": "Post stats async",
+      "functionType": "Action",
+      "group": "Stats",
+      "name": "PostStatsAsync",
+      "sentence": "Posts a stat for level _PARAM1_ with value _PARAM2_ and additional payload _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const level = eventsFunctionContext.getArgument(\"Level\");",
+            "const value = eventsFunctionContext.getArgument(\"Value\");",
+            "const payloadVar = eventsFunctionContext.getArgument(\"Payload\");",
+            "const payloadAsObj = gdjs._wortalExtension.gdevelopToJsObject(payloadVar);",
+            "",
+            "const postStats = payload => {",
+            "    Wortal.stats.postStatsAsync(level, value, payload)",
+            "        .then(() => {",
+            "            console.log(\"Stats posted successfully\");",
+            "        })",
+            "        .catch(() => {",
+            "            console.warn(\"Failed to post stats\");",
+            "        })",
+            "        .finally(() => eventsFunctionContext.task.resolve());",
+            "};",
+            "",
+            "const payload = gdjs._wortalExtension.isObjectEmpty(payloadAsObj) ? undefined : payloadAsObj;",
+            "postStats(payload);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Level",
+          "name": "Level",
+          "type": "string"
+        },
+        {
+          "description": "The value of the stat",
+          "name": "Value",
+          "type": "expression"
+        },
+        {
+          "description": "Payload structure variable",
+          "name": "Payload",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Cancel all scheduled notifications.",
+      "fullName": "Cancel all notifications async",
+      "functionType": "Action",
+      "group": "Notification",
+      "name": "CancelAllNotificationsAsync",
+      "sentence": "Cancel all notifications with optional label _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const labelVar = eventsFunctionContext.getArgument(\"Label\");",
+            "const label = labelVar ? labelVar : undefined;",
+            "",
+            "const cancelNotifications = label => {",
+            "    const cancelPromise = label ",
+            "        ? Wortal.notifications.cancelAllAsync(label) ",
+            "        : Wortal.notifications.cancelAllAsync();",
+            "",
+            "    cancelPromise",
+            "        .then(result => {",
+            "            console.log(`Notifications cancelled successfully: ${result}`);",
+            "        })",
+            "        .catch(error => {",
+            "            console.warn(\"Failed to cancel notifications:\", error);",
+            "        })",
+            "        .finally(() => eventsFunctionContext.task.resolve());",
+            "};",
+            "",
+            "cancelNotifications(label);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Notification label",
+          "name": "Label",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Cancel a notification async.",
+      "fullName": "Cancel notification async",
+      "functionType": "Action",
+      "group": "Notification",
+      "name": "CancelNotificationAsync",
+      "sentence": "Cancel notification with ID _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const id = eventsFunctionContext.getArgument(\"ID\");",
+            "",
+            "Wortal.notifications.cancelAsync(id)",
+            "    .then(result => {",
+            "        console.log(`Notification with ID ${id} cancelled successfully: ${result}`);",
+            "    })",
+            "    .catch(error => {",
+            "        console.warn(`Failed to cancel notification with ID ${id}:`, error);",
+            "    })",
+            "    .finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Notification ID",
+          "name": "ID",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Gets the history of scheduled notifications for the past 30 days.",
+      "fullName": "Get notification history async",
+      "functionType": "Action",
+      "group": "Notification",
+      "name": "GetNotificationHistoryAsync",
+      "sentence": "Get notification history and set it to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const historiesVar = eventsFunctionContext.getArgument(\"Result\");\r",
+            "Wortal.notifications.getHistoryAsync()\r",
+            ".then(histories => {\r",
+            "    if (!histories || histories.length === 0) {\r",
+            "        console.log(\"No scheduled notifications found.\");\r",
+            "    } else {\r",
+            "        console.log(`Found ${histories.length} scheduled notifications:`);\r",
+            "        gdjs._wortalExtension.setResultToVarableCallback(histories, historiesVar); \r",
+            "    }\r",
+            "})\r",
+            ".catch(error => {\r",
+            "    console.warn(\"Failed to retrieve notification history:\", error);\r",
+            "})\r",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Variable callback to save the notification",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Schedule a notification to be delivered to the player at a later time. Limit of 5 pending scheduled notifications per recipient.",
+      "fullName": "Schedule notification async",
+      "functionType": "Action",
+      "group": "Notification",
+      "name": "ScheduleNotificationAsync",
+      "sentence": "Schedule a notification with payload _PARAM1_ and set the result to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const payloadVar = eventsFunctionContext.getArgument(\"Payload\");",
+            "const payloadAsObj = gdjs._wortalExtension.gdevelopToJsObject(payloadVar);",
+            "const resultVariable = eventsFunctionContext.getArgument(\"Result\");",
+            "",
+            "Wortal.notifications.scheduleAsync(payloadAsObj)",
+            ".then(result => {",
+            "    if (result.success) {",
+            "        gdjs._wortalExtension.setResultValues(resultVariable, result);            ",
+            "        console.log(`Notification scheduled successfully with ID: ${result.id}`);",
+            "    } else {",
+            "        console.warn(\"Notification scheduling failed.\");",
+            "    }",
+            "})",
+            ".catch(error => {",
+            "    console.error(\"Error while scheduling notification:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Notification payload structure variable",
+          "name": "Payload",
+          "type": "variable"
+        },
+        {
+          "description": "Schedule result structure variable callbacl to save result",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Logs a choice the player made in the game. This can be a powerful tool for balancing the game and understanding what content the players are interacting with the most.",
+      "fullName": "Log game choice",
+      "functionType": "Action",
+      "group": "Analytics",
+      "name": "LogGameChoice",
+      "sentence": "Logs player decision _PARAM1_ for choice _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const decision = eventsFunctionContext.getArgument(\"Decision\");\r",
+            "const choice = eventsFunctionContext.getArgument(\"Choice\");\r",
+            "Wortal.analytics.logGameChoice(decision, choice);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Decision",
+          "name": "Decision",
+          "type": "string"
+        },
+        {
+          "description": "Choice",
+          "name": "Choice",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Logs the end of a level. To ensure the level timer is recorded the level name must match the name passed into the previous logLevelStart call. If it does not match then the timer will be logged at 0.",
+      "fullName": "Log level end",
+      "functionType": "Action",
+      "group": "Analytics",
+      "name": "LogLevelEnd",
+      "sentence": "Logs level _PARAM1_ with score _PARAM2_ is _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const level = eventsFunctionContext.getArgument(\"Level\");",
+            "const score = eventsFunctionContext.getArgument(\"Score\");",
+            "const wasCompleted = eventsFunctionContext.getArgument(\"WasCompleted\");",
+            "const wasCompletedBool = (wasCompleted == \"completed\");",
+            "Wortal.analytics.logLevelEnd(level, score, wasCompletedBool);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Level",
+          "name": "Level",
+          "type": "string"
+        },
+        {
+          "description": "Score",
+          "name": "Score",
+          "type": "string"
+        },
+        {
+          "description": "Flag if level is completed or not",
+          "name": "WasCompleted",
+          "supplementaryInformation": "[\"completed\",\"not completed\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Logs the start of a level.",
+      "fullName": "Log level start",
+      "functionType": "Action",
+      "group": "Analytics",
+      "name": "LogLevelStart",
+      "sentence": "Logs level _PARAM1_ start",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const level = eventsFunctionContext.getArgument(\"Level\");\r",
+            "Wortal.analytics.logLevelStart(level);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Level",
+          "name": "Level",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Logs the player achieving a new level.",
+      "fullName": "Log level up",
+      "functionType": "Action",
+      "group": "Analytics",
+      "name": "LogLevelUp",
+      "sentence": "Logs level up to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const level = eventsFunctionContext.getArgument(\"Level\");",
+            "Wortal.analytics.logLevelUp(level);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Level",
+          "name": "Level",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Logs the player's score.",
+      "fullName": "Log score",
+      "functionType": "Action",
+      "group": "Analytics",
+      "name": "LogScore",
+      "sentence": "Logs player score _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const score = eventsFunctionContext.getArgument(\"Score\");",
+            "Wortal.analytics.logScore(score);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Score",
+          "name": "Score",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Logs the player's social invite.",
+      "fullName": "Log social invite",
+      "functionType": "Action",
+      "group": "Analytics",
+      "name": "LogSocialInvite",
+      "sentence": "Logs social invite with placement _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const placement = eventsFunctionContext.getArgument(\"Placement\");",
+            "Wortal.analytics.logSocialInvite(placement);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Placement of the invite",
+          "name": "Placement",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Logs the player's social share.",
+      "fullName": "Log social share",
+      "functionType": "Action",
+      "group": "Analytics",
+      "name": "LogSocialShare",
+      "sentence": "Logs social share with placement _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const placement = eventsFunctionContext.getArgument(\"Placement\");\r",
+            "Wortal.analytics.logSocialShare(placement);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Placement of the share",
+          "name": "Placement",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Logs the end of a tutorial. To ensure the level timer is recorded the tutorial name must match the name passed into the previous logTutorialStart call. If it does not match then the timer will be logged at 0.",
+      "fullName": "Log tutorial end",
+      "functionType": "Action",
+      "group": "Analytics",
+      "name": "LogTutorialEnd",
+      "sentence": "Log tutorial with name _PARAM1_ is _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");",
+            "const wasCompleted = eventsFunctionContext.getArgument(\"WasCompleted\");",
+            "const wasCompletedBool = (wasCompleted == \"completed\");",
+            "Wortal.analytics.logTutorialEnd(name, wasCompletedBool);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the tutorial",
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "description": "Was the tutorial completed",
+          "name": "WasCompeleted",
+          "supplementaryInformation": "[\"compeleted\",\"not compeleted\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Logs the start of a tutorial.",
+      "fullName": "Log turotial start",
+      "functionType": "Action",
+      "group": "Analytics",
+      "name": "LogTutorialStart",
+      "sentence": "Logs tutorial _PARAM1_ start",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");",
+            "Wortal.analytics.logTutorialStart(name);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name of the tutorial",
+          "name": "Name",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Retrieves the leaderboard score entries of the current player's connected players (including the current player), ordered by local rank within the set of connected players.",
+      "fullName": "Get connected players entries",
+      "functionType": "Action",
+      "group": "Leaderboard",
+      "name": "GetConnectedPlayersEntriesAsync",
+      "sentence": "Gets connected player's for leaderboard _PARAM1_ with total entries _PARAM2_ offset _PARAM3_ and set the result to _PARAM4_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");",
+            "const count = eventsFunctionContext.getArgument(\"Count\");",
+            "const offset = eventsFunctionContext.getArgument(\"Offset\");",
+            "const resultVariable = eventsFunctionContext.getArgument(\"Result\");",
+            "",
+            "Wortal.leaderboard.getConnectedPlayersEntriesAsync(name, count, offset)",
+            ".then(entries => {",
+            "    if(entries && entries.length) {",
+            "        gdjs._wortalExtension.setResultToVarableCallback(entries, resultVariable);       ",
+            "    }    ",
+            "})",
+            ".catch(error => {",
+            "    console.error(\"Error while get connected players entries:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The name of the leaderboard",
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "description": "The number of entries to attempt to fetch from the leaderboard",
+          "name": "Count",
+          "type": "expression"
+        },
+        {
+          "description": "The offset from the set of ordered connected player score entries to fetch from",
+          "name": "Offset",
+          "type": "expression"
+        },
+        {
+          "description": "Array of Leaderboard structure result variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Retrieves a set of leaderboard entries, ordered by score ranking in the leaderboard.",
+      "fullName": "Get leaderboard entries",
+      "functionType": "Action",
+      "group": "Leaderboard",
+      "name": "GetLeaderboardEntriesAsync",
+      "sentence": "Gets entries for leaderboard _PARAM1_ with total entries _PARAM2_ offset _PARAM3_ and set the result to _PARAM4_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");",
+            "const count = eventsFunctionContext.getArgument(\"Count\");",
+            "const offset = eventsFunctionContext.getArgument(\"Offset\");",
+            "const resultVariable = eventsFunctionContext.getArgument(\"Result\");",
+            "",
+            "Wortal.leaderboard.getConnectedPlayersEntriesAsync(name, count, offset)",
+            ".then(results => {",
+            "    const resultsVar = eventsFunctionContext.getArgument(\"Result\");",
+            "    gdjs._wortalExtension.setResultToVarableCallback(results, resultsVar);",
+            "})",
+            ".catch(error => {",
+            "    console.warn(\"Error while get leaderboard entries:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The name of the leaderboard",
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "description": "The number of entries to attempt to fetch from the leaderboard",
+          "name": "Count",
+          "type": "expression"
+        },
+        {
+          "description": "The offset from the set of ordered connected player score entries to fetch from",
+          "name": "Offset",
+          "type": "expression"
+        },
+        {
+          "description": "Array of Leaderboard structure result variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Gets the total number of entries in the leaderboard.",
+      "fullName": "Get leaderboard entry count async",
+      "functionType": "Action",
+      "group": "Leaderboard",
+      "name": "GetLeaderboardEntryCountAsync",
+      "sentence": "Gets the total of entries in the leaderboard name _PARAM1_ and set the result to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "const resultVar = eventsFunctionContext.getArgument(\"Result\");\r",
+            "Wortal.leaderboard.getEntryCountAsync(name)\r",
+            ".then(entries => {\r",
+            "    resultVar.setNumber(entries);\r",
+            "})\r",
+            ".catch(error => {\r",
+            "    console.error(\"Error while get leaderboard entries count:\", error);\r",
+            "})\r",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The name of the leaderboard",
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "description": "Entry count variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Fetch a specific leaderboard belonging to this game.",
+      "fullName": "Get leaderboard async",
+      "functionType": "Action",
+      "group": "Leaderboard",
+      "name": "GetLeaderboardAsync",
+      "sentence": "Fetch a specific leaderboard belonging to this game with name _PARAM1_ and set the result to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");",
+            "const resultVariable = eventsFunctionContext.getArgument(\"Result\");",
+            "",
+            "Wortal.leaderboard.getLeaderboardAsync(name)",
+            ".then(result => {",
+            "    if (result) {",
+            "        gdjs._wortalExtension.setResultValues(resultVariable, result);          ",
+            "    } else {",
+            "        console.warn(\"No leaderboard fetched.\");",
+            "    }",
+            "})",
+            ".catch(error => {",
+            "    console.error(\"Error while fetching leaderbaord:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The name of the leaderboard. Each leaderboard for a game must have its own distinct name",
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "description": "Leaderboard structure variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Retrieves the leaderboard's entry for the current player, or null if the player has not set one yet.",
+      "fullName": "Get current player leaderboard entry async",
+      "functionType": "Action",
+      "group": "Leaderboard",
+      "name": "GetCurrentPlayerEntryAsync",
+      "sentence": "Gets current player's entry for leaderboard _PARAM1_ and set the result to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");\r",
+            "const resultVariable = eventsFunctionContext.getArgument(\"Result\");\r",
+            "\r",
+            "Wortal.leaderboard.getPlayerEntryAsync(name)\r",
+            ".then(result => {\r",
+            "    if (result) {\r",
+            "        gdjs._wortalExtension.setResultValues(resultVariable, result);            \r",
+            "    } else {\r",
+            "        console.warn(\"Failed to get leaderboard entry for current player.\");\r",
+            "    }\r",
+            "})\r",
+            ".catch(error => {\r",
+            "    console.error(\"Error while fetching leaderbaord entry for current player:\", error);\r",
+            "})\r",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The name of the leaderboard",
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "description": "Leaderboard entry structure variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Updates the player's score. If the player has an existing score, the old score will only be replaced if the new score is better than it.",
+      "fullName": "Send leaderboard entry async",
+      "functionType": "Action",
+      "group": "Leaderboard",
+      "name": "SendEntryAsync",
+      "sentence": "Send player entry for leaderboard _PARAM1_ with score _PARAM2_ and set the result to _PARAM3_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const name = eventsFunctionContext.getArgument(\"Name\");",
+            "const score = eventsFunctionContext.getArgument(\"Score\");",
+            "const resultVariable = eventsFunctionContext.getArgument(\"Result\");",
+            "",
+            "Wortal.leaderboard.sendEntryAsync(name, score)",
+            ".then(result => {",
+            "    if (result) {",
+            "        gdjs._wortalExtension.setResultValues(resultVariable, result);            ",
+            "    } else {",
+            "        console.warn(\"Failed to send leaderboard entry.\");",
+            "    }",
+            "})",
+            ".catch(error => {",
+            "    console.error(\"Error while sending leaderbaord entry for current player:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "The name of the leaderboard",
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "description": "Score for the entry. Must be a 64-bit integer number",
+          "name": "Score",
+          "type": "expression"
+        },
+        {
+          "description": "Leaderboard entry sturcture variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Opens the tournament creation dialog if the player is not currently in a tournament session.",
+      "fullName": "Create a tournament async",
+      "functionType": "Action",
+      "group": "Tournament",
+      "name": "CreateTournamentAsync",
+      "sentence": "Open the tournament creation dialog with payload _PARAM1_ and set the result to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const payloadVar = eventsFunctionContext.getArgument(\"Payload\");",
+            "const payloadAsObj = gdjs._wortalExtension.gdevelopToJsObject(payloadVar);",
+            "const resultVariable = eventsFunctionContext.getArgument(\"Result\");",
+            "",
+            "Wortal.tournament.createAsync(payloadAsObj)",
+            ".then(result => {",
+            "    gdjs._wortalExtension.setResultValues(resultVariable, result);",
+            "})",
+            ".catch(error => {",
+            "    console.error(\"Error while creating torunament:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Tournament creation payload structure variable",
+          "name": "Payload",
+          "type": "variable"
+        },
+        {
+          "description": "Tournament structure variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Returns a list of eligible tournaments that can be surfaced in-game.",
+      "fullName": "Get all tournaments async",
+      "functionType": "Action",
+      "group": "Tournament",
+      "name": "GetAllTournamentsAsync",
+      "sentence": "Gets all tournaments and set the result to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "Wortal.tournament.getAllAsync()",
+            ".then(results => {",
+            "    const resultsVar = eventsFunctionContext.getArgument(\"Result\");",
+            "    gdjs._wortalExtension.setResultToVarableCallback(results, resultsVar);",
+            "})",
+            ".catch(error => {",
+            "    console.warn(\"Failed to retrieve tournament history:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Array of tournament structure variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Fetch the tournament out of the current context the user is playing.",
+      "fullName": "Get current tournament async",
+      "functionType": "Action",
+      "group": "Tournament",
+      "name": "GetCurrentTournamentAsync",
+      "sentence": "Gets current tournament and set the result to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const resultVariable = eventsFunctionContext.getArgument(\"Result\");",
+            "",
+            "Wortal.tournament.getCurrentAsync()",
+            ".then(result => {",
+            "    gdjs._wortalExtension.setResultValues(resultVariable, result);",
+            "})",
+            ".catch(error => {",
+            "    console.error(\"Error while retrieving torunament:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Tournament structure variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Request a switch into a specific tournament context.",
+      "fullName": "Join tournament async",
+      "functionType": "Action",
+      "group": "Tournament",
+      "name": "JoinTournamentAsync",
+      "sentence": "Join a tournament with id _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const id = eventsFunctionContext.getArgument(\"ID\");",
+            "Wortal.tournament.joinAsync(id)",
+            ".then(() => {",
+            "    console.error(\"Switched to tournament \", id);",
+            "})",
+            ".catch(error => {",
+            "    console.error(\"Error while join tournament:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Tournament ID",
+          "name": "ID",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Posts a player's score. This API should only be called within a tournament context at the end of an activity (example: when the player doesn't have \"lives\" to continue the game).",
+      "fullName": "Post tournament score async",
+      "functionType": "Action",
+      "group": "Tournament",
+      "name": "PostTournamentScoreAsync",
+      "sentence": "Post score _PARAM1_ at the end of tournament activity",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const score = eventsFunctionContext.getArgument(\"Score\");",
+            "Wortal.tournament.postScoreAsync(score)",
+            ".then(() => {",
+            "    console.error(\"Score posted\");",
+            "})",
+            ".catch(error => {",
+            "    console.error(\"Error while posting score:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Score",
+          "name": "Score",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Opens the share tournament dialog if the player is currently in a tournament session.",
+      "fullName": "Share tournament async",
+      "functionType": "Action",
+      "group": "Tournament",
+      "name": "ShareTournamentAsync",
+      "sentence": "Opens the share tournament dialog with payload _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const payloadVar = eventsFunctionContext.getArgument(\"Payload\");",
+            "const payloadAsObj = gdjs._wortalExtension.gdevelopToJsObject(payloadVar);",
+            "",
+            "Wortal.tournament.shareAsync(payloadAsObj)",
+            ".then(result => {",
+            "    console.log(\"Shared tournament successfully\");",
+            "})",
+            ".catch(error => {",
+            "    console.error(\"Error while sharing tournament:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Payload structure variable",
+          "name": "Payload",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Consumes a specific purchase belonging to the current player.",
+      "fullName": "Consume purchase async",
+      "functionType": "Action",
+      "group": "IAP",
+      "name": "ConsumePurchaseAsync",
+      "sentence": "Consume purchased product with token _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const productID = eventsFunctionContext.getArgument(\"Token\");",
+            "Wortal.iap.consumePurchaseAsync(productID)",
+            ".then(() => {",
+            "    console.error(\"Consumed successfully\");",
+            "})",
+            ".catch(error => {",
+            "    console.error(\"Error while consuming score:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Token of the Purchased product",
+          "name": "Token",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Gets the catalog of available products the player can purchase.",
+      "fullName": "Get catalog async",
+      "functionType": "Action",
+      "group": "IAP",
+      "name": "GetCatalogAsync",
+      "sentence": "Gets the catalog of products and set to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "Wortal.iap.getCatalogAsync()",
+            ".then(results => {",
+            "    const resultsVar = eventsFunctionContext.getArgument(\"Result\");",
+            "    gdjs._wortalExtension.setResultToVarableCallback(results, resultsVar);",
+            "})",
+            ".catch(error => {",
+            "    console.warn(\"Failed to retrieve catalog:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Array of product structure variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Gets purchased products.",
+      "fullName": "Get purchased products async",
+      "functionType": "Action",
+      "group": "IAP",
+      "name": "GetPurchaseAsync",
+      "sentence": "Get purchased products and set the result to _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "Wortal.iap.getPurchasesAsync()",
+            ".then(results => {",
+            "    const resultsVar = eventsFunctionContext.getArgument(\"Result\");",
+            "    gdjs._wortalExtension.setResultToVarableCallback(results, resultsVar);",
+            "})",
+            ".catch(error => {",
+            "    console.warn(\"Failed to retrieve purchased products:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Array of purchased products structure variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Checks whether IAP is enabled in this session.",
+      "fullName": "IAP is enabled",
+      "functionType": "Condition",
+      "group": "IAP",
+      "name": "IsIAPEnabled",
+      "sentence": "IAP is enabled",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Wortal.iap.isEnabled();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Make purchase for specified product.",
+      "fullName": "Make purchase async",
+      "functionType": "Action",
+      "group": "IAP",
+      "name": "MakePurchaseAsync",
+      "sentence": "Begins the purchase flow for product _PARAM1_ and set the result to _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const productID = eventsFunctionContext.getArgument(\"ProductID\");",
+            "Wortal.iap.makePurchaseAsync({\"productID\": productID})",
+            ".then(result => {",
+            "    const resultsVar = eventsFunctionContext.getArgument(\"Result\");",
+            "    gdjs._wortalExtension.setResultValues(resultsVar, result);",
+            "})",
+            ".catch(error => {",
+            "    console.warn(\"Failed to retrieve purchased products:\", error);",
+            "})",
+            ".finally(() => eventsFunctionContext.task.resolve());"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "ID of product",
+          "name": "ProductID",
+          "type": "string"
+        },
+        {
+          "description": "Purchase result structure variable callback",
+          "name": "Result",
+          "type": "variable"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns whether ads are enabled for the current session.",
+      "fullName": "Ad is enabled",
+      "functionType": "Condition",
+      "group": "Ad",
+      "name": "IsAdEnabled",
+      "sentence": "Ad is enabled",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Wortal.ads.isEnabled();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Returns whether ads are blocked for the current session.",
+      "fullName": "Ad is blocked",
+      "functionType": "Condition",
+      "group": "Ad",
+      "name": "IsAdBlocked",
+      "sentence": "Ad is blocked",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = Wortal.ads.isAdBlocked();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Shows a banner ad.",
+      "fullName": "Show banner ad",
+      "functionType": "Action",
+      "group": "Ad",
+      "name": "ShowBannerAd",
+      "sentence": "Show a banner ad at the_PARAM1_ of the screen",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const position = eventsFunctionContext.getArgument(\"Position\");\r",
+            "try {\r",
+            "    Wortal.ads.showBanner(true, position);\r",
+            "} catch (error) {\r",
+            "    console.log(\"Failed to show banner ad: \", error);\r",
+            "}"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Ad position on the screen",
+          "name": "Position",
+          "supplementaryInformation": "[\"top\",\"bottom\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Shows an interstitial ad. These can be shown at various points in the game such as a level end, restart or a timed interval in games with longer levels.",
+      "fullName": "Show interstitial ad",
+      "functionType": "Action",
+      "group": "Ad",
+      "name": "ShowInterstitialAd",
+      "sentence": "Show interstitial ad on _PARAM1_ with decription _PARAM2_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const placement = eventsFunctionContext.getArgument(\"Placement\");",
+            "const desc = eventsFunctionContext.getArgument(\"Description\");",
+            "",
+            "Wortal.ads.showInterstitial(placement, desc, ",
+            "    () => {",
+            "        gdjs._wortalExtension.hasAdJustFinishedShowing = false;",
+            "        gdjs._wortalExtension.isShowingAd = true;",
+            "    },",
+            "    () => {",
+            "        gdjs._wortalExtension.hasAdJustFinishedShowing = true;",
+            "        gdjs._wortalExtension.isShowingAd = false;",
+            "        eventsFunctionContext.task.resolve();",
+            "    },",
+            "    () => {",
+            "        gdjs._wortalExtension.isShowingAd = false;",
+            "        gdjs._wortalExtension.hasAdJustFinishedShowing = false;",
+            "        eventsFunctionContext.task.resolve();",
+            "    },",
+            ");"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Placement type",
+          "name": "Placement",
+          "supplementaryInformation": "[\"start\",\"pause\",\"next\",\"browse\"]",
+          "type": "stringWithSelector"
+        },
+        {
+          "description": "Ad placement",
+          "name": "Description",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "async": true,
+      "description": "Shows a rewarded ad. These are longer, optional ads that the player can earn a reward for watching. The player must be notified of the ad and give permission to show before it can be shown.",
+      "fullName": "Show rewarded ad",
+      "functionType": "Action",
+      "group": "Ad",
+      "name": "ShowRewardedAd",
+      "sentence": "Show rewarded ad with description _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const desc = eventsFunctionContext.getArgument(\"Description\");",
+            "gdjs._wortalExtension.shouldRewardPlayer = false;",
+            "",
+            "function resetAdState() {",
+            "    gdjs._wortalExtension.hasAdJustFinishedShowing = true;",
+            "    gdjs._wortalExtension.isShowingAd = false;",
+            "    eventsFunctionContext.task.resolve();",
+            "}",
+            "",
+            "Wortal.ads.showRewarded(desc,",
+            "    () => {",
+            "        gdjs._wortalExtension.hasAdJustFinishedShowing = false;",
+            "        gdjs._wortalExtension.isShowingAd = true;",
+            "    },",
+            "    resetAdState,",
+            "    resetAdState,",
+            "    () => {",
+            "        gdjs._wortalExtension.shouldRewardPlayer = true;",
+            "        resetAdState();",
+            "    },",
+            "    () => {",
+            "        resetAdState();",
+            "        gdjs._wortalExtension.hasAdJustFinishedShowing = false;",
+            "    },",
+            ");"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Ad description",
+          "name": "Description",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if ad is showing.",
+      "fullName": "Ad is showing",
+      "functionType": "Condition",
+      "group": "Ad",
+      "name": "IsAdShowing",
+      "sentence": "Ad is showing",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._wortalExtension.isShowingAd;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if ad just finished showing.",
+      "fullName": "Ad has just finished showing",
+      "functionType": "Condition",
+      "group": "Ad",
+      "name": "HasAdJustFinishedShowing",
+      "sentence": "Ad has just finished showing",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "console.log(gdjs._wortalExtension.hasAdJustFinishedShowing);\r",
+            "eventsFunctionContext.returnValue = gdjs._wortalExtension.hasAdJustFinishedShowing;"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "To check if should reward player after showing rewarded ad.",
+      "fullName": "Player should be rewarded",
+      "functionType": "Condition",
+      "group": "Ad",
+      "name": "ShouldRewardPlayer",
+      "sentence": "Player should be rewarded",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._wortalExtension.shouldRewardPlayer;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

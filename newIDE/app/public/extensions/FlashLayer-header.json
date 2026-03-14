@@ -1,0 +1,32 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Flash layer",
+  "name": "FlashLayer",
+  "version": "0.3.0",
+  "url": "https://resources.gdevelop-app.com/extensions/FlashLayer.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/FlashLayer-header.json",
+  "tags": "effect,vfx,layer,flash",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/flash-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Show a layer for a set duration then automatically hide it.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/flash-layer",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "FlashLayer",
+      "fullName": "Flash layer",
+      "description": "Make a layer visible for a specified duration, and then hide the layer.",
+      "functionType": "Action"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Useful to make a temporary effect (flash on hit, flickering lights, lightning flash, show text like Batman and Robin \"Bam!\", etc)\n\nIt is recommended to select a layer on the top, and one that is hidden by default.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZsYXNoLW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNywySDE3TDEzLjUsOUgxN0wxMCwyMlYxNEg3VjJNOSw0VjEySDEyVjE0LjY2TDE0LDExSDEwLjI0TDEzLjc2LDRIOVoiIC8+PC9zdmc+"
+}

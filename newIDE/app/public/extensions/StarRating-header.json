@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "q8ubdigLvIRXLxsJDDTaokO41mc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Star Rating",
+  "name": "StarRating",
+  "version": "0.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/StarRating.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/StarRating-header.json",
+  "tags": "star,rating,shape painter",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/UI Essentials/UI Essentials_star.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "A rating system indicated by stars using the shape painter.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/star-rating",
+  "description": "A behavior to turn a shape painter into a rating system indicated by stars.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8cGF0aCBkPSJNMjkuMywxMi43Yy0wLjEtMC40LTAuNS0wLjctMS0wLjdoLTguN0wxNywzLjdjLTAuMS0wLjQtMC41LTAuNy0xLTAuN3MtMC44LDAuMy0xLDAuN0wxMi40LDEySDMuN2MtMC40LDAtMC44LDAuMy0xLDAuNw0KCWMtMC4xLDAuNCwwLDAuOSwwLjQsMS4xbDcsNS4xbC0yLjcsOC4zYy0wLjEsMC40LDAsMC45LDAuNCwxLjFjMC40LDAuMywwLjgsMC4zLDEuMiwwbDctNS4xbDcsNS4xYzAuMiwwLjEsMC40LDAuMiwwLjYsMC4yDQoJczAuNC0wLjEsMC42LTAuMmMwLjQtMC4zLDAuNS0wLjcsMC40LTEuMWwtMi43LTguM2w3LTUuMUMyOS4yLDEzLjYsMjkuNCwxMy4xLDI5LjMsMTIuN3oiLz4NCjwvc3ZnPg0K"
+}

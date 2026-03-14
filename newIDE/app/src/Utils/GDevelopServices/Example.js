@@ -34,6 +34,22 @@ export type AllExamples = {|
   filters: Filters,
 |};
 
+const USE_LOCAL_EXAMPLES = true;
+const LOCAL_EXAMPLES_DATABASE_URL = '/examples/examples.json';
+
+let cachedLocalExamplesDatabase: ?{
+  exampleShortHeaders: Array<ExampleShortHeader>,
+  filters: Filters,
+  examplesById?: { [string]: Example },
+} = null;
+
+const loadLocalExamplesDatabase = async () => {
+  if (cachedLocalExamplesDatabase) return cachedLocalExamplesDatabase;
+  const response = await axios.get(LOCAL_EXAMPLES_DATABASE_URL);
+  cachedLocalExamplesDatabase = response.data;
+  return cachedLocalExamplesDatabase;
+};
+
 export const listAllExamples = async (): Promise<AllExamples> => {
   // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(`${GDevelopAssetApi.baseUrl}/example`, {
@@ -55,9 +71,54 @@ export const listAllExamples = async (): Promise<AllExamples> => {
     retryIfFailed({ times: 2 }, async () => (await axios.get(filtersUrl)).data),
   ]);
 
+  let mergedExampleShortHeaders = exampleShortHeaders;
+  let mergedFilters = filters;
+
+  if (USE_LOCAL_EXAMPLES) {
+    try {
+      const localDatabase = await loadLocalExamplesDatabase();
+      const localExampleShortHeaders =
+        localDatabase && localDatabase.exampleShortHeaders
+          ? localDatabase.exampleShortHeaders
+          : [];
+
+      if (localExampleShortHeaders.length) {
+        const mergedById = new Map();
+        exampleShortHeaders.forEach(exampleShortHeader => {
+          mergedById.set(exampleShortHeader.id, exampleShortHeader);
+        });
+        localExampleShortHeaders.forEach(exampleShortHeader => {
+          // Local examples override remote ones if ids collide.
+          mergedById.set(exampleShortHeader.id, exampleShortHeader);
+        });
+
+        mergedExampleShortHeaders = Array.from(mergedById.values());
+
+        const localFilters = localDatabase ? localDatabase.filters : null;
+        const mergedTagsSet = new Set(
+          ([]: Array<string>)
+            .concat(filters ? filters.allTags || [] : [])
+            .concat(localFilters ? localFilters.allTags || [] : [])
+        );
+        const mergedTags = Array.from(mergedTagsSet);
+
+        mergedFilters = {
+          allTags: mergedTags,
+          defaultTags: mergedTags,
+          tagsTree:
+            (filters && filters.tagsTree) ||
+            (localFilters && localFilters.tagsTree) ||
+            [],
+        };
+      }
+    } catch (error) {
+      console.warn('Unable to load local examples database:', error);
+    }
+  }
+
   const allExamples: AllExamples = {
-    exampleShortHeaders,
-    filters,
+    exampleShortHeaders: mergedExampleShortHeaders,
+    filters: mergedFilters,
   };
 
   return allExamples;
@@ -66,6 +127,19 @@ export const listAllExamples = async (): Promise<AllExamples> => {
 export const getExample = async (
   exampleShortHeader: ExampleShortHeader
 ): Promise<Example> => {
+  if (USE_LOCAL_EXAMPLES) {
+    try {
+      const localDatabase = await loadLocalExamplesDatabase();
+      const localExample =
+        localDatabase &&
+        localDatabase.examplesById &&
+        localDatabase.examplesById[exampleShortHeader.id];
+      if (localExample) return localExample;
+    } catch (error) {
+      console.warn('Unable to load local example data:', error);
+    }
+  }
+
   // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
     `${GDevelopAssetApi.baseUrl}/example-v2/${exampleShortHeader.id}`

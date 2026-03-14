@@ -1,0 +1,78 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Auto typing animation for text (\"typewriter\" effect)",
+  "name": "AutoTyping",
+  "version": "2.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/AutoTyping.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/AutoTyping-header.json",
+  "tags": "text,bbtext,dialogue,visual novel,autotyping,bitmap",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/typewriter.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Typewriter text reveal effect, one letter at a time. For Text/BitmapText objects.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/auto-typing",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Reveal a text one letter after the other.",
+      "fullName": "Auto typing text",
+      "name": "AutoTyping",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "IsFinished",
+          "fullName": "Finished typing",
+          "description": "Check if the full text has been typed.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "HasJustTyped",
+          "fullName": "Has just typed",
+          "description": "Check if a character has just been typed. Useful for triggering sound effects.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "RestartFromBeginning",
+          "fullName": "Restart typing from the beginning",
+          "description": "Restart typing from the beginning of text. The autotyping also start automatically when a new text is set for the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "JumpToPosition",
+          "fullName": "Show Nth first characters",
+          "description": "Jump to a specific position in the text. Positions start at \"0\" and increase by one for every character.",
+          "functionType": "Action"
+        },
+        {
+          "name": "ShowFullText",
+          "fullName": "Show the full text",
+          "description": "Show the full text.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Interval",
+          "fullName": "Time between characters",
+          "description": "Compare the time between characters beign typed.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetInterval",
+          "fullName": "Time between characters",
+          "description": "Change the time between characters beign typed.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [],
+  "description": "Reveal a text one letter after the other (a \"typewriter\" effect).\n\nIt can be used for dialogue scenes or visual novels on Text and Bitmap Text objects.\n\nThe top-down RPG example uses this extension ([open the project online](https://editor.gdevelop.io/?project=example://top-down-rpg)).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXR5cGV3cml0ZXIiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjAgMTNIMTZDMTYgMTQuMSAxNS4xIDE1IDE0IDE1SDEwQzguOSAxNSA4IDE0LjEgOCAxM0g0TDIgMThWMjBDMiAyMS4xIDIuOSAyMiA0IDIySDIwQzIxLjEgMjIgMjIgMjEuMSAyMiAyMFYxOE02IDIwQzUuMTEgMjAgNC42NiAxOC45MiA1LjI5IDE4LjI5QzUuOTIgMTcuNjYgNyAxOC4xMSA3IDE5QzcgMTkuNTUgNi41NSAyMCA2IDIwTTEwIDIwQzkuMTEgMjAgOC42NiAxOC45MiA5LjI5IDE4LjI5QzkuOTIgMTcuNjYgMTEgMTguMTEgMTEgMTlDMTEgMTkuNTUgMTAuNTUgMjAgMTAgMjBNMTQgMjBDMTMuMTEgMjAgMTIuNjYgMTguOTIgMTMuMjkgMTguMjlDMTMuOTIgMTcuNjYgMTUgMTguMTEgMTUgMTlDMTUgMTkuNTUgMTQuNTUgMjAgMTQgMjBNMTggMjBDMTcuMTEgMjAgMTYuNjYgMTguOTIgMTcuMjkgMTguMjlDMTcuOTIgMTcuNjYgMTkgMTguMTEgMTkgMTlDMTkgMTkuNTUgMTguNTUgMjAgMTggMjBNMTggMTBWM0g2VjEwSDNWMTJIMjFWMTBNOCA1SDE2VjZIOE04IDdIMTRWOEg4IiAvPjwvc3ZnPg=="
+}

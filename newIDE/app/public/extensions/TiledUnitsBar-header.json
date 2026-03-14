@@ -1,0 +1,78 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+    "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+    "q8ubdigLvIRXLxsJDDTaokO41mc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Resource bar (separated units)",
+  "name": "TiledUnitsBar",
+  "version": "2.0.0",
+  "url": "https://resources.gdevelop-app.com/extensions/TiledUnitsBar.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/TiledUnitsBar-header.json",
+  "tags": "resource,bar,health,mana,shield,hearts,lives,ammo",
+  "category": "User interface",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/063e9152cf65bc0f3be2a828afd950c3ecf1b1fc72feefdc2467252fe987dc0f_dots-horizontal.svg",
+  "gdevelopVersion": ">=5.5.230",
+  "changelog": [
+    {
+      "version": "2.0.0",
+      "breaking": "- Resource bars now use \"variants\", allowing easy swapping of their visual aspect. You will have to make some adjustments to existing resource bars in your project. Follow this [migration documentation](https://wiki.gdevelop.io/gdevelop5/objects/custom-objects-prefab-template/migrate-to-variants/) to do these changes."
+    }
+  ],
+  "shortDescription": "A bar that represents a resource in the game (health, mana, ammo, etc).",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/objects/resource-bar",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [],
+  "eventsBasedObjects": [
+    {
+      "description": "A bar that represents a resource in the game (health, mana, ammo, etc).",
+      "fullName": "Resource bar (separated units)",
+      "name": "TiledUnitsBar",
+      "defaultName": "ResourceBar",
+      "eventsFunctions": [
+        {
+          "name": "Value",
+          "fullName": "Value",
+          "description": "Compare the value of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetValue",
+          "fullName": "Value",
+          "description": "Change the value of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MaxValue",
+          "fullName": "Maximum value",
+          "description": "Compare the maximum value of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetMaxValue",
+          "fullName": "Maximum value",
+          "description": "Change the maximum value of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "IsEmpty",
+          "fullName": "Empty",
+          "description": "Check if the bar is empty.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "IsFull",
+          "fullName": "Full",
+          "description": "Check if the bar is full.",
+          "functionType": "Condition"
+        }
+      ]
+    }
+  ],
+  "description": "A bar that represents a resource in the game (health, mana, ammo, etc).\n\nThere are ready-to-use resource bars in the asset-store [resource bars pack](https://editor.gdevelop.io/?initial-dialog=asset-store&asset-pack=resource-bars-resource-bars).",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWRvdHMtaG9yaXpvbnRhbCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xNiwxMkEyLDIgMCAwLDEgMTgsMTBBMiwyIDAgMCwxIDIwLDEyQTIsMiAwIDAsMSAxOCwxNEEyLDIgMCAwLDEgMTYsMTJNMTAsMTJBMiwyIDAgMCwxIDEyLDEwQTIsMiAwIDAsMSAxNCwxMkEyLDIgMCAwLDEgMTIsMTRBMiwyIDAgMCwxIDEwLDEyTTQsMTJBMiwyIDAgMCwxIDYsMTBBMiwyIDAgMCwxIDgsMTJBMiwyIDAgMCwxIDYsMTRBMiwyIDAgMCwxIDQsMTJaIiAvPjwvc3ZnPg=="
+}

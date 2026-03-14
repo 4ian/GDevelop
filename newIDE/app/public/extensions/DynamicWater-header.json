@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "QjE1CI3drHNR9Wklz2gTC5WbEgh1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Dynamic Water",
+  "name": "DynamicWater",
+  "version": "0.1.0",
+  "url": "https://resources.gdevelop-app.com/extensions/DynamicWater.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/DynamicWater-header.json",
+  "tags": "DynamicWater,Lava,etc",
+  "category": "Visual effect",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/waves.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Easily create a realistic liquid surface simulation.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/dynamic-water",
+  "description": "FEATURES\n\n- Fully customizable: by adjusting the liquid properties (tension, damping, spreading), you can simulate different types of liquids such as: water, jelly, lava, etc.\n- Can obtain the height of the surface at any point\n- Allows you to have full control over visual properties such as: color opacity, effects, etc.\n- Can create a force at any point on the surface.\n- Works on all platforms.\n",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXdhdmVzIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTIwLDEySDIyVjE0SDIwQzE4LjYyLDE0IDE3LjI2LDEzLjY1IDE2LDEzQzEzLjUsMTQuMyAxMC41LDE0LjMgOCwxM0M2Ljc0LDEzLjY1IDUuMzcsMTQgNCwxNEgyVjEySDRDNS4zOSwxMiA2Ljc4LDExLjUzIDgsMTAuNjdDMTAuNDQsMTIuMzggMTMuNTYsMTIuMzggMTYsMTAuNjdDMTcuMjIsMTEuNTMgMTguNjEsMTIgMjAsMTJNMjAsNkgyMlY4SDIwQzE4LjYyLDggMTcuMjYsNy42NSAxNiw3QzEzLjUsOC4zIDEwLjUsOC4zIDgsN0M2Ljc0LDcuNjUgNS4zNyw4IDQsOEgyVjZINEM1LjM5LDYgNi43OCw1LjUzIDgsNC42N0MxMC40NCw2LjM4IDEzLjU2LDYuMzggMTYsNC42N0MxNy4yMiw1LjUzIDE4LjYxLDYgMjAsNk0yMCwxOEgyMlYyMEgyMEMxOC42MiwyMCAxNy4yNiwxOS42NSAxNiwxOUMxMy41LDIwLjMgMTAuNSwyMC4zIDgsMTlDNi43NCwxOS42NSA1LjM3LDIwIDQsMjBIMlYxOEg0QzUuMzksMTggNi43OCwxNy41MyA4LDE2LjY3QzEwLjQ0LDE4LjM4IDEzLjU2LDE4LjM4IDE2LDE2LjY3QzE3LjIyLDE3LjUzIDE4LjYxLDE4IDIwLDE4WiIgLz48L3N2Zz4="
+}

@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IRIhkkTTl2UHhfjrLTTH5GYwkYu1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Character game feel",
+  "name": "CharacterGameFeel",
+  "version": "1.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/CharacterGameFeel.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/CharacterGameFeel-header.json",
+  "tags": "character,game,feel",
+  "category": "Visual effect",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Videogames/a9c73353ecb47ef44b3cf3c744d303a7df2b28787b82eeb1d9cceb2a3980ad9c_Videogames_videogame_pacman_game_video.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Add game feel to your platformer character object.",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/character-game-feel",
+  "description": "Add game feel behavior to your platformer character object to get the animations:\n\n- **Idle:** gives your character breath animation while not moving.\n- **Jump:** gives your character squash and stretch animation when jumping.\n- **Fall:** gives your character stretch animation when falling.\n- **Land:** gives your character squash and stretch animation when landing.\n\n# Behavior\n- Game feel behavior.\n   - Includes the options (Scale strength/Scaling speed) for every animation.\n\n# Condition\n- Animation is playing.\n\n# Action\n- Disable animation.\n- Enable animation.\n\n# Important\n- In the events add the action [Separate player object from floor object] to avoid any kind of bugs.\n![](https://i.imgur.com/TtdrAFp.png)\n- Your sprite \"origin\" point, must be at the center bottom.\n![](https://i.imgur.com/OdNv0cu.png)\n- Your sprite bottom collision, must be filled entirely.\n![](https://i.imgur.com/sHGOeqW.png)",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE4LDE2bDguMS04LjFDMjMuOCw0LjksMjAuMSwzLDE2LDNDOC44LDMsMyw4LjgsMywxNnM1LjgsMTMsMTMsMTNjNC4xLDAsNy44LTEuOSwxMC4xLTQuOUwxOCwxNnoiLz4NCjxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjE0IiBjeT0iMTEiIHI9IjIiLz4NCjwvc3ZnPg0K"
+}

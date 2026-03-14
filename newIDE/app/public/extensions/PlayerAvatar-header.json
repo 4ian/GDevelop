@@ -1,0 +1,53 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Player avatar",
+  "name": "PlayerAvatar",
+  "version": "1.1.1",
+  "url": "https://resources.gdevelop-app.com/extensions/PlayerAvatar.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/PlayerAvatar-header.json",
+  "tags": "ui,avatar,gdevelop",
+  "category": "User interface",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Users/1f89f002e87f1e836320f69725d21e3294e7e2e18ff7dd645c6973e9775d24c3_Users_avatar_user_profile_male.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Display player avatars from GDevelop accounts in multiplayer games.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 1,
+  "helpPath": "/extensions/player-avatar",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "UserID",
+      "fullName": "UserID",
+      "description": "Return the UserID from a lobby player number.",
+      "functionType": "StringExpression"
+    }
+  ],
+  "eventsBasedObjects": [
+    {
+      "description": "Display a player avatar according to their GDevelop account.",
+      "fullName": "Multiplayer Avatar",
+      "name": "PlayerAvatar",
+      "defaultName": "Avatar",
+      "eventsFunctions": [
+        {
+          "name": "UserID",
+          "fullName": "Player unique ID",
+          "description": "Compare the player unique ID of the avatar.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetUserID",
+          "fullName": "Player unique ID",
+          "description": "Change the player unique ID of the avatar.",
+          "functionType": "Action"
+        }
+      ]
+    }
+  ],
+  "description": "An object that displays a player avatar according to their GDevelop account. It can be used for multiplayer games.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjIuNywyMi45Yy0yLjItMC41LTMuNy0yLjUtMy43LTQuN2MxLjgtMSwzLTMsMy01LjJ2MGMwLTEuMSwwLjktMiwyLTJoMGwwLTIuM2MwLTIuOC0yLjEtNS40LTQuOS01LjcNCgljLTItMC4yLTMuOCwwLjYtNC45LDIuMWMtMC44LTAuMi0xLjYtMC4xLTIuNiwwLjZjLTEsMC44LTEuNiwyLTEuNiwzLjNsMCwxdjEuNXYxLjNjMCwyLjIsMS4yLDQuMywzLDUuNHYwYzAsMi4zLTEuNiw0LjItMy44LDQuOA0KCWMtMi42LDAuNy00LjUsMi44LTUuMSw1LjRDNC4xLDI4LjcsNC4zLDI5LDQuNywyOWwyMi43LDBjMC40LDAsMC42LTAuMywwLjUtMC43QzI3LjMsMjUuNywyNS4zLDIzLjYsMjIuNywyMi45eiIvPg0KPC9zdmc+DQo="
+}

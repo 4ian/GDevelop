@@ -1,0 +1,45 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "wWP8BSlAW0UP4NeaHa2LcmmDzmH2",
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Share dialog and sharing options",
+  "name": "Share",
+  "version": "0.0.1",
+  "url": "https://resources.gdevelop-app.com/extensions/Share.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Share-header.json",
+  "tags": "share,mobile",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/share-variant.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Share text/URL via system share dialog. Mobile browsers and apps only.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 3,
+  "helpPath": "/extensions/share",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "Share",
+      "fullName": "Share",
+      "description": "Share a link or text via another app using the system share dialog.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsSharingSupported",
+      "fullName": "Sharing is supported",
+      "description": "Check if the browser/operating system of the device supports sharing. Sharing is typically not supported on desktop browsers or desktop apps.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "LastShareResult",
+      "fullName": "Result of the last share dialog",
+      "description": "Compare the result of the last share dialog.",
+      "functionType": "Condition"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Actions and conditions to share a text and/or URL via the operating system share dialog.\n\nThis will work for Android and iOS on browsers (Google Chrome, Safari...) and on mobile apps.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNoYXJlLXZhcmlhbnQiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTgsMTYuMDhDMTcuMjQsMTYuMDggMTYuNTYsMTYuMzggMTYuMDQsMTYuODVMOC45MSwxMi43QzguOTYsMTIuNDcgOSwxMi4yNCA5LDEyQzksMTEuNzYgOC45NiwxMS41MyA4LjkxLDExLjNMMTUuOTYsNy4xOUMxNi41LDcuNjkgMTcuMjEsOCAxOCw4QTMsMyAwIDAsMCAyMSw1QTMsMyAwIDAsMCAxOCwyQTMsMyAwIDAsMCAxNSw1QzE1LDUuMjQgMTUuMDQsNS40NyAxNS4wOSw1LjdMOC4wNCw5LjgxQzcuNSw5LjMxIDYuNzksOSA2LDlBMywzIDAgMCwwIDMsMTJBMywzIDAgMCwwIDYsMTVDNi43OSwxNSA3LjUsMTQuNjkgOC4wNCwxNC4xOUwxNS4xNiwxOC4zNEMxNS4xMSwxOC41NSAxNS4wOCwxOC43NyAxNS4wOCwxOUMxNS4wOCwyMC42MSAxNi4zOSwyMS45MSAxOCwyMS45MUMxOS42MSwyMS45MSAyMC45MiwyMC42MSAyMC45MiwxOUEyLjkyLDIuOTIgMCAwLDAgMTgsMTYuMDhaIiAvPjwvc3ZnPg=="
+}

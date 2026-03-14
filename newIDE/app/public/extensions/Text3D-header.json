@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "3D text",
+  "name": "Text3D",
+  "version": "0.2.0",
+  "url": "https://resources.gdevelop-app.com/extensions/Text3D.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Text3D-header.json",
+  "tags": "3d",
+  "category": "Text",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/0b4ef00ba832f327e84d09b036d18f3fc8d4805e3020f95b034a23f558e17a6c_format-text.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Display texts in 3D scenes.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/text3d",
+  "description": "Display texts with 3D position and rotation.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZvcm1hdC10ZXh0IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE4LjUsNEwxOS42Niw4LjM1TDE4LjcsOC42MUMxOC4yNSw3Ljc0IDE3Ljc5LDYuODcgMTcuMjYsNi40M0MxNi43Myw2IDE2LjExLDYgMTUuNSw2SDEzVjE2LjVDMTMsMTcgMTMsMTcuNSAxMy4zMywxNy43NUMxMy42NywxOCAxNC4zMywxOCAxNSwxOFYxOUg5VjE4QzkuNjcsMTggMTAuMzMsMTggMTAuNjcsMTcuNzVDMTEsMTcuNSAxMSwxNyAxMSwxNi41VjZIOC41QzcuODksNiA3LjI3LDYgNi43NCw2LjQzQzYuMjEsNi44NyA1Ljc1LDcuNzQgNS4zLDguNjFMNC4zNCw4LjM1TDUuNSw0SDE4LjVaIiAvPjwvc3ZnPg=="
+}

@@ -1,0 +1,223 @@
+{
+  "author": "",
+  "category": "Device",
+  "description": "Listens from the browser microphone then returns a text\n\nLimitations: Voice recognition is only supported in https for security reasons\n\nCan be used for:\n   - Voice Based Games\n   - Voice Mobile App\n\nFeatures:\n- Conditions:\n    - OnSuccess\n    - OnError\n\n- Actions:\n    - Start listening\n\n- StringExpressions:\n    - RetrieveResultText\n    - RetrieveStatus\n    - RetrieveError\n\n[Example link](https://gdevelop.io/game-example/voice-recognition).",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Voice Recognition API",
+  "helpPath": "https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNMTMsMTZjMCwwLjYtMC40LDEtMSwxSDljMC4xLDIuOCwyLjQsNSw1LjIsNWgzLjdjMi44LDAsNS4xLTIuMiw1LjItNWgtN2MtMC42LDAtMS0wLjQtMS0xczAuNC0xLDEtMWg3di0yaC03DQoJCWMtMC42LDAtMS0wLjQtMS0xczAuNC0xLDEtMWg3VjloLTdjLTAuNiwwLTEtMC40LTEtMXMwLjQtMSwxLTFoN2MtMC4xLTIuOC0yLjQtNS01LjItNWgtMy43QzExLjQsMiw5LjEsNC4yLDksN2gzYzAuNiwwLDEsMC40LDEsMQ0KCQlzLTAuNCwxLTEsMUg5djJoM2MwLjYsMCwxLDAuNCwxLDFzLTAuNCwxLTEsMUg5djJoM0MxMi42LDE1LDEzLDE1LjQsMTMsMTZ6Ii8+DQoJPHBhdGggZD0iTTI4LDExaC0yYy0wLjYsMC0xLDAuNC0xLDF2NC44YzAsMy45LTMuMiw3LjItNy4yLDcuMmgtMy43QzEwLjIsMjQsNywyMC44LDcsMTYuOFYxMmMwLTAuNi0wLjQtMS0xLTFINGMtMC42LDAtMSwwLjQtMSwxDQoJCXMwLjQsMSwxLDFoMXYzLjhjMCw1LDQuMSw5LjIsOS4yLDkuMmgzLjdjNSwwLDkuMi00LjEsOS4yLTkuMlYxM2gxYzAuNiwwLDEtMC40LDEtMVMyOC42LDExLDI4LDExeiIvPg0KCTxwYXRoIGQ9Ik0yMi40LDI4LjFjLTEuOC0wLjctNC0xLjEtNi40LTEuMXMtNC41LDAuNC02LjQsMS4xYy0wLjUsMC4yLTAuOCwwLjgtMC42LDEuM2MwLjIsMC41LDAuOCwwLjgsMS4zLDAuNg0KCQljMy4yLTEuMiw4LjEtMS4yLDExLjMsMGMwLjEsMCwwLjIsMC4xLDAuNCwwLjFjMC40LDAsMC44LTAuMiwwLjktMC42QzIzLjEsMjguOCwyMi45LDI4LjMsMjIuNCwyOC4xeiIvPg0KPC9nPg0KPC9zdmc+DQo=",
+  "name": "VoiceRecognition",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Music/Music_microphone_sing_voice_studio_record_vintage.svg",
+  "shortDescription": "Converts voice to text.",
+  "version": "0.1.2",
+  "tags": "network,voicetotext",
+  "authorIds": [
+    "rotBq28wITdtfsrE7McHQri4k2w2"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "",
+      "fullName": "",
+      "functionType": "Action",
+      "group": "",
+      "name": "onFirstSceneLoaded",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "function VoiceRecognition() {\n    this.errorStatus = false;\n    this.successStatus = false;\n\n    this.setStatus = function (status) {\n        this.status = status;\n    }\n\n    this.setError = function (error) {\n        this.error = error;\n    }\n\n    this.setResultText = function (result) {\n        this.result = result;\n    }\n\n    this.getResultText = function () {\n        return this.result;\n    }\n\n    this.getStatus = function () {\n        return this.status;\n    }\n\n    this.getError = function () {\n        return this.error;\n    }\n\n    this.setLanguage = function (lang) {\n        this.recognition.lang = lang;\n    }\n\n    let parent = this;\n\n    var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition\n    var SpeechGrammarList = SpeechGrammarList || window.webkitSpeechGrammarList\n    var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent\n\n    this.recognition = new SpeechRecognition();\n\n    this.recognition.continuous = false;\n    this.recognition.interimResults = false;\n    this.recognition.maxAlternatives = 1;\n\n    // This runs when the speech recognition service starts\n    this.recognition.onstart = function() {\n        parent.setStatus(\"listening, please speak...\");\n    };\n\n    this.recognition.onspeechend = function() {\n        parent.recognition.stop();\n    }\n\n    this.recognition.onerror = function(event) {\n        parent.errorStatus = true;\n        parent.setError('Error occurred in recognition: ' + event.error);\n    }\n\n    // This runs when the speech recognition service returns result\n    this.recognition.onresult = function(event) {\n        var transcript = event.results[0][0].transcript;\n        var confidence = event.results[0][0].confidence;\n\n        parent.successStatus = true;\n        parent.confidence = confidence;\n        parent.setResultText(transcript);\n    };\n\n    // start recognition\n    this.startListening = function() {\n        parent.recognition.start();\n        \n        parent.errorStatus = false;\n        parent.successStatus = false;\n        parent.setStatus(\"listening, please speak...\");\n    }\n}\n\nif(gdjs._extensionVoiceRecognition == undefined) {\n    gdjs._extensionVoiceRecognition = new VoiceRecognition();\n}\n\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Retrieves Voice Recognition Result Text.",
+      "fullName": "Retrieves Voice Recognition Result Text",
+      "functionType": "StringExpression",
+      "group": "VoiceRecognition",
+      "name": "RetrievetResultText",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._extensionVoiceRecognition.getResultText();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Retrieves Voice Recognition Error Status.",
+      "fullName": "Retrieves Voice Recognition Error Status",
+      "functionType": "StringExpression",
+      "group": "VoiceRecognition",
+      "name": "RetrieveStatus",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._extensionVoiceRecognition.getStatus();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Retrieves Voice Recognition Error.",
+      "fullName": "Retrieves Voice Recognition Error",
+      "functionType": "StringExpression",
+      "group": "VoiceRecognition",
+      "name": "RetrieveError",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._extensionVoiceRecognition.getError();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Listen for speeches.",
+      "fullName": "Listen for speeches",
+      "functionType": "Action",
+      "group": "VoiceRecognition",
+      "name": "StartListening",
+      "private": false,
+      "sentence": "Listen for speeches (using language _PARAM1_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const Language = eventsFunctionContext.getArgument(\"language\");\r\n\r\nif(Language.trim() != \"\") {\r\n    gdjs._extensionVoiceRecognition.setLanguage(Language);\r\n}\r\n\r\ngdjs._extensionVoiceRecognition.startListening();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "Language (Optional, defaults to the browser language setting if none given)",
+          "longDescription": "",
+          "name": "language",
+          "optional": false,
+          "supplementaryInformation": "[\"ar-SA (Arabic)\",\"bn-BD (Bangla)\",\"bn-IN (Bangla)\",\"cs-CZ (Czech)\",\"da-DK (Danish)\",\"de-AT (German)\",\"de-CH (German)\",\"de-DE (German)\",\"el-GR (Greek)\",\"en-AU (English)\",\"en-CA (English)\",\"en-GB (English)\",\"en-IE (English)\",\"en-IN (English)\",\"en-NZ (English)\",\"en-US (English)\",\"en-ZA (English)\",\"es-AR (Spanish)\",\"es-CL (Spanish)\",\"es-CO (Spanish)\",\"es-ES (Spanish)\",\"es-MX (Spanish)\",\"es-US (Spanish)\",\"fi-FI (Finnish)\",\"fr-BE (French)\",\"fr-CA (French)\",\"fr-CH (French)\",\"fr-FR (French)\",\"he-IL (Hebrew)\",\"hi-IN (Hindi)\",\"hu-HU (Hungarian)\",\"id-ID (Indonesian)\",\"it-CH (Italian)\",\"it-IT (Italian)\",\"jp-JP (Japanese)\",\"ko-KR (Korean)\",\"nl-BE (Dutch)\",\"nl-NL (Dutch)\",\"no-NO (Norwegian)\",\"pl-PL (Polish)\",\"pt-BR (Portugese)\",\"pt-PT (Portugese)\",\"ro-RO (Romanian)\",\"ru-RU (Russian)\",\"sk-SK (Slovak)\",\"sv-SE (Swedish)\",\"ta-IN (Tamil)\",\"ta-LK (Tamil)\",\"th-TH (Thai)\",\"tr-TR (Turkish)\",\"zh-CN (Chinese)\",\"zh-HK (Chinese)\",\"zh-TW (Chinese)\"]",
+          "type": "stringWithSelector"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "On Voice Recognition Success.",
+      "fullName": "On Voice Recognition Success",
+      "functionType": "Condition",
+      "group": "VoiceRecognition",
+      "name": "OnSuccess",
+      "private": false,
+      "sentence": "On Voice Recognition Success",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._extensionVoiceRecognition.successStatus;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "On Voice Recognition Error.",
+      "fullName": "On Voice Recognition Error",
+      "functionType": "Condition",
+      "group": "VoiceRecognition",
+      "name": "OnError",
+      "private": false,
+      "sentence": "On Voice Recognition Error",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "eventsFunctionContext.returnValue = gdjs._extensionVoiceRecognition.errorStatus;",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

@@ -1,0 +1,1469 @@
+{
+  "author": "PANDAKO-GitHub",
+  "category": "Input",
+  "extensionNamespace": "",
+  "fullName": "Mouse Pointer Lock",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMTksMTkgMjQsMTkgMjQsMjQgIi8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSI2LDIzIDExLDIzIDExLDE4ICIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI0LDE5LjRjLTAuNywwLjgtMS40LDEuNi0yLjIsMi40Yy03LDctMTUuMywxMC4yLTE4LjUsN3MtMC4xLTExLjUsNy0xOC41czE1LjMtMTAuMiwxOC41LTcNCgljMS40LDEuNCwxLjYsMy42LDAuOCw2LjMiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMSwyMi41Yy0wLjMtMC4yLTAuNS0wLjUtMC44LTAuOGMtNy03LTEwLjItMTUuMy03LTE4LjVzMTEuNS0wLjEsMTguNSw3czEwLjIsMTUuMyw3LDE4LjUNCgljLTEuNywxLjctNC44LDEuNi04LjQsMC4xIi8+DQo8L3N2Zz4NCg==",
+  "name": "MousePointerLock",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Virtual Reality/Virtual Reality_360_rotate_vr_movement.svg",
+  "shortDescription": "Lock and hide mouse pointer for unlimited movement (e.g., FPS mouse look).",
+  "version": "0.3.0",
+  "description": [
+    "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
+    "",
+    "For example, a user can rotate or continue to manipulate an object by moving the mouse endlessly ([open the project online](https://editor.gdevelop.io/?project=example://mouse-pointer-lock)).",
+    "Without the pointer lock, the rotation or operation will stop the moment the pointer reaches the edge of the browser or screen.",
+    "",
+    "Game players don't have to worry about leaving the gameplay area or accidentally clicking on another application that moves the mouse focus away from the game.",
+    "",
+    "Locking the pointer locks `CursorX()` and `CursorY()` expressions.",
+    "Use `MovementX()` and `MovementY()` instead.",
+    ""
+  ],
+  "origin": {
+    "identifier": "MousePointerLock",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "mouse,lock,cursor,pointer",
+  "authorIds": [
+    "Zu55H5hcb9YmZTltIVOTAFDJQyB2",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [
+    {
+      "name": "TouchId",
+      "type": "number",
+      "value": -1
+    },
+    {
+      "name": "OldX",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "OldY",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "TouchSpeedFactor",
+      "type": "number",
+      "value": 4
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onFirstSceneLoaded",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "class PointerLockHandler {",
+            "    movementX = 0;",
+            "    movementY = 0;",
+            "    retried = false;",
+            "    /**",
+            "     * @type {gdjs.RuntimeGame}",
+            "     */",
+            "    game;",
+            "",
+            "    /**",
+            "     * @param {gdjs.RuntimeGame} game",
+            "     */",
+            "    constructor(game) {",
+            "        this.game = game;",
+            "        const canvas = game.getRenderer().getCanvas();",
+            "",
+            "        canvas.addEventListener(\"pointermove\", event => {",
+            "            if (!!document.pointerLockElement) {",
+            "                this.movementX += event.movementX || 0;",
+            "                this.movementY += event.movementY || 0;",
+            "            }",
+            "        }, false);",
+            "",
+            "        document.addEventListener(\"pointerlockerror\", event => {",
+            "            if (!this.retried) {",
+            "                canvas.requestPointerLock();",
+            "                this.retried = true;",
+            "            }",
+            "        });",
+            "    }",
+            "",
+            "    requestPointerLock() {",
+            "        const canvas = this.game.getRenderer().getCanvas();",
+            "        if (canvas.requestPointerLock && !document.pointerLockElement) {",
+            "            this.retried = false;",
+            "            canvas.requestPointerLock({ unadjustedMovement: true });",
+            "        }",
+            "    }",
+            "",
+            "    exitPointerLock() {",
+            "        if (document.exitPointerLock) {",
+            "            document.exitPointerLock();",
+            "        }",
+            "    }",
+            "",
+            "    isPointerLocked() {",
+            "        return !!document.pointerLockElement;",
+            "    }",
+            "",
+            "    resetMovement() {",
+            "        this.movementX = 0;",
+            "        this.movementY = 0;",
+            "    }",
+            "};",
+            "",
+            "gdjs._MousePointerLockExtension = { handler: new PointerLockHandler(runtimeScene.getGame()) };",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "Action",
+      "name": "onScenePostEvents",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const { handler } = gdjs._MousePointerLockExtension;\r",
+            "\r",
+            "handler.resetMovement();\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "MousePointerLock::isEmulatingPointerLock"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "MousePointerLock::SetMovementX"
+              },
+              "parameters": [
+                "",
+                "=",
+                "(MousePointerLock::TouchX(TouchId) - OldX) * TouchSpeedFactor",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "MousePointerLock::SetMovementY"
+              },
+              "parameters": [
+                "",
+                "=",
+                "(MousePointerLock::TouchY(TouchId) - OldY) * TouchSpeedFactor",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "OldX",
+                "=",
+                "MousePointerLock::TouchX(TouchId)"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "OldY",
+                "=",
+                "MousePointerLock::TouchY(TouchId)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "HasTouchEnded"
+              },
+              "parameters": [
+                "",
+                "TouchId"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "TouchId",
+                "=",
+                "-1"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Lock the mouse pointer to hide it.",
+      "fullName": "Request Pointer Lock",
+      "functionType": "Action",
+      "name": "RequestPointerLock",
+      "sentence": "Request Pointer Lock",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "HasAnyTouchOrMouseStarted"
+              },
+              "parameters": [
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "TouchId",
+                "=",
+                "-1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "TouchId",
+                "=",
+                "StartedTouchOrMouseId(0)"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "OldX",
+                "=",
+                "MousePointerLock::TouchX(TouchId)"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "OldY",
+                "=",
+                "MousePointerLock::TouchY(TouchId)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const { handler } = gdjs._MousePointerLockExtension;\r",
+            "\r",
+            "handler.requestPointerLock();\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Unlocks the mouse pointer and show it.",
+      "fullName": "Exit pointer lock",
+      "functionType": "Action",
+      "name": "ExitPointerLock",
+      "sentence": "Exit pointer lock",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "TouchId",
+                "=",
+                "-1"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const { handler } = gdjs._MousePointerLockExtension;\r",
+            "\r",
+            "handler.exitPointerLock();\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the mouse pointer is locked.",
+      "fullName": "Pointer is locked",
+      "functionType": "Condition",
+      "name": "isPointerLocked",
+      "sentence": "The mouse pointer is locked",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "TouchId",
+                ">=",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "TouchId",
+                "<",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "MousePointerLock::isPointerActuallyLocked"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the mouse pointer is actually locked.",
+      "fullName": "Pointer is actually locked",
+      "functionType": "Condition",
+      "name": "isPointerActuallyLocked",
+      "private": true,
+      "sentence": "The mouse pointer actually is locked",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const { handler } = gdjs._MousePointerLockExtension;\r",
+            "\r",
+            "eventsFunctionContext.returnValue = handler.isPointerLocked();\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the mouse pointer lock is emulated.",
+      "fullName": "Pointer lock is emulated",
+      "functionType": "Condition",
+      "name": "isEmulatingPointerLock",
+      "private": true,
+      "sentence": "The mouse pointer lock is emulated",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "MousePointerLock::isPointerActuallyLocked"
+              },
+              "parameters": [
+                "",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "TouchId",
+                ">=",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the locked pointer is moving.",
+      "fullName": "Locked pointer is moving",
+      "functionType": "Condition",
+      "name": "IsMoving",
+      "sentence": "Locked pointer is moving",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Or"
+              },
+              "parameters": [],
+              "subInstructions": [
+                {
+                  "type": {
+                    "value": "MousePointerLock::MovementX"
+                  },
+                  "parameters": [
+                    "",
+                    "!=",
+                    "0",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "MousePointerLock::MovementY"
+                  },
+                  "parameters": [
+                    "",
+                    "!=",
+                    "0",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "the movement of the locked pointer on the X axis.",
+      "fullName": "Pointer X movement",
+      "functionType": "ExpressionAndCondition",
+      "name": "MovementX",
+      "sentence": "the movement of the locked pointer on the X axis",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "eventsFunctionContext.returnValue = gdjs._MousePointerLockExtension.handler.movementX || 0;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "the movement of the locked pointer on the X axis.",
+      "fullName": "Pointer X movement",
+      "functionType": "ActionWithOperator",
+      "getterName": "MovementX",
+      "name": "SetMovementX",
+      "private": true,
+      "sentence": "the movement of the locked pointer on the X axis",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const value = eventsFunctionContext.getArgument(\"Value\");\r",
+            "gdjs._MousePointerLockExtension.handler.movementX = value;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "the movement of the pointer on the Y axis.",
+      "fullName": "Pointer Y movement",
+      "functionType": "ExpressionAndCondition",
+      "name": "MovementY",
+      "sentence": "the movement of the pointer on the Y axis",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "eventsFunctionContext.returnValue = gdjs._MousePointerLockExtension.handler.movementY || 0;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "the movement of the locked pointer on the X axis.",
+      "fullName": "Pointer X movement",
+      "functionType": "ActionWithOperator",
+      "getterName": "MovementY",
+      "name": "SetMovementY",
+      "private": true,
+      "sentence": "the movement of the locked pointer on the X axis",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "\r",
+            "const value = eventsFunctionContext.getArgument(\"Value\");\r",
+            "gdjs._MousePointerLockExtension.handler.movementY = value;\r",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the X position of a specific touch",
+      "fullName": "Touch X position",
+      "functionType": "Expression",
+      "name": "TouchX",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const touchId = eventsFunctionContext.getArgument(\"NewTouchId\");",
+            "eventsFunctionContext.returnValue = runtimeScene.getGame().getInputManager().getTouchX(touchId);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Touch identifier",
+          "name": "NewTouchId",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Return the Y position of a specific touch",
+      "fullName": "Touch Y position",
+      "functionType": "Expression",
+      "name": "TouchY",
+      "private": true,
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const touchId = eventsFunctionContext.getArgument(\"NewTouchId\");",
+            "eventsFunctionContext.returnValue = runtimeScene.getGame().getInputManager().getTouchY(touchId);",
+            ""
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Touch identifier",
+          "name": "NewTouchId",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "the speed factor for touch movement.",
+      "fullName": "Speed factor for touch movement",
+      "functionType": "ExpressionAndCondition",
+      "name": "TouchSpeedFactor",
+      "sentence": "the speed factor for touch movement",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "TouchSpeedFactor"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [],
+      "objectGroups": []
+    },
+    {
+      "fullName": "",
+      "functionType": "ActionWithOperator",
+      "getterName": "TouchSpeedFactor",
+      "name": "SetTouchSpeedFactor",
+      "sentence": "",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "TouchSpeedFactor",
+                "=",
+                "Value"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [
+    {
+      "description": "Control camera rotations with a mouse.",
+      "fullName": "First person camera mouse mapper",
+      "name": "FirstPersonPointerMapper",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "doStepPreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "TODO It's probably a bad idea to rotate the object around Y."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "MousePointerLock::isPointerLocked"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "Object",
+                    "+",
+                    "MousePointerLock::MovementX() * HorizontalSpeed / SceneWindowWidth()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetRotationY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Object3D",
+                    "+",
+                    "MousePointerLock::MovementY() * VerticalSpeed / SceneWindowHeight()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetRotationY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Object3D",
+                    "=",
+                    "clamp(Object.Object3D::RotationY(), VerticalAngleMin, VerticalAngleMax)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "MousePointerLock::FirstPersonPointerMapper::LookFromObjectEyes"
+                  },
+                  "parameters": [
+                    "Object",
+                    "Behavior",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "MouseButtonReleased"
+                  },
+                  "parameters": [
+                    "",
+                    "Left"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "ShouldLock",
+                    "True",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "MousePointerLock::isPointerLocked"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "MousePointerLock::RequestPointerLock"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "MousePointerLock::FirstPersonPointerMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Move the camera to look though _PARAM1_ eyes. The object must look to the right when all its angles are 0 and the top of its head be toward Z+.",
+          "fullName": "Look through object eyes",
+          "functionType": "Action",
+          "group": "Layers and cameras",
+          "name": "LookFromObjectEyes",
+          "private": true,
+          "sentence": "Move the camera to look though _PARAM0_ eyes",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "CentreCamera"
+                  },
+                  "parameters": [
+                    "",
+                    "Object",
+                    "",
+                    "Object.Layer()",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::SetCameraZ"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "Object.Object3D::Z() + Object.Object3D::Depth() + OffsetZ",
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::SetCameraRotationX"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "- Object.Object3D::RotationY() + 90",
+                    "GetArgumentAsString(\"Layer\")",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::SetCameraRotationY"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "Object.Object3D::RotationX()",
+                    "GetArgumentAsString(\"Layer\")",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetCameraAngle"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "Object.Angle() + 90",
+                    "Object.Layer()",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "MousePointerLock::FirstPersonPointerMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the horizontal rotation speed factor of the object.",
+          "fullName": "Horizontal rotation speed factor",
+          "functionType": "ExpressionAndCondition",
+          "group": "First person camera mouse mapper configuration",
+          "name": "HorizontalSpeed",
+          "sentence": "the horizontal rotation speed factor",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "HorizontalSpeed"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "MousePointerLock::FirstPersonPointerMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "HorizontalSpeed",
+          "name": "SetHorizontalSpeed",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "HorizontalSpeed",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "MousePointerLock::FirstPersonPointerMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the vertical rotation speed factor of the object.",
+          "fullName": "Vertical rotation speed factor",
+          "functionType": "ExpressionAndCondition",
+          "group": "First person camera mouse mapper configuration",
+          "name": "VerticalSpeed",
+          "sentence": "the vertical rotation speed factor",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "VerticalSpeed"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "MousePointerLock::FirstPersonPointerMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "VerticalSpeed",
+          "name": "SetVerticalSpeed",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "VerticalSpeed",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "MousePointerLock::FirstPersonPointerMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the minimum vertical camera angle of the object.",
+          "fullName": "Minimum vertical camera angle",
+          "functionType": "ExpressionAndCondition",
+          "group": "First person camera mouse mapper configuration",
+          "name": "VerticalAngleMin",
+          "sentence": "the minimum vertical camera angle",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "VerticalAngleMin"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "MousePointerLock::FirstPersonPointerMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "VerticalAngleMin",
+          "name": "SetVerticalAngleMin",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "VerticalAngleMin",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "MousePointerLock::FirstPersonPointerMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the maximum vertical camera angle of the object.",
+          "fullName": "Maximum vertical camera angle",
+          "functionType": "ExpressionAndCondition",
+          "group": "First person camera mouse mapper configuration",
+          "name": "VerticalAngleMax",
+          "sentence": "the maximum vertical camera angle",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "VerticalAngleMax"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "MousePointerLock::FirstPersonPointerMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "VerticalAngleMax",
+          "name": "SetVerticalAngleMax",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "VerticalAngleMax",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "MousePointerLock::FirstPersonPointerMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the z position offset of the object.",
+          "fullName": "Z position offset",
+          "functionType": "ExpressionAndCondition",
+          "group": "First person camera mouse mapper configuration",
+          "name": "OffsetZ",
+          "sentence": "the z position offset",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "OffsetZ"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "MousePointerLock::FirstPersonPointerMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "OffsetZ",
+          "name": "SetOffsetZ",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "OffsetZ",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "object"
+            },
+            {
+              "description": "Behavior",
+              "name": "Behavior",
+              "supplementaryInformation": "MousePointerLock::FirstPersonPointerMapper",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "value": "",
+          "type": "Behavior",
+          "label": "3D capability",
+          "extraInformation": [
+            "Scene3D::Base3DBehavior"
+          ],
+          "choices": [],
+          "name": "Object3D"
+        },
+        {
+          "value": "200",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "Horizontal rotation speed factor",
+          "name": "HorizontalSpeed"
+        },
+        {
+          "value": "100",
+          "type": "Number",
+          "unit": "Dimensionless",
+          "label": "Vertical rotation speed factor",
+          "name": "VerticalSpeed"
+        },
+        {
+          "value": "-90",
+          "type": "Number",
+          "unit": "DegreeAngle",
+          "label": "Minimum vertical camera angle",
+          "name": "VerticalAngleMin"
+        },
+        {
+          "value": "90",
+          "type": "Number",
+          "unit": "DegreeAngle",
+          "label": "Maximum vertical camera angle",
+          "name": "VerticalAngleMax"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "Pixel",
+          "label": "Z position offset",
+          "name": "OffsetZ"
+        },
+        {
+          "value": "true",
+          "type": "Boolean",
+          "label": "Lock the pointer on click",
+          "name": "ShouldLock"
+        }
+      ],
+      "sharedPropertyDescriptors": []
+    }
+  ],
+  "eventsBasedObjects": []
+}

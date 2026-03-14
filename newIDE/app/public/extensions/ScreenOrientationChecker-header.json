@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "wWP8BSlAW0UP4NeaHa2LcmmDzmH2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Screen Orientation Checker",
+  "name": "ScreenOrientationChecker",
+  "version": "0.2.2",
+  "url": "https://resources.gdevelop-app.com/extensions/ScreenOrientationChecker.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ScreenOrientationChecker-header.json",
+  "tags": "screen,orientation",
+  "category": "Input",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/0126888931a4a4f82bb2824df9f096347ace1c47f510c44df42aa8dc9e49e24a_screen-rotation.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Display a customizable screen asking the user to rotate their phone/tablet if not in the right orientation.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/screen-orientation-checker",
+  "description": "Display a customizable screen asking the user to rotate their phone/tablet if not in the right orientation.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNjcmVlbi1yb3RhdGlvbiIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik03LjUsMjEuNUM0LjI1LDE5Ljk0IDEuOTEsMTYuNzYgMS41NSwxM0gwLjA1QzAuNTYsMTkuMTYgNS43MSwyNCAxMiwyNEwxMi42NiwyMy45N0w4Ljg1LDIwLjE2TTE0LjgzLDIxLjE5TDIuODEsOS4xN0w5LjE3LDIuODFMMjEuMTksMTQuODNNMTAuMjMsMS43NUM5LjY0LDEuMTYgOC42OSwxLjE2IDguMTEsMS43NUwxLjc1LDguMTFDMS4xNiw4LjcgMS4xNiw5LjY1IDEuNzUsMTAuMjNMMTMuNzcsMjIuMjVDMTQuMzYsMjIuODQgMTUuMzEsMjIuODQgMTUuODksMjIuMjVMMjIuMjUsMTUuODlDMjIuODQsMTUuMyAyMi44NCwxNC4zNSAyMi4yNSwxMy43N0wxMC4yMywxLjc1TTE2LjUsMi41QzE5Ljc1LDQuMDcgMjIuMDksNy4yNCAyMi40NSwxMUgyMy45NUMyMy40NCw0Ljg0IDE4LjI5LDAgMTIsMEwxMS4zNCwwLjAzTDE1LjE1LDMuODRMMTYuNSwyLjVaIiAvPjwvc3ZnPg=="
+}

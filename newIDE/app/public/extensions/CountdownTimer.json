@@ -1,0 +1,366 @@
+{
+  "author": "",
+  "category": "General",
+  "extensionNamespace": "",
+  "fullName": "Countdown timer (deprecated)",
+  "gdevelopVersion": ">=5.5.222",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIyLDZIMTBDOC4zLDYsNyw0LjcsNywzdjBoMTh2MEMyNSw0LjcsMjMuNyw2LDIyLDZ6Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTAsMjZoMTJjMS43LDAsMywxLjMsMywzdjBIN3YwQzcsMjcuMyw4LjMsMjYsMTAsMjZ6Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjMsMjZ2LTRjMC0wLjYtMC4zLTEuMi0wLjgtMS42bC0zLjctMi44Yy0xLjEtMC44LTEuMS0yLjQsMC0zLjJsMy43LTIuOGMwLjUtMC40LDAuOC0xLDAuOC0xLjZWNiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTksNnY0YzAsMC42LDAuMywxLjIsMC44LDEuNmwzLjcsMi44YzEuMSwwLjgsMS4xLDIuNCwwLDMuMmwtMy43LDIuOEM5LjMsMjAuOCw5LDIxLjQsOSwyMnY0Ii8+DQo8cG9seWdvbiBjbGFzcz0ic3QwIiBwb2ludHM9IjExLDI2IDE2LDIxIDIxLDI2ICIvPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSIxNiwxMiAxMywxMCAxOSwxMCAiLz4NCjwvc3ZnPg0K",
+  "name": "CountdownTimer",
+  "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/UI Essentials/a87576ab3a35744221b26f87e4409ec174fb8fb79435b181232c40c29ac7340e_UI Essentials_sand_clock_time.svg",
+  "shortDescription": "A timer against the clock to create timer challenges in your projects. Countdown functionality.",
+  "version": "1.0.2",
+  "description": [
+    "This extension provides a timer against the clock to create timed challenges in your projects. You can set an initial time in seconds and then start the timer to count down. The extension includes actions to start or reset the timer, stop it at zero or allow negative numbers, and get the time remaining on the timer via an expression. With this extension, you will be able to easily add countdown functionality.",
+    "",
+    "This extension is deprecated. Prefer using a timer and a substraction like in the countdown timer example ([open the project online](https://editor.gdevelop.io/?project=example://count-down-timer))."
+  ],
+  "origin": {
+    "identifier": "CountdownTimer",
+    "name": "gdevelop-extension-store"
+  },
+  "tags": "countdown,timer,clock,time attak",
+  "authorIds": [
+    "xesgTnQuyNXPVkGEDLD3Wcr8O4m1"
+  ],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [
+    {
+      "description": "Set the countdown timer in seconds.",
+      "fullName": "Set the countdown of the clock",
+      "functionType": "Action",
+      "name": "SetCountdown",
+      "sentence": "Set the countdown timer to _PARAM2_ seconds from the _PARAM1_ timer",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__CountdownTimer.Clocks[ClockName].Time",
+                "=",
+                "TimeArg"
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__CountdownTimer.Clocks[ClockName].TimeRestart",
+                "=",
+                "TimeArg"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Clock name",
+          "name": "ClockName",
+          "type": "string"
+        },
+        {
+          "description": "Time remaining in seconds",
+          "name": "TimeArg",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Starts the countdown from the value set previously.",
+      "fullName": "Start countdown timer",
+      "functionType": "Action",
+      "name": "StartCountdown",
+      "sentence": "Start the countdown timer named _PARAM1_, allowing negative numbers (_PARAM2_)",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "VarScene"
+              },
+              "parameters": [
+                "__CountdownTimer.Clocks[ClockName].Time",
+                "=",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "inverted": true,
+                "value": "BooleanVariable"
+              },
+              "parameters": [
+                "ZeroNumbers",
+                "True",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "RemoveTimer"
+              },
+              "parameters": [
+                "player",
+                "\"__CountdownTimer.Repeat\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Timer"
+              },
+              "parameters": [
+                "player",
+                "1",
+                "\"__CountdownTimer.Repeat\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ResetTimer"
+              },
+              "parameters": [
+                "player",
+                "\"__CountdownTimer.Repeat\""
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__CountdownTimer.Clocks[ClockName].Time",
+                "-",
+                "1"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Clock name",
+          "name": "ClockName",
+          "type": "string"
+        },
+        {
+          "description": "Allow negative numbers",
+          "name": "ZeroNumbers",
+          "type": "yesorno"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Reset the countdown to its initial value.",
+      "fullName": "Restart the countdown timer",
+      "functionType": "Action",
+      "name": "RestartCountdown",
+      "sentence": "Reset the countdown timer from _PARAM1_",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "__CountdownTimer.Clocks[ClockName].Time",
+                "=",
+                "Variable(__CountdownTimer.Clocks[ClockName].TimeRestart)"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Clock name",
+          "name": "ClockName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the countdown timer has reached a specific time in seconds.",
+      "fullName": "Countdown timer is in x sec",
+      "functionType": "Condition",
+      "name": "IsTimerAtTime",
+      "sentence": "Countdown timer is at _PARAM2_ seconds from _PARAM1_ timer",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "VarScene"
+              },
+              "parameters": [
+                "__CountdownTimer.Clocks[ClockName].Time",
+                "=",
+                "TimeInSeconds"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Clock name",
+          "name": "ClockName",
+          "type": "string"
+        },
+        {
+          "description": "Time in seconds",
+          "name": "TimeInSeconds",
+          "type": "expression"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Check if the countdown timer has reached zero.",
+      "fullName": "The countdown timer has ended",
+      "functionType": "Condition",
+      "name": "IsTimerFinished",
+      "sentence": "The countdown timer _PARAM1_ has finished",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "VarScene"
+              },
+              "parameters": [
+                "__CountdownTimer.Clocks[ClockName].Time",
+                "=",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnBoolean"
+              },
+              "parameters": [
+                "True"
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Clock name",
+          "name": "ClockName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the remaining time of the countdown timer.",
+      "fullName": "Get remaining time",
+      "functionType": "Expression",
+      "name": "RemainingTime",
+      "sentence": "Remaining time of the countdown timer",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "Variable(__CountdownTimer.Clocks[ClockName].Time)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Clock name",
+          "name": "ClockName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    },
+    {
+      "description": "Get the initial setting time value of the clock.",
+      "fullName": "Get initial configuration value",
+      "functionType": "Expression",
+      "name": "InitialConfigurationValue",
+      "sentence": "Remaining time of the countdown timer",
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetReturnNumber"
+              },
+              "parameters": [
+                "Variable(__CountdownTimer.Clocks[ClockName].TimeRestart)"
+              ]
+            }
+          ]
+        }
+      ],
+      "expressionType": {
+        "type": "expression"
+      },
+      "parameters": [
+        {
+          "description": "Clock name",
+          "name": "ClockName",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}

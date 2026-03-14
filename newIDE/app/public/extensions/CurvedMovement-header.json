@@ -1,0 +1,392 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "AX15J5TSnpSLUglk4nQVamviftr2",
+    "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Curved movement",
+  "name": "CurvedMovement",
+  "version": "1.2.1",
+  "url": "https://resources.gdevelop-app.com/extensions/CurvedMovement.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/CurvedMovement-header.json",
+  "tags": "bezier,curve,path,movement,animate,animation,smooth",
+  "category": "Movement",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Graphic Design/Graphic Design_bezier_curve.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Move objects on curved paths.",
+  "eventsBasedBehaviorsCount": 2,
+  "eventsFunctionsCount": 32,
+  "helpPath": "/extensions/curved-movement/details/",
+  "eventsBasedBehaviors": [
+    {
+      "description": "Move objects on curved paths in a given duration and tween easing function.",
+      "fullName": "Movement on a curve (duration-based)",
+      "name": "TweenPathMovement",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "MoveTo",
+          "fullName": "Move on path to a position",
+          "description": "Move the object to a position by following a path.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MoveToAndGoBack",
+          "fullName": "Move back and forth to a position",
+          "description": "Move the object to a position by following a path and go back.",
+          "functionType": "Action"
+        },
+        {
+          "name": "Move",
+          "fullName": "Move on path",
+          "description": "Move the object by following a path.",
+          "functionType": "Action"
+        },
+        {
+          "name": "MoveAndGoBack",
+          "fullName": "Move back and forth",
+          "description": "Move the object by following a path and go back.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HasReachedAnEnd",
+          "fullName": "Reached an end",
+          "description": "Check if the object has reached one of the 2 ends of the path.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "HasFinishedToMove",
+          "fullName": "Finished to move",
+          "description": "Check if the object has finished to move on the path.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "MovementAngle",
+          "fullName": "Movement angle",
+          "description": "Return the angle of movement on its path.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "DrawDebug",
+          "fullName": "Draw the trajectory",
+          "description": "Draw the object trajectory.",
+          "functionType": "Action"
+        }
+      ]
+    },
+    {
+      "description": "Move objects on curved paths at a given speed.",
+      "fullName": "Movement on a curve (speed-based)",
+      "name": "SpeedPathMovement",
+      "objectType": "",
+      "eventsFunctions": [
+        {
+          "name": "SetPath",
+          "fullName": "Follow a path",
+          "description": "Change the path followed by an object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "SetPathTo",
+          "fullName": "Follow a path to a position",
+          "description": "Change the path followed by an object to reach a position.",
+          "functionType": "Action"
+        },
+        {
+          "name": "PositionOnLoop",
+          "fullName": "Position on the loop",
+          "description": "Compare the length between the trajectory origin and the current position without counting the loops.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "Loop",
+          "fullName": "Current loop",
+          "description": "Compare the number time the object loop the trajectory.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "PositionOnPath",
+          "fullName": "Position on the path",
+          "description": "Compare the length between the trajectory origin and the current position counting the loops.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetPositionOnPath",
+          "fullName": "Position on the path",
+          "description": "Change the length between the trajectory origin and the current position counting the loops.",
+          "functionType": "Action"
+        },
+        {
+          "name": "HasReachedOrigin",
+          "fullName": "Reached path origin",
+          "description": "Check if the object has reached the origin position of the path.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "HasReachedTarget",
+          "fullName": "Reached path target",
+          "description": "Check if the object has reached the target position of the path.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "HasReachedAnEnd",
+          "fullName": "Reach an end",
+          "description": "Check if the object has reached one of the 2 ends of the path.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "CanMoveFurther",
+          "fullName": "Can move further",
+          "description": "Check if the object can still move in the current direction.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "MovementAngle",
+          "fullName": "Movement angle",
+          "description": "Return the angle of movement on its path.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "Speed",
+          "fullName": "Speed",
+          "description": "Compare the speed of the object.",
+          "functionType": "Condition"
+        },
+        {
+          "name": "SetSpeed",
+          "fullName": "Speed",
+          "description": "Change the speed of the object.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AccelarateAt",
+          "fullName": "Accelerate",
+          "description": "Make an object accelerate until it reaches a given speed.",
+          "functionType": "Action"
+        },
+        {
+          "name": "AccelarateDuring",
+          "fullName": "Accelerate during",
+          "description": "Make an object accelerate to reaches a speed in a given amount of time.",
+          "functionType": "Action"
+        },
+        {
+          "name": "DrawDebug",
+          "fullName": "Draw the trajectory",
+          "description": "Draw the object trajectory.",
+          "functionType": "Action"
+        },
+        {
+          "name": "PathOriginX",
+          "fullName": "Path origin X",
+          "description": "Return the path origin on X axis of the object.",
+          "functionType": "Expression"
+        },
+        {
+          "name": "PathOriginY",
+          "fullName": "Path origin Y",
+          "description": "Return the path origin on Y axis of the object.",
+          "functionType": "Expression"
+        }
+      ]
+    }
+  ],
+  "eventsFunctions": [
+    {
+      "name": "AddCubicCurve",
+      "fullName": "Append a curve",
+      "description": "Append a cubic Bezier curve at the end of the path.",
+      "functionType": "Action"
+    },
+    {
+      "name": "AddSmoothCubicCurve",
+      "fullName": "Append a smooth curve",
+      "description": "Append a cubic Bezier curve to the end of an object's path. The first control point is symmetrical to the last control point of the path.",
+      "functionType": "Action"
+    },
+    {
+      "name": "AddLine",
+      "fullName": "Append a line",
+      "description": "Append a line at the end of the path.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ClosePath",
+      "fullName": "Close a path",
+      "description": "Append a line to close the path.",
+      "functionType": "Action"
+    },
+    {
+      "name": "CreatePathFromSvg",
+      "fullName": "Create a path from SVG",
+      "description": "Create a path from SVG commands, for instance \"M 0,0 C 55,0 100,45 100,100\". Commands are: M = Move, C = Curve, S = Smooth, L = Line. Lower case is for relative positions. The preferred way to build the commands is to use an external SVG editor like Inkscape.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ToSvg",
+      "fullName": "SVG path commands",
+      "description": "Return the SVG commands of a path.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "DeletePath",
+      "fullName": "Delete a path",
+      "description": "Delete a path from the memory.",
+      "functionType": "Action"
+    },
+    {
+      "name": "AppendPath",
+      "fullName": "Append a path",
+      "description": "Append a path to another path.",
+      "functionType": "Action"
+    },
+    {
+      "name": "DuplicatedPath",
+      "fullName": "Duplicate a path",
+      "description": "Duplicate a path.",
+      "functionType": "Action"
+    },
+    {
+      "name": "AppendRotatedPath",
+      "fullName": "Append a rotated path",
+      "description": "Append a path to another path. The appended path is rotated to have a smooth junction.",
+      "functionType": "Action"
+    },
+    {
+      "name": "SpeedScaleY",
+      "fullName": "Speed scale Y",
+      "description": "Return the speed scale on Y axis. This is used to change the view point of a path (top-dwon or isometry).",
+      "functionType": "Expression"
+    },
+    {
+      "name": "SetSpeedScaleY",
+      "fullName": "Speed scale Y",
+      "description": "Change the speed scale on Y axis. This allows to change the view point of a path (top-dwon or isometry).",
+      "functionType": "Action"
+    },
+    {
+      "name": "InvertPath",
+      "fullName": "Invert a path",
+      "description": "Invert a path, the end becomes the beginning.",
+      "functionType": "Action"
+    },
+    {
+      "name": "ScalePath",
+      "fullName": "Scale a path",
+      "description": "Scale a path.",
+      "functionType": "Action"
+    },
+    {
+      "name": "RotatePath",
+      "fullName": "Rotate a path",
+      "description": "Rotate a path.",
+      "functionType": "Action"
+    },
+    {
+      "name": "IsClosed",
+      "fullName": "Is  closed",
+      "description": "Check if a path is closed.",
+      "functionType": "Condition"
+    },
+    {
+      "name": "PathX",
+      "fullName": "Path X",
+      "description": "Return the position on X axis of the path for a given length.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PathY",
+      "fullName": "Path Y",
+      "description": "Return the position on Y axis of the path for a given length.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PathAngle",
+      "fullName": "Path angle",
+      "description": "Return the direction angle of the path for a given length (in degree).",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PathLength",
+      "fullName": "Path length",
+      "description": "Return the length of the path.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PathEndX",
+      "fullName": "Path end X",
+      "description": "Return the displacement on X axis of the path end.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PathEndY",
+      "fullName": "Path end Y",
+      "description": "Return the displacement on Y axis of the path end.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "ElementCount",
+      "fullName": "Path element count",
+      "description": "Return the number of lines or curves that make the path.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "OriginX",
+      "fullName": "Origin X",
+      "description": "Return the origin position on X axis of a curve.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "OriginY",
+      "fullName": "Origin Y",
+      "description": "Return the origin position on Y axis of a curve.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "FirstControlX",
+      "fullName": "First control X",
+      "description": "Return the first control point position on X axis of a curve.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "FirstControlY",
+      "fullName": "First control Y",
+      "description": "Return the first control point position on Y axis of a curve.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "SecondControlX",
+      "fullName": "Second control X",
+      "description": "Return the second control point position on X axis of a curve.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "SecondControlY",
+      "fullName": "Second control Y",
+      "description": "Return the second control point position on Y axis of a curve.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "TargetX",
+      "fullName": "Target X",
+      "description": "Return the target position on X axis of a curve.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "TargetY",
+      "fullName": "Target Y",
+      "description": "Return the target position on Y axis of a curve.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "PathExists",
+      "fullName": "Path exists",
+      "description": "Path exists.",
+      "functionType": "Condition"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "This extension allows to move objects on Bézier curve paths.\n- Paths can be built dynamically or from predetermined paths in SVG format.\n- A behavior moves objects in a given duration a bit like the Tween extension does.\n- Another behavior moves objects using a speed and an acceleration.\n- Expressions give access to the path trajectory values for more complex movements.\n\nThis extension can be used to:\n- Move enemies that follow a pattern\n- Animate decorations\n\nA collection of [small examples](https://editor.gdevelop.io/?project=example://curved-movement) shows how to use this extension.\n\n2 examples use it:\n- a 3D racing game ([open the project online](https://editor.gdevelop.io/?project=example://3d-racing-game))\n- a Zuma-like ([open the project online](https://editor.gdevelop.io/?project=example://smoothy))",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO30NCgkuc3Qye2ZpbGw6bm9uZTtzdHJva2U6IzAwMDAwMDtzdHJva2Utd2lkdGg6MjtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLWRhc2hhcnJheTo2LDY7fQ0KCS5zdDN7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtZGFzaGFycmF5OjQsNDt9DQoJLnN0NHtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7fQ0KCS5zdDV7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1kYXNoYXJyYXk6My4xMDgxLDMuMTA4MTt9DQoJDQoJCS5zdDZ7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDtzdHJva2UtZGFzaGFycmF5OjQsMzt9DQo8L3N0eWxlPg0KPHJlY3QgeD0iMyIgeT0iMjUiIGNsYXNzPSJzdDAiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiLz4NCjxyZWN0IHg9IjI1IiB5PSIzIiBjbGFzcz0ic3QwIiB3aWR0aD0iNCIgaGVpZ2h0PSI0Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjUsNUwyNSw1QzE0LDUsNSwxNCw1LDI1djAiLz4NCjwvc3ZnPg0K"
+}

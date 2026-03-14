@@ -1,0 +1,38 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "onPsboRtDkUHNOsx7OPr8R8G1oj2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Base conversion",
+  "name": "BaseConversion",
+  "version": "1.0.1",
+  "url": "https://resources.gdevelop-app.com/extensions/BaseConversion.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/BaseConversion-header.json",
+  "tags": "binary,numbers,number,base,hex,decimal",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/hexadecimal.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Convert numbers between bases (decimal, hexadecimal, binary, etc.).",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/base-conversion",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "ToDecimal",
+      "fullName": "Convert to decimal",
+      "description": "Converts a string representing a number in a different base to a decimal number.",
+      "functionType": "Expression"
+    },
+    {
+      "name": "ToBase",
+      "fullName": "Convert to different base",
+      "description": "Converts a number to a trsing representing it in another base.",
+      "functionType": "StringExpression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Adds expressions to convert numbers to a different base and back. Can be used to convert hexadecimal / binary representations of numbers to decimal numbers and vice-versa.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWhleGFkZWNpbWFsIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTcgN0M1LjkgNyA1IDcuOSA1IDlWMTVDNSAxNi4xMSA1LjkgMTcgNyAxN0g5QzEwLjExIDE3IDExIDE2LjExIDExIDE1VjlDMTEgNy45IDEwLjExIDcgOSA3SDdNNyA5SDlWMTVIN1Y5TTE3LjYgMTdMMTUuNSAxNC45TDEzLjQgMTdMMTIgMTUuNkwxNC4xIDEzLjVMMTIgMTEuNEwxMy40IDEwTDE1LjUgMTIuMUwxNy42IDEwTDE5IDExLjRMMTYuOSAxMy41TDE5IDE1LjZMMTcuNiAxN1oiIC8+PC9zdmc+"
+}

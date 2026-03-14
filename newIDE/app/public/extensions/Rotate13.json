@@ -1,0 +1,62 @@
+{
+  "author": "Silver-Streak",
+  "category": "Advanced",
+  "description": "By passing a string to this expression, you can go from:\n\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\"\n\nto \n\n\"NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm\"\n\nThis can be used for basic secrets, passwords, or very insecure encryption of data.",
+  "extensionNamespace": "",
+  "gdevelopVersion": ">=5.5.222",
+  "fullName": "Rotate a string 13 characters",
+  "helpPath": "",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZvcm1hdC10ZXh0LXJvdGF0aW9uLW5vbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjAuNSwxOEwxNy41LDIxVjE5SDVWMTdIMTcuNVYxNUwyMC41LDE4TTEwLjEzLDEwSDEzLjg4TDEyLDQuOTdMMTAuMTMsMTBNMTIuNzUsM0wxNy41LDE0SDE1LjQyTDE0LjUsMTEuODFIOS41TDguNTgsMTRINi41TDExLjI1LDNIMTIuNzVaIiAvPjwvc3ZnPg==",
+  "name": "Rotate13",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/format-text-rotation-none.svg",
+  "shortDescription": "This extension rotates all alphabetic characters in a string by 13 characters.",
+  "version": "1.0.0",
+  "tags": "rotate string,rot13,rotate13,string",
+  "authorIds": [
+    "8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3"
+  ],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Rotate String _PARAM1_  13 Characters.",
+      "fullName": "Rotate String 13 Characters",
+      "functionType": "StringExpression",
+      "name": "rot13",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "function rot13(s)\n {\n    return (s ? s : this).split('').map(function(_)\n     {\n        if (!_.match(/[A-Za-z]/)) return _;\n       var c = Math.floor(_.charCodeAt(0) / 97);\n       var k = (_.toLowerCase().charCodeAt(0) - 83) % 26 || 26;\n        return String.fromCharCode(k + ((c == 0) ? 64 : 96));\n     }).join('');\n }\nvar ConvString = eventsFunctionContext.getArgument(\"RotStr\");\neventsFunctionContext.returnValue = rot13(ConvString);\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "String to Rotate",
+          "longDescription": "",
+          "name": "RotStr",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

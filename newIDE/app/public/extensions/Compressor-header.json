@@ -1,0 +1,38 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Compressor",
+  "name": "Compressor",
+  "version": "1.0.1",
+  "url": "https://resources.gdevelop-app.com/extensions/Compressor.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/Compressor-header.json",
+  "tags": "string,compression,zip",
+  "category": "Advanced",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/folder-zip-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Compress and decompress strings using zip algorithm for smaller data storage.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/compressor",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "Decompress",
+      "fullName": "Decompress String",
+      "description": "Decompress a string.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "Compress",
+      "fullName": "Compress String",
+      "description": "Compress a string.",
+      "functionType": "StringExpression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "If you have a big file, you might want to make it smaller. \nUsing the well know zip compression algorithm, you can minimify strings and restore them later with this extension.",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZvbGRlci16aXAtb3V0bGluZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0yMCA2SDEyTDEwIDRINEMyLjkgNCAyIDQuOSAyIDZWMThDMiAxOS4xIDIuOSAyMCA0IDIwSDIwQzIxLjEgMjAgMjIgMTkuMSAyMiAxOFY4QzIyIDYuOSAyMS4xIDYgMjAgNk0yMCAxOEgxNlYxNkgxNFYxOEg0VjhIMTRWMTBIMTZWOEgyMFYxOE0xNiAxMlYxMEgxOFYxMkgxNk0xNCAxMkgxNlYxNEgxNFYxMk0xOCAxNkgxNlYxNEgxOFYxNloiIC8+PC9zdmc+"
+}

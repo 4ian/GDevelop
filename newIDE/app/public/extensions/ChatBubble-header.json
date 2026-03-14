@@ -1,0 +1,22 @@
+{
+  "tier": "community",
+  "authorIds": [
+    "rotBq28wITdtfsrE7McHQri4k2w2"
+  ],
+  "extensionNamespace": "",
+  "fullName": "ChatBubble",
+  "name": "ChatBubble",
+  "version": "1.7.1",
+  "url": "https://resources.gdevelop-app.com/extensions/ChatBubble.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/ChatBubble-header.json",
+  "tags": "bubble,chat,ui",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/chat-outline.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Create chat bubbles dynamically. ",
+  "eventsBasedBehaviorsCount": 1,
+  "eventsFunctionsCount": 0,
+  "helpPath": "/extensions/chat-bubble",
+  "description": "Create chat bubbles dynamically\n\ncurrently support:\n- auto adjustments for text width\n- auto adjustments for text height\n- chat bubble colors\n- name tags\n\nfuture support:\n- different positions for the chat bubble tail\n- adjustable paddings.\n\n[Example link](https://gdevelop.io/game-example/chat-bubble)",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNoYXQtb3V0bGluZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMiwzQzYuNSwzIDIsNi41OCAyLDExQzIuMDUsMTMuMTUgMy4wNiwxNS4xNyA0Ljc1LDE2LjVDNC43NSwxNy4xIDQuMzMsMTguNjcgMiwyMUM0LjM3LDIwLjg5IDYuNjQsMjAgOC40NywxOC41QzkuNjEsMTguODMgMTAuODEsMTkgMTIsMTlDMTcuNSwxOSAyMiwxNS40MiAyMiwxMUMyMiw2LjU4IDE3LjUsMyAxMiwzTTEyLDE3QzcuNTgsMTcgNCwxNC4zMSA0LDExQzQsNy42OSA3LjU4LDUgMTIsNUMxNi40Miw1IDIwLDcuNjkgMjAsMTFDMjAsMTQuMzEgMTYuNDIsMTcgMTIsMTdaIiAvPjwvc3ZnPg=="
+}

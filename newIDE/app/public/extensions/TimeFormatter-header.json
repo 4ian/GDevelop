@@ -1,0 +1,38 @@
+{
+  "tier": "reviewed",
+  "authorIds": [
+    "2OwwM8ToR9dx9RJ2sAKTcrLmCB92"
+  ],
+  "extensionNamespace": "",
+  "fullName": "Time formatting",
+  "name": "TimeFormatter",
+  "version": "0.0.2",
+  "url": "https://resources.gdevelop-app.com/extensions/TimeFormatter.json",
+  "headerUrl": "https://resources.gdevelop-app.com/extensions/TimeFormatter-header.json",
+  "tags": "time,timer,format,hours,minutes,seconds,milliseconds",
+  "category": "User interface",
+  "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/clock-digital.svg",
+  "gdevelopVersion": ">=5.5.222",
+  "shortDescription": "Format seconds into HH:MM:SS or HH:MM:SS.000 time display strings.",
+  "eventsBasedBehaviorsCount": 0,
+  "eventsFunctionsCount": 2,
+  "helpPath": "/extensions/time-formatter",
+  "eventsBasedBehaviors": [],
+  "eventsFunctions": [
+    {
+      "name": "SecondsToHHMMSS",
+      "fullName": "Format time in seconds to HH:MM:SS",
+      "description": "Format time in seconds to HH:MM:SS.",
+      "functionType": "StringExpression"
+    },
+    {
+      "name": "SecondsToHHMMSS000",
+      "fullName": "Format time in seconds to HH:MM:SS.000",
+      "description": "Format time in seconds to HH:MM:SS.000, including milliseconds.",
+      "functionType": "StringExpression"
+    }
+  ],
+  "eventsBasedObjects": [],
+  "description": "Ideal for displaying timers on screen.\n\nFormats included:\n* HH:MM:SS\n* HH:MM:SS.000 (displays milliseconds)",
+  "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNsb2NrLWRpZ2l0YWwiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMiw2QTIsMiAwIDAsMCAwLDhWMTZBMiwyIDAgMCwwIDIsMThIMjJBMiwyIDAgMCwwIDI0LDE2VjhBMiwyIDAgMCwwIDIyLDZNMiw4SDIyVjE2SDJNMyw5VjEwLjVINi4yNUwzLDE1SDQuNzVMOCwxMC41VjlNOS4yNSw5VjEwLjVIMTAuNzVWOU0xMiw5VjEwLjVIMTMuNVYxNUgxNVY5TTE3LDlBMSwxIDAgMCwwIDE2LDEwVjE0QTEsMSAwIDAsMCAxNywxNUgyMEExLDEgMCAwLDAgMjEsMTRWMTBBMSwxIDAgMCwwIDIwLDlNMTcuNSwxMC41SDE5LjVWMTMuNUgxNy41TTkuMjUsMTMuNVYxNUgxMC43NVYxMy41IiAvPjwvc3ZnPg=="
+}

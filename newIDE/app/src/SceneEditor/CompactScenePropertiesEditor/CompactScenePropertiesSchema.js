@@ -46,8 +46,7 @@ const getShouldStopSoundsOnStartupField = ({
   i18n: I18nType,
 |}): Field => ({
   name: 'ShouldStopSoundsOnStartup',
-  getLabel: () =>
-    i18n._(t`Stop music and sounds at the beginning of this scene`),
+  getLabel: () => i18n._(t`Stop music and sounds at scene startup`),
   valueType: 'boolean',
   getValue: (scene: gdLayout) => scene.stopSoundsOnStartup(),
   setValue: (scene: gdLayout, newValue: boolean) =>

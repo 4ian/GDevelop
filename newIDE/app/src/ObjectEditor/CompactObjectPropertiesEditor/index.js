@@ -60,6 +60,7 @@ import { CompactEffectsListEditor } from '../../LayersList/CompactLayerPropertie
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
+import useVariablesContainerRefactoring from '../../VariablesList/useVariablesContainerRefactoring';
 
 const gd: libGDevelop = global.gd;
 
@@ -498,6 +499,21 @@ export const CompactObjectPropertiesEditor = ({
     persistedScrollType: 'object',
   });
 
+  // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
+  const initialInstances =
+    (layout && layout.getInitialInstances()) ||
+    (customObjectEventsBasedObject &&
+      customObjectEventsBasedObject.getInitialInstances()) ||
+    null;
+  const { onVariablesUpdated } = useVariablesContainerRefactoring({
+    project,
+    variablesContainer: object.getVariables(),
+    initialInstances,
+    objectName: object.getName(),
+    eventsBasedObject: customObjectEventsBasedObject,
+    enabled: objects.length === 1,
+  });
+
   const propertiesSchema = React.useMemo(
     () => {
       if (schemaRecomputeTrigger) {
@@ -854,6 +870,7 @@ export const CompactObjectPropertiesEditor = ({
                     : []
                 }
                 historyHandler={historyHandler}
+                onVariablesUpdated={onVariablesUpdated}
                 toolbarIconStyle={styles.icon}
                 compactEmptyPlaceholderText={
                   <Trans>

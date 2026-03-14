@@ -33,6 +33,7 @@ import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEdit
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
 import { makeSchema } from './CompactScenePropertiesSchema';
 import EmptyMessage from '../../UI/EmptyMessage';
+import useVariablesContainerRefactoring from '../../VariablesList/useVariablesContainerRefactoring';
 
 const gd: libGDevelop = global.gd;
 
@@ -117,6 +118,16 @@ export const CompactScenePropertiesEditor = ({
     scrollKey,
     persistedScrollId,
     persistedScrollType: 'scene',
+  });
+
+  // Variable refactoring: snapshot on mount, apply on unmount/scene change.
+  const { onVariablesUpdated } = useVariablesContainerRefactoring({
+    project,
+    variablesContainer: scene.getVariables(),
+    initialInstances: null,
+    objectName: null,
+    eventsBasedObject: null,
+    enabled: true,
   });
 
   const propertiesSchema = React.useMemo(
@@ -271,6 +282,7 @@ export const CompactScenePropertiesEditor = ({
                   )
                 }
                 historyHandler={historyHandler}
+                onVariablesUpdated={onVariablesUpdated}
                 toolbarIconStyle={styles.icon}
                 compactEmptyPlaceholderText={
                   <Trans>

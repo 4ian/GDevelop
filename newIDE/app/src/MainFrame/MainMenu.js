@@ -14,6 +14,7 @@ import {
 import { getElectronAccelerator } from '../KeyboardShortcuts';
 import { isMacLike } from '../Utils/Platform';
 import Window from '../Utils/Window';
+import { ONLINE_SERVICES_ENABLED } from '../Utils/OnlineServices';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 
@@ -162,22 +163,30 @@ export const buildMainMenuDeclarativeTemplate = ({
         onClickSendEvent: 'main-menu-save-as',
         enabled: canSaveProjectAs,
       },
-      {
-        label: i18n._(t`Show version history`),
-        onClickSendEvent: 'main-menu-show-version-history',
-        enabled: !!project,
-      },
+      ...(ONLINE_SERVICES_ENABLED
+        ? [
+            {
+              label: i18n._(t`Show version history`),
+              onClickSendEvent: 'main-menu-show-version-history',
+              enabled: !!project,
+            },
+          ]
+        : []),
       { type: 'separator' },
+      ...(ONLINE_SERVICES_ENABLED
+        ? [
+            {
+              label: i18n._(t`Invite collaborators`),
+              accelerator: getElectronAccelerator(
+                shortcutMap['INVITE_COLLABORATORS']
+              ),
+              onClickSendEvent: 'main-menu-invite-collaborators',
+              enabled: !!project,
+            },
+          ]
+        : []),
       {
-        label: i18n._(t`Invite collaborators`),
-        accelerator: getElectronAccelerator(
-          shortcutMap['INVITE_COLLABORATORS']
-        ),
-        onClickSendEvent: 'main-menu-invite-collaborators',
-        enabled: !!project,
-      },
-      {
-        label: i18n._(t`Export (web, iOS, Android)...`),
+        label: i18n._(t`Export (web, Android, Windows)...`),
         accelerator: getElectronAccelerator(shortcutMap['EXPORT_GAME']),
         onClickSendEvent: 'main-menu-export',
         enabled: !!project,
@@ -304,10 +313,14 @@ export const buildMainMenuDeclarativeTemplate = ({
           onClickSendEvent: 'main-menu-open-about',
         },
         { type: 'separator' },
-        {
-          label: i18n._(t`My Profile`),
-          onClickSendEvent: 'main-menu-open-profile',
-        },
+        ...(ONLINE_SERVICES_ENABLED
+          ? [
+              {
+                label: i18n._(t`My Profile`),
+                onClickSendEvent: 'main-menu-open-profile',
+              },
+            ]
+          : []),
         {
           label: i18n._(t`Preferences`),
           onClickSendEvent: 'main-menu-open-preferences',

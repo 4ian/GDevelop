@@ -18,6 +18,7 @@ import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleSto
 import { HomePageHeader } from './HomePageHeader';
 import { HomePageMenu, type HomeTab } from './HomePageMenu';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import { ONLINE_SERVICES_ENABLED } from '../../../Utils/OnlineServices';
 import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
@@ -272,6 +273,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
       // Fetch user cloud projects when home page becomes active
       React.useEffect(
         () => {
+          if (!ONLINE_SERVICES_ENABLED) return;
           if (isActive && authenticated) {
             onCloudProjectsChanged();
           }
@@ -282,6 +284,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
       // Refresh games list when the home page is active.
       React.useEffect(
         () => {
+          if (!ONLINE_SERVICES_ENABLED) return;
           if (isActive && authenticated) {
             fetchGames();
           }

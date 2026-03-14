@@ -20,6 +20,7 @@ import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import PurchaseClaimDialog from '../Profile/PurchaseClaimDialog';
 import Window from '../Utils/Window';
+import { ONLINE_SERVICES_ENABLED } from '../Utils/OnlineServices';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import EditorTabsPane, {
   type EditorTabsPaneCommonProps,
@@ -5211,7 +5212,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           options={chooseResourceOptions}
         />
       )}
-      {profileDialogOpen && (
+      {ONLINE_SERVICES_ENABLED && profileDialogOpen && (
         // ProfileDialog is dependent on multiple contexts,
         // which are dependent of AuthenticatedUserContext.
         // So it cannot be moved inside the AuthenticatedUserProvider,
@@ -5223,7 +5224,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           }}
         />
       )}
-      {authenticatedUser.claimedProductOptions && (
+      {ONLINE_SERVICES_ENABLED && authenticatedUser.claimedProductOptions && (
         // PurchaseClaimDialog is dependent on SubscriptionContext,
         // which is defined after the AuthenticatedUserProvider in Providers.js.
         // So it cannot be rendered inside the AuthenticatedUserProvider.
@@ -5233,14 +5234,14 @@ const MainFrame = (props: Props): React.MixedElement => {
         />
       )}
       {renderNewProjectDialog()}
-      {cloudProjectFileMetadataToRecover && (
+      {ONLINE_SERVICES_ENABLED && cloudProjectFileMetadataToRecover && (
         <CloudProjectRecoveryDialog
           cloudProjectId={cloudProjectFileMetadataToRecover.fileIdentifier}
           onClose={() => setCloudProjectFileMetadataToRecover(null)}
           onOpenPreviousVersion={onOpenCloudProjectOnSpecificVersionForRecovery}
         />
       )}
-      {cloudProjectSaveChoiceOpen && (
+      {ONLINE_SERVICES_ENABLED && cloudProjectSaveChoiceOpen && (
         <CloudProjectSaveChoiceDialog
           isLoading={isSavingProject}
           onClose={() => setCloudProjectSaveChoiceOpen(false)}

@@ -2,6 +2,9 @@
 import * as React from 'react';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import AuthenticatedUserProvider from '../Profile/AuthenticatedUserProvider';
+import AuthenticatedUserContext, {
+  authenticatedUserLoggedOutAttributes,
+} from '../Profile/AuthenticatedUserContext';
 import { PublicProfileProvider } from '../Profile/PublicProfileContext';
 import Authentication from '../Utils/GDevelopServices/Authentication';
 import PreferencesProvider from './Preferences/PreferencesProvider';
@@ -45,6 +48,7 @@ import { MarketingPlansStoreStateProvider } from '../MarketingPlans/MarketingPla
 import { CourseStoreStateProvider } from '../Course/CourseStoreContext';
 import { Resource3DPreviewProvider } from '../ResourcesList/ResourcePreview/Resource3DPreviewContext';
 import { AiRequestProvider } from '../AiGeneration/AiRequestContext';
+import { ONLINE_SERVICES_ENABLED } from '../Utils/OnlineServices';
 
 type Props = {|
   authentication: Authentication,
@@ -56,6 +60,63 @@ type Props = {|
     i18n: I18nType,
   |}) => React.Node,
 |};
+
+const offlineAuthenticatedUser = {
+  ...authenticatedUserLoggedOutAttributes,
+  getAuthorizationHeader: async () => '',
+};
+
+type OnlineServicesProvidersProps = {|
+  children: React.Node,
+|};
+
+const OnlineServicesProviders = ({
+  children,
+}: OnlineServicesProvidersProps): React.Node => {
+  if (!ONLINE_SERVICES_ENABLED) {
+    return (
+      <ExampleStoreStateProvider>
+        <Resource3DPreviewProvider>{children}</Resource3DPreviewProvider>
+      </ExampleStoreStateProvider>
+    );
+  }
+
+  return (
+    <SubscriptionProvider>
+      <AssetStoreNavigatorStateProvider>
+        <AssetStoreStateProvider>
+          <ResourceStoreStateProvider>
+            <ExampleStoreStateProvider>
+              <PrivateGameTemplateStoreStateProvider>
+                <BundleStoreStateProvider>
+                  <CreditsPackageStoreStateProvider>
+                    <CourseStoreStateProvider>
+                      <ProductLicenseStoreStateProvider>
+                        <MarketingPlansStoreStateProvider>
+                          <TutorialStateProvider>
+                            <AnnouncementsFeedStateProvider>
+                              <PrivateAssetsAuthorizationProvider>
+                                <Resource3DPreviewProvider>
+                                  <AiRequestProvider>
+                                    {children}
+                                  </AiRequestProvider>
+                                </Resource3DPreviewProvider>
+                              </PrivateAssetsAuthorizationProvider>
+                            </AnnouncementsFeedStateProvider>
+                          </TutorialStateProvider>
+                        </MarketingPlansStoreStateProvider>
+                      </ProductLicenseStoreStateProvider>
+                    </CourseStoreStateProvider>
+                  </CreditsPackageStoreStateProvider>
+                </BundleStoreStateProvider>
+              </PrivateGameTemplateStoreStateProvider>
+            </ExampleStoreStateProvider>
+          </ResourceStoreStateProvider>
+        </AssetStoreStateProvider>
+      </AssetStoreNavigatorStateProvider>
+    </SubscriptionProvider>
+  );
+};
 
 /**
  * Wrap the children with Drag and Drop, Material UI theme and i18n React providers,
@@ -69,6 +130,25 @@ const Providers = ({
   eventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener,
 }: Props): React.Node => {
+  const renderCoreProviders = (i18n: I18nType) => (
+    <EventsFunctionsExtensionsProvider
+      i18n={i18n}
+      makeEventsFunctionCodeWriter={makeEventsFunctionCodeWriter}
+      eventsFunctionsExtensionWriter={eventsFunctionsExtensionWriter}
+      eventsFunctionsExtensionOpener={eventsFunctionsExtensionOpener}
+    >
+      <CommandsContextProvider>
+        <ExtensionStoreStateProvider i18n={i18n}>
+          <BehaviorStoreStateProvider i18n={i18n}>
+            <ObjectStoreStateProvider i18n={i18n}>
+              <OnlineServicesProviders>{children({ i18n })}</OnlineServicesProviders>
+            </ObjectStoreStateProvider>
+          </BehaviorStoreStateProvider>
+        </ExtensionStoreStateProvider>
+      </CommandsContextProvider>
+    </EventsFunctionsExtensionsProvider>
+  );
+
   return (
     <DragAndDropContextProvider>
       <UnsavedChangesContextProvider>
@@ -76,7 +156,7 @@ const Providers = ({
           <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
             <PreferencesContext.Consumer>
               {({ values }) => (
-                <GDI18nProvider language={values.language.replace('_', '-')}>
+                <GDI18nProvider language={values.language.replace('_', '-')}> 
                   <FullThemeProvider>
                     <ErrorBoundary
                       componentTitle={<Trans>Carrots Engine app</Trans>}
@@ -84,81 +164,26 @@ const Providers = ({
                     >
                       <InAppTutorialProvider>
                         <AlertProvider>
-                          <AuthenticatedUserProvider
-                            authentication={authentication}
-                            preferencesValues={values}
-                          >
-                            <PublicProfileProvider>
+                          {ONLINE_SERVICES_ENABLED ? (
+                            <AuthenticatedUserProvider
+                              authentication={authentication}
+                              preferencesValues={values}
+                            >
+                              <PublicProfileProvider>
+                                <I18n update>
+                                  {({ i18n }) => renderCoreProviders(i18n)}
+                                </I18n>
+                              </PublicProfileProvider>
+                            </AuthenticatedUserProvider>
+                          ) : (
+                            <AuthenticatedUserContext.Provider
+                              value={offlineAuthenticatedUser}
+                            >
                               <I18n update>
-                                {({ i18n }) => (
-                                  <EventsFunctionsExtensionsProvider
-                                    i18n={i18n}
-                                    makeEventsFunctionCodeWriter={
-                                      makeEventsFunctionCodeWriter
-                                    }
-                                    eventsFunctionsExtensionWriter={
-                                      eventsFunctionsExtensionWriter
-                                    }
-                                    eventsFunctionsExtensionOpener={
-                                      eventsFunctionsExtensionOpener
-                                    }
-                                  >
-                                    <SubscriptionProvider>
-                                      <CommandsContextProvider>
-                                        <AssetStoreNavigatorStateProvider>
-                                          <AssetStoreStateProvider>
-                                            <ResourceStoreStateProvider>
-                                              <ExampleStoreStateProvider>
-                                                <PrivateGameTemplateStoreStateProvider>
-                                                  <BundleStoreStateProvider>
-                                                    <CreditsPackageStoreStateProvider>
-                                                      <CourseStoreStateProvider>
-                                                        <ProductLicenseStoreStateProvider>
-                                                          <MarketingPlansStoreStateProvider>
-                                                            <ExtensionStoreStateProvider
-                                                              i18n={i18n}
-                                                            >
-                                                              <BehaviorStoreStateProvider
-                                                                i18n={i18n}
-                                                              >
-                                                                <ObjectStoreStateProvider
-                                                                  i18n={i18n}
-                                                                >
-                                                                  <TutorialStateProvider>
-                                                                    <AnnouncementsFeedStateProvider>
-                                                                      <PrivateAssetsAuthorizationProvider>
-                                                                        <Resource3DPreviewProvider>
-                                                                          <AiRequestProvider>
-                                                                            {children(
-                                                                              {
-                                                                                i18n,
-                                                                              }
-                                                                            )}
-                                                                          </AiRequestProvider>
-                                                                        </Resource3DPreviewProvider>
-                                                                      </PrivateAssetsAuthorizationProvider>
-                                                                    </AnnouncementsFeedStateProvider>
-                                                                  </TutorialStateProvider>
-                                                                </ObjectStoreStateProvider>
-                                                              </BehaviorStoreStateProvider>
-                                                            </ExtensionStoreStateProvider>
-                                                          </MarketingPlansStoreStateProvider>
-                                                        </ProductLicenseStoreStateProvider>
-                                                      </CourseStoreStateProvider>
-                                                    </CreditsPackageStoreStateProvider>
-                                                  </BundleStoreStateProvider>
-                                                </PrivateGameTemplateStoreStateProvider>
-                                              </ExampleStoreStateProvider>
-                                            </ResourceStoreStateProvider>
-                                          </AssetStoreStateProvider>
-                                        </AssetStoreNavigatorStateProvider>
-                                      </CommandsContextProvider>
-                                    </SubscriptionProvider>
-                                  </EventsFunctionsExtensionsProvider>
-                                )}
+                                {({ i18n }) => renderCoreProviders(i18n)}
                               </I18n>
-                            </PublicProfileProvider>
-                          </AuthenticatedUserProvider>
+                            </AuthenticatedUserContext.Provider>
+                          )}
                         </AlertProvider>
                       </InAppTutorialProvider>
                     </ErrorBoundary>

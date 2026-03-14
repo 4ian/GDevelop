@@ -6,6 +6,7 @@ import type { I18n as I18nType } from '@lingui/core';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import { ONLINE_SERVICES_ENABLED } from '../../../../Utils/OnlineServices';
 import {
   deleteGame,
   registerGame,
@@ -291,12 +292,13 @@ const CreateSection = ({
     RouterContext
   );
   const { isMobile } = useResponsiveWindowSize();
-  const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
-    authenticatedUser
-  );
+  const hasTooManyCloudProjects = ONLINE_SERVICES_ENABLED
+    ? checkIfHasTooManyCloudProjects(authenticatedUser)
+    : false;
 
   React.useEffect(
     () => {
+      if (!ONLINE_SERVICES_ENABLED) return;
       onRefreshGames();
     },
     // Refresh the games when the callback changes (defined in useGamesList), that's
@@ -316,7 +318,7 @@ const CreateSection = ({
 
   const [templateCategory, setTemplateCategory] = React.useState<
     'games' | '2d' | '3d'
-  >('games');
+  >(ONLINE_SERVICES_ENABLED ? 'games' : '2d');
 
   const onUnregisterGame = React.useCallback(
     async (
@@ -324,6 +326,7 @@ const CreateSection = ({
       i18n: I18nType,
       options?: { skipConfirmation: boolean, throwOnError: boolean }
     ) => {
+      if (!ONLINE_SERVICES_ENABLED) return;
       if (!profile) return;
 
       if (!options || !options.skipConfirmation) {
@@ -383,6 +386,7 @@ const CreateSection = ({
 
   React.useEffect(
     () => {
+      if (!ONLINE_SERVICES_ENABLED) return;
       const loadInitialGame = async () => {
         // When games are loaded and we have an initial game id, try to open it.
         const initialGameId = routeArguments['game-id'];
@@ -426,6 +430,7 @@ const CreateSection = ({
     { fileMetadata, storageProviderName }: FileMetadataAndStorageProviderName,
     options?: { skipConfirmation: boolean }
   ) => {
+    if (!ONLINE_SERVICES_ENABLED) return;
     if (storageProviderName !== 'Cloud') return;
     const projectName = fileMetadata.name;
     if (!projectName) return; // Only cloud projects can be deleted, and all cloud projects have names.
@@ -482,6 +487,7 @@ const CreateSection = ({
 
   const onRegisterProject = React.useCallback(
     async (file: FileMetadataAndStorageProviderName): Promise<?Game> => {
+      if (!ONLINE_SERVICES_ENABLED) return null;
       const projectId = file.fileMetadata.gameId;
 
       if (!authenticatedUser.profile) return;
@@ -544,7 +550,7 @@ const CreateSection = ({
 
   const isLoading = isUpdatingGame;
 
-  if (openedGame) {
+  if (ONLINE_SERVICES_ENABLED && openedGame) {
     return (
       <SectionContainer flexBody>
         <GameDashboard
@@ -583,7 +589,7 @@ const CreateSection = ({
                 )
               : undefined
           }
-          showUrgentAnnouncements
+          showUrgentAnnouncements={ONLINE_SERVICES_ENABLED}
         >
           <SectionRow>
             <div id="carrots-home-build-section" style={styles.heroPanel}>
@@ -659,18 +665,20 @@ const CreateSection = ({
                   />
                 </Line>
                 <div style={styles.filtersRow}>
-                  <button
-                    type="button"
-                    style={{
-                      ...styles.filterChip,
-                      ...(templateCategory === 'games'
-                        ? styles.filterChipActive
-                        : {}),
-                    }}
-                    onClick={() => setTemplateCategory('games')}
-                  >
-                    <Trans>Games</Trans>
-                  </button>
+                  {ONLINE_SERVICES_ENABLED && (
+                    <button
+                      type="button"
+                      style={{
+                        ...styles.filterChip,
+                        ...(templateCategory === 'games'
+                          ? styles.filterChipActive
+                          : {}),
+                      }}
+                      onClick={() => setTemplateCategory('games')}
+                    >
+                      <Trans>Games</Trans>
+                    </button>
+                  )}
                   <button
                     type="button"
                     style={{

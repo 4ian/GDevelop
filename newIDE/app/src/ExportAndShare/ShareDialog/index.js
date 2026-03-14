@@ -7,9 +7,10 @@ import FlatButton from '../../UI/FlatButton';
 import BuildsDialog from '../Builds/BuildsDialog';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import PublishHome from './PublishHome';
+import InviteHome from './InviteHome';
 import { type ExportPipeline } from '../ExportPipeline.flow';
 import { Tabs } from '../../UI/Tabs';
-import InviteHome from './InviteHome';
+import { ONLINE_SERVICES_ENABLED } from '../../Utils/OnlineServices';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import TextButton from '../../UI/TextButton';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
@@ -116,8 +117,9 @@ const ShareDialog = ({
     setShareDialogDefaultTab,
     getShareDialogDefaultTab,
   } = React.useContext(PreferencesContext);
+  const inviteEnabled = ONLINE_SERVICES_ENABLED;
   const [currentTab, setCurrentTab] = React.useState<ShareTab>(
-    initialTab || getShareDialogDefaultTab()
+    inviteEnabled ? initialTab || getShareDialogDefaultTab() : 'publish'
   );
   const isBrowserOnlineExporterEnabled = !!exporterSectionMapping.browser
     .online;
@@ -220,21 +222,29 @@ const ShareDialog = ({
           exporter ? (
             <HelpButton key="help" helpPagePath={exporter.helpPage} />
           ) : null,
-          <TextButton
-            key="exports"
-            label={
-              isMobile ? <Trans>Exports</Trans> : <Trans>See all exports</Trans>
-            }
-            onClick={openBuildDialog}
-            disabled={isNavigationDisabled || !isOnline}
-          />,
+          ONLINE_SERVICES_ENABLED ? (
+            <TextButton
+              key="exports"
+              label={
+                isMobile ? (
+                  <Trans>Exports</Trans>
+                ) : (
+                  <Trans>See all exports</Trans>
+                )
+              }
+              onClick={openBuildDialog}
+              disabled={isNavigationDisabled || !isOnline}
+            />
+          ) : null,
         ].filter(Boolean)
-      : [
+      : inviteEnabled
+      ? [
           <HelpButton
             key="help"
             helpPagePath="/collaboration/invite-collaborators"
           />,
-        ];
+        ]
+      : [];
 
   return (
     <Dialog
@@ -260,18 +270,22 @@ const ShareDialog = ({
               id: 'publish-tab',
               disabled: isNavigationDisabled,
             },
-            {
-              value: 'invite',
-              label: <Trans>Invite</Trans>,
-              id: 'invite-tab',
-              disabled: isNavigationDisabled,
-            },
+            ...(inviteEnabled
+              ? [
+                  {
+                    value: 'invite',
+                    label: <Trans>Invite</Trans>,
+                    id: 'invite-tab',
+                    disabled: isNavigationDisabled,
+                  },
+                ]
+              : []),
           ]}
         />
       }
       flexColumnBody
     >
-      {currentTab === 'invite' && (
+      {inviteEnabled && currentTab === 'invite' && (
         <InviteHome
           cloudProjectId={
             storageProvider.internalName === 'Cloud' && fileMetadata
@@ -298,7 +312,7 @@ const ShareDialog = ({
           showOnlineWebExporterOnly={showOnlineWebExporterOnly}
         />
       )}
-      {gameAndBuildsManager.game && (
+      {ONLINE_SERVICES_ENABLED && gameAndBuildsManager.game && (
         <BuildsDialog
           open={buildsDialogOpen}
           onClose={() => setBuildsDialogOpen(false)}

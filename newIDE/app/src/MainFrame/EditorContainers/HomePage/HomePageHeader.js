@@ -12,6 +12,7 @@ import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindow
 import SaveProjectIcon from '../../SaveProjectIcon';
 import HistoryIcon from '../../../UI/CustomSvgIcons/History';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import { ONLINE_SERVICES_ENABLED } from '../../../Utils/OnlineServices';
 import { type FileMetadata } from '../../../ProjectsStorage';
 import Text from '../../../UI/Text';
 import LocalesMetadata from '../../../locales/LocalesMetadata';
@@ -155,15 +156,17 @@ export const HomePageHeader = ({
             <Line noMargin style={styles.leftActions}>
               {!!hasProject && (
                 <>
-                  <IconButton
-                    size="small"
-                    id="main-toolbar-history-button"
-                    onClick={onOpenVersionHistory}
-                    tooltip={t`Open version history`}
-                    color="default"
-                  >
-                    <HistoryIcon />
-                  </IconButton>
+                  {ONLINE_SERVICES_ENABLED && (
+                    <IconButton
+                      size="small"
+                      id="main-toolbar-history-button"
+                      onClick={onOpenVersionHistory}
+                      tooltip={t`Open version history`}
+                      color="default"
+                    >
+                      <HistoryIcon />
+                    </IconButton>
+                  )}
                   <SaveProjectIcon
                     id="main-toolbar-save-button"
                     onSave={onSave}
@@ -179,8 +182,10 @@ export const HomePageHeader = ({
               alignItems="center"
               style={styles.rightActions}
             >
-              <UserChip onOpenProfile={onOpenProfile} />
-              {profile && <NotificationChip />}
+              {ONLINE_SERVICES_ENABLED && (
+                <UserChip onOpenProfile={onOpenProfile} />
+              )}
+              {ONLINE_SERVICES_ENABLED && profile && <NotificationChip />}
               {isMobile ? (
                 <button
                   type="button"

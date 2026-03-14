@@ -4,6 +4,7 @@ import { GDevelopAssetApi } from './ApiConfigs';
 import { type Filters } from './Filters';
 import { type UserPublicProfile } from './User';
 import { retryIfFailed } from '../RetryIfFailed';
+import { ONLINE_SERVICES_ENABLED } from '../OnlineServices';
 
 export type ExampleShortHeader = {|
   id: string,
@@ -34,6 +35,7 @@ export type AllExamples = {|
   filters: Filters,
 |};
 
+
 const USE_LOCAL_EXAMPLES = true;
 const LOCAL_EXAMPLES_DATABASE_URL = '/examples/examples.json';
 
@@ -51,6 +53,29 @@ const loadLocalExamplesDatabase = async () => {
 };
 
 export const listAllExamples = async (): Promise<AllExamples> => {
+  if (!ONLINE_SERVICES_ENABLED && USE_LOCAL_EXAMPLES) {
+    try {
+      const localDatabase = await loadLocalExamplesDatabase();
+      const localExampleShortHeaders =
+        localDatabase && localDatabase.exampleShortHeaders
+          ? localDatabase.exampleShortHeaders
+          : [];
+      const localFilters = localDatabase && localDatabase.filters
+        ? localDatabase.filters
+        : { allTags: [], defaultTags: [], tagsTree: [] };
+
+      return {
+        exampleShortHeaders: localExampleShortHeaders,
+        filters: localFilters,
+      };
+    } catch (error) {
+      console.warn('Unable to load local examples database:', error);
+      return {
+        exampleShortHeaders: [],
+        filters: { allTags: [], defaultTags: [], tagsTree: [] },
+      };
+    }
+  }
   // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(`${GDevelopAssetApi.baseUrl}/example`, {
     params: {

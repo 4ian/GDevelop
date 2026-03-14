@@ -64,6 +64,11 @@ import {
   getTileSet,
   isTileSetBadlyConfigured,
 } from '../Utils/TileMap';
+import {
+  buildInstancesIndex,
+  syncLocalFromWorld,
+  applyParentTransformToDescendants,
+} from './ParentingHelpers';
 
 const gd: libGDevelop = global.gd;
 
@@ -595,14 +600,17 @@ export default class InstancesEditor extends Component<Props, State> {
     });
     this.instancesResizer = new InstancesResizer({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
-      instancesEditorSettings: this.props.instancesEditorSettings,
+      instancesEditorSettings: props.instancesEditorSettings,
+      initialInstances: props.initialInstances,
     });
     this.instancesRotator = new InstancesRotator(
-      this.instancesRenderer.getInstanceMeasurer()
+      this.instancesRenderer.getInstanceMeasurer(),
+      props.initialInstances
     );
     this.instancesMover = new InstancesMover({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       instancesEditorSettings: this.props.instancesEditorSettings,
+      initialInstances: props.initialInstances,
     });
     this.windowBorder = new WindowBorder({
       project: props.project,
@@ -1569,9 +1577,14 @@ export default class InstancesEditor extends Component<Props, State> {
     const unlockedSelectedInstances = selectedInstances.filter(
       instance => !instance.isLocked()
     );
+    const instancesIndex = buildInstancesIndex(this.props.initialInstances);
     unlockedSelectedInstances.forEach(instance => {
       instance.setX(instance.getX() + x);
       instance.setY(instance.getY() + y);
+      syncLocalFromWorld(instance, instancesIndex);
+    });
+    unlockedSelectedInstances.forEach(instance => {
+      applyParentTransformToDescendants(instance, instancesIndex);
     });
     this.onInstancesMovedDebounced(unlockedSelectedInstances);
   };

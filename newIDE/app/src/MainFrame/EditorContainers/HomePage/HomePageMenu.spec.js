@@ -17,13 +17,7 @@ describe('HomePageMenu', () => {
 
       const tabs = getTabsToDisplay({ limits: null });
 
-      expect(tabs.map(tab => tab.tab)).toEqual([
-        'learn',
-        'create',
-        'play',
-        'shop',
-        'team-view',
-      ]);
+      expect(tabs.map(tab => tab.tab)).toEqual(['create']);
     });
 
     test('Desktop user student', () => {
@@ -33,7 +27,7 @@ describe('HomePageMenu', () => {
         limits: limitsForStudentUser,
       });
 
-      expect(tabs.map(tab => tab.tab)).toEqual(['learn', 'create']);
+      expect(tabs.map(tab => tab.tab)).toEqual(['create']);
     });
 
     test('Default mobile user', () => {
@@ -41,12 +35,7 @@ describe('HomePageMenu', () => {
 
       const tabs = getTabsToDisplay({ limits: null });
 
-      expect(tabs.map(tab => tab.tab)).toEqual([
-        'learn',
-        'create',
-        'play',
-        'shop',
-      ]);
+      expect(tabs.map(tab => tab.tab)).toEqual(['create']);
     });
 
     test('Mobile student user', () => {
@@ -54,7 +43,7 @@ describe('HomePageMenu', () => {
 
       const tabs = getTabsToDisplay({ limits: limitsForStudentUser });
 
-      expect(tabs.map(tab => tab.tab)).toEqual(['learn', 'create']);
+      expect(tabs.map(tab => tab.tab)).toEqual(['create']);
     });
   });
 });

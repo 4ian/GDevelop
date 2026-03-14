@@ -2,6 +2,11 @@
 import { roundPositionsToGrid } from '../Utils/GridHelpers';
 import { unserializeFromJSObject } from '../Utils/Serializer';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
+import {
+  buildInstancesIndex,
+  syncLocalFromWorld,
+  setLocalToWorld,
+} from './ParentingHelpers';
 
 const gd: libGDevelop = global.gd;
 
@@ -28,6 +33,7 @@ export const addSerializedInstances = ({
 
   let addedInstancesLowestZOrder = null;
 
+  const oldToNewPersistentUuid: Map<string, string> = new Map();
   const newInstances = serializedInstances
     .map(serializedInstance => {
       const instance = new gd.InitialInstance();
@@ -38,6 +44,7 @@ export const addSerializedInstances = ({
         project
       );
       if (!doesObjectExistInContext(instance.getObjectName())) return null;
+      const oldPersistentUuid = instance.getPersistentUuid();
       instance.setX(instance.getX() - copyReferential[0]);
       instance.setY(instance.getY() - copyReferential[1]);
       if (addInstancesInTheForeground) {
@@ -51,10 +58,36 @@ export const addSerializedInstances = ({
       const newInstance = instancesContainer
         .insertInitialInstance(instance)
         .resetPersistentUuid();
+      if (oldPersistentUuid) {
+        oldToNewPersistentUuid.set(
+          oldPersistentUuid,
+          newInstance.getPersistentUuid()
+        );
+      }
       instance.delete();
       return newInstance;
     })
     .filter(Boolean);
+
+  if (newInstances.length > 0) {
+    newInstances.forEach(instance => {
+      const parentPersistentUuid = instance.getParentPersistentUuid();
+      if (
+        parentPersistentUuid &&
+        oldToNewPersistentUuid.has(parentPersistentUuid)
+      ) {
+        const newParentPersistentUuid =
+          oldToNewPersistentUuid.get(parentPersistentUuid);
+        if (newParentPersistentUuid) {
+          instance.setParentPersistentUuid(newParentPersistentUuid);
+        }
+      }
+    });
+    const instancesIndex = buildInstancesIndex(instancesContainer);
+    newInstances.forEach(instance => {
+      syncLocalFromWorld(instance, instancesIndex);
+    });
+  }
 
   if (addInstancesInTheForeground && addedInstancesLowestZOrder !== null) {
     newInstances.forEach(instance => {
@@ -149,6 +182,7 @@ export default class InstancesAdder {
       instance.setY(newPos[1]);
       instance.setLayer(layer);
       instance.setZOrder(zOrder);
+      setLocalToWorld(instance);
 
       return instance;
     });
@@ -193,6 +227,7 @@ export default class InstancesAdder {
       instance.setY(newPos[1]);
       instance.setLayer(layer);
       instance.setZOrder(zOrder);
+      setLocalToWorld(instance);
 
       return instance;
     });
@@ -209,6 +244,7 @@ export default class InstancesAdder {
     this._temporaryInstances.forEach(instance => {
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);
+      setLocalToWorld(instance);
     });
 
     return this._temporaryInstances;

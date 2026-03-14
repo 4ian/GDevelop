@@ -564,10 +564,8 @@ describe('InstallAsset', () => {
           incompatibleButtonV4ExtensionShortHeader,
         ],
         breakingChangesExtensionShortHeaders: [],
-        incompatibleWithIdeExtensionShortHeaders: [
-          incompatibleButtonV4ExtensionShortHeader,
-        ],
-        safeToUpdateExtensions: [],
+        incompatibleWithIdeExtensionShortHeaders: [],
+        safeToUpdateExtensions: [incompatibleButtonV4ExtensionShortHeader],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -598,11 +596,9 @@ describe('InstallAsset', () => {
         missingExtensionShortHeaders: [incompatibleFlashExtensionShortHeader],
         outOfDateExtensionShortHeaders: [],
         breakingChangesExtensionShortHeaders: [],
-        incompatibleWithIdeExtensionShortHeaders: [
-          incompatibleFlashExtensionShortHeader,
-        ],
+        incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [],
-        isGDevelopUpdateNeeded: true,
+        isGDevelopUpdateNeeded: false,
       });
     });
 
@@ -809,11 +805,9 @@ describe('InstallAsset', () => {
           incompatibleButtonV4ExtensionShortHeader,
         ],
         breakingChangesExtensionShortHeaders: [],
-        incompatibleWithIdeExtensionShortHeaders: [
-          incompatibleButtonV4ExtensionShortHeader,
-        ],
-        safeToUpdateExtensions: [],
-        isGDevelopUpdateNeeded: true,
+        incompatibleWithIdeExtensionShortHeaders: [],
+        safeToUpdateExtensions: [incompatibleButtonV4ExtensionShortHeader],
+        isGDevelopUpdateNeeded: false,
       });
     });
 
@@ -847,11 +841,9 @@ describe('InstallAsset', () => {
         missingExtensionShortHeaders: [incompatibleFlashExtensionShortHeader],
         outOfDateExtensionShortHeaders: [],
         breakingChangesExtensionShortHeaders: [],
-        incompatibleWithIdeExtensionShortHeaders: [
-          incompatibleFlashExtensionShortHeader,
-        ],
+        incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [],
-        isGDevelopUpdateNeeded: true,
+        isGDevelopUpdateNeeded: false,
       });
     });
 

@@ -1,6 +1,7 @@
 .fullHeightFlexContainer {
   display: flex;
   height: 100%;
+  position: relative;
 }
 .fullHeightFlexContainer.withDivider {
   border-top: 1px solid var(--theme-list-item-separator-color);
@@ -72,6 +73,32 @@
 }
 .rowContainer:hover:not(.selected) {
   background-color: var(--theme-list-item-hover-background-color);
+}
+
+.indentGuides {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.indentGuide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: var(--theme-list-item-separator-color);
+  opacity: 0.35;
+}
+
+.indentConnector {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 1px;
+  background-color: var(--theme-list-item-separator-color);
+  opacity: 0.5;
 }
 
 .itemName,

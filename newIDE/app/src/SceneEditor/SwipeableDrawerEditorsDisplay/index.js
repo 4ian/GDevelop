@@ -466,6 +466,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         projectScopedContainersAccessor={
                           projectScopedContainersAccessor
                         }
+                        initialInstances={initialInstances}
                         objects={selectedObjects}
                         instances={selectedInstances}
                         layer={selectedLayer}

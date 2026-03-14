@@ -638,6 +638,7 @@ namespace gdjs {
       this._width = scaleX * this._collisionTileMap.getWidth();
       this._transformationIsUpToDate = false;
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     /**
@@ -656,6 +657,7 @@ namespace gdjs {
       this._height = scaleY * this._collisionTileMap.getHeight();
       this._transformationIsUpToDate = false;
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     getWidth(): float {

@@ -771,6 +771,7 @@ namespace gdjs {
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._renderer.updateScaleX();
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     /**
@@ -788,6 +789,7 @@ namespace gdjs {
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this._renderer.updateScaleY();
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     flipX(enable: boolean): void {

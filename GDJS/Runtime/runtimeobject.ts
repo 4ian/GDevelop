@@ -169,6 +169,19 @@ namespace gdjs {
     zOrder: integer = 0;
     hidden: boolean = false;
     layer: string = '';
+    private _parentObject: gdjs.RuntimeObject | null = null;
+    private _childrenObjects: gdjs.RuntimeObject[] = [];
+    private _localX: float = 0;
+    private _localY: float = 0;
+    private _localZ: float = 0;
+    private _localAngle: float = 0;
+    private _localRotationX: float = 0;
+    private _localRotationY: float = 0;
+    private _localScaleX: float = 1;
+    private _localScaleY: float = 1;
+    private _inheritRotation: boolean = true;
+    private _inheritScale: boolean = true;
+    private _isApplyingParentTransform: boolean = false;
     protected _nameId: integer;
     protected _livingOnScene: boolean = true;
 
@@ -335,6 +348,19 @@ namespace gdjs {
       this.zOrder = 0;
       this.hidden = false;
       this.layer = '';
+      this._parentObject = null;
+      this._childrenObjects.length = 0;
+      this._localX = 0;
+      this._localY = 0;
+      this._localZ = 0;
+      this._localAngle = 0;
+      this._localRotationX = 0;
+      this._localRotationY = 0;
+      this._localScaleX = 1;
+      this._localScaleY = 1;
+      this._inheritRotation = true;
+      this._inheritScale = true;
+      this._isApplyingParentTransform = false;
       this._livingOnScene = true;
       //@ts-ignore Reinitialize is like a constructor, it can overwrite the readonly property.
       this.id = runtimeScene
@@ -418,6 +444,297 @@ namespace gdjs {
      */
     getParent(): gdjs.RuntimeInstanceContainer {
       return this._runtimeScene;
+    }
+
+    /**
+     * The parent object of this object (for parenting/hierarchy), if any.
+     */
+    getParentObject(): gdjs.RuntimeObject | null {
+      return this._parentObject;
+    }
+
+    /**
+     * The children objects of this object (for parenting/hierarchy).
+     */
+    getChildren(): gdjs.RuntimeObject[] {
+      return this._childrenObjects;
+    }
+
+    /**
+     * Return true if the object has a parent.
+     */
+    hasParent(): boolean {
+      return !!this._parentObject;
+    }
+
+    /**
+     * Return true if this object is the parent of the given object.
+     */
+    isParentOf(other: gdjs.RuntimeObject | null): boolean {
+      return !!other && other.getParentObject() === this;
+    }
+
+    /**
+     * Return the number of children of this object.
+     */
+    getChildrenCount(): integer {
+      return this._childrenObjects.length;
+    }
+
+    /**
+     * Return the name of the parent object, or an empty string if none.
+     */
+    getParentObjectName(): string {
+      return this._parentObject ? this._parentObject.getName() : '';
+    }
+
+    /**
+     * Set the parent object of this object.
+     *
+     * @param parent The new parent object, or null to remove the parent.
+     * @param options.keepWorld Keep the world transform when reparenting.
+     * You can also pass a boolean instead of an options object.
+     */
+    setParent(
+      parent: gdjs.RuntimeObject | null,
+      options?: { keepWorld?: boolean } | boolean
+    ): void {
+      const keepWorld =
+        typeof options === 'boolean' ? options : options?.keepWorld !== false;
+      if (parent === this._parentObject) return;
+      if (parent === this) return;
+
+      if (parent) {
+        // Ensure both objects are in the same container.
+        if (parent.getInstanceContainer() !== this.getInstanceContainer()) {
+          return;
+        }
+        // Prevent cycles.
+        let ancestor: gdjs.RuntimeObject | null = parent;
+        while (ancestor) {
+          if (ancestor === this) {
+            return;
+          }
+          ancestor = ancestor.getParentObject();
+        }
+      }
+
+      if (keepWorld && parent) {
+        this._recomputeLocalFromWorld(parent);
+      }
+
+      if (this._parentObject) {
+        const siblings = this._parentObject._childrenObjects;
+        const index = siblings.indexOf(this);
+        if (index !== -1) siblings.splice(index, 1);
+      }
+
+      this._parentObject = parent;
+
+      if (parent) {
+        parent._childrenObjects.push(this);
+      }
+
+      if (!keepWorld) {
+        this._applyParentTransformFromLocal();
+      }
+    }
+
+    /**
+     * Remove the parent object.
+     *
+     * @param options.keepWorld Keep the world transform when detaching.
+     * You can also pass a boolean instead of an options object.
+     */
+    removeParent(options?: { keepWorld?: boolean } | boolean): void {
+      const keepWorld =
+        typeof options === 'boolean' ? options : options?.keepWorld !== false;
+      const parent = this._parentObject;
+      if (!parent) return;
+
+      if (keepWorld) {
+        this._localX = this.getX();
+        this._localY = this.getY();
+        this._localZ = this._getWorldZ();
+        this._localAngle = this.getAngle();
+        this._localRotationX = this._getWorldRotationX();
+        this._localRotationY = this._getWorldRotationY();
+        this._localScaleX = this._getWorldScaleX();
+        this._localScaleY = this._getWorldScaleY();
+      }
+
+      const siblings = parent._childrenObjects;
+      const index = siblings.indexOf(this);
+      if (index !== -1) siblings.splice(index, 1);
+
+      this._parentObject = null;
+
+      if (!keepWorld) {
+        this._applyParentTransformFromLocal();
+      }
+    }
+
+    /**
+     * Get the local X position relative to the parent.
+     */
+    getLocalX(): float {
+      return this._localX;
+    }
+
+    /**
+     * Get the local Y position relative to the parent.
+     */
+    getLocalY(): float {
+      return this._localY;
+    }
+
+    /**
+     * Get the local Z position relative to the parent.
+     */
+    getLocalZ(): float {
+      return this._localZ;
+    }
+
+    /**
+     * Set the local X position relative to the parent.
+     */
+    setLocalX(x: float): void {
+      this.setLocalPosition(x, this._localY, this._localZ);
+    }
+
+    /**
+     * Set the local Y position relative to the parent.
+     */
+    setLocalY(y: float): void {
+      this.setLocalPosition(this._localX, y, this._localZ);
+    }
+
+    /**
+     * Set the local Z position relative to the parent.
+     */
+    setLocalZ(z: float): void {
+      this.setLocalPosition(this._localX, this._localY, z);
+    }
+
+    /**
+     * Get the local angle (Z rotation) relative to the parent.
+     */
+    getLocalAngle(): float {
+      return this._localAngle;
+    }
+
+    /**
+     * Get the local X rotation relative to the parent.
+     */
+    getLocalRotationX(): float {
+      return this._localRotationX;
+    }
+
+    /**
+     * Get the local Y rotation relative to the parent.
+     */
+    getLocalRotationY(): float {
+      return this._localRotationY;
+    }
+
+    /**
+     * Get the local scale on X axis relative to the parent.
+     */
+    getLocalScaleX(): float {
+      return this._localScaleX;
+    }
+
+    /**
+     * Get the local scale on Y axis relative to the parent.
+     */
+    getLocalScaleY(): float {
+      return this._localScaleY;
+    }
+
+    /**
+     * Set the local position relative to the parent.
+     */
+    setLocalPosition(x: float, y: float, z: float = this._localZ): void {
+      this._localX = x;
+      this._localY = y;
+      this._localZ = z;
+      this._applyParentTransformFromLocal();
+    }
+
+    /**
+     * Set the local angle relative to the parent.
+     */
+    setLocalAngle(angle: float): void {
+      this._localAngle = angle;
+      this._applyParentTransformFromLocal();
+    }
+
+    /**
+     * Set the local X rotation relative to the parent.
+     */
+    setLocalRotationX(angle: float): void {
+      this._localRotationX = angle;
+      this._applyParentTransformFromLocal();
+    }
+
+    /**
+     * Set the local Y rotation relative to the parent.
+     */
+    setLocalRotationY(angle: float): void {
+      this._localRotationY = angle;
+      this._applyParentTransformFromLocal();
+    }
+
+    /**
+     * Set the local scale on X axis relative to the parent.
+     */
+    setLocalScaleX(scaleX: float): void {
+      this._localScaleX = scaleX;
+      this._applyParentTransformFromLocal();
+    }
+
+    /**
+     * Set the local scale on Y axis relative to the parent.
+     */
+    setLocalScaleY(scaleY: float): void {
+      this._localScaleY = scaleY;
+      this._applyParentTransformFromLocal();
+    }
+
+    /**
+     * Return true if the object should inherit rotation from its parent.
+     */
+    inheritRotation(): boolean {
+      return this._inheritRotation;
+    }
+
+    /**
+     * Define if the object should inherit rotation from its parent.
+     */
+    setInheritRotation(enable: boolean): void {
+      if (this._inheritRotation === enable) return;
+      this._inheritRotation = enable;
+      if (this._parentObject) {
+        this._recomputeLocalFromWorld(this._parentObject);
+      }
+    }
+
+    /**
+     * Return true if the object should inherit scale from its parent.
+     */
+    inheritScale(): boolean {
+      return this._inheritScale;
+    }
+
+    /**
+     * Define if the object should inherit scale from its parent.
+     */
+    setInheritScale(enable: boolean): void {
+      if (this._inheritScale === enable) return;
+      this._inheritScale = enable;
+      if (this._parentObject) {
+        this._recomputeLocalFromWorld(this._parentObject);
+      }
     }
 
     /**
@@ -676,6 +993,19 @@ namespace gdjs {
      * (`super.onDeletedFromScene();`).
      */
     onDeletedFromScene(): void {
+      if (this._childrenObjects.length > 0) {
+        const children = this._childrenObjects.slice();
+        for (let i = 0; i < children.length; ++i) {
+          children[i].deleteFromScene();
+        }
+      }
+      if (this._parentObject) {
+        const siblings = this._parentObject._childrenObjects;
+        const index = siblings.indexOf(this);
+        if (index !== -1) siblings.splice(index, 1);
+        this._parentObject = null;
+      }
+      this._childrenObjects.length = 0;
       const theLayer = this._runtimeScene.getLayer(this.layer);
       const rendererObject = this.getRendererObject();
       if (rendererObject) {
@@ -772,6 +1102,308 @@ namespace gdjs {
       return this.networkId;
     }
 
+    private _is3DObject(): boolean {
+      return !!(
+        // @ts-ignore - Optional 3D extension
+        gdjs.Base3DHandler && gdjs.Base3DHandler.is3D(this)
+      );
+    }
+
+    private _getWorldZ(): float {
+      if (this._is3DObject()) {
+        // @ts-ignore - 3D objects expose getZ
+        return this.getZ();
+      }
+      return 0;
+    }
+
+    private _getWorldRotationX(): float {
+      if (this._is3DObject()) {
+        // @ts-ignore - 3D objects expose getRotationX
+        return this.getRotationX();
+      }
+      return 0;
+    }
+
+    private _getWorldRotationY(): float {
+      if (this._is3DObject()) {
+        // @ts-ignore - 3D objects expose getRotationY
+        return this.getRotationY();
+      }
+      return 0;
+    }
+
+    private _hasScale(): boolean {
+      const scalable = this as any;
+      return (
+        typeof scalable.getScaleX === 'function' &&
+        typeof scalable.getScaleY === 'function' &&
+        typeof scalable.setScaleX === 'function' &&
+        typeof scalable.setScaleY === 'function'
+      );
+    }
+
+    private _getActualScaleX(): float {
+      const scalable = this as any;
+      return typeof scalable.getScaleX === 'function' ? scalable.getScaleX() : 1;
+    }
+
+    private _getActualScaleY(): float {
+      const scalable = this as any;
+      return typeof scalable.getScaleY === 'function' ? scalable.getScaleY() : 1;
+    }
+
+    private _setActualScaleX(scaleX: float): void {
+      const scalable = this as any;
+      if (typeof scalable.setScaleX === 'function') {
+        scalable.setScaleX(scaleX);
+      }
+    }
+
+    private _setActualScaleY(scaleY: float): void {
+      const scalable = this as any;
+      if (typeof scalable.setScaleY === 'function') {
+        scalable.setScaleY(scaleY);
+      }
+    }
+
+    private _getWorldScaleX(): float {
+      if (!this._parentObject || !this._inheritScale) {
+        return this._localScaleX;
+      }
+      return this._parentObject._getWorldScaleX() * this._localScaleX;
+    }
+
+    private _getWorldScaleY(): float {
+      if (!this._parentObject || !this._inheritScale) {
+        return this._localScaleY;
+      }
+      return this._parentObject._getWorldScaleY() * this._localScaleY;
+    }
+
+    private _recomputeLocalFromWorld(parent: gdjs.RuntimeObject): void {
+      // Local position from world position.
+      let dx = this.getX() - parent.getX();
+      let dy = this.getY() - parent.getY();
+      let dz = this._getWorldZ() - parent._getWorldZ();
+
+      if (this._inheritRotation) {
+        if (parent._is3DObject()) {
+          const rotX = gdjs.toRad(parent._getWorldRotationX());
+          const rotY = gdjs.toRad(parent._getWorldRotationY());
+          const rotZ = gdjs.toRad(parent.getAngle());
+
+          // Inverse rotation (ZYX order): apply -Z, -Y, -X.
+          const cosZ = Math.cos(-rotZ);
+          const sinZ = Math.sin(-rotZ);
+          let x1 = dx * cosZ - dy * sinZ;
+          let y1 = dx * sinZ + dy * cosZ;
+          let z1 = dz;
+
+          const cosY = Math.cos(-rotY);
+          const sinY = Math.sin(-rotY);
+          let x2 = x1 * cosY + z1 * sinY;
+          let y2 = y1;
+          let z2 = -x1 * sinY + z1 * cosY;
+
+          const cosX = Math.cos(-rotX);
+          const sinX = Math.sin(-rotX);
+          let x3 = x2;
+          let y3 = y2 * cosX - z2 * sinX;
+          let z3 = y2 * sinX + z2 * cosX;
+
+          dx = x3;
+          dy = y3;
+          dz = z3;
+        } else {
+          const angle = gdjs.toRad(parent.getAngle());
+          const cosA = Math.cos(-angle);
+          const sinA = Math.sin(-angle);
+          const x = dx * cosA - dy * sinA;
+          const y = dx * sinA + dy * cosA;
+          dx = x;
+          dy = y;
+        }
+      }
+
+      if (this._inheritScale) {
+        const parentScaleX = parent._getWorldScaleX();
+        const parentScaleY = parent._getWorldScaleY();
+        if (parentScaleX !== 0) dx /= parentScaleX;
+        if (parentScaleY !== 0) dy /= parentScaleY;
+        if (parentScaleX !== 0) dz /= parentScaleX;
+      }
+
+      this._localX = dx;
+      this._localY = dy;
+      this._localZ = dz;
+
+      // Local rotations.
+      if (this._inheritRotation) {
+        this._localAngle = this.getAngle() - parent.getAngle();
+        this._localRotationX =
+          this._getWorldRotationX() - parent._getWorldRotationX();
+        this._localRotationY =
+          this._getWorldRotationY() - parent._getWorldRotationY();
+      } else {
+        this._localAngle = this.getAngle();
+        this._localRotationX = this._getWorldRotationX();
+        this._localRotationY = this._getWorldRotationY();
+      }
+
+      // Local scales.
+      if (this._hasScale()) {
+        const worldScaleX = this._getActualScaleX();
+        const worldScaleY = this._getActualScaleY();
+        if (this._inheritScale) {
+          const parentScaleX = parent._getWorldScaleX();
+          const parentScaleY = parent._getWorldScaleY();
+          this._localScaleX =
+            parentScaleX !== 0 ? worldScaleX / parentScaleX : worldScaleX;
+          this._localScaleY =
+            parentScaleY !== 0 ? worldScaleY / parentScaleY : worldScaleY;
+        } else {
+          this._localScaleX = worldScaleX;
+          this._localScaleY = worldScaleY;
+        }
+      }
+    }
+
+    private _applyParentTransformFromLocal(): void {
+      const parent = this._parentObject;
+      if (!parent) {
+        this._isApplyingParentTransform = true;
+        this.setX(this._localX);
+        this.setY(this._localY);
+        if (this._is3DObject()) {
+          // @ts-ignore - 3D objects expose setZ
+          this.setZ(this._localZ);
+          // @ts-ignore - 3D objects expose setRotationX/RotationY
+          this.setRotationX(this._localRotationX);
+          // @ts-ignore - 3D objects expose setRotationY
+          this.setRotationY(this._localRotationY);
+        }
+        this.setAngle(this._localAngle);
+        if (this._hasScale()) {
+          this._setActualScaleX(this._localScaleX);
+          this._setActualScaleY(this._localScaleY);
+        }
+        this._isApplyingParentTransform = false;
+        return;
+      }
+
+      let x = this._localX;
+      let y = this._localY;
+      let z = this._localZ;
+
+      if (this._inheritScale) {
+        const parentScaleX = parent._getWorldScaleX();
+        const parentScaleY = parent._getWorldScaleY();
+        x *= parentScaleX;
+        y *= parentScaleY;
+        z *= parentScaleX;
+      }
+
+      if (this._inheritRotation) {
+        if (parent._is3DObject()) {
+          const rotX = gdjs.toRad(parent._getWorldRotationX());
+          const rotY = gdjs.toRad(parent._getWorldRotationY());
+          const rotZ = gdjs.toRad(parent.getAngle());
+
+          const cosX = Math.cos(rotX);
+          const sinX = Math.sin(rotX);
+          let x1 = x;
+          let y1 = y * cosX - z * sinX;
+          let z1 = y * sinX + z * cosX;
+
+          const cosY = Math.cos(rotY);
+          const sinY = Math.sin(rotY);
+          let x2 = x1 * cosY + z1 * sinY;
+          let y2 = y1;
+          let z2 = -x1 * sinY + z1 * cosY;
+
+          const cosZ = Math.cos(rotZ);
+          const sinZ = Math.sin(rotZ);
+          let x3 = x2 * cosZ - y2 * sinZ;
+          let y3 = x2 * sinZ + y2 * cosZ;
+          let z3 = z2;
+
+          x = x3;
+          y = y3;
+          z = z3;
+        } else {
+          const angle = gdjs.toRad(parent.getAngle());
+          const cosA = Math.cos(angle);
+          const sinA = Math.sin(angle);
+          const xRot = x * cosA - y * sinA;
+          const yRot = x * sinA + y * cosA;
+          x = xRot;
+          y = yRot;
+        }
+      }
+
+      const worldX = parent.getX() + x;
+      const worldY = parent.getY() + y;
+      const worldZ = parent._getWorldZ() + z;
+
+      let worldAngle = this._localAngle;
+      let worldRotationX = this._localRotationX;
+      let worldRotationY = this._localRotationY;
+      if (this._inheritRotation) {
+        worldAngle += parent.getAngle();
+        worldRotationX += parent._getWorldRotationX();
+        worldRotationY += parent._getWorldRotationY();
+      }
+
+      this._isApplyingParentTransform = true;
+      this.setX(worldX);
+      this.setY(worldY);
+      if (this._is3DObject()) {
+        // @ts-ignore - 3D objects expose setZ
+        this.setZ(worldZ);
+        // @ts-ignore - 3D objects expose setRotationX/RotationY
+        this.setRotationX(worldRotationX);
+        // @ts-ignore - 3D objects expose setRotationY
+        this.setRotationY(worldRotationY);
+      }
+      this.setAngle(worldAngle);
+      if (this._hasScale()) {
+        let worldScaleX = this._localScaleX;
+        let worldScaleY = this._localScaleY;
+        if (this._inheritScale) {
+          worldScaleX *= parent._getWorldScaleX();
+          worldScaleY *= parent._getWorldScaleY();
+        }
+        this._setActualScaleX(worldScaleX);
+        this._setActualScaleY(worldScaleY);
+      }
+      this._isApplyingParentTransform = false;
+    }
+
+    protected _onTransformChanged(): void {
+      if (!this._isApplyingParentTransform) {
+        if (this._parentObject) {
+          this._recomputeLocalFromWorld(this._parentObject);
+        } else {
+          this._localX = this.getX();
+          this._localY = this.getY();
+          this._localZ = this._getWorldZ();
+          this._localAngle = this.getAngle();
+          this._localRotationX = this._getWorldRotationX();
+          this._localRotationY = this._getWorldRotationY();
+          if (this._hasScale()) {
+            this._localScaleX = this._getActualScaleX();
+            this._localScaleY = this._getActualScaleY();
+          }
+        }
+      }
+      if (this._childrenObjects.length > 0) {
+        for (let i = 0; i < this._childrenObjects.length; ++i) {
+          this._childrenObjects[i]._applyParentTransformFromLocal();
+        }
+      }
+    }
+
     /**
      * Set the position of the object.
      *
@@ -794,6 +1426,7 @@ namespace gdjs {
       }
       this.x = x;
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     /**
@@ -830,6 +1463,7 @@ namespace gdjs {
       }
       this.y = y;
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     /**
@@ -959,6 +1593,7 @@ namespace gdjs {
       }
       this.angle = angle;
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     /**

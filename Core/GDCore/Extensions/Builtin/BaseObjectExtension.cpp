@@ -40,6 +40,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetIcon("res/actions/direction24_black.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Size")).SetIcon(
       "res/actions/scale24_black.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Hierarchy"))
+      .SetIcon("res/actions/add24.png");
 
   extension.AddInGameEditorResource()
       .SetResourceName("InGameEditor-MoveIcon")
@@ -353,6 +355,140 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetParameterLongDescription(_("Enter 0 for an immediate rotation."))
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
+
+  obj.AddCondition("HasParent",
+                   _("Has parent"),
+                   _("Check if the object has a parent."),
+                   _("_PARAM0_ has a parent"),
+                   _("Hierarchy"),
+                   "res/actions/add24.png",
+                   "res/actions/add24.png")
+      .AddParameter("object", _("Object"))
+      .MarkAsSimple();
+
+  obj.AddAction("SetParent",
+                _("Set parent"),
+                _("Make an object a child of another object."),
+                _("Set parent of _PARAM0_ to _PARAM1_ (keep world: _PARAM2_)"),
+                _("Hierarchy"),
+                "res/actions/add24.png",
+                "res/actions/add24.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectPtr", _("Parent object"))
+      .AddParameter("yesorno", _("Keep world position"), "", true)
+      .SetDefaultValue("yes")
+      .MarkAsSimple();
+
+  obj.AddAction("RemoveParent",
+                _("Remove parent"),
+                _("Detach an object from its parent."),
+                _("Detach _PARAM0_ from its parent (keep world: _PARAM1_)"),
+                _("Hierarchy"),
+                "res/actions/add24.png",
+                "res/actions/add24.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("yesorno", _("Keep world position"), "", true)
+      .SetDefaultValue("yes")
+      .MarkAsSimple();
+
+  obj.AddExpressionAndCondition(
+         "number",
+         "ChildrenCount",
+         _("Children count"),
+         _("the number of children of the object"),
+         _("the number of children"),
+         _("Hierarchy"),
+         "res/actions/add24.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
+
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "LocalX",
+         _("Local X position"),
+         _("the local X position relative to the parent"),
+         _("the local X position"),
+         _("Hierarchy"),
+         "res/actions/position24_black.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
+
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "LocalY",
+         _("Local Y position"),
+         _("the local Y position relative to the parent"),
+         _("the local Y position"),
+         _("Hierarchy"),
+         "res/actions/position24_black.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
+
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "LocalZ",
+         _("Local Z position"),
+         _("the local Z position relative to the parent"),
+         _("the local Z position"),
+         _("Hierarchy"),
+         "res/actions/position24_black.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
+
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "LocalAngle",
+         _("Local rotation (Z)"),
+         _("the local rotation around Z axis relative to the parent"),
+         _("the local rotation (Z)"),
+         _("Hierarchy"),
+         "res/actions/direction24_black.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
+
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "LocalRotationX",
+         _("Local rotation (X)"),
+         _("the local rotation around X axis relative to the parent"),
+         _("the local rotation (X)"),
+         _("Hierarchy"),
+         "res/actions/direction24_black.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
+
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "LocalRotationY",
+         _("Local rotation (Y)"),
+         _("the local rotation around Y axis relative to the parent"),
+         _("the local rotation (Y)"),
+         _("Hierarchy"),
+         "res/actions/direction24_black.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
+
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "LocalScaleX",
+         _("Local scale X"),
+         _("the local scale on X axis relative to the parent"),
+         _("the local scale X"),
+         _("Hierarchy"),
+         "res/actions/scale24_black.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
+
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "LocalScaleY",
+         _("Local scale Y"),
+         _("the local scale on Y axis relative to the parent"),
+         _("the local scale Y"),
+         _("Hierarchy"),
+         "res/actions/scale24_black.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
 
   obj.AddAction(
          "AddForceXY",
@@ -1777,6 +1913,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddAction(
+          "PickChildren",
+          _("Pick children"),
+          _("Pick the children of the specified parent object."),
+          _("Pick children of _PARAM1_ from _PARAM0_"),
+          _("Hierarchy"),
+          "res/actions/add24.png",
+          "res/actions/add.png")
+      .AddParameter("objectList", _("Pick these objects..."))
+      .AddParameter("objectPtr", _("...if they are children of this object"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction(
           "MoveObjects",
           _("Apply movement to all objects"),
           _("Moves all objects according to the forces they have. GDevelop "
@@ -1824,6 +1973,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectList", _("Object"))
       .AddParameter("objectList", _("Object 2"))
       .AddParameter("expression", _("Distance"))
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .MarkAsSimple();
+
+  extension
+      .AddCondition("IsParentOf",
+                    _("Is parent of"),
+                    _("Check if an object is parent of another."),
+                    _("_PARAM0_ is parent of _PARAM1_"),
+                    _("Hierarchy"),
+                    "res/actions/add24.png",
+                    "res/actions/add24.png")
+      .AddParameter("objectList", _("Parent object"))
+      .AddParameter("objectList", _("Child object"))
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsSimple();
 
@@ -1883,6 +2045,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Y position"))
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsSimple();
+
+  extension
+      .AddCondition(
+          "PickChildren",
+          _("Pick children"),
+          _("Pick the children of the specified parent object."),
+          _("Pick children of _PARAM1_ from _PARAM0_"),
+          _("Hierarchy"),
+          "res/actions/add24.png",
+          "res/actions/add.png")
+      .AddParameter("objectList", _("Pick these objects..."))
+      .AddParameter("objectPtr", _("...if they are children of this object"))
+      .MarkAsAdvanced();
 
   extension
       .AddCondition(
@@ -2058,6 +2233,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                      "res/conditions/nbObjet.png")
       .AddParameter("objectList", _("Object"))
       .SetHidden();  // Deprecated
+
+  obj.AddStrExpression("ParentName",
+                       _("Parent name"),
+                       _("Return the name of the parent object (if any)"),
+                       _("Hierarchy"),
+                       "res/conditions/text_black.png")
+      .AddParameter("object", _("Object"));
 
   obj.AddStrExpression("ObjectName",
                        _("Object name"),

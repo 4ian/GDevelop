@@ -184,6 +184,7 @@ namespace gdjs {
       if (z === this._z) return;
       this._z = z;
       this.getRenderer().updatePosition();
+      this._onTransformChanged();
     }
 
     /**
@@ -256,6 +257,7 @@ namespace gdjs {
     setRotationX(angle: float): void {
       this._rotationX = angle;
       this.getRenderer().updateRotation();
+      this._onTransformChanged();
     }
 
     /**
@@ -266,6 +268,7 @@ namespace gdjs {
     setRotationY(angle: float): void {
       this._rotationY = angle;
       this.getRenderer().updateRotation();
+      this._onTransformChanged();
     }
 
     /**
@@ -452,6 +455,7 @@ namespace gdjs {
         newScale = 0;
       }
       this.setWidth(this._originalWidth * newScale);
+      this._onTransformChanged();
     }
 
     /**
@@ -464,6 +468,7 @@ namespace gdjs {
         newScale = 0;
       }
       this.setHeight(this._originalHeight * newScale);
+      this._onTransformChanged();
     }
 
     /**
@@ -476,6 +481,7 @@ namespace gdjs {
         newScale = 0;
       }
       this.setDepth(this._originalDepth * newScale);
+      this._onTransformChanged();
     }
 
     /**

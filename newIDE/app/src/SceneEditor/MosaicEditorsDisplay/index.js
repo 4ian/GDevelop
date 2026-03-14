@@ -323,6 +323,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 projectScopedContainersAccessor={
                   projectScopedContainersAccessor
                 }
+                initialInstances={initialInstances}
                 instances={selectedInstances}
                 objects={selectedObjects}
                 layer={selectedLayer}

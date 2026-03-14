@@ -218,6 +218,35 @@ namespace gdjs {
         arr.length = finalSize;
       };
 
+      /**
+       * Keep only the children of the given parent object in the lists.
+       *
+       * @param objectsLists The lists of objects to trim
+       * @param parentObject The parent object whose children are picked
+       */
+      export const pickChildren = function (
+        objectsLists: ObjectsLists,
+        parentObject: gdjs.RuntimeObject | null
+      ): boolean {
+        let pickedSomething = false;
+        const lists = gdjs.staticArray(gdjs.evtTools.object.pickChildren);
+        objectsLists.values(lists);
+        for (let i = 0, leni = lists.length; i < leni; ++i) {
+          const arr = lists[i];
+          let finalSize = 0;
+          for (let k = 0, lenk = arr.length; k < lenk; ++k) {
+            const obj = arr[k];
+            if (parentObject && obj.getParentObject() === parentObject) {
+              arr[finalSize] = obj;
+              finalSize++;
+              pickedSomething = true;
+            }
+          }
+          arr.length = finalSize;
+        }
+        return pickedSomething;
+      };
+
       export const hitBoxesCollisionTest = function (
         objectsLists1: ObjectsLists,
         objectsLists2: ObjectsLists,
@@ -238,6 +267,13 @@ namespace gdjs {
         return obj1.getSqDistanceToObject(obj2) <= distance;
       };
 
+      export const _isParentOf = function (
+        obj1: gdjs.RuntimeObject,
+        obj2: gdjs.RuntimeObject
+      ) {
+        return obj2.getParentObject() === obj1;
+      };
+
       export const distanceTest = function (
         objectsLists1: ObjectsLists,
         objectsLists2: ObjectsLists,
@@ -250,6 +286,20 @@ namespace gdjs {
           objectsLists2,
           inverted,
           distance * distance
+        );
+      };
+
+      export const isParentOf = function (
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        inverted: boolean
+      ) {
+        return gdjs.evtTools.object.twoListsTest(
+          gdjs.evtTools.object._isParentOf,
+          objectsLists1,
+          objectsLists2,
+          inverted,
+          null
         );
       };
 

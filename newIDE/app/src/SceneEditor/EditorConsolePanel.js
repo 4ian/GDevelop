@@ -231,7 +231,7 @@ const EditorConsolePanel = (): React.Node => {
                     renderIcon: className => (
                       <InfoIcon className={className} />
                     ),
-                    tooltip: t`Show info`,
+                    tooltip: <Trans>Show info</Trans>,
                     onClick: () => setShowInfo(!showInfo),
                     isActive: showInfo,
                   },
@@ -240,7 +240,7 @@ const EditorConsolePanel = (): React.Node => {
                     renderIcon: className => (
                       <WarningIcon className={className} />
                     ),
-                    tooltip: t`Show warnings`,
+                    tooltip: <Trans>Show warnings</Trans>,
                     onClick: () => setShowWarning(!showWarning),
                     isActive: showWarning,
                   },
@@ -249,7 +249,7 @@ const EditorConsolePanel = (): React.Node => {
                     renderIcon: className => (
                       <ErrorIcon className={className} />
                     ),
-                    tooltip: t`Show errors`,
+                    tooltip: <Trans>Show errors</Trans>,
                     onClick: () => setShowError(!showError),
                     isActive: showError,
                   },

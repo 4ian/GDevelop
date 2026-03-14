@@ -267,6 +267,120 @@ class GD_CORE_API InitialInstance {
    */
   void SetShouldKeepRatio(bool enable = true) { keepRatio = enable; }
 
+  /**
+   * \brief Get the parent persistent UUID of the instance.
+   */
+  const gd::String& GetParentPersistentUuid() const {
+    return parentPersistentUuid;
+  }
+
+  /**
+   * \brief Set the parent persistent UUID of the instance.
+   */
+  void SetParentPersistentUuid(const gd::String& uuid) {
+    parentPersistentUuid = uuid;
+  }
+
+  /**
+   * \brief Get the local X position of the instance.
+   */
+  double GetLocalX() const { return localX; }
+
+  /**
+   * \brief Set the local X position of the instance.
+   */
+  void SetLocalX(double x_) { localX = x_; }
+
+  /**
+   * \brief Get the local Y position of the instance.
+   */
+  double GetLocalY() const { return localY; }
+
+  /**
+   * \brief Set the local Y position of the instance.
+   */
+  void SetLocalY(double y_) { localY = y_; }
+
+  /**
+   * \brief Get the local Z position of the instance.
+   */
+  double GetLocalZ() const { return localZ; }
+
+  /**
+   * \brief Set the local Z position of the instance.
+   */
+  void SetLocalZ(double z_) { localZ = z_; }
+
+  /**
+   * \brief Get the local rotation on Z axis, in radians.
+   */
+  double GetLocalAngle() const { return localAngle; }
+
+  /**
+   * \brief Set the local rotation on Z axis, in radians.
+   */
+  void SetLocalAngle(double angle_) { localAngle = angle_; }
+
+  /**
+   * \brief Get the local rotation on X axis, in radians.
+   */
+  double GetLocalRotationX() const { return localRotationX; }
+
+  /**
+   * \brief Set the local rotation on X axis, in radians.
+   */
+  void SetLocalRotationX(double rotationX_) { localRotationX = rotationX_; }
+
+  /**
+   * \brief Get the local rotation on Y axis, in radians.
+   */
+  double GetLocalRotationY() const { return localRotationY; }
+
+  /**
+   * \brief Set the local rotation on Y axis, in radians.
+   */
+  void SetLocalRotationY(double rotationY_) { localRotationY = rotationY_; }
+
+  /**
+   * \brief Get the local scale on X axis.
+   */
+  double GetLocalScaleX() const { return localScaleX; }
+
+  /**
+   * \brief Set the local scale on X axis.
+   */
+  void SetLocalScaleX(double scaleX_) { localScaleX = scaleX_; }
+
+  /**
+   * \brief Get the local scale on Y axis.
+   */
+  double GetLocalScaleY() const { return localScaleY; }
+
+  /**
+   * \brief Set the local scale on Y axis.
+   */
+  void SetLocalScaleY(double scaleY_) { localScaleY = scaleY_; }
+
+  /**
+   * \brief Return true if the instance should inherit rotation from its parent.
+   */
+  bool InheritRotation() const { return inheritRotation; }
+
+  /**
+   * \brief Define if the instance should inherit rotation from its parent.
+   */
+  void SetInheritRotation(bool enable = true) { inheritRotation = enable; }
+
+  /**
+   * \brief Return true if the instance should inherit scale from its parent.
+   */
+  bool InheritScale() const { return inheritScale; }
+
+  /**
+   * \brief Define if the instance should inherit scale from its parent.
+   */
+  void SetInheritScale(bool enable = true) { inheritScale = enable; }
+
   ///@}
 
   /** \name Variable management
@@ -485,6 +599,17 @@ class GD_CORE_API InitialInstance {
                            ///  should keep the same ratio.
   mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
                                       ///  useful for hot reloading.
+  gd::String parentPersistentUuid;  ///< Persistent UUID of the parent instance
+  double localX = 0;                ///< Local X position relative to parent
+  double localY = 0;                ///< Local Y position relative to parent
+  double localZ = 0;                ///< Local Z position relative to parent
+  double localAngle = 0;            ///< Local rotation on Z axis
+  double localRotationX = 0;        ///< Local rotation on X axis
+  double localRotationY = 0;        ///< Local rotation on Y axis
+  double localScaleX = 1;           ///< Local scale on X axis
+  double localScaleY = 1;           ///< Local scale on Y axis
+  bool inheritRotation = true;      ///< True if rotation inherits from parent
+  bool inheritScale = true;         ///< True if scale inherits from parent
 
   static gd::String* badStringPropertyValue;  ///< Empty string returned by
                                               ///< GetRawStringProperty

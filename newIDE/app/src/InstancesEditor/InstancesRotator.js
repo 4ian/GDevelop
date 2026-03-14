@@ -1,9 +1,17 @@
 // @flow
 import Rectangle from '../Utils/Rectangle';
 import { type InstanceMeasurer } from './InstancesRenderer';
+import {
+  buildInstancesIndex,
+  syncLocalFromWorld,
+  applyParentTransformToDescendants,
+  type InstancesIndex,
+} from './ParentingHelpers';
 
 export default class InstancesRotator {
   _instanceMeasurer: InstanceMeasurer;
+  _initialInstances: gdInitialInstancesContainer;
+  _instancesIndex: ?InstancesIndex = null;
 
   // Initial state of the instances
   // from which the rotation is calculated.
@@ -25,8 +33,12 @@ export default class InstancesRotator {
    */
   _fixedPoint: [number, number] = [0, 0];
 
-  constructor(instanceMeasurer: InstanceMeasurer) {
+  constructor(
+    instanceMeasurer: InstanceMeasurer,
+    initialInstances: gdInitialInstancesContainer
+  ) {
     this._instanceMeasurer = instanceMeasurer;
+    this._initialInstances = initialInstances;
   }
 
   _getNewAngle(proportional: boolean, initialAngle: number): any {
@@ -74,6 +86,10 @@ export default class InstancesRotator {
     deltaY: number,
     proportional: boolean
   ) {
+    if (!this._instancesIndex) {
+      this._instancesIndex = buildInstancesIndex(this._initialInstances);
+    }
+    const instancesIndex = this._instancesIndex;
     const nonLockedInstances = instances.filter(
       instance => !instance.isLocked()
     );
@@ -136,7 +152,12 @@ export default class InstancesRotator {
       );
       selectedInstance.setX(newX);
       selectedInstance.setY(newY);
+      syncLocalFromWorld(selectedInstance, instancesIndex);
     }
+
+    nonLockedInstances.forEach(instance => {
+      applyParentTransformToDescendants(instance, instancesIndex);
+    });
   }
 
   endRotate() {
@@ -146,5 +167,6 @@ export default class InstancesRotator {
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
     this._fixedPointIsUpToDate = false;
+    this._instancesIndex = null;
   }
 }

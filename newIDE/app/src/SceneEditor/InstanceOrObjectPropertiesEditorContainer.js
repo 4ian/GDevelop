@@ -63,6 +63,7 @@ type Props = {|
 
   // For instances:
   instances: Array<gdInitialInstance>,
+  initialInstances: gdInitialInstancesContainer,
   editObjectInPropertiesPanel: (objectName: string) => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
   onGetInstanceSize: gdInitialInstance => [number, number, number],
@@ -131,6 +132,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
 
       // For instances:
       instances,
+      initialInstances,
       editObjectInPropertiesPanel,
       onInstancesModified,
       onGetInstanceSize,
@@ -163,6 +165,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
         {!!instances.length && lastSelectionType === 'instance' ? (
           <CompactInstancePropertiesEditor
             instances={instances}
+            initialInstancesContainer={initialInstances}
             editObjectInPropertiesPanel={editObjectInPropertiesPanel}
             onInstancesModified={onInstancesModified}
             onGetInstanceSize={onGetInstanceSize}

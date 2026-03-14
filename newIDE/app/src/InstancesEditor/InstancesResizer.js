@@ -3,6 +3,12 @@ import Rectangle from '../Utils/Rectangle';
 import { roundPositionForResizing } from '../Utils/GridHelpers';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
 import { type InstanceMeasurer } from './InstancesRenderer';
+import {
+  buildInstancesIndex,
+  syncLocalFromWorld,
+  applyParentTransformToDescendants,
+  type InstancesIndex,
+} from './ParentingHelpers';
 
 export type ResizeGrabbingLocation =
   | 'TopLeft'
@@ -52,6 +58,8 @@ const areAnyInstancesNotStraight = (instances: gdInitialInstance[]) => {
 export default class InstancesResizer {
   instanceMeasurer: InstanceMeasurer;
   instancesEditorSettings: InstancesEditorSettings;
+  initialInstances: gdInitialInstancesContainer;
+  _instancesIndex: ?InstancesIndex = null;
 
   // The initial state of instances before a resize:
   _initialSelectionAABB: ?Rectangle = null;
@@ -71,12 +79,15 @@ export default class InstancesResizer {
   constructor({
     instanceMeasurer,
     instancesEditorSettings,
+    initialInstances,
   }: {
     instanceMeasurer: InstanceMeasurer,
     instancesEditorSettings: InstancesEditorSettings,
+    initialInstances: gdInitialInstancesContainer,
   }) {
     this.instanceMeasurer = instanceMeasurer;
     this.instancesEditorSettings = instancesEditorSettings;
+    this.initialInstances = initialInstances;
   }
 
   setInstancesEditorSettings(instancesEditorSettings: InstancesEditorSettings) {
@@ -144,6 +155,10 @@ export default class InstancesResizer {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 
+    if (!this._instancesIndex) {
+      this._instancesIndex = buildInstancesIndex(this.initialInstances);
+    }
+    const instancesIndex = this._instancesIndex;
     const nonLockedInstances = instances.filter(
       instance => !instance.isLocked()
     );
@@ -367,7 +382,12 @@ export default class InstancesResizer {
       selectedInstance.setCustomWidth(Math.round(newWidth));
       selectedInstance.setCustomHeight(Math.round(newHeight));
       selectedInstance.setCustomDepth(Math.round(newDepth));
+      syncLocalFromWorld(selectedInstance, instancesIndex);
     }
+
+    nonLockedInstances.forEach(instance => {
+      applyParentTransformToDescendants(instance, instancesIndex);
+    });
   }
 
   endResize() {
@@ -377,6 +397,7 @@ export default class InstancesResizer {
     this._instancePositions = {};
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
+    this._instancesIndex = null;
   }
 }
 

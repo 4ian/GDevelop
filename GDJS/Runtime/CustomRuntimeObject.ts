@@ -825,6 +825,7 @@ namespace gdjs {
       this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
       this.getRenderer().updateX();
+      this._onTransformChanged();
     }
 
     override setY(y: float): void {
@@ -835,6 +836,7 @@ namespace gdjs {
       this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
       this.getRenderer().updateY();
+      this._onTransformChanged();
     }
 
     override setAngle(angle: float): void {
@@ -845,6 +847,7 @@ namespace gdjs {
       this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
       this.getRenderer().updateAngle();
+      this._onTransformChanged();
     }
 
     /**
@@ -871,6 +874,7 @@ namespace gdjs {
       this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
       this.getRenderer().update();
+      this._onTransformChanged();
     }
 
     /**
@@ -893,6 +897,7 @@ namespace gdjs {
       this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
       this.getRenderer().update();
+      this._onTransformChanged();
     }
 
     /**
@@ -914,6 +919,7 @@ namespace gdjs {
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this.invalidateHitboxes();
       this.getRenderer().update();
+      this._onTransformChanged();
     }
 
     /**

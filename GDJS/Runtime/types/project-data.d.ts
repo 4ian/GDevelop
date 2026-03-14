@@ -426,6 +426,17 @@ declare interface InstanceData extends InstancePersistentUuidData {
   locked?: boolean;
   sealed?: boolean;
   name: string;
+  parentPersistentUuid?: string;
+  localX?: number;
+  localY?: number;
+  localZ?: number;
+  localAngle?: number;
+  localRotationX?: number;
+  localRotationY?: number;
+  localScaleX?: number;
+  localScaleY?: number;
+  inheritRotation?: boolean;
+  inheritScale?: boolean;
 
   x: number;
   y: number;

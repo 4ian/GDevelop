@@ -110,6 +110,7 @@ type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
   layout?: ?gdLayout,
+  initialInstancesContainer: ?gdInitialInstancesContainer,
   objectsContainer: gdObjectsContainer,
   globalObjectsContainer: gdObjectsContainer | null,
   layersContainer: gdLayersContainer,
@@ -133,6 +134,7 @@ export const CompactInstancePropertiesEditor = ({
   project,
   resourceManagementProps,
   layout,
+  initialInstancesContainer,
   objectsContainer,
   globalObjectsContainer,
   layersContainer,
@@ -283,6 +285,9 @@ export const CompactInstancePropertiesEditor = ({
         onEditObject: editObjectInPropertiesPanel,
         layersContainer,
         forceUpdate,
+        onInstancesModified,
+        initialInstancesContainer,
+        selectedInstances: instances,
       }).concat(reorderedInstanceSchemaForCustomProperties);
       return {
         object,
@@ -300,6 +305,8 @@ export const CompactInstancePropertiesEditor = ({
       layersContainer,
       onGetInstanceSize,
       editObjectInPropertiesPanel,
+      initialInstancesContainer,
+      instances,
     ]
   );
 

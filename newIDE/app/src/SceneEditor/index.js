@@ -98,6 +98,11 @@ import {
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import CommandsContext from '../CommandPalette/CommandsContext';
 import Rectangle from '../Utils/Rectangle';
+import {
+  buildInstancesIndex,
+  collectDescendants,
+  syncLocalFromWorld,
+} from '../InstancesEditor/ParentingHelpers';
 
 const gd: libGDevelop = global.gd;
 
@@ -516,6 +521,10 @@ export default class SceneEditor extends React.Component<Props, State> {
       modifiedInstances.push(instance);
     });
     if (modifiedInstances.length > 0) {
+      const instancesIndex = buildInstancesIndex(this.props.initialInstances);
+      modifiedInstances.forEach(instance => {
+        syncLocalFromWorld(instance, instancesIndex);
+      });
       this._onInstancesMoved(modifiedInstances);
     }
 
@@ -2076,8 +2085,19 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
+    const instancesIndex = buildInstancesIndex(this.props.initialInstances);
+    const instancesToDeleteByUuid: Map<string, gdInitialInstance> = new Map();
+
     selectedInstances.forEach(instance => {
       if (instance.isLocked()) return;
+      instancesToDeleteByUuid.set(instance.getPersistentUuid(), instance);
+      const descendants = collectDescendants(instance, instancesIndex);
+      descendants.forEach(child => {
+        instancesToDeleteByUuid.set(child.getPersistentUuid(), child);
+      });
+    });
+
+    instancesToDeleteByUuid.forEach(instance => {
       this.props.initialInstances.removeInstance(instance);
     });
 

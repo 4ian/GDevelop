@@ -2,11 +2,18 @@
 import { roundPositionsToGrid } from '../Utils/GridHelpers';
 import Rectangle from '../Utils/Rectangle';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
+import {
+  buildInstancesIndex,
+  syncLocalFromWorld,
+  applyParentTransformToDescendants,
+  type InstancesIndex,
+} from './ParentingHelpers';
 import { type InstanceMeasurer } from './InstancesRenderer';
 
 export default class InstancesMover {
   instanceMeasurer: InstanceMeasurer;
   instancesEditorSettings: InstancesEditorSettings;
+  initialInstances: gdInitialInstancesContainer;
   instancePositions: { [number]: { x: number, y: number } };
   totalDeltaX: number;
   totalDeltaY: number;
@@ -14,16 +21,20 @@ export default class InstancesMover {
   _initialSelectionAABB: ?Rectangle = null;
   _startX: number = 0;
   _startY: number = 0;
+  _instancesIndex: ?InstancesIndex = null;
 
   constructor({
     instanceMeasurer,
     instancesEditorSettings,
+    initialInstances,
   }: {
     instanceMeasurer: InstanceMeasurer,
     instancesEditorSettings: InstancesEditorSettings,
+    initialInstances: gdInitialInstancesContainer,
   }) {
     this.instanceMeasurer = instanceMeasurer;
     this.instancesEditorSettings = instancesEditorSettings;
+    this.initialInstances = initialInstances;
     this.instancePositions = {};
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
@@ -73,6 +84,7 @@ export default class InstancesMover {
   startMove(startX: number, startY: number) {
     this._startX = startX;
     this._startY = startY;
+    this._instancesIndex = buildInstancesIndex(this.initialInstances);
   }
 
   moveBy(
@@ -85,6 +97,10 @@ export default class InstancesMover {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 
+    if (!this._instancesIndex) {
+      this._instancesIndex = buildInstancesIndex(this.initialInstances);
+    }
+    const instancesIndex = this._instancesIndex;
     const nonLockedInstances = instances.filter(
       instance => !instance.isLocked()
     );
@@ -145,7 +161,12 @@ export default class InstancesMover {
       );
       selectedInstance.setX(newX);
       selectedInstance.setY(newY);
+      syncLocalFromWorld(selectedInstance, instancesIndex);
     }
+
+    nonLockedInstances.forEach(instance => {
+      applyParentTransformToDescendants(instance, instancesIndex);
+    });
   }
 
   endMove() {
@@ -153,6 +174,7 @@ export default class InstancesMover {
     this.instancePositions = {};
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
+    this._instancesIndex = null;
   }
 
   snapSelection(instances: gdInitialInstance[]): void {

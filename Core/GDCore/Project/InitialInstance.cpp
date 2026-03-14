@@ -68,6 +68,45 @@ void InitialInstance::UnserializeFrom(gd::Project &project,
   SetLocked(element.GetBoolAttribute("locked", false));
   SetSealed(element.GetBoolAttribute("sealed", false));
   SetShouldKeepRatio(element.GetBoolAttribute("keepRatio", false));
+  SetParentPersistentUuid(
+      element.GetStringAttribute("parentPersistentUuid", ""));
+  SetInheritRotation(element.GetBoolAttribute("inheritRotation", true));
+  SetInheritScale(element.GetBoolAttribute("inheritScale", true));
+
+  const bool hasLocalX =
+      element.HasChild("localX") || element.HasAttribute("localX");
+  const bool hasLocalY =
+      element.HasChild("localY") || element.HasAttribute("localY");
+  const bool hasLocalZ =
+      element.HasChild("localZ") || element.HasAttribute("localZ");
+  const bool hasLocalAngle =
+      element.HasChild("localAngle") || element.HasAttribute("localAngle");
+  const bool hasLocalRotationX =
+      element.HasChild("localRotationX") ||
+      element.HasAttribute("localRotationX");
+  const bool hasLocalRotationY =
+      element.HasChild("localRotationY") ||
+      element.HasAttribute("localRotationY");
+  const bool hasLocalScaleX =
+      element.HasChild("localScaleX") || element.HasAttribute("localScaleX");
+  const bool hasLocalScaleY =
+      element.HasChild("localScaleY") || element.HasAttribute("localScaleY");
+
+  SetLocalX(hasLocalX ? element.GetDoubleAttribute("localX") : GetX());
+  SetLocalY(hasLocalY ? element.GetDoubleAttribute("localY") : GetY());
+  SetLocalZ(hasLocalZ ? element.GetDoubleAttribute("localZ") : GetZ());
+  SetLocalAngle(
+      hasLocalAngle ? element.GetDoubleAttribute("localAngle") : GetAngle());
+  SetLocalRotationX(hasLocalRotationX
+                        ? element.GetDoubleAttribute("localRotationX")
+                        : GetRotationX());
+  SetLocalRotationY(hasLocalRotationY
+                        ? element.GetDoubleAttribute("localRotationY")
+                        : GetRotationY());
+  SetLocalScaleX(
+      hasLocalScaleX ? element.GetDoubleAttribute("localScaleX") : 1);
+  SetLocalScaleY(
+      hasLocalScaleY ? element.GetDoubleAttribute("localScaleY") : 1);
 
   persistentUuid = element.GetStringAttribute("persistentUuid");
   if (persistentUuid.empty()) ResetPersistentUuid();
@@ -148,6 +187,21 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   if (IsLocked()) element.SetAttribute("locked", IsLocked());
   if (IsSealed()) element.SetAttribute("sealed", IsSealed());
   if (ShouldKeepRatio()) element.SetAttribute("keepRatio", ShouldKeepRatio());
+  if (!GetParentPersistentUuid().empty()) {
+    element.SetStringAttribute("parentPersistentUuid",
+                               GetParentPersistentUuid());
+    element.SetAttribute("localX", GetLocalX());
+    element.SetAttribute("localY", GetLocalY());
+    element.SetAttribute("localZ", GetLocalZ());
+    element.SetAttribute("localAngle", GetLocalAngle());
+    element.SetAttribute("localRotationX", GetLocalRotationX());
+    element.SetAttribute("localRotationY", GetLocalRotationY());
+    element.SetAttribute("localScaleX", GetLocalScaleX());
+    element.SetAttribute("localScaleY", GetLocalScaleY());
+    if (!InheritRotation())
+      element.SetAttribute("inheritRotation", InheritRotation());
+    if (!InheritScale()) element.SetAttribute("inheritScale", InheritScale());
+  }
 
   if (persistentUuid.empty()) persistentUuid = UUID::MakeUuid4();
   element.SetStringAttribute("persistentUuid", persistentUuid);

@@ -149,6 +149,38 @@ BaseObjectExtension::BaseObjectExtension() {
       "setEffectBooleanParameter");
   objectActions["SetIncludedInParentCollisionMask"].SetFunctionName(
       "setIncludedInParentCollisionMask");
+  objectActions["SetParent"].SetFunctionName("setParent");
+  objectActions["RemoveParent"].SetFunctionName("removeParent");
+
+  objectConditions["HasParent"].SetFunctionName("hasParent");
+  objectConditions["ChildrenCount"].SetFunctionName("getChildrenCount");
+  objectConditions["LocalX"].SetFunctionName("getLocalX");
+  objectConditions["LocalY"].SetFunctionName("getLocalY");
+  objectConditions["LocalZ"].SetFunctionName("getLocalZ");
+  objectConditions["LocalAngle"].SetFunctionName("getLocalAngle");
+  objectConditions["LocalRotationX"].SetFunctionName("getLocalRotationX");
+  objectConditions["LocalRotationY"].SetFunctionName("getLocalRotationY");
+  objectConditions["LocalScaleX"].SetFunctionName("getLocalScaleX");
+  objectConditions["LocalScaleY"].SetFunctionName("getLocalScaleY");
+
+  objectActions["SetLocalX"].SetFunctionName("setLocalX").SetGetter("getLocalX");
+  objectActions["SetLocalY"].SetFunctionName("setLocalY").SetGetter("getLocalY");
+  objectActions["SetLocalZ"].SetFunctionName("setLocalZ").SetGetter("getLocalZ");
+  objectActions["SetLocalAngle"]
+      .SetFunctionName("setLocalAngle")
+      .SetGetter("getLocalAngle");
+  objectActions["SetLocalRotationX"]
+      .SetFunctionName("setLocalRotationX")
+      .SetGetter("getLocalRotationX");
+  objectActions["SetLocalRotationY"]
+      .SetFunctionName("setLocalRotationY")
+      .SetGetter("getLocalRotationY");
+  objectActions["SetLocalScaleX"]
+      .SetFunctionName("setLocalScaleX")
+      .SetGetter("getLocalScaleX");
+  objectActions["SetLocalScaleY"]
+      .SetFunctionName("setLocalScaleY")
+      .SetGetter("getLocalScaleY");
 
   objectExpressions["X"].SetFunctionName("getX");
   objectExpressions["Y"].SetFunctionName("getY");
@@ -209,11 +241,22 @@ BaseObjectExtension::BaseObjectExtension() {
   objectExpressions["ObjectTimerElapsedTime"].SetFunctionName(
       "getTimerElapsedTimeInSeconds");
   objectStrExpressions["ObjectName"].SetFunctionName("getName");
+  objectStrExpressions["ParentName"].SetFunctionName("getParentObjectName");
   objectStrExpressions["Layer"].SetFunctionName("getLayer");
   objectExpressions["XFromAngleAndDistance"].SetFunctionName(
       "getXFromAngleAndDistance");
   objectExpressions["YFromAngleAndDistance"].SetFunctionName(
       "getYFromAngleAndDistance");
+
+  objectExpressions["ChildrenCount"].SetFunctionName("getChildrenCount");
+  objectExpressions["LocalX"].SetFunctionName("getLocalX");
+  objectExpressions["LocalY"].SetFunctionName("getLocalY");
+  objectExpressions["LocalZ"].SetFunctionName("getLocalZ");
+  objectExpressions["LocalAngle"].SetFunctionName("getLocalAngle");
+  objectExpressions["LocalRotationX"].SetFunctionName("getLocalRotationX");
+  objectExpressions["LocalRotationY"].SetFunctionName("getLocalRotationY");
+  objectExpressions["LocalScaleX"].SetFunctionName("getLocalScaleX");
+  objectExpressions["LocalScaleY"].SetFunctionName("getLocalScaleY");
 
   GetAllActions()["Create"].SetFunctionName(
       "gdjs.evtTools.object.createObjectOnScene");
@@ -243,6 +286,8 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.raycastObjectToPosition");
   GetAllConditions()["Distance"].SetFunctionName(
       "gdjs.evtTools.object.distanceTest");
+  GetAllConditions()["IsParentOf"].SetFunctionName(
+      "gdjs.evtTools.object.isParentOf");
   GetAllConditions()["IsTotalForceAngleTowardObject"].SetFunctionName(
       "gdjs.evtTools.object.movesTowardTest");
   // Compatibility with GD <= 5.6.251
@@ -282,6 +327,10 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.pickNearestObject");
   GetAllConditions()["PickNearest"].SetFunctionName(
       "gdjs.evtTools.object.pickNearestObject");
+  GetAllActions()["PickChildren"].SetFunctionName(
+      "gdjs.evtTools.object.pickChildren");
+  GetAllConditions()["PickChildren"].SetFunctionName(
+      "gdjs.evtTools.object.pickChildren");
 
   objectActions["SetNumberObjectVariable"]
       .SetFunctionName("returnVariable")

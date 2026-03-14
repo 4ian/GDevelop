@@ -350,6 +350,12 @@ namespace gdjs {
         shouldTrackByPersistentUuid = arguments[3];
       }
 
+      const objectsToParent: Array<{
+        object: gdjs.RuntimeObject,
+        instanceData: InstanceData,
+      }> = [];
+      const objectsByPersistentUuid: Record<string, gdjs.RuntimeObject> = {};
+
       for (let i = 0, len = data.length; i < len; ++i) {
         const instanceData = data[i];
         const objectName = instanceData.name;
@@ -359,11 +365,21 @@ namespace gdjs {
 
         const newObject = this.createObject(objectName, instanceData);
         if (newObject !== null) {
+          if (instanceData.persistentUuid) {
+            objectsByPersistentUuid[instanceData.persistentUuid] = newObject;
+          }
           if (shouldTrackByPersistentUuid) {
             // Give the object the same persistentUuid as the instance, so that
             // it can be hot-reloaded.
             newObject.persistentUuid = instanceData.persistentUuid || null;
           }
+          if (instanceData.inheritRotation !== undefined) {
+            newObject.setInheritRotation(instanceData.inheritRotation);
+          }
+          if (instanceData.inheritScale !== undefined) {
+            newObject.setInheritScale(instanceData.inheritScale);
+          }
+
           newObject.setPosition(instanceData.x + xPos, instanceData.y + yPos);
           newObject.setAngle(instanceData.angle);
           if (gdjs.Base3DHandler && gdjs.Base3DHandler.is3D(newObject)) {
@@ -380,6 +396,53 @@ namespace gdjs {
             .getVariables()
             .initFrom(instanceData.initialVariables, true);
           newObject.extraInitializationFromInitialInstance(instanceData);
+
+          if (instanceData.parentPersistentUuid) {
+            objectsToParent.push({ object: newObject, instanceData });
+          }
+        }
+      }
+
+      for (let i = 0; i < objectsToParent.length; ++i) {
+        const { object, instanceData } = objectsToParent[i];
+        const parentUuid = instanceData.parentPersistentUuid;
+        if (!parentUuid) continue;
+        const parentObject = objectsByPersistentUuid[parentUuid];
+        if (!parentObject) continue;
+
+        object.setParent(parentObject, { keepWorld: true });
+
+        if (
+          instanceData.localX !== undefined ||
+          instanceData.localY !== undefined ||
+          instanceData.localZ !== undefined
+        ) {
+          object.setLocalPosition(
+            instanceData.localX !== undefined
+              ? instanceData.localX
+              : object.getLocalX(),
+            instanceData.localY !== undefined
+              ? instanceData.localY
+              : object.getLocalY(),
+            instanceData.localZ !== undefined
+              ? instanceData.localZ
+              : object.getLocalZ()
+          );
+        }
+        if (instanceData.localAngle !== undefined) {
+          object.setLocalAngle(instanceData.localAngle);
+        }
+        if (instanceData.localRotationX !== undefined) {
+          object.setLocalRotationX(instanceData.localRotationX);
+        }
+        if (instanceData.localRotationY !== undefined) {
+          object.setLocalRotationY(instanceData.localRotationY);
+        }
+        if (instanceData.localScaleX !== undefined) {
+          object.setLocalScaleX(instanceData.localScaleX);
+        }
+        if (instanceData.localScaleY !== undefined) {
+          object.setLocalScaleY(instanceData.localScaleY);
         }
       }
     }

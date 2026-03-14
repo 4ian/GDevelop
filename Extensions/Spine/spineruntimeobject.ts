@@ -335,6 +335,7 @@ namespace gdjs {
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this._renderer.updateScale();
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     setScaleX(newScale: float): void {
@@ -347,6 +348,7 @@ namespace gdjs {
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._renderer.updateScale();
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     setScaleY(newScale: float): void {
@@ -359,6 +361,7 @@ namespace gdjs {
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this._renderer.updateScale();
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     /**

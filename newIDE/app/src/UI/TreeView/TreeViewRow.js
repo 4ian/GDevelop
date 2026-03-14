@@ -576,6 +576,22 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                 [classes.withDivider]: node.item.isRoot && index > 0,
               })}
             >
+              {node.depth > 0 && (
+                <div className={classes.indentGuides} style={{ width: left }}>
+                  {Array.from({ length: node.depth }).map((_, depthIndex) => (
+                    <span
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={`indent-${node.id}-${depthIndex}`}
+                      className={classes.indentGuide}
+                      style={{ left: depthIndex * 16 + 8 }}
+                    />
+                  ))}
+                  <span
+                    className={classes.indentConnector}
+                    style={{ left: Math.max(left - 8, 0) }}
+                  />
+                </div>
+              )}
               {dropTarget}
             </div>
           );

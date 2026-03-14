@@ -352,6 +352,7 @@ namespace gdjs {
     setScale(newScale: float): void {
       this.setWidth(this._renderer.getTextureWidth() * newScale);
       this.setHeight(this._renderer.getTextureHeight() * newScale);
+      this._onTransformChanged();
     }
 
     /**
@@ -360,6 +361,7 @@ namespace gdjs {
      */
     setScaleX(newScale: float): void {
       this.setWidth(this._renderer.getTextureWidth() * newScale);
+      this._onTransformChanged();
     }
 
     /**
@@ -368,6 +370,7 @@ namespace gdjs {
      */
     setScaleY(newScale: float): void {
       this.setHeight(this._renderer.getTextureHeight() * newScale);
+      this._onTransformChanged();
     }
   }
   gdjs.registerObject(

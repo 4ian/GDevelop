@@ -598,6 +598,7 @@ namespace gdjs {
       this._scaleY = newScale;
       this._renderer.setScale(newScale);
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     /**
@@ -610,6 +611,7 @@ namespace gdjs {
       this._scaleX = newScale;
       this._renderer.setScaleX(newScale);
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     /**
@@ -622,6 +624,7 @@ namespace gdjs {
       this._scaleY = newScale;
       this._renderer.setScaleY(newScale);
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     /**

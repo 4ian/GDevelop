@@ -300,6 +300,7 @@ namespace gdjs {
       this._scaleX = scaleX;
       this._renderer.updateScale();
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     setScaleY(scaleY: float): void {
@@ -311,6 +312,7 @@ namespace gdjs {
       this._scaleY = scaleY;
       this._renderer.updateScale();
       this.invalidateHitboxes();
+      this._onTransformChanged();
     }
 
     getFontSize(): float {

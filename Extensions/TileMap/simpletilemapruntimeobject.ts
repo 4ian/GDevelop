@@ -410,6 +410,7 @@ namespace gdjs {
       this._renderer.setScaleX(scaleX);
       this.invalidateHitboxes();
       this._transformationIsUpToDate = false;
+      this._onTransformChanged();
     }
 
     /**
@@ -426,6 +427,7 @@ namespace gdjs {
       this._renderer.setScaleY(scaleY);
       this.invalidateHitboxes();
       this._transformationIsUpToDate = false;
+      this._onTransformChanged();
     }
 
     setX(x: float): void {

@@ -22,6 +22,7 @@ import Opacity from '../../UI/CustomSvgIcons/Opacity';
 import FlipHorizontal from '../../UI/CustomSvgIcons/FlipHorizontal';
 import FlipVertical from '../../UI/CustomSvgIcons/FlipVertical';
 import Instance from '../../UI/CustomSvgIcons/Instance';
+import InstancesList from '../../UI/CustomSvgIcons/InstancesList';
 import Link from '../../UI/CustomSvgIcons/Link';
 import Unlink from '../../UI/CustomSvgIcons/Unlink';
 import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
@@ -34,6 +35,23 @@ import RotateX from '../../UI/CustomSvgIcons/RotateX';
 import RotateY from '../../UI/CustomSvgIcons/RotateY';
 import RotateZ from '../../UI/CustomSvgIcons/RotateZ';
 import FlipZ from '../../UI/CustomSvgIcons/FlipZ';
+import CenterAlignment from '../../UI/CustomSvgIcons/CenterAlignment';
+import Copy from '../../UI/CustomSvgIcons/Copy';
+import {
+  buildInstancesIndex,
+  syncLocalFromWorld,
+  applyParentTransformToDescendants,
+  recomputeLocalFromWorld,
+  setLocalToWorld,
+  applyLocalToWorld,
+  applyParentTransformFromLocal,
+  getInstanceWorldScaleX,
+  getInstanceWorldScaleY,
+  collectDescendants,
+  getParentInstanceFromIndex,
+  getKeepWorldOnReparent,
+  setKeepWorldOnReparent,
+} from '../ParentingHelpers';
 
 /**
  * Applies ratio to value without intermediary value to avoid precision issues.
@@ -48,6 +66,16 @@ const applyRatio = ({
   valueToApplyTo: number,
 |}) => {
   return (newReferenceValue / oldReferenceValue) * valueToApplyTo;
+};
+
+const updateLocalAndChildren = (
+  instance: gdInitialInstance,
+  initialInstancesContainer: ?gdInitialInstancesContainer
+) => {
+  if (!initialInstancesContainer) return;
+  const instancesIndex = buildInstancesIndex(initialInstancesContainer);
+  syncLocalFromWorld(instance, instancesIndex);
+  applyParentTransformToDescendants(instance, instancesIndex);
 };
 
 const getEditObjectButton = ({
@@ -71,14 +99,22 @@ const getEditObjectButton = ({
     onEditObject(instance.getObjectName()),
 });
 
-const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
+const getRotationXAndRotationYFields = ({
+  i18n,
+  initialInstancesContainer,
+}: {|
+  i18n: I18nType,
+  initialInstancesContainer: ?gdInitialInstancesContainer,
+|}) => [
   {
     name: 'Rotation X',
     getLabel: () => i18n._(t`Rotation (X)`),
     valueType: 'number',
     getValue: (instance: gdInitialInstance) => instance.getRotationX(),
-    setValue: (instance: gdInitialInstance, newValue: number) =>
-      instance.setRotationX(newValue),
+    setValue: (instance: gdInitialInstance, newValue: number) => {
+      instance.setRotationX(newValue);
+      updateLocalAndChildren(instance, initialInstancesContainer);
+    },
     // $FlowFixMe[missing-local-annot]
     renderLeftIcon: className => <RotateX className={className} />,
   },
@@ -87,30 +123,48 @@ const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
     getLabel: () => i18n._(t`Rotation (Y)`),
     valueType: 'number',
     getValue: (instance: gdInitialInstance) => instance.getRotationY(),
-    setValue: (instance: gdInitialInstance, newValue: number) =>
-      instance.setRotationY(newValue),
+    setValue: (instance: gdInitialInstance, newValue: number) => {
+      instance.setRotationY(newValue);
+      updateLocalAndChildren(instance, initialInstancesContainer);
+    },
     // $FlowFixMe[missing-local-annot]
     renderLeftIcon: className => <RotateY className={className} />,
   },
 ];
-const getRotationZField = ({ i18n }: {| i18n: I18nType |}) => ({
+const getRotationZField = ({
+  i18n,
+  initialInstancesContainer,
+}: {|
+  i18n: I18nType,
+  initialInstancesContainer: ?gdInitialInstancesContainer,
+|}) => ({
   name: 'Angle',
   getLabel: () => i18n._(t`Rotation (Z)`),
   valueType: 'number',
   getValue: (instance: gdInitialInstance) => instance.getAngle(),
-  setValue: (instance: gdInitialInstance, newValue: number) =>
-    instance.setAngle(newValue),
+  setValue: (instance: gdInitialInstance, newValue: number) => {
+    instance.setAngle(newValue);
+    updateLocalAndChildren(instance, initialInstancesContainer);
+  },
   // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <RotateZ className={className} />,
 });
-const getXAndYFields = ({ i18n }: {| i18n: I18nType |}): Schema => [
+const getXAndYFields = ({
+  i18n,
+  initialInstancesContainer,
+}: {|
+  i18n: I18nType,
+  initialInstancesContainer: ?gdInitialInstancesContainer,
+|}): Schema => [
   {
     name: 'X',
     getLabel: () => i18n._(t`X`),
     valueType: 'number',
     getValue: (instance: gdInitialInstance) => instance.getX(),
-    setValue: (instance: gdInitialInstance, newValue: number) =>
-      instance.setX(newValue),
+    setValue: (instance: gdInitialInstance, newValue: number) => {
+      instance.setX(newValue);
+      updateLocalAndChildren(instance, initialInstancesContainer);
+    },
     renderLeftIcon: className => <LetterX className={className} />,
   },
   {
@@ -118,18 +172,28 @@ const getXAndYFields = ({ i18n }: {| i18n: I18nType |}): Schema => [
     getLabel: () => i18n._(t`Y`),
     valueType: 'number',
     getValue: (instance: gdInitialInstance) => instance.getY(),
-    setValue: (instance: gdInitialInstance, newValue: number) =>
-      instance.setY(newValue),
+    setValue: (instance: gdInitialInstance, newValue: number) => {
+      instance.setY(newValue);
+      updateLocalAndChildren(instance, initialInstancesContainer);
+    },
     renderLeftIcon: className => <LetterY className={className} />,
   },
 ];
-const getZField = ({ i18n }: {| i18n: I18nType |}) => ({
+const getZField = ({
+  i18n,
+  initialInstancesContainer,
+}: {|
+  i18n: I18nType,
+  initialInstancesContainer: ?gdInitialInstancesContainer,
+|}) => ({
   name: 'Z',
   getLabel: () => i18n._(t`Z`),
   valueType: 'number',
   getValue: (instance: gdInitialInstance) => instance.getZ(),
-  setValue: (instance: gdInitialInstance, newValue: number) =>
-    instance.setZ(newValue),
+  setValue: (instance: gdInitialInstance, newValue: number) => {
+    instance.setZ(newValue);
+    updateLocalAndChildren(instance, initialInstancesContainer);
+  },
   // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <LetterZ className={className} />,
 });
@@ -505,6 +569,338 @@ const getFlippableButtons = ({
   ].filter(Boolean),
 });
 
+const getParentField = ({
+  i18n,
+  initialInstancesContainer,
+  selectedInstances,
+}: {|
+  i18n: I18nType,
+  initialInstancesContainer: ?gdInitialInstancesContainer,
+  selectedInstances: Array<gdInitialInstance>,
+|}) => ({
+  name: 'Parent',
+  getLabel: () => i18n._(t`Parent`),
+  valueType: 'string',
+  getChoices: () => {
+    const choices = [
+      {
+        value: '',
+        label: i18n._(t`None`),
+      },
+    ];
+    if (!initialInstancesContainer) return choices;
+
+    const instancesIndex = buildInstancesIndex(initialInstancesContainer);
+    const excludedUuids = new Set();
+    selectedInstances.forEach(instance => {
+      const uuid = instance.getPersistentUuid();
+      excludedUuids.add(uuid);
+      collectDescendants(instance, instancesIndex).forEach(descendant =>
+        excludedUuids.add(descendant.getPersistentUuid())
+      );
+    });
+
+    instancesIndex.instances.forEach(instance => {
+      const uuid = instance.getPersistentUuid();
+      if (excludedUuids.has(uuid)) return;
+      choices.push({
+        value: uuid,
+        label: instance.getObjectName(),
+        labelIsUserDefined: true,
+      });
+    });
+
+    return choices;
+  },
+  getValue: (instance: gdInitialInstance) =>
+    instance.getParentPersistentUuid() || '',
+  setValue: (instance: gdInitialInstance, newValue: string) => {
+    const parentPersistentUuid = newValue || '';
+    if (instance.getParentPersistentUuid() === parentPersistentUuid) return;
+
+    const keepWorld = getKeepWorldOnReparent();
+
+    if (!initialInstancesContainer) {
+      instance.setParentPersistentUuid(parentPersistentUuid);
+      if (keepWorld) {
+        setLocalToWorld(instance);
+      } else {
+        applyLocalToWorld(instance);
+      }
+      return;
+    }
+
+    const instancesIndex = buildInstancesIndex(initialInstancesContainer);
+    const destinationInstance = parentPersistentUuid
+      ? instancesIndex.instancesByPersistentUuid.get(parentPersistentUuid) ||
+        null
+      : null;
+
+    const worldScaleX = getInstanceWorldScaleX(
+      instance,
+      instancesIndex.instancesByPersistentUuid
+    );
+    const worldScaleY = getInstanceWorldScaleY(
+      instance,
+      instancesIndex.instancesByPersistentUuid
+    );
+
+    if (destinationInstance) {
+      if (keepWorld) {
+        recomputeLocalFromWorld(
+          instance,
+          destinationInstance,
+          instancesIndex.instancesByPersistentUuid
+        );
+
+        const inheritScale =
+          // $FlowFixMe[prop-missing]
+          typeof instance.inheritScale === 'function'
+            ? // $FlowFixMe[prop-missing]
+              instance.inheritScale()
+            : true;
+        if (inheritScale) {
+          const parentWorldScaleX = getInstanceWorldScaleX(
+            destinationInstance,
+            instancesIndex.instancesByPersistentUuid
+          );
+          const parentWorldScaleY = getInstanceWorldScaleY(
+            destinationInstance,
+            instancesIndex.instancesByPersistentUuid
+          );
+          if (parentWorldScaleX !== 0)
+            instance.setLocalScaleX(worldScaleX / parentWorldScaleX);
+          else instance.setLocalScaleX(worldScaleX);
+          if (parentWorldScaleY !== 0)
+            instance.setLocalScaleY(worldScaleY / parentWorldScaleY);
+          else instance.setLocalScaleY(worldScaleY);
+        } else {
+          instance.setLocalScaleX(worldScaleX);
+          instance.setLocalScaleY(worldScaleY);
+        }
+      }
+      instance.setParentPersistentUuid(parentPersistentUuid);
+      if (!keepWorld) {
+        applyParentTransformFromLocal(
+          instance,
+          destinationInstance,
+          instancesIndex.instancesByPersistentUuid
+        );
+      }
+    } else {
+      if (keepWorld) {
+        setLocalToWorld(instance, worldScaleX, worldScaleY);
+      }
+      instance.setParentPersistentUuid(parentPersistentUuid);
+      if (!keepWorld) {
+        applyLocalToWorld(instance);
+      }
+    }
+  },
+  // $FlowFixMe[missing-local-annot]
+  renderLeftIcon: className => <InstancesList className={className} />,
+});
+
+const getKeepWorldOnReparentField = ({
+  i18n,
+  forceUpdate,
+}: {|
+  i18n: I18nType,
+  forceUpdate: () => void,
+|}) => ({
+  name: 'Keep world transform',
+  getLabel: () => i18n._(t`Keep world transform`),
+  getDescription: () =>
+    i18n._(t`Preserve position, rotation and scale when changing parent.`),
+  valueType: 'boolean',
+  getValue: () => getKeepWorldOnReparent(),
+  setValue: (_instance: gdInitialInstance, newValue: boolean) => {
+    setKeepWorldOnReparent(newValue);
+    forceUpdate();
+  },
+  hasImpactOnAllOtherFields: true,
+});
+
+const withParentInstance = ({
+  instance,
+  initialInstancesContainer,
+  onInstancesModified,
+  action,
+}: {|
+  instance: gdInitialInstance,
+  initialInstancesContainer: ?gdInitialInstancesContainer,
+  onInstancesModified?: ?(Array<gdInitialInstance>) => void,
+  action: (instancesIndex: any, parentInstance: gdInitialInstance) => void,
+|}) => {
+  if (!initialInstancesContainer) return;
+  const instancesIndex = buildInstancesIndex(initialInstancesContainer);
+  const parentInstance = getParentInstanceFromIndex(instance, instancesIndex);
+  if (!parentInstance) return;
+  action(instancesIndex, parentInstance);
+  if (onInstancesModified) onInstancesModified([instance]);
+};
+
+const getHierarchyActionButtons = ({
+  i18n,
+  initialInstancesContainer,
+  onInstancesModified,
+}: {|
+  i18n: I18nType,
+  initialInstancesContainer: ?gdInitialInstancesContainer,
+  onInstancesModified?: ?(Array<gdInitialInstance>) => void,
+|}) => ({
+  name: 'Hierarchy actions',
+  type: 'row',
+  preventWrap: true,
+  removeSpacers: true,
+  children: [
+    {
+      label: i18n._(t`Center child`),
+      disabled: 'onValuesDifferent',
+      nonFieldType: 'button',
+      // $FlowFixMe[missing-local-annot]
+      getIcon: props => <CenterAlignment {...props} />,
+      getValue: (instance: gdInitialInstance) => instance.getObjectName(),
+      onClick: (instance: gdInitialInstance) =>
+        withParentInstance({
+          instance,
+          initialInstancesContainer,
+          onInstancesModified,
+          action: (instancesIndex, parentInstance) => {
+            instance.setLocalX(0);
+            instance.setLocalY(0);
+            instance.setLocalZ(0);
+            applyParentTransformFromLocal(
+              instance,
+              parentInstance,
+              instancesIndex.instancesByPersistentUuid
+            );
+            applyParentTransformToDescendants(instance, instancesIndex);
+          },
+        }),
+    },
+    {
+      label: i18n._(t`Match parent`),
+      disabled: 'onValuesDifferent',
+      nonFieldType: 'button',
+      // $FlowFixMe[missing-local-annot]
+      getIcon: props => <Copy {...props} />,
+      getValue: (instance: gdInitialInstance) => instance.getObjectName(),
+      onClick: (instance: gdInitialInstance) =>
+        withParentInstance({
+          instance,
+          initialInstancesContainer,
+          onInstancesModified,
+          action: (instancesIndex, parentInstance) => {
+            const inheritRotation =
+              // $FlowFixMe[prop-missing]
+              typeof instance.inheritRotation === 'function'
+                ? // $FlowFixMe[prop-missing]
+                  instance.inheritRotation()
+                : true;
+            const inheritScale =
+              // $FlowFixMe[prop-missing]
+              typeof instance.inheritScale === 'function'
+                ? // $FlowFixMe[prop-missing]
+                  instance.inheritScale()
+                : true;
+
+            instance.setLocalX(0);
+            instance.setLocalY(0);
+            instance.setLocalZ(0);
+            instance.setLocalAngle(
+              inheritRotation ? 0 : parentInstance.getAngle()
+            );
+            instance.setLocalRotationX(
+              inheritRotation ? 0 : parentInstance.getRotationX()
+            );
+            instance.setLocalRotationY(
+              inheritRotation ? 0 : parentInstance.getRotationY()
+            );
+
+            const parentWorldScaleX = getInstanceWorldScaleX(
+              parentInstance,
+              instancesIndex.instancesByPersistentUuid
+            );
+            const parentWorldScaleY = getInstanceWorldScaleY(
+              parentInstance,
+              instancesIndex.instancesByPersistentUuid
+            );
+            // $FlowFixMe[prop-missing]
+            if (typeof instance.setLocalScaleX === 'function') {
+              // $FlowFixMe[prop-missing]
+              instance.setLocalScaleX(inheritScale ? 1 : parentWorldScaleX);
+            }
+            // $FlowFixMe[prop-missing]
+            if (typeof instance.setLocalScaleY === 'function') {
+              // $FlowFixMe[prop-missing]
+              instance.setLocalScaleY(inheritScale ? 1 : parentWorldScaleY);
+            }
+
+            applyParentTransformFromLocal(
+              instance,
+              parentInstance,
+              instancesIndex.instancesByPersistentUuid
+            );
+            applyParentTransformToDescendants(instance, instancesIndex);
+          },
+        }),
+    },
+  ],
+});
+
+const getInheritRotationField = ({
+  i18n,
+  initialInstancesContainer,
+}: {|
+  i18n: I18nType,
+  initialInstancesContainer: ?gdInitialInstancesContainer,
+|}) => ({
+  name: 'Inherit rotation',
+  getLabel: () => i18n._(t`Inherit rotation`),
+  valueType: 'boolean',
+  getValue: (instance: gdInitialInstance) =>
+    // $FlowFixMe[prop-missing]
+    typeof instance.inheritRotation === 'function'
+      ? // $FlowFixMe[prop-missing]
+        instance.inheritRotation()
+      : true,
+  setValue: (instance: gdInitialInstance, newValue: boolean) => {
+    // $FlowFixMe[prop-missing]
+    if (typeof instance.setInheritRotation === 'function') {
+      // $FlowFixMe[prop-missing]
+      instance.setInheritRotation(newValue);
+    }
+    updateLocalAndChildren(instance, initialInstancesContainer);
+  },
+});
+
+const getInheritScaleField = ({
+  i18n,
+  initialInstancesContainer,
+}: {|
+  i18n: I18nType,
+  initialInstancesContainer: ?gdInitialInstancesContainer,
+|}) => ({
+  name: 'Inherit scale',
+  getLabel: () => i18n._(t`Inherit scale`),
+  valueType: 'boolean',
+  getValue: (instance: gdInitialInstance) =>
+    // $FlowFixMe[prop-missing]
+    typeof instance.inheritScale === 'function'
+      ? // $FlowFixMe[prop-missing]
+        instance.inheritScale()
+      : true,
+  setValue: (instance: gdInitialInstance, newValue: boolean) => {
+    // $FlowFixMe[prop-missing]
+    if (typeof instance.setInheritScale === 'function') {
+      // $FlowFixMe[prop-missing]
+      instance.setInheritScale(newValue);
+    }
+    updateLocalAndChildren(instance, initialInstancesContainer);
+  },
+});
+
 export const makeSchema = ({
   is3DInstance,
   hasOpacity,
@@ -512,9 +908,12 @@ export const makeSchema = ({
   canBeFlippedZ,
   i18n,
   forceUpdate,
+  onInstancesModified,
   onEditObject,
   onGetInstanceSize,
   layersContainer,
+  initialInstancesContainer,
+  selectedInstances,
 }: {|
   is3DInstance: boolean,
   hasOpacity: boolean,
@@ -522,9 +921,12 @@ export const makeSchema = ({
   canBeFlippedZ: boolean,
   i18n: I18nType,
   forceUpdate: () => void,
+  onInstancesModified?: (Array<gdInitialInstance>) => void,
   onEditObject: (name: string) => void,
   onGetInstanceSize: gdInitialInstance => [number, number, number],
   layersContainer: gdLayersContainer,
+  initialInstancesContainer: ?gdInitialInstancesContainer,
+  selectedInstances: Array<gdInitialInstance>,
 |}): Schema => {
   const getInstanceWidth = (instance: gdInitialInstance) =>
     instance.hasCustomSize()
@@ -547,11 +949,34 @@ export const makeSchema = ({
       getTitleRow({ i18n }),
       getEditObjectButton({ i18n, onEditObject, is3DInstance }),
       {
+        name: 'Hierarchy',
+        type: 'column',
+        title: i18n._(t`Hierarchy`),
+        children: [
+          getParentField({
+            i18n,
+            initialInstancesContainer,
+            selectedInstances,
+          }),
+          getKeepWorldOnReparentField({ i18n, forceUpdate }),
+          getHierarchyActionButtons({
+            i18n,
+            initialInstancesContainer,
+            onInstancesModified,
+          }),
+          getInheritRotationField({ i18n, initialInstancesContainer }),
+          getInheritScaleField({ i18n, initialInstancesContainer }),
+        ],
+      },
+      {
         name: 'Position',
         type: 'row',
         preventWrap: true,
         removeSpacers: true,
-        children: [...getXAndYFields({ i18n }), getZField({ i18n })],
+        children: [
+          ...getXAndYFields({ i18n, initialInstancesContainer }),
+          getZField({ i18n, initialInstancesContainer }),
+        ],
       },
       {
         name: 'Size',
@@ -624,8 +1049,11 @@ export const makeSchema = ({
         preventWrap: true,
         removeSpacers: true,
         children: [
-          ...getRotationXAndRotationYFields({ i18n }),
-          getRotationZField({ i18n }),
+          ...getRotationXAndRotationYFields({
+            i18n,
+            initialInstancesContainer,
+          }),
+          getRotationZField({ i18n, initialInstancesContainer }),
         ],
       },
     ].filter(Boolean);
@@ -636,11 +1064,31 @@ export const makeSchema = ({
     getTitleRow({ i18n }),
     getEditObjectButton({ i18n, onEditObject, is3DInstance }),
     {
+      name: 'Hierarchy',
+      type: 'column',
+      title: i18n._(t`Hierarchy`),
+      children: [
+        getParentField({
+          i18n,
+          initialInstancesContainer,
+          selectedInstances,
+        }),
+        getKeepWorldOnReparentField({ i18n, forceUpdate }),
+        getHierarchyActionButtons({
+          i18n,
+          initialInstancesContainer,
+          onInstancesModified,
+        }),
+        getInheritRotationField({ i18n, initialInstancesContainer }),
+        getInheritScaleField({ i18n, initialInstancesContainer }),
+      ],
+    },
+    {
       name: 'Position',
       type: 'row',
       preventWrap: true,
       removeSpacers: true,
-      children: getXAndYFields({ i18n }),
+      children: getXAndYFields({ i18n, initialInstancesContainer }),
     },
     getZOrderField({ i18n }),
     {
@@ -706,7 +1154,7 @@ export const makeSchema = ({
       type: 'row',
       preventWrap: true,
       removeSpacers: true,
-      children: [getRotationZField({ i18n })],
+      children: [getRotationZField({ i18n, initialInstancesContainer })],
     },
   ].filter(Boolean);
 };

@@ -235,5 +235,5 @@ export const isLightRgbColor = (rgbColor: RGBColor): boolean => {
   return rgbColor.r * 0.299 + rgbColor.g * 0.587 + rgbColor.b * 0.114 > 186;
 };
 
-export const clampComponent = (component: number): number =>
+export const clampRgbComponent = (component: number): number =>
   Math.min(Math.max(0, component), 255);

@@ -33,7 +33,6 @@ export const Default = (): React.Node => (
             }
             i18n={i18n}
             onBackgroundColorChanged={action('onBackgroundColorChanged')}
-            onUpdateBehaviorsSharedData={action('onUpdateBehaviorsSharedData')}
             openSceneVariables={action('openSceneVariables')}
           />
         </SerializedObjectDisplay>
@@ -56,7 +55,6 @@ export const Empty = (): React.Node => (
             }
             i18n={i18n}
             onBackgroundColorChanged={action('onBackgroundColorChanged')}
-            onUpdateBehaviorsSharedData={action('onUpdateBehaviorsSharedData')}
             openSceneVariables={action('openSceneVariables')}
           />
         </SerializedObjectDisplay>

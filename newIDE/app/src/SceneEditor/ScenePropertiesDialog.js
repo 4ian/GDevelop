@@ -16,7 +16,7 @@ import { ColumnStackLayout } from '../UI/Layout';
 import {
   rgbColorToRGBString,
   rgbStringAndAlphaToRGBColor,
-  clampComponent,
+  clampRgbComponent,
   type RGBColor,
 } from '../Utils/ColorTransformer';
 import HelpIcon from '../UI/HelpIcon';
@@ -110,9 +110,9 @@ const ScenePropertiesDialog = ({
       layout.getBackgroundColorGreen() !== backgroundColor.g &&
       layout.getBackgroundColorBlue() !== backgroundColor.b;
     layout.setBackgroundColor(
-      backgroundColor ? clampComponent(backgroundColor.r) : 0,
-      backgroundColor ? clampComponent(backgroundColor.g) : 0,
-      backgroundColor ? clampComponent(backgroundColor.b) : 0
+      backgroundColor ? clampRgbComponent(backgroundColor.r) : 0,
+      backgroundColor ? clampRgbComponent(backgroundColor.g) : 0,
+      backgroundColor ? clampRgbComponent(backgroundColor.b) : 0
     );
     onApply();
     if (hasBackgroundColorChanged) {

@@ -9,7 +9,7 @@ import {
 import {
   rgbColorToRGBString,
   rgbStringAndAlphaToRGBColor,
-  clampComponent,
+  clampRgbComponent,
 } from '../../Utils/ColorTransformer';
 
 const getBackgroundColorField = ({
@@ -31,9 +31,9 @@ const getBackgroundColorField = ({
   setValue: (scene: gdLayout, newValue: string) => {
     const backgroundColor = rgbStringAndAlphaToRGBColor(newValue);
     scene.setBackgroundColor(
-      backgroundColor ? clampComponent(backgroundColor.r) : 0,
-      backgroundColor ? clampComponent(backgroundColor.g) : 0,
-      backgroundColor ? clampComponent(backgroundColor.b) : 0
+      backgroundColor ? clampRgbComponent(backgroundColor.r) : 0,
+      backgroundColor ? clampRgbComponent(backgroundColor.g) : 0,
+      backgroundColor ? clampRgbComponent(backgroundColor.b) : 0
     );
     onBackgroundColorChanged();
   },

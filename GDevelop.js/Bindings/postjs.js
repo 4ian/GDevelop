@@ -421,7 +421,20 @@ function patchClassesForUseAfterFreeDetection(
 
 patchClassesForUseAfterFreeDetection(Module, {
   skippedClassNames: new Set([]),
-  // If adding new classes, also add them to `MemoryTrackedRegistryDialog`.
-  trackedClassNames: new Set(['Project', 'Layout', 'gdObject', 'Behavior']),
+  // If adding new classes, also add them to `MemoryTrackedRegistryDialog`
+  // and to the MemoryTracked member in the C++ class header.
+  trackedClassNames: new Set([
+    'Project',
+    'Layout',
+    'gdObject',
+    'Behavior',
+    'BehaviorsSharedData',
+    'EffectsContainer',
+    'InitialInstancesContainer',
+    'LayersContainer',
+    'ObjectGroupsContainer',
+    'ObjectsContainer',
+    'VariablesContainer',
+  ]),
   verbose: false,
 });

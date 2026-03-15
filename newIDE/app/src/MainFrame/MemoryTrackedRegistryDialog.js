@@ -15,8 +15,21 @@ import {
 
 const gd: libGDevelop = global.gd;
 
-// If adding new classes, also add them to `patchClassesForUseAfterFreeDetection`.
-const trackedClasses = ['Project', 'Layout', 'gdObject', 'Behavior'];
+// If adding new classes, also add them to `patchClassesForUseAfterFreeDetection`
+// in postjs.js and to the MemoryTracked member in the C++ class header.
+const trackedClasses = [
+  'Project',
+  'Layout',
+  'gdObject',
+  'Behavior',
+  'BehaviorsSharedData',
+  'EffectsContainer',
+  'InitialInstancesContainer',
+  'LayersContainer',
+  'ObjectGroupsContainer',
+  'ObjectsContainer',
+  'VariablesContainer',
+];
 
 type Stats = {|
   className: string,

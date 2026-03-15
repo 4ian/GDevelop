@@ -116,6 +116,12 @@ class MemoryTrackedRegistry {
  *     MemoryTracked _memoryTracked{this, "Layout"};
  * };
  * \endcode
+ *
+ * When adding a new tracked class, also update:
+ * - GDevelop.js/Bindings/postjs.js (trackedClassNames set in
+ *   patchClassesForUseAfterFreeDetection)
+ * - newIDE/app/src/MainFrame/MemoryTrackedRegistryDialog.js (trackedClasses
+ *   array)
  */
 class MemoryTracked {
  public:

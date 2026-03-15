@@ -29,17 +29,19 @@ export type ValueFieldCommonProperties = {|
   defaultValue?: string | number | boolean | null,
 |};
 
+export type FieldChoices = {|
+  value: string,
+  label: string,
+  labelIsUserDefined?: boolean,
+|};
+
 // "Primitive" value fields are "simple" fields.
 export type PrimitiveValueField =
   | {|
       valueType: 'number',
       getValue: Instance => number | null,
       setValue: (instance: Instance, newValue: number) => void,
-      getChoices?: ?() => Array<{|
-        value: string,
-        label: string,
-        labelIsUserDefined?: boolean,
-      |}>,
+      getChoices?: ?() => Array<FieldChoices>,
       /** Only supported on non compact property editors. */
       getEndAdornment?: Instance => {|
         label: string,

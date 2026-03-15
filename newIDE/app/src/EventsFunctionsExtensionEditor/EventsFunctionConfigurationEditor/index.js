@@ -5,7 +5,7 @@ import { I18n } from '@lingui/react';
 import * as React from 'react';
 import ObjectGroupsListWithObjectGroupEditor from '../../ObjectGroupsList/ObjectGroupsListWithObjectGroupEditor';
 import { Tabs } from '../../UI/Tabs';
-import { EventsFunctionParametersEditor } from './EventsFunctionParametersEditor';
+import { CompactEventsFunctionParametersEditor } from './CompactEventsFunctionParametersEditor';
 import { CompactEventsFunctionPropertiesEditor } from './CompactEventsFunctionPropertiesEditor';
 import { Column, Line } from '../../UI/Grid';
 import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
@@ -192,7 +192,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
               </Line>
             ) : null}
             {this.state.currentTab === 'config' ? (
-              <EventsFunctionParametersEditor
+              <CompactEventsFunctionParametersEditor
                 project={project}
                 projectScopedContainersAccessor={
                   projectScopedContainersAccessor
@@ -215,7 +215,6 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 key={eventsFunction ? eventsFunction.ptr : null}
               >
                 <CompactEventsFunctionPropertiesEditor
-                  i18n={i18n}
                   project={project}
                   eventsFunction={eventsFunction}
                   eventsBasedBehavior={eventsBasedBehavior}
@@ -235,7 +234,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                   freezeEventsFunctionType={freezeEventsFunctionType}
                   getFunctionGroupNames={getFunctionGroupNames}
                 />
-              </EventsFunctionParametersEditor>
+              </CompactEventsFunctionParametersEditor>
             ) : null}
             {this.state.currentTab === 'groups' ? (
               <ObjectGroupsListWithObjectGroupEditor

@@ -10,7 +10,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import IconButton from '../../UI/IconButton';
 import EmptyMessage from '../../UI/EmptyMessage';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
-import SemiControlledTextField from '../../UI/SemiControlledTextField';
+import CompactSemiControlledTextField from '../../UI/CompactSemiControlledTextField';
 import { ParametersIndexOffsets } from '../../EventsFunctionsExtensionsLoader';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import {
@@ -20,7 +20,7 @@ import {
 } from '../../UI/Layout';
 import { getLastObjectParameterObjectType } from '../../EventsSheet/ParameterFields/ParameterMetadataTools';
 import newNameGenerator from '../../Utils/NewNameGenerator';
-import ValueTypeEditor from './ValueTypeEditor';
+import CompactValueTypeEditor from './CompactValueTypeEditor';
 import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
 import Add from '../../UI/CustomSvgIcons/Add';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -41,6 +41,8 @@ import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import Text from '../../UI/Text';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import CompactPropertiesEditorRowField from '../../CompactPropertiesEditor/CompactPropertiesEditorRowField';
+import { CompactTextAreaField } from '../../UI/CompactTextAreaField';
 
 const gd: libGDevelop = global.gd;
 
@@ -140,7 +142,7 @@ type Props = {|
   ) => void,
 |};
 
-export const EventsFunctionParametersEditor = ({
+export const CompactEventsFunctionParametersEditor = ({
   project,
   projectScopedContainersAccessor,
   eventsFunction,
@@ -698,7 +700,7 @@ export const EventsFunctionParametersEditor = ({
                                       </Column>
                                     </span>
                                   )}
-                                  <ResponsiveLineStackLayout expand>
+                                  <ResponsiveLineStackLayout expand noMargin>
                                     <LineStackLayout
                                       noMargin
                                       expand
@@ -714,22 +716,22 @@ export const EventsFunctionParametersEditor = ({
                                           :
                                         </Trans>
                                       </Text>
-                                      <SemiControlledTextField
+                                      <CompactSemiControlledTextField
                                         commitOnBlur
-                                        margin="none"
-                                        translatableHintText={t`Enter the parameter name (mandatory)`}
+                                        placeholder={i18n._(
+                                          t`Enter the parameter name (mandatory)`
+                                        )}
                                         value={parameter.getName()}
                                         onChange={newName =>
                                           renameParameter(parameter, newName)
                                         }
                                         disabled={isParameterDisabled(i)}
-                                        fullWidth
                                       />
                                     </LineStackLayout>
                                   </ResponsiveLineStackLayout>
                                   <ElementWithMenu
                                     element={
-                                      <IconButton>
+                                      <IconButton size="small">
                                         <ThreeDotsMenu />
                                       </IconButton>
                                     }
@@ -809,7 +811,7 @@ export const EventsFunctionParametersEditor = ({
                                 </div>
                                 <Line>
                                   <ColumnStackLayout expand>
-                                    <ValueTypeEditor
+                                    <CompactValueTypeEditor
                                       project={project}
                                       eventsFunctionsExtension={
                                         eventsFunctionsExtension
@@ -855,20 +857,22 @@ export const EventsFunctionParametersEditor = ({
                                       }
                                     />
                                     {isParameterDescriptionShown(i) && (
-                                      <SemiControlledTextField
-                                        commitOnBlur
-                                        floatingLabelText={<Trans>Label</Trans>}
-                                        floatingLabelFixed
-                                        value={parameter.getDescription()}
-                                        onChange={text => {
-                                          parameter.setDescription(text);
-                                          forceUpdate();
-                                        }}
-                                        fullWidth
-                                        disabled={
-                                          /* When parameter are freezed, long description (if shown) can always be changed */
-                                          isParameterDisabled(i) &&
-                                          !freezeParameters
+                                      <CompactPropertiesEditorRowField
+                                        label={i18n._(t`Label`)}
+                                        field={
+                                          <CompactSemiControlledTextField
+                                            commitOnBlur
+                                            value={parameter.getDescription()}
+                                            onChange={text => {
+                                              parameter.setDescription(text);
+                                              forceUpdate();
+                                            }}
+                                            disabled={
+                                              /* When parameter are freezed, long description (if shown) can always be changed */
+                                              isParameterDisabled(i) &&
+                                              !freezeParameters
+                                            }
+                                          />
                                         }
                                       />
                                     )}
@@ -876,19 +880,13 @@ export const EventsFunctionParametersEditor = ({
                                       parameter,
                                       i
                                     ) && (
-                                      <SemiControlledTextField
-                                        commitOnBlur
-                                        floatingLabelText={
-                                          <Trans>Long description</Trans>
-                                        }
-                                        floatingLabelFixed
+                                      <CompactTextAreaField
+                                        label={i18n._(t`Long description`)}
                                         value={parameter.getLongDescription()}
                                         onChange={text => {
                                           parameter.setLongDescription(text);
                                           forceUpdate();
                                         }}
-                                        multiline
-                                        fullWidth
                                         disabled={
                                           /* When parameter are freezed, long description (if shown) can always be changed */
                                           isParameterDisabled(i) &&

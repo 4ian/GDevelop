@@ -145,6 +145,42 @@ export const getSchemaWithOpenFullEditorButton = ({
   return schema;
 };
 
+export const CompactCollapsibleAdvancedSection = ({
+  children,
+  uncollapsedByDefault,
+}: {
+  children?: React.Node,
+  uncollapsedByDefault?: boolean,
+}): React.Node => {
+  const [showAdvancedOptions, setShowAdvancedOptions] = React.useState(
+    uncollapsedByDefault
+  );
+  return showAdvancedOptions ? (
+    <React.Fragment>
+      {children}
+      <FlatButton
+        fullWidth
+        primary
+        leftIcon={<ChevronArrowTop style={styles.icon} />}
+        label={<Trans>Show less</Trans>}
+        onClick={() => {
+          setShowAdvancedOptions(false);
+        }}
+      />
+    </React.Fragment>
+  ) : (
+    <FlatButton
+      fullWidth
+      primary
+      leftIcon={<ChevronArrowRight style={styles.icon} />}
+      label={<Trans>Show more</Trans>}
+      onClick={() => {
+        setShowAdvancedOptions(true);
+      }}
+    />
+  );
+};
+
 export const CompactPropertiesEditorByVisibility = ({
   onInstancesModified,
   instances,
@@ -205,10 +241,6 @@ export const CompactPropertiesEditorByVisibility = ({
     [instances, advancedPropertiesSchema]
   );
 
-  const [showAdvancedOptions, setShowAdvancedOptions] = React.useState(
-    areAdvancedPropertiesExpandedByDefault
-  );
-
   return (
     <ColumnStackLayout expand noMargin noOverflowParent>
       {!hasAnyProperty && (
@@ -230,39 +262,21 @@ export const CompactPropertiesEditorByVisibility = ({
           unsavedChanges={unsavedChanges}
         />
       )}
-      {!showAdvancedOptions && hasAdvancedProperties && (
-        <FlatButton
-          fullWidth
-          primary
-          leftIcon={<ChevronArrowRight style={styles.icon} />}
-          label={<Trans>Show more</Trans>}
-          onClick={() => {
-            setShowAdvancedOptions(true);
-          }}
-        />
-      )}
-      {showAdvancedOptions && hasAdvancedProperties && (
-        <CompactPropertiesEditor
-          project={project}
-          schema={advancedPropertiesSchema}
-          instances={instances}
-          onInstancesModified={onInstancesModified}
-          resourceManagementProps={resourceManagementProps}
-          onRefreshAllFields={onRefreshAllFields}
-          renderExtraDescriptionText={renderExtraDescriptionText}
-          unsavedChanges={unsavedChanges}
-        />
-      )}
-      {showAdvancedOptions && hasAdvancedProperties && (
-        <FlatButton
-          fullWidth
-          primary
-          leftIcon={<ChevronArrowTop style={styles.icon} />}
-          label={<Trans>Show less</Trans>}
-          onClick={() => {
-            setShowAdvancedOptions(false);
-          }}
-        />
+      {hasAdvancedProperties && (
+        <CompactCollapsibleAdvancedSection
+          uncollapsedByDefault={areAdvancedPropertiesExpandedByDefault}
+        >
+          <CompactPropertiesEditor
+            project={project}
+            schema={advancedPropertiesSchema}
+            instances={instances}
+            onInstancesModified={onInstancesModified}
+            resourceManagementProps={resourceManagementProps}
+            onRefreshAllFields={onRefreshAllFields}
+            renderExtraDescriptionText={renderExtraDescriptionText}
+            unsavedChanges={unsavedChanges}
+          />
+        </CompactCollapsibleAdvancedSection>
       )}
     </ColumnStackLayout>
   );

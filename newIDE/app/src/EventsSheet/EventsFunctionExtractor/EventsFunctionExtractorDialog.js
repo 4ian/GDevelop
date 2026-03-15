@@ -21,8 +21,8 @@ import {
 } from '.';
 import AlertMessage from '../../UI/AlertMessage';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
-import { EventsFunctionParametersEditor } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionParametersEditor';
-import { EventsFunctionPropertiesEditor } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionPropertiesEditor';
+import { CompactEventsFunctionParametersEditor } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/CompactEventsFunctionParametersEditor';
+import { CompactEventsFunctionPropertiesEditor } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/CompactEventsFunctionPropertiesEditor';
 import HelpButton from '../../UI/HelpButton';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
@@ -178,6 +178,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
         cannotBeDismissed
         onRequestClose={onClose}
         onApply={onApply}
+        maxWidth="sm"
       >
         <ColumnStackLayout noMargin>
           <DismissableAlertMessage
@@ -299,7 +300,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
               </Line>
             ) : null}
           </Column>
-          <EventsFunctionPropertiesEditor
+          <CompactEventsFunctionPropertiesEditor
             project={project}
             eventsFunction={eventsFunction}
             eventsBasedBehavior={null}
@@ -314,7 +315,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             getFunctionGroupNames={this._getFunctionGroupNames}
           />
           {this._projectScopedContainersAccessor && (
-            <EventsFunctionParametersEditor
+            <CompactEventsFunctionParametersEditor
               project={project}
               projectScopedContainersAccessor={
                 this._projectScopedContainersAccessor

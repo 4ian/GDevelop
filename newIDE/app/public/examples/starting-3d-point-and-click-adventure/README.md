@@ -1,0 +1,3 @@
+# 3D Point-and-click adventure
+
+A 3D point-and-click adventure game with an angled down side view camera. The player clicks a location in the scene, and the player character uses pathfinding to move there, navigating around pathfinding obstacles that block movement. NPCs can be clicked to make the player walk up to them and open a dialog box with text and two buttons representing choices the player can select. Movement points can be set using either mouse or touch screen controls.

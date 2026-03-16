@@ -1,0 +1,602 @@
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 245,
+    "major": 5,
+    "minor": 5,
+    "revision": 0
+  },
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "antialiasingMode": "MSAA",
+    "antialisingEnabledOnMobile": false,
+    "folderProject": false,
+    "orientation": "landscape",
+    "packageName": "com.example.gamename",
+    "pixelsRounding": true,
+    "projectUuid": "a23a1eac-7032-48e6-b459-609d6f502849",
+    "scaleMode": "nearest",
+    "sizeOnStartupMode": "",
+    "templateSlug": "",
+    "version": "1.0.0",
+    "name": "starting-point-and-click-pixel",
+    "description": "",
+    "author": "",
+    "windowWidth": 1280,
+    "windowHeight": 720,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 20,
+    "verticalSync": false,
+    "platformSpecificAssets": {
+      "android-icon-144": "",
+      "android-icon-192": "",
+      "android-icon-36": "",
+      "android-icon-48": "",
+      "android-icon-72": "",
+      "android-icon-96": "",
+      "android-windowSplashScreenAnimatedIcon": "",
+      "desktop-icon-512": "",
+      "ios-icon-100": "",
+      "ios-icon-1024": "",
+      "ios-icon-114": "",
+      "ios-icon-120": "",
+      "ios-icon-144": "",
+      "ios-icon-152": "",
+      "ios-icon-167": "",
+      "ios-icon-180": "",
+      "ios-icon-20": "",
+      "ios-icon-29": "",
+      "ios-icon-40": "",
+      "ios-icon-50": "",
+      "ios-icon-57": "",
+      "ios-icon-58": "",
+      "ios-icon-60": "",
+      "ios-icon-72": "",
+      "ios-icon-76": "",
+      "ios-icon-80": "",
+      "ios-icon-87": ""
+    },
+    "loadingScreen": {
+      "backgroundColor": 0,
+      "backgroundFadeInDuration": 0.2,
+      "backgroundImageResourceName": "",
+      "gdevelopLogoStyle": "light",
+      "logoAndProgressFadeInDuration": 0.2,
+      "logoAndProgressLogoFadeInDelay": 0,
+      "minDuration": 1.5,
+      "progressBarColor": 16777215,
+      "progressBarHeight": 20,
+      "progressBarMaxWidth": 200,
+      "progressBarMinWidth": 40,
+      "progressBarWidthPercent": 30,
+      "showGDevelopSplash": true,
+      "showProgressBar": true
+    },
+    "watermark": {
+      "placement": "bottom-left",
+      "showWatermark": true
+    },
+    "authorIds": [],
+    "authorUsernames": [],
+    "categories": [],
+    "playableDevices": [],
+    "extensionProperties": [],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "file": "assets/StartingPixelPlayer.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "assets\\StartingPixelPlayer.png",
+        "smoothed": false,
+        "userAdded": false
+      },
+      {
+        "file": "assets/StartingPixelGroundTilemap.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "assets\\StartingPixelGroundTilemap.png",
+        "smoothed": false,
+        "userAdded": false
+      },
+      {
+        "file": "assets/StartingPixelWater.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "assets\\StartingPixelWater.png",
+        "smoothed": false,
+        "userAdded": false
+      },
+      {
+        "file": "assets/StartingPixelWall.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "assets\\StartingPixelWall.png",
+        "smoothed": false,
+        "userAdded": false
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsFolderStructure": {
+    "folderName": "__ROOT"
+  },
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 255,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "Game_32Scene",
+      "name": "Game Scene",
+      "r": 255,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 255,
+      "uiSettings": {
+        "grid": false,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.4,
+        "snap": false,
+        "zoomFactor": 1.0615714305220039,
+        "windowMask": false,
+        "selectedLayer": ""
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Player",
+          "persistentUuid": "25990a6c-9e9b-43b0-8689-7bcc58d7b138",
+          "width": 0,
+          "x": 624,
+          "y": 336,
+          "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "locked": true,
+          "name": "Ground_Tilemap",
+          "persistentUuid": "81583751-9f95-448a-bc58-52d3ffe9d1eb",
+          "width": 0,
+          "x": 320,
+          "y": 160,
+          "zOrder": -1,
+          "numberProperties": [],
+          "stringProperties": [
+            {
+              "name": "tilemap",
+              "value": "{\"tileWidth\":32,\"tileHeight\":32,\"dimX\":20,\"dimY\":13,\"layers\":[{\"id\":0,\"alpha\":1,\"tiles\":[[0,2,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],[2,0,0,0,0,0,0,3,4,4,4,4,5,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,4,4,4,4,4,4,0,0,0,0,0,0,0],[0,0,0,0,0,0,2,4,4,4,4,4,4,0,0,0,1,0,0,2],[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],[0,0,0,0,0,0,0,4,4,4,4,4,4,2,0,0,0,0,0,0],[0,0,0,0,0,0,0,4,4,4,4,4,4,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,6,7,7,7,7,8,0,0,0,0,0,1,0],[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0]]}]}"
+            }
+          ],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 1,
+          "height": 192,
+          "keepRatio": true,
+          "layer": "",
+          "locked": true,
+          "name": "Water_Passable",
+          "persistentUuid": "df68a606-0ed2-4513-aad5-198c70281290",
+          "width": 128,
+          "x": 576,
+          "y": 256,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 1,
+          "height": 64,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Obstacle_Impassable",
+          "persistentUuid": "7de36727-1bc8-45f5-a1e3-bbd103d844f7",
+          "width": 64,
+          "x": 864,
+          "y": 384,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 1,
+          "height": 64,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Obstacle_Impassable",
+          "persistentUuid": "0865950d-c78d-4fda-823f-c4ad53ae1e89",
+          "width": 64,
+          "x": 416,
+          "y": 256,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Obstacle_Impassable",
+          "persistentUuid": "ec52bf38-0422-45fa-86e6-4889f26ec5b8",
+          "width": 0,
+          "x": 672,
+          "y": 192,
+          "zOrder": 4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "assetStoreId": "",
+          "name": "Ground_Tilemap",
+          "type": "TileMap::SimpleTileMap",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "atlasImage": "assets\\StartingPixelGroundTilemap.png",
+            "rowCount": 3,
+            "columnCount": 3,
+            "tileSize": 32,
+            "tilesWithHitBox": ""
+          }
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "Player",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Pathfinding",
+              "type": "PathfindingBehavior::PathfindingBehavior",
+              "acceleration": 400,
+              "allowDiagonals": false,
+              "cellHeight": 16,
+              "cellWidth": 16,
+              "maxSpeed": 125,
+              "angleOffset": 0,
+              "angularMaxSpeed": 180,
+              "extraBorder": 0,
+              "gridOffsetX": 0,
+              "gridOffsetY": 0,
+              "rotateObject": false,
+              "smoothingMaxCellGap": 1
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "assets\\StartingPixelPlayer.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 32,
+                            "y": 0
+                          },
+                          {
+                            "x": 32,
+                            "y": 32
+                          },
+                          {
+                            "x": 0,
+                            "y": 32
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "bottomMargin": 32,
+          "height": 96,
+          "leftMargin": 32,
+          "name": "Water_Passable",
+          "rightMargin": 32,
+          "texture": "assets\\StartingPixelWater.png",
+          "tiled": true,
+          "topMargin": 32,
+          "type": "PanelSpriteObject::PanelSprite",
+          "width": 96,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "PathfindingObstacle",
+              "type": "PathfindingBehavior::PathfindingObstacleBehavior",
+              "cost": 5,
+              "impassable": false
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "Obstacle_Impassable",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "PathfindingObstacle",
+              "type": "PathfindingBehavior::PathfindingObstacleBehavior",
+              "cost": 2,
+              "impassable": true
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "assets\\StartingPixelWall.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 32,
+                            "y": 0
+                          },
+                          {
+                            "x": 32,
+                            "y": 32
+                          },
+                          {
+                            "x": 0,
+                            "y": 32
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "Player"
+          },
+          {
+            "objectName": "Ground_Tilemap"
+          },
+          {
+            "objectName": "Water_Passable"
+          },
+          {
+            "objectName": "Obstacle_Impassable"
+          }
+        ]
+      },
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ZoomCamera"
+              },
+              "parameters": [
+                "",
+                "2",
+                "",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "MouseButtonFromTextPressed"
+              },
+              "parameters": [
+                "",
+                "\"Left\""
+              ]
+            },
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "PathfindingBehavior::SetDestination"
+              },
+              "parameters": [
+                "Player",
+                "Pathfinding",
+                "",
+                "CursorX()-(Player.Width()/2)",
+                "CursorY()-(Player.Height()/2)"
+              ]
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": [
+        {
+          "name": "Animation",
+          "type": "AnimatableCapability::AnimatableBehavior"
+        },
+        {
+          "name": "Effect",
+          "type": "EffectCapability::EffectBehavior"
+        },
+        {
+          "name": "Flippable",
+          "type": "FlippableCapability::FlippableBehavior"
+        },
+        {
+          "name": "Opacity",
+          "type": "OpacityCapability::OpacityBehavior"
+        },
+        {
+          "name": "Pathfinding",
+          "type": "PathfindingBehavior::PathfindingBehavior"
+        },
+        {
+          "name": "PathfindingObstacle",
+          "type": "PathfindingBehavior::PathfindingObstacleBehavior"
+        },
+        {
+          "name": "Resizable",
+          "type": "ResizableCapability::ResizableBehavior"
+        },
+        {
+          "name": "Scale",
+          "type": "ScalableCapability::ScalableBehavior"
+        }
+      ]
+    }
+  ],
+  "externalEvents": [],
+  "eventsFunctionsExtensions": [],
+  "externalLayouts": []
+}

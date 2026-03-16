@@ -1,0 +1,3 @@
+# 2D Racing
+
+A top-down 2D car racing game where the player accelerates and steers using keyboard or mobile controls. The car uses physics-based movement and can collide with other physics obstacles in the scene. Checkpoints track the car’s position around the track, count laps completed, and record lap times. A timer measures the duration of each lap, and the UI displays the current lap number and most recent lap time. The engine sound effect increases in volume as the car’s speed increases.

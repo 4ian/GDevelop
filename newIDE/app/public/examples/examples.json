@@ -1,6 +1,24 @@
 {
   "exampleShortHeaders": [
     {
+      "id": "3d-platformer",
+      "slug": "3d-platformer",
+      "name": "3D Platformer",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/3d-platformer/preview.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
       "id": "3d-wall-sliding",
       "slug": "3d-wall-sliding",
       "name": "Amazing Teeth (3d wall sliding)",
@@ -17,6 +35,760 @@
       "gdevelopVersion": "5.6.0",
       "codeSizeLevel": "medium",
       "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "NatureElementsDemo",
+      "slug": "NatureElementsDemo",
+      "name": "Nature elements demo",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-2d-car-racing",
+      "slug": "starting-2d-car-racing",
+      "name": "starting-2d-car-racing",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-2d-car-racing/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-2d-driving",
+      "slug": "starting-2d-driving",
+      "name": "starting-2d-driving",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-2d-driving/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-2d-platformer-shooter",
+      "slug": "starting-2d-platformer-shooter",
+      "name": "starting-2d-platformer-shooter",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-2d-platformer-shooter/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-3d-car-racing",
+      "slug": "starting-3d-car-racing",
+      "name": "starting-3d-car-racing",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-car-racing/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-3d-draggable-tiles",
+      "slug": "starting-3d-draggable-tiles",
+      "name": "starting-3d-draggable-tiles",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-draggable-tiles/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-3d-driving",
+      "slug": "starting-3d-driving",
+      "name": "starting-3d-driving",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-driving/preview.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-3d-endless-runner",
+      "slug": "starting-3d-endless-runner",
+      "name": "starting-3d-endless-runner",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-endless-runner/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-3d-flight-sim",
+      "slug": "starting-3d-flight-sim",
+      "name": "starting-3d-flight-sim",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-flight-sim/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-3D-platformer",
+      "slug": "starting-3D-platformer",
+      "name": "starting-3D-platformer",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3D-platformer/preview.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-3d-point-and-click-adventure",
+      "slug": "starting-3d-point-and-click-adventure",
+      "name": "starting-3d-point-and-click-adventure",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-point-and-click-adventure/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-3d-rts-unit-selection",
+      "slug": "starting-3d-rts-unit-selection",
+      "name": "starting-3d-rts-unit-selection",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-rts-unit-selection/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-3d-shootemup",
+      "slug": "starting-3d-shootemup",
+      "name": "starting-3d-shootemup",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-shootemup/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-3d-tank",
+      "slug": "starting-3d-tank",
+      "name": "starting-3d-tank",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-tank/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-3d-tile-placement",
+      "slug": "starting-3d-tile-placement",
+      "name": "starting-3d-tile-placement",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-tile-placement/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-3d-top-down-rpg",
+      "slug": "starting-3d-top-down-rpg",
+      "name": "starting-3d-top-down-rpg",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-top-down-rpg/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-3d-twin-stick-shooter",
+      "slug": "starting-3d-twin-stick-shooter",
+      "name": "starting-3d-twin-stick-shooter",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-twin-stick-shooter/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-3d-vampire-survivor",
+      "slug": "starting-3d-vampire-survivor",
+      "name": "starting-3d-vampire-survivor",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-vampire-survivor/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-beatemup",
+      "slug": "starting-beatemup",
+      "name": "starting-beatemup",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-beatemup/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-card-game",
+      "slug": "starting-card-game",
+      "name": "starting-card-game",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-card-game/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-clicker",
+      "slug": "starting-clicker",
+      "name": "starting-clicker",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-clicker/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-draggable-tiles",
+      "slug": "starting-draggable-tiles",
+      "name": "starting-draggable-tiles",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-draggable-tiles/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-endless-runner",
+      "slug": "starting-endless-runner",
+      "name": "starting-endless-runner",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-endless-runner/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-flappy-bird",
+      "slug": "starting-flappy-bird",
+      "name": "starting-flappy-bird",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-flappy-bird/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-physics",
+      "slug": "starting-physics",
+      "name": "starting-physics",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-physics/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-physics-pixel",
+      "slug": "starting-physics-pixel",
+      "name": "starting-physics-pixel",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-physics-pixel/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-platformer",
+      "slug": "starting-platformer",
+      "name": "starting-platformer",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-platformer/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-platformer-pixel",
+      "slug": "starting-platformer-pixel",
+      "name": "starting-platformer-pixel",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-platformer-pixel/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-point-and-click",
+      "slug": "starting-point-and-click",
+      "name": "starting-point-and-click",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-point-and-click/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-point-and-click-adventure",
+      "slug": "starting-point-and-click-adventure",
+      "name": "starting-point-and-click-adventure",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-point-and-click-adventure/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-point-and-click-pixel",
+      "slug": "starting-point-and-click-pixel",
+      "name": "starting-point-and-click-pixel",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-point-and-click-pixel/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-quiz",
+      "slug": "starting-quiz",
+      "name": "starting-quiz",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-quiz/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-rts-unit-selection",
+      "slug": "starting-rts-unit-selection",
+      "name": "starting-rts-unit-selection",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-rts-unit-selection/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-shootemup",
+      "slug": "starting-shootemup",
+      "name": "starting-shootemup",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-shootemup/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-tile-placement",
+      "slug": "starting-tile-placement",
+      "name": "starting-tile-placement",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-tile-placement/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-top-down",
+      "slug": "starting-top-down",
+      "name": "starting-top-down",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-top-down/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-top-down-farming",
+      "slug": "starting-top-down-farming",
+      "name": "starting-top-down-farming",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-top-down-farming/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-top-down-pixel",
+      "slug": "starting-top-down-pixel",
+      "name": "starting-top-down-pixel",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-top-down-pixel/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-top-down-rpg",
+      "slug": "starting-top-down-rpg",
+      "name": "starting-top-down-rpg",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-top-down-rpg/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-top-down-survival-crafting",
+      "slug": "starting-top-down-survival-crafting",
+      "name": "starting-top-down-survival-crafting",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-top-down-survival-crafting/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-twin-stick-shooter",
+      "slug": "starting-twin-stick-shooter",
+      "name": "starting-twin-stick-shooter",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-twin-stick-shooter/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
+    },
+    {
+      "id": "starting-vampire-survivor",
+      "slug": "starting-vampire-survivor",
+      "name": "starting-vampire-survivor",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-vampire-survivor/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate"
     }
   ],
   "filters": {
@@ -29,6 +801,26 @@
     "tagsTree": []
   },
   "examplesById": {
+    "3d-platformer": {
+      "id": "3d-platformer",
+      "slug": "3d-platformer",
+      "name": "3D Platformer",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/3d-platformer/preview.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/3d-platformer/3d-platformer.json",
+      "authors": []
+    },
     "3d-wall-sliding": {
       "id": "3d-wall-sliding",
       "slug": "3d-wall-sliding",
@@ -47,6 +839,844 @@
       "codeSizeLevel": "medium",
       "difficultyLevel": "intermediate",
       "projectFileUrl": "examples/3d-wall-sliding/game.json",
+      "authors": []
+    },
+    "NatureElementsDemo": {
+      "id": "NatureElementsDemo",
+      "slug": "NatureElementsDemo",
+      "name": "Nature elements demo",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/NatureElementsDemo/game.json",
+      "authors": []
+    },
+    "starting-2d-car-racing": {
+      "id": "starting-2d-car-racing",
+      "slug": "starting-2d-car-racing",
+      "name": "starting-2d-car-racing",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-2d-car-racing/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-2d-car-racing/starting-2d-car-racing.json",
+      "authors": []
+    },
+    "starting-2d-driving": {
+      "id": "starting-2d-driving",
+      "slug": "starting-2d-driving",
+      "name": "starting-2d-driving",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-2d-driving/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-2d-driving/starting-2d-driving.json",
+      "authors": []
+    },
+    "starting-2d-platformer-shooter": {
+      "id": "starting-2d-platformer-shooter",
+      "slug": "starting-2d-platformer-shooter",
+      "name": "starting-2d-platformer-shooter",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-2d-platformer-shooter/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-2d-platformer-shooter/starting-2d-platformer-shooter.json",
+      "authors": []
+    },
+    "starting-3d-car-racing": {
+      "id": "starting-3d-car-racing",
+      "slug": "starting-3d-car-racing",
+      "name": "starting-3d-car-racing",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-car-racing/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-3d-car-racing/starting-3d-car-racing.json",
+      "authors": []
+    },
+    "starting-3d-draggable-tiles": {
+      "id": "starting-3d-draggable-tiles",
+      "slug": "starting-3d-draggable-tiles",
+      "name": "starting-3d-draggable-tiles",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-draggable-tiles/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-3d-draggable-tiles/starting-3d-draggable-tiles.json",
+      "authors": []
+    },
+    "starting-3d-driving": {
+      "id": "starting-3d-driving",
+      "slug": "starting-3d-driving",
+      "name": "starting-3d-driving",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-driving/preview.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-3d-driving/starting-3d-driving.json",
+      "authors": []
+    },
+    "starting-3d-endless-runner": {
+      "id": "starting-3d-endless-runner",
+      "slug": "starting-3d-endless-runner",
+      "name": "starting-3d-endless-runner",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-endless-runner/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-3d-endless-runner/starting-3d-endless-runner.json",
+      "authors": []
+    },
+    "starting-3d-flight-sim": {
+      "id": "starting-3d-flight-sim",
+      "slug": "starting-3d-flight-sim",
+      "name": "starting-3d-flight-sim",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-flight-sim/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-3d-flight-sim/starting-3d-flight-sim.json",
+      "authors": []
+    },
+    "starting-3D-platformer": {
+      "id": "starting-3D-platformer",
+      "slug": "starting-3D-platformer",
+      "name": "starting-3D-platformer",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3D-platformer/preview.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-3D-platformer/starting-3D-platformer.json",
+      "authors": []
+    },
+    "starting-3d-point-and-click-adventure": {
+      "id": "starting-3d-point-and-click-adventure",
+      "slug": "starting-3d-point-and-click-adventure",
+      "name": "starting-3d-point-and-click-adventure",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-point-and-click-adventure/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-3d-point-and-click-adventure/starting-3d-point-and-click-adventure.json",
+      "authors": []
+    },
+    "starting-3d-rts-unit-selection": {
+      "id": "starting-3d-rts-unit-selection",
+      "slug": "starting-3d-rts-unit-selection",
+      "name": "starting-3d-rts-unit-selection",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-rts-unit-selection/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-3d-rts-unit-selection/starting-3d-rts-unit-selection.json",
+      "authors": []
+    },
+    "starting-3d-shootemup": {
+      "id": "starting-3d-shootemup",
+      "slug": "starting-3d-shootemup",
+      "name": "starting-3d-shootemup",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-shootemup/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-3d-shootemup/starting-3d-shootemup.json",
+      "authors": []
+    },
+    "starting-3d-tank": {
+      "id": "starting-3d-tank",
+      "slug": "starting-3d-tank",
+      "name": "starting-3d-tank",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-tank/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-3d-tank/starting-3d-tank.json",
+      "authors": []
+    },
+    "starting-3d-tile-placement": {
+      "id": "starting-3d-tile-placement",
+      "slug": "starting-3d-tile-placement",
+      "name": "starting-3d-tile-placement",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-tile-placement/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-3d-tile-placement/starting-3d-tile-placement.json",
+      "authors": []
+    },
+    "starting-3d-top-down-rpg": {
+      "id": "starting-3d-top-down-rpg",
+      "slug": "starting-3d-top-down-rpg",
+      "name": "starting-3d-top-down-rpg",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-top-down-rpg/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-3d-top-down-rpg/starting-3d-top-down-rpg.json",
+      "authors": []
+    },
+    "starting-3d-twin-stick-shooter": {
+      "id": "starting-3d-twin-stick-shooter",
+      "slug": "starting-3d-twin-stick-shooter",
+      "name": "starting-3d-twin-stick-shooter",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-twin-stick-shooter/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-3d-twin-stick-shooter/starting-3d-twin-stick-shooter.json",
+      "authors": []
+    },
+    "starting-3d-vampire-survivor": {
+      "id": "starting-3d-vampire-survivor",
+      "slug": "starting-3d-vampire-survivor",
+      "name": "starting-3d-vampire-survivor",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-3d-vampire-survivor/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.6.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-3d-vampire-survivor/starting-3d-vampire-survivor.json",
+      "authors": []
+    },
+    "starting-beatemup": {
+      "id": "starting-beatemup",
+      "slug": "starting-beatemup",
+      "name": "starting-beatemup",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-beatemup/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-beatemup/starting-beatemup.json",
+      "authors": []
+    },
+    "starting-card-game": {
+      "id": "starting-card-game",
+      "slug": "starting-card-game",
+      "name": "starting-card-game",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-card-game/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-card-game/starting-card-game.json",
+      "authors": []
+    },
+    "starting-clicker": {
+      "id": "starting-clicker",
+      "slug": "starting-clicker",
+      "name": "starting-clicker",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-clicker/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-clicker/starting-clicker.json",
+      "authors": []
+    },
+    "starting-draggable-tiles": {
+      "id": "starting-draggable-tiles",
+      "slug": "starting-draggable-tiles",
+      "name": "starting-draggable-tiles",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-draggable-tiles/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-draggable-tiles/starting-draggable-tiles.json",
+      "authors": []
+    },
+    "starting-endless-runner": {
+      "id": "starting-endless-runner",
+      "slug": "starting-endless-runner",
+      "name": "starting-endless-runner",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-endless-runner/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-endless-runner/starting-endless-runner.json",
+      "authors": []
+    },
+    "starting-flappy-bird": {
+      "id": "starting-flappy-bird",
+      "slug": "starting-flappy-bird",
+      "name": "starting-flappy-bird",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-flappy-bird/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-flappy-bird/starting-flappy-bird.json",
+      "authors": []
+    },
+    "starting-physics": {
+      "id": "starting-physics",
+      "slug": "starting-physics",
+      "name": "starting-physics",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-physics/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-physics/starting-physics.json",
+      "authors": []
+    },
+    "starting-physics-pixel": {
+      "id": "starting-physics-pixel",
+      "slug": "starting-physics-pixel",
+      "name": "starting-physics-pixel",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-physics-pixel/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-physics-pixel/starting-physics-pixel.json",
+      "authors": []
+    },
+    "starting-platformer": {
+      "id": "starting-platformer",
+      "slug": "starting-platformer",
+      "name": "starting-platformer",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-platformer/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-platformer/starting-platformer.json",
+      "authors": []
+    },
+    "starting-platformer-pixel": {
+      "id": "starting-platformer-pixel",
+      "slug": "starting-platformer-pixel",
+      "name": "starting-platformer-pixel",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-platformer-pixel/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-platformer-pixel/starting-platformer-pixel.json",
+      "authors": []
+    },
+    "starting-point-and-click": {
+      "id": "starting-point-and-click",
+      "slug": "starting-point-and-click",
+      "name": "starting-point-and-click",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-point-and-click/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-point-and-click/starting-point-and-click.json",
+      "authors": []
+    },
+    "starting-point-and-click-adventure": {
+      "id": "starting-point-and-click-adventure",
+      "slug": "starting-point-and-click-adventure",
+      "name": "starting-point-and-click-adventure",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-point-and-click-adventure/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-point-and-click-adventure/starting-point-and-click-adventure.json",
+      "authors": []
+    },
+    "starting-point-and-click-pixel": {
+      "id": "starting-point-and-click-pixel",
+      "slug": "starting-point-and-click-pixel",
+      "name": "starting-point-and-click-pixel",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-point-and-click-pixel/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-point-and-click-pixel/starting-point-and-click-pixel.json",
+      "authors": []
+    },
+    "starting-quiz": {
+      "id": "starting-quiz",
+      "slug": "starting-quiz",
+      "name": "starting-quiz",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-quiz/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-quiz/starting-quiz.json",
+      "authors": []
+    },
+    "starting-rts-unit-selection": {
+      "id": "starting-rts-unit-selection",
+      "slug": "starting-rts-unit-selection",
+      "name": "starting-rts-unit-selection",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-rts-unit-selection/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-rts-unit-selection/starting-rts-unit-selection.json",
+      "authors": []
+    },
+    "starting-shootemup": {
+      "id": "starting-shootemup",
+      "slug": "starting-shootemup",
+      "name": "starting-shootemup",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-shootemup/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-shootemup/starting-shootemup.json",
+      "authors": []
+    },
+    "starting-tile-placement": {
+      "id": "starting-tile-placement",
+      "slug": "starting-tile-placement",
+      "name": "starting-tile-placement",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-tile-placement/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-tile-placement/starting-tile-placement.json",
+      "authors": []
+    },
+    "starting-top-down": {
+      "id": "starting-top-down",
+      "slug": "starting-top-down",
+      "name": "starting-top-down",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-top-down/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-top-down/starting-top-down.json",
+      "authors": []
+    },
+    "starting-top-down-farming": {
+      "id": "starting-top-down-farming",
+      "slug": "starting-top-down-farming",
+      "name": "starting-top-down-farming",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-top-down-farming/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-top-down-farming/starting-top-down-farming.json",
+      "authors": []
+    },
+    "starting-top-down-pixel": {
+      "id": "starting-top-down-pixel",
+      "slug": "starting-top-down-pixel",
+      "name": "starting-top-down-pixel",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-top-down-pixel/preview.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-top-down-pixel/starting-top-down-pixel.json",
+      "authors": []
+    },
+    "starting-top-down-rpg": {
+      "id": "starting-top-down-rpg",
+      "slug": "starting-top-down-rpg",
+      "name": "starting-top-down-rpg",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-top-down-rpg/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-top-down-rpg/starting-top-down-rpg.json",
+      "authors": []
+    },
+    "starting-top-down-survival-crafting": {
+      "id": "starting-top-down-survival-crafting",
+      "slug": "starting-top-down-survival-crafting",
+      "name": "starting-top-down-survival-crafting",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-top-down-survival-crafting/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-top-down-survival-crafting/starting-top-down-survival-crafting.json",
+      "authors": []
+    },
+    "starting-twin-stick-shooter": {
+      "id": "starting-twin-stick-shooter",
+      "slug": "starting-twin-stick-shooter",
+      "name": "starting-twin-stick-shooter",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-twin-stick-shooter/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-twin-stick-shooter/starting-twin-stick-shooter.json",
+      "authors": []
+    },
+    "starting-vampire-survivor": {
+      "id": "starting-vampire-survivor",
+      "slug": "starting-vampire-survivor",
+      "name": "starting-vampire-survivor",
+      "shortDescription": "Local example template.",
+      "description": "",
+      "license": "MIT",
+      "tags": [
+        "Template"
+      ],
+      "authorIds": [],
+      "previewImageUrls": [
+        "examples/starting-vampire-survivor/thumbnail.png"
+      ],
+      "gdevelopVersion": "5.5.0",
+      "codeSizeLevel": "medium",
+      "difficultyLevel": "intermediate",
+      "projectFileUrl": "examples/starting-vampire-survivor/starting-vampire-survivor.json",
       "authors": []
     }
   }

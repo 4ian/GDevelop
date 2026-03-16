@@ -1,0 +1,3 @@
+# Beat'em up
+
+A 2D side-scrolling beat’em up brawler where the player uses top-down style movement within a side-view camera angle. All movement, attacks, and hurt states use animations and animation timers. The player uses a separate attack collision object to detect hits on enemies, while enemies move toward the player and attack using their own collision mask objects to detect hits on the player. Boundaries keep the player within the play area of the screen. The game supports both keyboard and mobile touch controls.

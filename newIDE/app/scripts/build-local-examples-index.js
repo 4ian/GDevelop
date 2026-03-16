@@ -18,31 +18,56 @@ const toVersionString = gdVersion => {
   return `${major}.${minor}.${revision}`;
 };
 
-const hasPreview = folderPath =>
-  fs.existsSync(path.join(folderPath, 'preview.jpg')) ||
-  fs.existsSync(path.join(folderPath, 'preview.png'));
+const findProjectFile = (folderPath, folderName) => {
+  const gamePath = path.join(folderPath, 'game.json');
+  if (fs.existsSync(gamePath)) {
+    return { fileName: 'game.json', filePath: gamePath };
+  }
+
+  const jsonFiles = fs
+    .readdirSync(folderPath)
+    .filter(name => name.toLowerCase().endsWith('.json'));
+  if (!jsonFiles.length) return null;
+
+  const folderJson = `${folderName}.json`.toLowerCase();
+  const match =
+    jsonFiles.find(name => name.toLowerCase() === folderJson) || jsonFiles[0];
+
+  return {
+    fileName: match,
+    filePath: path.join(folderPath, match),
+  };
+};
+
+const findPreviewFile = folderPath => {
+  const candidates = [
+    'preview.jpg',
+    'preview.png',
+    'thumbnail.jpg',
+    'thumbnail.png',
+  ];
+  return candidates.find(fileName =>
+    fs.existsSync(path.join(folderPath, fileName))
+  );
+};
 
 const buildExampleEntry = folderName => {
   const folderPath = path.join(examplesRoot, folderName);
-  const gamePath = path.join(folderPath, 'game.json');
-  if (!fs.existsSync(gamePath)) return null;
+  const projectFile = findProjectFile(folderPath, folderName);
+  if (!projectFile) return null;
 
-  const game = readJson(gamePath);
+  const game = readJson(projectFile.filePath);
   const props = game.properties || {};
   const gdVersion = toVersionString(game.gdVersion);
 
-  const id = props.templateSlug || folderName;
+  const id = folderName;
   if (excludedIds.has(id)) return null;
 
   const name = props.name || folderName;
   const description = props.description || '';
   const shortDescription = description || 'Local example template.';
 
-  const previewFile = fs.existsSync(path.join(folderPath, 'preview.jpg'))
-    ? 'preview.jpg'
-    : fs.existsSync(path.join(folderPath, 'preview.png'))
-    ? 'preview.png'
-    : null;
+  const previewFile = findPreviewFile(folderPath);
 
   const previewImageUrls = previewFile
     ? [`examples/${folderName}/${previewFile}`]
@@ -63,7 +88,7 @@ const buildExampleEntry = folderName => {
     gdevelopVersion: gdVersion,
     codeSizeLevel: 'medium',
     difficultyLevel: 'intermediate',
-    projectFileUrl: `examples/${folderName}/game.json`,
+    projectFileUrl: `examples/${folderName}/${projectFile.fileName}`,
     authors: [],
   };
 };

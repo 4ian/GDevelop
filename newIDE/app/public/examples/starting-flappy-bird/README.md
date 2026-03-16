@@ -1,0 +1,3 @@
+# Flappy Bird
+
+A Flappy Bird-style 2D side view game where the player uses platformer behavior to jump and fall, navigating hazards that scroll in from the right at varying heights. Objects that move off the left side of the screen are recycled back to the right, and the background scrolls to the left, to create an endless scrolling environment. The level resets if the player collides with an obstacle or moves too high or too low. The game supports both mouse and mobile touch controls.

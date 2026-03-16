@@ -1,0 +1,3 @@
+# 3D Racing
+
+A 3D car racing game with a third-person camera view. The player accelerates and steers using keyboard or mobile controls. The car uses physics-based movement and can collide with other physics obstacles in the 3D environment. Checkpoints track the car’s position around the track, count completed laps, and measure lap times. A timer records each lap’s duration, and the UI displays the current lap number and most recent lap time.

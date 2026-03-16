@@ -1,0 +1,3 @@
+# 3D RPG
+
+A 3D top-down RPG-style game with an angled down camera view. The player can move left, right, up, or down, but cannot walk through building objects. When near an NPC, the player can press an action button to open a dialog box with text and two choice buttons. The camera follows the player along the X and Y axis without changing depth. The player character can be controlled with keyboard or touch screen controls.

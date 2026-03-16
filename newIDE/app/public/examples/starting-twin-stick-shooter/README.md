@@ -1,0 +1,3 @@
+# 2D Twin Stick Shooter
+
+A 2D top-down twin-stick shooter where the player moves freely along the X and Y axes while independently aiming to control the direction that bullets are fired. Enemies spawn off-screen around the player and continuously move toward them. Enemies take three hits to be destroyed, and the player dies if they collide with an enemy. The game supports keyboard and mouse controls, or mobile touch controls using two virtual joysticks for independent movement and shooting.

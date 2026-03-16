@@ -1,0 +1,3 @@
+# 3D Endless Runner
+
+A 3D side scrolling endless runner platformer where the player constantly moves to the right, and can jump or fall to navigate the level. The player dies if they collide with hazard objects. The scene continuously scrolls, moving objects that go off the left side of the screen to the right side of the screen to repopulate the path. The UI displays the distance traveled by the player. The game supports both keyboard and mobile touch screen controls for jumping.

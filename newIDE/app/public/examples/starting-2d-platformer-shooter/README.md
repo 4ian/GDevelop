@@ -1,0 +1,3 @@
+# 2D Platformer Shooter
+
+A 2D side-scrolling platformer where the player can move left or right, jump, and fall down. The player can fire bullets that travel in the direction the character is facing, and the character’s sprite flips when changing direction. Bullets can collide with target objects and destroy them upon collision. The game supports both keyboard and mobile controls for both movement and shooting.

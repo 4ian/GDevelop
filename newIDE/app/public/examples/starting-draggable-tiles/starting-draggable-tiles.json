@@ -1,0 +1,1147 @@
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 245,
+    "major": 5,
+    "minor": 5,
+    "revision": 0
+  },
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "antialiasingMode": "MSAA",
+    "antialisingEnabledOnMobile": false,
+    "folderProject": false,
+    "orientation": "landscape",
+    "packageName": "com.example.gamename",
+    "pixelsRounding": false,
+    "projectUuid": "fcb1b3f5-7e22-4639-916d-970e483a6151",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "",
+    "templateSlug": "starting-platformer",
+    "version": "1.0.0",
+    "name": "starting-draggable-tiles",
+    "description": "",
+    "author": "",
+    "windowWidth": 1280,
+    "windowHeight": 720,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 20,
+    "verticalSync": false,
+    "platformSpecificAssets": {
+      "android-icon-144": "",
+      "android-icon-192": "",
+      "android-icon-36": "",
+      "android-icon-48": "",
+      "android-icon-72": "",
+      "android-icon-96": "",
+      "android-windowSplashScreenAnimatedIcon": "",
+      "desktop-icon-512": "",
+      "ios-icon-100": "",
+      "ios-icon-1024": "",
+      "ios-icon-114": "",
+      "ios-icon-120": "",
+      "ios-icon-144": "",
+      "ios-icon-152": "",
+      "ios-icon-167": "",
+      "ios-icon-180": "",
+      "ios-icon-20": "",
+      "ios-icon-29": "",
+      "ios-icon-40": "",
+      "ios-icon-50": "",
+      "ios-icon-57": "",
+      "ios-icon-58": "",
+      "ios-icon-60": "",
+      "ios-icon-72": "",
+      "ios-icon-76": "",
+      "ios-icon-80": "",
+      "ios-icon-87": ""
+    },
+    "loadingScreen": {
+      "backgroundColor": 0,
+      "backgroundFadeInDuration": 0.2,
+      "backgroundImageResourceName": "",
+      "gdevelopLogoStyle": "light",
+      "logoAndProgressFadeInDuration": 0.2,
+      "logoAndProgressLogoFadeInDelay": 0,
+      "minDuration": 1.5,
+      "progressBarColor": 16777215,
+      "progressBarHeight": 20,
+      "progressBarMaxWidth": 200,
+      "progressBarMinWidth": 40,
+      "progressBarWidthPercent": 30,
+      "showGDevelopSplash": true,
+      "showProgressBar": true
+    },
+    "watermark": {
+      "placement": "bottom-left",
+      "showWatermark": true
+    },
+    "authorIds": [],
+    "authorUsernames": [],
+    "categories": [],
+    "playableDevices": [],
+    "extensionProperties": [],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "file": "assets/StartingUnit.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "assets\\StartingUnit.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "assets/StartingTower.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "assets\\StartingTower.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "assets/StartingTree.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "assets\\StartingTree.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "assets/BoardTilemap.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "assets\\BoardTilemap.png",
+        "smoothed": true,
+        "userAdded": false
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsFolderStructure": {
+    "folderName": "__ROOT"
+  },
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 255,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "Game_32Scene",
+      "name": "Game Scene",
+      "r": 255,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 255,
+      "uiSettings": {
+        "grid": true,
+        "gridType": "rectangular",
+        "gridWidth": 64,
+        "gridHeight": 64,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": true,
+        "zoomFactor": 0.6244537826600037,
+        "windowMask": false,
+        "selectedLayer": ""
+      },
+      "objectsGroups": [
+        {
+          "name": "DraggablePiece",
+          "objects": [
+            {
+              "name": "Unit"
+            },
+            {
+              "name": "Tower"
+            },
+            {
+              "name": "Tree"
+            }
+          ]
+        }
+      ],
+      "variables": [],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "locked": true,
+          "name": "Board_Tilemap",
+          "persistentUuid": "abf3cf44-1464-4211-92b1-1f63914b9e79",
+          "width": 0,
+          "x": 0,
+          "y": 0,
+          "zOrder": -1,
+          "numberProperties": [],
+          "stringProperties": [
+            {
+              "name": "tilemap",
+              "value": "{\"tileWidth\":64,\"tileHeight\":64,\"dimX\":20,\"dimY\":12,\"layers\":[{\"id\":0,\"alpha\":1,\"tiles\":[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,1,2,1,2,1,2,1,2,1,2,1,2,0,0,0,0],[0,0,0,0,2,1,2,1,2,1,2,1,2,1,2,1,0,0,0,0],[0,0,0,0,1,2,1,2,1,2,1,2,1,2,1,2,0,0,0,0],[0,0,0,0,2,1,2,1,2,1,2,1,2,1,2,1,0,0,0,0],[0,0,0,0,1,2,1,2,1,2,1,2,1,2,1,2,0,0,0,0],[0,0,0,0,2,1,2,1,2,1,2,1,2,1,2,1,0,0,0,0],[0,0,0,0,1,2,1,2,1,2,1,2,1,2,1,2,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]}]}"
+            }
+          ],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Unit",
+          "persistentUuid": "7bc16e36-b731-46e8-a995-c9b6458b53a5",
+          "width": 0,
+          "x": 320,
+          "y": 192,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Unit",
+          "persistentUuid": "332af2b4-3e90-461b-8913-182a50089018",
+          "width": 0,
+          "x": 256,
+          "y": 128,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Unit",
+          "persistentUuid": "9ab29974-1c4f-450f-a338-75d7bb07f893",
+          "width": 0,
+          "x": 256,
+          "y": 256,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Unit",
+          "persistentUuid": "104a5501-6d08-4e36-83a0-7a2ebe447ba6",
+          "width": 0,
+          "x": 256,
+          "y": 384,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Tower",
+          "persistentUuid": "04986b0f-9085-4991-9ce9-4b3e9e14bcb9",
+          "width": 0,
+          "x": 896,
+          "y": 128,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Tower",
+          "persistentUuid": "04422722-5fc1-42d5-9549-e548699c3cee",
+          "width": 0,
+          "x": 896,
+          "y": 256,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Tower",
+          "persistentUuid": "a583205f-e80a-403c-bf8c-134f5dce6961",
+          "width": 0,
+          "x": 960,
+          "y": 192,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Tree",
+          "persistentUuid": "b6b1f19f-cd16-471f-8258-fcb4f598bdff",
+          "width": 0,
+          "x": 448,
+          "y": 192,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Unit",
+          "persistentUuid": "e2745f8a-e7b2-4c95-803c-4d331c189899",
+          "width": 0,
+          "x": 320,
+          "y": 320,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Unit",
+          "persistentUuid": "d2064273-4a69-4772-b476-2fcf790b1b0d",
+          "width": 0,
+          "x": 320,
+          "y": 448,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Unit",
+          "persistentUuid": "9834f02e-38ea-4b4e-a44a-6105caf6e76b",
+          "width": 0,
+          "x": 256,
+          "y": 512,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Tower",
+          "persistentUuid": "cbf266d1-9229-4006-a2fc-c02beb9b061c",
+          "width": 0,
+          "x": 896,
+          "y": 512,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Tower",
+          "persistentUuid": "305bb5e0-bffe-4029-af59-81f0550cf85e",
+          "width": 0,
+          "x": 960,
+          "y": 320,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Tower",
+          "persistentUuid": "5fd9dbfc-1b80-45bc-850c-008fc75f5165",
+          "width": 0,
+          "x": 896,
+          "y": 384,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Tower",
+          "persistentUuid": "cac6147a-2d92-4c12-9b32-b5c759abf850",
+          "width": 0,
+          "x": 960,
+          "y": 448,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Tree",
+          "persistentUuid": "365f62fb-1115-487a-9d5f-4f44e4ac4fb2",
+          "width": 0,
+          "x": 768,
+          "y": 512,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Tree",
+          "persistentUuid": "a94823a8-dd62-41b0-9b9f-65e7a020313d",
+          "width": 0,
+          "x": 640,
+          "y": 256,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Tree",
+          "persistentUuid": "f10f74bc-0db0-4d19-9e85-3cddac2b3904",
+          "width": 0,
+          "x": 576,
+          "y": 448,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "assetStoreId": "",
+          "name": "Board_Tilemap",
+          "type": "TileMap::SimpleTileMap",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "atlasImage": "assets\\BoardTilemap.png",
+            "rowCount": 3,
+            "columnCount": 1,
+            "tileSize": 64,
+            "tilesWithHitBox": ""
+          }
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "Unit",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "LastXPosition",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "LastYPosition",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Draggable",
+              "type": "DraggableBehavior::Draggable",
+              "checkCollisionMask": true
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "assets\\StartingUnit.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 17,
+                            "y": 5
+                          },
+                          {
+                            "x": 47,
+                            "y": 5
+                          },
+                          {
+                            "x": 47,
+                            "y": 59
+                          },
+                          {
+                            "x": 17,
+                            "y": 59
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "Tower",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "LastYPosition",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "LastXPosition",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Draggable",
+              "type": "DraggableBehavior::Draggable",
+              "checkCollisionMask": true
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "assets\\StartingTower.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 12,
+                            "y": 6
+                          },
+                          {
+                            "x": 52,
+                            "y": 6
+                          },
+                          {
+                            "x": 52,
+                            "y": 59
+                          },
+                          {
+                            "x": 12,
+                            "y": 59
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "Tree",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "LastYPosition",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "LastXPosition",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Draggable",
+              "type": "DraggableBehavior::Draggable",
+              "checkCollisionMask": true
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "assets\\StartingTree.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 8,
+                            "y": 3
+                          },
+                          {
+                            "x": 56,
+                            "y": 3
+                          },
+                          {
+                            "x": 56,
+                            "y": 60
+                          },
+                          {
+                            "x": 8,
+                            "y": 60
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "Board_Tilemap"
+          },
+          {
+            "objectName": "Unit"
+          },
+          {
+            "objectName": "Tower"
+          },
+          {
+            "objectName": "Tree"
+          }
+        ]
+      },
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberObjectVariable"
+              },
+              "parameters": [
+                "DraggablePiece",
+                "LastXPosition",
+                "=",
+                "DraggablePiece.X()"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberObjectVariable"
+              },
+              "parameters": [
+                "DraggablePiece",
+                "LastYPosition",
+                "=",
+                "DraggablePiece.Y()"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "DraggableBehavior::Dropped"
+              },
+              "parameters": [
+                "DraggablePiece",
+                "Draggable"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SnapToGrid::SnapObjectToVirtualGrid"
+              },
+              "parameters": [
+                "",
+                "DraggablePiece",
+                "64",
+                "64",
+                "0",
+                "0",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "NewXPosition",
+                "=",
+                "DraggablePiece.X()"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "NewYPosition",
+                "=",
+                "DraggablePiece.Y()"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "AjoutObjConcern"
+                  },
+                  "parameters": [
+                    "",
+                    "DraggablePiece"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "NumberObjectVariable"
+                  },
+                  "parameters": [
+                    "DraggablePiece",
+                    "LastXPosition",
+                    "=",
+                    "NewXPosition"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "NumberObjectVariable"
+                  },
+                  "parameters": [
+                    "DraggablePiece",
+                    "LastYPosition",
+                    "=",
+                    "NewYPosition"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "Occupied",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Occupied",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "DraggablePiece",
+                    "=",
+                    "DraggablePiece.LastXPosition",
+                    "=",
+                    "DraggablePiece.LastYPosition"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "Occupied",
+                    "False",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberObjectVariable"
+                  },
+                  "parameters": [
+                    "DraggablePiece",
+                    "LastXPosition",
+                    "=",
+                    "DraggablePiece.X()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberObjectVariable"
+                  },
+                  "parameters": [
+                    "DraggablePiece",
+                    "LastYPosition",
+                    "=",
+                    "DraggablePiece.Y()"
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "Occupied",
+              "type": "boolean",
+              "value": false
+            },
+            {
+              "name": "NewXPosition",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "NewYPosition",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": [
+        {
+          "name": "Animation",
+          "type": "AnimatableCapability::AnimatableBehavior"
+        },
+        {
+          "name": "Effect",
+          "type": "EffectCapability::EffectBehavior"
+        },
+        {
+          "name": "Flippable",
+          "type": "FlippableCapability::FlippableBehavior"
+        },
+        {
+          "name": "Opacity",
+          "type": "OpacityCapability::OpacityBehavior"
+        },
+        {
+          "name": "Resizable",
+          "type": "ResizableCapability::ResizableBehavior"
+        },
+        {
+          "name": "Scale",
+          "type": "ScalableCapability::ScalableBehavior"
+        }
+      ]
+    }
+  ],
+  "externalEvents": [],
+  "eventsFunctionsExtensions": [
+    {
+      "author": "@Lizard-13",
+      "category": "Game mechanic",
+      "extensionNamespace": "",
+      "fullName": "Rectangular 2D grid",
+      "gdevelopVersion": ">=5.5.222",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZpZXctZ3JpZC1wbHVzLW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMyAyMUgxMVYxM0gzTTUgMTVIOVYxOUg1TTMgMTFIMTFWM0gzTTUgNUg5VjlINU0xMyAzVjExSDIxVjNNMTkgOUgxNVY1SDE5TTE4IDE2SDIxVjE4SDE4VjIxSDE2VjE4SDEzVjE2SDE2VjEzSDE4WiIgLz48L3N2Zz4=",
+      "name": "SnapToGrid",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/view-grid-plus-outline.svg",
+      "shortDescription": "Snap objects on a virtual grid.",
+      "version": "0.0.4",
+      "description": [
+        "It allows to snap objects on a *virtual 2D grid*.",
+        "",
+        "It's useful for:",
+        "- level editors",
+        "- building systems",
+        "",
+        "A [simple example](https://editor.gdevelop.io/?project=example://snap-object-to-grid) shows how to snap objects that are dragged with the mouse."
+      ],
+      "origin": {
+        "identifier": "SnapToGrid",
+        "name": "gdevelop-extension-store"
+      },
+      "tags": [
+        "snap",
+        "grid",
+        "positioning",
+        "tiles"
+      ],
+      "authorIds": [],
+      "dependencies": [],
+      "globalVariables": [],
+      "sceneVariables": [],
+      "eventsFunctions": [
+        {
+          "description": "Snap object to a virtual grid (i.e: this is not the grid used in the editor).",
+          "fullName": "Snap objects to a virtual grid",
+          "functionType": "Action",
+          "name": "SnapObjectToVirtualGrid",
+          "sentence": "Snap _PARAM1_ to a virtual grid using cells with width: _PARAM2_px, height _PARAM3_px and an offset position (_PARAM4_; _PARAM5_)",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Round the Object position to snap to the in-game grid"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "CellWidth * round((Object.X() - OffsetX) / CellWidth) + OffsetX",
+                    "=",
+                    "CellHeight * round((Object.Y() - OffsetY) / CellHeight) + OffsetY"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Objects to snap to the virtual grid",
+              "name": "Object",
+              "type": "objectList"
+            },
+            {
+              "description": "Width of a cell of the virtual grid (in pixels)",
+              "name": "CellWidth",
+              "type": "expression"
+            },
+            {
+              "description": "Height of a cell of the virtual grid (in pixels)",
+              "name": "CellHeight",
+              "type": "expression"
+            },
+            {
+              "description": "Offset on the X axis of the virtual grid (in pixels)",
+              "name": "OffsetX",
+              "type": "expression"
+            },
+            {
+              "description": "Offset on the Y axis of the virtual grid (in pixels)",
+              "name": "OffsetY",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "eventsBasedBehaviors": [],
+      "eventsBasedObjects": []
+    }
+  ],
+  "externalLayouts": []
+}

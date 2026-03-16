@@ -1,0 +1,5 @@
+# Top-down Survival Crafting
+
+A 2D angled top-down game where the player uses the Top-Down Movement behavior to move smoothly in all directions. The scene includes a ground tilemap, as well as solid tree and boulder objects that the player can't pass through. The player can pick up objects and store them in an inventory, then place objects back onto the ground using a ground selection tool to check if that location is one where the object can be placed. Performing an action on the harvestable tree and boulder objects will add resources to the inventory. The inventory uses UI icons to display the contents of the inventory, as well as allow the player to select which item to use and choose which slot a picked-up object will occupy. 
+
+This setup works well for any game where the player picks up resources and crafts things with those resources, especially for survival crafting games. The game supports both keyboard/mouse controls and mobile touch controls.

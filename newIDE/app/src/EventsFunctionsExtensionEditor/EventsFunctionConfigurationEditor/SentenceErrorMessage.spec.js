@@ -1,5 +1,5 @@
 // @flow
-import { getSentenceErrorText } from './CompactEventsFunctionPropertiesEditor';
+import { getSentenceErrorText } from './SentenceErrorMessage';
 const gd: libGDevelop = global.gd;
 
 // $FlowFixMe[incompatible-type]

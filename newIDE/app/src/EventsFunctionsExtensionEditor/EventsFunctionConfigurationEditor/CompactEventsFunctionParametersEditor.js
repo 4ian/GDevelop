@@ -642,7 +642,7 @@ export const CompactEventsFunctionParametersEditor = ({
                       if (!child) return null;
                       return (
                         <Line>
-                          <Column noMargin expand>
+                          <Column noMargin expand noOverflowParent>
                             {child}
                           </Column>
                         </Line>
@@ -711,13 +711,13 @@ export const CompactEventsFunctionParametersEditor = ({
                                       alignItems="center"
                                     >
                                       <Text
+                                        color="secondary"
                                         style={{
                                           whiteSpace: 'nowrap',
                                         }}
                                       >
                                         <Trans>
                                           Parameter #{i + parametersIndexOffset}
-                                          :
                                         </Trans>
                                       </Text>
                                       <CompactSemiControlledTextField
@@ -926,7 +926,7 @@ export const CompactEventsFunctionParametersEditor = ({
                     <LineStackLayout justifyContent="flex-end" expand>
                       <RaisedButton
                         primary
-                        label={<Trans>Add a parameter</Trans>}
+                        label={<Trans>Add</Trans>}
                         onClick={addParameter}
                         icon={<Add />}
                       />

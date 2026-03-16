@@ -24,7 +24,7 @@ export default function CompactResourceTypeSelectField({
     <I18n>
       {({ i18n }) => (
         <CompactPropertiesEditorRowField
-          label={i18n._(t`Behavior type`)}
+          label={i18n._(t`Resource kind`)}
           field={
             <CompactSelectField value={value} onChange={onChange}>
               {allResourceKindsAndMetadata.map(({ kind, displayName }) => (

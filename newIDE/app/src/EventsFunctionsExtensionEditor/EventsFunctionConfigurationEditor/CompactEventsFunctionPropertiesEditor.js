@@ -11,7 +11,6 @@ import { CompactToggleField } from '../../UI/CompactToggleField';
 import SelectOption from '../../UI/SelectOption';
 import { mapFor } from '../../Utils/MapFor';
 import HelpButton from '../../UI/HelpButton';
-import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { ColumnStackLayout } from '../../UI/Layout';
@@ -170,7 +169,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
       {({ i18n }) => (
         <ColumnStackLayout expand noOverflowParent noMargin>
           <CompactPropertiesEditorRowField
-            label={i18n._(t`Function type`)}
+            label={i18n._(t`Function Type`)}
             field={
               <CompactSelectField
                 value={type.toString()}
@@ -250,7 +249,8 @@ export const CompactEventsFunctionPropertiesEditor = ({
             />
           ) : (
             <CompactPropertiesEditorRowField
-              label={i18n._(t`Full name displayed in editor`)}
+              label={i18n._(t`Full name`)}
+              markdownDescription={i18n._(t`Full name displayed in editor`)}
               field={
                 <CompactSemiControlledTextField
                   commitOnBlur
@@ -273,7 +273,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
           {type === gd.EventsFunction.ActionWithOperator ? (
             <CompactTextAreaField
               disabled
-              label={i18n._(t`Description, displayed in editor`)}
+              label={i18n._(t`Description`)}
               value={
                 getterFunction
                   ? 'Change ' + getterFunction.getDescription()
@@ -286,9 +286,9 @@ export const CompactEventsFunctionPropertiesEditor = ({
               label={
                 type === gd.EventsFunction.ExpressionAndCondition
                   ? i18n._(
-                      t`Description, displayed in editor (automatically prefixed by "Compare" or "Return")`
+                      t`Description (will be prefixed by "Compare" or "Return")`
                     )
-                  : i18n._(t`Description, displayed in editor`)
+                  : i18n._(t`Description`)
               }
               markdownDescription={getDescriptionHintText(
                 type,
@@ -453,12 +453,9 @@ export const CompactEventsFunctionPropertiesEditor = ({
                 }
               />
               {eventsFunction.isDeprecated() && (
-                <SemiControlledTextField
-                  commitOnBlur
-                  floatingLabelText={<Trans>Deprecation message</Trans>}
-                  translatableHintText={t`Example: Use "New Action Name" instead.`}
-                  fullWidth
-                  multiline
+                <CompactTextAreaField
+                  placeholder={t`Example: Use "New Action Name" instead.`}
+                  label={i18n._(t`Deprecation notice`)}
                   value={eventsFunction.getDeprecationMessage()}
                   onChange={text => {
                     eventsFunction.setDeprecationMessage(text);

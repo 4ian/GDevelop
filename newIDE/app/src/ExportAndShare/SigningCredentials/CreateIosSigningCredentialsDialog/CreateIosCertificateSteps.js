@@ -169,6 +169,7 @@ export const CreateIosCertificateSteps = ({
 
         setWasCertificateGenerated(true);
       } catch (err) {
+        console.error('Error while uploading certificate:', err);
         setCertificateError(err);
       } finally {
         setIsCertificateLoading(false);

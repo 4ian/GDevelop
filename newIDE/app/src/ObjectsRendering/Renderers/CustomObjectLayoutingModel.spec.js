@@ -2,10 +2,8 @@
 import {
   getLayoutedRenderedInstance,
   LayoutedInstance,
-  // $FlowFixMe[import-type-as-value]
-  LayoutedParent,
-  // $FlowFixMe[import-type-as-value]
-  ChildRenderedInstance,
+  type LayoutedParent,
+  type ChildRenderedInstance,
 } from './CustomObjectLayoutingModel';
 
 const gd: libGDevelop = global.gd;
@@ -560,6 +558,7 @@ const getVerticalAnchorFor = (anchor: ?CustomObjectConfiguration_EdgeAnchor) =>
     : 'None';
 
 class MockedChildRenderedInstance implements ChildRenderedInstance {
+  // $FlowFixMe[incompatible-exact]
   _instance: gdInitialInstance;
   _pixiObject: { height: number };
   defaultWidth: number;

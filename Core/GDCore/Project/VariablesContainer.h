@@ -7,6 +7,7 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/Project/Variable.h"
 #include "GDCore/String.h"
 namespace gd {
@@ -195,6 +196,7 @@ class GD_CORE_API VariablesContainer {
                                       ///< useful for computing changesets.
   static gd::Variable badVariable;
   static gd::String badName;
+  gd::MemoryTracked _memoryTracked{this, "VariablesContainer"};
 
   /**
    * Initialize from another variables container, copying elements. Used by

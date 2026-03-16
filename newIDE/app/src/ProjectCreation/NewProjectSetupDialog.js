@@ -320,7 +320,7 @@ const NewProjectSetupDialog = ({
   }[] = React.useMemo(
     () => {
       if (
-        !exampleShortHeaders ||
+        !Array.isArray(exampleShortHeaders) ||
         !selectedExampleShortHeader ||
         !selectedExampleShortHeader.linkedExampleShortHeaders
       )

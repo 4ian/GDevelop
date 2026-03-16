@@ -711,6 +711,15 @@ static gd::String GetVariantFullType(const gd::String& extensionName,
 
   static gd::String GetObjectNameFromFullObjectType(const gd::String& type);
 
+  /**
+   * \brief Get the instruction name from a full type
+   * (e.g. "MyExtension::DoSomething" -> "DoSomething").
+   *
+   * If no namespace separator is found or the name after the separator is
+   * empty, the full type is returned as-is.
+   */
+  static gd::String GetInstructionNameFromFullType(const gd::String& type);
+
  private:
   /**
    * Set the namespace (the string all actions/conditions/expressions start

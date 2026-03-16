@@ -8,8 +8,7 @@ import ObjectsRenderingService from '../ObjectsRenderingService';
 import {
   getLayoutedRenderedInstance,
   LayoutedInstance,
-  // $FlowFixMe[import-type-as-value]
-  LayoutedParent,
+  type LayoutedParent,
 } from './CustomObjectLayoutingModel';
 import { mapVector } from '../../Utils/MapFor';
 import * as PIXI from 'pixi.js-legacy';
@@ -77,9 +76,7 @@ const getPropertyMappingRules = (
   if (!properties.has('_PropertyMapping')) {
     return [];
   }
-  // $FlowFixMe[incompatible-exact]
   return mapVector(properties.get('_PropertyMapping').getChoices(), choice => {
-    // $FlowFixMe[incompatible-use]
     const mapping = choice.getValue().split('=');
     if (mapping.length < 2) {
       return null;
@@ -100,7 +97,9 @@ const getPropertyMappingRules = (
  * Renderer for gd.CustomObject (the class is not exposed to newIDE)
  */
 export default class RenderedCustomObjectInstance extends Rendered3DInstance
-  implements LayoutedParent<RenderedInstance | Rendered3DInstance> {
+  implements
+    // $FlowFixMe[incompatible-exact]
+    LayoutedParent<RenderedInstance | Rendered3DInstance> {
   _isRenderedIn3D = false;
 
   /** Functor used to render an instance */
@@ -181,7 +180,8 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         | RenderedInstance
         | Rendered3DInstance
         | null = eventBasedObject.isInnerAreaFollowingParentSize()
-        ? getLayoutedRenderedInstance(this, instance)
+        ? // $FlowFixMe[incompatible-exact]
+          getLayoutedRenderedInstance(this, instance)
         : this.getRendererOfInstance(instance);
 
       if (!renderedInstance) return;

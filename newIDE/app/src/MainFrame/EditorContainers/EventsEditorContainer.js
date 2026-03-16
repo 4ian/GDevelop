@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import EventsSheet, { type EventsSheetInterface } from '../../EventsSheet';
+import type { EventPath } from '../../Utils/EventPath';
 import { sendEventsExtractedAsFunction } from '../../Utils/Analytics/EventSender';
 import {
   type RenderEditorContainerProps,
@@ -16,6 +17,7 @@ import {
   setEditorHotReloadNeeded,
   type HotReloadSteps,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
+import type { SearchFilterParams } from '../../Utils/Search';
 
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsSheetInterface;
@@ -63,8 +65,28 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     }
   }
 
-  scrollToEventPath(eventPath: Array<number>) {
+  scrollToEventPath(eventPath: EventPath) {
     if (this.editor) this.editor.scrollToEventPath(eventPath);
+  }
+
+  setGlobalSearchResults(
+    eventPaths: Array<EventPath>,
+    focusedEventPath: EventPath,
+    searchText: string,
+    searchFilters?: SearchFilterParams
+  ) {
+    if (this.editor) {
+      this.editor.setGlobalSearchResults(
+        eventPaths,
+        focusedEventPath,
+        searchText,
+        searchFilters
+      );
+    }
+  }
+
+  clearGlobalSearchResults() {
+    if (this.editor) this.editor.clearGlobalSearchResults();
   }
 
   forceUpdateEditor() {
@@ -132,7 +154,10 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     });
   };
 
-  onCreateEventsFunction = (extensionName: any, eventsFunction: any) => {
+  onCreateEventsFunction = (
+    extensionName: string,
+    eventsFunction: gdEventsFunction
+  ) => {
     this.props.onCreateEventsFunction(
       extensionName,
       eventsFunction,

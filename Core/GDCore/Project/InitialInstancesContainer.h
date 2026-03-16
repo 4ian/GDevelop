@@ -8,6 +8,7 @@
 
 #include <list>
 #include "GDCore/Project/InitialInstance.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/String.h"
 namespace gd {
 class InitialInstanceFunctor;
@@ -38,6 +39,14 @@ namespace gd {
 class GD_CORE_API InitialInstancesContainer {
  public:
   InitialInstancesContainer(){};
+  InitialInstancesContainer(const InitialInstancesContainer& other)
+      : initialInstances(other.initialInstances) {};
+  InitialInstancesContainer& operator=(const InitialInstancesContainer& other) {
+    if (this != &other) {
+      initialInstances = other.initialInstances;
+    }
+    return *this;
+  }
   virtual ~InitialInstancesContainer();
 
   /**
@@ -198,6 +207,7 @@ private:
   std::list<gd::InitialInstance> initialInstances;
 
   static gd::InitialInstance badPosition;
+  gd::MemoryTracked _memoryTracked{this, "InitialInstancesContainer"};
 };
 
 /**

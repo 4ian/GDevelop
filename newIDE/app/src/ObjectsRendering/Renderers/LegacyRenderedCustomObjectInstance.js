@@ -11,8 +11,7 @@ import {
   applyChildLayouts,
   ChildInstance,
   type ChildLayout,
-  // $FlowFixMe[import-type-as-value]
-  LayoutedParent,
+  type LayoutedParent,
   getProportionalPositionX,
   getProportionalPositionY,
   getProportionalPositionZ,
@@ -27,7 +26,9 @@ const gd: libGDevelop = global.gd;
  */
 export default class LegacyRenderedCustomObjectInstance
   extends Rendered3DInstance
-  implements LayoutedParent<RenderedInstance | Rendered3DInstance> {
+  implements
+    // $FlowFixMe[incompatible-exact]
+    LayoutedParent<RenderedInstance | Rendered3DInstance> {
   childrenInstances: ChildInstance[];
   childrenLayouts: ChildLayout[];
   childrenRenderedInstances: Array<RenderedInstance | Rendered3DInstance>;
@@ -271,6 +272,7 @@ export default class LegacyRenderedCustomObjectInstance
   }
 
   update() {
+    // $FlowFixMe[incompatible-exact]
     applyChildLayouts(this);
 
     // This allows a 3D custom object to use a 2D rendering in the editor.

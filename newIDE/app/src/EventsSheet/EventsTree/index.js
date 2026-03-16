@@ -141,6 +141,8 @@ type EventsContainerProps = {|
   idPrefix: string,
   highlightedAiGeneratedEventIds: Set<string>,
   isValidElseEvent: boolean,
+  highlightedSearchText: ?string,
+  highlightedSearchMatchCase?: boolean,
 |};
 
 /**
@@ -260,6 +262,8 @@ const EventContainer = (props: EventsContainerProps) => {
               windowSize={props.windowSize}
               idPrefix={props.idPrefix}
               isValidElseEvent={props.isValidElseEvent}
+              highlightedSearchText={props.highlightedSearchText}
+              highlightedSearchMatchCase={props.highlightedSearchMatchCase}
             />
           </div>
         </div>
@@ -351,6 +355,8 @@ type EventsTreeProps = {|
 
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
+  highlightedSearchText: ?string,
+  highlightedSearchMatchCase?: boolean,
 
   onEventMoved: (previousRowIndex: number, nextRowIndex: number) => void,
   onEndEditingEvent: (event: gdBaseEvent) => void,
@@ -427,14 +433,11 @@ const EventsTree: React.ComponentType<{
     };
   }, []);
 
-  /**
-   * Should be called whenever an event height has changed
-   */
-  const onHeightsChanged = React.useCallback(
-    (cb: ?() => void) => {
-      if (_list.current) {
-        _list.current.recomputeRowHeights();
-      }
+  const forceEventsUpdate = React.useCallback(
+    (cb?: () => void) => {
+      // Note: do not do anything here that would trigger re-render of the events yet,
+      // because they can be invalid (deleted). We just ask for a re-render of this component,
+      // which will rebuild the tree data passed to SortableEventsTree.
       forceUpdate();
 
       // Use a timeout so that the callback is called after the events
@@ -445,10 +448,9 @@ const EventsTree: React.ComponentType<{
     },
     [forceUpdate]
   );
-  const forceEventsUpdate = onHeightsChanged;
 
   React.useEffect(() => {
-    onHeightsChanged();
+    forceUpdate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -464,25 +466,25 @@ const EventsTree: React.ComponentType<{
   const unfoldForEvent = React.useCallback(
     (event: gdBaseEvent) => {
       gd.EventsListUnfolder.unfoldWhenContaining(props.events, event);
-      forceEventsUpdate();
+      forceUpdate();
     },
-    [forceEventsUpdate, props.events]
+    [forceUpdate, props.events]
   );
 
   const foldAll = React.useCallback(
     () => {
       gd.EventsListUnfolder.foldAll(props.events);
-      forceEventsUpdate();
+      forceUpdate();
     },
-    [forceEventsUpdate, props.events]
+    [forceUpdate, props.events]
   );
 
   const unfoldToLevel = React.useCallback(
     (level: number) => {
       gd.EventsListUnfolder.unfoldToLevel(props.events, level);
-      forceEventsUpdate();
+      forceUpdate();
     },
-    [forceEventsUpdate, props.events]
+    [forceUpdate, props.events]
   );
 
   const tutorial = React.useMemo(
@@ -505,9 +507,9 @@ const EventsTree: React.ComponentType<{
       );
 
       temporaryUnfoldedNodes.current = [];
-      forceEventsUpdate();
+      forceUpdate();
     },
-    [forceEventsUpdate]
+    [forceUpdate]
   );
 
   const _onEndDrag = React.useCallback(
@@ -520,10 +522,10 @@ const EventsTree: React.ComponentType<{
       if (draggedNode) {
         setDraggedNode(null);
         _restoreFoldedNodes();
-        forceEventsUpdate();
+        forceUpdate();
       }
     },
-    [draggedNode, _restoreFoldedNodes, forceEventsUpdate]
+    [draggedNode, _restoreFoldedNodes, forceUpdate]
   );
 
   const eventPtrToRowIndex = React.useRef<{ [key: string]: number }>({});
@@ -549,7 +551,7 @@ const EventsTree: React.ComponentType<{
               // $FlowFixMe[incompatible-type] - Per the condition above, we are confident that node.event is not null.
               event.setFolded(false);
               temporaryUnfoldedNodes.current.push(node);
-              forceEventsUpdate();
+              forceUpdate();
             }, 1000);
           }
         }
@@ -558,7 +560,7 @@ const EventsTree: React.ComponentType<{
         _hoverTimerId.current = null;
       }
     },
-    [forceEventsUpdate]
+    [forceUpdate]
   );
 
   const _getRowHeight = ({ node }: { node: ?SortableTreeNode }) => {
@@ -772,6 +774,8 @@ const EventsTree: React.ComponentType<{
                 windowSize={props.windowSize}
                 idPrefix={`event-${node.relativeNodePath.join('-')}`}
                 isValidElseEvent={isValidElseEvent}
+                highlightedSearchText={props.highlightedSearchText}
+                highlightedSearchMatchCase={props.highlightedSearchMatchCase}
                 highlightedAiGeneratedEventIds={
                   props.highlightedAiGeneratedEventIds
                 }
@@ -846,10 +850,8 @@ const EventsTree: React.ComponentType<{
           ? isElseEventValid(eventsList, i)
           : false;
 
-      // $FlowFixMe[missing-empty-array-annot]
-      const childrenTreeData = [];
+      const childrenTreeData: Array<SortableTreeNode> = [];
       buildEventsTreeData(
-        // $FlowFixMe[incompatible-type]
         childrenTreeData,
         projectScopedContainersAccessor,
         event.getSubEvents(),
@@ -1016,7 +1018,6 @@ const EventsTree: React.ComponentType<{
       .filter(Boolean);
   };
 
-  // $FlowFixMe[incompatible-type]
   React.useImperativeHandle(ref, () => ({
     forceEventsUpdate,
     foldAll,
@@ -1033,9 +1034,9 @@ const EventsTree: React.ComponentType<{
       if (!event) return;
 
       event.setFolded(!event.isFolded());
-      forceEventsUpdate();
+      forceUpdate();
     },
-    [forceEventsUpdate]
+    [forceUpdate]
   );
 
   const _isNodeHighlighted = React.useCallback(
@@ -1133,6 +1134,11 @@ const EventsTree: React.ComponentType<{
         searchMethod={_isNodeHighlighted}
         searchQuery={props.searchResults}
         searchFocusOffset={props.searchFocusOffset}
+        searchFocusedEvent={
+          props.searchResults && props.searchFocusOffset != null
+            ? props.searchResults[props.searchFocusOffset] || null
+            : null
+        }
         className={props.searchResults ? eventsTreeWithSearchResults : ''}
         reactVirtualizedListProps={{
           ref: list => {

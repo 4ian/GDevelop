@@ -1316,8 +1316,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const [
       selectedMainMenuItemIndices,
       setSelectedMainMenuItemIndices,
-      // $FlowFixMe[missing-empty-array-annot]
-    ] = React.useState([]);
+    ] = React.useState<Array<number>>([]);
     const isNavigatingInMainMenuItem = selectedMainMenuItemIndices.length > 0;
     const shouldHideMainMenu = isMacLike() && !!electron;
 

@@ -156,10 +156,7 @@ const extractErrors = (
   const fatalErrors = expressionValidator.getFatalErrors();
   const hasFatalErrors = fatalErrors.size() > 0;
 
-  // $FlowFixMe[incompatible-type]
-  // $FlowFixMe[incompatible-exact]
   const errorHighlights: Array<Highlight> = mapVector(errors, error => {
-    // $FlowFixMe[incompatible-use]
     const errorType = error.getType();
     const isDeprecated =
       errorType === gd.ExpressionParserError.DeprecatedExpression;
@@ -167,15 +164,13 @@ const extractErrors = (
     if (isDeprecated && showDeprecatedInstructionWarning === 'no') {
       return null;
     }
-    return {
-      // $FlowFixMe[incompatible-use]
+    const highlight: Highlight = {
       begin: error.getStartPosition(),
-      // $FlowFixMe[incompatible-use]
       end: error.getEndPosition() + 1,
-      // $FlowFixMe[incompatible-use]
       message: error.getMessage(),
       type: isDeprecated ? 'deprecated' : 'error',
     };
+    return highlight;
   }).filter(Boolean);
   const otherErrorsCount = Math.max(
     0,
@@ -671,7 +666,12 @@ export default class ExpressionField extends React.Component<Props, State> {
                     />
                   </div>
                   {this._inputElement && this.state.popoverOpen && (
-                    <ClickAwayListener onClickAway={this._handleRequestClose}>
+                    <ClickAwayListener
+                      onClickAway={this._handleRequestClose}
+                      // Needed since React 18 to avoid what seems to be the immediate closing of the popper.
+                      mouseEvent="onMouseDown"
+                      touchEvent="onTouchStart"
+                    >
                       <Popper
                         style={popoverStyle}
                         open={this.state.popoverOpen}

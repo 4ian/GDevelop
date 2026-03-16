@@ -64,7 +64,8 @@ export function serializeToObjectAsset(
   project: gdProject,
   object: gdObject,
   objectFullName: string,
-  usedResourceNames: Array<string>
+  usedResourceNames: Array<string>,
+  extensionDependencyCache: gdExtensionDependencyCache
 ): any {
   const usedResourceNamesVector = new gd.VectorString();
   const serializedElement = new gd.SerializerElement();
@@ -73,7 +74,8 @@ export function serializeToObjectAsset(
     object,
     objectFullName,
     serializedElement,
-    usedResourceNamesVector
+    usedResourceNamesVector,
+    extensionDependencyCache
   );
   usedResourceNames.push(...usedResourceNamesVector.toJSArray());
   usedResourceNamesVector.delete();

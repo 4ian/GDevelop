@@ -766,14 +766,12 @@ const VariablesList: React.ComponentType<{
 
   const triggerSearch = React.useCallback(
     () => {
-      // $FlowFixMe[missing-empty-array-annot]
-      let matchingInheritedNodes = [];
+      let matchingInheritedNodes: Array<string> = [];
       const matchingNodes = generateListOfNodesMatchingSearchInVariablesContainer(
         props.variablesContainer,
         normalizeString(searchText)
       );
       if (props.inheritedVariablesContainer) {
-        // $FlowFixMe[incompatible-type]
         matchingInheritedNodes = generateListOfNodesMatchingSearchInVariablesContainer(
           props.inheritedVariablesContainer,
           normalizeString(searchText),

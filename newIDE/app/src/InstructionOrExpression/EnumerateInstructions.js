@@ -346,8 +346,7 @@ export const enumerateAllInstructions = (
   isCondition: boolean,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
-  // $FlowFixMe[missing-empty-array-annot]
-  let allInstructions = [];
+  let allInstructions: Array<EnumeratedInstructionMetadata> = [];
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
@@ -369,14 +368,13 @@ export const enumerateAllInstructions = (
       },
       i18n
     );
-    // $FlowFixMe[recursive-definition]
     allInstructions = [...allInstructions, ...extensionFreeInstructions];
 
     //Objects instructions:
     for (let j = 0; j < allObjectsTypes.size(); ++j) {
       const objectType = allObjectsTypes.at(j);
       const objectMetadata = extension.getObjectMetadata(objectType);
-      const scope = {
+      const scope: InstructionOrExpressionScope = {
         extension: { name: extension.getName() },
         objectMetadata: {
           name: objectMetadata.getName(),
@@ -390,7 +388,6 @@ export const enumerateAllInstructions = (
           isCondition
             ? extension.getAllConditionsForObject(objectType)
             : extension.getAllActionsForObject(objectType),
-          // $FlowFixMe[incompatible-type]
           scope,
           i18n
         ),
@@ -640,8 +637,7 @@ export const enumerateFreeInstructions = (
   isCondition: boolean,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
-  // $FlowFixMe[missing-empty-array-annot]
-  let allFreeInstructions = [];
+  const allFreeInstructions: Array<EnumeratedInstructionMetadata> = [];
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
@@ -649,7 +645,6 @@ export const enumerateFreeInstructions = (
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
 
-    // $FlowFixMe[incompatible-type]
     allFreeInstructions.push(
       ...enumerateFreeInstructionsWithoutExtra(
         isCondition,
@@ -663,7 +658,6 @@ export const enumerateFreeInstructions = (
       )
     );
   }
-  // $FlowFixMe[incompatible-type]
   return allFreeInstructions;
 };
 

@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include <set>
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/String.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectFolderOrObject.h"
@@ -252,6 +253,7 @@ class GD_CORE_API ObjectsContainer {
  private:
   SourceType sourceType = Unknown;
   std::unique_ptr<gd::ObjectFolderOrObject> rootFolder;
+  gd::MemoryTracked _memoryTracked{this, "ObjectsContainer"};
 
   /**
    * Initialize from another variables container, copying elements. Used by

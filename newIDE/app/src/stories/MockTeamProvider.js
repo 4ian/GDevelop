@@ -503,7 +503,10 @@ export const MockTeamProvider = ({
               onActivateMembers: action('activateMembers'),
               onChangeMemberPassword: changeMemberPassword,
               onSetAdmin: setAdmin,
+              onSetMember: action('setMember'),
               onEditUser: editUser,
+              invitations: null,
+              onRefreshInvitations: async () => {},
             }}
           >
             <Text allowSelection>

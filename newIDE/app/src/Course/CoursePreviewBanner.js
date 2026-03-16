@@ -197,8 +197,7 @@ const CoursePreviewBanner = ({
             );
           });
       }
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      const completionByChapter = new Array(course.chaptersTargetCount)
+      const completionByChapter = new Array<number>(course.chaptersTargetCount)
         .fill(0)
         .map((_, index) => {
           const chapter = courseChapters[index];

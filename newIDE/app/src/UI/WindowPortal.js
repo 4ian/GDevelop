@@ -127,8 +127,20 @@ const WindowPortal = ({
 
   if (!container) return null;
 
+  // Provide the external window's document.body as the portal container
+  // for MUI overlay components (Dialog, Menu, Popover, Tooltip, Drawer).
+  // Using document.body (rather than the container div) is important because:
+  // 1. MUI's Modal/Popover positioning assumes the container is the viewport root.
+  // 2. ContextMenu uses anchorReference="anchorPosition" (no anchorEl), so MUI
+  //    derives ownerDocument from the container — must be the external window's body.
+  // 3. ClickAwayListener (used by InlinePopover) attaches event listeners to
+  //    ownerDocument of the portal content — must be the external window's document.
+  const portalBody = container.ownerDocument
+    ? container.ownerDocument.body
+    : container;
+
   return ReactDOM.createPortal(
-    <PortalContainerContext.Provider value={container}>
+    <PortalContainerContext.Provider value={portalBody}>
       {children}
     </PortalContainerContext.Provider>,
     container

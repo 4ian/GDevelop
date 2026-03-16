@@ -418,6 +418,11 @@ const EditorTabsPane: React.ComponentType<{
   } = props;
 
   const toolbarRef = React.useRef<?ToolbarInterface>(null);
+  // Ref map for Toolbar instances in popped-out windows.
+  // Each popped-out editor gets its own Toolbar, keyed by editorTab.key.
+  const poppedOutToolbarRefs = React.useRef<{
+    [string]: ?ToolbarInterface,
+  }>({});
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const askAiPaneIdentifier = getEditorTabOpenedWithKey(editorTabs, 'ask-ai');
   const containerRef = React.useRef<?HTMLDivElement>(null);
@@ -723,8 +728,20 @@ const EditorTabsPane: React.ComponentType<{
                     fileMetadata: currentFileMetadata,
                     storageProvider: getStorageProvider(),
                     ref: editorRef => (editorTab.editorRef = editorRef),
-                    setToolbar: editorToolbar =>
-                      setEditorToolbar(editorToolbar, isCurrentTab),
+                    setToolbar: editorToolbar => {
+                      if (isPoppedOut) {
+                        // Route to the popped-out window's own Toolbar.
+                        const poppedOutToolbar =
+                          poppedOutToolbarRefs.current[editorTab.key];
+                        if (poppedOutToolbar) {
+                          poppedOutToolbar.setEditorToolbar(
+                            editorToolbar || null
+                          );
+                        }
+                      } else {
+                        setEditorToolbar(editorToolbar, isCurrentTab);
+                      }
+                    },
                     setGamesPlatformFrameShown: onSetGamesPlatformFrameShown,
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
@@ -852,11 +869,14 @@ const EditorTabsPane: React.ComponentType<{
 
             if (isPoppedOut) {
               // Render in a separate window via portal.
+              // Each popped-out editor gets its own Toolbar so that
+              // toolbar buttons interact with the editor and vice versa.
               return (
                 <WindowPortal
                   key={`popout-${editorTab.key}`}
                   title={editorTab.label || 'GDevelop'}
                   onClose={() => {
+                    delete poppedOutToolbarRefs.current[editorTab.key];
                     onPopInTab(editorTab.key);
                     onEditorTabClosing(editorTab);
                     onCloseEditorTab(editorTab);
@@ -865,13 +885,56 @@ const EditorTabsPane: React.ComponentType<{
                   height={750}
                 >
                   <FullThemeProvider>
-                    <div style={{
-                      display: 'flex',
-                      flex: 1,
-                      width: '100%',
-                      height: '100%',
-                      minHeight: 0,
-                    }}>
+                    <Toolbar
+                      ref={ref => {
+                        poppedOutToolbarRefs.current[editorTab.key] = ref;
+                        // When the Toolbar mounts, ask the editor to re-set its
+                        // toolbar content so it appears in this new Toolbar instance.
+                        if (ref && editorTab.editorRef) {
+                          editorTab.editorRef.updateToolbar();
+                        }
+                      }}
+                      hidden={false}
+                      showProjectButtons={
+                        !['start page', 'debugger', 'ask-ai', 'global-search'].includes(
+                          editorTab.key
+                        )
+                      }
+                      canSave={canSave}
+                      onSave={saveProject}
+                      openShareDialog={() => openShareDialog()}
+                      isSharingEnabled={isSharingEnabled}
+                      onOpenDebugger={launchDebuggerAndPreview}
+                      hasPreviewsRunning={hasPreviewsRunning}
+                      onPreviewWithoutHotReload={launchNewPreview}
+                      onNetworkPreview={launchNetworkPreview}
+                      onHotReloadPreview={launchHotReloadPreview}
+                      onLaunchPreviewWithDiagnosticReport={
+                        launchPreviewWithDiagnosticReport
+                      }
+                      canDoNetworkPreview={canDoNetworkPreview}
+                      setPreviewOverride={setPreviewOverride}
+                      isPreviewEnabled={
+                        !!currentProject &&
+                        currentProject.getLayoutsCount() > 0
+                      }
+                      previewState={previewState}
+                      onOpenVersionHistory={openVersionHistoryPanel}
+                      checkedOutVersionStatus={checkedOutVersionStatus}
+                      onQuitVersionHistory={onQuitVersionHistory}
+                      canQuitVersionHistory={!isSavingProject}
+                      toolbarButtons={toolbarButtons}
+                      projectPath={projectPath}
+                    />
+                    <div
+                      style={{
+                        display: 'flex',
+                        flex: 1,
+                        width: '100%',
+                        minHeight: 0,
+                        overflow: 'hidden',
+                      }}
+                    >
                       {editorContent}
                     </div>
                   </FullThemeProvider>

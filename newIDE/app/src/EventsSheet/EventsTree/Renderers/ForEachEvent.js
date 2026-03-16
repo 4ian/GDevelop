@@ -52,10 +52,12 @@ const InlineSelect = ({
   value,
   onChange,
   children,
+  disabled,
 }: {|
   value: string,
   onChange: (value: string) => void,
   children: React.Node,
+  disabled: boolean,
 |}) => {
   const selectRef = React.useRef<?HTMLSelectElement>(null);
   const [displayedText, setDisplayedText] = React.useState('');
@@ -77,7 +79,9 @@ const InlineSelect = ({
       </span>
       <select
         ref={selectRef}
-        className={classNames(selectableArea, forEachClasses.inlineSelect)}
+        className={classNames(selectableArea, forEachClasses.inlineSelect, {
+          [disabledText]: disabled,
+        })}
         value={value}
         onChange={e => onChange(e.currentTarget.value)}
         tabIndex={0}
@@ -287,7 +291,12 @@ export default class ForEachEvent extends React.Component<
               windowSize={this.props.windowSize}
               idPrefix={this.props.idPrefix}
             />
-            <div className={eventLabel}>
+            <div
+              className={classNames({
+                [eventLabel]: true,
+                [disabledText]: this.props.disabled,
+              })}
+            >
               <Trans>
                 Repeat for each instance of
                 <span
@@ -381,9 +390,7 @@ export default class ForEachEvent extends React.Component<
                         this.props.onUpdate();
                         this.forceUpdate();
                       } else if (value === 'orderBy') {
-                        forEachEvent.setOrderBy(
-                          objectNameIsValid ? `${objectName}.XXX` : '0'
-                        );
+                        forEachEvent.setOrderBy(`${objectPrefix}.`);
                         forEachEvent.setOrder('asc');
                         this.props.onUpdate();
                         this.forceUpdate();
@@ -395,8 +402,9 @@ export default class ForEachEvent extends React.Component<
                         this.forceUpdate();
                       }
                     }}
+                    disabled={this.props.disabled}
                   >
-                    <option value="any">{i18n._(t`(any order)`)}</option>
+                    <option value="any">{i18n._(t`(default order)`)}</option>
                     <option value="orderBy">{i18n._(t`ordered by`)}</option>
                     <optgroup label="Examples">
                       <option value={`${objectPrefix}.SomeVariable`}>
@@ -421,6 +429,7 @@ export default class ForEachEvent extends React.Component<
                       [selectableArea]: true,
                       [instructionParameter]: true,
                       number: true,
+                      [disabledText]: this.props.disabled,
                     })}
                     style={styles.orderByContainer}
                     onClick={this.editOrderBy}
@@ -454,6 +463,7 @@ export default class ForEachEvent extends React.Component<
                       this.props.onUpdate();
                       this.forceUpdate();
                     }}
+                    disabled={this.props.disabled}
                   >
                     <option value="asc">{i18n._(t`ascending`)}</option>
                     <option value="desc">{i18n._(t`descending`)}</option>
@@ -542,6 +552,10 @@ export default class ForEachEvent extends React.Component<
                     this.props.projectScopedContainersAccessor
                   }
                   idPrefix={this.props.idPrefix}
+                  highlightedSearchText={this.props.highlightedSearchText}
+                  highlightedSearchMatchCase={
+                    this.props.highlightedSearchMatchCase
+                  }
                 />
               )}
               renderActionsList={({ className }) => (
@@ -579,6 +593,10 @@ export default class ForEachEvent extends React.Component<
                     this.props.projectScopedContainersAccessor
                   }
                   idPrefix={this.props.idPrefix}
+                  highlightedSearchText={this.props.highlightedSearchText}
+                  highlightedSearchMatchCase={
+                    this.props.highlightedSearchMatchCase
+                  }
                 />
               )}
             />

@@ -32,6 +32,14 @@
   outline: 1px solid var(--theme-text-field-active-error);
 }
 
+.container .error {
+  font-size: 14px;
+  line-height: 20px;
+  font-family: var(--gdevelop-modern-font-family);
+  color: var(--theme-error-color);
+  padding: 2px 0px;
+}
+
 .compactTextAreaField::before {
   position: absolute;
   left: 0;

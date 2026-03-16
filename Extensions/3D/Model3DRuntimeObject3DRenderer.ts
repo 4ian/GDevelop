@@ -130,12 +130,34 @@ namespace gdjs {
       );
     }
 
-    getOriginPoint() {
-      return this._model3DRuntimeObject._originPoint || this._modelOriginPoint;
+    getOriginPoint(): FloatPoint3D {
+      //@ts-ignore
+      const point: FloatPoint3D = gdjs.staticArray(
+        Model3DRuntimeObject3DRenderer.prototype.getOriginPoint
+      );
+      const originPoint = this._model3DRuntimeObject._originPoint;
+      point[0] =
+        originPoint[0] === null ? this._modelOriginPoint[0] : originPoint[0];
+      point[1] =
+        originPoint[1] === null ? this._modelOriginPoint[1] : originPoint[1];
+      point[2] =
+        originPoint[2] === null ? this._modelOriginPoint[2] : originPoint[2];
+      return point;
     }
 
-    getCenterPoint() {
-      return this._model3DRuntimeObject._centerPoint || this._modelOriginPoint;
+    getCenterPoint(): FloatPoint3D {
+      //@ts-ignore
+      const point: FloatPoint3D = gdjs.staticArray(
+        Model3DRuntimeObject3DRenderer.prototype.getCenterPoint
+      );
+      const centerPoint = this._model3DRuntimeObject._centerPoint;
+      point[0] =
+        centerPoint[0] === null ? this._modelOriginPoint[0] : centerPoint[0];
+      point[1] =
+        centerPoint[1] === null ? this._modelOriginPoint[1] : centerPoint[1];
+      point[2] =
+        centerPoint[2] === null ? this._modelOriginPoint[2] : centerPoint[2];
+      return point;
     }
 
     /**
@@ -177,12 +199,23 @@ namespace gdjs {
 
       // Center the model.
       const centerPoint = this._model3DRuntimeObject._centerPoint;
-      if (centerPoint) {
-        threeObject.position.set(
-          -(boundingBox.min.x + modelWidth * centerPoint[0]),
-          // The model is flipped on Y axis.
-          -(boundingBox.min.y + modelHeight * (1 - centerPoint[1])),
-          -(boundingBox.min.z + modelDepth * centerPoint[2])
+      if (centerPoint[0] !== null) {
+        threeObject.position.x = -(
+          boundingBox.min.x +
+          modelWidth * centerPoint[0]
+        );
+      }
+      if (centerPoint[1] !== null) {
+        // The model is flipped on Y axis.
+        threeObject.position.y = -(
+          boundingBox.min.y +
+          modelHeight * (1 - centerPoint[1])
+        );
+      }
+      if (centerPoint[2] !== null) {
+        threeObject.position.z = -(
+          boundingBox.min.z +
+          modelDepth * centerPoint[2]
         );
       }
 

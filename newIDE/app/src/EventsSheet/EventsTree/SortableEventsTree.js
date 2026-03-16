@@ -5,6 +5,8 @@ import classNames from 'classnames';
 import { AutoSizer } from 'react-virtualized';
 import type { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
+const gd: libGDevelop = global.gd;
+
 // -- Types --
 
 // A node displayed by the SortableTree. Almost always represents an
@@ -44,6 +46,7 @@ type RowItemData = {
   onVisibilityToggle: ({| node: SortableTreeNode |}) => void,
   scaffoldBlockPxWidth: number,
   searchFocusOffset: ?number,
+  searchFocusedEvent: ?gdBaseEvent,
 };
 
 type Props = {|
@@ -59,6 +62,7 @@ type Props = {|
   }) => boolean,
   searchQuery?: any,
   searchFocusOffset?: ?number,
+  searchFocusedEvent?: ?gdBaseEvent,
   className?: string,
   reactVirtualizedListProps?: {
     ref?: (list: {
@@ -203,8 +207,7 @@ const getSearchMatches = ({
   searchQuery?: any,
 }) => {
   if (!searchMethod || !searchQuery) {
-    // $FlowFixMe[underconstrained-implicit-instantiation]
-    return { matchIndexes: [], matchIndexSet: new Set() };
+    return { matchIndexes: [], matchIndexSet: new Set<number>() };
   }
 
   const matchIndexes = [];
@@ -244,10 +247,9 @@ const TreeRow = ({
   const {
     flatData,
     matchIndexSet,
-    matchIndexes,
     onVisibilityToggle,
     scaffoldBlockPxWidth,
-    searchFocusOffset,
+    searchFocusedEvent,
   } = data;
 
   const entry = flatData[index];
@@ -257,7 +259,10 @@ const TreeRow = ({
   const depth = lowerSiblingCounts.length;
   const isSearchMatch = matchIndexSet.has(index);
   const isSearchFocus =
-    searchFocusOffset != null && matchIndexes[searchFocusOffset] === index;
+    searchFocusedEvent &&
+    node.event &&
+    // $FlowFixMe[incompatible-exact]
+    gd.compare(node.event, searchFocusedEvent);
 
   const scaffold = lowerSiblingCounts.map((lowerSiblingCount, i) => {
     const isNodeDepth = i === depth - 1;
@@ -358,6 +363,7 @@ const SortableEventsTree = ({
   searchMethod,
   searchQuery,
   searchFocusOffset,
+  searchFocusedEvent,
   className,
   reactVirtualizedListProps,
 }: Props): React.MixedElement => {
@@ -438,6 +444,7 @@ const SortableEventsTree = ({
       onVisibilityToggle,
       scaffoldBlockPxWidth,
       searchFocusOffset,
+      searchFocusedEvent,
     }),
     [
       flatData,
@@ -446,6 +453,7 @@ const SortableEventsTree = ({
       onVisibilityToggle,
       scaffoldBlockPxWidth,
       searchFocusOffset,
+      searchFocusedEvent,
     ]
   );
 

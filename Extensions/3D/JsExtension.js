@@ -3880,9 +3880,9 @@ module.exports = {
       /** @type {number} */
       _defaultDepth;
 
-      /** @type {[number, number, number] | null} */
+      /** @type {[number | null, number | null, number | null]} */
       _originPoint;
-      /** @type {[number, number, number] | null} */
+      /** @type {[number | null, number | null, number | null]} */
       _centerPoint;
 
       /** @type {[number, number, number]} */
@@ -3977,11 +3977,31 @@ module.exports = {
       }
 
       getOriginPoint() {
-        return this._originPoint || this._modelOriginPoint;
+        return [
+          this._originPoint[0] === null
+            ? this._modelOriginPoint[0]
+            : this._originPoint[0],
+          this._originPoint[1] === null
+            ? this._modelOriginPoint[1]
+            : this._originPoint[1],
+          this._originPoint[2] === null
+            ? this._modelOriginPoint[2]
+            : this._originPoint[2],
+        ];
       }
 
       getCenterPoint() {
-        return this._centerPoint || this._modelOriginPoint;
+        return [
+          this._centerPoint[0] === null
+            ? this._modelOriginPoint[0]
+            : this._centerPoint[0],
+          this._centerPoint[1] === null
+            ? this._modelOriginPoint[1]
+            : this._centerPoint[1],
+          this._centerPoint[2] === null
+            ? this._modelOriginPoint[2]
+            : this._centerPoint[2],
+        ];
       }
 
       _updateDefaultTransformation(
@@ -4028,12 +4048,23 @@ module.exports = {
 
         // Center the model.
         const centerPoint = this._centerPoint;
-        if (centerPoint) {
-          threeObject.position.set(
-            -(boundingBox.min.x + modelWidth * centerPoint[0]),
-            // The model is flipped on Y axis.
-            -(boundingBox.min.y + modelHeight * (1 - centerPoint[1])),
-            -(boundingBox.min.z + modelDepth * centerPoint[2])
+        if (centerPoint[0]) {
+          threeObject.position.x = -(
+            boundingBox.min.x +
+            modelWidth * centerPoint[0]
+          );
+        }
+        if (centerPoint[1]) {
+          // The model is flipped on Y axis.
+          threeObject.position.y = -(
+            boundingBox.min.y +
+            modelHeight * (1 - centerPoint[1])
+          );
+        }
+        if (centerPoint[2]) {
+          threeObject.position.z = -(
+            boundingBox.min.z +
+            modelDepth * centerPoint[2]
           );
         }
 
@@ -4129,8 +4160,8 @@ module.exports = {
     }
 
     /**
-     * @param {[number, number, number] | null} point1
-     * @param {[number, number, number] | null} point2
+     * @param {[number | null, number | null, number | null]} point1
+     * @param {[number | null, number | null, number | null]} point2
      * @returns {boolean}
      */
     const isSamePoint = (point1, point2) => {
@@ -4146,14 +4177,16 @@ module.exports = {
 
     /**
      * @param {string} location
-     * @returns {[number, number, number] | null}
+     * @returns {[number | null, number | null, number | null]}
      */
     const getPointForLocation = (location) => {
       switch (location) {
         case 'ModelOrigin':
-          return null;
+          return [null, null, null];
         case 'ObjectCenter':
           return [0.5, 0.5, 0.5];
+        case 'CenteredOnZ':
+          return [null, null, 0.5];
         case 'BottomCenterZ':
           return [0.5, 0.5, 0];
         case 'BottomCenterY':
@@ -4161,7 +4194,7 @@ module.exports = {
         case 'TopLeft':
           return [0, 0, 0];
         default:
-          return null;
+          return [null, null, null];
       }
     };
 
@@ -4176,10 +4209,10 @@ module.exports = {
       _rotationY = 0;
       _rotationZ = 0;
       _keepAspectRatio = false;
-      /** @type {[number, number, number] | null} */
-      _originPoint = null;
-      /** @type {[number, number, number] | null} */
-      _centerPoint = null;
+      /** @type {[number | null, number | null, number | null]} */
+      _originPoint = [null, null, null];
+      /** @type {[number | null, number | null, number | null]} */
+      _centerPoint = [null, null, null];
 
       /** @type {[number, number, number]} */
       _modelOriginPoint = [0, 0, 0];
@@ -4245,11 +4278,31 @@ module.exports = {
       }
 
       getOriginPoint() {
-        return this._originPoint || this._modelOriginPoint;
+        return [
+          this._originPoint[0] === null
+            ? this._modelOriginPoint[0]
+            : this._originPoint[0],
+          this._originPoint[1] === null
+            ? this._modelOriginPoint[1]
+            : this._originPoint[1],
+          this._originPoint[2] === null
+            ? this._modelOriginPoint[2]
+            : this._originPoint[2],
+        ];
       }
 
       getCenterPoint() {
-        return this._centerPoint || this._modelOriginPoint;
+        return [
+          this._centerPoint[0] === null
+            ? this._modelOriginPoint[0]
+            : this._centerPoint[0],
+          this._centerPoint[1] === null
+            ? this._modelOriginPoint[1]
+            : this._centerPoint[1],
+          this._centerPoint[2] === null
+            ? this._modelOriginPoint[2]
+            : this._centerPoint[2],
+        ];
       }
 
       _updateDefaultTransformation() {
@@ -4302,12 +4355,23 @@ module.exports = {
 
         // Center the model.
         const centerPoint = this._centerPoint;
-        if (centerPoint) {
-          threeModelGroup.position.set(
-            -(boundingBox.min.x + modelWidth * centerPoint[0]),
-            // The model is flipped on Y axis.
-            -(boundingBox.min.y + modelHeight * (1 - centerPoint[1])),
-            -(boundingBox.min.z + modelDepth * centerPoint[2])
+        if (centerPoint[0] !== null) {
+          threeModelGroup.position.x = -(
+            boundingBox.min.x +
+            modelWidth * centerPoint[0]
+          );
+        }
+        if (centerPoint[1] !== null) {
+          // The model is flipped on Y axis.
+          threeModelGroup.position.y = -(
+            boundingBox.min.y +
+            modelHeight * (1 - centerPoint[1])
+          );
+        }
+        if (centerPoint[2] !== null) {
+          threeModelGroup.position.z = -(
+            boundingBox.min.z +
+            modelDepth * centerPoint[2]
           );
         }
 

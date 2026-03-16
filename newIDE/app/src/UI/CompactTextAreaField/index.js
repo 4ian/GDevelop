@@ -30,6 +30,7 @@ export type CompactTextAreaFieldProps = {|
   id?: string,
   disabled?: boolean,
   errored?: boolean,
+  errorText?: React.Node,
   placeholder?: MessageDescriptor,
   rows?: number,
   maxLength?: number,
@@ -44,6 +45,7 @@ export const CompactTextAreaField = ({
   id,
   disabled,
   errored,
+  errorText,
   placeholder,
   rows,
   maxLength,
@@ -121,6 +123,7 @@ export const CompactTextAreaField = ({
               maxLength={maxLength}
             />
           </div>
+          {errorText && <div className={classes.error}>{errorText}</div>}
         </label>
       )}
     </I18n>

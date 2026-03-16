@@ -165,11 +165,8 @@ const getPropertySummary = (
     };
   }
   if (property.getChoices().size() > 0) {
-    // $FlowFixMe[incompatible-exact]
     propertySummary.choices = mapVector(property.getChoices(), choice => ({
-      // $FlowFixMe[incompatible-use]
       value: choice.getValue(),
-      // $FlowFixMe[incompatible-use]
       label: choice.getLabel(),
     }));
   }
@@ -207,10 +204,7 @@ const getPropertiesSummary = ({
       });
 
   if (propertiesContainer)
-    // $FlowFixMe[incompatible-exact]
     return mapVector(propertiesContainer, namedProperty => {
-      // $FlowFixMe[incompatible-use]
-      // $FlowFixMe[incompatible-type]
       return getPropertySummary(namedProperty.getName(), namedProperty);
     });
 

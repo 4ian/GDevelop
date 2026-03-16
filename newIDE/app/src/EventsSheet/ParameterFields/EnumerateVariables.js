@@ -140,8 +140,7 @@ export const enumerateVariables = (
       return [
         enumeratedVariable,
         ...flatMap(
-          // $FlowFixMe[underconstrained-implicit-instantiation]
-          new Array(variable.getChildrenCount()).fill(''),
+          new Array<string>(variable.getChildrenCount()).fill(''),
           (_, index) =>
             enumerateVariableAndChildrenNames(
               source,

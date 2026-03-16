@@ -47,7 +47,6 @@ import UserSVG from '../../../../UI/CustomSvgIcons/User';
 import { copyTextToClipboard } from '../../../../Utils/Clipboard';
 import ManageEducationAccountDialog from './ManageEducationAccountDialog';
 import TeamAvailableSeats from './TeamAvailableSeats';
-import StudentCreationCard from './StudentCreationCard';
 
 const PADDING = 16;
 
@@ -107,7 +106,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       onRefreshMembers,
       onRefreshAdmins,
       getAvailableSeats,
-      onCreateMembers,
     } = React.useContext(TeamContext);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const [
@@ -137,9 +135,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       setShowNewGroupNameField,
     ] = React.useState<boolean>(false);
     const [isLoadingMembers, setIsLoadingMembers] = React.useState<boolean>(
-      false
-    );
-    const [isCreatingMembers, setIsCreatingMembers] = React.useState<boolean>(
       false
     );
     const [movingUsers, setMovingUsers] = React.useState<?{|
@@ -208,30 +203,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     );
 
     const availableSeats = getAvailableSeats();
-
-    const onCreateTeamMembers = React.useCallback(
-      async (quantity: number) => {
-        if (
-          !availableSeats ||
-          quantity > availableSeats ||
-          quantity <= 0 ||
-          isCreatingMembers
-        ) {
-          return;
-        }
-        setIsCreatingMembers(true);
-        try {
-          await onCreateMembers(quantity);
-          await onRefreshTeamMembers();
-        } catch (error) {
-          console.error(`An error occurred when creating members: `, error);
-          throw error;
-        } finally {
-          setIsCreatingMembers(false);
-        }
-      },
-      [onCreateMembers, onRefreshTeamMembers, availableSeats, isCreatingMembers]
-    );
 
     const buildContextMenu = (
       i18n: I18nType,
@@ -404,11 +375,12 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                       <Trans>Lobby</Trans>
                     </Text>
                     {hasNoActiveTeamMembers && availableSeats !== null ? (
-                      <StudentCreationCard
-                        availableSeats={availableSeats}
-                        onCreateStudentAccounts={onCreateTeamMembers}
-                        isCreatingMembers={isCreatingMembers}
-                      />
+                      <EmptyMessage>
+                        <Trans>
+                          You don't have any active students. Click on "Manage
+                          seats" to add students or teachers to your team.
+                        </Trans>
+                      </EmptyMessage>
                     ) : (
                       <List style={styles.list}>
                         {membersNotInAGroupToDisplay.members

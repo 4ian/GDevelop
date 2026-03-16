@@ -57,6 +57,7 @@ declare class libGDevelop {
   VectorVariable: Class<gdVectorVariable>;
   VectorObjectFolderOrObject: Class<gdVectorObjectFolderOrObject>;
   VectorPropertyFolderOrProperty: Class<gdVectorPropertyFolderOrProperty>;
+  VectorFunctionFolderOrFunction: Class<gdVectorFunctionFolderOrFunction>;
   VectorScreenshot: Class<gdVectorScreenshot>;
   MapStringString: Class<gdMapStringString>;
   MapStringBoolean: Class<gdMapStringBoolean>;
@@ -153,6 +154,7 @@ declare class libGDevelop {
   Serializer: Class<gdSerializer>;
   BinarySerializer: Class<gdBinarySerializer>;
   ObjectAssetSerializer: Class<gdObjectAssetSerializer>;
+  ExtensionDependencyCache: Class<gdExtensionDependencyCache>;
   InstructionsList: Class<gdInstructionsList>;
   Instruction: Class<gdInstruction>;
   Expression: Class<gdExpression>;
@@ -240,6 +242,7 @@ declare class libGDevelop {
   ExpressionParser2: Class<gdExpressionParser2>;
   EventsFunction_FunctionType: Class<EventsFunction_FunctionType>;
   EventsFunction: Class<gdEventsFunction>;
+  FunctionFolderOrFunction: Class<gdFunctionFolderOrFunction>;
   EventsFunctionsContainer_FunctionOwner: Class<EventsFunctionsContainer_FunctionOwner>;
   EventsFunctionsContainer: Class<gdEventsFunctionsContainer>;
   AbstractEventsBasedEntity: Class<gdAbstractEventsBasedEntity>;
@@ -306,4 +309,5 @@ declare class libGDevelop {
   Exporter: Class<gdExporter>;
   JsCodeEvent: Class<gdJsCodeEvent>;
   MetadataDeclarationHelper: Class<gdMetadataDeclarationHelper>;
+  MemoryTrackedRegistry: Class<gdMemoryTrackedRegistry>;
 };

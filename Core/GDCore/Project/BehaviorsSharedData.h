@@ -8,6 +8,7 @@
 
 #include "GDCore/String.h"
 #include "GDCore/Project/BehaviorConfigurationContainer.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 
 namespace gd {
 
@@ -25,8 +26,19 @@ class GD_CORE_API BehaviorsSharedData: public BehaviorConfigurationContainer {
   BehaviorsSharedData(): BehaviorConfigurationContainer() {};
   BehaviorsSharedData(const gd::String& name_, const gd::String& type_)
       : BehaviorConfigurationContainer(name_, type_) {};
+  BehaviorsSharedData(const BehaviorsSharedData& other)
+      : BehaviorConfigurationContainer(other) {};
+  BehaviorsSharedData& operator=(const BehaviorsSharedData& other) {
+    if (this != &other) {
+      BehaviorConfigurationContainer::operator=(other);
+    }
+    return *this;
+  }
   virtual ~BehaviorsSharedData();
   virtual BehaviorsSharedData* Clone() const { return new BehaviorsSharedData(*this); }
+
+ private:
+  gd::MemoryTracked _memoryTracked{this, "BehaviorsSharedData"};
 };
 
 }  // namespace gd

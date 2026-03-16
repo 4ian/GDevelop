@@ -3,11 +3,11 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY)
-#ifndef GDCORE_EVENTSFUNCTIONSCONTAINER_H
-#define GDCORE_EVENTSFUNCTIONSCONTAINER_H
+#pragma once
+
 #include <vector>
 #include "GDCore/Project/EventsFunction.h"
+#include "GDCore/Project/FunctionFolderOrFunction.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/SerializableWithNameList.h"
 namespace gd {
@@ -31,7 +31,11 @@ public:
       Object,
       Behavior};
 
-  EventsFunctionsContainer(FunctionOwner source_) : owner(source_) {}
+  EventsFunctionsContainer(FunctionOwner source_) : owner(source_) {
+    // The properties folders are not copied.
+    // It's not an issue because the UI uses the serialization for duplication.
+    rootFolder = gd::make_unique<gd::FunctionFolderOrFunction>("__ROOT");
+  }
 
   EventsFunctionsContainer(const EventsFunctionsContainer &other)
       : owner(other.owner) {
@@ -112,15 +116,25 @@ public:
    */
   std::size_t GetEventsFunctionsCount() const { return GetCount(); }
 
-  gd::EventsFunction& InsertNewEventsFunction(const gd::String& name,
+  gd::EventsFunction &InsertNewEventsFunction(const gd::String &name,
                                               std::size_t position) {
-    return InsertNew(name, position);
+    auto &newlyCreatedFunction = InsertNew(name, position);
+    rootFolder->InsertFunction(&newlyCreatedFunction);
+    return newlyCreatedFunction;
   }
-  gd::EventsFunction& InsertEventsFunction(const gd::EventsFunction& object,
-                                           std::size_t position) {
-    return Insert(object, position);
+
+  gd::EventsFunction &
+  InsertEventsFunction(const gd::EventsFunction &eventFunction,
+                       std::size_t position) {
+    auto &newlyCreatedFunction = Insert(eventFunction, position);
+    rootFolder->InsertFunction(&newlyCreatedFunction);
+    return newlyCreatedFunction;
   }
-  void RemoveEventsFunction(const gd::String& name) { return Remove(name); }
+
+  void RemoveEventsFunction(const gd::String& name) {
+    rootFolder->RemoveRecursivelyFunctionNamed(name);
+    return Remove(name);
+  }
   void ClearEventsFunctions() { return Clear(); }
   void MoveEventsFunction(std::size_t oldIndex, std::size_t newIndex) {
     return Move(oldIndex, newIndex);
@@ -143,6 +157,43 @@ public:
   std::vector<std::unique_ptr<gd::EventsFunction>>& GetInternalVector() {
     return elements;
   };
+  ///@}
+
+  /** \name Folders management
+   */
+  ///@{
+  /**
+   * \brief Add a new empty function called \a name in the
+   * given folder at the specified position.<br>
+   *
+   * \return A reference to the function in the list.
+   */
+  gd::EventsFunction &InsertNewEventsFunctionInFolder(
+      const gd::String &name,
+      gd::FunctionFolderOrFunction &functionFolderOrFunction,
+      std::size_t position);
+
+  /**
+   * Returns a vector containing all object and folders in this container.
+   * Only use this for checking if you hold a valid `FunctionFolderOrFunction` -
+   * don't use this for rendering or anything else.
+   */
+  std::vector<const FunctionFolderOrFunction *>
+  GetAllFunctionFolderOrFunction() const;
+
+  gd::FunctionFolderOrFunction &GetRootFolder() { return *rootFolder; }
+
+  void AddMissingFunctionsInRootFolder();
+
+  /**
+   * \brief Serialize folder structure.
+   */
+  void SerializeFoldersTo(SerializerElement &element) const;
+
+  /**
+   * \brief Unserialize folder structure.
+   */
+  void UnserializeFoldersFrom(const SerializerElement &element);
   ///@}
 
   /** \name Serialization
@@ -169,14 +220,15 @@ public:
    * Don't forget to update me if members were changed!
    */
   void Init(const gd::EventsFunctionsContainer& other) {
-    return SerializableWithNameList<gd::EventsFunction>::Init(other);
+    // The properties folders are not copied.
+    // It's not an issue because the UI uses the serialization for duplication.
+    rootFolder = gd::make_unique<gd::FunctionFolderOrFunction>("__ROOT");
+    SerializableWithNameList<gd::EventsFunction>::Init(other);
   };
 
 private:
   FunctionOwner owner;
+  std::unique_ptr<gd::FunctionFolderOrFunction> rootFolder;
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_EVENTSFUNCTIONSCONTAINER_H
-#endif

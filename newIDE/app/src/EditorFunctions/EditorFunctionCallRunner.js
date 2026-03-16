@@ -36,7 +36,7 @@ export type EditorFunctionCallResult =
       output: any,
     |}
   | {|
-      status: 'ignored',
+      status: 'aborted',
       call_id: string,
     |};
 
@@ -46,7 +46,6 @@ export type ProcessEditorFunctionCallsOptions = {|
   i18n: I18nType,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
-  ignore: boolean,
   relatedAiRequestId: string | null,
   getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
   generateEvents: (
@@ -88,7 +87,6 @@ export const processEditorFunctionCalls = async ({
   onInstancesModifiedOutsideEditor,
   onObjectsModifiedOutsideEditor,
   onObjectGroupsModifiedOutsideEditor,
-  ignore,
   relatedAiRequestId,
   getRelatedAiRequestLastMessages,
   ensureExtensionInstalled,
@@ -107,14 +105,6 @@ export const processEditorFunctionCalls = async ({
 
   for (const functionCall of functionCalls) {
     const call_id = functionCall.call_id;
-    if (ignore) {
-      results.push({
-        status: 'ignored',
-        call_id,
-      });
-      continue;
-    }
-
     const name = functionCall.name;
     if (!project && name !== 'initialize_project') {
       results.push({
@@ -229,6 +219,11 @@ export const processEditorFunctionCalls = async ({
           success: false,
           message: `Unknown function with name: ${name}. Please use something else as this seems not supported or existing.`,
         }: EditorFunctionGenericOutput);
+      }
+
+      if (result.aborted) {
+        results.push({ status: 'aborted', call_id });
+        continue;
       }
 
       const { success, meta, ...output } = result;

@@ -30,6 +30,8 @@ import { type ExtensionDependency } from '../Utils/GDevelopServices/Extension';
 import { serializeToJSObject } from '../Utils/Serializer';
 import { getIDEVersion } from '../Version';
 
+const gd: libGDevelop = global.gd;
+
 const excludedObjectType = [
   'BBText::BBText',
   'Lighting::LightObject',
@@ -168,6 +170,7 @@ const zipAssets = async (
 
   try {
     const allRequiredExtensionNames = new Set<string>();
+    const extensionDependencyCache = new gd.ExtensionDependencyCache();
     await Promise.all(
       enumeratedObjects.map(async ({ object, path }) => {
         const usedResourceNames: Array<string> = [];
@@ -175,7 +178,8 @@ const zipAssets = async (
           project,
           object,
           addSpacesToPascalCase(object.getName()),
-          usedResourceNames
+          usedResourceNames,
+          extensionDependencyCache
         );
 
         // Download resources to blobs and update the resources.
@@ -207,6 +211,7 @@ const zipAssets = async (
         });
       })
     );
+    extensionDependencyCache.delete();
     for (const extensionName of allRequiredExtensionNames) {
       allRequiredExtensionNames.add(extensionName);
       if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {

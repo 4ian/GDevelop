@@ -67,6 +67,8 @@ type CommandHandlers = {|
   onOpenCommandPalette: () => void,
   onOpenProfile: () => void,
   onRestartInGameEditor: (reason: string) => void,
+  onOpenGlobalSearch: () => void,
+  onOpenMemoryTrackerRegistry: () => void,
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
@@ -160,12 +162,20 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     handler: handlers.onOpenCommandPalette,
   });
 
+  useCommand('OPEN_GLOBAL_SEARCH', !!handlers.project, {
+    handler: handlers.onOpenGlobalSearch,
+  });
+
   const onRestartInGameEditor = handlers.onRestartInGameEditor;
   useCommand('RESTART_IN_GAME_EDITOR', true, {
     handler: React.useCallback(
       () => onRestartInGameEditor('relaunched-manually'),
       [onRestartInGameEditor]
     ),
+  });
+
+  useCommand('OPEN_MEMORY_TRACKER_REGISTRY', true, {
+    handler: handlers.onOpenMemoryTrackerRegistry,
   });
 
   useCommandWithOptions('OPEN_LAYOUT', !!handlers.project, {

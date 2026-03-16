@@ -171,6 +171,15 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   }
 
+  async takeScreenshot(options: {|
+    viewX?: number,
+    viewY?: number,
+    zoom?: number,
+  |}): Promise<string | null> {
+    if (!this.editor) return null;
+    return this.editor.takeScreenshot(options);
+  }
+
   onObjectsModifiedOutsideEditor(changes: ObjectsOutsideEditorChanges) {
     if (changes.scene !== this.getLayout()) {
       return;

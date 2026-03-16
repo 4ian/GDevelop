@@ -185,6 +185,11 @@ export type SceneEditorsDisplayInterface = {|
     getLastCursorSceneCoordinates: () => [number, number],
     getLastContextMenuSceneCoordinates: () => [number, number],
     getViewPosition: () => ?ViewPosition,
+    takeScreenshot: (options: {|
+      viewX?: number,
+      viewY?: number,
+      zoom?: number,
+    |}) => Promise<string | null>,
   |},
   startSceneRendering: (start: boolean) => void,
   instancesHandlers: {|

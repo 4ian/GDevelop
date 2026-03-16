@@ -277,6 +277,12 @@ export type EditorTabsPaneCommonProps = {|
   onObjectsModifiedOutsideEditor: (
     changes: ObjectsOutsideEditorChanges
   ) => void,
+  takeEditorScreenshot: (options: {|
+    scene_name?: string,
+    view_x?: number,
+    view_y?: number,
+    zoom?: number,
+  |}) => Promise<string | null>,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
@@ -399,6 +405,7 @@ const EditorTabsPane: React.ComponentType<{
     onExternalLayoutAssociationChanged,
     triggerHotReloadInGameEditorIfNeeded,
     gamesList,
+    takeEditorScreenshot,
     setEditorTabs,
     onSetPointerEventsNone,
     paneIdentifier,
@@ -813,6 +820,7 @@ const EditorTabsPane: React.ComponentType<{
                       onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
                       onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
                       onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
+                      takeEditorScreenshot: takeEditorScreenshot,
                       onWillInstallExtension: onWillInstallExtension,
                       onExtensionInstalled: onExtensionInstalled,
                       onEffectAdded: onEffectAdded,

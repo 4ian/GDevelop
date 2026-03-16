@@ -74,6 +74,13 @@ export type ProcessEditorFunctionCallsOptions = {|
   searchAndInstallResources: (
     options: ResourceSearchAndInstallOptions
   ) => Promise<ResourceSearchAndInstallResult>,
+  takeEditorScreenshot: (options: {|
+    scene_name?: string,
+    view_x?: number,
+    view_y?: number,
+    zoom?: number,
+  |}) => Promise<string | null>,
+  uploadEditorScreenshot: (dataUrl: string) => Promise<string | null>,
 |};
 
 export const processEditorFunctionCalls = async ({
@@ -94,14 +101,18 @@ export const processEditorFunctionCalls = async ({
   onExtensionInstalled,
   searchAndInstallAsset,
   searchAndInstallResources,
+  takeEditorScreenshot,
+  uploadEditorScreenshot,
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
   createdSceneNames: Array<string>,
   createdProject: ?gdProject,
+  screenshotJpegUserRelativeKey: string | null,
 |}> => {
   const results: Array<EditorFunctionCallResult> = [];
   const createdSceneNames: Array<string> = [];
   let createdProject: ?gdProject = null;
+  let screenshotJpegUserRelativeKey: string | null = null;
 
   for (const functionCall of functionCalls) {
     const call_id = functionCall.call_id;
@@ -193,6 +204,8 @@ export const processEditorFunctionCalls = async ({
         onExtensionInstalled,
         searchAndInstallAsset,
         searchAndInstallResources,
+        takeEditorScreenshot,
+        uploadEditorScreenshot,
         PixiResourcesLoader,
       };
 
@@ -240,6 +253,9 @@ export const processEditorFunctionCalls = async ({
       if (meta && meta.createdProject) {
         createdProject = meta.createdProject;
       }
+      if (meta && meta.screenshotJpegUserRelativeKey) {
+        screenshotJpegUserRelativeKey = meta.screenshotJpegUserRelativeKey;
+      }
     } catch (error) {
       results.push({
         status: 'finished',
@@ -250,5 +266,10 @@ export const processEditorFunctionCalls = async ({
     }
   }
 
-  return { results, createdSceneNames, createdProject };
+  return {
+    results,
+    createdSceneNames,
+    createdProject,
+    screenshotJpegUserRelativeKey,
+  };
 };

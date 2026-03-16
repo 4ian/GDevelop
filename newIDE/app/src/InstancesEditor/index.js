@@ -258,6 +258,10 @@ export default class InstancesEditor extends Component<Props, State> {
       gameCanvas = document.createElement('canvas');
       const threeRenderer = new THREE.WebGLRenderer({
         canvas: gameCanvas,
+        // Required so that toDataURL() works on this canvas (used for screenshots).
+        // Without this, the WebGL drawing buffer is swapped/cleared after each
+        // frame and reading back pixels returns black.
+        preserveDrawingBuffer: true,
       });
       threeRenderer.useLegacyLights = true;
       threeRenderer.autoClear = false;
@@ -1736,6 +1740,67 @@ export default class InstancesEditor extends Component<Props, State> {
 
   getViewPosition = (): ?ViewPosition => {
     return this.viewPosition;
+  };
+
+  takeScreenshot = async ({
+    viewX,
+    viewY,
+    zoom,
+  }: {
+    viewX?: number,
+    viewY?: number,
+    zoom?: number,
+  }): Promise<string | null> => {
+    if (!this.pixiRenderer || !this.viewPosition) return null;
+
+    // Save current state
+    const savedX = this.viewPosition.getViewX();
+    const savedY = this.viewPosition.getViewY();
+    const savedZoom = this.props.instancesEditorSettings.zoomFactor;
+
+    // Apply requested view
+    if (viewX !== undefined && viewY !== undefined) {
+      this.viewPosition.scrollTo(viewX, viewY);
+    }
+    if (zoom !== undefined) {
+      this.setZoomFactor(zoom);
+    }
+
+    // Force a synchronous render (bypass FPS limiter)
+    this.background.render();
+    this.windowBorder.render();
+    this.instancesRenderer.render(
+      this.pixiRenderer,
+      this.threeRenderer,
+      this.viewPosition,
+      this.uiPixiContainer,
+      this.backgroundPixiContainer
+    );
+
+    // Capture canvas.
+    // The PIXI renderer uses backgroundAlpha: 0, so the WebGL canvas has a
+    // transparent background. JPEG has no alpha channel, so transparent pixels
+    // would become black. Composite onto a 2D canvas with a white fill first.
+    const webglCanvas = this.pixiRenderer.view;
+    const offscreen = document.createElement('canvas');
+    offscreen.width = webglCanvas.width;
+    offscreen.height = webglCanvas.height;
+    const ctx = offscreen.getContext('2d');
+    if (!ctx) return null;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+    ctx.drawImage(webglCanvas, 0, 0);
+    const dataUrl = offscreen.toDataURL('image/jpeg', 0.8);
+
+    // Restore view
+    if (viewX !== undefined || viewY !== undefined) {
+      this.viewPosition.scrollTo(savedX, savedY);
+    }
+    if (zoom !== undefined) {
+      this.setZoomFactor(savedZoom);
+    }
+
+    return dataUrl;
   };
 
   _renderScene = () => {

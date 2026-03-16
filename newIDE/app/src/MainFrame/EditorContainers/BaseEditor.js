@@ -237,6 +237,12 @@ export type RenderEditorContainerProps = {|
   onObjectsModifiedOutsideEditor: (
     changes: ObjectsOutsideEditorChanges
   ) => void,
+  takeEditorScreenshot?: (options: {|
+    scene_name?: string,
+    view_x?: number,
+    view_y?: number,
+    zoom?: number,
+  |}) => Promise<string | null>,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,

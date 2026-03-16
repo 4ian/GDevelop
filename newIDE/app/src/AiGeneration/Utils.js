@@ -108,6 +108,8 @@ export const useProcessFunctionCalls = ({
   onWillInstallExtension,
   onExtensionInstalled,
   isReadyToProcessFunctionCalls,
+  takeEditorScreenshot,
+  uploadEditorScreenshot,
 }: {|
   i18n: I18nType,
   project: ?gdProject,
@@ -119,6 +121,7 @@ export const useProcessFunctionCalls = ({
     options: {|
       createdSceneNames?: Array<string>,
       createdProject?: ?gdProject,
+      screenshotJpegUserRelativeKey?: string | null,
     |}
   ) => Promise<void>,
   getEditorFunctionCallResults: string => Array<EditorFunctionCallResult> | null,
@@ -141,6 +144,13 @@ export const useProcessFunctionCalls = ({
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isReadyToProcessFunctionCalls: boolean,
+  takeEditorScreenshot: (options: {|
+    scene_name?: string,
+    view_x?: number,
+    view_y?: number,
+    zoom?: number,
+  |}) => Promise<string | null>,
+  uploadEditorScreenshot: (dataUrl: string) => Promise<string | null>,
 |}): {
   onProcessFunctionCalls: (
     functionCalls: Array<AiRequestMessageAssistantFunctionCall>
@@ -212,6 +222,7 @@ export const useProcessFunctionCalls = ({
           results,
           createdSceneNames,
           createdProject,
+          screenshotJpegUserRelativeKey,
         } = await processEditorFunctionCalls({
           project,
           editorCallbacks,
@@ -236,6 +247,8 @@ export const useProcessFunctionCalls = ({
           onExtensionInstalled,
           searchAndInstallAsset,
           searchAndInstallResources,
+          takeEditorScreenshot,
+          uploadEditorScreenshot,
         });
 
         // If the request was suspended while we were processing, discard the
@@ -258,6 +271,7 @@ export const useProcessFunctionCalls = ({
         await onSendEditorFunctionCallResults(newResults, {
           createdSceneNames,
           createdProject,
+          screenshotJpegUserRelativeKey,
         });
       } finally {
         // Release the lock so these calls can be retried if needed
@@ -287,6 +301,8 @@ export const useProcessFunctionCalls = ({
       searchAndInstallResources,
       generateEvents,
       onSendEditorFunctionCallResults,
+      takeEditorScreenshot,
+      uploadEditorScreenshot,
     ]
   );
 

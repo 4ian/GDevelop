@@ -92,6 +92,7 @@ export type EditorFunctionGenericOutput = {|
   meta?: {
     newSceneNames?: Array<string>,
     createdProject?: gdProject,
+    screenshotJpegUserRelativeKey?: string,
   },
   message?: string,
   eventsAsText?: string,
@@ -267,6 +268,13 @@ type LaunchFunctionOptionsWithoutProject = {|
   searchAndInstallResources: (
     options: ResourceSearchAndInstallOptions
   ) => Promise<ResourceSearchAndInstallResult>,
+  takeEditorScreenshot: (options: {|
+    scene_name?: string,
+    view_x?: number,
+    view_y?: number,
+    zoom?: number,
+  |}) => Promise<string | null>,
+  uploadEditorScreenshot: (dataUrl: string) => Promise<string | null>,
 |};
 
 export type LaunchFunctionOptionsWithProject = {|
@@ -4990,6 +4998,77 @@ const initializeProject: EditorFunctionWithoutProject = {
   },
 };
 
+const takeEditorScreenshotFunction: EditorFunction = {
+  renderForEditor: ({ args }) => ({
+    text: <Trans>Take a screenshot of the scene editor</Trans>,
+  }),
+  launchFunction: async ({
+    project,
+    args,
+    takeEditorScreenshot,
+    uploadEditorScreenshot,
+  }) => {
+    const scene_name =
+      SafeExtractor.extractStringProperty(args, 'scene_name') || undefined;
+    const view_x = SafeExtractor.extractNumberProperty(args, 'view_x');
+    const view_y = SafeExtractor.extractNumberProperty(args, 'view_y');
+    const zoom = SafeExtractor.extractNumberProperty(args, 'zoom');
+
+    // 1. Capture
+    const dataUrl = await takeEditorScreenshot({
+      scene_name,
+      view_x: view_x !== null ? view_x : undefined,
+      view_y: view_y !== null ? view_y : undefined,
+      zoom: zoom !== null ? zoom : undefined,
+    });
+
+    if (!dataUrl) {
+      return ({
+        success: false,
+        message: 'No scene editor is open to take a screenshot.',
+      }: EditorFunctionGenericOutput);
+    }
+
+    // 2. Upload
+    const screenshotJpegUserRelativeKey = await uploadEditorScreenshot(dataUrl);
+
+    // 3. Instance summary for the target scene
+    const targetSceneName =
+      scene_name ||
+      (project.getLayoutsCount() > 0 ? project.getLayoutAt(0).getName() : null);
+    const instances = [];
+    if (targetSceneName && project.hasLayoutNamed(targetSceneName)) {
+      const layout = project.getLayout(targetSceneName);
+      const initialInstances = layout.getInitialInstances();
+      mapFor(0, layout.getLayersCount(), i => {
+        const layerName = layout.getLayerAt(i).getName();
+        getInstancesInLayoutForLayer(initialInstances, layerName).forEach(
+          instance => {
+            const serializedInstance = serializeToJSObject(instance);
+            instances.push({
+              ...serializedInstance,
+              persistentUuid: undefined,
+              id: instance.getPersistentUuid().slice(0, 10),
+              initialVariables: undefined,
+              numberProperties: undefined,
+              stringProperties: undefined,
+            });
+          }
+        );
+      });
+    }
+
+    return ({
+      success: true,
+      instances,
+      instancesForSceneNamed: targetSceneName || undefined,
+      meta: screenshotJpegUserRelativeKey
+        ? { screenshotJpegUserRelativeKey }
+        : undefined,
+    }: EditorFunctionGenericOutput);
+  },
+};
+
 export const editorFunctions: { [string]: EditorFunction } = {
   create_object: createOrReplaceObject,
   create_or_replace_object: createOrReplaceObject,
@@ -5011,6 +5090,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   add_or_edit_variable: addOrEditVariable,
   read_full_docs: readFullDocs,
   create_or_update_plan: createOrUpdatePlan,
+  take_editor_screenshot: takeEditorScreenshotFunction,
 };
 
 export const editorFunctionsWithoutProject: {

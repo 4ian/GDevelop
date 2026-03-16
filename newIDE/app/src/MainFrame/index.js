@@ -53,7 +53,10 @@ import {
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
 import { renderExternalEventsEditorContainer } from './EditorContainers/ExternalEventsEditorContainer';
-import { renderSceneEditorContainer } from './EditorContainers/SceneEditorContainer';
+import {
+  renderSceneEditorContainer,
+  SceneEditorContainer,
+} from './EditorContainers/SceneEditorContainer';
 import { renderExternalLayoutEditorContainer } from './EditorContainers/ExternalLayoutEditorContainer';
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
@@ -3430,6 +3433,39 @@ const MainFrame = (props: Props): React.MixedElement => {
     [state.editorTabs]
   );
 
+  const takeEditorScreenshot = React.useCallback(
+    async (options: {|
+      scene_name?: string,
+      view_x?: number,
+      view_y?: number,
+      zoom?: number,
+    |}) => {
+      const { scene_name, view_x, view_y, zoom } = options;
+      const allTabs = getAllEditorTabs(state.editorTabs);
+
+      let target = null;
+      if (scene_name) {
+        target = allTabs.find(
+          tab =>
+            tab.projectItemName === scene_name &&
+            tab.editorRef instanceof SceneEditorContainer
+        );
+      } else {
+        target = allTabs.find(
+          tab => tab.editorRef instanceof SceneEditorContainer
+        );
+      }
+
+      if (!target || !target.editorRef) return null;
+      return (target.editorRef: any).takeScreenshot({
+        viewX: view_x,
+        viewY: view_y,
+        zoom,
+      });
+    },
+    [state.editorTabs]
+  );
+
   const _onProjectItemModified = () => {
     triggerUnsavedChanges();
     forceUpdate();
@@ -5021,6 +5057,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
     onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
+    takeEditorScreenshot: takeEditorScreenshot,
     onWillInstallExtension: onWillInstallExtension,
     onExtensionInstalled: onExtensionInstalled,
     onEffectAdded: onEffectAdded,

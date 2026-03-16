@@ -77,6 +77,9 @@ const gameProjectJsonUploadCache = makeUploadCache({
 const eventsJsonUploadCache = makeUploadCache({
   minimalContentLength: 9 * 1000, // Roughly 9KB.
 });
+const screenshotUploadCache = makeUploadCache({
+  minimalContentLength: null, // Always upload the screenshot.
+});
 
 const computeSha256 = (payload: string): string => {
   const shaObj = new jsSHA('SHA-256', 'TEXT', { encoding: 'UTF8' });
@@ -172,6 +175,7 @@ export const prepareAiUserContent = async ({
             ? projectSpecificExtensionsSummaryJsonHash
             : null,
           eventsJsonHash: shouldUploadEventsJson ? eventsJsonHash : null,
+          screenshotJpegHash: null,
         })
     );
 
@@ -274,4 +278,64 @@ export const prepareAiUserContent = async ({
     eventsJsonUserRelativeKey,
     eventsJson: eventsJsonUserRelativeKey ? null : eventsJson || null,
   };
+};
+
+/**
+ * Upload a screenshot JPEG (given as a dataUrl) to S3 via the presigned URL
+ * infrastructure. Returns the `userRelativeKey` the backend can use to include
+ * the image as an image block in the AI conversation context, or null on failure.
+ * Uploads are deduplicated: the same screenshot won't be re-uploaded for 30 minutes.
+ */
+export const prepareAiScreenshotContent = async ({
+  getAuthorizationHeader,
+  userId,
+  screenshotJpegDataUrl,
+}: {|
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  screenshotJpegDataUrl: string,
+|}): Promise<string | null> => {
+  const hash = computeSha256(screenshotJpegDataUrl);
+
+  if (
+    !screenshotUploadCache.shouldUpload({
+      hash,
+      contentLength: screenshotJpegDataUrl.length,
+    })
+  ) {
+    return screenshotUploadCache.getUserRelativeKey(hash);
+  }
+
+  const {
+    screenshotJpegSignedUrl,
+    screenshotJpegUserRelativeKey,
+  }: AiUserContentPresignedUrlsResult = await retryIfFailed({ times: 3 }, () =>
+    createAiUserContentPresignedUrls(getAuthorizationHeader, {
+      userId,
+      gameProjectJsonHash: null,
+      projectSpecificExtensionsSummaryJsonHash: null,
+      eventsJsonHash: null,
+      screenshotJpegHash: hash,
+    })
+  );
+
+  if (!screenshotJpegSignedUrl || !screenshotJpegUserRelativeKey) return null;
+
+  // Convert the dataUrl to a Blob for upload.
+  const blob = await fetch(screenshotJpegDataUrl).then(r => r.blob());
+
+  await retryIfFailed({ times: 3 }, () =>
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    axios.put(screenshotJpegSignedUrl, blob, {
+      headers: { 'Content-Type': 'image/jpeg' },
+      maxContentLength: Infinity,
+    })
+  );
+
+  screenshotUploadCache.storeUpload(hash, {
+    uploadedAt: Date.now(),
+    userRelativeKey: screenshotJpegUserRelativeKey,
+  });
+
+  return screenshotJpegUserRelativeKey;
 };

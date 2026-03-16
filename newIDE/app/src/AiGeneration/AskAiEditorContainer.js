@@ -37,7 +37,7 @@ import {
   hasValidSubscriptionPlan,
 } from '../Utils/GDevelopServices/Usage';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
-import { type EditorCallbacks } from '../EditorFunctions';
+import { type EditorCallbacks, editorFunctions } from '../EditorFunctions';
 import {
   aiRequestHasWorkInProgress,
   getFunctionCallNameByCallId,
@@ -62,7 +62,10 @@ import {
 } from '../Utils/Analytics/EventSender';
 import { listAllExamples } from '../Utils/GDevelopServices/Example';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
-import { prepareAiUserContent } from './PrepareAiUserContent';
+import {
+  prepareAiUserContent,
+  prepareAiScreenshotContent,
+} from './PrepareAiUserContent';
 import { AiRequestContext } from './AiRequestContext';
 import { getAiConfigurationPresetsWithAvailability } from './AiConfiguration';
 import {
@@ -176,6 +179,12 @@ type Props = {|
       createdProject?: gdProject,
     |}
   ) => Promise<?FileMetadata>,
+  takeEditorScreenshot?: (options: {|
+    scene_name?: string,
+    view_x?: number,
+    view_y?: number,
+    zoom?: number,
+  |}) => Promise<string | null>,
 |};
 
 export type AskAiEditorInterface = {|
@@ -244,6 +253,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         getOrLoadProjectVersion,
         onSave,
         onSaveProjectAsWithStorageProvider,
+        takeEditorScreenshot,
       }: Props,
       ref
     ) => {
@@ -613,12 +623,14 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           createdProject,
           editorFunctionCallResults,
           mode,
+          screenshotJpegUserRelativeKey,
         }: {|
           userMessage: string,
           createdSceneNames?: Array<string>,
           createdProject?: ?gdProject,
           editorFunctionCallResults: Array<EditorFunctionCallResult>,
           mode?: 'chat' | 'agent' | 'orchestrator',
+          screenshotJpegUserRelativeKey?: string | null,
         |}) => {
           if (!profile || !selectedAiRequestId || !selectedAiRequest) return;
 
@@ -743,6 +755,8 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                   preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
                 projectSpecificExtensionsSummaryJson:
                   preparedAiUserContent.projectSpecificExtensionsSummaryJson,
+                screenshotJpegUserRelativeKey:
+                  screenshotJpegUserRelativeKey || null,
                 gameId: upToDateProject
                   ? upToDateProject.getProjectUuid()
                   : undefined,
@@ -835,18 +849,33 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           triggerUnsavedChanges,
         ]
       );
+      const uploadEditorScreenshot = React.useCallback(
+        async (dataUrl: string): Promise<string | null> => {
+          if (!profile) return null;
+          return prepareAiScreenshotContent({
+            getAuthorizationHeader,
+            userId: profile.id,
+            screenshotJpegDataUrl: dataUrl,
+          });
+        },
+        [getAuthorizationHeader, profile]
+      );
+
       const onSendEditorFunctionCallResults = React.useCallback(
         async (
           editorFunctionCallResults: Array<EditorFunctionCallResult>,
           options: {|
             createdProject?: ?gdProject,
             createdSceneNames?: Array<string>,
+            screenshotJpegUserRelativeKey?: string | null,
           |}
         ) => {
           await onSendMessage({
             userMessage: '',
             createdProject: options.createdProject,
             createdSceneNames: options.createdSceneNames,
+            screenshotJpegUserRelativeKey:
+              options.screenshotJpegUserRelativeKey,
             editorFunctionCallResults,
           });
         },
@@ -868,7 +897,81 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onWillInstallExtension,
         onExtensionInstalled,
         isReadyToProcessFunctionCalls,
+        takeEditorScreenshot: takeEditorScreenshot || (async () => null),
+        uploadEditorScreenshot,
       });
+
+      // DEBUG: expose screenshot tool for manual testing from the browser console.
+      // Usage: await window.__testTakeEditorScreenshot({ scene_name: 'MyScene' })
+      React.useEffect(
+        () => {
+          const _takeEditorScreenshot =
+            takeEditorScreenshot || (async () => null);
+          window.__testTakeEditorScreenshot = async (args?: {|
+            scene_name?: string,
+            view_x?: number,
+            view_y?: number,
+            zoom?: number,
+          |}) => {
+            if (!project) {
+              console.warn('[DEBUG] No project open.');
+              return null;
+            }
+            console.log(
+              '[DEBUG] takeEditorScreenshot prop available:',
+              !!takeEditorScreenshot
+            );
+            console.log(
+              '[DEBUG] Calling take_editor_screenshot launchFunction...'
+            );
+            const output = await editorFunctions[
+              'take_editor_screenshot'
+            ].launchFunction({
+              project,
+              args: args || {},
+              takeEditorScreenshot: _takeEditorScreenshot,
+              // Skip the real upload — return a fake key so instances still show up.
+              uploadEditorScreenshot: async () =>
+                'debug-fake-key/screenshot.jpg',
+              // Unused by this tool but required by the type:
+              editorCallbacks,
+              toolOptions: null,
+              i18n,
+              relatedAiRequestId: null,
+              getRelatedAiRequestLastMessages: () => ({
+                lastUserMessage: null,
+                lastAssistantMessages: [],
+              }),
+              generateEvents: async () => ({
+                generationCompleted: false,
+                errorMessage: 'not available in debug',
+              }),
+              onSceneEventsModifiedOutsideEditor: () => {},
+              onInstancesModifiedOutsideEditor: () => {},
+              onObjectsModifiedOutsideEditor: () => {},
+              onObjectGroupsModifiedOutsideEditor: () => {},
+              ensureExtensionInstalled: async () => {},
+              onWillInstallExtension: () => {},
+              onExtensionInstalled: () => {},
+              searchAndInstallAsset: async () => ({
+                status: 'error',
+                message: 'not available in debug',
+                createdObjects: [],
+                assetShortHeader: null,
+              }),
+              searchAndInstallResources: async () => ({ results: [] }),
+              PixiResourcesLoader: null,
+            });
+            console.log('[DEBUG] Tool output:', output);
+            return output;
+          };
+          return () => {
+            delete window.__testTakeEditorScreenshot;
+          };
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [takeEditorScreenshot, project, editorCallbacks, i18n]
+      );
 
       React.useEffect(() => {
         // When component is mounted, and an AI request was already selected,
@@ -1499,6 +1602,7 @@ export const renderAskAiEditorContainer = (
         onSaveProjectAsWithStorageProvider={
           props.onSaveProjectAsWithStorageProvider
         }
+        takeEditorScreenshot={props.takeEditorScreenshot}
       />
     )}
   </I18n>

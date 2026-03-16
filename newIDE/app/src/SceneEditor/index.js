@@ -2099,6 +2099,15 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  takeScreenshot = async (options: {|
+    viewX?: number,
+    viewY?: number,
+    zoom?: number,
+  |}): Promise<string | null> => {
+    if (!this.editorDisplay) return null;
+    return this.editorDisplay.viewControls.takeScreenshot(options);
+  };
+
   getContextMenuZoomItems = (i18n: I18nType): any => {
     return [
       {

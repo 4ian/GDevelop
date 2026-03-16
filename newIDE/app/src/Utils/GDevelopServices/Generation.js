@@ -451,6 +451,7 @@ export const addMessageToAiRequest = async (
     gameProjectJsonUserRelativeKey,
     projectSpecificExtensionsSummaryJson,
     projectSpecificExtensionsSummaryJsonUserRelativeKey,
+    screenshotJpegUserRelativeKey,
     paused,
     mode,
     toolsVersion,
@@ -466,6 +467,7 @@ export const addMessageToAiRequest = async (
     gameProjectJsonUserRelativeKey: string | null,
     projectSpecificExtensionsSummaryJson: string | null,
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
+    screenshotJpegUserRelativeKey: string | null,
     paused?: boolean,
     mode?: 'chat' | 'agent' | 'orchestrator',
     toolsVersion?: string,
@@ -486,6 +488,7 @@ export const addMessageToAiRequest = async (
       gameProjectJsonUserRelativeKey,
       projectSpecificExtensionsSummaryJson,
       projectSpecificExtensionsSummaryJsonUserRelativeKey,
+      screenshotJpegUserRelativeKey,
       paused,
       mode,
       toolsVersion,
@@ -874,6 +877,8 @@ export type AiUserContentPresignedUrlsResult = {
   projectSpecificExtensionsSummaryJsonUserRelativeKey?: string,
   eventsJsonSignedUrl?: string,
   eventsJsonUserRelativeKey?: string,
+  screenshotJpegSignedUrl?: string,
+  screenshotJpegUserRelativeKey?: string,
 };
 
 export const createAiUserContentPresignedUrls = async (
@@ -883,11 +888,13 @@ export const createAiUserContentPresignedUrls = async (
     gameProjectJsonHash,
     projectSpecificExtensionsSummaryJsonHash,
     eventsJsonHash,
+    screenshotJpegHash,
   }: {|
     userId: string,
     gameProjectJsonHash: string | null,
     projectSpecificExtensionsSummaryJsonHash: string | null,
     eventsJsonHash: string | null,
+    screenshotJpegHash: string | null,
   |}
 ): Promise<AiUserContentPresignedUrlsResult> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -898,6 +905,7 @@ export const createAiUserContentPresignedUrls = async (
       gameProjectJsonHash,
       projectSpecificExtensionsSummaryJsonHash,
       eventsJsonHash,
+      screenshotJpegHash,
     },
     {
       params: {

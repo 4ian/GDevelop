@@ -74,6 +74,8 @@ describe('editorFunctions', () => {
     onObjectsModifiedOutsideEditor: jest.fn(),
     onWillInstallExtension: jest.fn(),
     onExtensionInstalled: jest.fn(),
+    takeEditorScreenshot: jest.fn(),
+    uploadEditorScreenshot: jest.fn(),
     PixiResourcesLoader: PixiResourcesLoaderMock,
   });
 

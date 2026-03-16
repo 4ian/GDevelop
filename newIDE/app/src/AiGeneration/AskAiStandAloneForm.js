@@ -459,6 +459,7 @@ export const AskAiStandAloneForm = ({
             // We don't pause when creating the request as we are in orchestrator mode.
             // If we switch back to agent mode for the standalone form in the future,
             // check if it has just initialized the project to mark it as paused.
+            screenshotJpegUserRelativeKey: null,
             paused: false,
             mode: aiRequestModeForForm,
             toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
@@ -507,6 +508,7 @@ export const AskAiStandAloneForm = ({
       options: {|
         createdSceneNames?: Array<string>,
         createdProject?: ?gdProject,
+        screenshotJpegUserRelativeKey?: string | null,
       |}
     ) => {
       await onSendMessage({
@@ -534,6 +536,8 @@ export const AskAiStandAloneForm = ({
     onWillInstallExtension,
     onExtensionInstalled,
     isReadyToProcessFunctionCalls: true,
+    takeEditorScreenshot: async () => null,
+    uploadEditorScreenshot: async () => null,
   });
 
   const { values, showAskAiStandAloneForm } = React.useContext(

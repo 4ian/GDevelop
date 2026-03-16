@@ -230,6 +230,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
             ? editor.getLastContextMenuSceneCoordinates
             : () => [0, 0],
           getViewPosition: editor ? editor.getViewPosition : noop,
+          takeScreenshot: editor ? editor.takeScreenshot : async () => null,
         },
         instancesHandlers: {
           getContentAABB: editor ? editor.getContentAABB : () => null,

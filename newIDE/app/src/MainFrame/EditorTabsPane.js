@@ -423,6 +423,9 @@ const EditorTabsPane: React.ComponentType<{
   const poppedOutToolbarRefs = React.useRef<{
     [string]: ?ToolbarInterface,
   }>({});
+  // Track which popped-out toolbars have had their initial updateToolbar call,
+  // to avoid infinite re-render loops from inline ref callbacks.
+  const initializedPoppedOutToolbars = React.useRef<Set<string>>(new Set());
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const askAiPaneIdentifier = getEditorTabOpenedWithKey(editorTabs, 'ask-ai');
   const containerRef = React.useRef<?HTMLDivElement>(null);
@@ -877,6 +880,7 @@ const EditorTabsPane: React.ComponentType<{
                   title={editorTab.label || 'GDevelop'}
                   onClose={() => {
                     delete poppedOutToolbarRefs.current[editorTab.key];
+                    initializedPoppedOutToolbars.current.delete(editorTab.key);
                     onPopInTab(editorTab.key);
                     onEditorTabClosing(editorTab);
                     onCloseEditorTab(editorTab);
@@ -887,11 +891,28 @@ const EditorTabsPane: React.ComponentType<{
                   <FullThemeProvider>
                     <Toolbar
                       ref={ref => {
-                        poppedOutToolbarRefs.current[editorTab.key] = ref;
-                        // When the Toolbar mounts, ask the editor to re-set its
-                        // toolbar content so it appears in this new Toolbar instance.
-                        if (ref && editorTab.editorRef) {
-                          editorTab.editorRef.updateToolbar();
+                        if (ref) {
+                          poppedOutToolbarRefs.current[editorTab.key] = ref;
+                          // When the Toolbar first mounts, ask the editor to
+                          // populate it. Only do this once per pop-out lifecycle
+                          // to avoid an infinite re-render loop (inline ref
+                          // callbacks are called on every render).
+                          if (
+                            !initializedPoppedOutToolbars.current.has(
+                              editorTab.key
+                            ) &&
+                            editorTab.editorRef
+                          ) {
+                            initializedPoppedOutToolbars.current.add(
+                              editorTab.key
+                            );
+                            editorTab.editorRef.updateToolbar();
+                          }
+                        } else {
+                          delete poppedOutToolbarRefs.current[editorTab.key];
+                          initializedPoppedOutToolbars.current.delete(
+                            editorTab.key
+                          );
                         }
                       }}
                       hidden={false}

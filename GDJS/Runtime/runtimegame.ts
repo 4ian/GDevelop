@@ -177,6 +177,9 @@ namespace gdjs {
     playerId?: string;
     playerToken?: string;
 
+    /** Multithreading options for the runtime. */
+    threading?: ThreadingOptions;
+
     /**
      * If set, the game should use the specified environment for making calls
      * to GDevelop APIs ("dev" = development APIs).
@@ -227,6 +230,7 @@ namespace gdjs {
     _sessionId: string | null;
     _playerId: string | null;
     _watermark: watermark.RuntimeWatermark;
+    _threadingManager: gdjs.ThreadingManager;
 
     _sceneStack: SceneStack;
     /**
@@ -283,6 +287,9 @@ namespace gdjs {
      */
     constructor(data: ProjectData, options?: RuntimeGameOptions) {
       this._options = options || {};
+      // Expose options early for libraries loading asynchronously.
+      gdjs.runtimeGameOptions = this._options;
+      this._threadingManager = new gdjs.ThreadingManager(this._options.threading);
 
       this._isPreview = this._options.isPreview || false;
       if (this._isPreview) {
@@ -479,6 +486,10 @@ namespace gdjs {
      */
     getAdditionalOptions(): RuntimeGameOptions {
       return this._options;
+    }
+
+    getThreadingManager(): gdjs.ThreadingManager {
+      return this._threadingManager;
     }
 
     getRenderer(): gdjs.RuntimeGameRenderer {
@@ -1316,6 +1327,7 @@ namespace gdjs {
                 // Note we might want to disable rendering if there is a loading screen?
                 this._sceneStack.renderWithoutStep();
               }
+              this._threadingManager.flushFrameProfile(null);
             } else {
               // The game is not paused (and so, not edited): both the rendering
               // and game logic (a full "step") is executed.
@@ -1360,6 +1372,7 @@ namespace gdjs {
       this._sceneStack.dispose();
       this._renderer.dispose(removeCanvas);
       this._resourcesLoader.dispose();
+      this._threadingManager.dispose();
 
       this._wasDisposed = true;
     }

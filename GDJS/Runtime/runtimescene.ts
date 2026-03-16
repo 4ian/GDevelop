@@ -450,6 +450,9 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.end('render');
       }
+      this._runtimeGame
+        .getThreadingManager()
+        .flushFrameProfile(this._profiler);
       if (this._profiler) {
         this._profiler.endFrame();
       }

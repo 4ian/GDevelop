@@ -56,6 +56,8 @@ const untransformedPaths = [
   'Extensions/ParticleSystem/pixi-particles-pixi-renderer.min.js',
   'Extensions/Physics2Behavior/box2d.js',
   'Extensions/PhysicsBehavior/box2djs',
+  'Extensions/Physics3DBehavior/jolt-physics.wasm.js',
+  'Extensions/Physics3DBehavior/jolt-physics.multithread.wasm.js',
   'Extensions/Shopify/shopify-buy.umd.polyfilled.min.js',
   'Extensions/JsExtensionTypes.flow.js',
   'Extensions/TileMap/pako/dist/pako.min.js',

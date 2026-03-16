@@ -9,15 +9,76 @@ namespace Jolt {
 const epsilon = 1 / (1 << 16);
 
 namespace gdjs {
+  const canUseWasmThreads = (): boolean => {
+    const hasWorker = typeof Worker !== 'undefined';
+    const hasSharedArrayBuffer = typeof SharedArrayBuffer !== 'undefined';
+    const hasAtomics = typeof Atomics !== 'undefined';
+    const isCrossOriginIsolated =
+      typeof crossOriginIsolated !== 'undefined' ? !!crossOriginIsolated : false;
+    return hasWorker && hasSharedArrayBuffer && hasAtomics && isCrossOriginIsolated;
+  };
+
+  const getThreadingOptions = (): ThreadingOptions | null => {
+    // Use global options if available.
+    return gdjs.runtimeGameOptions?.threading || null;
+  };
+
+  const getWorkerCountFromOptions = (): integer => {
+    const threading = getThreadingOptions();
+    if (threading && typeof threading.workerCount === 'number') {
+      return Math.max(1, Math.floor(threading.workerCount));
+    }
+    const cores =
+      typeof navigator !== 'undefined' && navigator.hardwareConcurrency
+        ? navigator.hardwareConcurrency
+        : 4;
+    return Math.max(1, Math.floor(cores) - 1);
+  };
+
+  const shouldUseMultithreadedJolt = (): boolean => {
+    const threading = getThreadingOptions();
+    if (threading && threading.enabled === false) return false;
+    const mode = threading?.useSharedArrayBuffer || 'auto';
+    if (mode === 'off') return false;
+    if (!canUseWasmThreads()) {
+      if (mode === 'force') {
+        console.warn(
+          'SharedArrayBuffer is not available (COOP/COEP missing). Falling back to single-threaded Jolt.'
+        );
+      }
+      return false;
+    }
+    return true;
+  };
+
   const loadJolt = async () => {
     try {
-      const module = await import('./jolt-physics.wasm.js');
+      const useMultithread = shouldUseMultithreadedJolt();
+      let module;
+      try {
+        module = useMultithread
+          ? await import('./jolt-physics.multithread.wasm.js')
+          : await import('./jolt-physics.wasm.js');
+      } catch (err) {
+        if (useMultithread) {
+          console.warn(
+            'Failed to load multithreaded Jolt. Falling back to single-threaded build.',
+            err
+          );
+          module = await import('./jolt-physics.wasm.js');
+        } else {
+          throw err;
+        }
+      }
       const initializeJoltPhysics = module.default;
       if (!initializeJoltPhysics) {
         throw new Error('No default export found in Jolt.');
       }
-
-      const Jolt = await initializeJoltPhysics();
+      const moduleOptions: Record<string, any> = {};
+      if (useMultithread) {
+        moduleOptions.PTHREAD_POOL_SIZE = getWorkerCountFromOptions();
+      }
+      const Jolt = await initializeJoltPhysics(moduleOptions);
       //@ts-ignore
       window.Jolt = Jolt;
     } catch (err) {

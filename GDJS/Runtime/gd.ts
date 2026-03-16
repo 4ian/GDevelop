@@ -91,6 +91,12 @@ namespace gdjs {
   export let gdevelopLogo: string = '';
 
   /**
+   * Runtime options used to start the game (if any).
+   * @category Core Engine > Game
+   */
+  export let runtimeGameOptions: gdjs.RuntimeGameOptions | null = null;
+
+  /**
    * Convert a RGB object to a Hex string.
    *
    * No "#" or "0x" are added.

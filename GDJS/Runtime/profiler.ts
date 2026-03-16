@@ -132,6 +132,25 @@ namespace gdjs {
       }
     }
 
+    /**
+     * Add time to a section without starting/stopping a timer.
+     * Useful for asynchronous or external timings.
+     */
+    addExternalTime(sectionName: string, timeMs: float): void {
+      if (this._currentSection === null) return;
+      let root = this._currentSection;
+      while (root.parent) root = root.parent;
+      const subsections = root.subsections;
+      const subsection = (subsections[sectionName] =
+        subsections[sectionName] || {
+          parent: root,
+          time: 0,
+          lastStartTime: 0,
+          subsections: {},
+        });
+      subsection.time = (subsection.time || 0) + timeMs;
+    }
+
     static _addAverageSectionTimes(
       section: FrameMeasure,
       destinationSection: FrameMeasure,

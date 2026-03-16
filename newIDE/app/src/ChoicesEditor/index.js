@@ -37,8 +37,13 @@ const ChoicesEditor = ({
   const updateChoices = () => setChoices(choices);
 
   return (
-    <ResponsiveLineStackLayout>
-      <ColumnStackLayout justifyContent="flex-end" expand noMargin>
+    <ResponsiveLineStackLayout noOverflowParent>
+      <ColumnStackLayout
+        justifyContent="flex-end"
+        expand
+        noOverflowParent
+        noMargin
+      >
         {choices.map((item, index) => (
           <LineStackLayout
             key={index}

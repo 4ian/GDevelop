@@ -67,7 +67,7 @@ export default function CompactValueTypeEditor({
   return (
     <I18n>
       {({ i18n }) => (
-        <ColumnStackLayout noMargin expand>
+        <ColumnStackLayout noMargin expand noOverflowParent>
           {isTypeSelectorShown && (
             <CompactPropertiesEditorRowField
               label={i18n._(t`Type`)}

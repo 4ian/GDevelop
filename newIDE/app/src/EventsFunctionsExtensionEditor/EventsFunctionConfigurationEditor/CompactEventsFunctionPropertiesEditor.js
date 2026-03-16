@@ -482,7 +482,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
                 );
               })()}
             </Line>
-            <ColumnStackLayout expand noMargin>
+            <ColumnStackLayout expand noOverflowParent noMargin>
               <CompactToggleField
                 label={i18n._(t`Private`)}
                 checked={eventsFunction.isPrivate()}

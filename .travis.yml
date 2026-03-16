@@ -55,7 +55,7 @@ install:
 script:
   # GDCore tests:
   - cd .build-tests
-  - Core/GDCore_tests
+  - Core/GDCore_testsfor i in {1..20}; do echo "Run $i"; Core/GDCore_tests; done
   - cd ..
   # GDevelop.js tests
   - cd GDevelop.js

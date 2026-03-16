@@ -950,7 +950,12 @@ export const CompactEventsFunctionParametersEditor = ({
                   })
                 : null}
               <Line>
-                <Column noMargin expand justifyContent="center">
+                <Column
+                  noMargin
+                  expand
+                  noOverflowParent
+                  justifyContent="center"
+                >
                   <EmptyPlaceholder
                     title={<Trans>Add your first parameter</Trans>}
                     description={

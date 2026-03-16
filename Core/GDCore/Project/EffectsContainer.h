@@ -9,6 +9,7 @@
 #include <vector>
 #include <algorithm>
 
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/String.h"
 
 namespace gd {
@@ -119,6 +120,7 @@ class GD_CORE_API EffectsContainer {
   std::vector<std::shared_ptr<gd::Effect>> effects;
   static Effect badEffect;
   void Init(const EffectsContainer& other);
+  gd::MemoryTracked _memoryTracked{this, "EffectsContainer"};
 };
 }  // namespace gd
 

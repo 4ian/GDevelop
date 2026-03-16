@@ -18,6 +18,7 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { type CommunityLinks, type UserSurvey } from './User';
 import { userCancellationErrorName } from '../../LoginProvider/Utils';
 import { ensureIsObject, ensureObjectHasProperty } from '../DataValidator';
+import { OFFLINE_MODE } from '../OfflineMode';
 
 export type Profile = {|
   id: string,
@@ -130,6 +131,12 @@ export default class Authentication {
   _initialAuthCheckPromise: Promise<void>;
 
   constructor() {
+    if (OFFLINE_MODE) {
+      // Offline mode: skip Firebase initialization completely.
+      this.auth = ({ currentUser: null }: any);
+      this._initialAuthCheckPromise = Promise.resolve();
+      return;
+    }
     const app = initializeApp(GDevelopFirebaseConfig);
     this.auth = getAuth(app);
 
@@ -535,6 +542,7 @@ export default class Authentication {
 
   // $FlowFixMe[value-as-type]
   getFirebaseUserSync = (): ?FirebaseUser => {
+    if (!this.auth || OFFLINE_MODE) return null;
     return this.auth.currentUser || null;
   };
 
@@ -576,6 +584,7 @@ export default class Authentication {
   };
 
   getAuthorizationHeader = async (): Promise<string> => {
+    if (OFFLINE_MODE) throw new Error('Offline mode: authentication disabled.');
     const { currentUser } = this.auth;
     if (!currentUser) throw new Error('User is not authenticated.');
 
@@ -583,7 +592,7 @@ export default class Authentication {
   };
 
   isAuthenticated = (): boolean => {
-    return !!this.auth.currentUser;
+    return !!this.auth && !!this.auth.currentUser;
   };
 
   waitForInitialAuthCheck = (): Promise<void> => {

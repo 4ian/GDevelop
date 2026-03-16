@@ -17,6 +17,7 @@ import { isMobile, isNativeMobileApp } from '../Platform';
 import { retryIfFailed } from '../RetryIfFailed';
 import { type NewProjectCreationSource } from '../../ProjectCreation/NewProjectSetupDialog';
 import { isServiceWorkerSupported } from '../../ServiceWorkerSetup';
+import { OFFLINE_MODE } from '../OfflineMode';
 const electron = optionalRequire('electron');
 
 const isElectronApp = !!electron;
@@ -110,6 +111,7 @@ const makeCanSendEvent = (options: {| minimumTimeBetweenEvents: number |}) => {
  * This function will retry to send the event if the analytics service is not ready.
  */
 const recordEvent = (name: string, metadata?: { [string]: any }) => {
+  if (OFFLINE_MODE) return;
   if (isDev) {
     // Uncomment to inspect analytics in development.
     // console.log(`Should have sent analytics event "${name}"`, metadata);
@@ -158,6 +160,7 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
  * Used once at the beginning of the app to initialize the analytics.
  */
 export const installAnalyticsEvents = () => {
+  if (OFFLINE_MODE) return;
   if (isDev) {
     console.info('Development build - Analytics disabled');
     return;
@@ -185,6 +188,7 @@ export const installAnalyticsEvents = () => {
 export const identifyUserForAnalytics = (
   authenticatedUser: AuthenticatedUser
 ) => {
+  if (OFFLINE_MODE) return;
   if (isDev) {
     console.info('Development build - Analytics disabled');
     return;

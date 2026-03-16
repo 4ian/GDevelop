@@ -7,6 +7,7 @@ var shell = require('shelljs');
 var AdmZip = require('adm-zip');
 var process = require('process');
 var path = require('path');
+var fs = require('fs');
 const { hashElement } = require('folder-hash');
 const { downloadLocalFile } = require('./lib/DownloadLocalFile');
 const { retryIfFailed } = require('./lib/RetryIfFailed');
@@ -17,6 +18,8 @@ const expectedFolderHash = process.argv[4];
 const gitUrl = 'https://github.com/4ian/GDevelop';
 const basePath = path.join('../public/external/', editor, editor + '-editor');
 const zipFilePath = basePath + '.zip';
+const isOffline =
+  process.env.GD_OFFLINE === '1' || process.env.OFFLINE_MODE === '1';
 
 // Tool function checking if the editor folder has the proper SHA256 checksum
 // If you're updating the zip of a third party editor, update also the checksum
@@ -39,13 +42,50 @@ const editorHasCorrectHash = () =>
     }
   );
 
+const extractZip = async () => {
+  try {
+    const zip = new AdmZip(zipFilePath);
+    zip.extractAllTo(path.join('../public/external/', editor), /*overwrite=*/ true);
+
+    shell.echo(
+      'OK Extracted ' +
+        editor +
+        '-editor.zip to public/external/' +
+        editor +
+        ' folder'
+    );
+    shell.rm(zipFilePath);
+    const { isHashCorrect, actualFolderHash } = await editorHasCorrectHash();
+
+    if (!isHashCorrect) {
+      shell.echo(
+        "ERROR Can't verify that " +
+          editor +
+          '-editor hash is correct. Be careful about potential tampering of the third party editor!'
+      );
+      shell.echo(
+        `INFO Expected folder hash was "${expectedFolderHash}" while actual folder hash that is computed is "${actualFolderHash}".`
+      );
+    }
+  } catch (e) {
+    shell.echo(
+      'ERROR Error while extracting ' +
+        editor +
+        '-editor.zip to public/external/' +
+        editor +
+        ' folder:',
+      e.message
+    );
+  }
+};
+
 (async () => {
   const { isHashCorrect } = await editorHasCorrectHash();
 
   if (isHashCorrect) {
     //Nothing to do
     shell.echo(
-      '✅ ' +
+      'OK ' +
         editor +
         '-editor already existing in public/external/' +
         editor +
@@ -54,8 +94,24 @@ const editorHasCorrectHash = () =>
     return;
   }
 
+  if (isOffline) {
+    if (!fs.existsSync(zipFilePath)) {
+      shell.echo(
+        'ERROR Offline mode: missing ' +
+          editor +
+          '-editor.zip. Please provide it locally at ' +
+          zipFilePath
+      );
+      shell.exit(1);
+      return;
+    }
+    shell.echo('INFO Offline mode: extracting local ' + editor + '-editor.zip');
+    await extractZip();
+    return;
+  }
+
   shell.echo(
-    '🌐 Outdated/non-existing ' +
+    'INFO Outdated/non-existing ' +
       editor +
       '-editor, downloading it from ' +
       gitUrl +
@@ -77,55 +133,21 @@ const editorHasCorrectHash = () =>
         )
     );
     shell.echo(
-      '📂 Extracting ' +
+      'INFO Extracting ' +
         editor +
         '-editor.zip to public/external/' +
         editor +
         ' folder'
     );
 
-    try {
-      const zip = new AdmZip(zipFilePath);
-      zip.extractAllTo(
-        path.join('../public/external/', editor),
-        /*overwrite=*/ true
-      );
-
-      shell.echo(
-        '✅ Extracted ' +
-          editor +
-          '-editor.zip to public/external/' +
-          editor +
-          ' folder'
-      );
-      shell.rm(zipFilePath);
-      const { isHashCorrect, actualFolderHash } = await editorHasCorrectHash();
-
-      if (!isHashCorrect) {
-        shell.echo(
-          "❌ Can't verify that " +
-            editor +
-            '-editor hash is correct. Be careful about potential tampering of the third party editor! 💣'
-        );
-        shell.echo(
-          `ℹ️ Expected folder hash was "${expectedFolderHash}" while actual folder hash that is computed is "${actualFolderHash}".`
-        );
-      }
-    } catch (e) {
-      shell.echo(
-        '❌ Error while extracting ' +
-          editor +
-          '-editor.zip to public/external/' +
-          editor +
-          ' folder:',
-        e.message
-      );
-    }
+    await extractZip();
   } catch (e) {
     shell.echo(
-      `❌ Can't download ` +
+      'ERROR Cannot download ' +
         editor +
-        `-editor.zip (${e}), please check your internet connection`
+        '-editor.zip (' +
+        e +
+        '), please check your internet connection'
     );
     shell.exit(1);
     return;

@@ -8,6 +8,8 @@ import {
   sendProgramOpening,
   installAnalyticsEvents,
 } from './Utils/Analytics/EventSender';
+import { OFFLINE_MODE } from './Utils/OfflineMode';
+import { setupOfflineNetworkGuard } from './Utils/SetupOfflineNetworkGuard';
 import { registerServiceWorker } from './ServiceWorkerSetup';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 import optionalRequire from './Utils/OptionalRequire';
@@ -22,6 +24,9 @@ const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 // No i18n in this file
 
 const electron = optionalRequire('electron');
+
+// Ensure offline guard is installed as early as possible.
+setupOfflineNetworkGuard();
 
 // Make sure that the process object is available, even if we are not in Node.
 // This is needed by some libraries like path-browserify for example.
@@ -78,7 +83,7 @@ class Bootstrapper extends Component<{}, State> {
   authentication = new Authentication();
 
   componentDidMount() {
-    installAnalyticsEvents();
+    if (!OFFLINE_MODE) installAnalyticsEvents();
     GD_STARTUP_TIMES.push(['bootstrapperComponentDidMount', performance.now()]);
 
     // Load GDevelop.js, ensuring a new version is fetched when the version changes.
@@ -111,7 +116,7 @@ class Bootstrapper extends Component<{}, State> {
           'libGD.js initialization done',
           performance.now(),
         ]);
-        sendProgramOpening();
+        if (!OFFLINE_MODE) sendProgramOpening();
 
         if (electron) {
           import(/* webpackChunkName: "local-app" */ './LocalApp')

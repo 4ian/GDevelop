@@ -30,16 +30,19 @@ class MemoryTrackedRegistry {
  public:
   // Internal C++ API (used by MemoryTracked).
   static void add(const void* ptr, const char* className) {
+    if (!className) return;
     dead()[className].erase(ptr);
     alive()[className].insert(ptr);
   }
 
   static void remove(const void* ptr, const char* className) {
+    if (!className) return;
     alive()[className].erase(ptr);
     dead()[className].insert(ptr);
   }
 
   static bool isDead(const void* ptr, const char* className) {
+    if (!className) return false;
     auto it = dead().find(className);
     return it != dead().end() && it->second.count(ptr) > 0;
   }
@@ -127,10 +130,10 @@ class MemoryTracked {
  public:
   MemoryTracked(const void* owner, const char* className)
       : owner_(owner), className_(className) {
-    MemoryTrackedRegistry::add(owner_, className_);
+    if (className_) MemoryTrackedRegistry::add(owner_, className_);
   }
 
-  ~MemoryTracked() { MemoryTrackedRegistry::remove(owner_, className_); }
+  ~MemoryTracked() { if (className_) MemoryTrackedRegistry::remove(owner_, className_); }
 
   // Non-copyable, non-movable.
   MemoryTracked(const MemoryTracked&) = delete;

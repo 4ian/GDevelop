@@ -29,7 +29,6 @@ type Props = {|
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
   onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
-  renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,
   onMoveFreeEventsParameter?: (
@@ -153,7 +152,6 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       onParametersOrGroupsUpdated,
       freezeParameters,
       helpPagePath,
-      renderConfigurationHeader,
       onMoveFreeEventsParameter,
       onMoveBehaviorEventsParameter,
       onMoveObjectEventsParameter,
@@ -230,7 +228,6 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                     // A function configuration change may impact the parameters.
                     this.forceUpdate();
                   }}
-                  renderConfigurationHeader={renderConfigurationHeader}
                   freezeEventsFunctionType={freezeEventsFunctionType}
                   getFunctionGroupNames={getFunctionGroupNames}
                 />

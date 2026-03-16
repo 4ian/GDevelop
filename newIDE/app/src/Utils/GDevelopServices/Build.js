@@ -556,10 +556,7 @@ export const signingCredentialApi = {
       }
     );
 
-    return ensureIsObject({
-      data: response.data,
-      endpointName: '/signing-credential/action/create-csr of Build API',
-    });
+    return response.data;
   },
   uploadMobileProvision: async (
     getAuthorizationHeader: () => Promise<string>,

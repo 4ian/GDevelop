@@ -260,33 +260,42 @@ export default class InstancesEditor extends Component<Props, State> {
     this._showObjectInstancesIn3D = this.props.showObjectInstancesIn3D;
     // TODO (3D): Should it handle preference changes without needing to reopen tabs?
     if (this._showObjectInstancesIn3D) {
-      gameCanvas = document.createElement('canvas');
-      const threeRenderer = new THREE.WebGLRenderer({
-        canvas: gameCanvas,
-      });
-      threeRenderer.useLegacyLights = true;
-      threeRenderer.autoClear = false;
-      threeRenderer.setSize(this.props.width, this.props.height);
+      try {
+        gameCanvas = document.createElement('canvas');
+        const threeRenderer = new THREE.WebGLRenderer({
+          canvas: gameCanvas,
+        });
+        threeRenderer.useLegacyLights = true;
+        threeRenderer.autoClear = false;
+        threeRenderer.setSize(this.props.width, this.props.height);
 
-      // Create a PixiJS renderer that use the same GL context as Three.js
-      // so that both can render to the canvas and even have PixiJS rendering
-      // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
-      this.pixiRenderer = new PIXI.Renderer({
-        width: this.props.width,
-        height: this.props.height,
-        view: gameCanvas,
-        context: threeRenderer.getContext(),
-        clearBeforeRender: false,
-        preserveDrawingBuffer: true,
-        antialias: false,
-        backgroundAlpha: 0,
-        // It's the default value, but it's better to make it explicit.
-        // It allows instances composed of several pixi objects to detect hovering.
-        eventMode: 'auto',
-        // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
-      });
+        // Create a PixiJS renderer that use the same GL context as Three.js
+        // so that both can render to the canvas and even have PixiJS rendering
+        // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
+        this.pixiRenderer = new PIXI.Renderer({
+          width: this.props.width,
+          height: this.props.height,
+          view: gameCanvas,
+          context: threeRenderer.getContext(),
+          clearBeforeRender: false,
+          preserveDrawingBuffer: true,
+          antialias: false,
+          backgroundAlpha: 0,
+          // It's the default value, but it's better to make it explicit.
+          // It allows instances composed of several pixi objects to detect hovering.
+          eventMode: 'auto',
+          // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
+        });
 
-      this.threeRenderer = threeRenderer;
+        this.threeRenderer = threeRenderer;
+      } catch (error) {
+        console.warn(
+          'Failed to initialize WebGL/3D renderer. Falling back to 2D editor.',
+          error
+        );
+        this._showObjectInstancesIn3D = false;
+        this.threeRenderer = null;
+      }
     } else {
       // Create the renderer and setup the rendering area for scene editor.
       this.pixiRenderer = PIXI.autoDetectRenderer({
@@ -300,6 +309,21 @@ export default class InstancesEditor extends Component<Props, State> {
         backgroundAlpha: 0,
       });
 
+      gameCanvas = this.pixiRenderer.view;
+    }
+
+    // Fallback to 2D renderer if 3D init failed.
+    if (!this.pixiRenderer) {
+      this.pixiRenderer = PIXI.autoDetectRenderer({
+        width: this.props.width,
+        height: this.props.height,
+        // "preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
+        preserveDrawingBuffer: true,
+        // Disable anti-aliasing (default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
+        antialias: false,
+        clearBeforeRender: false,
+        backgroundAlpha: 0,
+      });
       gameCanvas = this.pixiRenderer.view;
     }
 

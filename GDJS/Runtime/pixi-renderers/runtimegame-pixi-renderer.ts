@@ -44,6 +44,7 @@ namespace gdjs {
 
     _pixiRenderer: PIXI.Renderer | null = null;
     private _threeRenderer: THREE.WebGLRenderer | null = null;
+    private _threeRendererInitializationError: Error | null = null;
     private _gameCanvas: HTMLCanvasElement | null = null;
     private _domElementsContainer: HTMLDivElement | null = null;
 
@@ -105,40 +106,52 @@ namespace gdjs {
       this._throwIfDisposed();
 
       if (typeof THREE !== 'undefined') {
-        this._threeRenderer = new THREE.WebGLRenderer({
-          canvas: gameCanvas,
-          antialias:
-            this._game.getAntialiasingMode() !== 'none' &&
-            (this._game.isAntialisingEnabledOnMobile() ||
-              !gdjs.evtTools.common.isMobile()),
-          preserveDrawingBuffer: true, // Keep to true to allow screenshots.
-        });
-        this._threeRenderer.shadowMap.enabled = true;
-        this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this._threeRenderer.useLegacyLights = true;
-        this._threeRenderer.autoClear = false;
-        this._threeRenderer.pixelRatio = window.devicePixelRatio;
-        this._threeRenderer.setSize(
-          this._game.getGameResolutionWidth(),
-          this._game.getGameResolutionHeight()
-        );
+        try {
+          this._threeRenderer = new THREE.WebGLRenderer({
+            canvas: gameCanvas,
+            antialias:
+              this._game.getAntialiasingMode() !== 'none' &&
+              (this._game.isAntialisingEnabledOnMobile() ||
+                !gdjs.evtTools.common.isMobile()),
+            preserveDrawingBuffer: true, // Keep to true to allow screenshots.
+          });
+          this._threeRenderer.shadowMap.enabled = true;
+          this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+          this._threeRenderer.useLegacyLights = true;
+          this._threeRenderer.autoClear = false;
+          this._threeRenderer.pixelRatio = window.devicePixelRatio;
+          this._threeRenderer.setSize(
+            this._game.getGameResolutionWidth(),
+            this._game.getGameResolutionHeight()
+          );
 
-        // Create a PixiJS renderer that use the same GL context as Three.js
-        // so that both can render to the canvas and even have PixiJS rendering
-        // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
-        this._pixiRenderer = new PIXI.Renderer({
-          width: this._game.getGameResolutionWidth(),
-          height: this._game.getGameResolutionHeight(),
-          view: gameCanvas,
-          // @ts-ignore - reuse the context from Three.js.
-          context: this._threeRenderer.getContext(),
-          clearBeforeRender: false,
-          preserveDrawingBuffer: true, // Keep to true to allow screenshots.
-          antialias: false,
-          backgroundAlpha: 0,
-          // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
-        });
-      } else {
+          // Create a PixiJS renderer that use the same GL context as Three.js
+          // so that both can render to the canvas and even have PixiJS rendering
+          // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
+          this._pixiRenderer = new PIXI.Renderer({
+            width: this._game.getGameResolutionWidth(),
+            height: this._game.getGameResolutionHeight(),
+            view: gameCanvas,
+            // @ts-ignore - reuse the context from Three.js.
+            context: this._threeRenderer.getContext(),
+            clearBeforeRender: false,
+            preserveDrawingBuffer: true, // Keep to true to allow screenshots.
+            antialias: false,
+            backgroundAlpha: 0,
+            // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
+          });
+        } catch (error) {
+          logger.warn(
+            'Failed to initialize Three.js renderer. Falling back to Pixi-only renderer.',
+            error
+          );
+          this._threeRenderer = null;
+          this._threeRendererInitializationError =
+            error instanceof Error ? error : new Error(String(error));
+        }
+      }
+
+      if (!this._pixiRenderer) {
         // Create the renderer and setup the rendering area.
         // "preserveDrawingBuffer: true" is needed to avoid flickering
         // and background issues on some mobile phones (see #585 #572 #566 #463).
@@ -203,6 +216,26 @@ namespace gdjs {
 
       gameCanvas.parentNode?.appendChild(domElementsContainer);
       this._domElementsContainer = domElementsContainer;
+
+      if (this._threeRendererInitializationError) {
+        const warning = document.createElement('div');
+        warning.style.position = 'absolute';
+        warning.style.top = '8px';
+        warning.style.left = '8px';
+        warning.style.right = '8px';
+        warning.style.padding = '8px 12px';
+        warning.style.background = 'rgba(20, 20, 20, 0.8)';
+        warning.style.color = '#fff';
+        warning.style.fontSize = '12px';
+        warning.style.fontFamily = 'sans-serif';
+        warning.style.zIndex = '9999';
+        warning.style.borderRadius = '6px';
+        warning.style.pointerEvents = 'none';
+        warning.textContent =
+          'WebGL context could not be created. 3D rendering is disabled. ' +
+          'Update GPU drivers or enable hardware acceleration.';
+        domElementsContainer.appendChild(warning);
+      }
 
       this._resizeCanvas();
 

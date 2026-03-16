@@ -1,0 +1,172 @@
+
+> gdevelop-ide@0.1.0 start
+> npm run import-resources && concurrently "npm run start:editor" "node scripts/watch-serve-GDJS-runtime.js" -n "editor,game engine" --kill-others
+
+
+> gdevelop-ide@0.1.0 import-resources
+> npm run make-version-metadata && npm run import-zipped-external-editors && npm run build-theme-resources && npm run make-service-worker && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-external-libs.js
+
+
+> gdevelop-ide@0.1.0 make-version-metadata
+> cd scripts && node make-version-metadata.js
+
+src/Version/VersionMetadata.js properly generated.
+
+> gdevelop-ide@0.1.0 import-zipped-external-editors
+> cd scripts && node import-zipped-editor.js piskel 5.5.228 b161dc74582e428a6d210cd1b74f052ca4aab301d0d522e0be87bdb4962d0fb7 && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.134 ba8558cad00ec9b18cf3c6fd8647f8c1478ca67c894bca94a152a3740af209cc
+
+✅ piskel-editor already existing in public/external/piskel folder and up-to-date - skipping download
+✅ jfxr-editor already existing in public/external/jfxr folder and up-to-date - skipping download
+✅ yarn-editor already existing in public/external/yarn folder and up-to-date - skipping download
+
+> gdevelop-ide@0.1.0 build-theme-resources
+> node scripts/build-theme-resources.js
+
+
+css
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/DefaultDarkTheme/DefaultDarkThemeVariables.css
+
+js
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/DefaultDarkTheme/DefaultDarkThemeVariables.json
+
+css
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/DefaultLightTheme/DefaultLightThemeVariables.css
+
+js
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/DefaultLightTheme/DefaultLightThemeVariables.json
+
+css
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/BlueDarkTheme/BlueDarkThemeVariables.css
+
+js
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/BlueDarkTheme/BlueDarkThemeVariables.json
+
+css
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/NordTheme/NordThemeVariables.css
+
+js
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/NordTheme/NordThemeVariables.json
+
+css
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/SolarizedDarkTheme/SolarizedDarkThemeVariables.css
+
+js
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/SolarizedDarkTheme/SolarizedDarkThemeVariables.json
+
+css
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/OneDarkTheme/OneDarkThemeVariables.css
+
+js
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/OneDarkTheme/OneDarkThemeVariables.json
+
+css
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/RosePineTheme/RosePineThemeVariables.css
+
+js
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/RosePineTheme/RosePineThemeVariables.json
+
+css
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/DeepBlueTheme/DeepBlueThemeVariables.css
+
+js
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/DeepBlueTheme/DeepBlueThemeVariables.json
+
+css
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/CarrotsDarkTheme/CarrotsDarkThemeVariables.css
+
+js
+✔︎  C:\Users\Tech Shop\Desktop\engine\newIDE\app\scripts/../src/UI/Theme/CarrotsDarkTheme/CarrotsDarkThemeVariables.json
+
+> gdevelop-ide@0.1.0 make-service-worker
+> cd scripts && node make-service-worker.js
+
+⚠️ workbox warning: One of the glob patterns doesn't match any files. Please remove or fix the following: {
+  "globDirectory": "../public",
+  "globPattern": "static/css/*.css",
+  "globIgnores": [
+    "**/node_modules/**/*",
+    "**/service-worker.js"
+  ]
+}
+ℹ️ 0 files will be precached, totaling 0 MB.
+Copying libGD.js and associated files built locally to newIDE...
+✅ Copied libGD.wasm from Binaries/embuild/GDevelop.js to public and node_modules folders of newIDE/app.
+✅ Copied libGD.js from Binaries/embuild/GDevelop.js to public and node_modules folders of newIDE/app.
+Cleaning destination first...
+Cleaning destination first...
+✅ GDJS built in 13046ms
+✅ GDJS built in 16136ms
+Copying GDJS and extensions runtime sources to C:\Users\Tech Shop\Desktop\engine\newIDE\app\resources\GDJS, C:\Users\Tech Shop\Desktop\engine\newIDE\app\node_modules\GDJS-for-web-app-only...
+Runtime source files copy done (500 file(s) copied in 13799ms).
+Runtime source files copy done (500 file(s) copied in 14379ms).
+✅ Sources of Monaco Editor properly copied in public folder
+✅ Extracted zip.js.zip to public/external/ folder
+✅ Extracted zlib-asm.zip to public/external/ folder
+[game engine] ℹ️ GDJS Runtime served for the web-app at http://localhost:5002.
+[editor] 
+[editor] > gdevelop-ide@0.1.0 start:editor
+[editor] > react-app-rewired --max-old-space-size=8192 start
+[editor] 
+[game engine] ✅ GDJS watcher ready in 4044.10ms.
+[game engine] ℹ️ Watching GDJS engine files for changes in:
+[game engine] - C:\Users\Tech Shop\Desktop\engine\GDJS\Runtime
+[game engine] - C:\Users\Tech Shop\Desktop\engine\Extensions.
+[editor] (node:4144) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+[editor] (Use `node --trace-deprecation ...` to show where the warning was created)
+[editor] Browserslist: caniuse-lite is outdated. Please run:
+[editor]   npx update-browserslist-db@latest
+[editor]   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[editor] (node:4144) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+[editor] (node:4144) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+[editor] Starting the development server...
+[editor] 
+[editor] Compiled successfully!
+[editor] 
+[editor] You can now view gdevelop-ide in the browser.
+[editor] 
+[editor]   Local:            http://localhost:3000
+[editor]   On Your Network:  http://192.168.1.6:3000
+[editor] 
+[editor] Note that the development build is not optimized.
+[editor] To create a production build, use npm run build.
+[editor] 
+[editor] webpack compiled [1m[32msuccessfully[39m[22m
+[editor] Compiling...
+[editor] Compiled successfully!
+[editor] webpack compiled [1m[32msuccessfully[39m[22m
+[game engine] 📁 Detected "change" in GDJS\Runtime\pixi-renderers\fsr1-pass.ts, updating GDJS Runtime...
+[game engine] 🔄 Running import-GDJS-Runtime.js...
+[game engine] ✅ GDJS built in 8213ms
+[game engine] ✅ GDJS built in 4829ms
+[game engine] 
+[game engine] ✅ GDJS Runtime updated in 15004ms.
+[game engine] 📁 Detected "change" in GDJS\Runtime\pixi-renderers\fsr1-pass.ts, updating GDJS Runtime...
+[game engine] 🔄 Running import-GDJS-Runtime.js...
+[game engine] ✅ GDJS built in 4033ms
+[game engine] ✅ GDJS built in 5143ms
+[game engine] 
+[game engine] ✅ GDJS Runtime updated in 10238ms.
+[editor] Compiling...
+[editor] Compiled successfully!
+[editor] webpack compiled [1m[32msuccessfully[39m[22m
+[editor] Compiling...
+[editor] Compiled successfully!
+[editor] webpack compiled [1m[32msuccessfully[39m[22m
+[editor] Compiling...
+[editor] Compiled successfully!
+[editor] webpack compiled [1m[32msuccessfully[39m[22m
+[game engine] 📁 Detected "change" in GDJS\Runtime\pixi-renderers\runtimegame-pixi-renderer.ts, updating GDJS Runtime...
+[game engine] 🔄 Running import-GDJS-Runtime.js...
+[game engine] ✅ GDJS built in 6340ms
+[game engine] ✅ GDJS built in 5754ms
+[game engine] 
+[game engine] ✅ GDJS Runtime updated in 13650ms.
+[editor] Compiling...
+[editor] Compiled successfully!
+[editor] webpack compiled [1m[32msuccessfully[39m[22m
+[game engine] 📁 Detected "change" in GDJS\Runtime\pixi-renderers\runtimegame-pixi-renderer.ts, updating GDJS Runtime...
+[game engine] 🔄 Running import-GDJS-Runtime.js...
+[game engine] ✅ GDJS built in 5838ms
+[game engine] ✅ GDJS built in 8348ms
+[game engine] 
+[game engine] ✅ GDJS Runtime updated in 16755ms.

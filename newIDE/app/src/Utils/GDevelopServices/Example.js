@@ -35,9 +35,17 @@ export type AllExamples = {|
   filters: Filters,
 |};
 
-
 const USE_LOCAL_EXAMPLES = true;
 const LOCAL_EXAMPLES_DATABASE_URL = '/examples/examples.json';
+const EXCLUDED_EXAMPLE_IDS = new Set(['3d-first-person', 'first-person']);
+const EXCLUDED_EXAMPLE_SLUGS = new Set(['3d-first-person', 'first-person']);
+
+const filterExcludedExamples = exampleShortHeaders =>
+  exampleShortHeaders.filter(
+    example =>
+      !EXCLUDED_EXAMPLE_IDS.has(example.id) &&
+      !EXCLUDED_EXAMPLE_SLUGS.has(example.slug)
+  );
 
 let cachedLocalExamplesDatabase: ?{
   exampleShortHeaders: Array<ExampleShortHeader>,
@@ -60,12 +68,13 @@ export const listAllExamples = async (): Promise<AllExamples> => {
         localDatabase && localDatabase.exampleShortHeaders
           ? localDatabase.exampleShortHeaders
           : [];
-      const localFilters = localDatabase && localDatabase.filters
-        ? localDatabase.filters
-        : { allTags: [], defaultTags: [], tagsTree: [] };
+      const localFilters =
+        localDatabase && localDatabase.filters
+          ? localDatabase.filters
+          : { allTags: [], defaultTags: [], tagsTree: [] };
 
       return {
-        exampleShortHeaders: localExampleShortHeaders,
+        exampleShortHeaders: filterExcludedExamples(localExampleShortHeaders),
         filters: localFilters,
       };
     } catch (error) {
@@ -77,24 +86,39 @@ export const listAllExamples = async (): Promise<AllExamples> => {
     }
   }
   // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(`${GDevelopAssetApi.baseUrl}/example`, {
-    params: {
-      // Could be changed according to the editor environment, but keep
-      // reading from the "live" data for now.
-      environment: 'live',
-    },
-  });
-  const { exampleShortHeadersUrl, filtersUrl } = response.data;
+  let exampleShortHeaders = [];
+  let filters = { allTags: [], defaultTags: [], tagsTree: [] };
+  try {
+    const response = await axios.get(`${GDevelopAssetApi.baseUrl}/example`, {
+      params: {
+        // Could be changed according to the editor environment, but keep
+        // reading from the "live" data for now.
+        environment: 'live',
+      },
+    });
+    const { exampleShortHeadersUrl, filtersUrl } = response.data;
 
-  const [exampleShortHeaders, filters] = await Promise.all([
-    retryIfFailed(
-      { times: 2 },
+    [exampleShortHeaders, filters] = await Promise.all([
+      retryIfFailed(
+        { times: 2 },
+        // $FlowFixMe[underconstrained-implicit-instantiation]
+        async () => (await axios.get(exampleShortHeadersUrl)).data
+      ),
       // $FlowFixMe[underconstrained-implicit-instantiation]
-      async () => (await axios.get(exampleShortHeadersUrl)).data
-    ),
-    // $FlowFixMe[underconstrained-implicit-instantiation]
-    retryIfFailed({ times: 2 }, async () => (await axios.get(filtersUrl)).data),
-  ]);
+      retryIfFailed(
+        { times: 2 },
+        async () => (await axios.get(filtersUrl)).data
+      ),
+    ]);
+  } catch (error) {
+    console.warn('Unable to load remote examples database:', error);
+    if (!USE_LOCAL_EXAMPLES) {
+      return {
+        exampleShortHeaders: [],
+        filters: { allTags: [], defaultTags: [], tagsTree: [] },
+      };
+    }
+  }
 
   let mergedExampleShortHeaders = exampleShortHeaders;
   let mergedFilters = filters;
@@ -142,7 +166,7 @@ export const listAllExamples = async (): Promise<AllExamples> => {
   }
 
   const allExamples: AllExamples = {
-    exampleShortHeaders: mergedExampleShortHeaders,
+    exampleShortHeaders: filterExcludedExamples(mergedExampleShortHeaders),
     filters: mergedFilters,
   };
 

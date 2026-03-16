@@ -9,6 +9,7 @@ import {
   enumerateBehaviorsMetadata,
 } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
 import CompactPropertiesEditorRowField from '../CompactPropertiesEditor/CompactPropertiesEditorRowField';
+import ListIcon from '../UI/ListIcon';
 
 type Props = {|
   project: gdProject,
@@ -27,7 +28,7 @@ export default function CompactBehaviorTypeSelector({
   onChange,
   objectType,
 }: Props): React.Node {
-  const behaviorMetadata: Array<EnumeratedBehaviorMetadata> = React.useMemo(
+  const behaviorMetadataList: Array<EnumeratedBehaviorMetadata> = React.useMemo(
     () =>
       enumerateBehaviorsMetadata(
         project.getCurrentPlatform(),
@@ -37,10 +38,14 @@ export default function CompactBehaviorTypeSelector({
     [eventsFunctionsExtension, project]
   );
 
+  const behaviorMetadata = React.useMemo(
+    () => behaviorMetadataList.find(({ type }) => type === value),
+    [behaviorMetadataList, value]
+  );
   // If the behavior type is not in the list, we'll still
   // add a menu item for it so that the value is displayed
   // on screen.
-  const valueIsListed = !!behaviorMetadata.find(({ type }) => type === value);
+  const valueIsListed = !!behaviorMetadata;
 
   return (
     <I18n>
@@ -54,18 +59,29 @@ export default function CompactBehaviorTypeSelector({
                 onChange(value);
               }}
               disabled={disabled}
+              renderOptionIcon={className =>
+                behaviorMetadata ? (
+                  <ListIcon
+                    src={behaviorMetadata.previewIconUrl}
+                    iconSize={16}
+                    brightness={disabled ? 0.5 : null}
+                  />
+                ) : null
+              }
             >
-              {behaviorMetadata.map((metadata: EnumeratedBehaviorMetadata) => (
-                <SelectOption
-                  key={metadata.type}
-                  value={metadata.type}
-                  label={metadata.fullName}
-                  disabled={
-                    metadata.objectType !== '' &&
-                    metadata.objectType !== objectType
-                  }
-                />
-              ))}
+              {behaviorMetadataList.map(
+                (metadata: EnumeratedBehaviorMetadata) => (
+                  <SelectOption
+                    key={metadata.type}
+                    value={metadata.type}
+                    label={metadata.fullName}
+                    disabled={
+                      metadata.objectType !== '' &&
+                      metadata.objectType !== objectType
+                    }
+                  />
+                )
+              )}
               {!valueIsListed && value && (
                 <SelectOption value={value} label={value} />
               )}

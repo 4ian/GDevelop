@@ -9,6 +9,7 @@ import {
   type EnumeratedObjectMetadata,
 } from '../ObjectsList/EnumerateObjects';
 import CompactPropertiesEditorRowField from '../CompactPropertiesEditor/CompactPropertiesEditorRowField';
+import ListIcon from '../UI/ListIcon';
 
 type Props = {|
   project: gdProject,
@@ -29,9 +30,14 @@ export default function CompactObjectTypeSelector({
   label,
   allowedObjectTypes,
 }: Props): React.Node {
-  const objectMetadata: Array<EnumeratedObjectMetadata> = React.useMemo(
+  const objectMetadataList: Array<EnumeratedObjectMetadata> = React.useMemo(
     () => enumerateObjectTypes(project, eventsFunctionsExtension),
     [eventsFunctionsExtension, project]
+  );
+
+  const objectMetadata = React.useMemo(
+    () => objectMetadataList.find(({ type }) => type === value),
+    [objectMetadataList, value]
   );
 
   const isDisabled = React.useCallback(
@@ -55,13 +61,22 @@ export default function CompactObjectTypeSelector({
                 onChange(value);
               }}
               disabled={disabled}
+              renderOptionIcon={className =>
+                objectMetadata ? (
+                  <ListIcon
+                    src={objectMetadata.iconFilename}
+                    iconSize={16}
+                    brightness={disabled ? 0.5 : null}
+                  />
+                ) : null
+              }
             >
               <SelectOption
                 value=""
                 label={t`Any object`}
                 disabled={isDisabled('')}
               />
-              {objectMetadata.map((metadata: EnumeratedObjectMetadata) => {
+              {objectMetadataList.map((metadata: EnumeratedObjectMetadata) => {
                 if (metadata.name === '') {
                   // Base object is an "abstract" object
                   return null;

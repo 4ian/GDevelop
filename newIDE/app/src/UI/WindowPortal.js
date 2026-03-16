@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import ReactDOM from 'react-dom';
+import PortalContainerContext from './PortalContainerContext';
 
 type Props = {|
   /** The title of the new window. */
@@ -19,6 +20,10 @@ type Props = {|
  * A component that renders its children into a separate browser window
  * using a React portal. Styles from the parent window are copied over
  * so that Material-UI and GDevelop themes work correctly.
+ *
+ * It also provides a PortalContainerContext so that Material-UI overlays
+ * (Dialog, Menu, Popover, Tooltip, Popper) render inside this window
+ * instead of the main window.
  *
  * When the external window is closed, `onClose` is called.
  * When this component unmounts, the external window is closed.
@@ -122,7 +127,12 @@ const WindowPortal = ({
 
   if (!container) return null;
 
-  return ReactDOM.createPortal(children, container);
+  return ReactDOM.createPortal(
+    <PortalContainerContext.Provider value={container}>
+      {children}
+    </PortalContainerContext.Provider>,
+    container
+  );
 };
 
 /**

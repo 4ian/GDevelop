@@ -13,6 +13,7 @@ import {
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { doesPathContainDialog } from '../UI/MaterialUISpecificUtil';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import PortalContainerContext from '../UI/PortalContainerContext';
 
 const styles = {
   popover: {
@@ -51,6 +52,7 @@ export default function InlinePopover(props: Props): React.Node {
   const startSentinel = React.useRef<?HTMLDivElement>(null);
   const endSentinel = React.useRef<?HTMLDivElement>(null);
   const { isMobile } = useResponsiveWindowSize();
+  const portalContainer = React.useContext(PortalContainerContext);
 
   return (
     <ClickAwayListener
@@ -97,6 +99,7 @@ export default function InlinePopover(props: Props): React.Node {
       <Popper
         open={props.open}
         anchorEl={props.anchorEl}
+        container={portalContainer}
         style={{
           ...styles.popover,
           // On mobile, make it take full screen width, but not too much for large mobile phones.

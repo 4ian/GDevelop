@@ -18,6 +18,7 @@ import ChevronArrowRight from '../CustomSvgIcons/ChevronArrowRight';
 import { useScreenType } from '../Responsive/ScreenTypeMeasurer';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { itemAboveBlockingLayerZIndex } from '../../InAppTutorial/BlockingLayerWithHoles';
+import PortalContainerContext from '../PortalContainerContext';
 const electron = optionalRequire('electron');
 
 const useStyles = makeStyles({
@@ -47,7 +48,7 @@ const styles = {
 };
 
 // $FlowFixMe[missing-local-annot]
-const SubMenuItem = ({ item, buildFromTemplate }) => {
+const SubMenuItem = ({ item, buildFromTemplate, portalContainer }) => {
   // The invisible backdrop behind the submenu is either:
   // - not clickable, when using a mouse (it's like it does not exist).
   // - clickable, when on a touchscreen or using a pen. This is to allow closing the submenu
@@ -158,6 +159,7 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
         anchorEl={anchorElement}
         onClose={handleClose}
         TransitionComponent={Fade}
+        container={portalContainer}
         MenuListProps={{
           onPointerEnter: handleHover,
           onPointerLeave: handleLeave,
@@ -220,6 +222,8 @@ export default class MaterialUIMenuImplementation
     // This is not a real hook.
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const isTouchscreen = useScreenType() === 'touch';
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const portalContainer = React.useContext(PortalContainerContext);
 
     return template
       .map((item, id) => {
@@ -279,6 +283,7 @@ export default class MaterialUIMenuImplementation
             <SubMenuItem
               key={'submenu' + item.label}
               item={item}
+              portalContainer={portalContainer}
               buildFromTemplate={template =>
                 this.buildFromTemplate(template, forceUpdate)
               }

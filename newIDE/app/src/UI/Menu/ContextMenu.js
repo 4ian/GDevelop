@@ -12,6 +12,7 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import { Drawer } from '@material-ui/core';
 import { isMobile } from '../../Utils/Platform';
 import { itemAboveBlockingLayerZIndex } from '../../InAppTutorial/BlockingLayerWithHoles';
+import PortalContainerContext from '../PortalContainerContext';
 const electron = optionalRequire('electron');
 
 export type ContextMenuInterface = {|
@@ -38,6 +39,7 @@ const MaterialUIContextMenu = React.forwardRef<
   const [openMenu, setOpenMenu] = React.useState<boolean>(false);
   const [buildOptions, setBuildOptions] = React.useState<any>({});
   const forceUpdate = useForceUpdate();
+  const portalContainer = React.useContext(PortalContainerContext);
 
   const menuImplementation = new MaterialUIMenuImplementation({
     onClose: () => setOpenMenu(false),
@@ -87,6 +89,7 @@ const MaterialUIContextMenu = React.forwardRef<
         style={{
           zIndex: itemAboveBlockingLayerZIndex,
         }}
+        container={portalContainer}
       >
         {menuImplementation.buildFromTemplate(menuTemplate, forceUpdate)}
       </Drawer>
@@ -104,6 +107,7 @@ const MaterialUIContextMenu = React.forwardRef<
         zIndex: itemAboveBlockingLayerZIndex,
       }}
       anchorReference={'anchorPosition'}
+      container={portalContainer}
       onClose={(event, reason) => {
         if (reason === 'backdropClick') {
           // Prevent any side effect of a backdrop click that should only

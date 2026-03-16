@@ -633,7 +633,7 @@ export const CompactEventsFunctionParametersEditor = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <Column noMargin expand useFullHeight>
+        <Column noMargin expand noOverflowParent useFullHeight>
           {parameters.getParametersCount() > 0 || freezeParameters ? (
             <React.Fragment>
               <ScrollView ref={scrollView}>
@@ -650,7 +650,7 @@ export const CompactEventsFunctionParametersEditor = ({
                     })
                   : null}
                 <Line>
-                  <Column noMargin expand>
+                  <Column noMargin expand noOverflowParent>
                     {mapFor(0, parameters.getParametersCount(), i => {
                       const parameter = parameters.getParameterAt(i);
                       const parameterRef =
@@ -700,7 +700,11 @@ export const CompactEventsFunctionParametersEditor = ({
                                       </Column>
                                     </span>
                                   )}
-                                  <ResponsiveLineStackLayout expand noMargin>
+                                  <ResponsiveLineStackLayout
+                                    expand
+                                    noOverflowParent
+                                    noMargin
+                                  >
                                     <LineStackLayout
                                       noMargin
                                       expand
@@ -810,7 +814,7 @@ export const CompactEventsFunctionParametersEditor = ({
                                   <Spacer />
                                 </div>
                                 <Line>
-                                  <ColumnStackLayout expand>
+                                  <ColumnStackLayout expand noOverflowParent>
                                     <CompactValueTypeEditor
                                       project={project}
                                       eventsFunctionsExtension={
@@ -906,7 +910,7 @@ export const CompactEventsFunctionParametersEditor = ({
                 </Line>
               </ScrollView>
               {!freezeParameters && (
-                <Column>
+                <Column expand noOverflowParent>
                   <Line noMargin>
                     <LineStackLayout expand>
                       <ResponsiveFlatButton

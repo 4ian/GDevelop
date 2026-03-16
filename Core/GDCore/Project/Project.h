@@ -406,6 +406,42 @@ class GD_CORE_API Project {
   }
 
   /**
+   * Return the upscaling mode used by the game ("none" or "fsr1").
+   */
+  const gd::String& GetUpscalingMode() const { return upscalingMode; }
+
+  /**
+   * Set the upscaling mode used by the game ("none" or "fsr1").
+   */
+  void SetUpscalingMode(const gd::String& upscalingMode_) {
+    upscalingMode = upscalingMode_;
+  }
+
+  /**
+   * Return the quality preset used by FSR1 ("ultra-quality", "quality",
+   * "balanced", "performance").
+   */
+  const gd::String& GetFsrQuality() const { return fsrQuality; }
+
+  /**
+   * Set the quality preset used by FSR1 ("ultra-quality", "quality",
+   * "balanced", "performance").
+   */
+  void SetFsrQuality(const gd::String& fsrQuality_) {
+    fsrQuality = fsrQuality_;
+  }
+
+  /**
+   * Return the sharpness used by FSR1 (0..1).
+   */
+  double GetFsrSharpness() const { return fsrSharpness; }
+
+  /**
+   * Set the sharpness used by FSR1 (0..1).
+   */
+  void SetFsrSharpness(double fsrSharpness_) { fsrSharpness = fsrSharpness_; }
+
+  /**
    * Return true if antialising is enabled on mobiles.
    */
   bool IsAntialisingEnabledOnMobile() const {
@@ -1114,6 +1150,9 @@ class GD_CORE_API Project {
       sizeOnStartupMode;  ///< How to adapt the game size to the screen. Can be
                           ///< "adaptWidth", "adaptHeight" or empty
   gd::String antialiasingMode;
+  gd::String upscalingMode;
+  gd::String fsrQuality;
+  double fsrSharpness = 0.2;
   bool isAntialisingEnabledOnMobile = false;
   gd::String projectUuid;  ///< UUID useful to identify the game in online
                            ///< services or database that would require it.

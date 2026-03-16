@@ -538,6 +538,9 @@ declare interface ProjectPropertiesData {
   pixelsRounding: boolean;
   antialiasingMode: 'none' | 'MSAA';
   antialisingEnabledOnMobile: boolean;
+  upscalingMode?: 'none' | 'fsr1';
+  fsrQuality?: 'ultra-quality' | 'quality' | 'balanced' | 'performance';
+  fsrSharpness?: number;
   sizeOnStartupMode: '' | 'scaleOuter' | 'adaptWidth' | 'adaptHeight';
   version: string;
   name: string;

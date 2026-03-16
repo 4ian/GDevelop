@@ -1033,6 +1033,19 @@ namespace gdjs {
     }
 
     /**
+     * Get the pixel ratio used by the renderer (defaults to 1).
+     */
+    getPixelRatio(): float {
+      if (this._threeRenderer) {
+        return this._threeRenderer.getPixelRatio();
+      }
+      if (this._pixiRenderer) {
+        return this._pixiRenderer.resolution;
+      }
+      return 1;
+    }
+
+    /**
      * Get the DOM element used as a container for HTML elements to display
      * on top of the game.
      */

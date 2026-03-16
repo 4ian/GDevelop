@@ -101,7 +101,8 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     // Export engine libraries
     helper.AddLibsInclude(
         /*pixiRenderers=*/true,
-        usedExtensionsResult.Has3DObjects(),
+        usedExtensionsResult.Has3DObjects() ||
+            exportedProject.GetUpscalingMode() == "fsr1",
         /*isInGameEditor=*/false,
         /*includeWebsocketDebuggerClient=*/false,
         /*includeWindowMessageDebuggerClient=*/false,

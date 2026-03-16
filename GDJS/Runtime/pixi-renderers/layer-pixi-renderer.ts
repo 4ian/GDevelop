@@ -193,6 +193,7 @@ namespace gdjs {
     /** For a lighting layer, the sprite used to display the render texture. */
     private _lightingSprite: PIXI.Sprite | null = null;
     private _isLightingLayer: boolean;
+    private _force3DRendering: boolean = false;
     private _clearColor: Array<integer>;
 
     /**
@@ -201,10 +202,15 @@ namespace gdjs {
      * or to be rendered in a 3D scene (for a 2D+3D layer).
      */
     private _renderTexture: PIXI.RenderTexture | null = null;
+    private _lightingRenderTexture: PIXI.RenderTexture | null = null;
 
     // Width and height are tracked when a render texture is used.
     private _oldWidth: float | null = null;
     private _oldHeight: float | null = null;
+    private _oldLightingWidth: float | null = null;
+    private _oldLightingHeight: float | null = null;
+    private _oldResolution: float | null = null;
+    private _oldLightingResolution: float | null = null;
 
     // For a 3D (or 2D+3D) layer:
     private _threeGroup: THREE.Group | null = null;
@@ -244,6 +250,12 @@ namespace gdjs {
       this._pixiContainer.sortableChildren = true;
       this._layer = layer;
       this._isLightingLayer = layer.isLightingLayer();
+      const runtimeGame = this._layer.getRuntimeScene().getGame();
+      const threeRenderer = runtimeGameRenderer.getThreeRenderer();
+      this._force3DRendering =
+        runtimeGame.isFsrEnabled() &&
+        !!threeRenderer &&
+        threeRenderer.capabilities.isWebGL2;
       const parentRendererObject =
         runtimeInstanceContainerRenderer.getRendererObject();
       if (parentRendererObject) {
@@ -255,10 +267,14 @@ namespace gdjs {
       const pixiRenderer = runtimeGameRenderer.getPIXIRenderer();
       if (this._isLightingLayer) {
         this._clearColor = layer.getClearColor();
-        this._setupLightingRendering(
-          pixiRenderer,
-          runtimeInstanceContainerRenderer
-        );
+        if (this._force3DRendering) {
+          this._setup3DRendering(pixiRenderer, runtimeInstanceContainerRenderer);
+        } else {
+          this._setupLightingRendering(
+            pixiRenderer,
+            runtimeInstanceContainerRenderer
+          );
+        }
       } else {
         // Clear color is used as background color of transparent sprites.
         this._clearColor = [
@@ -386,12 +402,12 @@ namespace gdjs {
       // TODO (3D): ideally we would avoid the need for this check at all,
       // maybe by having separate rendering classes for custom object layers and scene layers.
       if (this._layer instanceof gdjs.Layer) {
-        if (
-          this._layer.getRenderingType() ===
-            gdjs.RuntimeLayerRenderingType.THREE_D ||
-          this._layer.getRenderingType() ===
-            gdjs.RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
-        ) {
+        const renderingType = this._layer.getRenderingType();
+        const shouldSetup3D =
+          this._force3DRendering ||
+          renderingType === gdjs.RuntimeLayerRenderingType.THREE_D ||
+          renderingType === gdjs.RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D;
+        if (shouldSetup3D) {
           if (this._threeScene || this._threeGroup || this._threeCamera) {
             throw new Error(
               'Tried to setup 3D rendering for a layer that is already set up.'
@@ -453,10 +469,11 @@ namespace gdjs {
             this._threeEffectComposer.addPass(new THREE_ADDONS.OutputPass());
           }
 
-          if (
-            this._layer.getRenderingType() ===
-            gdjs.RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
-          ) {
+          const shouldSetup2DPlane = this._force3DRendering
+            ? renderingType !== gdjs.RuntimeLayerRenderingType.THREE_D
+            : renderingType ===
+              gdjs.RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D;
+          if (shouldSetup2DPlane) {
             if (
               this._renderTexture ||
               this._threePlaneGeometry ||
@@ -526,7 +543,9 @@ namespace gdjs {
             this._threePlaneMaterial = new THREE.ShaderMaterial(
               noGammaCorrectionShader
             );
-            this._threePlaneMaterial;
+            if (this._isLightingLayer) {
+              this._threePlaneMaterial.blending = THREE.MultiplyBlending;
+            }
 
             // Finally, create the mesh shown in the scene.
             this._threePlaneMesh = new THREE.Mesh(
@@ -858,6 +877,7 @@ namespace gdjs {
       // pixi container setup to avoid a zoom mismatch.
       // Keep in sync with: `shouldRenderLayerIn3D` in `runtimescene-pixi-renderer.ts`.
       const shouldRenderLayerIn3D =
+        this._force3DRendering ||
         runtimeGame.isInGameEdition() ||
         (this._threeCamera && this._threePlaneMesh && this.has3DObjects());
 
@@ -989,10 +1009,15 @@ namespace gdjs {
     updateResolution() {
       if (this._threeEffectComposer) {
         const game = this._layer.getRuntimeScene().getGame();
-        this._threeEffectComposer.setPixelRatio(window.devicePixelRatio);
+        const pixelRatio = game.getRenderer().getPixelRatio();
+        this._threeEffectComposer.setPixelRatio(pixelRatio);
         this._threeEffectComposer.setSize(
-          game.getGameResolutionWidth(),
-          game.getGameResolutionHeight()
+          this._force3DRendering
+            ? game.getRenderingWidth()
+            : game.getGameResolutionWidth(),
+          this._force3DRendering
+            ? game.getRenderingHeight()
+            : game.getGameResolutionHeight()
         );
       }
     }
@@ -1157,11 +1182,29 @@ namespace gdjs {
         return;
       }
 
-      this._oldWidth = pixiRenderer.screen.width;
-      this._oldHeight = pixiRenderer.screen.height;
-      const width = this._oldWidth;
-      const height = this._oldHeight;
-      const resolution = pixiRenderer.resolution;
+      const runtimeGame = this._layer.getRuntimeScene().getGame();
+      const gameResolutionWidth = runtimeGame.getGameResolutionWidth();
+      const gameResolutionHeight = runtimeGame.getGameResolutionHeight();
+      const renderingWidth = runtimeGame.getRenderingWidth();
+      const renderingHeight = runtimeGame.getRenderingHeight();
+      const pixelRatio = runtimeGame.getRenderer().getPixelRatio();
+      const fsrScaleX =
+        gameResolutionWidth > 0
+          ? renderingWidth / gameResolutionWidth
+          : 1;
+      const fsrScaleY =
+        gameResolutionHeight > 0
+          ? renderingHeight / gameResolutionHeight
+          : 1;
+      const fsrScale = Math.min(fsrScaleX, fsrScaleY);
+      const width = gameResolutionWidth || pixiRenderer.screen.width;
+      const height = gameResolutionHeight || pixiRenderer.screen.height;
+      const resolution = this._force3DRendering
+        ? Math.max(0.01, fsrScale * pixelRatio)
+        : pixiRenderer.resolution;
+      this._oldWidth = width;
+      this._oldHeight = height;
+      this._oldResolution = resolution;
       this._renderTexture = PIXI.RenderTexture.create({
         // A size of 0 is forbidden by Pixi.
         width: width || 100,
@@ -1180,18 +1223,50 @@ namespace gdjs {
       if (!this._renderTexture) {
         return;
       }
-      if (
-        this._oldWidth !== pixiRenderer.screen.width ||
-        this._oldHeight !== pixiRenderer.screen.height
-      ) {
+
+      const runtimeGame = this._layer.getRuntimeScene().getGame();
+      const gameResolutionWidth = runtimeGame.getGameResolutionWidth();
+      const gameResolutionHeight = runtimeGame.getGameResolutionHeight();
+      const renderingWidth = runtimeGame.getRenderingWidth();
+      const renderingHeight = runtimeGame.getRenderingHeight();
+      const pixelRatio = runtimeGame.getRenderer().getPixelRatio();
+      const fsrScaleX =
+        gameResolutionWidth > 0
+          ? renderingWidth / gameResolutionWidth
+          : 1;
+      const fsrScaleY =
+        gameResolutionHeight > 0
+          ? renderingHeight / gameResolutionHeight
+          : 1;
+      const fsrScale = Math.min(fsrScaleX, fsrScaleY);
+      const width = gameResolutionWidth || pixiRenderer.screen.width;
+      const height = gameResolutionHeight || pixiRenderer.screen.height;
+      const resolution = this._force3DRendering
+        ? Math.max(0.01, fsrScale * pixelRatio)
+        : pixiRenderer.resolution;
+
+      const needsResize =
+        this._oldWidth !== width || this._oldHeight !== height;
+      const needsRecreate = this._oldResolution !== resolution;
+      if (needsRecreate) {
+        const oldRenderTexture = this._renderTexture;
+        this._renderTexture = PIXI.RenderTexture.create({
+          width: width || 100,
+          height: height || 100,
+          resolution,
+        });
+        this._renderTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
+        if (this._lightingSprite) {
+          this._lightingSprite.texture = this._renderTexture;
+        }
+        oldRenderTexture.destroy(true);
+      } else if (needsResize) {
         // A size of 0 is forbidden by Pixi.
-        this._renderTexture.resize(
-          pixiRenderer.screen.width || 100,
-          pixiRenderer.screen.height || 100
-        );
-        this._oldWidth = pixiRenderer.screen.width;
-        this._oldHeight = pixiRenderer.screen.height;
+        this._renderTexture.resize(width || 100, height || 100);
       }
+      this._oldWidth = width;
+      this._oldHeight = height;
+      this._oldResolution = resolution;
       const oldRenderTexture = pixiRenderer.renderTexture.current || undefined;
       const oldSourceFrame = pixiRenderer.renderTexture.sourceFrame;
       pixiRenderer.renderTexture.bind(this._renderTexture);

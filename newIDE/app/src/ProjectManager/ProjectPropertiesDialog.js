@@ -74,6 +74,9 @@ type ProjectProperties = {|
   sizeOnStartupMode: string,
   antialiasingMode: string,
   isAntialisingEnabledOnMobile: boolean,
+  upscalingMode: string,
+  fsrQuality: string,
+  fsrSharpness: number,
   minFPS: number,
   maxFPS: number,
   isFolderProject: boolean,
@@ -105,6 +108,18 @@ const loadPropertiesFromProject = (project: gdProject): ProjectProperties => {
     sizeOnStartupMode: project.getSizeOnStartupMode(),
     antialiasingMode: project.getAntialiasingMode(),
     isAntialisingEnabledOnMobile: project.isAntialisingEnabledOnMobile(),
+    upscalingMode:
+      typeof project.getUpscalingMode === 'function'
+        ? project.getUpscalingMode() || 'none'
+        : 'none',
+    fsrQuality:
+      typeof project.getFsrQuality === 'function'
+        ? project.getFsrQuality() || 'quality'
+        : 'quality',
+    fsrSharpness:
+      typeof project.getFsrSharpness === 'function'
+        ? project.getFsrSharpness()
+        : 0.2,
     minFPS: project.getMinimumFPS(),
     maxFPS: project.getMaximumFPS(),
     isFolderProject: project.isFolderProject(),
@@ -149,6 +164,9 @@ function applyPropertiesToProject(
     sizeOnStartupMode,
     antialiasingMode,
     isAntialisingEnabledOnMobile,
+    upscalingMode,
+    fsrQuality,
+    fsrSharpness,
     minFPS,
     maxFPS,
     isFolderProject,
@@ -181,6 +199,15 @@ function applyPropertiesToProject(
   project.setSizeOnStartupMode(sizeOnStartupMode);
   project.setAntialiasingMode(antialiasingMode);
   project.setAntialisingEnabledOnMobile(isAntialisingEnabledOnMobile);
+  if (typeof project.setUpscalingMode === 'function') {
+    project.setUpscalingMode(upscalingMode);
+  }
+  if (typeof project.setFsrQuality === 'function') {
+    project.setFsrQuality(fsrQuality);
+  }
+  if (typeof project.setFsrSharpness === 'function') {
+    project.setFsrSharpness(fsrSharpness);
+  }
   project.setMinimumFPS(minFPS);
   project.setMaximumFPS(maxFPS);
   project.setFolderProject(isFolderProject);
@@ -256,6 +283,15 @@ const ProjectPropertiesDialog = (props: Props) => {
   );
   let [antialiasingMode, setAntialiasingMode] = React.useState(
     initialProperties.antialiasingMode
+  );
+  let [upscalingMode, setUpscalingMode] = React.useState(
+    initialProperties.upscalingMode
+  );
+  let [fsrQuality, setFsrQuality] = React.useState(
+    initialProperties.fsrQuality
+  );
+  let [fsrSharpness, setFsrSharpness] = React.useState(
+    initialProperties.fsrSharpness
   );
   let [
     isAntialisingEnabledOnMobile,
@@ -357,6 +393,9 @@ const ProjectPropertiesDialog = (props: Props) => {
         pixelsRounding,
         antialiasingMode,
         isAntialisingEnabledOnMobile,
+        upscalingMode,
+        fsrQuality,
+        fsrSharpness,
         sizeOnStartupMode,
         minFPS,
         maxFPS,
@@ -820,6 +859,63 @@ const ProjectPropertiesDialog = (props: Props) => {
                   <SelectOption value="always" label={t`Always`} />
                   <SelectOption value="never" label={t`Never`} />
                 </SelectField>
+                <SelectField
+                  fullWidth
+                  floatingLabelText={<Trans>Upscaling</Trans>}
+                  value={upscalingMode}
+                  onChange={(e, i, newUpscalingMode: string) => {
+                    if (newUpscalingMode === upscalingMode) {
+                      return;
+                    }
+                    setUpscalingMode(newUpscalingMode);
+                    notifyOfChange();
+                  }}
+                >
+                  <SelectOption value="none" label={t`None`} />
+                  <SelectOption value="fsr1" label={t`AMD FSR 1.0`} />
+                </SelectField>
+                <SelectField
+                  fullWidth
+                  floatingLabelText={<Trans>FSR quality preset</Trans>}
+                  value={fsrQuality}
+                  disabled={upscalingMode !== 'fsr1'}
+                  onChange={(e, i, newFsrQuality: string) => {
+                    if (newFsrQuality === fsrQuality) {
+                      return;
+                    }
+                    setFsrQuality(newFsrQuality);
+                    notifyOfChange();
+                  }}
+                >
+                  <SelectOption
+                    value="ultra-quality"
+                    label={t`Ultra Quality`}
+                  />
+                  <SelectOption value="quality" label={t`Quality`} />
+                  <SelectOption value="balanced" label={t`Balanced`} />
+                  <SelectOption value="performance" label={t`Performance`} />
+                </SelectField>
+                <SemiControlledTextField
+                  floatingLabelText={
+                    <Trans>FSR sharpness (0 to 1, higher = sharper)</Trans>
+                  }
+                  fullWidth
+                  type="number"
+                  value={'' + fsrSharpness}
+                  disabled={upscalingMode !== 'fsr1'}
+                  onChange={value => {
+                    const parsed = parseFloat(value);
+                    const newSharpness = Math.max(
+                      0,
+                      Math.min(1, isNaN(parsed) ? 0 : parsed)
+                    );
+                    if (newSharpness === fsrSharpness) {
+                      return;
+                    }
+                    setFsrSharpness(newSharpness);
+                    notifyOfChange();
+                  }}
+                />
 
                 <Text size="block-title">
                   <Trans>Project files</Trans>

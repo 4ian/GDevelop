@@ -63,6 +63,9 @@ Project::Project()
       adaptGameResolutionAtRuntime(true),
       sizeOnStartupMode("adaptWidth"),
       antialiasingMode("MSAA"),
+      upscalingMode("none"),
+      fsrQuality("quality"),
+      fsrSharpness(0.2),
       isAntialisingEnabledOnMobile(false),
       projectUuid(""),
       useDeprecatedZeroAsDefaultZOrder(false),
@@ -726,6 +729,9 @@ void Project::UnserializeFrom(const SerializerElement& element) {
       propElement.GetStringAttribute("antialiasingMode", "MSAA"));
   SetAntialisingEnabledOnMobile(
       propElement.GetBoolAttribute("antialisingEnabledOnMobile", false));
+  SetUpscalingMode(propElement.GetStringAttribute("upscalingMode", "none"));
+  SetFsrQuality(propElement.GetStringAttribute("fsrQuality", "quality"));
+  SetFsrSharpness(propElement.GetDoubleAttribute("fsrSharpness", 0.2));
   SetProjectUuid(propElement.GetStringAttribute("projectUuid", ""));
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
@@ -1107,6 +1113,9 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("antialiasingMode", antialiasingMode);
   propElement.SetAttribute("antialisingEnabledOnMobile",
                            isAntialisingEnabledOnMobile);
+  propElement.SetAttribute("upscalingMode", upscalingMode);
+  propElement.SetAttribute("fsrQuality", fsrQuality);
+  propElement.SetDoubleAttribute("fsrSharpness", fsrSharpness);
   propElement.SetAttribute("projectUuid", projectUuid);
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
@@ -1284,6 +1293,9 @@ void Project::Init(const gd::Project& game) {
   adaptGameResolutionAtRuntime = game.adaptGameResolutionAtRuntime;
   sizeOnStartupMode = game.sizeOnStartupMode;
   antialiasingMode = game.antialiasingMode;
+  upscalingMode = game.upscalingMode;
+  fsrQuality = game.fsrQuality;
+  fsrSharpness = game.fsrSharpness;
   isAntialisingEnabledOnMobile = game.isAntialisingEnabledOnMobile;
   projectUuid = game.projectUuid;
   useDeprecatedZeroAsDefaultZOrder = game.useDeprecatedZeroAsDefaultZOrder;

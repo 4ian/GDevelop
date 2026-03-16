@@ -177,7 +177,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     // Export engine libraries
     AddLibsInclude(/*pixiRenderers=*/true,
                   /*pixiInThreeRenderers=*/
-                  usedExtensionsResult.Has3DObjects(),
+                  usedExtensionsResult.Has3DObjects() ||
+                      immutableProject.GetUpscalingMode() == "fsr1",
                   /*isInGameEdition=*/
                   options.isInGameEdition,
                   /*includeWebsocketDebuggerClient=*/
@@ -1221,6 +1222,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "pixi-renderers/pixi.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-filters-tools.js");
     InsertUnique(includesFiles, "pixi-renderers/runtimegame-pixi-renderer.js");
+    InsertUnique(includesFiles, "pixi-renderers/fsr1-pass.js");
     InsertUnique(includesFiles, "pixi-renderers/runtimescene-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/layer-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-image-manager.js");

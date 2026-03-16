@@ -213,6 +213,11 @@ namespace gdjs {
     _scaleMode: 'linear' | 'nearest';
     _pixelsRounding: boolean;
     _antialiasingMode: 'none' | 'MSAA';
+    _upscalingMode: 'none' | 'fsr1';
+    _fsrQuality: 'ultra-quality' | 'quality' | 'balanced' | 'performance';
+    _fsrSharpness: float;
+    _renderingWidth: integer;
+    _renderingHeight: integer;
     _isAntialisingEnabledOnMobile: boolean;
     /**
      * Game loop management (see startGameLoop method)
@@ -342,6 +347,24 @@ namespace gdjs {
       this._scaleMode = data.properties.scaleMode || 'linear';
       this._pixelsRounding = this._data.properties.pixelsRounding;
       this._antialiasingMode = this._data.properties.antialiasingMode;
+      this._upscalingMode =
+        (this._data.properties.upscalingMode as
+          | 'none'
+          | 'fsr1'
+          | undefined) || 'none';
+      this._fsrQuality =
+        (this._data.properties.fsrQuality as
+          | 'ultra-quality'
+          | 'quality'
+          | 'balanced'
+          | 'performance'
+          | undefined) || 'quality';
+      const fsrSharpness =
+        typeof this._data.properties.fsrSharpness === 'number'
+          ? this._data.properties.fsrSharpness
+          : 0.2;
+      this._fsrSharpness = Math.max(0, Math.min(1, fsrSharpness));
+      this._updateRenderingSize();
       this._isAntialisingEnabledOnMobile =
         this._data.properties.antialisingEnabledOnMobile;
 
@@ -407,6 +430,24 @@ namespace gdjs {
         getGlobalResourceNames(projectData),
         projectData.layouts
       );
+      this._upscalingMode =
+        (this._data.properties.upscalingMode as
+          | 'none'
+          | 'fsr1'
+          | undefined) || 'none';
+      this._fsrQuality =
+        (this._data.properties.fsrQuality as
+          | 'ultra-quality'
+          | 'quality'
+          | 'balanced'
+          | 'performance'
+          | undefined) || 'quality';
+      const fsrSharpness =
+        typeof this._data.properties.fsrSharpness === 'number'
+          ? this._data.properties.fsrSharpness
+          : 0.2;
+      this._fsrSharpness = Math.max(0, Math.min(1, fsrSharpness));
+      this._updateRenderingSize();
     }
 
     private _updateSceneAndExtensionsData(): void {
@@ -794,6 +835,8 @@ namespace gdjs {
       // will maybe adapt the size of the canvas or whatever is used to render the
       // game in the window, but this does not change the "game resolution".
 
+      this._updateRenderingSize();
+
       // Notify the renderer that game resolution changed (so that the renderer size
       // can be updated, and maybe other things like the canvas size), and let the
       // scenes know too.
@@ -874,6 +917,49 @@ namespace gdjs {
      */
     getAntialiasingMode(): 'none' | 'MSAA' {
       return this._antialiasingMode;
+    }
+
+    /**
+     * Return the upscaling mode used by the game ("none" or "fsr1").
+     */
+    getUpscalingMode(): 'none' | 'fsr1' {
+      return this._upscalingMode;
+    }
+
+    /**
+     * Return the FSR quality preset ("ultra-quality", "quality", "balanced",
+     * "performance").
+     */
+    getFsrQuality(): 'ultra-quality' | 'quality' | 'balanced' | 'performance' {
+      return this._fsrQuality;
+    }
+
+    /**
+     * Return the FSR sharpness (0..1).
+     */
+    getFsrSharpness(): float {
+      return this._fsrSharpness;
+    }
+
+    /**
+     * Return true if FSR is enabled.
+     */
+    isFsrEnabled(): boolean {
+      return this._upscalingMode === 'fsr1';
+    }
+
+    /**
+     * Return the internal rendering width (before upscaling).
+     */
+    getRenderingWidth(): integer {
+      return this._renderingWidth;
+    }
+
+    /**
+     * Return the internal rendering height (before upscaling).
+     */
+    getRenderingHeight(): integer {
+      return this._renderingHeight;
     }
 
     /**
@@ -1512,6 +1598,40 @@ namespace gdjs {
         this._gameResolutionWidth,
         this._gameResolutionHeight
       );
+    }
+
+    private _getFsrQualityRatio(): float {
+      switch (this._fsrQuality) {
+        case 'ultra-quality':
+          return 1.3;
+        case 'quality':
+          return 1.5;
+        case 'balanced':
+          return 1.7;
+        case 'performance':
+          return 2.0;
+        default:
+          return 1.5;
+      }
+    }
+
+    private _updateRenderingSize(): void {
+      if (this._upscalingMode !== 'fsr1') {
+        this._renderingWidth = this._gameResolutionWidth;
+        this._renderingHeight = this._gameResolutionHeight;
+        return;
+      }
+      const ratio = this._getFsrQualityRatio();
+      const rawWidth = Math.max(
+        2,
+        Math.floor(this._gameResolutionWidth / ratio)
+      );
+      const rawHeight = Math.max(
+        2,
+        Math.floor(this._gameResolutionHeight / ratio)
+      );
+      this._renderingWidth = rawWidth - (rawWidth % 2);
+      this._renderingHeight = rawHeight - (rawHeight % 2);
     }
 
     /**

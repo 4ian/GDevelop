@@ -169,7 +169,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
       {({ i18n }) => (
         <ColumnStackLayout expand noOverflowParent noMargin>
           <CompactPropertiesEditorRowField
-            label={i18n._(t`Function Type`)}
+            label={i18n._(t`Function type`)}
             field={
               <CompactSelectField
                 value={type.toString()}

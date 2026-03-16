@@ -42,7 +42,16 @@ void EventsFunctionsContainer::AddMissingFunctionsInRootFolder() {
   for (std::size_t i = 0; i < GetEventsFunctionsCount(); ++i) {
     auto &function = GetEventsFunction(i);
     if (!rootFolder->HasFunctionNamed(function.GetName())) {
-      const gd::String &group = function.GetGroup();
+      gd::EventsFunction *groupSource = &function;
+      // Groups were implicit for ActionWithOperator
+      if (function.GetFunctionType() ==
+              gd::EventsFunction::ActionWithOperator) {
+        const gd::String &getterName = function.GetGetterName();
+        if (HasEventsFunctionNamed(getterName)) {
+          groupSource = &GetEventsFunction(getterName);
+        }
+      }
+      const gd::String &group = groupSource->GetGroup();
       auto &folder = !group.empty() ? rootFolder->GetOrCreateChildFolder(group)
                                     : *rootFolder;
       folder.InsertFunction(&function);

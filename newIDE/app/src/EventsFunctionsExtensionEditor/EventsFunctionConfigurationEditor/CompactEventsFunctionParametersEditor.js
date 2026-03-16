@@ -910,7 +910,7 @@ export const CompactEventsFunctionParametersEditor = ({
                 </Line>
               </ScrollView>
               {!freezeParameters && (
-                <Column expand noOverflowParent>
+                <Column noOverflowParent>
                   <Line noMargin>
                     <LineStackLayout expand>
                       <ResponsiveFlatButton

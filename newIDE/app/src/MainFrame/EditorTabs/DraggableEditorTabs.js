@@ -26,6 +26,7 @@ type DraggableEditorTabsProps = {|
   onCloseTab: (editor: EditorTab) => void,
   onCloseOtherTabs: (editor: EditorTab) => void,
   onCloseAll: () => void,
+  onPopOutTab?: ?(editor: EditorTab) => void,
   onTabActivated: (editor: EditorTab) => void,
   onDropTab: (fromIndex: number, toHoveredIndex: number) => void,
   onHoverTab: (
@@ -47,6 +48,7 @@ export function DraggableEditorTabs({
   onCloseTab,
   onCloseOtherTabs,
   onCloseAll,
+  onPopOutTab,
   onTabActivated,
   onDropTab,
   onHoverTab,
@@ -112,6 +114,11 @@ export function DraggableEditorTabs({
               onClose={() => onCloseTab(editorTab)}
               onCloseOthers={() => onCloseOtherTabs(editorTab)}
               onCloseAll={onCloseAll}
+              onPopOut={
+                onPopOutTab && editorTab.closable
+                  ? () => onPopOutTab(editorTab)
+                  : null
+              }
               onHover={(
                 enter: boolean,
                 options: {| isLabelTruncated: boolean |}
@@ -152,6 +159,7 @@ export function DraggableClosableTab({
   onClose,
   onCloseOthers,
   onCloseAll,
+  onPopOut,
   label,
   icon,
   renderCustomIcon,
@@ -194,6 +202,7 @@ export function DraggableClosableTab({
                   onClose={onClose}
                   onCloseOthers={onCloseOthers}
                   onCloseAll={onCloseAll}
+                  onPopOut={onPopOut}
                   label={label}
                   icon={icon}
                   renderCustomIcon={renderCustomIcon}

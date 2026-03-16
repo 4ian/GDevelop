@@ -58,10 +58,12 @@ import { MuiThemeOnlyProvider } from '../UI/Theme/FullThemeProvider';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useOnResize from '../Utils/UseOnResize';
 import DrawerTopBar from '../UI/DrawerTopBar';
+import WindowPortal from '../UI/WindowPortal';
 import { type FloatingPaneState } from './PanesContainer';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 import { type ToolbarButtonConfig } from './CustomToolbarButton';
+import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
 
 const styles = {
   container: {
@@ -527,6 +529,33 @@ const EditorTabsPane: React.ComponentType<{
     [editorTabs, paneIdentifier, setEditorTabs]
   );
 
+  // Track which editor tabs are popped out into separate windows, by key.
+  const [poppedOutTabKeys, setPoppedOutTabKeys] = React.useState<
+    Set<string>
+  >(new Set());
+
+  const onPopOutTab = React.useCallback(
+    (editorTab: EditorTab) => {
+      setPoppedOutTabKeys(prev => {
+        const next = new Set(prev);
+        next.add(editorTab.key);
+        return next;
+      });
+    },
+    []
+  );
+
+  const onPopInTab = React.useCallback(
+    (editorTabKey: string) => {
+      setPoppedOutTabKeys(prev => {
+        const next = new Set(prev);
+        next.delete(editorTabKey);
+        return next;
+      });
+    },
+    []
+  );
+
   const paneEditorTabs = getEditorsForPane(editorTabs, paneIdentifier);
   const currentTab = getCurrentTabForPane(editorTabs, paneIdentifier);
 
@@ -591,6 +620,7 @@ const EditorTabsPane: React.ComponentType<{
               onClickTab={onChangeEditorTab}
               onCloseTab={(editorTab: EditorTab) => {
                 clearTooltipOnTabClose();
+                onPopInTab(editorTab.key);
                 onEditorTabClosing(editorTab);
                 onCloseEditorTab(editorTab);
               }}
@@ -598,6 +628,7 @@ const EditorTabsPane: React.ComponentType<{
                 clearTooltipOnTabClose();
                 paneEditorTabs.forEach(paneEditorTab => {
                   if (paneEditorTab !== editorTab && paneEditorTab.closable) {
+                    onPopInTab(paneEditorTab.key);
                     onEditorTabClosing(paneEditorTab);
                   }
                 });
@@ -607,11 +638,13 @@ const EditorTabsPane: React.ComponentType<{
                 clearTooltipOnTabClose();
                 paneEditorTabs.forEach(paneEditorTab => {
                   if (paneEditorTab.closable) {
+                    onPopInTab(paneEditorTab.key);
                     onEditorTabClosing(paneEditorTab);
                   }
                 });
                 onCloseAllEditorTabs();
               }}
+              onPopOutTab={onPopOutTab}
               onTabActivated={onEditorTabActivated}
               onDropTab={onDropEditorTab}
               onHoverTab={onEditorTabHovered}
@@ -672,6 +705,179 @@ const EditorTabsPane: React.ComponentType<{
             const errorBoundaryProps = getEditorErrorBoundaryProps(
               editorTab.key
             );
+            const isPoppedOut = poppedOutTabKeys.has(editorTab.key);
+
+            const editorContent = (
+              <CommandsContextScopedProvider active={isCurrentTab || isPoppedOut}>
+                <ErrorBoundary
+                  componentTitle={errorBoundaryProps.componentTitle}
+                  scope={errorBoundaryProps.scope}
+                >
+                  {editorTab.renderEditorContainer({
+                    editorId: editorTab.key,
+                    gameEditorMode,
+                    setGameEditorMode,
+                    isActive: isCurrentTab || isPoppedOut,
+                    extraEditorProps: editorTab.extraEditorProps,
+                    project: currentProject,
+                    fileMetadata: currentFileMetadata,
+                    storageProvider: getStorageProvider(),
+                    ref: editorRef => (editorTab.editorRef = editorRef),
+                    setToolbar: editorToolbar =>
+                      setEditorToolbar(editorToolbar, isCurrentTab),
+                    setGamesPlatformFrameShown: onSetGamesPlatformFrameShown,
+                    projectItemName: editorTab.projectItemName,
+                    setPreviewedLayout,
+                    onOpenAskAi,
+                    onCloseAskAi,
+                    onOpenExternalEvents: openExternalEvents,
+                    onOpenEvents: (sceneName: string) => {
+                      openLayout(sceneName, {
+                        openEventsEditor: true,
+                        openSceneEditor: false,
+                        focusWhenOpened: 'events',
+                      });
+                    },
+                    onOpenLayout: openLayout,
+                    onOpenTemplateFromTutorial: openTemplateFromTutorial,
+                    onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
+                    previewDebuggerServer,
+                    hotReloadPreviewButtonProps,
+                    onRestartInGameEditor,
+                    showRestartInGameEditorAfterErrorButton,
+                    resourceManagementProps,
+                    onSave: saveProject,
+                    onSaveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
+                    canSave,
+                    onCheckoutVersion,
+                    getOrLoadProjectVersion,
+                    onCreateEventsFunction,
+                    openInstructionOrExpression,
+                    onOpenCustomObjectEditor: onOpenCustomObjectEditor,
+                    onOpenEventsFunctionsExtension,
+                    onRenamedEventsBasedObject: onRenamedEventsBasedObject,
+                    onDeletedEventsBasedObject: onDeletedEventsBasedObject,
+                    openObjectEvents,
+                    onNavigateToEventFromGlobalSearch,
+                    unsavedChanges: unsavedChanges,
+                    canOpen,
+                    onChooseProject: () =>
+                      openOpenFromStorageProviderDialog(),
+                    onOpenRecentFile: openFromFileMetadataWithStorageProvider,
+                    onOpenNewProjectSetupDialog: openNewProjectDialog,
+                    onOpenProjectManager: () => openProjectManager(true),
+                    onOpenVersionHistory: openVersionHistoryPanel,
+                    askToCloseProject,
+                    closeProject,
+                    onSelectExampleShortHeader: exampleShortHeader => {
+                      onSelectExampleShortHeader({
+                        exampleShortHeader,
+                        preventBackHome: true,
+                      });
+                    },
+                    onSelectPrivateGameTemplateListingData: privateGameTemplateListingData => {
+                      onSelectPrivateGameTemplateListingData({
+                        privateGameTemplateListingData,
+                        preventBackHome: true,
+                      });
+                    },
+                    onOpenPrivateGameTemplateListingData: privateGameTemplateListingData => {
+                      onSelectPrivateGameTemplateListingData({
+                        privateGameTemplateListingData,
+                        preventBackHome: true,
+                      });
+                    },
+                    onCreateEmptyProject: createEmptyProject,
+                    onCreateProjectFromExample: createProjectFromExample,
+                    onOpenProfile: onOpenProfileDialog,
+                    onOpenLanguageDialog: () => openLanguageDialog(true),
+                    onOpenPreferences: () => openPreferencesDialog(true),
+                    onOpenAbout: () => openAboutDialog(true),
+                    selectInAppTutorial: selectInAppTutorial,
+                    onLoadEventsFunctionsExtensions: onLoadEventsFunctionsExtensions,
+                    onReloadEventsFunctionsExtensionMetadata: extension => {
+                      if (isProjectClosedSoAvoidReloadingExtensions) {
+                        return;
+                      }
+                      eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(
+                        currentProject,
+                        extension
+                      );
+                    },
+                    onDeleteResource: (
+                      resource: gdResource,
+                      cb: boolean => void
+                    ) => {
+                      // TODO: Project wide refactoring of objects/events using the resource
+                      cb(true);
+                    },
+                    onRenameResource: (
+                      resource: gdResource,
+                      newName: string,
+                      cb: boolean => void
+                    ) => {
+                      if (currentProject)
+                        renameResourcesInProject(currentProject, {
+                          [resource.getName()]: newName,
+                        });
+
+                      cb(true);
+                    },
+                    openBehaviorEvents: openBehaviorEvents,
+                    onExtractAsExternalLayout: onExtractAsExternalLayout,
+                    onExtractAsEventBasedObject: onExtractAsEventBasedObject,
+                    onEventBasedObjectTypeChanged: onEventBasedObjectTypeChanged,
+                    onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
+                    onOpenEventBasedObjectVariantEditor: onOpenEventBasedObjectVariantEditor,
+                    onDeleteEventsBasedObjectVariant: deleteEventsBasedObjectVariant,
+                    onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
+                    onSceneObjectEdited: onSceneObjectEdited,
+                    onSceneObjectsDeleted: onSceneObjectsDeleted,
+                    onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
+                    onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
+                    onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
+                    onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
+                    onWillInstallExtension: onWillInstallExtension,
+                    onExtensionInstalled: onExtensionInstalled,
+                    onEffectAdded: onEffectAdded,
+                    onObjectListsModified: onObjectListsModified,
+                    onExternalLayoutAssociationChanged,
+                    triggerHotReloadInGameEditorIfNeeded: triggerHotReloadInGameEditorIfNeeded,
+                    gamesList,
+                    gamesPlatformFrameTools,
+                  })}
+                </ErrorBoundary>
+              </CommandsContextScopedProvider>
+            );
+
+            if (isPoppedOut) {
+              // Render in a separate window via portal.
+              return (
+                <WindowPortal
+                  key={`popout-${editorTab.key}`}
+                  title={editorTab.label || 'GDevelop'}
+                  onClose={() => {
+                    onPopInTab(editorTab.key);
+                    onEditorTabClosing(editorTab);
+                    onCloseEditorTab(editorTab);
+                  }}
+                  width={1024}
+                  height={750}
+                >
+                  <FullThemeProvider>
+                    <div style={{
+                      display: 'flex',
+                      flex: 1,
+                      width: '100%',
+                      height: '100%',
+                      minHeight: 0,
+                    }}>
+                      {editorContent}
+                    </div>
+                  </FullThemeProvider>
+                </WindowPortal>
+              );
+            }
 
             return (
               <TabContentContainer
@@ -684,146 +890,7 @@ const EditorTabsPane: React.ComponentType<{
                   shouldRemovePointerEvents(editorTab.kind, gameEditorMode)
                 }
               >
-                <CommandsContextScopedProvider active={isCurrentTab}>
-                  <ErrorBoundary
-                    componentTitle={errorBoundaryProps.componentTitle}
-                    scope={errorBoundaryProps.scope}
-                  >
-                    {editorTab.renderEditorContainer({
-                      editorId: editorTab.key,
-                      gameEditorMode,
-                      setGameEditorMode,
-                      isActive: isCurrentTab,
-                      extraEditorProps: editorTab.extraEditorProps,
-                      project: currentProject,
-                      fileMetadata: currentFileMetadata,
-                      storageProvider: getStorageProvider(),
-                      ref: editorRef => (editorTab.editorRef = editorRef),
-                      setToolbar: editorToolbar =>
-                        setEditorToolbar(editorToolbar, isCurrentTab),
-                      setGamesPlatformFrameShown: onSetGamesPlatformFrameShown,
-                      projectItemName: editorTab.projectItemName,
-                      setPreviewedLayout,
-                      onOpenAskAi,
-                      onCloseAskAi,
-                      onOpenExternalEvents: openExternalEvents,
-                      onOpenEvents: (sceneName: string) => {
-                        openLayout(sceneName, {
-                          openEventsEditor: true,
-                          openSceneEditor: false,
-                          focusWhenOpened: 'events',
-                        });
-                      },
-                      onOpenLayout: openLayout,
-                      onOpenTemplateFromTutorial: openTemplateFromTutorial,
-                      onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
-                      previewDebuggerServer,
-                      hotReloadPreviewButtonProps,
-                      onRestartInGameEditor,
-                      showRestartInGameEditorAfterErrorButton,
-                      resourceManagementProps,
-                      onSave: saveProject,
-                      onSaveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
-                      canSave,
-                      onCheckoutVersion,
-                      getOrLoadProjectVersion,
-                      onCreateEventsFunction,
-                      openInstructionOrExpression,
-                      onOpenCustomObjectEditor: onOpenCustomObjectEditor,
-                      onOpenEventsFunctionsExtension,
-                      onRenamedEventsBasedObject: onRenamedEventsBasedObject,
-                      onDeletedEventsBasedObject: onDeletedEventsBasedObject,
-                      openObjectEvents,
-                      onNavigateToEventFromGlobalSearch,
-                      unsavedChanges: unsavedChanges,
-                      canOpen,
-                      onChooseProject: () =>
-                        openOpenFromStorageProviderDialog(),
-                      onOpenRecentFile: openFromFileMetadataWithStorageProvider,
-                      onOpenNewProjectSetupDialog: openNewProjectDialog,
-                      onOpenProjectManager: () => openProjectManager(true),
-                      onOpenVersionHistory: openVersionHistoryPanel,
-                      askToCloseProject,
-                      closeProject,
-                      onSelectExampleShortHeader: exampleShortHeader => {
-                        onSelectExampleShortHeader({
-                          exampleShortHeader,
-                          preventBackHome: true,
-                        });
-                      },
-                      onSelectPrivateGameTemplateListingData: privateGameTemplateListingData => {
-                        onSelectPrivateGameTemplateListingData({
-                          privateGameTemplateListingData,
-                          preventBackHome: true,
-                        });
-                      },
-                      onOpenPrivateGameTemplateListingData: privateGameTemplateListingData => {
-                        onSelectPrivateGameTemplateListingData({
-                          privateGameTemplateListingData,
-                          preventBackHome: true,
-                        });
-                      },
-                      onCreateEmptyProject: createEmptyProject,
-                      onCreateProjectFromExample: createProjectFromExample,
-                      onOpenProfile: onOpenProfileDialog,
-                      onOpenLanguageDialog: () => openLanguageDialog(true),
-                      onOpenPreferences: () => openPreferencesDialog(true),
-                      onOpenAbout: () => openAboutDialog(true),
-                      selectInAppTutorial: selectInAppTutorial,
-                      onLoadEventsFunctionsExtensions: onLoadEventsFunctionsExtensions,
-                      onReloadEventsFunctionsExtensionMetadata: extension => {
-                        if (isProjectClosedSoAvoidReloadingExtensions) {
-                          return;
-                        }
-                        eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(
-                          currentProject,
-                          extension
-                        );
-                      },
-                      onDeleteResource: (
-                        resource: gdResource,
-                        cb: boolean => void
-                      ) => {
-                        // TODO: Project wide refactoring of objects/events using the resource
-                        cb(true);
-                      },
-                      onRenameResource: (
-                        resource: gdResource,
-                        newName: string,
-                        cb: boolean => void
-                      ) => {
-                        if (currentProject)
-                          renameResourcesInProject(currentProject, {
-                            [resource.getName()]: newName,
-                          });
-
-                        cb(true);
-                      },
-                      openBehaviorEvents: openBehaviorEvents,
-                      onExtractAsExternalLayout: onExtractAsExternalLayout,
-                      onExtractAsEventBasedObject: onExtractAsEventBasedObject,
-                      onEventBasedObjectTypeChanged: onEventBasedObjectTypeChanged,
-                      onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
-                      onOpenEventBasedObjectVariantEditor: onOpenEventBasedObjectVariantEditor,
-                      onDeleteEventsBasedObjectVariant: deleteEventsBasedObjectVariant,
-                      onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
-                      onSceneObjectEdited: onSceneObjectEdited,
-                      onSceneObjectsDeleted: onSceneObjectsDeleted,
-                      onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
-                      onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
-                      onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
-                      onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
-                      onWillInstallExtension: onWillInstallExtension,
-                      onExtensionInstalled: onExtensionInstalled,
-                      onEffectAdded: onEffectAdded,
-                      onObjectListsModified: onObjectListsModified,
-                      onExternalLayoutAssociationChanged,
-                      triggerHotReloadInGameEditorIfNeeded: triggerHotReloadInGameEditorIfNeeded,
-                      gamesList,
-                      gamesPlatformFrameTools,
-                    })}
-                  </ErrorBoundary>
-                </CommandsContextScopedProvider>
+                {editorContent}
               </TabContentContainer>
             );
           })}

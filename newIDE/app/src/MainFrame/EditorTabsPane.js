@@ -555,6 +555,8 @@ const EditorTabsPane: React.ComponentType<{
 
   const onPopInTab = React.useCallback(
     (editorTabKey: string) => {
+      delete poppedOutToolbarRefs.current[editorTabKey];
+      initializedPoppedOutToolbars.current.delete(editorTabKey);
       setPoppedOutTabKeys(prev => {
         const next = new Set(prev);
         next.delete(editorTabKey);
@@ -879,8 +881,6 @@ const EditorTabsPane: React.ComponentType<{
                   key={`popout-${editorTab.key}`}
                   title={editorTab.label || 'GDevelop'}
                   onClose={() => {
-                    delete poppedOutToolbarRefs.current[editorTab.key];
-                    initializedPoppedOutToolbars.current.delete(editorTab.key);
                     onPopInTab(editorTab.key);
                     onEditorTabClosing(editorTab);
                     onCloseEditorTab(editorTab);
@@ -891,28 +891,26 @@ const EditorTabsPane: React.ComponentType<{
                   <FullThemeProvider>
                     <Toolbar
                       ref={ref => {
-                        if (ref) {
-                          poppedOutToolbarRefs.current[editorTab.key] = ref;
-                          // When the Toolbar first mounts, ask the editor to
-                          // populate it. Only do this once per pop-out lifecycle
-                          // to avoid an infinite re-render loop (inline ref
-                          // callbacks are called on every render).
-                          if (
-                            !initializedPoppedOutToolbars.current.has(
-                              editorTab.key
-                            ) &&
-                            editorTab.editorRef
-                          ) {
-                            initializedPoppedOutToolbars.current.add(
-                              editorTab.key
-                            );
-                            editorTab.editorRef.updateToolbar();
-                          }
-                        } else {
-                          delete poppedOutToolbarRefs.current[editorTab.key];
-                          initializedPoppedOutToolbars.current.delete(
+                        // Ignore null (cleanup) calls — React calls inline ref
+                        // callbacks with null on every re-render before passing
+                        // the new element. Actual cleanup of both the ref and
+                        // the initialized set happens in onPopInTab/onClose.
+                        if (!ref) return;
+
+                        poppedOutToolbarRefs.current[editorTab.key] = ref;
+                        // When the Toolbar first mounts, ask the editor to
+                        // populate it. Only do this once per pop-out lifecycle
+                        // to avoid an infinite re-render loop.
+                        if (
+                          !initializedPoppedOutToolbars.current.has(
+                            editorTab.key
+                          ) &&
+                          editorTab.editorRef
+                        ) {
+                          initializedPoppedOutToolbars.current.add(
                             editorTab.key
                           );
+                          editorTab.editorRef.updateToolbar();
                         }
                       }}
                       hidden={false}

@@ -478,8 +478,7 @@ function patchClassesForUseAfterFreeDetection(
     // Wrap delete() to set the call-context ID before calling gd.destroy().
     // This is critical: when delete() is called on a tracked object, any
     // child destructions in C++ will be attributed to "ClassName.delete"
-    // rather than being attributed to whatever unrelated call happened
-    // to run before.
+    // rather than being attributed to nothing.
     if (typeof proto.delete === 'function') {
       const deleteContextId = nextContextId++;
       callContextLabels[deleteContextId] = gdClass + '.delete';

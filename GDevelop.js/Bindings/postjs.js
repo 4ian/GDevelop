@@ -358,7 +358,7 @@ function assertAlive(obj, label, gd, className) {
     gd.MemoryTrackedRegistry.isDead(obj.ptr, className)
   ) {
     throw new UseAfterFreeError(
-      `${label}: C++ object (${className}) was deleted but JavaScript wrapper still exists and was about to be used (this exception was thrown instead).`
+      `${label}: C++ object (${className}) was destroyed on C++ side but JavaScript wrapper still exists (ptr is not 0) and was about to be used (this exception was thrown instead).`
     );
   }
 }

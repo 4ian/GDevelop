@@ -52,6 +52,22 @@ const generateUnusedFilepath = (
   return path.join(basePath, directory, name) + extension;
 };
 
+const generateUnusedFilepathFromResourceName = (
+  baseAssetsPath: string,
+  alreadyUsedFilePaths: Set<string>,
+  resourceName: string,
+  extension: string
+) => {
+  const filename = sanitizeFilePath(resourceName + (extension || ''));
+  return generateUnusedFilepath(
+    baseAssetsPath,
+    alreadyUsedFilePaths,
+    filename.startsWith('assets/')
+      ? filename.substring('assets/'.length)
+      : filename
+  );
+};
+
 const downloadBlobToLocalFile = async (
   blobUrl: string,
   filePath: string
@@ -122,10 +138,11 @@ export const moveUrlResourcesToLocalFiles = async ({
             } = parseLocalFilePathOrExtensionFromMetadata(resource);
             const downloadedFilePath = localFilePath
               ? path.resolve(projectPath, localFilePath)
-              : generateUnusedFilepath(
+              : generateUnusedFilepathFromResourceName(
                   baseAssetsPath,
                   downloadedFilePaths,
-                  sanitizeFilePath(resource.getName() + (extension || ''))
+                  resource.getName(),
+                  extension || ''
                 );
 
             await fs.ensureDir(baseAssetsPath);

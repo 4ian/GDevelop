@@ -2356,7 +2356,7 @@ const describeInstances: EditorFunction = {
 
           const defaultSize = object
             ? getObjectSizeInfo(object, project, PixiResourcesLoader)
-            : { width: 32, height: 32, depth: 0 };
+            : { width: 0, height: 0, depth: 0 };
 
           const width = instance.hasCustomSize()
             ? instance.getCustomWidth()

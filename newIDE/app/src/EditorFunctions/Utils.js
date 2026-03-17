@@ -20,7 +20,7 @@ export type ObjectSizeInfo = {|
  * Uses PixiResourcesLoader to get the actual texture dimensions for Sprite objects.
  * Accepts an optional assetShortHeader for Sprite objects installed from the asset store,
  * where the texture may not yet be loaded in PixiResourcesLoader.
- * Always returns a value — falls back to 32x32x0 for unknown/unsupported types.
+ * Returns 0 for width/height/depth when dimensions are not available.
  */
 export const getObjectSizeInfo = (
   object: gdObject,
@@ -91,14 +91,14 @@ export const getObjectSizeInfo = (
       }
     }
     return {
-      width: 32,
-      height: 32,
+      width: 0,
+      height: 0,
       depth: 0,
       originX: 0,
       originY: 0,
       originZ: 0,
-      centerX: 16,
-      centerY: 16,
+      centerX: 0,
+      centerY: 0,
       centerZ: 0,
     };
   }
@@ -156,8 +156,8 @@ export const getObjectSizeInfo = (
     const maxY = variant.getAreaMaxY();
     const minZ = isRenderedIn3D ? variant.getAreaMinZ() : 0;
     const maxZ = isRenderedIn3D ? variant.getAreaMaxZ() : 0;
-    const width = maxX - minX || 48;
-    const height = maxY - minY || 48;
+    const width = maxX - minX;
+    const height = maxY - minY;
     const depth = maxZ - minZ;
 
     return {
@@ -174,14 +174,14 @@ export const getObjectSizeInfo = (
   }
 
   return {
-    width: 32,
-    height: 32,
+    width: 0,
+    height: 0,
     depth: 0,
     originX: 0,
     originY: 0,
     originZ: 0,
-    centerX: 16,
-    centerY: 16,
+    centerX: 0,
+    centerY: 0,
     centerZ: 0,
   };
 };

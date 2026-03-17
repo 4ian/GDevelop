@@ -118,7 +118,7 @@ describe('getObjectSizeInfo', () => {
       });
     });
 
-    it('returns 32×32 fallback when texture is not valid/loaded', () => {
+    it('returns 0 dimensions when texture is not valid/loaded', () => {
       const objects = project.getObjects();
       const object = objects.insertNewObject(
         project,
@@ -137,14 +137,14 @@ describe('getObjectSizeInfo', () => {
       expect(
         getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
-        width: 32,
-        height: 32,
+        width: 0,
+        height: 0,
         depth: 0,
         originX: 0,
         originY: 0,
         originZ: 0,
-        centerX: 16,
-        centerY: 16,
+        centerX: 0,
+        centerY: 0,
         centerZ: 0,
       });
     });
@@ -185,7 +185,7 @@ describe('getObjectSizeInfo', () => {
       });
     });
 
-    it('returns 32×32 fallback when sprite has no animations', () => {
+    it('returns 0 dimensions when sprite has no animations', () => {
       const objects = project.getObjects();
       const object = objects.insertNewObject(
         project,
@@ -197,14 +197,14 @@ describe('getObjectSizeInfo', () => {
       expect(
         getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
-        width: 32,
-        height: 32,
+        width: 0,
+        height: 0,
         depth: 0,
         originX: 0,
         originY: 0,
         originZ: 0,
-        centerX: 16,
-        centerY: 16,
+        centerX: 0,
+        centerY: 0,
         centerZ: 0,
       });
     });
@@ -418,7 +418,7 @@ describe('getObjectSizeInfo', () => {
   });
 
   describe('Unsupported object type', () => {
-    it('returns 32×32×0 fallback with centered origin for unknown types', () => {
+    it('returns 0 dimensions for unknown types', () => {
       const objects = project.getObjects();
       const object = objects.insertNewObject(
         project,
@@ -430,14 +430,14 @@ describe('getObjectSizeInfo', () => {
       expect(
         getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
-        width: 32,
-        height: 32,
+        width: 0,
+        height: 0,
         depth: 0,
         originX: 0,
         originY: 0,
         originZ: 0,
-        centerX: 16,
-        centerY: 16,
+        centerX: 0,
+        centerY: 0,
         centerZ: 0,
       });
     });

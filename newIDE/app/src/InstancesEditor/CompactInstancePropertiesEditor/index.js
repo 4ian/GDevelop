@@ -150,6 +150,19 @@ export const CompactInstancePropertiesEditor = ({
   const forceUpdate = useForceUpdate();
   const instance = instances[0];
 
+  // Guard against use-after-free: when instances are rebuilt (e.g., after
+  // undo/redo), React's batched rendering can cause a render with stale
+  // instance references whose C++ objects are already freed.
+  // InitialInstance is not memory-tracked, but its VariablesContainer is,
+  // so we use it as a proxy to detect freed instances.
+  if (instance) {
+    try {
+      instance.getVariables().count();
+    } catch (e) {
+      return null;
+    }
+  }
+
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   /**
    * TODO: multiple instances support for variables list. Expected behavior should be:

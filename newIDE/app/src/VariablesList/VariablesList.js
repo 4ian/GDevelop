@@ -670,11 +670,27 @@ const VariablesList: React.ComponentType<{
   ...Props,
   +ref?: React.RefSetter<VariablesListInterface>,
 }> = React.forwardRef<Props, VariablesListInterface>((props, ref) => {
-  const historyRef = useRefWithInit(() =>
-    getHistoryInitialState(props.variablesContainer, {
-      historyMaxSize: 50,
-    })
-  );
+  const historyRef = useRefWithInit(() => {
+    try {
+      return getHistoryInitialState(props.variablesContainer, {
+        historyMaxSize: 50,
+      });
+    } catch (e) {
+      // If the variables container was freed (use-after-free from a stale
+      // C++ wrapper surviving into a React render), return an empty history
+      // rather than crashing.
+      console.warn(
+        'Failed to initialize history for variables list, the variables container may have been freed:',
+        e
+      );
+      return {
+        previousActions: [],
+        currentValue: {},
+        futureActions: [],
+        maxSize: 50,
+      };
+    }
+  });
 
   const {
     historyHandler,

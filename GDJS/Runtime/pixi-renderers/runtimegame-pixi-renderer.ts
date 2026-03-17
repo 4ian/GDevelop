@@ -115,9 +115,6 @@ namespace gdjs {
         });
         this._threeRenderer.shadowMap.enabled = false;
         this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        // Keep legacy light intensity behavior for backward compatibility with
-        // existing projects/light values.
-        this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.outputColorSpace = THREE.SRGBColorSpace;
         this._threeRenderer.toneMapping = THREE.NoToneMapping;
         this._threeRenderer.toneMappingExposure = 1;

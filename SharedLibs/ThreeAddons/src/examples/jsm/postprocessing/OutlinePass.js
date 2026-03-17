@@ -257,7 +257,7 @@ class OutlinePass extends Pass {
 
 				}
 
-			} else if ( object.isPoints || object.isLine || object.isTransformControls ) {
+			} else if ( object.isPoints || object.isLine ) {
 
 				// the visibilty of points and lines is always set to false in order to
 				// not affect the outline computation
@@ -462,7 +462,7 @@ class OutlinePass extends Pass {
 						worldPosition = instanceMatrix * worldPosition;
 
 					#endif
-
+					
 					worldPosition = modelMatrix * worldPosition;
 
 					projTexCoord = textureMatrix * worldPosition;

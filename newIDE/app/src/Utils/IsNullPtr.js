@@ -1,5 +1,7 @@
 // @flow
 
+const gd: libGDevelop = global.gd;
+
 /**
  * Check if the Emscripten object is actually a null pointer.
  *
@@ -28,12 +30,9 @@ export const isNullPtr = (
 export const exceptionallyGuardAgainstDeadObject = <T>(obj: ?T): ?T => {
   if (!obj) return null;
 
-  const gd: libGDevelop = global.gd;
   try {
-    // $FlowFixMe[incompatible-call] - obj is a WebIDL wrapper object.
-    if (!gd.assertObjectAlive(obj)) {
-      return null;
-    }
+    // $FlowFixMe[incompatible-call] - obj is an Emscripten wrapper object.
+    gd.assertObjectAlive(obj);
   } catch (exception) {
     console.warn(
       'Detected a dead object being accessed - returning null instead.',

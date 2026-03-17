@@ -567,7 +567,7 @@ patchClassesForUseAfterFreeDetection(Module, {
 });
 
 /**
- * Check that a WebIDL object is still alive, i.e. not destroyed from
+ * Check that an Emscripten object is still alive, i.e. not destroyed from
  * JavaScript (ptr is 0) or from C++ (only for memory-tracked classes).
  *
  * In theory, a dead object should never be accessed. In practice this can
@@ -575,19 +575,10 @@ patchClassesForUseAfterFreeDetection(Module, {
  * or deleted in C++, only for tracked classes).
  * This is used just to add extra protection and should usually not be useful.
  *
- * @param {object} obj - The WebIDL wrapper object.
- * @returns {boolean} true if the object is alive, false otherwise.
+ * @param {object} obj - The Emscripten wrapper object.
+ * @throws {UseAfterFreeError} if the object is dead.
  */
 Module.assertObjectAlive = function assertObjectAlive(obj) {
-  if (!obj || !obj.ptr) return false;
-
   const className = obj._memoryTrackedClassName || null;
-  if (
-    className !== null &&
-    Module.MemoryTrackedRegistry.isDead(obj.ptr, className)
-  ) {
-    return false;
-  }
-
-  return true;
+  assertAlive(obj, 'assertObjectAlive', Module, className);
 };

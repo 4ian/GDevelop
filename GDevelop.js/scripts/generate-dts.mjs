@@ -455,15 +455,17 @@ export function compare<T extends EmscriptenObject>(object1: T, object2: T): boo
 export function destroy(object: EmscriptenObject): void;
 
 /**
- * Check that a WebIDL object is still alive, i.e. not destroyed from
+ * Check that an Emscripten object is still alive, i.e. not destroyed from
  * JavaScript (ptr is 0) or from C++ (only for memory-tracked classes).
  *
  * In theory, a dead object should never be accessed. In practice this can
  * help prevent stale references to objects (deleted by JS: ptr will be 0,
  * or deleted in C++, only for tracked classes).
  * This is used just to add extra protection and should usually not be useful.
+ *
+ * @throws if the object is dead.
  */
-export function assertObjectAlive(object: EmscriptenObject): boolean;
+export function assertObjectAlive(object: EmscriptenObject): void;
 
 export function _malloc(size: number): number;
 export function _free(ptr: number): void;

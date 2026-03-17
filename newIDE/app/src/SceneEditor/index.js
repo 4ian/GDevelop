@@ -553,13 +553,12 @@ export default class SceneEditor extends React.Component<Props, State> {
         multiSelect: false,
       });
 
-      // Immediately update the properties editor to ensure they keep no reference
-      // to the deleted instances.
-      this.forceUpdatePropertiesEditor();
-
       this.setState(
         {
           selectedObjectFolderOrObjectsWithContext: [],
+          // Close any open instance variables dialog to avoid accessing
+          // the destroyed instance's VariablesContainer.
+          variablesEditedInstance: null,
           history: saveToHistory(
             this.state.history,
             this.props.initialInstances,
@@ -1005,6 +1004,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.clearSelection();
     this.setState(
       {
+        // Close any open instance variables dialog to avoid accessing
+        // a destroyed instance's VariablesContainer after undo.
+        variablesEditedInstance: null,
         history: undo(
           this.state.history,
           this.props.initialInstances,
@@ -1028,6 +1030,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.clearSelection();
     this.setState(
       {
+        // Close any open instance variables dialog to avoid accessing
+        // a destroyed instance's VariablesContainer after redo.
+        variablesEditedInstance: null,
         history: redo(
           this.state.history,
           this.props.initialInstances,
@@ -2043,13 +2048,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay)
       this.editorDisplay.instancesHandlers.clearHighlightedInstance();
 
-    // Immediately update the properties editor to ensure they keep no reference
-    // to the deleted instances.
-    this.forceUpdatePropertiesEditor();
-
     this.setState(
       {
         selectedObjectFolderOrObjectsWithContext: [],
+        // Close any open instance variables dialog to avoid accessing
+        // the destroyed instance's VariablesContainer.
+        variablesEditedInstance: null,
         history: saveToHistory(
           this.state.history,
           this.props.initialInstances,

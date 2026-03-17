@@ -129,11 +129,10 @@ describe('Use-after-free detection (MemoryTracked)', function () {
       const layout = project.getLayout('ChildScene');
       expect(layout.getName()).toBe('ChildScene');
 
-      // Deleting the project destroys all layouts via the C++ destructor
-      // chain. The call context should point to the delete() wrapper, but
-      // since delete() is not wrapped with a context ID, the context will
-      // be whatever was last set (Project.delete is not a wrapped method,
-      // but the __destroy__ call goes through gd.destroy).
+      // Deleting the project destroys all child layouts via the C++
+      // destructor chain. The delete() wrapper sets the call-context ID
+      // to "Project.delete" before calling gd.destroy(), so the ring
+      // buffer correctly attributes the child destructions.
       project.delete();
 
       try {
@@ -142,7 +141,8 @@ describe('Use-after-free detection (MemoryTracked)', function () {
       } catch (e) {
         expect(e).toBeInstanceOf(gd.UseAfterFreeError);
         expect(e.message).toContain('destroyed on C++ side');
-        // Timestamp should always be present regardless of context source.
+        // The context should point to Project.delete.
+        expect(e.message).toContain('Destroyed by call to: Project.delete');
         expect(e.message).toContain('ms ago');
       }
     });

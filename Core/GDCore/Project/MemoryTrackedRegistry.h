@@ -7,12 +7,17 @@
 
 #include <algorithm>
 #include <array>
-#include <chrono>
 #include <cstdint>
 #include <cstring>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#else
+#include <chrono>
+#endif
 
 #include "GDCore/String.h"
 
@@ -189,10 +194,17 @@ class MemoryTrackedRegistry {
 
   /** Wall-clock milliseconds (matches Date.now() in JS). */
   static double nowMs() {
+#ifdef __EMSCRIPTEN__
+    // emscripten_date_now() is the C equivalent of Date.now(), returning
+    // milliseconds since Unix epoch as a double. This avoids pulling in
+    // <chrono> and ensures the timestamp is directly comparable to JS.
+    return emscripten_date_now();
+#else
     return static_cast<double>(
         std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch())
             .count());
+#endif
   }
 
   static const DestructionContext* findDeadContext(const void* ptr,

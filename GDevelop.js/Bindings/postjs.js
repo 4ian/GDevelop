@@ -352,7 +352,7 @@ Module.UseAfterFreeError = UseAfterFreeError;
  * read at error time (cold path only).
  * @type {string[]}
  */
-var callContextLabels = [];
+const callContextLabels = [];
 
 /**
  * Check that an Emscripten WebIDL object is still alive.
@@ -365,13 +365,13 @@ var callContextLabels = [];
  */
 function assertAlive(obj, label, gd, className) {
   if (!obj.ptr) {
-    var message = label + ': object was already destroyed from JavaScript (ptr is 0).';
-    var ctx = obj._destructionContext;
-    if (ctx) {
-      var agoMs = Date.now() - ctx.time;
-      message += '\nDestroyed ' + agoMs + 'ms ago.';
-      if (ctx.stack) {
-        message += '\nDestruction stack:\n' + ctx.stack;
+    let message = `${label}: object was already destroyed from JavaScript (ptr is 0).`;
+    const destructionContext = obj._destructionContext;
+    if (destructionContext) {
+      const agoMs = Date.now() - destructionContext.time;
+      message += `\nDestroyed ${agoMs}ms ago.`;
+      if (destructionContext.stack) {
+        message += `\nDestruction stack:\n${destructionContext.stack}`;
       }
     }
     throw new UseAfterFreeError(message);
@@ -380,19 +380,19 @@ function assertAlive(obj, label, gd, className) {
     className !== null &&
     gd.MemoryTrackedRegistry.isDead(obj.ptr, className)
   ) {
-    var message = label + ': C++ object (' + className + ') was destroyed on C++ side but JavaScript wrapper still exists (ptr is not 0) and was about to be used (this exception was thrown instead).';
-    var ctxId = gd.MemoryTrackedRegistry.getDeadContextId(obj.ptr, className);
-    if (ctxId >= 0) {
-      var ctxLabel = callContextLabels[ctxId] || ('unknown (id=' + ctxId + ')');
-      message += '\nDestroyed by call to: ' + ctxLabel;
+    let message = `${label}: C++ object (${className}) was destroyed on C++ side but JavaScript wrapper still exists (ptr is not 0) and was about to be used (this exception was thrown instead).`;
+    const deadContextId = gd.MemoryTrackedRegistry.getDeadContextId(obj.ptr, className);
+    if (deadContextId >= 0) {
+      const contextLabel = callContextLabels[deadContextId] || (`unknown (id=${deadContextId})`);
+      message += `\nDestroyed by call to: ${contextLabel}`;
     }
-    var ctxTimeMs = gd.MemoryTrackedRegistry.getDeadContextTimeMs(obj.ptr, className);
-    if (ctxTimeMs > 0) {
-      var agoMs = Math.round(Date.now() - ctxTimeMs);
-      message += ' (' + agoMs + 'ms ago)';
+    const deadContextTimeMs = gd.MemoryTrackedRegistry.getDeadContextTimeMs(obj.ptr, className);
+    if (deadContextTimeMs > 0) {
+      const agoMs = Math.round(Date.now() - deadContextTimeMs);
+      message += ` (${agoMs}ms ago)`;
     }
     if (obj._lastSuccessfulCall) {
-      message += '\nLast successful method call on this wrapper: ' + className + '.' + obj._lastSuccessfulCall;
+      message += `\nLast successful method call on this wrapper: ${className}.${obj._lastSuccessfulCall}`;
     }
     throw new UseAfterFreeError(message);
   }
@@ -400,9 +400,10 @@ function assertAlive(obj, label, gd, className) {
 
 /**
  * Patch all WebIDL classes to check for use-after-free before every method call.
- * Also assigns an integer call-context ID to each method and sets it on the C++
- * side before calling into WASM, so that MemoryTrackedRegistry::remove() can
- * capture which JS call triggered each destruction.
+ * Also assigns an integer call-context ID to each method (including delete) and
+ * sets it on the C++ side before calling into WASM, so that
+ * MemoryTrackedRegistry::remove() can capture which JS call triggered each
+ * destruction.
  *
  * @param {object} gd - The Module/gd object (after adaptNamingConventions).
  * @param {{skipped: Set<string>, tracked: Set<string>, verbose: boolean}}
@@ -411,26 +412,28 @@ function patchClassesForUseAfterFreeDetection(
   gd,
   { skippedClassNames, trackedClassNames, verbose }
 ) {
-  var patchedCount = 0;
-  var nextContextId = 0;
-  var setCtxId = gd.MemoryTrackedRegistry.setCurrentCallContextId.bind(
-    gd.MemoryTrackedRegistry
-  );
+  let patchedCount = 0;
+  let nextContextId = 0;
+  const setCurrentCallContextId =
+    gd.MemoryTrackedRegistry.setCurrentCallContextId.bind(
+      gd.MemoryTrackedRegistry
+    );
 
-  for (var gdClass in gd) {
+  for (const gdClass in gd) {
     if (!gd.hasOwnProperty(gdClass)) continue;
     if (typeof gd[gdClass] !== 'function') continue;
     if (!gd[gdClass].prototype) continue;
     if (!gd[gdClass].prototype.hasOwnProperty('__class__')) continue;
     if (skippedClassNames.has(gdClass)) continue;
 
-    var proto = gd[gdClass].prototype;
+    const proto = gd[gdClass].prototype;
 
     // Determine if this class is tracked in C++.
-    var className = trackedClassNames.has(gdClass) ? gdClass : null;
+    const className = trackedClassNames.has(gdClass) ? gdClass : null;
 
-    Object.getOwnPropertyNames(proto).forEach(function (methodName) {
-      // Skip special methods.
+    Object.getOwnPropertyNames(proto).forEach((methodName) => {
+      // Skip internal Emscripten methods (constructor, __destroy__, __class__).
+      // Note: delete is handled separately below.
       if (
         methodName === 'constructor' ||
         methodName === '__destroy__' ||
@@ -439,11 +442,11 @@ function patchClassesForUseAfterFreeDetection(
       )
         return;
 
-      var desc = Object.getOwnPropertyDescriptor(proto, methodName);
+      const desc = Object.getOwnPropertyDescriptor(proto, methodName);
       if (!desc || typeof desc.value !== 'function') return;
 
       // Assign a call-context ID for this (class, method) pair.
-      var contextId = nextContextId++;
+      const contextId = nextContextId++;
       callContextLabels[contextId] = gdClass + '.' + methodName;
 
       // Wrap the method with:
@@ -453,27 +456,42 @@ function patchClassesForUseAfterFreeDetection(
       //    any destruction that occurs during this method.
       // 3. For tracked classes, recording the last successful method name
       //    on the wrapper for richer error messages.
-      proto[methodName] = (function (original, mName, cName, ctxId) {
+      proto[methodName] = (function (original, wrappedMethodName, wrappedClassName, wrappedContextId) {
         return function useAfterFreeDetectionWrapper() {
-          assertAlive(this, cName ? cName + '.' + mName : mName, gd, cName);
-          setCtxId(ctxId);
+          assertAlive(this, wrappedClassName ? wrappedClassName + '.' + wrappedMethodName : wrappedMethodName, gd, wrappedClassName);
+          setCurrentCallContextId(wrappedContextId);
           var result = original.apply(this, arguments);
-          if (cName) {
-            this._lastSuccessfulCall = mName;
+          if (wrappedClassName) {
+            this._lastSuccessfulCall = wrappedMethodName;
           }
           return result;
         };
       })(desc.value, methodName, className, contextId);
     });
 
+    // Wrap delete() to set the call-context ID before calling gd.destroy().
+    // This is critical: when delete() is called on a tracked object, any
+    // child destructions in C++ will be attributed to "ClassName.delete"
+    // rather than being attributed to whatever unrelated call happened
+    // to run before.
+    if (typeof proto.delete === 'function') {
+      const deleteContextId = nextContextId++;
+      callContextLabels[deleteContextId] = gdClass + '.delete';
+      const originalDelete = proto.delete;
+      proto.delete = (function (wrappedOriginalDelete, wrappedDeleteContextId) {
+        return function deleteWithContextId() {
+          setCurrentCallContextId(wrappedDeleteContextId);
+          return wrappedOriginalDelete.apply(this, arguments);
+        };
+      })(originalDelete, deleteContextId);
+    }
+
     patchedCount++;
   }
 
   if (verbose) {
     console.log(
-      '[UseAfterFreeDetection] Patched ' + patchedCount + ' classes (' +
-      trackedClassNames.size + ' tracked in C++, ' +
-      nextContextId + ' call-context IDs assigned).'
+      `[UseAfterFreeDetection] Patched ${patchedCount} classes (${trackedClassNames.size} tracked in C++, ${nextContextId} call-context IDs assigned).`
     );
   }
 }

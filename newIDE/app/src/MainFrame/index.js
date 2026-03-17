@@ -59,7 +59,7 @@ import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainer
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
-import { exceptionallyGuardAgainstNullPtr } from '../Utils/IsNullPtr';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
@@ -614,7 +614,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   // });
 
   const { currentFileMetadata, updateStatus } = state;
-  const currentProject = exceptionallyGuardAgainstNullPtr(state.currentProject);
+  const currentProject = exceptionallyGuardAgainstDeadObject(state.currentProject);
   const {
     renderShareDialog,
     resourceSources,

@@ -13,24 +13,34 @@ export const isNullPtr = (
 ): boolean => gd.getPointer(object) === 0;
 
 /**
- * Guard against use-after-free on C++/WebIDL wrapper objects.
+ * Guard against dead (destroyed) C++/WebIDL wrapper objects.
  *
- * When a C++ object exposed via Emscripten is destroyed (`.delete()`),
- * its JavaScript wrapper remains in memory but with `ptr` set to 0.
- * Any subsequent method call on that wrapper throws a `UseAfterFreeError`.
+ * In theory, a dead object should never be accessed, but this can help
+ * prevent stale references to objects (deleted by JS: ptr will be 0,
+ * or deleted in C++, only for tracked classes).
+ * This is used just to add extra protection and should usually not be useful.
  *
- * In theory, callers should always set their JS reference to `null`
- * before calling `.delete()`, so stale wrappers should never be
- * reachable.  In practice, React 18's batched / concurrent rendering
- * can allow a stale non-null reference to survive into a render that
- * runs after the C++ side has already been torn down.
- *
- * This helper turns such a dangling wrapper back into `null`, so it
- * can be applied at the point where a value is derived from state,
- * protecting every downstream consumer without per-call-site checks.
+ * - If the object is null/undefined, returns null.
+ * - If the object is dead (detected via gd.assertObjectAlive), returns null
+ *   and logs a warning with the exception.
+ * - Otherwise returns the object as-is.
  */
-export const exceptionallyGuardAgainstNullPtr = <T>(obj: ?T): ?T => {
-  // $FlowFixMe[prop-missing] - ptr is an Emscripten internal property present on all WebIDL wrappers.
-  if (obj && obj.ptr === 0) return null;
+export const exceptionallyGuardAgainstDeadObject = <T>(obj: ?T): ?T => {
+  if (!obj) return null;
+
+  const gd: libGDevelop = global.gd;
+  try {
+    // $FlowFixMe[incompatible-call] - obj is a WebIDL wrapper object.
+    if (!gd.assertObjectAlive(obj)) {
+      return null;
+    }
+  } catch (exception) {
+    console.warn(
+      'Detected a dead object being accessed - returning null instead.',
+      exception
+    );
+    return null;
+  }
+
   return obj;
 };

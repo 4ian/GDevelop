@@ -1719,10 +1719,19 @@ export default class SceneEditor extends React.Component<Props, State> {
       }
     });
 
-    // /!\ Clear the selected objects before actually deleting them to prevent
-    // any stale reference in a re-render after deletion.
+    // /!\ Clear the selected objects and the edited object (if it's being
+    // deleted) before actually deleting them to prevent any stale reference
+    // in a re-render after deletion.
+    const { editedObjectWithContext } = this.state;
+    const isEditedObjectDeleted =
+      editedObjectWithContext &&
+      objectsWithContext.some(
+        ({ object }) =>
+          object.ptr === editedObjectWithContext.object.ptr
+      );
     this.setState({
       selectedObjectFolderOrObjectsWithContext: [],
+      ...(isEditedObjectDeleted ? { editedObjectWithContext: null } : undefined),
     });
 
     this.props.onObjectListsModified({ isNewObjectTypeUsed: false });

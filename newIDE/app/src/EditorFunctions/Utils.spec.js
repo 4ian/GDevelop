@@ -1,10 +1,11 @@
 // @flow
 import { fakeAssetShortHeader1 } from '../fixtures/GDevelopServicesTestData';
-import { getObjectSizeAndOriginInfo } from './Utils';
+import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
+import { getObjectSizeInfo } from './Utils';
 
 const gd: libGDevelop = global.gd;
 
-describe('getObjectSizeAndOriginInfo', () => {
+describe('getObjectSizeInfo', () => {
   let project: gdProject;
 
   beforeEach(() => {
@@ -17,7 +18,7 @@ describe('getObjectSizeAndOriginInfo', () => {
   });
 
   describe('Sprite', () => {
-    it('returns origin and center from first frame, and size from the asset short header', () => {
+    it('returns texture dimensions × preScale with origin and center when texture is valid', () => {
       const objects = project.getObjects();
       const object = objects.insertNewObject(
         project,
@@ -29,22 +30,29 @@ describe('getObjectSizeAndOriginInfo', () => {
       const animation = new gd.Animation();
       animation.setDirectionsCount(1);
       const sprite = new gd.Sprite();
+      sprite.setImageName('Frame100x240');
       sprite.getOrigin().setX(10);
       sprite.getOrigin().setY(20);
-      // Leave center as default (isDefaultCenterPoint = true)
+      // Leave center as default (isDefaultCenterPoint = true) → center = texture dimensions / 2
       animation.getDirection(0).addSprite(sprite);
       spriteConfig.getAnimations().addAnimation(animation);
 
       expect(
-        getObjectSizeAndOriginInfo(object, project, fakeAssetShortHeader1)
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
-        size: '36x36',
-        origin: '10;20',
-        center: '18;18', // fakeAssetShortHeader1 is 36x36, so center = 18;18
+        width: 100,
+        height: 240,
+        depth: 0,
+        originX: 10,
+        originY: 20,
+        originZ: 0,
+        centerX: 50,
+        centerY: 120,
+        centerZ: 0,
       });
     });
 
-    it('returns a custom center when the sprite has one set explicitly', () => {
+    it('uses explicit center point when set', () => {
       const objects = project.getObjects();
       const object = objects.insertNewObject(
         project,
@@ -56,8 +64,7 @@ describe('getObjectSizeAndOriginInfo', () => {
       const animation = new gd.Animation();
       animation.setDirectionsCount(1);
       const sprite = new gd.Sprite();
-      sprite.getOrigin().setX(5);
-      sprite.getOrigin().setY(5);
+      sprite.setImageName('Frame100x240');
       sprite.setDefaultCenterPoint(false);
       sprite.getCenter().setX(40);
       sprite.getCenter().setY(80);
@@ -65,37 +72,120 @@ describe('getObjectSizeAndOriginInfo', () => {
       spriteConfig.getAnimations().addAnimation(animation);
 
       expect(
-        getObjectSizeAndOriginInfo(object, project, fakeAssetShortHeader1)
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
-        size: '36x36',
-        origin: '5;5',
-        center: '40;80',
+        width: 100,
+        height: 240,
+        depth: 0,
+        originX: 0,
+        originY: 0,
+        originZ: 0,
+        centerX: 40,
+        centerY: 80,
+        centerZ: 0,
       });
     });
 
-    it('returns "unknown" size and "center of image" when no asset short header is provided', () => {
+    it('applies preScale to texture dimensions and center', () => {
       const objects = project.getObjects();
       const object = objects.insertNewObject(
         project,
         'Sprite',
-        'MySpriteNoHeader',
+        'MyScaledSprite',
+        objects.getObjectsCount()
+      );
+      const spriteConfig = gd.asSpriteConfiguration(object.getConfiguration());
+      spriteConfig.setPreScale(2);
+      const animation = new gd.Animation();
+      animation.setDirectionsCount(1);
+      const sprite = new gd.Sprite();
+      sprite.setImageName('Frame50x120');
+      animation.getDirection(0).addSprite(sprite);
+      spriteConfig.getAnimations().addAnimation(animation);
+
+      expect(
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
+      ).toEqual({
+        width: 100,
+        height: 240,
+        depth: 0,
+        originX: 0,
+        originY: 0,
+        originZ: 0,
+        centerX: 50,
+        centerY: 120,
+        centerZ: 0,
+      });
+    });
+
+    it('returns 0 dimensions when texture is not valid/loaded', () => {
+      const objects = project.getObjects();
+      const object = objects.insertNewObject(
+        project,
+        'Sprite',
+        'MySpriteUnknownTexture',
         objects.getObjectsCount()
       );
       const spriteConfig = gd.asSpriteConfiguration(object.getConfiguration());
       const animation = new gd.Animation();
       animation.setDirectionsCount(1);
       const sprite = new gd.Sprite();
+      sprite.setImageName('UnknownImage');
       animation.getDirection(0).addSprite(sprite);
       spriteConfig.getAnimations().addAnimation(animation);
 
-      expect(getObjectSizeAndOriginInfo(object, project, null)).toEqual({
-        size: 'unknown',
-        origin: '0;0',
-        center: 'center of image',
+      expect(
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
+      ).toEqual({
+        width: 0,
+        height: 0,
+        depth: 0,
+        originX: 0,
+        originY: 0,
+        originZ: 0,
+        centerX: 0,
+        centerY: 0,
+        centerZ: 0,
       });
     });
 
-    it('returns null when the sprite has no animations', () => {
+    it('uses assetShortHeader dimensions when provided (asset store case)', () => {
+      const objects = project.getObjects();
+      const object = objects.insertNewObject(
+        project,
+        'Sprite',
+        'MySpriteFromStore',
+        objects.getObjectsCount()
+      );
+      const spriteConfig = gd.asSpriteConfiguration(object.getConfiguration());
+      const animation = new gd.Animation();
+      animation.setDirectionsCount(1);
+      const sprite = new gd.Sprite();
+      // Image name not in mock loader — but assetShortHeader provides the dimensions
+      sprite.setImageName('UnknownImage');
+      animation.getDirection(0).addSprite(sprite);
+      spriteConfig.getAnimations().addAnimation(animation);
+
+      expect(
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock, {
+          ...fakeAssetShortHeader1,
+          width: 200,
+          height: 300,
+        })
+      ).toEqual({
+        width: 200,
+        height: 300,
+        depth: 0,
+        originX: 0,
+        originY: 0,
+        originZ: 0,
+        centerX: 100,
+        centerY: 150,
+        centerZ: 0,
+      });
+    });
+
+    it('returns 0 dimensions when sprite has no animations', () => {
       const objects = project.getObjects();
       const object = objects.insertNewObject(
         project,
@@ -103,16 +193,25 @@ describe('getObjectSizeAndOriginInfo', () => {
         'MySpriteEmpty',
         objects.getObjectsCount()
       );
-      // No animations added — getAnimationsCount() === 0
 
       expect(
-        getObjectSizeAndOriginInfo(object, project, fakeAssetShortHeader1)
-      ).toBeNull();
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
+      ).toEqual({
+        width: 0,
+        height: 0,
+        depth: 0,
+        originX: 0,
+        originY: 0,
+        originZ: 0,
+        centerX: 0,
+        centerY: 0,
+        centerZ: 0,
+      });
     });
   });
 
   describe('TiledSpriteObject::TiledSprite', () => {
-    it('returns origin 0;0, center at image center, and size from the configuration', () => {
+    it('returns configuration width and height with centered origin', () => {
       const objects = project.getObjects();
       const object = objects.insertNewObject(
         project,
@@ -124,16 +223,24 @@ describe('getObjectSizeAndOriginInfo', () => {
       config.setWidth(200);
       config.setHeight(150);
 
-      expect(getObjectSizeAndOriginInfo(object, project, null)).toEqual({
-        size: '200x150',
-        origin: '0;0',
-        center: '100;75',
+      expect(
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
+      ).toEqual({
+        width: 200,
+        height: 150,
+        depth: 0,
+        originX: 0,
+        originY: 0,
+        originZ: 0,
+        centerX: 100,
+        centerY: 75,
+        centerZ: 0,
       });
     });
   });
 
   describe('PanelSpriteObject::PanelSprite', () => {
-    it('returns origin 0;0, center at image center, and size from the configuration', () => {
+    it('returns configuration width and height with centered origin', () => {
       const objects = project.getObjects();
       const object = objects.insertNewObject(
         project,
@@ -145,17 +252,24 @@ describe('getObjectSizeAndOriginInfo', () => {
       config.setWidth(120);
       config.setHeight(390);
 
-      expect(getObjectSizeAndOriginInfo(object, project, null)).toEqual({
-        size: '120x390',
-        origin: '0;0',
-        center: '60;195',
+      expect(
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
+      ).toEqual({
+        width: 120,
+        height: 390,
+        depth: 0,
+        originX: 0,
+        originY: 0,
+        originZ: 0,
+        centerX: 60,
+        centerY: 195,
+        centerZ: 0,
       });
     });
   });
 
   describe('Events-based (custom) object', () => {
-    it('returns size and center derived from the declared area bounds', () => {
-      // Register a custom object type in the project.
+    it('returns size and origin derived from the declared area bounds', () => {
       const extension = project.insertNewEventsFunctionsExtension('MyExt', 0);
       const eventsBasedObject = extension
         .getEventsBasedObjects()
@@ -173,10 +287,18 @@ describe('getObjectSizeAndOriginInfo', () => {
         objects.getObjectsCount()
       );
 
-      expect(getObjectSizeAndOriginInfo(object, project, null)).toEqual({
-        size: '100x80',
-        origin: '0;0',
-        center: '50;40',
+      expect(
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
+      ).toEqual({
+        width: 100,
+        height: 80,
+        depth: 0,
+        originX: 0,
+        originY: 0,
+        originZ: 0,
+        centerX: 50,
+        centerY: 40,
+        centerZ: 0,
       });
     });
 
@@ -198,10 +320,16 @@ describe('getObjectSizeAndOriginInfo', () => {
         objects.getObjectsCount()
       );
 
-      expect(getObjectSizeAndOriginInfo(object, project, null)).toEqual({
-        size: '100x60',
-        origin: '10;20',
-        center: '50;30',
+      expect(getObjectSizeInfo(object, project, null)).toEqual({
+        width: 100,
+        height: 60,
+        depth: 0,
+        originX: 10,
+        originY: 20,
+        originZ: 0,
+        centerX: 50,
+        centerY: 30,
+        centerZ: 0,
       });
     });
 
@@ -213,13 +341,11 @@ describe('getObjectSizeAndOriginInfo', () => {
       const eventsBasedObject = extension
         .getEventsBasedObjects()
         .insertNew('MyVariantObject', 0);
-      // Set default variant bounds.
       eventsBasedObject.setAreaMinX(0);
       eventsBasedObject.setAreaMaxX(100);
       eventsBasedObject.setAreaMinY(0);
       eventsBasedObject.setAreaMaxY(80);
 
-      // Add a named variant with different bounds.
       const variant = eventsBasedObject
         .getVariants()
         .insertNewVariant('Small', 0);
@@ -235,20 +361,27 @@ describe('getObjectSizeAndOriginInfo', () => {
         'MyVariantObjectInstance',
         objects.getObjectsCount()
       );
-      const customObjectConfiguration = gd.asCustomObjectConfiguration(
-        object.getConfiguration()
+      gd.asCustomObjectConfiguration(object.getConfiguration()).setVariantName(
+        'Small'
       );
-      customObjectConfiguration.setVariantName('Small');
 
-      expect(getObjectSizeAndOriginInfo(object, project, null)).toEqual({
-        size: '50x40',
-        origin: '5;10',
-        center: '25;20',
+      expect(
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
+      ).toEqual({
+        width: 50,
+        height: 40,
+        depth: 0,
+        originX: 5,
+        originY: 10,
+        originZ: 0,
+        centerX: 25,
+        centerY: 20,
+        centerZ: 0,
       });
     });
 
-    it('handles 3D events-based objects with Z bounds included in size/origin/center', () => {
-      const extension = project.insertNewEventsFunctionsExtension('MyExt3', 0);
+    it('includes depth and 3D origin for 3D events-based objects', () => {
+      const extension = project.insertNewEventsFunctionsExtension('MyExt3D', 0);
       const eventsBasedObject = extension
         .getEventsBasedObjects()
         .insertNew('My3DObject', 0);
@@ -263,21 +396,29 @@ describe('getObjectSizeAndOriginInfo', () => {
       const objects = project.getObjects();
       const object = objects.insertNewObject(
         project,
-        'MyExt3::My3DObject',
+        'MyExt3D::My3DObject',
         'My3DObjectInstance',
         objects.getObjectsCount()
       );
 
-      expect(getObjectSizeAndOriginInfo(object, project, null)).toEqual({
-        size: '100x60x30',
-        origin: '10;20;5',
-        center: '50;30;15',
+      expect(
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
+      ).toEqual({
+        width: 100,
+        height: 60,
+        depth: 30,
+        originX: 10,
+        originY: 20,
+        originZ: 5,
+        centerX: 50,
+        centerY: 30,
+        centerZ: 15,
       });
     });
   });
 
   describe('Unsupported object type', () => {
-    it('returns null for object types with no static size info', () => {
+    it('returns 0 dimensions for unknown types', () => {
       const objects = project.getObjects();
       const object = objects.insertNewObject(
         project,
@@ -286,7 +427,19 @@ describe('getObjectSizeAndOriginInfo', () => {
         objects.getObjectsCount()
       );
 
-      expect(getObjectSizeAndOriginInfo(object, project, null)).toBeNull();
+      expect(
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
+      ).toEqual({
+        width: 0,
+        height: 0,
+        depth: 0,
+        originX: 0,
+        originY: 0,
+        originZ: 0,
+        centerX: 0,
+        centerY: 0,
+        centerZ: 0,
+      });
     });
   });
 });

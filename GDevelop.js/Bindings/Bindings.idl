@@ -4428,4 +4428,7 @@ interface MemoryTrackedRegistry {
     void STATIC_pruneDead(long maxSize);
     long STATIC_getAliveCountForClass(DOMString className);
     long STATIC_getDeadCountForClass(DOMString className);
+    void STATIC_setCurrentCallContextId(long id);
+    long STATIC_getDeadContextId(long ptr, DOMString className);
+    double STATIC_getDeadContextTimeMs(long ptr, DOMString className);
 };

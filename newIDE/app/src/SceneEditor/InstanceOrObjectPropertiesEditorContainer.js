@@ -16,6 +16,7 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { CompactLayerPropertiesEditor } from '../LayersList/CompactLayerPropertiesEditor';
 import { CompactEventsBasedObjectVariantPropertiesEditor } from '../SceneEditor/CompactEventsBasedObjectVariantPropertiesEditor';
 import Rectangle from '../Utils/Rectangle';
+import { exceptionallyGuardAgainstNullPtr } from '../Utils/IsNullPtr';
 
 export const styles = {
   paper: {
@@ -158,11 +159,16 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
       globalObjectsContainer,
     } = props;
 
+    // Guard against stale C++ references that can survive into a render
+    // due to React 18's batched rendering (UseAfterFreeError).
+    const validInstances = instances.filter(exceptionallyGuardAgainstNullPtr);
+    const validLayer = exceptionallyGuardAgainstNullPtr(layer);
+
     return (
       <Paper background="dark" square style={styles.paper}>
-        {!!instances.length && lastSelectionType === 'instance' ? (
+        {!!validInstances.length && lastSelectionType === 'instance' ? (
           <CompactInstancePropertiesEditor
-            instances={instances}
+            instances={validInstances}
             editObjectInPropertiesPanel={editObjectInPropertiesPanel}
             onInstancesModified={onInstancesModified}
             onGetInstanceSize={onGetInstanceSize}
@@ -208,9 +214,9 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             unsavedChanges={unsavedChanges}
             i18n={i18n}
           />
-        ) : layer && lastSelectionType === 'layer' ? (
+        ) : validLayer && lastSelectionType === 'layer' ? (
           <CompactLayerPropertiesEditor
-            layer={layer}
+            layer={validLayer}
             onEditLayer={onEditLayer}
             onEditLayerEffects={onEditLayerEffects}
             onLayersModified={onLayersModified}

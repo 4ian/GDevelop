@@ -350,9 +350,12 @@ Module.UseAfterFreeError = UseAfterFreeError;
  * Maps integer call-context IDs to human-readable labels like
  * "Project.removeLayout". Built during patchClassesForUseAfterFreeDetection,
  * read at error time (cold path only).
+ *
+ * ID 0 is reserved for "no context set" — it is the default value when no
+ * wrapped JS method is currently executing (reset after each call returns).
  * @type {string[]}
  */
-const callContextLabels = [];
+const callContextLabels = ['<no context set>'];
 
 /**
  * Check that an Emscripten WebIDL object is still alive.
@@ -388,7 +391,8 @@ function assertAlive(obj, label, gd, className) {
     }
     const deadContextTimeMs = gd.MemoryTrackedRegistry.getDeadContextTimeMs(obj.ptr, className);
     if (deadContextTimeMs > 0) {
-      const agoMs = Math.round(Date.now() - deadContextTimeMs);
+      // The C++ side uses emscripten_get_now() which maps to performance.now().
+      const agoMs = Math.round(performance.now() - deadContextTimeMs);
       message += ` (${agoMs}ms ago)`;
     }
     if (obj._lastSuccessfulCall) {
@@ -413,7 +417,8 @@ function patchClassesForUseAfterFreeDetection(
   { skippedClassNames, trackedClassNames, verbose }
 ) {
   let patchedCount = 0;
-  let nextContextId = 0;
+  // Start at 1 because ID 0 is reserved for "<no context set>".
+  let nextContextId = 1;
   const setCurrentCallContextId =
     gd.MemoryTrackedRegistry.setCurrentCallContextId.bind(
       gd.MemoryTrackedRegistry
@@ -461,6 +466,7 @@ function patchClassesForUseAfterFreeDetection(
           assertAlive(this, wrappedClassName ? wrappedClassName + '.' + wrappedMethodName : wrappedMethodName, gd, wrappedClassName);
           setCurrentCallContextId(wrappedContextId);
           var result = original.apply(this, arguments);
+          setCurrentCallContextId(0);
           if (wrappedClassName) {
             this._lastSuccessfulCall = wrappedMethodName;
           }
@@ -481,7 +487,9 @@ function patchClassesForUseAfterFreeDetection(
       proto.delete = (function (wrappedOriginalDelete, wrappedDeleteContextId) {
         return function deleteWithContextId() {
           setCurrentCallContextId(wrappedDeleteContextId);
-          return wrappedOriginalDelete.apply(this, arguments);
+          var result = wrappedOriginalDelete.apply(this, arguments);
+          setCurrentCallContextId(0);
+          return result;
         };
       })(originalDelete, deleteContextId);
     }

@@ -153,7 +153,10 @@ class MemoryTrackedRegistry {
     size_t count = 0;  // total pushes; head = count % kRingCapacity
 
     void push(const void* p, int contextId, double timestamp) {
-      entries[count % kRingCapacity] = {p, contextId, timestamp};
+      DestructionContext& entry = entries[count % kRingCapacity];
+      entry.ptr = p;
+      entry.callContextId = contextId;
+      entry.timestampMs = timestamp;
       count++;
     }
 
@@ -188,17 +191,16 @@ class MemoryTrackedRegistry {
   }
 
   static int& currentCallContextId_() {
-    static int id = -1;
+    static int id = 0;
     return id;
   }
 
-  /** Wall-clock milliseconds (matches Date.now() in JS). */
+  /** High-resolution milliseconds for timestamping destructions.
+   *  Under Emscripten, uses emscripten_get_now() (equivalent to
+   *  performance.now() in JS). Otherwise falls back to std::chrono. */
   static double nowMs() {
 #ifdef __EMSCRIPTEN__
-    // emscripten_date_now() is the C equivalent of Date.now(), returning
-    // milliseconds since Unix epoch as a double. This avoids pulling in
-    // <chrono> and ensures the timestamp is directly comparable to JS.
-    return emscripten_date_now();
+    return emscripten_get_now();
 #else
     return static_cast<double>(
         std::chrono::duration_cast<std::chrono::milliseconds>(

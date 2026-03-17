@@ -1010,9 +1010,6 @@ export default class SceneEditor extends React.Component<Props, State> {
           this.props.initialInstances,
           this.props.project
         ),
-        // Clear selectedLayer to avoid stale C++ references after undo
-        // rebuilds the layout (UseAfterFreeError).
-        selectedLayer: null,
       },
       () => {
         // /!\ Force the instances editor to destroy and mount again the
@@ -1036,9 +1033,6 @@ export default class SceneEditor extends React.Component<Props, State> {
           this.props.initialInstances,
           this.props.project
         ),
-        // Clear selectedLayer to avoid stale C++ references after redo
-        // rebuilds the layout (UseAfterFreeError).
-        selectedLayer: null,
       },
       () => {
         // /!\ Force the instances editor to destroy and mount again the
@@ -1531,9 +1525,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       if (doRemove && layerName === this.state.chosenLayer) {
         newState.chosenLayer = BASE_LAYER_NAME;
       }
-      // Clear selectedLayer to avoid rendering a stale C++ layer reference
-      // after the layer is deleted, which would cause a UseAfterFreeError
-      // (e.g. EffectsContainer.getEffectsCount on a deleted layer).
       if (
         doRemove &&
         this.state.selectedLayer &&

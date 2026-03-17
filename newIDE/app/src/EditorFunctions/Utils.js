@@ -113,7 +113,7 @@ export const getObjectSizeAndOriginInfo = (
   return null;
 };
 
-export type ObjectDefaultSize = {|
+export type ObjectSizeInfo = {|
   width: number,
   height: number,
   depth: number,
@@ -132,12 +132,12 @@ export type ObjectDefaultSize = {|
  * where the texture may not yet be loaded in PixiResourcesLoader.
  * Always returns a value — falls back to 32x32x0 for unknown/unsupported types.
  */
-export const getObjectDefaultSize = (
+export const getObjectSizeInfo = (
   object: gdObject,
   project: gdProject,
   pixiResourcesLoader: any,
   assetShortHeader?: AssetShortHeader | null
-): ObjectDefaultSize => {
+): ObjectSizeInfo => {
   const objectConfiguration = object.getConfiguration();
   const objectType = object.getType();
 

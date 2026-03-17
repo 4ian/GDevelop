@@ -1,7 +1,7 @@
 // @flow
 import { fakeAssetShortHeader1 } from '../fixtures/GDevelopServicesTestData';
 import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
-import { getObjectSizeAndOriginInfo, getObjectDefaultSize } from './Utils';
+import { getObjectSizeAndOriginInfo, getObjectSizeInfo } from './Utils';
 
 const gd: libGDevelop = global.gd;
 
@@ -292,7 +292,7 @@ describe('getObjectSizeAndOriginInfo', () => {
   });
 });
 
-describe('getObjectDefaultSize', () => {
+describe('getObjectSizeInfo', () => {
   let project: gdProject;
 
   beforeEach(() => {
@@ -325,7 +325,7 @@ describe('getObjectDefaultSize', () => {
       spriteConfig.getAnimations().addAnimation(animation);
 
       expect(
-        getObjectDefaultSize(object, project, PixiResourcesLoaderMock)
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
         width: 100,
         height: 240,
@@ -359,7 +359,7 @@ describe('getObjectDefaultSize', () => {
       spriteConfig.getAnimations().addAnimation(animation);
 
       expect(
-        getObjectDefaultSize(object, project, PixiResourcesLoaderMock)
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
         width: 100,
         height: 240,
@@ -391,7 +391,7 @@ describe('getObjectDefaultSize', () => {
       spriteConfig.getAnimations().addAnimation(animation);
 
       expect(
-        getObjectDefaultSize(object, project, PixiResourcesLoaderMock)
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
         width: 100,
         height: 240,
@@ -422,7 +422,7 @@ describe('getObjectDefaultSize', () => {
       spriteConfig.getAnimations().addAnimation(animation);
 
       expect(
-        getObjectDefaultSize(object, project, PixiResourcesLoaderMock)
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
         width: 32,
         height: 32,
@@ -454,7 +454,7 @@ describe('getObjectDefaultSize', () => {
       spriteConfig.getAnimations().addAnimation(animation);
 
       expect(
-        getObjectDefaultSize(object, project, PixiResourcesLoaderMock, {
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock, {
           ...fakeAssetShortHeader1,
           width: 200,
           height: 300,
@@ -482,7 +482,7 @@ describe('getObjectDefaultSize', () => {
       );
 
       expect(
-        getObjectDefaultSize(object, project, PixiResourcesLoaderMock)
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
         width: 32,
         height: 32,
@@ -511,7 +511,7 @@ describe('getObjectDefaultSize', () => {
       config.setHeight(150);
 
       expect(
-        getObjectDefaultSize(object, project, PixiResourcesLoaderMock)
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
         width: 200,
         height: 150,
@@ -540,7 +540,7 @@ describe('getObjectDefaultSize', () => {
       config.setHeight(390);
 
       expect(
-        getObjectDefaultSize(object, project, PixiResourcesLoaderMock)
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
         width: 120,
         height: 390,
@@ -575,7 +575,7 @@ describe('getObjectDefaultSize', () => {
       );
 
       expect(
-        getObjectDefaultSize(object, project, PixiResourcesLoaderMock)
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
         width: 100,
         height: 80,
@@ -611,7 +611,7 @@ describe('getObjectDefaultSize', () => {
       );
 
       expect(
-        getObjectDefaultSize(object, project, PixiResourcesLoaderMock)
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
         width: 100,
         height: 60,
@@ -637,7 +637,7 @@ describe('getObjectDefaultSize', () => {
       );
 
       expect(
-        getObjectDefaultSize(object, project, PixiResourcesLoaderMock)
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
         width: 32,
         height: 32,

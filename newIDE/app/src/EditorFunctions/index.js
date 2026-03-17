@@ -39,7 +39,7 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
-import { getObjectDefaultSize, type ObjectDefaultSize } from './Utils';
+import { getObjectSizeInfo, type ObjectSizeInfo } from './Utils';
 
 const gd: libGDevelop = global.gd;
 
@@ -123,7 +123,7 @@ export type EditorFunctionGenericOutput = {|
   newlyAddedResources?: Array<SingleResourceSearchAndInstallResult>,
 
   // Default size, origin and center of the object(s) being operated on, keyed by object name:
-  defaultObjectSize?: { [string]: ObjectDefaultSize },
+  objectSizeInfo?: { [string]: ObjectSizeInfo },
 
   // Set to true when the function call was aborted mid-execution (e.g. the AI
   // request was suspended while event generation was still polling).
@@ -844,8 +844,8 @@ const createOrReplaceObject: EditorFunction = {
                 `Created (from the asset store) object "${object.getName()}" of type "${object.getType()}" in scene "${scene_name}".`,
                 getPropertiesText(object),
               ].join(' '),
-              defaultObjectSize: {
-                [object.getName()]: getObjectDefaultSize(
+              objectSizeInfo: {
+                [object.getName()]: getObjectSizeInfo(
                   object,
                   project,
                   PixiResourcesLoader,
@@ -927,8 +927,8 @@ const createOrReplaceObject: EditorFunction = {
           getPropertiesText(object),
         ].join(' '),
       };
-      scratchResult.defaultObjectSize = {
-        [targetObjectName]: getObjectDefaultSize(
+      scratchResult.objectSizeInfo = {
+        [targetObjectName]: getObjectSizeInfo(
           object,
           project,
           PixiResourcesLoader
@@ -1278,12 +1278,8 @@ const inspectObjectProperties: EditorFunction = {
       objectPropertiesDeduplicationKey: [scene_name, object_name]
         .filter(Boolean)
         .join('-'),
-      defaultObjectSize: {
-        [object_name]: getObjectDefaultSize(
-          object,
-          project,
-          PixiResourcesLoader
-        ),
+      objectSizeInfo: {
+        [object_name]: getObjectSizeInfo(object, project, PixiResourcesLoader),
       },
     };
     if (animationNames.length > 0) {
@@ -2359,7 +2355,7 @@ const describeInstances: EditorFunction = {
           }
 
           const defaultSize = object
-            ? getObjectDefaultSize(object, project, PixiResourcesLoader)
+            ? getObjectSizeInfo(object, project, PixiResourcesLoader)
             : { width: 32, height: 32, depth: 0 };
 
           const width = instance.hasCustomSize()
@@ -2579,8 +2575,8 @@ const put2dInstances: EditorFunction = {
         namedObject = globalObjects.getObject(object_name);
       }
     }
-    const defaultObjectSize = namedObject
-      ? getObjectDefaultSize(namedObject, project, PixiResourcesLoader)
+    const objectSizeInfo = namedObject
+      ? getObjectSizeInfo(namedObject, project, PixiResourcesLoader)
       : null;
 
     // Check if layer exists (empty string is allowed for base layer)
@@ -2667,8 +2663,8 @@ const put2dInstances: EditorFunction = {
           .filter(Boolean)
           .join(' '),
       };
-      if (object_name && defaultObjectSize)
-        eraseResult.defaultObjectSize = { [object_name]: defaultObjectSize };
+      if (object_name && objectSizeInfo)
+        eraseResult.objectSizeInfo = { [object_name]: objectSizeInfo };
       return eraseResult;
     } else {
       const brushPosition: Array<number> = brush_position
@@ -2989,8 +2985,8 @@ const put2dInstances: EditorFunction = {
         success: true,
         message: changes.join(' '),
       };
-      if (object_name && defaultObjectSize)
-        put2dResult.defaultObjectSize = { [object_name]: defaultObjectSize };
+      if (object_name && objectSizeInfo)
+        put2dResult.objectSizeInfo = { [object_name]: objectSizeInfo };
       return put2dResult;
     }
   },
@@ -3148,8 +3144,8 @@ const put3dInstances: EditorFunction = {
         namedObject = globalObjects.getObject(object_name);
       }
     }
-    const defaultObjectSize = namedObject
-      ? getObjectDefaultSize(namedObject, project, PixiResourcesLoader)
+    const objectSizeInfo = namedObject
+      ? getObjectSizeInfo(namedObject, project, PixiResourcesLoader)
       : null;
 
     // Check if layer exists (empty string is allowed for base layer)
@@ -3238,8 +3234,8 @@ const put3dInstances: EditorFunction = {
           .filter(Boolean)
           .join(' '),
       };
-      if (object_name && defaultObjectSize)
-        eraseResult.defaultObjectSize = { [object_name]: defaultObjectSize };
+      if (object_name && objectSizeInfo)
+        eraseResult.objectSizeInfo = { [object_name]: objectSizeInfo };
       return eraseResult;
     } else {
       const brushPosition: Array<number> = brush_position
@@ -3515,8 +3511,8 @@ const put3dInstances: EditorFunction = {
         success: true,
         message: changes.join(' '),
       };
-      if (object_name && defaultObjectSize)
-        put3dResult.defaultObjectSize = { [object_name]: defaultObjectSize };
+      if (object_name && objectSizeInfo)
+        put3dResult.objectSizeInfo = { [object_name]: objectSizeInfo };
       return put3dResult;
     }
   },

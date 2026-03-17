@@ -686,12 +686,10 @@ export default class InstancesEditor extends Component<Props, State> {
       const width = nextProps.width || 1;
       const height = nextProps.height || 1;
 
-      // When PixiJS and Three.js share the same WebGL context, Three.js may
-      // have left its shader programs bound. PixiJS's resize triggers internal
-      // shader uniform syncing (FilterSystem.bind → ShaderSystem.syncUniforms),
-      // which will crash if Three.js's stale program is still active.
-      // Reset both renderers' state before resizing, mirroring what the render
-      // loop does before each frame (see InstancesRenderer.render).
+      // Mirror what the render loop does before each frame (see InstancesRenderer.render),
+      // to ensure the WebGL state is clean and avoid crashes when resizing renderers
+      // (PixiJS's resize triggers internal shader uniform syncing,
+      // which will crash if Three.js's stale program is still active).
       if (this.threeRenderer) {
         this.threeRenderer.resetState();
         this.pixiRenderer.reset();

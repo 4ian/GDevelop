@@ -22,6 +22,21 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
       expect(() => vec.size()).toThrow(gd.UseAfterFreeError);
     });
+
+    it('includes destruction context in the error after delete()', function () {
+      const vec = new gd.VectorString();
+      vec.push_back('hello');
+      vec.delete();
+
+      try {
+        vec.size();
+        fail('Expected UseAfterFreeError');
+      } catch (e) {
+        expect(e).toBeInstanceOf(gd.UseAfterFreeError);
+        expect(e.message).toContain('Destruction stack:');
+        expect(e.message).toContain('ms ago');
+      }
+    });
   });
 
   describe('Tracked class (Layout) - JS deletion', function () {
@@ -39,6 +54,24 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
       expect(() => layout.getName()).toThrow(gd.UseAfterFreeError);
     });
+
+    it('includes destruction stack and timing in the error for JS deletion', function () {
+      const layout = new gd.Layout();
+      layout.setName('TestScene');
+      layout.delete();
+
+      try {
+        layout.getName();
+        fail('Expected UseAfterFreeError');
+      } catch (e) {
+        expect(e).toBeInstanceOf(gd.UseAfterFreeError);
+        expect(e.message).toContain('destroyed from JavaScript');
+        expect(e.message).toContain('Destroyed');
+        expect(e.message).toContain('ms ago');
+        expect(e.message).toContain('Destruction stack:');
+        expect(e.message).toContain('Object destroyed here');
+      }
+    });
   });
 
   describe('Tracked class (Layout) - C++ deletion', function () {
@@ -55,6 +88,32 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
       // The JS wrapper still has a non-zero ptr, but the object is dead.
       expect(() => layout.getName()).toThrow(gd.UseAfterFreeError);
+
+      project.delete();
+    });
+
+    it('includes last successful call in the error for C++ deletion', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('MyScene', 0);
+
+      const layout = project.getLayout('MyScene');
+      // Call a method so _lastSuccessfulCall is set.
+      layout.setName('RenamedScene');
+      expect(layout.getName()).toBe('RenamedScene');
+
+      // C++ deletes the layout.
+      project.removeLayout('RenamedScene');
+
+      try {
+        layout.getName();
+        fail('Expected UseAfterFreeError');
+      } catch (e) {
+        expect(e).toBeInstanceOf(gd.UseAfterFreeError);
+        expect(e.message).toContain('destroyed on C++ side');
+        expect(e.message).toContain('Last successful method call on this wrapper');
+        // The last successful call was getName (from the expect above).
+        expect(e.message).toContain('Layout.getName');
+      }
 
       project.delete();
     });

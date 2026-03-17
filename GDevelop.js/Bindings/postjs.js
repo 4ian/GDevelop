@@ -68,6 +68,14 @@ var adaptNamingConventions = function (gd) {
 
     //Offer a delete method that does what gd.destroy does.
     proto.delete = function () {
+      // Capture destruction context before the pointer is invalidated.
+      // This is only done once per deletion, so the cost of capturing a
+      // stack trace is negligible.
+      this._destructionContext = {
+        source: 'js',
+        stack: new Error('Object destroyed here').stack,
+        time: Date.now(),
+      };
       gd.destroy(this);
       this.ptr = 0;
     };
@@ -349,17 +357,26 @@ Module.UseAfterFreeError = UseAfterFreeError;
  */
 function assertAlive(obj, label, gd, className) {
   if (!obj.ptr) {
-    throw new UseAfterFreeError(
-      `${label}: object was already destroyed from JavaScript (ptr is 0).`
-    );
+    let message = `${label}: object was already destroyed from JavaScript (ptr is 0).`;
+    const ctx = obj._destructionContext;
+    if (ctx) {
+      const agoMs = Date.now() - ctx.time;
+      message += `\nDestroyed ${agoMs}ms ago.`;
+      if (ctx.stack) {
+        message += `\nDestruction stack:\n${ctx.stack}`;
+      }
+    }
+    throw new UseAfterFreeError(message);
   }
   if (
     className !== null &&
     gd.MemoryTrackedRegistry.isDead(obj.ptr, className)
   ) {
-    throw new UseAfterFreeError(
-      `${label}: C++ object (${className}) was destroyed on C++ side but JavaScript wrapper still exists (ptr is not 0) and was about to be used (this exception was thrown instead).`
-    );
+    let message = `${label}: C++ object (${className}) was destroyed on C++ side but JavaScript wrapper still exists (ptr is not 0) and was about to be used (this exception was thrown instead).`;
+    if (obj._lastSuccessfulCall) {
+      message += `\nLast successful method call on this wrapper: ${className}.${obj._lastSuccessfulCall}`;
+    }
+    throw new UseAfterFreeError(message);
   }
 }
 
@@ -401,10 +418,17 @@ function patchClassesForUseAfterFreeDetection(
       if (!desc || typeof desc.value !== 'function') return;
 
       // Wrap the method with a liveness check.
+      // For tracked classes (cName !== null), also record the last method
+      // that succeeded so we can include it in C++ use-after-free errors.
+      // This is a single property assignment per call — negligible overhead.
       proto[methodName] = (function (original, mName, cName) {
         return function useAfterFreeDetectionWrapper() {
           assertAlive(this, cName ? cName + '.' + mName : mName, gd, cName);
-          return original.apply(this, arguments);
+          var result = original.apply(this, arguments);
+          if (cName) {
+            this._lastSuccessfulCall = mName;
+          }
+          return result;
         };
       })(desc.value, methodName, className);
     });

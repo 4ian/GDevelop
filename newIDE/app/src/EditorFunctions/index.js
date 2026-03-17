@@ -39,7 +39,7 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
-import { getObjectSizeAndOriginInfo } from './Utils';
+import { getObjectSizeInfo, type ObjectSizeInfo } from './Utils';
 
 const gd: libGDevelop = global.gd;
 
@@ -122,10 +122,8 @@ export type EditorFunctionGenericOutput = {|
   // Used when new resources are added by a function call:
   newlyAddedResources?: Array<SingleResourceSearchAndInstallResult>,
 
-  // Size/origin/center info for newly created objects, keyed by object name:
-  newObjectDefaultSize?: {
-    [string]: {| size: string, origin: string, center: string |},
-  },
+  // Default size, origin and center of the object(s) being operated on, keyed by object name:
+  objectSizeInfo?: { [string]: ObjectSizeInfo },
 
   // Set to true when the function call was aborted mid-execution (e.g. the AI
   // request was suspended while event generation was still polling).
@@ -840,23 +838,21 @@ const createOrReplaceObject: EditorFunction = {
 
           if (createdObjects.length === 1) {
             const object = createdObjects[0];
-            const sizeAndOriginInfo = getObjectSizeAndOriginInfo(
-              object,
-              project,
-              assetShortHeader
-            );
             const result: EditorFunctionGenericOutput = {
               success: true,
               message: [
                 `Created (from the asset store) object "${object.getName()}" of type "${object.getType()}" in scene "${scene_name}".`,
                 getPropertiesText(object),
               ].join(' '),
+              objectSizeInfo: {
+                [object.getName()]: getObjectSizeInfo(
+                  object,
+                  project,
+                  PixiResourcesLoader,
+                  assetShortHeader
+                ),
+              },
             };
-            if (sizeAndOriginInfo) {
-              result.newObjectDefaultSize = {
-                [object.getName()]: sizeAndOriginInfo,
-              };
-            }
             return result;
           }
 
@@ -924,24 +920,21 @@ const createOrReplaceObject: EditorFunction = {
         isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
       });
 
-      const sizeAndOriginInfo = getObjectSizeAndOriginInfo(
-        object,
-        project,
-        null
-      );
-      const result: EditorFunctionGenericOutput = {
+      const scratchResult: EditorFunctionGenericOutput = {
         success: true,
         message: [
           `Created a new object (from scratch) called "${targetObjectName}" of type "${object_type}" in scene "${scene_name}".`,
           getPropertiesText(object),
         ].join(' '),
       };
-      if (sizeAndOriginInfo) {
-        result.newObjectDefaultSize = {
-          [targetObjectName]: sizeAndOriginInfo,
-        };
-      }
-      return result;
+      scratchResult.objectSizeInfo = {
+        [targetObjectName]: getObjectSizeInfo(
+          object,
+          project,
+          PixiResourcesLoader
+        ),
+      };
+      return scratchResult;
     };
 
     const replaceExistingObject = async () => {
@@ -1212,7 +1205,7 @@ const inspectObjectProperties: EditorFunction = {
       ),
     };
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({ project, args, PixiResourcesLoader }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
 
@@ -1285,6 +1278,9 @@ const inspectObjectProperties: EditorFunction = {
       objectPropertiesDeduplicationKey: [scene_name, object_name]
         .filter(Boolean)
         .join('-'),
+      objectSizeInfo: {
+        [object_name]: getObjectSizeInfo(object, project, PixiResourcesLoader),
+      },
     };
     if (animationNames.length > 0) {
       output.animationNames = animationNames.join(', ');
@@ -2313,7 +2309,7 @@ const describeInstances: EditorFunction = {
       ),
     };
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({ project, args, PixiResourcesLoader }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const filter_by_object_name =
       SafeExtractor.extractStringProperty(args, 'filter_by_object_name') || '';
@@ -2330,6 +2326,8 @@ const describeInstances: EditorFunction = {
     }
 
     const layout = project.getLayout(scene_name);
+    const layoutObjects = layout.getObjects();
+    const globalObjects = project.getObjects();
     const initialInstances = layout.getInitialInstances();
 
     const instances = [];
@@ -2348,12 +2346,38 @@ const describeInstances: EditorFunction = {
             return;
           }
 
+          const objectName = instance.getObjectName();
+          let object = null;
+          if (layoutObjects.hasObjectNamed(objectName)) {
+            object = layoutObjects.getObject(objectName);
+          } else if (globalObjects.hasObjectNamed(objectName)) {
+            object = globalObjects.getObject(objectName);
+          }
+
+          const defaultSize = object
+            ? getObjectSizeInfo(object, project, PixiResourcesLoader)
+            : { width: 0, height: 0, depth: 0 };
+
+          const width = instance.hasCustomSize()
+            ? instance.getCustomWidth()
+            : defaultSize.width;
+          const height = instance.hasCustomSize()
+            ? instance.getCustomHeight()
+            : defaultSize.height;
+          const depth = instance.hasCustomDepth()
+            ? instance.getCustomDepth()
+            : defaultSize.depth;
+
           const serializedInstance = serializeToJSObject(instance);
           instances.push({
             ...serializedInstance,
             // Replace persistentUuid by id:
             persistentUuid: undefined,
             id: instance.getPersistentUuid().slice(0, 10),
+            // Actual computed dimensions (accounting for default size when no custom size is set):
+            width,
+            height,
+            depth,
             // For now, don't expose these:
             initialVariables: undefined,
             numberProperties: undefined,
@@ -2500,6 +2524,7 @@ const put2dInstances: EditorFunction = {
     project,
     args,
     onInstancesModifiedOutsideEditor,
+    PixiResourcesLoader,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = SafeExtractor.extractStringProperty(
@@ -2540,6 +2565,19 @@ const put2dInstances: EditorFunction = {
 
     const layout = project.getLayout(scene_name);
     const objectsContainer = layout.getObjects();
+    const globalObjects = project.getObjects();
+
+    let namedObject: gdObject | null = null;
+    if (object_name) {
+      if (objectsContainer.hasObjectNamed(object_name)) {
+        namedObject = objectsContainer.getObject(object_name);
+      } else if (globalObjects.hasObjectNamed(object_name)) {
+        namedObject = globalObjects.getObject(object_name);
+      }
+    }
+    const objectSizeInfo = namedObject
+      ? getObjectSizeInfo(namedObject, project, PixiResourcesLoader)
+      : null;
 
     // Check if layer exists (empty string is allowed for base layer)
     if (layer_name !== '' && !layout.hasLayerNamed(layer_name)) {
@@ -2609,8 +2647,9 @@ const put2dInstances: EditorFunction = {
       onInstancesModifiedOutsideEditor({
         scene: layout,
       });
-      return makeGenericSuccess(
-        [
+      const eraseResult: EditorFunctionGenericOutput = {
+        success: true,
+        message: [
           `Erased ${instancesToDelete.size} instance${
             instancesToDelete.size > 1 ? 's' : ''
           }.`,
@@ -2622,8 +2661,11 @@ const put2dInstances: EditorFunction = {
             : '',
         ]
           .filter(Boolean)
-          .join(' ')
-      );
+          .join(' '),
+      };
+      if (object_name && objectSizeInfo)
+        eraseResult.objectSizeInfo = { [object_name]: objectSizeInfo };
+      return eraseResult;
     } else {
       const brushPosition: Array<number> = brush_position
         ? brush_position.split(',').map(Number)
@@ -2939,7 +2981,13 @@ const put2dInstances: EditorFunction = {
       onInstancesModifiedOutsideEditor({
         scene: layout,
       });
-      return makeGenericSuccess(changes.join(' '));
+      const put2dResult: EditorFunctionGenericOutput = {
+        success: true,
+        message: changes.join(' '),
+      };
+      if (object_name && objectSizeInfo)
+        put2dResult.objectSizeInfo = { [object_name]: objectSizeInfo };
+      return put2dResult;
     }
   },
 };
@@ -3045,6 +3093,7 @@ const put3dInstances: EditorFunction = {
     project,
     args,
     onInstancesModifiedOutsideEditor,
+    PixiResourcesLoader,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = SafeExtractor.extractStringProperty(
@@ -3085,6 +3134,19 @@ const put3dInstances: EditorFunction = {
 
     const layout = project.getLayout(scene_name);
     const objectsContainer = layout.getObjects();
+    const globalObjects = project.getObjects();
+
+    let namedObject: gdObject | null = null;
+    if (object_name) {
+      if (objectsContainer.hasObjectNamed(object_name)) {
+        namedObject = objectsContainer.getObject(object_name);
+      } else if (globalObjects.hasObjectNamed(object_name)) {
+        namedObject = globalObjects.getObject(object_name);
+      }
+    }
+    const objectSizeInfo = namedObject
+      ? getObjectSizeInfo(namedObject, project, PixiResourcesLoader)
+      : null;
 
     // Check if layer exists (empty string is allowed for base layer)
     if (layer_name !== '' && !layout.hasLayerNamed(layer_name)) {
@@ -3156,8 +3218,9 @@ const put3dInstances: EditorFunction = {
       onInstancesModifiedOutsideEditor({
         scene: layout,
       });
-      return makeGenericSuccess(
-        [
+      const eraseResult: EditorFunctionGenericOutput = {
+        success: true,
+        message: [
           `Erased ${instancesToDelete.size} instance${
             instancesToDelete.size > 1 ? 's' : ''
           }.`,
@@ -3169,8 +3232,11 @@ const put3dInstances: EditorFunction = {
             : '',
         ]
           .filter(Boolean)
-          .join(' ')
-      );
+          .join(' '),
+      };
+      if (object_name && objectSizeInfo)
+        eraseResult.objectSizeInfo = { [object_name]: objectSizeInfo };
+      return eraseResult;
     } else {
       const brushPosition: Array<number> = brush_position
         ? brush_position.split(',').map(Number)
@@ -3441,7 +3507,13 @@ const put3dInstances: EditorFunction = {
       onInstancesModifiedOutsideEditor({
         scene: layout,
       });
-      return makeGenericSuccess(changes.join(' '));
+      const put3dResult: EditorFunctionGenericOutput = {
+        success: true,
+        message: changes.join(' '),
+      };
+      if (object_name && objectSizeInfo)
+        put3dResult.objectSizeInfo = { [object_name]: objectSizeInfo };
+      return put3dResult;
     }
   },
 };

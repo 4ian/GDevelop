@@ -703,12 +703,7 @@ export default class InstancesEditor extends Component<Props, State> {
       }
       this.viewPosition.resize(width, height);
       this.statusBar.resize(width, height);
-      this.backgroundArea.hitArea = new PIXI.Rectangle(
-        0,
-        0,
-        width,
-        height
-      );
+      this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, width, height);
       this.background.resize(width, height);
 
       // Avoid flickering that could happen while waiting for next animation frame.

@@ -155,6 +155,7 @@ const errorHandler = (
       errorMessage: error.message || '',
       errorStack: error.stack || '',
       errorName: error.name || '',
+      useAfterFreeContext: error.useAfterFreeContext || undefined,
       IDEVersion: getIDEVersion(),
       IDEVersionWithHash: getIDEVersionWithHash(),
       arch: getArch(),
@@ -222,6 +223,15 @@ export const ErrorFallbackComponent = ({
             {error && error.stack && (
               <BackgroundText allowSelection style={styles.errorMessage}>
                 {error.stack.slice(0, 400)}...
+              </BackgroundText>
+            )}
+            {error && error.useAfterFreeContext && (
+              <BackgroundText allowSelection style={styles.errorMessage}>
+                {JSON.stringify(error.useAfterFreeContext, null, 1).slice(
+                  0,
+                  400
+                )}
+                ...
               </BackgroundText>
             )}
             {componentStack && (

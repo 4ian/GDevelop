@@ -71,7 +71,7 @@ var adaptNamingConventions = function (gd) {
       // Capture destruction context before the pointer is invalidated.
       // This is only done once per deletion, so the cost of capturing a
       // stack trace is negligible.
-      this._destructionContext = {
+      this._jsDestructionContext = {
         source: 'js',
         stack: new Error('Object destroyed here').stack,
         time: Date.now(),
@@ -338,9 +338,10 @@ adaptNamingConventions(Module);
  * - C++ internally deleted the object but a JS wrapper still references it
  */
 class UseAfterFreeError extends Error {
-  constructor(message) {
+  constructor({ message, useAfterFreeContext }) {
     super(message);
     this.name = 'UseAfterFreeError';
+    this.useAfterFreeContext = useAfterFreeContext;
   }
 }
 
@@ -369,36 +370,60 @@ const callContextLabels = ['<no context set>'];
 function assertAlive(obj, label, gd, className) {
   if (!obj.ptr) {
     let message = `${label}: object was already destroyed from JavaScript (ptr is 0).`;
-    const destructionContext = obj._destructionContext;
-    if (destructionContext) {
-      const agoMs = Date.now() - destructionContext.time;
-      message += `\nDestroyed ${agoMs}ms ago.`;
-      if (destructionContext.stack) {
-        message += `\nDestruction stack:\n${destructionContext.stack}`;
-      }
-    }
-    throw new UseAfterFreeError(message);
+
+    const destructionContext = obj._jsDestructionContext;
+    throw new UseAfterFreeError({
+      message,
+      useAfterFreeContext: {
+        timeSinceDestroyedInMs: destructionContext
+          ? Math.round(performance.now() - destructionContext.time)
+          : undefined,
+        destroyedBy: destructionContext ? destructionContext.stack : 'unknown',
+      },
+    });
   }
   if (
     className !== null &&
     gd.MemoryTrackedRegistry.isDead(obj.ptr, className)
   ) {
     let message = `${label}: C++ object (${className}) was destroyed on C++ side but JavaScript wrapper still exists (ptr is not 0) and was about to be used (this exception was thrown instead).`;
-    const deadContextId = gd.MemoryTrackedRegistry.getDeadContextId(obj.ptr, className);
+
+    // Gather information about how/when the object was destroyed and last proper usage.
+    let destroyedByCallTo = 'unknown';
+    const deadContextId = gd.MemoryTrackedRegistry.getDeadContextId(
+      obj.ptr,
+      className
+    );
     if (deadContextId >= 0) {
-      const contextLabel = callContextLabels[deadContextId] || (`unknown (id=${deadContextId})`);
-      message += `\nDestroyed by call to: ${contextLabel}`;
+      destroyedByCallTo =
+        callContextLabels[deadContextId] || `unknown (id=${deadContextId})`;
     }
-    const deadContextTimeMs = gd.MemoryTrackedRegistry.getDeadContextTimeMs(obj.ptr, className);
+
+    let timeSinceDestroyedInMs = undefined;
+    const deadContextTimeMs = gd.MemoryTrackedRegistry.getDeadContextTimeMs(
+      obj.ptr,
+      className
+    );
     if (deadContextTimeMs > 0) {
       // The C++ side uses emscripten_get_now() which maps to performance.now().
-      const agoMs = Math.round(performance.now() - deadContextTimeMs);
-      message += ` (${agoMs}ms ago)`;
+      timeSinceDestroyedInMs = Math.round(
+        performance.now() - deadContextTimeMs
+      );
     }
+
+    let lastSuccessfulCallToThisWrapper = undefined;
     if (obj._lastSuccessfulCall) {
-      message += `\nLast successful method call on this wrapper: ${className}.${obj._lastSuccessfulCall}`;
+      lastSuccessfulCallToThisWrapper = `${className}.${obj._lastSuccessfulCall}`;
     }
-    throw new UseAfterFreeError(message);
+
+    throw new UseAfterFreeError({
+      message,
+      useAfterFreeContext: {
+        destroyedByCallTo,
+        timeSinceDestroyedInMs,
+        lastSuccessfulCallToThisWrapper,
+      },
+    });
   }
 }
 
@@ -461,9 +486,21 @@ function patchClassesForUseAfterFreeDetection(
       //    any destruction that occurs during this method.
       // 3. For tracked classes, recording the last successful method name
       //    on the wrapper for richer error messages.
-      proto[methodName] = (function (original, wrappedMethodName, wrappedClassName, wrappedContextId) {
+      proto[methodName] = (function (
+        original,
+        wrappedMethodName,
+        wrappedClassName,
+        wrappedContextId
+      ) {
         return function useAfterFreeDetectionWrapper() {
-          assertAlive(this, wrappedClassName ? wrappedClassName + '.' + wrappedMethodName : wrappedMethodName, gd, wrappedClassName);
+          assertAlive(
+            this,
+            wrappedClassName
+              ? wrappedClassName + '.' + wrappedMethodName
+              : wrappedMethodName,
+            gd,
+            wrappedClassName
+          );
           setCurrentCallContextId(wrappedContextId);
           var result = original.apply(this, arguments);
           setCurrentCallContextId(0);

@@ -33,8 +33,14 @@ describe('Use-after-free detection (MemoryTracked)', function () {
         fail('Expected UseAfterFreeError');
       } catch (e) {
         expect(e).toBeInstanceOf(gd.UseAfterFreeError);
-        expect(e.message).toContain('Destruction stack:');
-        expect(e.message).toContain('ms ago');
+        expect(e.useAfterFreeContext).toBeDefined();
+        expect(e.useAfterFreeContext.timeSinceDestroyedInMs).not.toBe(
+          undefined
+        );
+        expect(e.useAfterFreeContext.destroyedBy).toContain(
+          'Object destroyed here'
+        );
+        expect(e.useAfterFreeContext.destroyedBy).toContain('.delete');
       }
     });
   });
@@ -66,10 +72,16 @@ describe('Use-after-free detection (MemoryTracked)', function () {
       } catch (e) {
         expect(e).toBeInstanceOf(gd.UseAfterFreeError);
         expect(e.message).toContain('destroyed from JavaScript');
-        expect(e.message).toContain('Destroyed');
-        expect(e.message).toContain('ms ago');
-        expect(e.message).toContain('Destruction stack:');
-        expect(e.message).toContain('Object destroyed here');
+        expect(e.useAfterFreeContext.timeSinceDestroyedInMs).not.toBe(
+          undefined
+        );
+        expect(e.useAfterFreeContext.destroyedBy).toContain(
+          'Object destroyed here'
+        );
+        expect(e.useAfterFreeContext.destroyedBy).toContain(
+          'Object destroyed here'
+        );
+        expect(e.useAfterFreeContext.destroyedBy).toContain('.delete');
       }
     });
   });
@@ -97,9 +109,10 @@ describe('Use-after-free detection (MemoryTracked)', function () {
       project.insertNewLayout('MyScene', 0);
 
       const layout = project.getLayout('MyScene');
-      // Call a method so _lastSuccessfulCall is set.
+      // Call a few methods
       layout.setName('RenamedScene');
       expect(layout.getName()).toBe('RenamedScene');
+      layout.setName('RenamedScene');
 
       // C++ deletes the layout — the call context "Project.removeLayout"
       // is captured by the ring buffer in MemoryTrackedRegistry.
@@ -112,12 +125,17 @@ describe('Use-after-free detection (MemoryTracked)', function () {
         expect(e).toBeInstanceOf(gd.UseAfterFreeError);
         expect(e.message).toContain('destroyed on C++ side');
         // The call that triggered the destruction.
-        expect(e.message).toContain('Destroyed by call to: Project.removeLayout');
+        expect(e.useAfterFreeContext.destroyedByCallTo).toContain(
+          'Project.removeLayout'
+        );
         // Timestamp should be present.
-        expect(e.message).toContain('ms ago');
+        expect(e.useAfterFreeContext.timeSinceDestroyedInMs).not.toBe(
+          undefined
+        );
         // Last successful call on the stale wrapper.
-        expect(e.message).toContain('Last successful method call on this wrapper');
-        expect(e.message).toContain('Layout.getName');
+        expect(e.useAfterFreeContext.lastSuccessfulCallToThisWrapper).toBe(
+          'Layout.setName'
+        );
       }
 
       project.delete();
@@ -141,9 +159,18 @@ describe('Use-after-free detection (MemoryTracked)', function () {
       } catch (e) {
         expect(e).toBeInstanceOf(gd.UseAfterFreeError);
         expect(e.message).toContain('destroyed on C++ side');
-        // The context should point to Project.delete.
-        expect(e.message).toContain('Destroyed by call to: Project.delete');
-        expect(e.message).toContain('ms ago');
+        // The call that triggered the destruction.
+        expect(e.useAfterFreeContext.destroyedByCallTo).toContain(
+          'Project.delete'
+        );
+        // Timestamp should be present.
+        expect(e.useAfterFreeContext.timeSinceDestroyedInMs).not.toBe(
+          undefined
+        );
+        // Last successful call on the stale wrapper.
+        expect(e.useAfterFreeContext.lastSuccessfulCallToThisWrapper).toBe(
+          'Layout.getName'
+        );
       }
     });
   });
@@ -168,7 +195,8 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
   describe('Per-class stats', function () {
     it('reports per-class alive and dead counts', function () {
-      const aliveBefore = gd.MemoryTrackedRegistry.getAliveCountForClass('Layout');
+      const aliveBefore =
+        gd.MemoryTrackedRegistry.getAliveCountForClass('Layout');
       const layout1 = new gd.Layout();
       const layout2 = new gd.Layout();
       expect(gd.MemoryTrackedRegistry.getAliveCountForClass('Layout')).toBe(
@@ -184,12 +212,18 @@ describe('Use-after-free detection (MemoryTracked)', function () {
       ).toBeGreaterThan(0);
 
       layout2.delete();
-      expect(gd.MemoryTrackedRegistry.getAliveCountForClass('Layout')).toBe(aliveBefore);
+      expect(gd.MemoryTrackedRegistry.getAliveCountForClass('Layout')).toBe(
+        aliveBefore
+      );
     });
 
     it('returns 0 for unknown classes', function () {
-      expect(gd.MemoryTrackedRegistry.getAliveCountForClass('NonExistent')).toBe(0);
-      expect(gd.MemoryTrackedRegistry.getDeadCountForClass('NonExistent')).toBe(0);
+      expect(
+        gd.MemoryTrackedRegistry.getAliveCountForClass('NonExistent')
+      ).toBe(0);
+      expect(gd.MemoryTrackedRegistry.getDeadCountForClass('NonExistent')).toBe(
+        0
+      );
     });
 
     it('returns totals when given empty string', function () {
@@ -200,8 +234,10 @@ describe('Use-after-free detection (MemoryTracked)', function () {
     });
 
     it('tracks different classes independently', function () {
-      const layoutAliveBefore = gd.MemoryTrackedRegistry.getAliveCountForClass('Layout');
-      const projectAliveBefore = gd.MemoryTrackedRegistry.getAliveCountForClass('Project');
+      const layoutAliveBefore =
+        gd.MemoryTrackedRegistry.getAliveCountForClass('Layout');
+      const projectAliveBefore =
+        gd.MemoryTrackedRegistry.getAliveCountForClass('Project');
 
       const layout = new gd.Layout();
       expect(gd.MemoryTrackedRegistry.getAliveCountForClass('Layout')).toBe(
@@ -338,12 +374,8 @@ describe('Use-after-free detection (MemoryTracked)', function () {
       project.insertNewLayout('Scene', 0);
       const layout = project.getLayout('Scene');
 
-      layout
-        .getObjects()
-        .insertNewObject(project, 'Sprite', 'Player', 0);
-      layout
-        .getObjects()
-        .insertNewObject(project, 'Sprite', 'Enemy', 1);
+      layout.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+      layout.getObjects().insertNewObject(project, 'Sprite', 'Enemy', 1);
 
       const player = layout.getObjects().getObject('Player');
       const enemy = layout.getObjects().getObject('Enemy');

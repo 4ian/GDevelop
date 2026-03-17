@@ -1519,6 +1519,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         layerRemoved: null,
         chosenLayer?: string,
         selectedLayer?: null,
+        editedLayer?: null,
       |} = {
         layerRemoved: null,
       };
@@ -1531,6 +1532,13 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.state.selectedLayer.getName() === layerName
       ) {
         newState.selectedLayer = null;
+      }
+      if (
+        doRemove &&
+        this.state.editedLayer &&
+        this.state.editedLayer.getName() === layerName
+      ) {
+        newState.editedLayer = null;
       }
       return newState;
     };

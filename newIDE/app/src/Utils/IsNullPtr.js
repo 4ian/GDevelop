@@ -34,3 +34,33 @@ export const exceptionallyGuardAgainstNullPtr = <T>(obj: ?T): ?T => {
   if (obj && obj.ptr === 0) return null;
   return obj;
 };
+
+const gd: libGDevelop = global.gd;
+
+/**
+ * Check if a C++ object from a tracked class has been destroyed on the C++
+ * side (e.g. because a parent container removed/deleted it), even though the
+ * JavaScript wrapper still exists with a non-zero `ptr`.
+ *
+ * This relies on the `MemoryTrackedRegistry` that libGD.js maintains for
+ * certain classes (EffectsContainer, Layout, etc.).  When such an object is
+ * destroyed from C++ (for instance when `LayersContainer.removeLayer` frees a
+ * layer and its effects container), the registry marks the pointer as dead.
+ *
+ * Use this at the top of React render functions that receive a tracked C++
+ * object as a prop — if `true`, return early / render nothing so that no
+ * method call is attempted on the dead wrapper.
+ */
+export const isCppObjectDestroyedOnCppSide = (
+  obj: any,
+  trackedClassName: string
+): boolean => {
+  if (!obj || !obj.ptr) return true;
+  try {
+    return gd.MemoryTrackedRegistry.isDead(obj.ptr, trackedClassName);
+  } catch {
+    // If MemoryTrackedRegistry is not available (e.g. in tests), fall back
+    // to assuming the object is alive.
+    return false;
+  }
+};

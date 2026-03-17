@@ -57,6 +57,7 @@ import InlineCheckbox from '../UI/InlineCheckbox';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
 import PropertiesEditorByVisibility from '../PropertiesEditor/PropertiesEditorByVisibility';
+import { isCppObjectDestroyedOnCppSide } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -363,6 +364,8 @@ export const getEffects2DCount = (
   platform: gdPlatform,
   effectsContainer: gdEffectsContainer
 ): number => {
+  if (isCppObjectDestroyedOnCppSide(effectsContainer, 'EffectsContainer'))
+    return 0;
   const effectCount = effectsContainer.getEffectsCount();
   let effect2DCount = 0;
   for (let i = 0; i < effectCount; i++) {
@@ -382,6 +385,8 @@ export const getEffects3DCount = (
   platform: gdPlatform,
   effectsContainer: gdEffectsContainer
 ): number => {
+  if (isCppObjectDestroyedOnCppSide(effectsContainer, 'EffectsContainer'))
+    return 0;
   const effectCount = effectsContainer.getEffectsCount();
   let effect3DCount = 0;
   for (let i = 0; i < effectCount; i++) {
@@ -834,6 +839,13 @@ export default function EffectsList(props: Props): React.Node {
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
     {}
   );
+
+  // Guard against rendering after the C++ EffectsContainer has been destroyed
+  // (e.g. because the owning layer was removed). React 18's batched rendering
+  // can allow a stale reference to survive briefly into a render pass.
+  if (isCppObjectDestroyedOnCppSide(effectsContainer, 'EffectsContainer')) {
+    return null;
+  }
 
   // Count the number of effects to hide titles of empty sections.
   const platform = project.getCurrentPlatform();

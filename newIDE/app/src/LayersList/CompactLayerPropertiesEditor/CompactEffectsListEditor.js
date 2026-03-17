@@ -34,6 +34,7 @@ import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import Link from '../../UI/Link';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
+import { isCppObjectDestroyedOnCppSide } from '../../Utils/IsNullPtr';
 
 export const styles = {
   icon: {
@@ -242,6 +243,13 @@ export const CompactEffectsListEditor = ({
 
   const filteredEffectMetadata =
     layerRenderingType === '3d' ? all3DEffectMetadata : all2DEffectMetadata;
+
+  // Guard against rendering after the C++ EffectsContainer has been destroyed
+  // (e.g. because the owning layer was removed). React 18's batched rendering
+  // can allow a stale reference to survive briefly into a render pass.
+  if (isCppObjectDestroyedOnCppSide(effectsContainer, 'EffectsContainer')) {
+    return null;
+  }
 
   return (
     <TopLevelCollapsibleSection

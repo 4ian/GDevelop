@@ -347,6 +347,14 @@ class UseAfterFreeError extends Error {
 Module.UseAfterFreeError = UseAfterFreeError;
 
 /**
+ * Maps integer call-context IDs to human-readable labels like
+ * "Project.removeLayout". Built during patchClassesForUseAfterFreeDetection,
+ * read at error time (cold path only).
+ * @type {string[]}
+ */
+var callContextLabels = [];
+
+/**
  * Check that an Emscripten WebIDL object is still alive.
  * Throws UseAfterFreeError if the object has been destroyed.
  *
@@ -357,13 +365,13 @@ Module.UseAfterFreeError = UseAfterFreeError;
  */
 function assertAlive(obj, label, gd, className) {
   if (!obj.ptr) {
-    let message = `${label}: object was already destroyed from JavaScript (ptr is 0).`;
-    const ctx = obj._destructionContext;
+    var message = label + ': object was already destroyed from JavaScript (ptr is 0).';
+    var ctx = obj._destructionContext;
     if (ctx) {
-      const agoMs = Date.now() - ctx.time;
-      message += `\nDestroyed ${agoMs}ms ago.`;
+      var agoMs = Date.now() - ctx.time;
+      message += '\nDestroyed ' + agoMs + 'ms ago.';
       if (ctx.stack) {
-        message += `\nDestruction stack:\n${ctx.stack}`;
+        message += '\nDestruction stack:\n' + ctx.stack;
       }
     }
     throw new UseAfterFreeError(message);
@@ -372,9 +380,19 @@ function assertAlive(obj, label, gd, className) {
     className !== null &&
     gd.MemoryTrackedRegistry.isDead(obj.ptr, className)
   ) {
-    let message = `${label}: C++ object (${className}) was destroyed on C++ side but JavaScript wrapper still exists (ptr is not 0) and was about to be used (this exception was thrown instead).`;
+    var message = label + ': C++ object (' + className + ') was destroyed on C++ side but JavaScript wrapper still exists (ptr is not 0) and was about to be used (this exception was thrown instead).';
+    var ctxId = gd.MemoryTrackedRegistry.getDeadContextId(obj.ptr, className);
+    if (ctxId >= 0) {
+      var ctxLabel = callContextLabels[ctxId] || ('unknown (id=' + ctxId + ')');
+      message += '\nDestroyed by call to: ' + ctxLabel;
+    }
+    var ctxTimeMs = gd.MemoryTrackedRegistry.getDeadContextTimeMs(obj.ptr, className);
+    if (ctxTimeMs > 0) {
+      var agoMs = Math.round(Date.now() - ctxTimeMs);
+      message += ' (' + agoMs + 'ms ago)';
+    }
     if (obj._lastSuccessfulCall) {
-      message += `\nLast successful method call on this wrapper: ${className}.${obj._lastSuccessfulCall}`;
+      message += '\nLast successful method call on this wrapper: ' + className + '.' + obj._lastSuccessfulCall;
     }
     throw new UseAfterFreeError(message);
   }
@@ -382,6 +400,9 @@ function assertAlive(obj, label, gd, className) {
 
 /**
  * Patch all WebIDL classes to check for use-after-free before every method call.
+ * Also assigns an integer call-context ID to each method and sets it on the C++
+ * side before calling into WASM, so that MemoryTrackedRegistry::remove() can
+ * capture which JS call triggered each destruction.
  *
  * @param {object} gd - The Module/gd object (after adaptNamingConventions).
  * @param {{skipped: Set<string>, tracked: Set<string>, verbose: boolean}}
@@ -390,21 +411,25 @@ function patchClassesForUseAfterFreeDetection(
   gd,
   { skippedClassNames, trackedClassNames, verbose }
 ) {
-  let patchedCount = 0;
+  var patchedCount = 0;
+  var nextContextId = 0;
+  var setCtxId = gd.MemoryTrackedRegistry.setCurrentCallContextId.bind(
+    gd.MemoryTrackedRegistry
+  );
 
-  for (const gdClass in gd) {
+  for (var gdClass in gd) {
     if (!gd.hasOwnProperty(gdClass)) continue;
     if (typeof gd[gdClass] !== 'function') continue;
     if (!gd[gdClass].prototype) continue;
     if (!gd[gdClass].prototype.hasOwnProperty('__class__')) continue;
     if (skippedClassNames.has(gdClass)) continue;
 
-    const proto = gd[gdClass].prototype;
+    var proto = gd[gdClass].prototype;
 
     // Determine if this class is tracked in C++.
-    const className = trackedClassNames.has(gdClass) ? gdClass : null;
+    var className = trackedClassNames.has(gdClass) ? gdClass : null;
 
-    Object.getOwnPropertyNames(proto).forEach((methodName) => {
+    Object.getOwnPropertyNames(proto).forEach(function (methodName) {
       // Skip special methods.
       if (
         methodName === 'constructor' ||
@@ -414,23 +439,31 @@ function patchClassesForUseAfterFreeDetection(
       )
         return;
 
-      const desc = Object.getOwnPropertyDescriptor(proto, methodName);
+      var desc = Object.getOwnPropertyDescriptor(proto, methodName);
       if (!desc || typeof desc.value !== 'function') return;
 
-      // Wrap the method with a liveness check.
-      // For tracked classes (cName !== null), also record the last method
-      // that succeeded so we can include it in C++ use-after-free errors.
-      // This is a single property assignment per call — negligible overhead.
-      proto[methodName] = (function (original, mName, cName) {
+      // Assign a call-context ID for this (class, method) pair.
+      var contextId = nextContextId++;
+      callContextLabels[contextId] = gdClass + '.' + methodName;
+
+      // Wrap the method with:
+      // 1. A liveness check (assertAlive).
+      // 2. Setting the call-context ID on the C++ side (~50-100ns) so
+      //    MemoryTrackedRegistry::remove() knows which JS call triggered
+      //    any destruction that occurs during this method.
+      // 3. For tracked classes, recording the last successful method name
+      //    on the wrapper for richer error messages.
+      proto[methodName] = (function (original, mName, cName, ctxId) {
         return function useAfterFreeDetectionWrapper() {
           assertAlive(this, cName ? cName + '.' + mName : mName, gd, cName);
+          setCtxId(ctxId);
           var result = original.apply(this, arguments);
           if (cName) {
             this._lastSuccessfulCall = mName;
           }
           return result;
         };
-      })(desc.value, methodName, className);
+      })(desc.value, methodName, className, contextId);
     });
 
     patchedCount++;
@@ -438,7 +471,9 @@ function patchClassesForUseAfterFreeDetection(
 
   if (verbose) {
     console.log(
-      `[UseAfterFreeDetection] Patched ${patchedCount} classes (${trackedClassNames.size} tracked in C++).`
+      '[UseAfterFreeDetection] Patched ' + patchedCount + ' classes (' +
+      trackedClassNames.size + ' tracked in C++, ' +
+      nextContextId + ' call-context IDs assigned).'
     );
   }
 }

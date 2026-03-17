@@ -92,7 +92,7 @@ describe('Use-after-free detection (MemoryTracked)', function () {
       project.delete();
     });
 
-    it('includes last successful call in the error for C++ deletion', function () {
+    it('includes destruction context and last successful call in error for C++ deletion', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       project.insertNewLayout('MyScene', 0);
 
@@ -101,7 +101,8 @@ describe('Use-after-free detection (MemoryTracked)', function () {
       layout.setName('RenamedScene');
       expect(layout.getName()).toBe('RenamedScene');
 
-      // C++ deletes the layout.
+      // C++ deletes the layout — the call context "Project.removeLayout"
+      // is captured by the ring buffer in MemoryTrackedRegistry.
       project.removeLayout('RenamedScene');
 
       try {
@@ -110,12 +111,40 @@ describe('Use-after-free detection (MemoryTracked)', function () {
       } catch (e) {
         expect(e).toBeInstanceOf(gd.UseAfterFreeError);
         expect(e.message).toContain('destroyed on C++ side');
+        // The call that triggered the destruction.
+        expect(e.message).toContain('Destroyed by call to: Project.removeLayout');
+        // Timestamp should be present.
+        expect(e.message).toContain('ms ago');
+        // Last successful call on the stale wrapper.
         expect(e.message).toContain('Last successful method call on this wrapper');
-        // The last successful call was getName (from the expect above).
         expect(e.message).toContain('Layout.getName');
       }
 
       project.delete();
+    });
+
+    it('includes destruction context when a project deletion kills child layouts', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('ChildScene', 0);
+      const layout = project.getLayout('ChildScene');
+      expect(layout.getName()).toBe('ChildScene');
+
+      // Deleting the project destroys all layouts via the C++ destructor
+      // chain. The call context should point to the delete() wrapper, but
+      // since delete() is not wrapped with a context ID, the context will
+      // be whatever was last set (Project.delete is not a wrapped method,
+      // but the __destroy__ call goes through gd.destroy).
+      project.delete();
+
+      try {
+        layout.getName();
+        fail('Expected UseAfterFreeError');
+      } catch (e) {
+        expect(e).toBeInstanceOf(gd.UseAfterFreeError);
+        expect(e.message).toContain('destroyed on C++ side');
+        // Timestamp should always be present regardless of context source.
+        expect(e.message).toContain('ms ago');
+      }
     });
   });
 

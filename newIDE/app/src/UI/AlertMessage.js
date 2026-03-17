@@ -19,6 +19,14 @@ const styles = {
   topRightHideButton: { position: 'absolute', right: 0, top: 0 },
   paper: { position: 'relative', overflow: 'hidden' },
   content: { flex: 1 },
+  iconAndText: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
+  textContainer: { flex: 1, minWidth: 200 },
 };
 
 type Props = {|
@@ -84,7 +92,7 @@ const AlertMessage = ({
                 expand
                 noResponsiveLandscape
               >
-                <Line noMargin alignItems="center">
+                <div style={styles.iconAndText}>
                   {renderLeftIcon ? (
                     <React.Fragment>
                       {renderLeftIcon()}
@@ -120,8 +128,8 @@ const AlertMessage = ({
                     </React.Fragment>
                   )}
                   {/* $FlowFixMe[incompatible-type] */}
-                  <Text style={styles.content}>{children}</Text>
-                </Line>
+                  <Text style={styles.textContainer}>{children}</Text>
+                </div>
                 {renderRightButton && renderRightButton()}
               </ResponsiveLineStackLayout>
             </Line>

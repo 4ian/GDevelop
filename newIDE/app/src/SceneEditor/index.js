@@ -1721,7 +1721,11 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     // /!\ Clear the selected objects and the edited object (if it's being
     // deleted) before actually deleting them to prevent any stale reference
-    // in a re-render after deletion.
+    // in a re-render after deletion. With React 18 concurrent rendering,
+    // a render could be interrupted and resumed after the C++ object is
+    // destroyed. By deferring the deletion to the setState callback, we
+    // ensure the state is committed (and stale references removed) before
+    // the C++ object is destroyed.
     const { editedObjectWithContext } = this.state;
     const isEditedObjectDeleted =
       editedObjectWithContext &&
@@ -1729,27 +1733,32 @@ export default class SceneEditor extends React.Component<Props, State> {
         ({ object }) =>
           object.ptr === editedObjectWithContext.object.ptr
       );
-    this.setState({
-      selectedObjectFolderOrObjectsWithContext: [],
-      ...(isEditedObjectDeleted ? { editedObjectWithContext: null } : undefined),
-    });
+    this.setState(
+      {
+        selectedObjectFolderOrObjectsWithContext: [],
+        ...(isEditedObjectDeleted
+          ? { editedObjectWithContext: null }
+          : undefined),
+      },
+      () => {
+        this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
 
-    this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
+        // Note: done() actually does the deletion of the objects,
+        // so ensure objectsWithContext are not used after this call.
+        done(true);
+        onObjectsDeleted();
 
-    // Note: done() actually does the deletion of the objects,
-    // so ensure objectsWithContext are not used after this call.
-    done(true);
-    onObjectsDeleted();
+        // /!\ Force the instances editor to destroy and mount again the
+        // renderers to avoid keeping any references to existing instances
+        if (this.editorDisplay) {
+          this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
+        }
 
-    // /!\ Force the instances editor to destroy and mount again the
-    // renderers to avoid keeping any references to existing instances
-    if (this.editorDisplay) {
-      this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
-    }
-
-    // We modified the selection, so force an update of editors dealing with it.
-    this.forceUpdatePropertiesEditor();
-    this.updateToolbar();
+        // We modified the selection, so force an update of editors dealing with it.
+        this.forceUpdatePropertiesEditor();
+        this.updateToolbar();
+      }
+    );
   };
 
   _getValidatedObjectOrGroupName = (

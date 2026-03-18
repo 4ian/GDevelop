@@ -315,6 +315,7 @@ type CustomObjectConfiguration_EdgeAnchor = 0 | 1 | 2 | 3 | 4`
       'declare class libGDevelop {',
       [
         'declare class libGDevelop {',
+        '  assertObjectAlive(gdEmscriptenObject): void;',
         '  getPointer(gdEmscriptenObject): number;',
         '  castObject<T>(gdEmscriptenObject, Class<T>): T;',
         '  wrapPointer<T>(ptr: number, objectClass: Class<T>): T;',

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import useStableValue from '../../Utils/useStableValue';
-import { exceptionallyGuardAgainstNullPtr } from '../../Utils/IsNullPtr';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 import type { I18n as I18nType } from '@lingui/core';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
@@ -408,7 +408,7 @@ export const AiRequestChat: React.ComponentType<{
     }: Props,
     ref
   ) => {
-    const project = exceptionallyGuardAgainstNullPtr(nullableProject);
+    const project = exceptionallyGuardAgainstDeadObject(nullableProject);
     const {
       aiRequestHistory: { handleNavigateHistory, resetNavigation },
     } = React.useContext(AiRequestContext);

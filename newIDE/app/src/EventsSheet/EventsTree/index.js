@@ -420,6 +420,7 @@ const EventsTree: React.ComponentType<{
   const [draggedNode, setDraggedNode] = React.useState(null);
   const [isScrolledTop, setIsScrolledTop] = React.useState(true);
   const [isScrolledBottom, setIsScrolledBottom] = React.useState(false);
+  const lastKnownScroll = React.useRef(0);
 
   // This is the data that will be displayed by the tree - reconstructed at each render
   // (because events could have changed, some could have been deleted, so we can't keep
@@ -1145,6 +1146,10 @@ const EventsTree: React.ComponentType<{
             _list.current = list;
           },
           onScroll: event => {
+            if (lastKnownScroll.current === event.scrollTop) {
+              return;
+            }
+            lastKnownScroll.current = event.scrollTop;
             props.onScroll && props.onScroll();
             setIsScrolledTop(event.scrollTop === 0);
             setIsScrolledBottom(

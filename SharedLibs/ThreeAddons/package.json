@@ -19,7 +19,7 @@
     "@rollup/plugin-terser": "^0.4.0",
     "prettier": "2.1.2",
     "rollup": "^2.66.1",
-    "three": "^0.162.0"
+    "three": "^0.163.0"
   },
   "repository": {
     "type": "git",

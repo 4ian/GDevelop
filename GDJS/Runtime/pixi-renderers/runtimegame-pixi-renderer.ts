@@ -104,42 +104,84 @@ namespace gdjs {
     initializeRenderers(gameCanvas: HTMLCanvasElement): void {
       this._throwIfDisposed();
 
+      const useAntialias =
+        this._game.getAntialiasingMode() !== 'none' &&
+        (this._game.isAntialisingEnabledOnMobile() ||
+          !gdjs.evtTools.common.isMobile());
+
       if (typeof THREE !== 'undefined') {
-        this._threeRenderer = new THREE.WebGLRenderer({
-          canvas: gameCanvas,
-          antialias:
-            this._game.getAntialiasingMode() !== 'none' &&
-            (this._game.isAntialisingEnabledOnMobile() ||
-              !gdjs.evtTools.common.isMobile()),
-          preserveDrawingBuffer: true, // Keep to true to allow screenshots.
-        });
-        this._threeRenderer.shadowMap.enabled = false;
-        this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this._threeRenderer.outputColorSpace = THREE.SRGBColorSpace;
-        this._threeRenderer.toneMapping = THREE.NoToneMapping;
-        this._threeRenderer.toneMappingExposure = 1;
-        this._threeRenderer.autoClear = false;
-        this._threeRenderer.pixelRatio = window.devicePixelRatio;
-        this._threeRenderer.setSize(
-          this._game.getGameResolutionWidth(),
-          this._game.getGameResolutionHeight()
-        );
+        let gl: WebGL2RenderingContext | null = null;
+        if (typeof WebGL2RenderingContext !== 'undefined') {
+          gl = gameCanvas.getContext('webgl2', {
+            antialias: useAntialias,
+            preserveDrawingBuffer: true, // Keep to true to allow screenshots.
+            stencil: true,
+          }) as WebGL2RenderingContext | null;
+        }
+
+        if (gl) {
+          try {
+            this._threeRenderer = new THREE.WebGLRenderer({
+              canvas: gameCanvas,
+              context: gl,
+              antialias: useAntialias,
+              preserveDrawingBuffer: true, // Keep to true to allow screenshots.
+              stencil: true,
+            });
+            logger.info('WebGL2 context created. 3D renderer enabled.');
+            this._threeRenderer.shadowMap.enabled = false;
+            this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            this._threeRenderer.outputColorSpace = THREE.SRGBColorSpace;
+            this._threeRenderer.toneMapping = THREE.NoToneMapping;
+            this._threeRenderer.toneMappingExposure = 1;
+            this._threeRenderer.autoClear = false;
+            this._threeRenderer.pixelRatio = window.devicePixelRatio;
+            this._threeRenderer.setSize(
+              this._game.getGameResolutionWidth(),
+              this._game.getGameResolutionHeight()
+            );
+          } catch (error) {
+            logger.warn(
+              'Three.js WebGLRenderer initialization failed. Falling back to 2D renderer only.',
+              error
+            );
+            this._threeRenderer = null;
+          }
+        } else {
+          logger.warn(
+            'WebGL2 is required for the 3D renderer. Falling back to 2D renderer only.'
+          );
+        }
 
         // Create a PixiJS renderer that use the same GL context as Three.js
         // so that both can render to the canvas and even have PixiJS rendering
         // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
-        this._pixiRenderer = new PIXI.Renderer({
-          width: this._game.getGameResolutionWidth(),
-          height: this._game.getGameResolutionHeight(),
-          view: gameCanvas,
-          // @ts-ignore - reuse the context from Three.js.
-          context: this._threeRenderer.getContext(),
-          clearBeforeRender: false,
-          preserveDrawingBuffer: true, // Keep to true to allow screenshots.
-          antialias: false,
-          backgroundAlpha: 0,
-          // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
-        });
+        if (gl) {
+          this._pixiRenderer = new PIXI.Renderer({
+            width: this._game.getGameResolutionWidth(),
+            height: this._game.getGameResolutionHeight(),
+            view: gameCanvas,
+            // @ts-ignore - reuse the context from Three.js or WebGL2 probe.
+            context: gl,
+            clearBeforeRender: false,
+            preserveDrawingBuffer: true, // Keep to true to allow screenshots.
+            antialias: false,
+            backgroundAlpha: 0,
+            // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
+          });
+        } else {
+          // Create the renderer and setup the rendering area.
+          // "preserveDrawingBuffer: true" is needed to avoid flickering
+          // and background issues on some mobile phones (see #585 #572 #566 #463).
+          logger.info('Using 2D renderer only (no WebGL2 context).');
+          this._pixiRenderer = PIXI.autoDetectRenderer({
+            width: this._game.getGameResolutionWidth(),
+            height: this._game.getGameResolutionHeight(),
+            view: gameCanvas,
+            preserveDrawingBuffer: true,
+            antialias: false,
+          }) as PIXI.Renderer;
+        }
       } else {
         // Create the renderer and setup the rendering area.
         // "preserveDrawingBuffer: true" is needed to avoid flickering

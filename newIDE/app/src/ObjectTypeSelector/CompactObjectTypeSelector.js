@@ -10,6 +10,7 @@ import {
 } from '../ObjectsList/EnumerateObjects';
 import CompactPropertiesEditorRowField from '../CompactPropertiesEditor/CompactPropertiesEditorRowField';
 import ListIcon from '../UI/ListIcon';
+import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
 
 type Props = {|
   project: gdProject,
@@ -68,7 +69,9 @@ export default function CompactObjectTypeSelector({
                     iconSize={16}
                     brightness={disabled ? 0.5 : null}
                   />
-                ) : null
+                ) : (
+                  <ExtensionIcon className={className} />
+                )
               }
             >
               <SelectOption

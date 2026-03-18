@@ -461,6 +461,12 @@ function patchClassesForUseAfterFreeDetection(
     // Determine if this class is tracked in C++.
     const className = trackedClassNames.has(gdClass) ? gdClass : null;
 
+    // Store the class name on the prototype so that assertObjectAlive can
+    // look it up at runtime without requiring callers to know it.
+    if (className !== null) {
+      proto._memoryTrackedClassName = className;
+    }
+
     Object.getOwnPropertyNames(proto).forEach((methodName) => {
       // Skip internal Emscripten methods (constructor, __destroy__, __class__).
       // Note: delete is handled separately below.
@@ -559,3 +565,20 @@ patchClassesForUseAfterFreeDetection(Module, {
   ]),
   verbose: false,
 });
+
+/**
+ * Check that an Emscripten object is still alive, i.e. not destroyed from
+ * JavaScript (ptr is 0) or from C++ (only for memory-tracked classes).
+ *
+ * In theory, a dead object should never be accessed. In practice this can
+ * help prevent stale references to objects (deleted by JS: ptr will be 0,
+ * or deleted in C++, only for tracked classes).
+ * This is used just to add extra protection and should usually not be useful.
+ *
+ * @param {object} obj - The Emscripten wrapper object.
+ * @throws {UseAfterFreeError} if the object is dead.
+ */
+Module.assertObjectAlive = function assertObjectAlive(obj) {
+  const className = obj._memoryTrackedClassName || null;
+  assertAlive(obj, 'assertObjectAlive', Module, className);
+};

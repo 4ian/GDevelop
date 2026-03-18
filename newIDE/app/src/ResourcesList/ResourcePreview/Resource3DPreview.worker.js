@@ -74,8 +74,6 @@ const initRenderer = () => {
     antialias: true,
     alpha: true,
   });
-  renderer.useLegacyLights = true; // Use legacy lights as in the editor.
-
   renderer.setSize(width, height, false);
 
   return true;

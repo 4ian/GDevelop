@@ -1,8 +1,8 @@
 diff --git a/node_modules/@material-ui/core/ButtonBase/ButtonBase.js b/node_modules/@material-ui/core/ButtonBase/ButtonBase.js
-index 4972129..36ce725 100644
+index 94b4ac5..677dd01 100644
 --- a/node_modules/@material-ui/core/ButtonBase/ButtonBase.js
 +++ b/node_modules/@material-ui/core/ButtonBase/ButtonBase.js
-@@ -159,7 +159,7 @@ var ButtonBase = /*#__PURE__*/React.forwardRef(function ButtonBase(props, ref) {
+@@ -157,7 +157,7 @@ var ButtonBase = /*#__PURE__*/React.forwardRef(function ButtonBase(props, ref) {
      };
    }, []);
    React.useEffect(function () {
@@ -12,10 +12,10 @@ index 4972129..36ce725 100644
      }
    }, [disableRipple, focusRipple, focusVisible]);
 diff --git a/node_modules/@material-ui/core/esm/ButtonBase/ButtonBase.js b/node_modules/@material-ui/core/esm/ButtonBase/ButtonBase.js
-index 58cfc64..92786c3 100644
+index e340afe..ef6495d 100644
 --- a/node_modules/@material-ui/core/esm/ButtonBase/ButtonBase.js
 +++ b/node_modules/@material-ui/core/esm/ButtonBase/ButtonBase.js
-@@ -135,7 +135,7 @@ var ButtonBase = /*#__PURE__*/React.forwardRef(function ButtonBase(props, ref) {
+@@ -134,7 +134,7 @@ var ButtonBase = /*#__PURE__*/React.forwardRef(function ButtonBase(props, ref) {
      };
    }, []);
    React.useEffect(function () {

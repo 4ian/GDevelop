@@ -12,6 +12,63 @@ import CompactResourceTypeSelectField from './CompactResourceTypeSelectField';
 import CompactSelectField from '../../UI/CompactSelectField';
 import CompactSemiControlledTextField from '../../UI/CompactSemiControlledTextField';
 import CompactPropertiesEditorRowField from '../../CompactPropertiesEditor/CompactPropertiesEditorRowField';
+import ObjectIcon from '../../UI/CustomSvgIcons/Object';
+import BehaviorIcon from '../../UI/CustomSvgIcons/Behavior';
+import SceneVariableIcon from '../../UI/CustomSvgIcons/SceneVariable';
+import SceneIcon from '../../UI/CustomSvgIcons/Scene';
+import LayerIcon from '../../UI/CustomSvgIcons/Layers';
+import EffectIcon from '../../UI/CustomSvgIcons/Sun';
+import PropertyIcon from '../../UI/CustomSvgIcons/Settings';
+import ResourceIcon from '../../UI/CustomSvgIcons/ProjectResources';
+import VariableStringIcon from '../../VariablesList/Icons/VariableStringIcon';
+import VariableNumberIcon from '../../VariablesList/Icons/VariableNumberIcon';
+import VariableBooleanIcon from '../../VariablesList/Icons/VariableBooleanIcon';
+
+const renderOptionIcon = (type: string, className: string): React.Node => {
+  switch (type) {
+    case 'expression':
+    case 'number':
+    case 'numberWithChoices':
+      return <VariableNumberIcon className={className} />;
+    case 'string':
+    case 'stringWithSelector':
+    case 'identifier':
+    case 'keyboardKey':
+    case 'mouseButton':
+    case 'objectPointName':
+    case 'color':
+    case 'leaderboardId':
+      return <VariableStringIcon className={className} />;
+    case 'yesorno':
+    case 'trueorfalse':
+      return <VariableBooleanIcon className={className} />;
+    case 'objectList':
+    case 'objectListOrEmptyIfJustDeclared':
+      return <ObjectIcon className={className} />;
+    case 'behavior':
+      return <BehaviorIcon className={className} />;
+    case 'variable':
+    case 'scenevar':
+      return <SceneVariableIcon className={className} />;
+    case 'sceneName':
+      return <SceneIcon className={className} />;
+    case 'layer':
+      return <LayerIcon className={className} />;
+    case 'objectAnimationName':
+      return <SceneIcon className={className} />;
+    case 'layerEffectName':
+    case 'objectEffectName':
+      return <EffectIcon className={className} />;
+    case 'layerEffectParameterName':
+    case 'objectEffectParameterName':
+      return <PropertyIcon className={className} />;
+    case 'jsonResource':
+      return <ResourceIcon className={className} />;
+
+    default:
+      return null;
+  }
+};
 
 type Props = {|
   project: gdProject,
@@ -82,6 +139,9 @@ export default function CompactValueTypeEditor({
                     onTypeUpdated();
                   }}
                   disabled={disabled}
+                  renderOptionIcon={className =>
+                    renderOptionIcon(type, className)
+                  }
                 >
                   {!isExpressionType && (
                     <SelectOption value="objectList" label={t`Objects`} />

@@ -682,19 +682,27 @@ export default class InstancesEditor extends Component<Props, State> {
       nextProps.width !== this.props.width ||
       nextProps.height !== this.props.height
     ) {
-      this.pixiRenderer.resize(nextProps.width, nextProps.height);
+      // Ensure we don't resize to 0, which is invalid for PixiJS/WebGL.
+      const width = nextProps.width || 1;
+      const height = nextProps.height || 1;
+
+      // Mirror what the render loop does before each frame (see InstancesRenderer.render),
+      // to ensure the WebGL state is clean and avoid crashes when resizing renderers
+      // (PixiJS's resize triggers internal shader uniform syncing,
+      // which will crash if Three.js's stale program is still active).
       if (this.threeRenderer) {
-        this.threeRenderer.setSize(nextProps.width, nextProps.height);
+        this.threeRenderer.resetState();
+        this.pixiRenderer.reset();
       }
-      this.viewPosition.resize(nextProps.width, nextProps.height);
-      this.statusBar.resize(nextProps.width, nextProps.height);
-      this.backgroundArea.hitArea = new PIXI.Rectangle(
-        0,
-        0,
-        nextProps.width,
-        nextProps.height
-      );
-      this.background.resize(nextProps.width, nextProps.height);
+
+      this.pixiRenderer.resize(width, height);
+      if (this.threeRenderer) {
+        this.threeRenderer.setSize(width, height);
+      }
+      this.viewPosition.resize(width, height);
+      this.statusBar.resize(width, height);
+      this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, width, height);
+      this.background.resize(width, height);
 
       // Avoid flickering that could happen while waiting for next animation frame.
       this.fpsLimiter.forceNextUpdate();

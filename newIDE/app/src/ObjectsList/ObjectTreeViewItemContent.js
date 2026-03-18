@@ -30,7 +30,13 @@ export const getObjectTreeViewItemId = (object: gdObject): string => {
   // Use the ptr to avoid display bugs in the rare case a user set an object
   // as global although another layout has an object with the same name,
   // and ignored the warning.
-  return `${object.getName()}-${object.ptr}`;
+  try {
+    return `${object.getName()}-${object.ptr}`;
+  } catch (e) {
+    // The C++ object may have been destroyed (UseAfterFreeError) while
+    // the React tree view still holds a stale reference.
+    return `deleted-${object.ptr}`;
+  }
 };
 
 export type ObjectTreeViewItemCallbacks = {|
@@ -209,19 +215,33 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   is3D(): boolean {
-    const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-      this.props.project.getCurrentPlatform(),
-      this.object.getObject().getType()
-    );
-    return objectMetadata.isRenderedIn3D();
+    try {
+      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+        this.props.project.getCurrentPlatform(),
+        this.object.getObject().getType()
+      );
+      return objectMetadata.isRenderedIn3D();
+    } catch (e) {
+      return false;
+    }
   }
 
   getName(): string | React.Node {
-    return this.object.getObject().getName();
+    try {
+      return this.object.getObject().getName();
+    } catch (e) {
+      // The C++ object may have been destroyed (UseAfterFreeError) while
+      // the React tree view still holds a stale reference.
+      return '';
+    }
   }
 
   getId(): string {
-    return getObjectTreeViewItemId(this.object.getObject());
+    try {
+      return getObjectTreeViewItemId(this.object.getObject());
+    } catch (e) {
+      return `deleted-${this.object.ptr}`;
+    }
   }
 
   getHtmlId(index: number): ?string {
@@ -229,17 +249,25 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   getDataSet(): ?HTMLDataset {
-    return {
-      objectName: this.object.getObject().getName(),
-      global: this._isGlobal.toString(),
-    };
+    try {
+      return {
+        objectName: this.object.getObject().getName(),
+        global: this._isGlobal.toString(),
+      };
+    } catch (e) {
+      return null;
+    }
   }
 
   getThumbnail(): ?string {
-    return this.props.getThumbnail(
-      this.props.project,
-      this.object.getObject().getConfiguration()
-    );
+    try {
+      return this.props.getThumbnail(
+        this.props.project,
+        this.object.getObject().getConfiguration()
+      );
+    } catch (e) {
+      return null;
+    }
   }
 
   onClick(): void {

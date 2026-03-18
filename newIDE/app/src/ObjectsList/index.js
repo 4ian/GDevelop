@@ -245,18 +245,24 @@ class ObjectFolderTreeViewItem implements TreeViewItem {
   }
 
   getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-    if (this.objectFolderOrObject.getChildrenCount() === 0) {
+    try {
+      if (this.objectFolderOrObject.getChildrenCount() === 0) {
+        return this.placeholder ? [this.placeholder] : [];
+      }
+      return mapFor(0, this.objectFolderOrObject.getChildrenCount(), i => {
+        const child = this.objectFolderOrObject.getChildAt(i);
+        return createTreeViewItem({
+          objectFolderOrObject: child,
+          isGlobal: this.global,
+          objectFolderTreeViewItemProps: this.objectFolderTreeViewItemProps,
+          objectTreeViewItemProps: this.objectTreeViewItemProps,
+        });
+      });
+    } catch (e) {
+      // The C++ object may have been destroyed (UseAfterFreeError) while
+      // the React tree view still holds a stale reference.
       return this.placeholder ? [this.placeholder] : [];
     }
-    return mapFor(0, this.objectFolderOrObject.getChildrenCount(), i => {
-      const child = this.objectFolderOrObject.getChildAt(i);
-      return createTreeViewItem({
-        objectFolderOrObject: child,
-        isGlobal: this.global,
-        objectFolderTreeViewItemProps: this.objectFolderTreeViewItemProps,
-        objectTreeViewItemProps: this.objectTreeViewItemProps,
-      });
-    });
   }
 }
 

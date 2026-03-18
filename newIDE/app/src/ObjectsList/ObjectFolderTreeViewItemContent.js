@@ -139,11 +139,21 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   getName(): string | React.Node {
-    return this.objectFolder.getFolderName();
+    try {
+      return this.objectFolder.getFolderName();
+    } catch (e) {
+      // The C++ object may have been destroyed (UseAfterFreeError) while
+      // the React tree view still holds a stale reference.
+      return '';
+    }
   }
 
   getId(): string {
-    return getObjectFolderTreeViewItemId(this.objectFolder);
+    try {
+      return getObjectFolderTreeViewItemId(this.objectFolder);
+    } catch (e) {
+      return `deleted-folder-${this.objectFolder.ptr}`;
+    }
   }
 
   getHtmlId(index: number): ?string {
@@ -151,10 +161,14 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   getDataSet(): ?HTMLDataset {
-    return {
-      folderName: this.objectFolder.getFolderName(),
-      global: this._isGlobal.toString(),
-    };
+    try {
+      return {
+        folderName: this.objectFolder.getFolderName(),
+        global: this._isGlobal.toString(),
+      };
+    } catch (e) {
+      return null;
+    }
   }
 
   getThumbnail(): ?string {

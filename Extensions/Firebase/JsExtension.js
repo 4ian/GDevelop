@@ -28,6 +28,9 @@ module.exports = {
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
+      .setShortDescription(
+        'Google Firebase: realtime database, cloud functions, storage, authentication, analytics, performance.'
+      )
       .setExtensionHelpPath('/all-features/firebase')
       .setCategory('Network');
     extension

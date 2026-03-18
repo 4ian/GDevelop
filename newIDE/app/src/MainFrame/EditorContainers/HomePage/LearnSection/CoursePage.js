@@ -136,7 +136,7 @@ const CoursePage = ({
   simulateAppStoreProduct,
   onOpenAskAi,
 }: Props): React.Node => {
-  const { profile } = React.useContext(AuthenticatedUserContext);
+  const { profile, subscription } = React.useContext(AuthenticatedUserContext);
   const userId = (profile && profile.id) || null;
   const {
     values: { language },
@@ -309,6 +309,11 @@ const CoursePage = ({
     [scrollingContainerRef]
   );
 
+  const isStudentAccount =
+    !!subscription &&
+    !!subscription.benefitsFromEducationPlan &&
+    !subscription.isTeacher;
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -441,33 +446,35 @@ const CoursePage = ({
                       <Spacer />
                       {tableOfContent}
                     </Paper>
-                    <Paper
-                      background="light"
-                      style={styles.askAQuestionContainer}
-                    >
-                      <ColumnStackLayout expand noMargin>
-                        <LineStackLayout
-                          expand
-                          alignItems="center"
-                          noMargin
-                          justifyContent="center"
-                        >
-                          <Help />
-                          <Text noMargin>
-                            <Trans>Do you need any help?</Trans>
-                          </Text>
-                        </LineStackLayout>
-                        <RaisedButton
-                          primary
-                          label={<Trans>Ask the AI</Trans>}
-                          onClick={() =>
-                            onOpenAskAi({
-                              aiRequestId: null,
-                            })
-                          }
-                        />
-                      </ColumnStackLayout>
-                    </Paper>
+                    {!isStudentAccount && (
+                      <Paper
+                        background="light"
+                        style={styles.askAQuestionContainer}
+                      >
+                        <ColumnStackLayout expand noMargin>
+                          <LineStackLayout
+                            expand
+                            alignItems="center"
+                            noMargin
+                            justifyContent="center"
+                          >
+                            <Help />
+                            <Text noMargin>
+                              <Trans>Do you need any help?</Trans>
+                            </Text>
+                          </LineStackLayout>
+                          <RaisedButton
+                            primary
+                            label={<Trans>Ask the AI</Trans>}
+                            onClick={() =>
+                              onOpenAskAi({
+                                aiRequestId: null,
+                              })
+                            }
+                          />
+                        </ColumnStackLayout>
+                      </Paper>
+                    )}
                   </div>
                 </div>
               )}

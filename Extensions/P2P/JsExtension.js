@@ -25,6 +25,9 @@ module.exports = {
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
+      .setShortDescription(
+        'Peer-to-peer communication via WebRTC. Send/receive events and variables between game instances.'
+      )
       .setExtensionHelpPath('/all-features/p2p')
       .setCategory('Network');
     extension

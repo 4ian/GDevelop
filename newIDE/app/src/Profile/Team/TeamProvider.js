@@ -11,6 +11,7 @@ import {
   type Team,
   type TeamGroup,
   type TeamMembership,
+  type TeamInvitation,
   type User,
   updateUserGroup,
   deleteGroup,
@@ -20,12 +21,15 @@ import {
   changeTeamMemberPassword,
   activateTeamMembers,
   setUserAsAdmin,
+  setUserAsMember,
+  listTeamInvitations,
   editUser,
   type EditUserChanges,
 } from '../../Utils/GDevelopServices/User';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { listOtherUserCloudProjects } from '../../Utils/GDevelopServices/Project';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
+import { type CloudProjectWithUserAccessInfo } from '../../Utils/GDevelopServices/Project';
 
 type Props = {| children: React.Node |};
 
@@ -41,6 +45,9 @@ const TeamProvider = ({ children }: Props): React.Node => {
   const [members, setMembers] = React.useState<?(User[])>(null);
   const [admins, setAdmins] = React.useState<?(User[])>(null);
   const [memberships, setMemberships] = React.useState<?(TeamMembership[])>(
+    null
+  );
+  const [invitations, setInvitations] = React.useState<?(TeamInvitation[])>(
     null
   );
 
@@ -122,7 +129,7 @@ const TeamProvider = ({ children }: Props): React.Node => {
           adminUserId,
           team.id
         );
-        setAdmins(teamAdmins);
+        setAdmins(teamAdmins.slice().sort((a, b) => a.createdAt - b.createdAt));
       } catch (error) {
         console.error('An error occurred while fetching members:', error);
       }
@@ -227,6 +234,31 @@ const TeamProvider = ({ children }: Props): React.Node => {
     [fetchMemberships]
   );
 
+  const fetchInvitations = React.useCallback(
+    async (): Promise<TeamInvitation[] | void> => {
+      if (!team || !adminUserId) return;
+
+      try {
+        const teamInvitations = await listTeamInvitations(
+          getAuthorizationHeader,
+          { userId: adminUserId, teamId: team.id }
+        );
+        setInvitations(teamInvitations);
+        return teamInvitations;
+      } catch (error) {
+        console.error('An error occurred while fetching invitations:', error);
+      }
+    },
+    [team, getAuthorizationHeader, adminUserId]
+  );
+
+  React.useEffect(
+    () => {
+      fetchInvitations();
+    },
+    [fetchInvitations]
+  );
+
   const onChangeGroupName = React.useCallback(
     async (group: TeamGroup, newName: string) => {
       if (!team || !adminUserId || !groups) return;
@@ -285,8 +317,7 @@ const TeamProvider = ({ children }: Props): React.Node => {
   );
 
   const onListUserProjects = React.useCallback(
-    async (user: User) => {
-      // $FlowFixMe[missing-empty-array-annot]
+    async (user: User): Promise<Array<CloudProjectWithUserAccessInfo>> => {
       if (!adminUserId) return [];
       return listOtherUserCloudProjects(
         getAuthorizationHeader,
@@ -301,6 +332,19 @@ const TeamProvider = ({ children }: Props): React.Node => {
     async (email: string, activate: boolean) => {
       if (!team || !adminUserId) return;
       await setUserAsAdmin(getAuthorizationHeader, {
+        teamId: team.id,
+        email,
+        activate,
+        adminUserId,
+      });
+    },
+    [team, getAuthorizationHeader, adminUserId]
+  );
+
+  const onSetMember = React.useCallback(
+    async (email: string, activate: boolean) => {
+      if (!team || !adminUserId) return;
+      await setUserAsMember(getAuthorizationHeader, {
         teamId: team.id,
         email,
         activate,
@@ -350,19 +394,20 @@ const TeamProvider = ({ children }: Props): React.Node => {
         adminUserId,
         team.id
       );
-      setAdmins(teamAdmins);
+      setAdmins(teamAdmins.slice().sort((a, b) => a.createdAt - b.createdAt));
     },
     [team, getAuthorizationHeader, adminUserId]
   );
 
   const getAvailableSeats = React.useCallback(
     () =>
-      team && members && admins
+      team && members && admins && invitations
         ? team.seats -
           members.filter(member => !member.deactivatedAt).length -
-          admins.length
+          admins.length -
+          invitations.length
         : null,
-    [team, members, admins]
+    [team, members, admins, invitations]
   );
 
   return (
@@ -373,6 +418,7 @@ const TeamProvider = ({ children }: Props): React.Node => {
         admins,
         members,
         memberships,
+        invitations,
         onEditUser,
         onChangeGroupName,
         onChangeUserGroup,
@@ -381,11 +427,13 @@ const TeamProvider = ({ children }: Props): React.Node => {
         onCreateGroup,
         onRefreshMembers,
         onRefreshAdmins,
+        onRefreshInvitations: fetchInvitations,
         getAvailableSeats,
         onCreateMembers,
         onChangeMemberPassword,
         onActivateMembers,
         onSetAdmin,
+        onSetMember,
       }}
     >
       {children}

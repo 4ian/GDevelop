@@ -12,6 +12,8 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/Events/ExtensionDependencyCache.h"
+#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/Project/AssetResourcePathCleaner.h"
 #include "GDCore/IDE/Project/ResourcesInUseHelper.h"
 #include "GDCore/IDE/Project/ResourcesRenamer.h"
@@ -41,7 +43,8 @@ ObjectAssetSerializer::GetObjectExtensionName(const gd::Object &object) {
 void ObjectAssetSerializer::SerializeTo(
     gd::Project &project, const gd::Object &object,
     const gd::String &objectFullName, SerializerElement &element,
-    std::vector<gd::String> &usedResourceNames) {
+    std::vector<gd::String> &usedResourceNames,
+    ExtensionDependencyCache &extensionDependencyCache) {
   auto cleanObject = object.Clone();
   cleanObject->GetVariables().Clear();
   cleanObject->GetEffects().Clear();
@@ -114,23 +117,29 @@ void ObjectAssetSerializer::SerializeTo(
     resourceElement.SetAttribute("name", resource.GetName());
   }
 
-  std::unordered_set<gd::String> usedExtensionNames;
-  usedExtensionNames.insert(extensionName);
-  for (auto &usedVariantIdentifier : alreadyUsedVariantIdentifiers) {
-    usedExtensionNames.insert(PlatformExtension::GetExtensionFromFullObjectType(
-        usedVariantIdentifier));
-  }
   SerializerElement &requiredExtensionsElement =
       objectAssetElement.AddChild("requiredExtensions");
   requiredExtensionsElement.ConsiderAsArrayOf("requiredExtension");
-  for (auto &usedExtensionName : usedExtensionNames) {
-    if (project.HasEventsFunctionsExtensionNamed(usedExtensionName)) {
-      auto &extension = project.GetEventsFunctionsExtension(usedExtensionName);
-      SerializerElement &requiredExtensionElement =
-          requiredExtensionsElement.AddChild("requiredExtension");
-      requiredExtensionElement.SetAttribute("extensionName", usedExtensionName);
-      requiredExtensionElement.SetAttribute("extensionVersion",
-                                            extension.GetVersion());
+  if (project.HasEventsFunctionsExtensionNamed(extensionName)) {
+    auto &eventsFunctionsExtension =
+        project.GetEventsFunctionsExtension(extensionName);
+    auto usedExtensionNames =
+        extensionDependencyCache.FindRequiredExtensionsRecursively(
+            project, eventsFunctionsExtension.GetName());
+    // The extension may not use any of its own instructions.
+    usedExtensionNames.insert(extensionName);
+
+    for (auto &usedExtensionName : usedExtensionNames) {
+      if (project.HasEventsFunctionsExtensionNamed(usedExtensionName)) {
+        auto &extension =
+            project.GetEventsFunctionsExtension(usedExtensionName);
+        SerializerElement &requiredExtensionElement =
+            requiredExtensionsElement.AddChild("requiredExtension");
+        requiredExtensionElement.SetAttribute("extensionName",
+                                              usedExtensionName);
+        requiredExtensionElement.SetAttribute("extensionVersion",
+                                              extension.GetVersion());
+      }
     }
   }
 

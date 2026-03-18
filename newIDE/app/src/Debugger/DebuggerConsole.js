@@ -170,8 +170,7 @@ export const DebuggerConsole = ({
   };
 
   const [editingHiddenGroups, setEditingHiddenGroups] = React.useState(false);
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const hiddenGroups = React.useRef(new Set()).current;
+  const hiddenGroups = React.useRef(new Set<string>()).current;
   React.useEffect(
     () => {
       // Do not register for group updates to avoid rerendering when the groups are not displayed.

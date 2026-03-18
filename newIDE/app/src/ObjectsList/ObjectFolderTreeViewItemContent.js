@@ -5,8 +5,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
-// $FlowFixMe[import-type-as-value]
-import { TreeViewItemContent } from '.';
+import { type TreeViewItemContent } from '.';
 import {
   enumerateFoldersInContainer,
   enumerateFoldersInFolder,
@@ -165,13 +164,14 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   onClick(): void {}
 
   rename(newName: string): void {
-    if (this.getName() === newName) {
+    const safeNewName = newName.replaceAll('/', '-');
+    if (this.getName() === safeNewName) {
       return;
     }
 
     this.props.onRenameObjectFolderOrObjectWithContextFinish(
       { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
-      newName,
+      safeNewName,
       doRename => {
         if (!doRename) return;
 

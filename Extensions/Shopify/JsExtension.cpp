@@ -16,6 +16,7 @@ void DeclareShopifyExtension(gd::PlatformExtension& extension) {
         "Shopify shop."),
       "Florian Rival",
       "Open source (MIT License)")
+      .SetShortDescription("Initialize Shopify shop, fetch products, generate checkout URLs.")
       .SetExtensionHelpPath("/all-features/shopify")
       .SetCategory("Third-party");
   extension.AddInstructionOrExpressionGroupMetadata(_("Shopify"))

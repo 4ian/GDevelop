@@ -425,7 +425,7 @@ namespace gdjs {
       this.massCenterOffsetX = behaviorData.massCenterOffsetX || 0;
       this.massCenterOffsetY = behaviorData.massCenterOffsetY || 0;
       this.massCenterOffsetZ = behaviorData.massCenterOffsetZ || 0;
-      this.density = behaviorData.density;
+      this.density = Math.max(0.0001, behaviorData.density);
       this.massOverride = behaviorData.massOverride || 0;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
@@ -1404,9 +1404,9 @@ namespace gdjs {
     }
 
     setDensity(density: float): void {
-      // Non-negative values only
-      if (density < 0) {
-        density = 0;
+      // Jolt requires a positive density to compute valid mass properties.
+      if (density < 0.0001) {
+        density = 0.0001;
       }
       if (this.density === density) {
         return;

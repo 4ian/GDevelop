@@ -323,17 +323,8 @@ void ProjectBrowserHelper::ExposeProjectObjects(
        e++) {
     auto &eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
 
-    for (auto &&eventsBasedObjectUniquePtr :
-         eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
-      auto eventsBasedObject = eventsBasedObjectUniquePtr.get();
-      worker.Launch(eventsBasedObject->GetObjects());
-
-      for (auto &&variantUniquePtr :
-           eventsBasedObject->GetVariants().GetInternalVector()) {
-        auto variant = variantUniquePtr.get();
-        worker.Launch(variant->GetObjects());
-      }
-    }
+    gd::ProjectBrowserHelper::ExposeEventsFunctionsExtensionObjects(
+      eventsFunctionsExtension, worker);
   }
 };
 
@@ -343,6 +334,24 @@ void ProjectBrowserHelper::ExposeLayoutObjects(gd::Layout &layout,
 
   // Layout objects
   worker.Launch(layout.GetObjects());
+}
+
+void ProjectBrowserHelper::ExposeEventsFunctionsExtensionObjects(
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    gd::ArbitraryObjectsWorker &worker) {
+
+  for (auto &&eventsBasedObjectUniquePtr :
+       eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
+    auto eventsBasedObject = eventsBasedObjectUniquePtr.get();
+    worker.Launch(eventsBasedObject->GetObjects());
+
+    for (auto &&variantUniquePtr :
+         eventsBasedObject->GetVariants().GetInternalVector()) {
+      auto *eventsBasedObjectVariant = variantUniquePtr.get();
+      gd::ProjectBrowserHelper::ExposeEventsBasedObjectVariantObjects(
+          *eventsBasedObjectVariant, worker);
+    }
+  }
 }
 
 void ProjectBrowserHelper::ExposeEventsBasedObjectVariantObjects(

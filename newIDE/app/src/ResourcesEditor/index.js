@@ -23,6 +23,7 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
+import { showWarningBox } from '../UI/Messages/MessageBox';
 
 const gd: libGDevelop = global.gd;
 
@@ -87,6 +88,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
       this.onResourceExternallyChanged.bind(this)
     );
   }
+
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
       this.resourceExternallyChangedCallbackId
@@ -129,21 +131,67 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     );
     if (!answer) return;
 
+    const resourcesManager = project.getResourcesManager();
+    const currentIndex = resourcesManager.getResourcePosition(
+      resource.getName()
+    );
+
     onDeleteResource(resource, doRemove => {
       if (!doRemove || !resource) return;
 
-      project.getResourcesManager().removeResource(resource.getName());
+      resourcesManager.removeResource(resource.getName());
+
+      const newCount = resourcesManager.count();
+      const nextResourceToSelect =
+        newCount > 0
+          ? resourcesManager.getResourceAt(Math.min(currentIndex, newCount - 1))
+          : null;
+
       this.setState(
         {
-          selectedResource: null,
+          selectedResource: nextResourceToSelect,
         },
         () => {
-          // Force update of the resources list as otherwise it could render
-          // resource that was just deleted.
-          if (this._resourcesList) this._resourcesList.forceUpdateList();
+          const resourcesList = this._resourcesList;
+          if (resourcesList) {
+            resourcesList.forceUpdateList();
+            resourcesList.focusList();
+          }
+          const propertiesEditor = this._propertiesEditor;
+          if (propertiesEditor) propertiesEditor.forceUpdate();
           this.updateToolbar();
         }
       );
+    });
+  };
+
+  renameResource = (resource: gdResource, newName: string) => {
+    const { project, onRenameResource } = this.props;
+
+    // Nothing to do if the name is not changed or empty.
+    if (resource.getName() === newName || newName.length === 0) return;
+
+    // Check for duplicate names.
+    const resourcesManager = project.getResourcesManager();
+    if (resourcesManager.hasResource(newName)) {
+      showWarningBox('Another resource with this name already exists', {
+        delayToNextTick: true,
+      });
+      return;
+    }
+
+    onRenameResource(resource, newName, doRename => {
+      if (!doRename) return;
+
+      resource.setName(newName);
+
+      const resourcesList = this._resourcesList;
+      if (resourcesList) {
+        resourcesList.forceUpdateList();
+        resourcesList.focusList();
+      }
+      const propertiesEditor = this._propertiesEditor;
+      if (propertiesEditor) propertiesEditor.forceUpdate();
     });
   };
 
@@ -243,12 +291,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   };
 
   render(): any {
-    const {
-      project,
-      onRenameResource,
-      resourceManagementProps,
-      fileMetadata,
-    } = this.props;
+    const { project, resourceManagementProps, fileMetadata } = this.props;
     const { selectedResource } = this.state;
     const resourcesActionsMenuBuilder = resourceManagementProps.getStorageProviderResourceOperations();
 
@@ -282,7 +325,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             project={project}
             fileMetadata={fileMetadata}
             onDeleteResource={this.deleteResource}
-            onRenameResource={onRenameResource}
+            onRenameResource={this.renameResource}
             onSelectResource={this._onResourceSelected}
             selectedResource={selectedResource}
             ref={resourcesList => (this._resourcesList = resourcesList)}

@@ -2,6 +2,11 @@
 
 import { mapFor } from '../../Utils/MapFor';
 
+type EnumeratedPropertyFolderOrProperty = {|
+  path: string,
+  folder: gdPropertyFolderOrProperty,
+|};
+
 export const getPropertyFolderOrPropertyUnifiedName = (
   propertyFolderOrProperty: gdPropertyFolderOrProperty
 ): string =>
@@ -12,7 +17,7 @@ export const getPropertyFolderOrPropertyUnifiedName = (
 const recursivelyEnumerateFoldersInFolder = (
   folder: gdPropertyFolderOrProperty,
   prefix: string,
-  result: {| path: string, folder: gdPropertyFolderOrProperty |}[]
+  result: Array<EnumeratedPropertyFolderOrProperty>
 ) => {
   mapFor(0, folder.getChildrenCount(), i => {
     const child = folder.getChildAt(i);
@@ -45,37 +50,28 @@ const recursivelyEnumeratePropertiesInFolder = (
 
 export const enumeratePropertiesInFolder = (
   folder: gdPropertyFolderOrProperty
-): gdNamedPropertyDescriptor[] => {
+): Array<gdNamedPropertyDescriptor> => {
   if (!folder.isFolder()) return [];
-  // $FlowFixMe[missing-empty-array-annot]
-  const result = [];
-  // $FlowFixMe[incompatible-type]
+  const result: Array<gdNamedPropertyDescriptor> = [];
   recursivelyEnumeratePropertiesInFolder(folder, result);
-  // $FlowFixMe[incompatible-type]
   return result;
 };
 
 export const enumerateFoldersInFolder = (
   folder: gdPropertyFolderOrProperty
-): {| path: string, folder: gdPropertyFolderOrProperty |}[] => {
+): Array<EnumeratedPropertyFolderOrProperty> => {
   if (!folder.isFolder()) return [];
-  // $FlowFixMe[missing-empty-array-annot]
-  const result = [];
-  // $FlowFixMe[incompatible-type]
+  const result: Array<EnumeratedPropertyFolderOrProperty> = [];
   recursivelyEnumerateFoldersInFolder(folder, '', result);
-  // $FlowFixMe[incompatible-type]
   return result;
 };
 
 export const enumerateFoldersInContainer = (
   container: gdPropertiesContainer
-): {| path: string, folder: gdPropertyFolderOrProperty |}[] => {
+): Array<EnumeratedPropertyFolderOrProperty> => {
   const rootFolder = container.getRootFolder();
-  // $FlowFixMe[missing-empty-array-annot]
-  const result = [];
-  // $FlowFixMe[incompatible-type]
+  const result: Array<EnumeratedPropertyFolderOrProperty> = [];
   recursivelyEnumerateFoldersInFolder(rootFolder, '', result);
-  // $FlowFixMe[incompatible-type]
   return result;
 };
 

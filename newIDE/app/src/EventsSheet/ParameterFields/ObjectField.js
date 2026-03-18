@@ -13,6 +13,7 @@ import {
 import { Trans } from '@lingui/macro';
 import { nameAndIconContainer } from '../EventsTree/ClassNames';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
+import { highlightSearchText } from '../../Utils/HighlightSearchText';
 
 const gd: libGDevelop = global.gd;
 
@@ -109,11 +110,10 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? parameterMetadata.getExtraInfo()
       : undefined;
 
-    const requiredCapabilitiesBehaviorTypes = React.useMemo(
+    const requiredCapabilitiesBehaviorTypes = React.useMemo<Array<string>>(
       () => {
         const functionMetadata = instructionMetadata || expressionMetadata;
         if (!project || !functionMetadata || parameterIndex === undefined) {
-          // $FlowFixMe[missing-empty-array-annot]
           return [];
         }
         return getRequiredCapabilitiesBehaviorTypes(
@@ -210,7 +210,9 @@ export const renderInlineObjectWithThumbnail = ({
   expressionIsValid,
   InvalidParameterValue,
   MissingParameterValue,
-}: ParameterInlineRendererProps): React.MixedElement => {
+  highlightedSearchText,
+  highlightedSearchMatchCase,
+}: ParameterInlineRendererProps): React.Node => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }
@@ -224,9 +226,15 @@ export const renderInlineObjectWithThumbnail = ({
     >
       {renderObjectThumbnail(value)}
       {expressionIsValid ? (
-        value
+        highlightSearchText(value, highlightedSearchText, {
+          matchCase: highlightedSearchMatchCase,
+        })
       ) : (
-        <InvalidParameterValue>{value}</InvalidParameterValue>
+        <InvalidParameterValue>
+          {highlightSearchText(value, highlightedSearchText, {
+            matchCase: highlightedSearchMatchCase,
+          })}
+        </InvalidParameterValue>
       )}
     </span>
   );

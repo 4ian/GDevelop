@@ -308,19 +308,18 @@ const ImagePreview = ({
             y: touch2clientY - containerRect.top,
           }
         );
-        if (previousDoubleTouchInfo.current) {
+        const previousTouchInfo = previousDoubleTouchInfo.current;
+        if (previousTouchInfo) {
           setZoomState(zoomState => ({
             ...zoomState,
             xOffset:
-              zoomState.xOffset +
-              (newCenter[0] - previousDoubleTouchInfo.current.center[0]),
+              zoomState.xOffset + (newCenter[0] - previousTouchInfo.center[0]),
             yOffset:
-              zoomState.yOffset +
-              (newCenter[1] - previousDoubleTouchInfo.current.center[1]),
+              zoomState.yOffset + (newCenter[1] - previousTouchInfo.center[1]),
           }));
 
           zoomAroundPointBy(
-            newDistance / previousDoubleTouchInfo.current.distance,
+            newDistance / previousTouchInfo.distance,
             newCenter
           );
         }
@@ -486,12 +485,11 @@ const ImagePreview = ({
   const containerLoaded = !!containerWidth && !!containerHeight;
   const imageLoaded = !!imageWidth && !!imageHeight && !errored;
 
-  // We display the elements only when the image is loaded and
-  // the zoom is applied to avoid a shift in the image.
+  // We display the elements only when both the container and image are loaded
+  // to avoid a shift in the image.
   // We use "visibility": "hidden" instead of "display": "none"
   // so that the image takes the space of the container whilst being hidden.
-  // TODO: handle a proper loader.
-  const visibility = containerLoaded ? undefined : 'hidden';
+  const visibility = containerLoaded && imageLoaded ? undefined : 'hidden';
 
   const forcedCursor = shouldMoveView ? 'grab' : null;
   const forcedCursorStyle = forcedCursor

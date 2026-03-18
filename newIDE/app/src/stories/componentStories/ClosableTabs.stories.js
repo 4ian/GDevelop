@@ -313,6 +313,7 @@ export const WithObjectsList = (): React.Node => (
                     'On edit variant'
                   )}
                   onExportAssets={action('On export assets')}
+                  onImportAssets={action('On import assets')}
                   onAddObjectInstance={action('On add instance to the scene')}
                   selectedObjectFolderOrObjectsWithContext={[]}
                   getValidatedObjectOrGroupName={newName => newName}

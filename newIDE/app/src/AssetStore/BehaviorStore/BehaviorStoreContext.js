@@ -19,8 +19,7 @@ const gd: libGDevelop = global.gd;
 
 const emptySearchText = '';
 
-// $FlowFixMe[underconstrained-implicit-instantiation]
-const noExcludedTiers = new Set();
+const noExcludedTiers = new Set<string>();
 const excludedExperimentalTiers = new Set(['experimental']);
 
 type TranslatedBehaviorShortHeader = {
@@ -292,8 +291,7 @@ export const BehaviorStoreStateProvider = ({
 
   const allCategories = React.useMemo(
     () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      const categoriesSet = new Set();
+      const categoriesSet = new Set<string>();
       for (const type in allTranslatedBehaviors) {
         categoriesSet.add(allTranslatedBehaviors[type].category);
       }
@@ -305,10 +303,9 @@ export const BehaviorStoreStateProvider = ({
     [allTranslatedBehaviors]
   );
 
-  const filters = React.useMemo(
+  const filters: Filters = React.useMemo(
     () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      const tagsSet = new Set();
+      const tagsSet = new Set<string>();
       for (const type in allTranslatedBehaviors) {
         const behavior = allTranslatedBehaviors[type];
         behavior.tags.forEach(tag => {
@@ -327,7 +324,6 @@ export const BehaviorStoreStateProvider = ({
       return {
         allTags: sortedTags,
         defaultTags: sortedTags,
-        // $FlowFixMe[missing-empty-array-annot]
         tagsTree: [],
       };
     },

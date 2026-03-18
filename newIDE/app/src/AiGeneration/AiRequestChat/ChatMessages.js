@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import useStableValue from '../../Utils/useStableValue';
 import { ChatBubble } from './ChatBubble';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import { ChatMarkdownText } from './ChatMarkdownText';
@@ -7,6 +8,11 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { getFunctionCallToFunctionCallOutputMap } from '../AiRequestUtils';
 import { FunctionCallRow } from './FunctionCallRow';
 import { FunctionCallsGroup } from './FunctionCallsGroup';
+import { SuggestionLines } from './SuggestionLines';
+import {
+  editorFunctions,
+  editorFunctionsWithoutProject,
+} from '../../EditorFunctions';
 import IconButton from '../../UI/IconButton';
 import Like from '../../UI/CustomSvgIcons/Like';
 import Dislike from '../../UI/CustomSvgIcons/Dislike';
@@ -15,8 +21,6 @@ import { Trans, t } from '@lingui/macro';
 import {
   type AiRequest,
   type AiRequestMessageAssistantFunctionCall,
-  type AiRequestAssistantMessage,
-  type AiRequestFunctionCallOutput,
   type AiRequestMessage,
 } from '../../Utils/GDevelopServices/Generation';
 import {
@@ -27,15 +31,9 @@ import classes from './ChatMessages.module.css';
 import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
 import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
-import {
-  ColumnStackLayout,
-  LineStackLayout,
-  ResponsiveLineStackLayout,
-} from '../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import FlatButton from '../../UI/FlatButton';
-import Pause from '../../UI/CustomSvgIcons/Pause';
-import Paper, { getBackgroundColor } from '../../UI/Paper';
-import Play from '../../UI/CustomSvgIcons/Play';
+import Paper from '../../UI/Paper';
 import Floppy from '../../UI/CustomSvgIcons/Floppy';
 import SubscriptionPlanTableSummary from '../../Profile/Subscription/SubscriptionDialog/SubscriptionPlanTableSummary';
 import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
@@ -50,6 +48,9 @@ import CheckCircle from '@material-ui/icons/CheckCircle';
 import Link from '../../UI/Link';
 import { type FileMetadata } from '../../ProjectsStorage';
 import UnsavedChangesContext from '../../MainFrame/UnsavedChangesContext';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
+import { OrchestratorPlan } from './OrchestratorPlan';
+import { type FunctionCallItem, type RenderItem } from './Utils';
 
 const styles = {
   subscriptionPaper: {
@@ -66,120 +67,26 @@ const styles = {
   },
 };
 
-const getMessageSuggestionsLines = ({
-  aiRequest,
-  onUserRequestTextChange,
-  disabled,
-  message,
-  messageIndex,
-  onlyShowExplanationMessage,
-  functionCallItems,
-  project,
-  onProcessFunctionCalls,
-  editorCallbacks,
-}: {|
-  aiRequest: AiRequest,
-  onUserRequestTextChange: (
-    userRequestText: string,
-    aiRequestIdToChange: string
-  ) => void,
-  disabled?: boolean,
-  message: AiRequestAssistantMessage | AiRequestFunctionCallOutput,
-  messageIndex: number,
-  onlyShowExplanationMessage?: boolean,
-  functionCallItems?: Array<any>,
-  project: ?gdProject,
-  onProcessFunctionCalls: (
-    functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
-    options: ?{|
-      ignore?: boolean,
-    |}
-  ) => Promise<void>,
-  editorCallbacks: EditorCallbacks,
-|}) => {
-  const lines = [];
-  const suggestions = message.suggestions;
-
-  if (suggestions && suggestions.explanationMessage) {
-    lines.push(
-      <Line
-        key={`${messageIndex}-suggestion-message`}
-        justifyContent="flex-start"
-      >
-        <ChatBubble role="assistant">
-          <Column noMargin>
-            {functionCallItems && functionCallItems.length > 0 && (
-              <FunctionCallsGroup>
-                {functionCallItems.map(
-                  ({
-                    key: functionCallKey,
-                    messageContent: functionCallMessageContent,
-                    existingFunctionCallOutput,
-                    editorFunctionCallResult,
-                  }) => (
-                    <FunctionCallRow
-                      project={project}
-                      key={functionCallKey}
-                      onProcessFunctionCalls={onProcessFunctionCalls}
-                      functionCall={functionCallMessageContent}
-                      editorFunctionCallResult={editorFunctionCallResult}
-                      existingFunctionCallOutput={existingFunctionCallOutput}
-                      editorCallbacks={editorCallbacks}
-                    />
-                  )
-                )}
-              </FunctionCallsGroup>
-            )}
-            <ChatMarkdownText source={suggestions.explanationMessage} />
-          </Column>
-        </ChatBubble>
-      </Line>
-    );
-  }
-  if (
-    !onlyShowExplanationMessage &&
-    suggestions &&
-    suggestions.suggestions.length
-  ) {
-    lines.push(
-      <Line
-        key={`${messageIndex}-suggestions-title`}
-        justifyContent="flex-start"
-        noMargin
-      >
-        <Text size="sub-title">
-          <Trans>What should I do next?</Trans>
-        </Text>
-      </Line>
-    );
-    lines.push(
-      <Line
-        key={`${messageIndex}-suggestions`}
-        justifyContent="flex-start"
-        noMargin
-      >
-        <ResponsiveLineStackLayout noMargin>
-          {suggestions.suggestions.map((suggestion, suggestionIndex) => (
-            <FlatButton
-              key={`suggestion-${suggestionIndex}`}
-              onClick={() => {
-                onUserRequestTextChange(
-                  suggestion.suggestedMessage,
-                  aiRequest.id
-                );
-              }}
-              label={suggestion.title}
-              disabled={disabled}
-              color="ai"
-            />
-          ))}
-        </ResponsiveLineStackLayout>
-      </Line>
-    );
-  }
-
-  return lines;
-};
+// Phrases displayed while the AI is thinking/waiting (no active function calls).
+// Defined outside the component so the array is stable across renders.
+const thinkingPhrases: Array<React.Node> = [
+  <Trans>Reading the documentation</Trans>,
+  <Trans>Analyzing the project</Trans>,
+  <Trans>Reviewing the game structure</Trans>,
+  <Trans>Studying the event sheets</Trans>,
+  <Trans>Thinking through the approach</Trans>,
+  <Trans>Considering the possibilities</Trans>,
+  <Trans>Examining the behaviors</Trans>,
+  <Trans>Reading through the events</Trans>,
+  <Trans>Understanding the context</Trans>,
+  <Trans>Evaluating the game logic</Trans>,
+  <Trans>Reviewing the scene data</Trans>,
+  <Trans>Analyzing the object properties</Trans>,
+  <Trans>Thinking through the details</Trans>,
+  <Trans>Reviewing the current state</Trans>,
+  <Trans>Studying the object behaviors</Trans>,
+  <Trans>Considering the best approach</Trans>,
+];
 
 type Props = {|
   aiRequest: AiRequest,
@@ -205,16 +112,15 @@ type Props = {|
     aiRequestIdToChange: string
   ) => void,
   shouldBeWorkingIfNotPaused?: boolean,
-  isPaused?: boolean,
   isForAnotherProject?: boolean,
   shouldDisplayFeedbackBanner?: boolean,
-  onPause: (pause: boolean) => void,
   onScrollToBottom: () => void,
   hasStartedRequestButCannotContinue: boolean,
   onSwitchedToGDevelopCredits: () => void,
 
   onStartOrOpenChat: (options: ?{| aiRequestId: string | null |}) => void,
   isFetchingSuggestions: boolean,
+  isSending?: boolean,
   savingProjectForMessageId: ?string,
   forkingState: ?{| aiRequestId: string, messageId: string |},
   onRestore: ({|
@@ -230,23 +136,24 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     editorFunctionCallResults,
     onProcessFunctionCalls,
     editorCallbacks,
-    project,
+
+    project: nullableProject,
     fileMetadata,
     onUserRequestTextChange,
     shouldBeWorkingIfNotPaused,
-    isPaused,
     isForAnotherProject,
     shouldDisplayFeedbackBanner,
-    onPause,
     onScrollToBottom,
     hasStartedRequestButCannotContinue,
     onSwitchedToGDevelopCredits,
     onStartOrOpenChat,
     isFetchingSuggestions,
+    isSending,
     savingProjectForMessageId,
     forkingState,
     onRestore,
   }: Props) {
+    const project = exceptionallyGuardAgainstDeadObject(nullableProject);
     const theme = React.useContext(GDevelopThemeContext);
     const isLightTheme = theme.palette.type === 'light';
     const {
@@ -311,7 +218,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
         if (
           shouldShowCreditsOrSubscriptionPrompt ||
           isFetchingSuggestions ||
-          (shouldBeWorkingIfNotPaused && !isPaused)
+          shouldBeWorkingIfNotPaused
         ) {
           onScrollToBottom();
         }
@@ -320,12 +227,11 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
         shouldShowCreditsOrSubscriptionPrompt,
         isFetchingSuggestions,
         shouldBeWorkingIfNotPaused,
-        isPaused,
         onScrollToBottom,
       ]
     );
 
-    const isWorking = !!shouldBeWorkingIfNotPaused && !isPaused;
+    const isWorking = !!shouldBeWorkingIfNotPaused;
     const [isRestoring, setIsRestoring] = React.useState(false);
     const disabled = isWorking || isForAnotherProject || isRestoring;
 
@@ -360,17 +266,30 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     // Group consecutive function calls.
     const renderItems = React.useMemo(
       () => {
-        const items = [];
-        let currentFunctionCallItems = [];
+        const items: Array<RenderItem> = [];
+        // Function calls from the current assistant message (rendered inside the
+        // same bubble as any following text content in that message).
+        let currentFunctionCallItems: Array<FunctionCallItem> = [];
+        // Function calls accumulated across previous messages that haven't been
+        // flushed yet. They are rendered as a standalone group right before the
+        // next text content, keeping consecutive cross-message function calls
+        // together while preventing them from being lost when absorbed into a plan.
+        let crossMessageFunctionCallItems: Array<FunctionCallItem> = [];
         const forkedAfterNewMessageId = aiRequest.forkedAfterNewMessageId;
+        const seenProjectVersionIds: Set<string> = new Set();
 
         const flushFunctionCallGroup = () => {
-          if (currentFunctionCallItems.length > 0) {
+          const allItems = [
+            ...crossMessageFunctionCallItems,
+            ...currentFunctionCallItems,
+          ];
+          crossMessageFunctionCallItems = [];
+          currentFunctionCallItems = [];
+          if (allItems.length > 0) {
             items.push({
               type: 'function_call_group',
-              items: currentFunctionCallItems,
+              items: allItems,
             });
-            currentFunctionCallItems = [];
           }
         };
 
@@ -379,7 +298,6 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
 
           if (message.type === 'message' && message.role === 'user') {
             flushFunctionCallGroup();
-            // $FlowFixMe[incompatible-type]
             items.push({
               type: 'user_message',
               messageIndex,
@@ -389,8 +307,18 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
             message.type === 'message' &&
             message.role === 'assistant'
           ) {
-            // $FlowFixMe[missing-empty-array-annot]
-            let pendingFunctionCallItems = [];
+            // Move any function calls from previous messages into the cross-message
+            // accumulator so they stay grouped together but don't bleed into this
+            // message's same-bubble functionCallItems.
+            if (currentFunctionCallItems.length > 0) {
+              crossMessageFunctionCallItems = [
+                ...crossMessageFunctionCallItems,
+                ...currentFunctionCallItems,
+              ];
+              currentFunctionCallItems = [];
+            }
+
+            let pendingFunctionCallItems: Array<FunctionCallItem> = [];
 
             message.content.forEach((messageContent, messageContentIndex) => {
               if (messageContent.type === 'function_call') {
@@ -406,6 +334,18 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                     )) ||
                   null;
 
+                // Don't display create_or_update_plan calls — the plan is shown
+                // separately via the OrchestratorPlan component.
+                if (messageContent.name === 'create_or_update_plan') {
+                  return;
+                }
+
+                // Don't display function calls with a taskId here — they are
+                // shown inside their task row in the OrchestratorPlan component.
+                if (messageContent.taskId) {
+                  return;
+                }
+
                 currentFunctionCallItems.push({
                   key: `messageIndex${messageIndex}-${messageContentIndex}`,
                   messageContent,
@@ -413,18 +353,30 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                   editorFunctionCallResult,
                 });
               } else {
-                // Attach pending function calls to this message content
+                // Flush cross-message function calls as a standalone group first,
+                // so they appear before this text content and don't get attached
+                // to the message_content (where they could be silently dropped if
+                // the item is absorbed into a plan bubble as followingText).
+                if (crossMessageFunctionCallItems.length > 0) {
+                  items.push({
+                    type: 'function_call_group',
+                    items: crossMessageFunctionCallItems,
+                  });
+                  crossMessageFunctionCallItems = [];
+                }
+
+                // Attach same-message function calls to this content (same bubble).
                 if (currentFunctionCallItems.length > 0) {
                   pendingFunctionCallItems = [...currentFunctionCallItems];
                   currentFunctionCallItems = [];
                 }
 
-                // $FlowFixMe[incompatible-type]
                 items.push({
                   type: 'message_content',
                   messageIndex,
                   messageContentIndex,
                   message,
+                  // $FlowFixMe[incompatible-type] - messageContent types are complex
                   messageContent,
                   isLastMessage,
                   functionCallItems:
@@ -449,19 +401,27 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
             (message.projectVersionIdAfterMessage ||
               isSavingProjectForThisMessage)
           ) {
-            flushFunctionCallGroup();
-            // $FlowFixMe[incompatible-type]
-            items.push({
-              type: 'save',
-              messageIndex: messageIndex,
-              message: message,
-              isRestored:
-                forkedAfterNewMessageId &&
-                message.messageId === forkedAfterNewMessageId,
-              isSaving:
-                isSavingProjectForThisMessage &&
-                !message.projectVersionIdAfterMessage,
-            });
+            // Deduplicate: skip if we already showed a save item for this version
+            const versionId = message.projectVersionIdAfterMessage;
+            const isDuplicate =
+              versionId && seenProjectVersionIds.has(versionId);
+            if (!isDuplicate) {
+              if (versionId) seenProjectVersionIds.add(versionId);
+              flushFunctionCallGroup();
+              items.push({
+                type: 'save',
+                messageIndex: messageIndex,
+                message: message,
+                isRestored: !!(
+                  forkedAfterNewMessageId &&
+                  message.messageId === forkedAfterNewMessageId
+                ),
+                isSaving: !!(
+                  isSavingProjectForThisMessage &&
+                  !message.projectVersionIdAfterMessage
+                ),
+              });
+            }
           }
 
           if (
@@ -483,14 +443,36 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
               flushFunctionCallGroup();
             }
 
-            // $FlowFixMe[incompatible-type]
             items.push({
               type: 'suggestions',
               messageIndex: messageIndex,
+              // $FlowFixMe[incompatible-type] - message can be assistant or function_call_output
               message: message,
               onlyShowExplanationMessage: !isLastMessage,
               functionCallItems: functionCallItemsForSuggestions,
             });
+          }
+
+          // Display plan when a function_call_output contains plan data.
+          if (
+            aiRequest.mode === 'orchestrator' &&
+            message.type === 'function_call_output' &&
+            message.output
+          ) {
+            try {
+              const output = JSON.parse(message.output);
+              if (output && output.plan && Array.isArray(output.plan.tasks)) {
+                flushFunctionCallGroup();
+                items.push({
+                  type: 'orchestrator_plan',
+                  plan: output.plan,
+                  messageIndex,
+                  messageId: message.messageId || '',
+                });
+              }
+            } catch (e) {
+              // Ignore parse errors.
+            }
           }
 
           if (isLastMessage) {
@@ -508,28 +490,212 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
       ]
     );
 
+    // Collect text descriptions of function calls that are actively being worked on,
+    // so we can display them in the status bar instead of a generic "Working..." label.
+    const workingFunctionCallTexts: Array<React.Node> = React.useMemo(
+      () => {
+        if (!shouldBeWorkingIfNotPaused) return [];
+        const texts: Array<React.Node> = [];
+        // Iterate all assistant messages directly so we capture function calls
+        // that have a taskId (which are excluded from renderItems but still
+        // need to appear in the status bar when running).
+        for (const message of aiRequest.output) {
+          if (message.type !== 'message' || message.role !== 'assistant')
+            continue;
+          for (const messageContent of message.content) {
+            if (messageContent.type !== 'function_call') continue;
+            if (messageContent.name === 'create_or_update_plan') continue;
+            const existingFunctionCallOutput = functionCallToFunctionCallOutput.get(
+              messageContent
+            );
+            const editorFunctionCallResult =
+              (!existingFunctionCallOutput &&
+                editorFunctionCallResults &&
+                editorFunctionCallResults.find(
+                  r => r.call_id === messageContent.call_id
+                )) ||
+              null;
+            if (
+              !editorFunctionCallResult ||
+              editorFunctionCallResult.status !== 'working'
+            )
+              continue;
+            const editorFunction =
+              // $FlowFixMe[incompatible-type]
+              editorFunctions[messageContent.name] ||
+              // $FlowFixMe[incompatible-type]
+              editorFunctionsWithoutProject[messageContent.name] ||
+              null;
+            if (!editorFunction) continue;
+            try {
+              const result = editorFunction.renderForEditor({
+                project,
+                args: JSON.parse(messageContent.arguments),
+                editorCallbacks,
+                shouldShowDetails: false,
+                editorFunctionCallResultOutput: null,
+              });
+              if (result.text) texts.push(result.text);
+            } catch (e) {
+              // Ignore rendering errors for the status bar.
+            }
+          }
+        }
+        return texts;
+      },
+      [
+        shouldBeWorkingIfNotPaused,
+        aiRequest.output,
+        project,
+        editorCallbacks,
+        editorFunctionCallResults,
+        functionCallToFunctionCallOutput,
+      ]
+    );
+
+    // Index used to rotate through working function call texts or thinking phrases.
+    // Start at a random offset so the first phrase shown is not always the same.
+    const [rotationIndex, setRotationIndex] = React.useState(() =>
+      Math.floor(Math.random() * thinkingPhrases.length)
+    );
+
+    // Keep function-call texts visible for at least 3s after they finish, so
+    // fast calls don't flash in and out immediately.
+    const hasWorkingFunctionCallTexts = useStableValue({
+      minimumDuration: 3000,
+      value: workingFunctionCallTexts.length > 0,
+    });
+    // Remember the last non-empty texts so they're still shown during the
+    // grace period after workingFunctionCallTexts becomes empty.
+    const lastWorkingFunctionCallTextsRef = React.useRef(
+      workingFunctionCallTexts
+    );
+    if (workingFunctionCallTexts.length > 0) {
+      lastWorkingFunctionCallTextsRef.current = workingFunctionCallTexts;
+    }
+
+    // Compute here (not inside JSX) so the ref is always up to date regardless
+    // of which render branch is active (e.g. isFetchingSuggestions vs working).
+    const textsToShow = hasWorkingFunctionCallTexts
+      ? lastWorkingFunctionCallTextsRef.current
+      : thinkingPhrases;
+
+    // Ref holding current texts so the setInterval callback can pick a random
+    // next index without going stale.
+    const textsToShowRef = React.useRef<Array<React.Node>>(textsToShow);
+    textsToShowRef.current = textsToShow;
+
+    const isActivelyWorking =
+      !!shouldBeWorkingIfNotPaused || isFetchingSuggestions;
+
+    React.useEffect(
+      () => {
+        if (!isActivelyWorking) return;
+        const interval = setInterval(() => {
+          setRotationIndex(prev => {
+            const texts = textsToShowRef.current;
+            const len = texts.length;
+            if (len <= 1) return prev;
+            // Random skip of 1..len-1 to guarantee a different item each rotation.
+            const skip = 1 + Math.floor(Math.random() * (len - 1));
+            return (prev + skip) % len;
+          });
+        }, 8000);
+        return () => clearInterval(interval);
+      },
+      [isActivelyWorking]
+    );
+
     const filteredRenderItems = React.useMemo(
       () => {
-        if (!forkingState || forkingState.aiRequestId !== aiRequest.id) {
-          return renderItems;
+        let items = renderItems;
+
+        if (forkingState && forkingState.aiRequestId === aiRequest.id) {
+          const forkSaveIndex = items.findIndex(
+            item =>
+              item.type === 'save' &&
+              item.message &&
+              item.message.messageId === forkingState.messageId
+          );
+
+          if (forkSaveIndex !== -1) {
+            // Only show items up to and including the save item.
+            // The save item itself will show "Restoring..." state.
+            items = items.slice(0, forkSaveIndex + 1);
+          }
         }
 
-        const forkSaveIndex = renderItems.findIndex(
-          item =>
-            item.type === 'save' &&
-            // $FlowFixMe[prop-missing]
-            item.message &&
-            // $FlowFixMe[invalid-compare]
-            item.message.messageId === forkingState.messageId
-        );
+        // Deduplicate consecutive plan items: if multiple plans appear with no
+        // user or assistant message between them, only show the latest one
+        // (it's just a status update to the same plan).
+        const planIndicesToRemove: Set<number> = new Set();
+        let lastPlanIndex = -1;
+        items.forEach((item, index) => {
+          if (item.type === 'orchestrator_plan') {
+            if (lastPlanIndex !== -1) {
+              planIndicesToRemove.add(lastPlanIndex);
+            }
+            lastPlanIndex = index;
+          } else if (
+            item.type === 'user_message' ||
+            item.type === 'message_content'
+          ) {
+            // A real message resets the sequence — plans after it are independent.
+            lastPlanIndex = -1;
+          }
+        });
+        if (planIndicesToRemove.size > 0) {
+          items = items.filter((_, index) => !planIndicesToRemove.has(index));
+        }
 
-        if (forkSaveIndex === -1) return renderItems;
-
-        // Only show items up to and including the save item.
-        // The save item itself will show "Restoring..." state.
-        return renderItems.slice(0, forkSaveIndex + 1);
+        return items;
       },
       [renderItems, forkingState, aiRequest.id]
+    );
+
+    // Map each plan task id to the function call items linked to it (via taskId),
+    // so the OrchestratorPlan component can show them inside the task row.
+    const functionCallItemsByTaskId: Map<
+      string,
+      Array<FunctionCallItem>
+    > = React.useMemo(
+      () => {
+        const map: Map<string, Array<FunctionCallItem>> = new Map();
+        aiRequest.output.forEach(message => {
+          if (message.type === 'message' && message.role === 'assistant') {
+            message.content.forEach(messageContent => {
+              if (
+                messageContent.type === 'function_call' &&
+                messageContent.taskId
+              ) {
+                const taskId = messageContent.taskId;
+                const existingFunctionCallOutput = functionCallToFunctionCallOutput.get(
+                  messageContent
+                );
+                const editorFunctionCallResult =
+                  (!existingFunctionCallOutput &&
+                    editorFunctionCallResults &&
+                    editorFunctionCallResults.find(
+                      r => r.call_id === messageContent.call_id
+                    )) ||
+                  null;
+                if (!map.has(taskId)) map.set(taskId, []);
+                const taskItems = map.get(taskId);
+                if (taskItems) {
+                  taskItems.push({
+                    key: `task-${taskId}-${messageContent.call_id}`,
+                    messageContent,
+                    existingFunctionCallOutput,
+                    editorFunctionCallResult,
+                  });
+                }
+              }
+            });
+          }
+        });
+        return map;
+      },
+      [aiRequest, editorFunctionCallResults, functionCallToFunctionCallOutput]
     );
 
     // Scroll to bottom when suggestions are added.
@@ -556,12 +722,66 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
 
     const forkedFromAiRequestId = aiRequest.forkedFromAiRequestId;
 
+    // Pre-compute which message_content items are absorbed into the preceding
+    // plan bubble so they don't render as a separate ChatBubble.
+    const absorbedMessageContentIndices: Set<number> = React.useMemo(
+      () => {
+        const set: Set<number> = new Set();
+        filteredRenderItems.forEach((item, index) => {
+          if (item.type === 'orchestrator_plan') {
+            const next = filteredRenderItems[index + 1];
+            if (
+              next &&
+              next.type === 'message_content' &&
+              next.messageContent.type === 'output_text' &&
+              next.messageContent.text &&
+              next.messageContent.text.trim()
+            ) {
+              set.add(index + 1);
+            }
+          }
+        });
+        return set;
+      },
+      [filteredRenderItems]
+    );
+
     return (
       <>
         {filteredRenderItems
           .flatMap((item, itemIndex) => {
+            if (item.type === 'orchestrator_plan') {
+              const nextItem = filteredRenderItems[itemIndex + 1];
+              const followingText =
+                nextItem &&
+                nextItem.type === 'message_content' &&
+                nextItem.messageContent.type === 'output_text' &&
+                nextItem.messageContent.text
+                  ? nextItem.messageContent.text.trim()
+                  : undefined;
+              return [
+                <Line
+                  key={`orchestrator-plan-${item.messageIndex}`}
+                  justifyContent="flex-start"
+                >
+                  <OrchestratorPlan
+                    tasks={item.plan.tasks}
+                    messageId={item.messageId}
+                    followingText={followingText}
+                    functionCallItemsByTaskId={functionCallItemsByTaskId}
+                    project={project}
+                    onProcessFunctionCalls={onProcessFunctionCalls}
+                    editorCallbacks={editorCallbacks}
+                  />
+                </Line>,
+              ];
+            }
+
+            if (absorbedMessageContentIndices.has(itemIndex)) {
+              return ([]: Array<React.Node>);
+            }
+
             if (item.type === 'user_message') {
-              // $FlowFixMe[prop-missing]
               const { messageIndex, message } = item;
 
               const currentVersionOpened = fileMetadata
@@ -673,15 +893,10 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
 
             if (item.type === 'message_content') {
               const {
-                // $FlowFixMe[prop-missing]
                 messageIndex,
-                // $FlowFixMe[prop-missing]
                 messageContentIndex,
-                // $FlowFixMe[prop-missing]
                 messageContent,
-                // $FlowFixMe[prop-missing]
                 isLastMessage,
-                // $FlowFixMe[prop-missing]
                 functionCallItems,
               } = item;
               // $FlowFixMe[incompatible-type]
@@ -700,92 +915,115 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                   return null;
                 }
 
+                // Don't show the "Did it work?" banner when this message is a
+                // plan confirmation (i.e. it immediately follows a
+                // function_call_output that returned a plan).
+                const previousOutputMessage =
+                  messageIndex > 0 ? aiRequest.output[messageIndex - 1] : null;
+                const isAfterPlanOutput =
+                  previousOutputMessage &&
+                  previousOutputMessage.type === 'function_call_output' &&
+                  (() => {
+                    try {
+                      return !!JSON.parse(previousOutputMessage.output).plan;
+                    } catch (e) {
+                      return false;
+                    }
+                  })();
+
                 return [
                   <Line key={key} justifyContent="flex-start">
                     <ChatBubble
                       role="assistant"
                       feedbackButtons={
-                        <div className={classes.feedbackButtonsContainer}>
-                          {/* $FlowFixMe[constant-condition] */}
-                          {isLastMessage && shouldDisplayFeedbackBanner && (
-                            <Text size="body-small" color="secondary" noMargin>
-                              <Trans>Did it work?</Trans>
-                            </Text>
-                          )}
-                          <LineStackLayout
-                            expand
-                            noMargin
-                            justifyContent="flex-end"
-                          >
-                            <IconButton
-                              size="small"
-                              tooltip={t`Copy`}
-                              onClick={() => {
-                                navigator.clipboard.writeText(
-                                  // $FlowFixMe[incompatible-use]
-                                  messageContent.text
-                                );
-                              }}
+                        isAfterPlanOutput ? (
+                          undefined
+                        ) : (
+                          <div className={classes.feedbackButtonsContainer}>
+                            {isLastMessage && shouldDisplayFeedbackBanner && (
+                              <Text
+                                size="body-small"
+                                color="secondary"
+                                noMargin
+                              >
+                                <Trans>Did it work?</Trans>
+                              </Text>
+                            )}
+                            <LineStackLayout
+                              expand
+                              noMargin
+                              justifyContent="flex-end"
                             >
-                              <Copy fontSize="small" />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              tooltip={t`This was helpful`}
-                              onClick={() => {
-                                // $FlowFixMe[incompatible-type]
-                                setMessageFeedbacks({
-                                  ...messageFeedbacks,
-                                  [feedbackKey]: 'like',
-                                });
-                                onSendFeedback(
-                                  aiRequest.id,
+                              <IconButton
+                                size="small"
+                                tooltip={t`Copy`}
+                                onClick={() => {
+                                  if (messageContent.text) {
+                                    navigator.clipboard.writeText(
+                                      messageContent.text
+                                    );
+                                  }
+                                }}
+                              >
+                                <Copy fontSize="small" />
+                              </IconButton>
+                              <IconButton
+                                size="small"
+                                tooltip={t`This was helpful`}
+                                onClick={() => {
                                   // $FlowFixMe[incompatible-type]
-                                  messageIndex,
-                                  'like'
-                                );
-                              }}
-                            >
-                              <Like
-                                fontSize="small"
-                                htmlColor={
-                                  currentFeedback === 'like'
-                                    ? theme.message.valid
-                                    : undefined
-                                }
-                              />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              tooltip={t`This needs improvement`}
-                              onClick={() => {
-                                // $FlowFixMe[incompatible-type]
-                                setMessageFeedbacks({
-                                  ...messageFeedbacks,
-                                  [feedbackKey]: 'dislike',
-                                });
-                                // $FlowFixMe[incompatible-type]
-                                setDislikeFeedbackDialogOpenedFor({
-                                  aiRequestId: aiRequest.id,
-                                  messageIndex,
-                                });
-                              }}
-                            >
-                              <Dislike
-                                fontSize="small"
-                                htmlColor={
-                                  currentFeedback === 'dislike'
-                                    ? theme.message.warning
-                                    : undefined
-                                }
-                              />
-                            </IconButton>
-                          </LineStackLayout>
-                        </div>
+                                  setMessageFeedbacks({
+                                    ...messageFeedbacks,
+                                    [feedbackKey]: 'like',
+                                  });
+                                  onSendFeedback(
+                                    aiRequest.id,
+                                    // $FlowFixMe[incompatible-type]
+                                    messageIndex,
+                                    'like'
+                                  );
+                                }}
+                              >
+                                <Like
+                                  fontSize="small"
+                                  htmlColor={
+                                    currentFeedback === 'like'
+                                      ? theme.message.valid
+                                      : undefined
+                                  }
+                                />
+                              </IconButton>
+                              <IconButton
+                                size="small"
+                                tooltip={t`This needs improvement`}
+                                onClick={() => {
+                                  // $FlowFixMe[incompatible-type]
+                                  setMessageFeedbacks({
+                                    ...messageFeedbacks,
+                                    [feedbackKey]: 'dislike',
+                                  });
+                                  // $FlowFixMe[incompatible-type]
+                                  setDislikeFeedbackDialogOpenedFor({
+                                    aiRequestId: aiRequest.id,
+                                    messageIndex,
+                                  });
+                                }}
+                              >
+                                <Dislike
+                                  fontSize="small"
+                                  htmlColor={
+                                    currentFeedback === 'dislike'
+                                      ? theme.message.warning
+                                      : undefined
+                                  }
+                                />
+                              </IconButton>
+                            </LineStackLayout>
+                          </div>
+                        )
                       }
                     >
                       <Column noMargin>
-                        {/* $FlowFixMe[constant-condition] */}
                         {functionCallItems && functionCallItems.length > 0 && (
                           <FunctionCallsGroup>
                             {functionCallItems.map(
@@ -837,7 +1075,6 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
             }
 
             if (item.type === 'save') {
-              // $FlowFixMe[prop-missing]
               const { messageIndex, message, isRestored, isSaving } = item;
               const isForking =
                 forkingState &&
@@ -867,8 +1104,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                           <Trans>Restoring...</Trans>
                         </Text>
                       </LineStackLayout>
-                    ) : // $FlowFixMe[constant-condition]
-                    isSaving ? (
+                    ) : isSaving ? (
                       <LineStackLayout noMargin alignItems="center">
                         <Floppy fontSize="small" />
                         <Text size="body-small" noMargin color="secondary">
@@ -905,7 +1141,6 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                         </Text>
                       </LineStackLayout>
                     )}
-                    {/* $FlowFixMe[constant-condition] */}
                     {isRestored && !isForking && forkedFromAiRequestId && (
                       <LineStackLayout
                         noMargin
@@ -938,30 +1173,26 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
 
             if (item.type === 'suggestions') {
               const {
-                // $FlowFixMe[prop-missing]
                 messageIndex,
-                // $FlowFixMe[prop-missing]
                 message,
-                // $FlowFixMe[prop-missing]
                 onlyShowExplanationMessage,
-                // $FlowFixMe[prop-missing]
                 functionCallItems,
               } = item;
               return [
-                ...getMessageSuggestionsLines({
-                  aiRequest,
-                  onUserRequestTextChange,
-                  disabled,
+                <SuggestionLines
+                  key={`suggestions-${messageIndex}`}
+                  aiRequest={aiRequest}
+                  onUserRequestTextChange={onUserRequestTextChange}
+                  disabled={disabled}
                   // $FlowFixMe[incompatible-type]
-                  message,
-                  // $FlowFixMe[incompatible-type]
-                  messageIndex,
-                  onlyShowExplanationMessage,
-                  functionCallItems,
-                  project,
-                  onProcessFunctionCalls,
-                  editorCallbacks,
-                }),
+                  message={message}
+                  messageIndex={messageIndex}
+                  onlyShowExplanationMessage={onlyShowExplanationMessage}
+                  functionCallItems={functionCallItems}
+                  project={project}
+                  onProcessFunctionCalls={onProcessFunctionCalls}
+                  editorCallbacks={editorCallbacks}
+                />,
               ];
             }
 
@@ -979,6 +1210,21 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
               </Trans>
             </AlertMessage>
           </Line>
+        ) : aiRequest.status === 'suspended' && !shouldBeWorkingIfNotPaused ? (
+          <Line justifyContent="flex-start">
+            <div className={classes.suspendedIndicator}>
+              <div className={classes.suspendedDot} />
+              <Spacer />
+              <Text
+                noMargin
+                displayInlineAsSpan
+                size="body-small"
+                color="secondary"
+              >
+                <Trans>Stopped. Ready when you are.</Trans>
+              </Text>
+            </div>
+          </Line>
         ) : isFetchingSuggestions ? (
           <Line justifyContent="flex-start">
             <div className={classes.thinkingText}>
@@ -990,44 +1236,64 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                 size="body-small"
                 color="inherit"
               >
-                <Trans>Thinking...</Trans>
+                <span className={classes.cursorWrapper}>
+                  <span>
+                    <Trans>Thinking...</Trans>
+                  </span>
+                  <span className={classes.cursor} />
+                </span>
               </Text>
             </div>
           </Line>
-        ) : shouldBeWorkingIfNotPaused ? (
+        ) : isSending ? (
           <Line justifyContent="flex-start">
             <div className={classes.thinkingText}>
-              {/* $FlowFixMe[constant-condition] */}
-              {onPause && aiRequest.mode === 'agent' && (
-                <IconButton
-                  onClick={() => onPause(!isPaused)}
-                  size="small"
-                  style={{
-                    backgroundColor: !isPaused
-                      ? getBackgroundColor(theme, 'light')
-                      : undefined,
-                    borderRadius: 4,
-                    padding: 0,
-                  }}
-                  selected={isPaused}
-                >
-                  {isPaused ? <Play /> : <Pause />}
-                </IconButton>
-              )}
-              <Spacer />
               <Text
                 noMargin
                 displayInlineAsSpan
                 size="body-small"
                 color="inherit"
               >
-                {isPaused ? (
-                  <Trans>Paused</Trans>
-                ) : aiRequest.mode === 'chat' ? (
-                  <Trans>Thinking...</Trans>
-                ) : (
-                  <Trans>Working...</Trans>
-                )}
+                <span className={classes.cursorWrapper}>
+                  <span className={classes.typeReveal}>
+                    <Trans>Sending...</Trans>
+                  </span>
+                  <span className={classes.cursor} />
+                </span>
+              </Text>
+            </div>
+          </Line>
+        ) : shouldBeWorkingIfNotPaused ? (
+          <Line justifyContent="flex-start">
+            <div className={classes.thinkingText}>
+              <Text
+                noMargin
+                displayInlineAsSpan
+                size="body-small"
+                color="inherit"
+              >
+                <span className={classes.cursorWrapper}>
+                  {(() => {
+                    const singleItem = textsToShow.length === 1;
+                    return (
+                      <>
+                        <span
+                          key={singleItem ? 'stable' : rotationIndex}
+                          className={classes.typeReveal}
+                        >
+                          {textsToShow[rotationIndex % textsToShow.length]}
+                          {'...'}
+                        </span>
+                        {!singleItem && (
+                          <span
+                            key={`c${rotationIndex}`}
+                            className={classes.cursor}
+                          />
+                        )}
+                      </>
+                    );
+                  })()}
+                </span>
               </Text>
             </div>
           </Line>

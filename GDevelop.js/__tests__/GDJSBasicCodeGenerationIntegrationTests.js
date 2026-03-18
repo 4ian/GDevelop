@@ -490,7 +490,8 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const runCompiledEvents = generateCompiledEventsForEventsFunction(
       gd,
       project,
-      eventsFunction
+      eventsFunction,
+      { exceptionallyPersistNamespaceOnGdjs: true }
     );
 
     const { gdjs, runtimeScene, mocks } = makeMinimalGDJSMock();
@@ -511,7 +512,8 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const runHotReloadedCompiledEvents = generateCompiledEventsForEventsFunction(
       gd,
       project,
-      eventsFunction
+      eventsFunction,
+      { exceptionallyPersistNamespaceOnGdjs: true }
     );
     runHotReloadedCompiledEvents(
       gdjs,

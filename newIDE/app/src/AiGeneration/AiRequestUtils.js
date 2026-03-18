@@ -1,10 +1,13 @@
 // @flow
 import {
   type AiRequest,
+  type AiRequestMessage,
   type AiRequestMessageAssistantFunctionCall,
   type AiRequestFunctionCallOutput,
+  type AiRequestPlan,
 } from '../Utils/GDevelopServices/Generation';
 import { type EditorFunctionCallResult } from '../EditorFunctions/EditorFunctionCallRunner';
+import { type RelatedAiRequestLastMessages } from '../EditorFunctions';
 
 export const getFunctionCallToFunctionCallOutputMap = ({
   aiRequest,
@@ -134,6 +137,71 @@ export const getFunctionCallNameByCallId = ({
   return null;
 };
 
+/**
+ * Extract the latest plan from the AI request if it exists and should be displayed.
+ * Returns null if no plan should be displayed (no plan exists, or all tasks are done/voided).
+ */
+export const getLatestActivePlan = (
+  aiRequest: AiRequest
+): AiRequestPlan | null => {
+  let latestPlan = null;
+  for (let i = aiRequest.output.length - 1; i >= 0; i--) {
+    const message = aiRequest.output[i];
+    if (message.type === 'function_call_output' && message.output) {
+      try {
+        const output = JSON.parse(message.output);
+        if (output && output.plan && output.plan.tasks) {
+          latestPlan = output.plan;
+          break;
+        }
+      } catch (e) {
+        // Ignore parse errors
+      }
+    }
+  }
+
+  if (!latestPlan) return null;
+
+  const hasActiveTasks = latestPlan.tasks.some(
+    task => task.status !== 'done' && task.status !== 'voided'
+  );
+
+  if (!hasActiveTasks) return null;
+
+  return latestPlan;
+};
+
+/**
+ * Returns true if the AI request has work in progress that should be suspended:
+ * - The server is actively processing (status === 'working')
+ * - OR the request is ready with function calls that still need to be processed and sent back
+ */
+export const aiRequestHasWorkInProgress = (
+  aiRequest: AiRequest,
+  editorFunctionCallResults: Array<EditorFunctionCallResult> | null
+): boolean => {
+  if (aiRequest.status === 'working') return true;
+  // A function call is either either being processed or has been processed by the editor but not yet sent back
+  // (e.g. generateEvents that finished execution but the output hasn't been sent back to the AI with the follow-up request).
+  // This means there's still work in progress from the AI perspective, even if the editor is not actively working on a function call.
+  if (
+    editorFunctionCallResults &&
+    editorFunctionCallResults.some(
+      r => r.status === 'finished' || r.status === 'working'
+    )
+  )
+    return true;
+  if (aiRequest.status === 'ready') {
+    return (
+      getFunctionCallsToProcess({
+        aiRequest,
+        editorFunctionCallResults,
+      }).length > 0
+    );
+  }
+  return false;
+};
+
 export const getFunctionCallOutputsFromEditorFunctionCallResults = (
   editorFunctionCallResults: Array<EditorFunctionCallResult> | null
 ): {|
@@ -155,15 +223,6 @@ export const getFunctionCallOutputsFromEditorFunctionCallResults = (
             ...functionCallOutput.output,
           }),
         };
-      } else if (functionCallOutput.status === 'ignored') {
-        return {
-          type: 'function_call_output',
-          call_id: functionCallOutput.call_id,
-          output: JSON.stringify({
-            ignored: true,
-            message: 'This was marked as ignored by the user.',
-          }),
-        };
       }
 
       hasUnfinishedResult = true;
@@ -175,5 +234,45 @@ export const getFunctionCallOutputsFromEditorFunctionCallResults = (
     // $FlowFixMe[incompatible-type]
     functionCallOutputs,
     hasUnfinishedResult,
+  };
+};
+
+/**
+ * Extract the last user message and last assistant messages from an AI request's
+ * output, to provide context for enhanced LLM reranking (e.g., asset search).
+ *
+ * Collects up to 5 assistant `output_text` messages from the end of the conversation,
+ * stopping when the last user message is reached.
+ */
+export const getLastMessagesFromAiRequestOutput = (
+  output: Array<AiRequestMessage>
+): RelatedAiRequestLastMessages => {
+  let lastUserMessage: string | null = null;
+  const lastAssistantMessages: string[] = [];
+
+  for (let i = output.length - 1; i >= 0; i--) {
+    const message = output[i];
+    if (message.type === 'message' && message.role === 'user') {
+      const textContent = message.content.find(c => c.type === 'user_request');
+      if (textContent) {
+        lastUserMessage = textContent.text;
+      }
+      break;
+    }
+    if (message.type === 'message' && message.role === 'assistant') {
+      for (const content of message.content) {
+        if (
+          content.type === 'output_text' &&
+          lastAssistantMessages.length < 5
+        ) {
+          lastAssistantMessages.push(content.text);
+        }
+      }
+    }
+  }
+
+  return {
+    lastUserMessage,
+    lastAssistantMessages,
   };
 };

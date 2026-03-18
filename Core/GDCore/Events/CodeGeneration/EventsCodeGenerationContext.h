@@ -256,6 +256,20 @@ class GD_CORE_API EventsCodeGenerationContext {
   bool IsAsyncCallback() const { return parent != nullptr && parent->asyncDepth != asyncDepth; }
 
   /**
+   * \brief Set whether this event is followed by an Else event in the
+   * events list. Used by Standard event code generation to decide whether
+   * to emit the else chain tracking variable assignment.
+   */
+  void SetFollowedByElseEvent(bool followed) {
+    followedByElseEvent = followed;
+  }
+
+  /**
+   * \brief Return true if this event is followed by an Else event.
+   */
+  bool IsFollowedByElseEvent() const { return followedByElseEvent; }
+
+  /**
    * \brief Returns true if the given object is already going to be declared
    * in this context (either as a traditional objects list, or an empty one).
    */
@@ -322,6 +336,10 @@ class GD_CORE_API EventsCodeGenerationContext {
   bool reuseExplicitlyForbidden =
       false;  ///< If set to true, forbid children contexts
               ///< to reuse this one without inheriting.
+  bool followedByElseEvent =
+      false;  ///< If set to true, this event is followed by an Else event
+              ///< in the events list, meaning the else chain tracking variable
+              ///< should be updated.
 };
 
 }  // namespace gd

@@ -363,10 +363,8 @@ const filterMissingExtensions = (
   requiredExtensions: Array<ExtensionShortHeader>
 ): Array<ExtensionShortHeader> => {
   const loadedExtensionNames = mapVector(
-    // $FlowFixMe[incompatible-exact]
     gd.asPlatform(gd.JsPlatform.get()).getAllPlatformExtensions(),
     extension => {
-      // $FlowFixMe[incompatible-use]
       return extension.getName();
     }
   );
@@ -569,9 +567,7 @@ export const useImportExtension = (): (({
         const allExtensions = gd
           .asPlatform(gd.JsPlatform.get())
           .getAllPlatformExtensions();
-        // $FlowFixMe[incompatible-exact]
         mapVector(allExtensions, extension => {
-          // $FlowFixMe[incompatible-use]
           if (importedExtensionNames.includes(extension.getName())) {
             hasConflictWithBuiltInExtension = true;
           }

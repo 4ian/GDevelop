@@ -377,6 +377,47 @@ describe('EventsTree/TextRenderer', () => {
           comment: longCommentText,
           color: { r: 255, g: 230, b: 109, textR: 0, textG: 0, textB: 0 },
         },
+        // ForEach event without orderBy
+        {
+          type: 'BuiltinCommonInstructions::ForEach',
+          object: 'MySpriteObject',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Show' },
+              parameters: ['MySpriteObject', ''],
+            },
+          ],
+        },
+        // ForEach event with orderBy ascending and limit
+        {
+          type: 'BuiltinCommonInstructions::ForEach',
+          object: 'MySpriteObject',
+          orderBy: 'MySpriteObject.Variable(Priority)',
+          order: 'asc',
+          limit: '3',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Show' },
+              parameters: ['MySpriteObject', ''],
+            },
+          ],
+        },
+        // ForEach event with orderBy descending without limit
+        {
+          type: 'BuiltinCommonInstructions::ForEach',
+          object: 'MySpriteObject',
+          orderBy: 'MySpriteObject.Variable(Score)',
+          order: 'desc',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Show' },
+              parameters: ['MySpriteObject', ''],
+            },
+          ],
+        },
       ];
 
       const eventsList = new gd.EventsList();
@@ -523,7 +564,28 @@ describe('EventsTree/TextRenderer', () => {
         </event-2>
         <event-3 type=\\"comment\\">
          AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA[cut - 50 more characters]
-        </event-3>"
+        </event-3>
+        <event-4 type=\\"for-each\\">
+         Repeat these separately for each instance of MySpriteObject:
+         Conditions:
+          (no conditions)
+         Actions:
+          - Show MySpriteObject
+        </event-4>
+        <event-5 type=\\"for-each\\">
+         Repeat these separately for each instance of MySpriteObject ordered by \`MySpriteObject.Variable(Priority)\` (ascending) limit: \`3\`:
+         Conditions:
+          (no conditions)
+         Actions:
+          - Show MySpriteObject
+        </event-5>
+        <event-6 type=\\"for-each\\">
+         Repeat these separately for each instance of MySpriteObject ordered by \`MySpriteObject.Variable(Score)\` (descending):
+         Conditions:
+          (no conditions)
+         Actions:
+          - Show MySpriteObject
+        </event-6>"
       `);
     } finally {
       project.delete();

@@ -73,13 +73,13 @@ const styles = {
 const extensionItemReactDndType = 'GD_EXTENSION_ITEM';
 
 export const getTreeViewItemIdFromPropertyFolderOrProperty = (
-  propertyFolderOrObject: gdPropertyFolderOrProperty,
+  propertyFolderOrFunction: gdPropertyFolderOrProperty,
   isSharedProperties: boolean
 ): string => {
-  return propertyFolderOrObject.isFolder()
-    ? getEventsBasedEntityPropertyFolderTreeViewItemId(propertyFolderOrObject)
+  return propertyFolderOrFunction.isFolder()
+    ? getEventsBasedEntityPropertyFolderTreeViewItemId(propertyFolderOrFunction)
     : getEventsBasedEntityPropertyTreeViewItemId(
-        propertyFolderOrObject.getProperty(),
+        propertyFolderOrFunction.getProperty(),
         isSharedProperties
       );
 };

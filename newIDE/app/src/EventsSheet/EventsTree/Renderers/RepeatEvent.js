@@ -226,6 +226,8 @@ export default class RepeatEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
           renderActionsList={({ className }) => (
@@ -263,6 +265,8 @@ export default class RepeatEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
         />
@@ -285,7 +289,6 @@ export default class RepeatEvent extends React.Component<
               repeatEvent.setRepeatExpressionPlainString(text);
               this.props.onUpdate();
             }}
-            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             isInline
             ref={field => (this._field = field)}

@@ -23,8 +23,6 @@ import {
 import { LineStackLayout } from '../../UI/Layout';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
-import Paper from '../../UI/Paper';
-import { Line, Column } from '../../UI/Grid';
 import { SafeExtractor } from '../../Utils/SafeExtractor';
 import CircledAdd from '../../UI/CustomSvgIcons/CircledAdd';
 
@@ -41,10 +39,7 @@ type Props = {|
   editorFunctionCallResult: ?EditorFunctionCallResult,
   existingFunctionCallOutput: ?AiRequestFunctionCallOutput,
   onProcessFunctionCalls: (
-    functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
-    options: ?{|
-      ignore?: boolean,
-    |}
+    functionCalls: Array<AiRequestMessageAssistantFunctionCall>
   ) => Promise<void>,
   editorCallbacks: EditorCallbacks,
 |};
@@ -72,10 +67,10 @@ export const FunctionCallRow: React.ComponentType<Props> = React.memo<Props>(
       existingParsedOutput = null;
     }
 
-    const isIgnored =
+    const isAborted =
       (!!editorFunctionCallResult &&
-        editorFunctionCallResult.status === 'ignored') ||
-      (existingParsedOutput && !!existingParsedOutput.ignored);
+        editorFunctionCallResult.status === 'aborted') ||
+      (existingParsedOutput && !!existingParsedOutput.stopped);
     const isFinished =
       !!existingFunctionCallOutput ||
       (!!editorFunctionCallResult &&
@@ -138,8 +133,7 @@ export const FunctionCallRow: React.ComponentType<Props> = React.memo<Props>(
 
         text = result.text;
         details = result.details;
-        // $FlowFixMe[incompatible-type]
-        hasDetailsToShow = result.hasDetailsToShow;
+        hasDetailsToShow = !!result.hasDetailsToShow;
       } catch (error) {
         console.error('Error rendering function call:', error);
         text = (
@@ -151,22 +145,24 @@ export const FunctionCallRow: React.ComponentType<Props> = React.memo<Props>(
       }
     }
 
+    const toggle = () => setShowDetails(v => !v);
+
     return (
       <div className={classes.functionCallContainer}>
-        <LineStackLayout noMargin alignItems="center">
+        <div className={classes.functionCallRow}>
           <Tooltip
             title={JSON.stringify(
               existingFunctionCallOutput || editorFunctionCallResult
             )}
           >
-            <span style={{ width: 16 }}>
+            <span className={classes.statusIconContainer}>
               {hasErrored ? (
                 <Error
                   htmlColor={gdevelopTheme.message.error}
                   fontSize="small"
                 />
-              ) : isIgnored ? (
-                <Check
+              ) : isAborted ? (
+                <Error
                   htmlColor={gdevelopTheme.text.color.disabled}
                   fontSize="small"
                 />
@@ -184,19 +180,54 @@ export const FunctionCallRow: React.ComponentType<Props> = React.memo<Props>(
               )}
             </span>
           </Tooltip>
-          <Text
-            size="body-small"
-            color="secondary"
-            // $FlowFixMe[incompatible-type]
-            style={styles.functionCallText}
+          <div
+            className={
+              hasDetailsToShow
+                ? `${classes.functionCallTextArea} ${
+                    classes.functionCallTextAreaClickable
+                  }`
+                : classes.functionCallTextArea
+            }
+            onClick={hasDetailsToShow ? toggle : undefined}
+            role={hasDetailsToShow ? 'button' : undefined}
+            tabIndex={hasDetailsToShow ? 0 : undefined}
+            onKeyDown={
+              hasDetailsToShow
+                ? e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      toggle();
+                    }
+                  }
+                : undefined
+            }
           >
-            {text || <Trans>Working...</Trans>}
-          </Text>
-        </LineStackLayout>
+            <Text
+              size="body-small"
+              color="secondary"
+              // $FlowFixMe[incompatible-type]
+              style={styles.functionCallText}
+            >
+              {text || <Trans>Working...</Trans>}
+            </Text>
+            {hasDetailsToShow && (
+              <div className={classes.chevron}>
+                {showDetails ? (
+                  <ChevronArrowBottom fontSize="small" />
+                ) : (
+                  <ChevronArrowRight fontSize="small" />
+                )}
+              </div>
+            )}
+          </div>
+        </div>
         {newlyAddedResourcesNames && newlyAddedResourcesNames.length > 0 && (
           <div className={classes.addedResourcesContainer}>
             <LineStackLayout noMargin alignItems="center">
-              <CircledAdd fontSize="small" />
+              <CircledAdd
+                fontSize="small"
+                htmlColor={gdevelopTheme.message.valid}
+              />
               <Text noMargin size="body-small" color="secondary">
                 <Trans>
                   Resources added: {newlyAddedResourcesNames.join(', ')}
@@ -205,42 +236,11 @@ export const FunctionCallRow: React.ComponentType<Props> = React.memo<Props>(
             </LineStackLayout>
           </div>
         )}
-        {hasDetailsToShow && (
-          <div
-            className={classes.detailsButtonContainer}
-            onClick={() => setShowDetails(!showDetails)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={e => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setShowDetails(!showDetails);
-              }
-            }}
-          >
-            <LineStackLayout noMargin alignItems="center">
-              {showDetails ? (
-                <ChevronArrowBottom fontSize="small" />
-              ) : (
-                <ChevronArrowRight fontSize="small" />
-              )}
-              <Text noMargin size="body-small" color="secondary">
-                <Trans>Details</Trans>
-              </Text>
-            </LineStackLayout>
-          </div>
-        )}
-        {details && (
-          <div className={classes.detailsPaperContainer}>
-            <Paper background="medium" elevation={0} square variant="outlined">
-              <Line expand>
-                <Column expand>
-                  <Text noMargin color="secondary">
-                    {details}
-                  </Text>
-                </Column>
-              </Line>
-            </Paper>
+        {showDetails && details && (
+          <div className={classes.detailsContent}>
+            <Text noMargin size="body-small" color="secondary">
+              {details}
+            </Text>
           </div>
         )}
       </div>

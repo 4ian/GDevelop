@@ -291,12 +291,6 @@ describe('unsplit', () => {
   });
 
   it('can unsplit with a maximum depth', () => {
-    const originalObject = {
-      myArray: [
-        { name: 'A', aa: '1', ab: '2', innerObject: { hello: 'world' } },
-        { name: 'B', ba: '3', bb: '4', innerObject: { hello: 'world2' } },
-      ],
-    };
     const splitObject = {
       myArray: [
         { __REFERENCE_TO_SPLIT_OBJECT: true, referenceTo: '/myArray/A' },

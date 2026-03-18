@@ -57,6 +57,11 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
            ? ""
            : " " + UnCapitalizeFirstLetter(property.GetGroup())) +
       " configuration";
+  auto &folder =
+      functionGroupName.empty()
+          ? functionsContainer.GetRootFolder()
+          : functionsContainer.GetRootFolder().GetOrCreateChildFolder(
+                functionGroupName);
 
   gd::String propertyLabel =
       property.GetLabel().empty() ? property.GetName() : property.GetLabel();
@@ -77,8 +82,8 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
   gd::String getterName = capitalizedName;
 
   if (!functionsContainer.HasEventsFunctionNamed(getterName)) {
-    auto &getter = functionsContainer.InsertNewEventsFunction(
-        getterName, functionsContainer.GetEventsFunctionsCount());
+    auto &getter = functionsContainer.InsertNewEventsFunctionInFolder(
+        getterName, folder, folder.GetChildrenCount());
     auto &expressionType =
         gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(
             property.GetType());
@@ -126,8 +131,8 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
   }
 
   if (!functionsContainer.HasEventsFunctionNamed(setterName)) {
-    auto &setter = functionsContainer.InsertNewEventsFunction(
-        setterName, functionsContainer.GetEventsFunctionsCount());
+    auto &setter = functionsContainer.InsertNewEventsFunctionInFolder(
+        setterName, folder, folder.GetChildrenCount());
     if (primitiveType == "boolean") {
       setter.SetFunctionType(gd::EventsFunction::Action)
           .SetFullName(propertyLabel)

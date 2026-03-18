@@ -223,7 +223,7 @@ public:
         static_assert(!std::is_same<T, std::string>::value, "Can't use gd::String::From with std::string.");
 
         std::ostringstream oss;
-        oss.precision(17);
+        oss.precision(16);
         oss << value;
         return gd::String(oss.str().c_str());
     }

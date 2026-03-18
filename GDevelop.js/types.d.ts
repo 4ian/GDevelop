@@ -178,6 +178,11 @@ export class VectorPropertyFolderOrProperty extends EmscriptenObject {
   at(index: number): PropertyFolderOrProperty;
 }
 
+export class VectorFunctionFolderOrFunction extends EmscriptenObject {
+  size(): number;
+  at(index: number): FunctionFolderOrFunction;
+}
+
 export class VectorScreenshot extends EmscriptenObject {
   size(): number;
   at(index: number): Screenshot;
@@ -502,6 +507,7 @@ export class ObjectFolderOrObject extends EmscriptenObject {
   getChildPosition(child: ObjectFolderOrObject): number;
   getParent(): ObjectFolderOrObject;
   insertNewFolder(name: string, newPosition: number): ObjectFolderOrObject;
+  getOrCreateFolderChild(name: string): ObjectFolderOrObject;
   moveObjectFolderOrObjectToAnotherFolder(objectFolderOrObject: ObjectFolderOrObject, newParentFolder: ObjectFolderOrObject, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: ObjectFolderOrObject): void;
@@ -788,7 +794,7 @@ export class gdObject extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
   resetPersistentUuid(): gdObject;
-  clearPersistentUuid(): gdObject;
+  getPersistentUuid(): string;
 }
 
 export class UniquePtrObject extends EmscriptenObject {
@@ -1125,12 +1131,14 @@ export class ResourcesContainer extends EmscriptenObject {
   findFilesNotInResources(filesToCheck: VectorString): VectorString;
   hasResource(name: string): boolean;
   getResource(name: string): Resource;
+  getResourceAt(index: number): Resource;
   getResourceNameWithOrigin(originName: string, originIdentifier: string): string;
   getResourceNameWithFile(file: string): string;
   addResource(res: Resource): boolean;
   removeResource(name: string): void;
   renameResource(oldName: string, name: string): void;
   getResourcePosition(name: string): number;
+  count(): number;
   moveResourceUpInList(oldName: string): boolean;
   moveResourceDownInList(oldName: string): boolean;
   moveResource(oldIndex: number, newIndex: number): void;
@@ -1365,7 +1373,11 @@ export class BinarySerializer extends EmscriptenObject {
 }
 
 export class ObjectAssetSerializer extends EmscriptenObject {
-  static serializeTo(project: Project, obj: gdObject, objectFullName: string, element: SerializerElement, usedResourceNames: VectorString): void;
+  static serializeTo(project: Project, obj: gdObject, objectFullName: string, element: SerializerElement, usedResourceNames: VectorString, ExtensionDependencyCache: ExtensionDependencyCache): void;
+}
+
+export class ExtensionDependencyCache extends EmscriptenObject {
+  constructor();
 }
 
 export class InstructionsList extends EmscriptenObject {
@@ -1797,6 +1809,10 @@ export class PlatformExtension extends EmscriptenObject {
   setExtensionHelpPath(helpPath: string): PlatformExtension;
   setIconUrl(iconUrl: string): PlatformExtension;
   setCategory(category: string): PlatformExtension;
+  setShortDescription(shortDescription: string): PlatformExtension;
+  getShortDescription(): string;
+  setDimension(dimension: string): PlatformExtension;
+  getDimension(): string;
   addInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
   markAsDeprecated(): void;
   getTags(): VectorString;
@@ -1934,6 +1950,14 @@ export class ForEachEvent extends BaseEvent {
   getActions(): InstructionsList;
   getLoopIndexVariableName(): string;
   setLoopIndexVariableName(name: string): void;
+  getOrderBy(): string;
+  setOrderBy(orderBy: string): void;
+  getOrderByExpression(): Expression;
+  getOrder(): string;
+  setOrder(order: string): void;
+  getLimit(): string;
+  setLimit(limit: string): void;
+  getLimitExpression(): Expression;
 }
 
 export class ForEachChildVariableEvent extends BaseEvent {
@@ -2027,7 +2051,7 @@ export class VectorEventsSearchResult extends EmscriptenObject {
 export class EventsRefactorer extends EmscriptenObject {
   static renameObjectInEvents(platform: Platform, projectScopedContainers: ProjectScopedContainers, events: EventsList, targetedObjectsContainer: ObjectsContainer, oldName: string, newName: string): void;
   static replaceStringInEvents(project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, toReplace: string, newString: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean): VectorEventsSearchResult;
-  static searchInEvents(platform: Platform, events: EventsList, search: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean, inEventSentences: boolean): VectorEventsSearchResult;
+  static searchInEvents(platform: Platform, events: EventsList, search: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean, inEventSentences: boolean, inInstructionNames: boolean): VectorEventsSearchResult;
 }
 
 export class UnfilledRequiredBehaviorPropertyProblem extends EmscriptenObject {
@@ -2362,6 +2386,28 @@ export class EventsFunction extends EmscriptenObject {
   unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
+export class FunctionFolderOrFunction extends EmscriptenObject {
+  constructor();
+  isFolder(): boolean;
+  isRootFolder(): boolean;
+  getFunction(): EventsFunction;
+  getFolderName(): string;
+  setFolderName(name: string): void;
+  hasFunctionNamed(name: string): boolean;
+  getFunctionNamed(name: string): FunctionFolderOrFunction;
+  getChildrenCount(): number;
+  getChildAt(pos: number): FunctionFolderOrFunction;
+  getFunctionChild(name: string): FunctionFolderOrFunction;
+  getOrCreateChildFolder(name: string): FunctionFolderOrFunction;
+  getChildPosition(child: FunctionFolderOrFunction): number;
+  getParent(): FunctionFolderOrFunction;
+  insertNewFolder(name: string, newPosition: number): FunctionFolderOrFunction;
+  moveFunctionFolderOrFunctionToAnotherFolder(functionFolderOrFunction: FunctionFolderOrFunction, newParentFolder: FunctionFolderOrFunction, newPosition: number): void;
+  moveChild(oldIndex: number, newIndex: number): void;
+  removeFolderChild(childToRemove: FunctionFolderOrFunction): void;
+  isADescendantOf(otherFunctionFolderOrFunction: FunctionFolderOrFunction): boolean;
+}
+
 export class EventsFunctionsContainer extends EmscriptenObject {
   insertNewEventsFunction(name: string, pos: number): EventsFunction;
   insertEventsFunction(eventsFunction: EventsFunction, pos: number): EventsFunction;
@@ -2372,6 +2418,10 @@ export class EventsFunctionsContainer extends EmscriptenObject {
   moveEventsFunction(oldIndex: number, newIndex: number): void;
   getEventsFunctionsCount(): number;
   getEventsFunctionPosition(eventsFunction: EventsFunction): number;
+  insertNewEventsFunctionInFolder(name: string, folder: FunctionFolderOrFunction, pos: number): EventsFunction;
+  getRootFolder(): FunctionFolderOrFunction;
+  getAllFunctionFolderOrFunction(): VectorFunctionFolderOrFunction;
+  addMissingFunctionsInRootFolder(): void;
 }
 
 export class AbstractEventsBasedEntity extends EmscriptenObject {
@@ -2568,6 +2618,8 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   getShortDescription(): string;
   setDescription(description: string): EventsFunctionsExtension;
   getDescription(): string;
+  setDimension(dimension: string): EventsFunctionsExtension;
+  getDimension(): string;
   setName(name: string): EventsFunctionsExtension;
   getName(): string;
   setFullName(fullName: string): EventsFunctionsExtension;
@@ -3210,6 +3262,20 @@ export class MetadataDeclarationHelper extends EmscriptenObject {
   static shiftSentenceParamIndexes(sentence: string, offset: number): string;
 }
 
+export class MemoryTrackedRegistry extends EmscriptenObject {
+  static add(ptr: number, className: string): void;
+  static remove(ptr: number, className: string): void;
+  static isDead(ptr: number, className: string): boolean;
+  static getDeadCount(): number;
+  static getAliveCount(): number;
+  static pruneDead(maxSize: number): void;
+  static getAliveCountForClass(className: string): number;
+  static getDeadCountForClass(className: string): number;
+  static setCurrentCallContextId(id: number): void;
+  static getDeadContextId(ptr: number, className: string): number;
+  static getDeadContextTimeMs(ptr: number, className: string): number;
+}
+
 export function toNewVectorString(): VectorString;
 
 export function getTypeOfBehavior(layout: ObjectsContainer, name: string, searchInGroups: boolean): string;
@@ -3340,6 +3406,19 @@ export function compare<T extends EmscriptenObject>(object1: T, object2: T): boo
  * The alias {@link EmscriptenObject.delete} is recommended instead, for readability.
  */
 export function destroy(object: EmscriptenObject): void;
+
+/**
+ * Check that an Emscripten object is still alive, i.e. not destroyed from
+ * JavaScript (ptr is 0) or from C++ (only for memory-tracked classes).
+ *
+ * In theory, a dead object should never be accessed. In practice this can
+ * help prevent stale references to objects (deleted by JS: ptr will be 0,
+ * or deleted in C++, only for tracked classes).
+ * This is used just to add extra protection and should usually not be useful.
+ *
+ * @throws if the object is dead.
+ */
+export function assertObjectAlive(object: EmscriptenObject): void;
 
 export function _malloc(size: number): number;
 export function _free(ptr: number): void;

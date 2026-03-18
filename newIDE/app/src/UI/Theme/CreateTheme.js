@@ -22,6 +22,8 @@ export function getMuiOverrides({
   snackbarBackgroundColor,
   snackbarBorderColor,
   textDefaultColor,
+  tooltipBackgroundColor,
+  tooltipTextColor,
 }: {|
   tabTextColor: string,
   tabSelectedTextColor: string,
@@ -37,6 +39,8 @@ export function getMuiOverrides({
   snackbarBackgroundColor: string,
   snackbarBorderColor: string,
   textDefaultColor: string,
+  tooltipBackgroundColor: string,
+  tooltipTextColor: string,
 |}): any {
   return {
     MuiTypography: {
@@ -309,6 +313,30 @@ export function getMuiOverrides({
       },
       message: {
         color: textDefaultColor,
+      },
+    },
+    MuiTooltip: {
+      tooltip: {
+        backgroundColor: tooltipBackgroundColor,
+        color: tooltipTextColor,
+        // Ensure Typography (Text component) inside tooltips uses the tooltip text color,
+        // instead of using the theme's textPrimary which can be invisible on the tooltip background.
+        // We use an attribute selector because in development mode MUI v4 appends a numeric
+        // counter to class names (e.g. "MuiTypography-root-78"), which breaks a plain class selector.
+        '& [class*="MuiTypography-root"]': {
+          color: tooltipTextColor,
+        },
+        // Ensure chips inside tooltips have good contrast
+        '& .MuiChip-root': {
+          color: tooltipTextColor,
+        },
+        '& .MuiChip-outlined': {
+          borderColor: tooltipTextColor,
+          color: tooltipTextColor,
+        },
+        '& .MuiChip-icon': {
+          color: tooltipTextColor,
+        },
       },
     },
   };
@@ -721,6 +749,8 @@ export function createGdevelopTheme({
         snackbarBackgroundColor: styles['ThemeSnackbarBackgroundColor'],
         snackbarBorderColor: styles['ThemeSnackbarBorderColor'],
         textDefaultColor: styles['ThemeTextDefaultColor'],
+        tooltipBackgroundColor: styles['ThemeTooltipBackgroundColor'],
+        tooltipTextColor: styles['ThemeTooltipTextColor'],
       }),
     },
   };

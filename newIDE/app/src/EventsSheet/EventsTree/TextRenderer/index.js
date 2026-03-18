@@ -4,6 +4,30 @@ import { isElseEventValid, getPreviousExecutableEventIndex } from '../helpers';
 
 const gd: libGDevelop = global.gd;
 
+export const renderInstructionSentenceAsPlainText = (
+  instruction: gdInstruction,
+  metadata: gdInstructionMetadata
+): string => {
+  // Note: we could do like in `MetadataDeclarationHelper` for events-based extensions
+  // and create if necessary a default sentence. Here though we assume all extensions
+  // will have a sentence.
+
+  if (gd.MetadataProvider.isBadInstructionMetadata(metadata)) {
+    // Even if the instruction is bad, we still render it so that it's displayed
+    // as "Unknown or unsupported instruction".
+  }
+
+  const formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
+    instruction,
+    metadata
+  );
+
+  return mapFor(0, formattedTexts.size(), i => {
+    const value = formattedTexts.getString(i);
+    return value;
+  }).join('');
+};
+
 // $FlowFixMe[recursive-definition]
 // $FlowFixMe[definition-cycle]
 const renderInstructionsAsText = ({
@@ -27,15 +51,10 @@ const renderInstructionsAsText = ({
           instruction.getType()
         );
 
-    const formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
+    const sentence = renderInstructionSentenceAsPlainText(
       instruction,
       metadata
     );
-
-    const sentence = mapFor(0, formattedTexts.size(), i => {
-      const value = formattedTexts.getString(i);
-      return value;
-    }).join('');
 
     return {
       text: `${padding}- ${[invertedText, sentence].filter(Boolean).join('')}`,
@@ -170,6 +189,14 @@ ${actions}`,
     const indexVarText = forEachEvent.getLoopIndexVariableName()
       ? ` (loop index variable: \`${forEachEvent.getLoopIndexVariableName()}\`)`
       : '';
+    const orderBy = forEachEvent.getOrderBy();
+    const order = forEachEvent.getOrder();
+    const limit = forEachEvent.getLimit();
+    const orderText = orderBy
+      ? ` ordered by \`${orderBy}\` (${
+          order === 'desc' ? 'descending' : 'ascending'
+        })${limit ? ` limit: \`${limit}\`` : ''}`
+      : '';
     const conditions = renderInstructionsAsText({
       instructionsList: forEachEvent.getConditions(),
       padding: padding + ' ',
@@ -182,7 +209,7 @@ ${actions}`,
     });
 
     return {
-      content: `${padding}Repeat these separately for each instance of ${forEachEvent.getObjectToPick()}${indexVarText}:
+      content: `${padding}Repeat these separately for each instance of ${forEachEvent.getObjectToPick()}${orderText}${indexVarText}:
 ${padding}Conditions:
 ${conditions}
 ${padding}Actions:
@@ -275,7 +302,6 @@ const convertVariableToJsObject = (variable: gdVariable) => {
     return object;
   } else if (variable.getType() === gd.Variable.Array) {
     const children = variable.getAllChildrenArray();
-    // $FlowFixMe[incompatible-exact]
     return mapVector(children, child => convertVariableToJsObject(child));
   }
 

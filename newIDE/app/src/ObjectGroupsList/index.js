@@ -6,7 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
-import SearchBar from '../UI/SearchBar';
+import CompactSearchBar from '../UI/CompactSearchBar';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { enumerateGroups } from '../ObjectsList/EnumerateObjects';
 import {
@@ -27,6 +27,7 @@ import ErrorBoundary from '../UI/ErrorBoundary';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { getLabelsForObjectsAndGroupsLists } from '../ObjectsList';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
@@ -244,7 +245,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     );
 
     const onDuplicate = React.useCallback(
-      (groupWithContext: GroupWithContext): ?GroupWithContext => {
+      (groupWithContext: GroupWithContext): void => {
         const { group, global } = groupWithContext;
 
         const newName = newNameGenerator(
@@ -470,10 +471,12 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     );
 
     const renderGroupMenuTemplate = React.useCallback(
-      (i18n: I18nType) => (item: TreeViewItem, index: number) =>
+      (i18n: I18nType) => (
+        item: TreeViewItem,
+        index: number
+      ): Array<MenuItemTemplate> =>
         item.isRoot || item.isPlaceholder
-          ? // $FlowFixMe[missing-empty-array-annot]
-            []
+          ? []
           : [
               {
                 label: i18n._(t`Duplicate`),
@@ -493,14 +496,16 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                 accelerator: 'F2',
                 enabled: !isListLocked,
               },
-              globalObjectGroups
-                ? {
-                    label: i18n._(t`Set as global group`),
-                    enabled: !isGroupWithContextGlobal(item) && !isListLocked,
-                    click: () => setAsGlobalGroup(item),
-                    visible: canSetAsGlobalGroup !== false,
-                  }
-                : null,
+              ...(globalObjectGroups
+                ? [
+                    {
+                      label: i18n._(t`Set as global group`),
+                      enabled: !isGroupWithContextGlobal(item) && !isListLocked,
+                      click: () => setAsGlobalGroup(item),
+                      visible: canSetAsGlobalGroup !== false,
+                    },
+                  ]
+                : []),
               {
                 label: i18n._(t`Delete`),
                 click: () => onDelete(item),
@@ -513,7 +518,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                 click: onCreateGroup,
                 enabled: !isListLocked,
               },
-            ].filter(Boolean),
+            ],
       [
         isListLocked,
         globalObjectGroups,
@@ -629,10 +634,9 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     return (
       <Background>
         <Line>
-          <Column expand>
-            <SearchBar
+          <Column expand noOverflowParent>
+            <CompactSearchBar
               value={searchText}
-              onRequestSearch={() => {}}
               onChange={setSearchText}
               placeholder={t`Search object groups`}
             />

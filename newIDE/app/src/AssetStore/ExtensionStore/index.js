@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SearchBar from '../../UI/SearchBar';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
@@ -8,7 +8,6 @@ import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { ExtensionListItem } from './ExtensionListItem';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
-import Toggle from '../../UI/Toggle';
 import {
   sendExtensionDetailsOpened,
   sendExtensionAddedToProject,
@@ -16,11 +15,14 @@ import {
 import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
 import { t } from '@lingui/macro';
 import { ColumnStackLayout } from '../../UI/Layout';
-import { Column } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import SearchBarSelectField from '../../UI/SearchBarSelectField';
 import SelectOption from '../../UI/SelectOption';
+import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
+import IconButton from '../../UI/IconButton';
+import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
 
 type Props = {|
   isInstalling: boolean,
@@ -103,27 +105,39 @@ export const ExtensionStore = ({
                 />
               ))}
             </SearchBarSelectField>
-            <Column expand noMargin>
-              <SearchBar
-                id="extension-search-bar"
-                value={searchText}
-                onChange={setSearchText}
-                onRequestSearch={() => {}}
-                placeholder={t`Search extensions`}
-                autoFocus="desktop"
+            <Line expand noMargin>
+              <Column expand noMargin>
+                <SearchBar
+                  id="extension-search-bar"
+                  value={searchText}
+                  onChange={setSearchText}
+                  onRequestSearch={() => {}}
+                  placeholder={t`Search extensions`}
+                  autoFocus="desktop"
+                />
+              </Column>
+              <ElementWithMenu
+                key="menu"
+                element={
+                  <IconButton size="small">
+                    <ThreeDotsMenu />
+                  </IconButton>
+                }
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    label: preferences.values.showExperimentalExtensions
+                      ? i18n._(t`Hide experimental extensions`)
+                      : i18n._(t`Show experimental extensions`),
+                    click: () => {
+                      preferences.setShowExperimentalExtensions(
+                        !preferences.values.showExperimentalExtensions
+                      );
+                    },
+                  },
+                ]}
               />
-            </Column>
+            </Line>
           </ResponsiveLineStackLayout>
-          <Column>
-            <Toggle
-              onToggle={(e, check) =>
-                preferences.setShowExperimentalExtensions(check)
-              }
-              toggled={preferences.values.showExperimentalExtensions}
-              labelPosition="right"
-              label={<Trans>Show experimental extensions</Trans>}
-            />
-          </Column>
           {DismissableTutorialMessage}
         </ColumnStackLayout>
         <ListSearchResults

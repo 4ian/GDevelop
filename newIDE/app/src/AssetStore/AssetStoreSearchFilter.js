@@ -1,6 +1,5 @@
 // @flow
-// $FlowFixMe[import-type-as-value]
-import { TagSearchFilter, SearchFilter } from '../UI/Search/UseSearchItem';
+import { TagSearchFilter, type SearchFilter } from '../UI/Search/UseSearchItem';
 import {
   type AssetShortHeader,
   type PrivateAssetPack,

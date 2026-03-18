@@ -12,7 +12,7 @@ import {
 
 export type Environment = 'staging' | 'live';
 
-export type GenerationStatus = 'working' | 'ready' | 'error';
+export type GenerationStatus = 'working' | 'ready' | 'error' | 'suspended';
 
 export type AiRequestSuggestion = {
   title: string,
@@ -24,12 +24,25 @@ export type AiRequestSuggestions = {
   suggestions: Array<AiRequestSuggestion>,
 };
 
+export type AiRequestPlanTask = {
+  id: string,
+  title: string,
+  description: string,
+  status: 'pending' | 'in_progress' | 'done' | 'voided',
+  dependsOn: string[],
+};
+
+export type AiRequestPlan = {
+  tasks: AiRequestPlanTask[],
+};
+
 export type AiRequestMessageAssistantFunctionCall = {|
   type: 'function_call',
   status: 'completed',
   call_id: string,
   name: string,
   arguments: string,
+  taskId?: string,
 |};
 
 export type AiRequestFunctionCallOutput = {
@@ -40,6 +53,7 @@ export type AiRequestFunctionCallOutput = {
   messageId?: string,
   projectVersionIdAfterMessage?: string,
 };
+
 export type AiRequestAssistantMessage = {
   type: 'message',
   status: 'completed',
@@ -101,7 +115,7 @@ export type AiRequest = {
   gameId?: string | null,
   gameProjectJson?: string | null,
   status: GenerationStatus,
-  mode?: 'chat' | 'agent',
+  mode?: 'chat' | 'agent' | 'orchestrator',
   aiConfiguration?: AiConfiguration,
   toolsVersion?: string,
   toolOptions?: AiRequestToolOptions | null,
@@ -215,6 +229,9 @@ export type AssetSearch = {
     objectType: string,
     description: string | null,
     twoDimensionalViewKind: string | null,
+    relatedAiRequestId: string | null,
+    lastUserMessage: string | null,
+    lastAssistantMessages: string[],
   },
   status: 'completed' | 'failed',
   results: Array<{
@@ -370,7 +387,7 @@ export const createAiRequest = async (
     projectSpecificExtensionsSummaryJson: string | null,
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
     payWithCredits: boolean,
-    mode: 'chat' | 'agent',
+    mode: 'chat' | 'agent' | 'orchestrator',
     aiConfiguration: AiConfiguration,
     gameId: string | null,
     projectVersionIdBeforeMessage?: string | null,
@@ -450,7 +467,7 @@ export const addMessageToAiRequest = async (
     projectSpecificExtensionsSummaryJson: string | null,
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
     paused?: boolean,
-    mode?: 'chat' | 'agent',
+    mode?: 'chat' | 'agent' | 'orchestrator',
     toolsVersion?: string,
   |}
 ): Promise<AiRequest> => {
@@ -486,6 +503,23 @@ export const addMessageToAiRequest = async (
     data: response.data,
     propertyName: 'id',
     endpointName: '/ai-request/{id}/action/add-message of Generation API',
+  });
+};
+
+export const suspendAiRequest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { userId, aiRequestId }: {| userId: string, aiRequestId: string |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.post(
+    `/ai-request/${aiRequestId}/action/suspend`,
+    {},
+    { params: { userId }, headers: { Authorization: authorizationHeader } }
+  );
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-request/{id}/action/suspend of Generation API',
   });
 };
 
@@ -641,6 +675,7 @@ export const createAiGeneratedEvent = async (
     existingEventsJsonUserRelativeKey,
     placementHint,
     relatedAiRequestId,
+    estimatedComplexity,
   }: {|
     userId: string,
     gameProjectJson: string | null,
@@ -656,6 +691,7 @@ export const createAiGeneratedEvent = async (
     existingEventsJsonUserRelativeKey: string | null,
     placementHint: string | null,
     relatedAiRequestId: string,
+    estimatedComplexity: number | null,
   |}
 ): Promise<CreateAiGeneratedEventResult> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -676,6 +712,7 @@ export const createAiGeneratedEvent = async (
       existingEventsJsonUserRelativeKey,
       placementHint,
       relatedAiRequestId,
+      estimatedComplexity,
     },
     {
       params: {
@@ -751,12 +788,18 @@ export const createAssetSearch = async (
     description,
     objectType,
     twoDimensionalViewKind,
+    relatedAiRequestId,
+    lastUserMessage,
+    lastAssistantMessages,
   }: {|
     userId: string,
     searchTerms: string,
     description: string,
     objectType: string,
     twoDimensionalViewKind: string,
+    relatedAiRequestId?: string | null,
+    lastUserMessage?: string | null,
+    lastAssistantMessages?: string[],
   |}
 ): Promise<AssetSearch> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -768,6 +811,9 @@ export const createAssetSearch = async (
       description,
       objectType,
       twoDimensionalViewKind,
+      relatedAiRequestId,
+      lastUserMessage,
+      lastAssistantMessages,
     },
     {
       params: {
@@ -870,7 +916,7 @@ export const createAiUserContentPresignedUrls = async (
 };
 
 export type AiConfigurationPreset = {|
-  mode: 'chat' | 'agent',
+  mode: 'chat' | 'agent' | 'orchestrator',
   id: string,
   nameByLocale: MessageByLocale,
   disabled: boolean,

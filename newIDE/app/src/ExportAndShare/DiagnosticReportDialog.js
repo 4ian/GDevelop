@@ -27,6 +27,7 @@ import Link from '../UI/Link';
 import IconButton from '../UI/IconButton';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
+import type { EventPath } from '../Utils/EventPath';
 
 const gd: libGDevelop = global.gd;
 
@@ -216,13 +217,10 @@ type Props = {|
   project: gdProject,
   wholeProjectDiagnosticReport: gdWholeProjectDiagnosticReport,
   onClose: () => void,
-  onNavigateToLayoutEvent: (
-    layoutName: string,
-    eventPath: Array<number>
-  ) => void,
+  onNavigateToLayoutEvent: (layoutName: string, eventPath: EventPath) => void,
   onNavigateToExternalEventsEvent: (
     externalEventsName: string,
-    eventPath: Array<number>
+    eventPath: EventPath
   ) => void,
 |};
 
@@ -247,13 +245,12 @@ export default function DiagnosticReportDialog({
   const preferences = React.useContext(PreferencesContext);
 
   // Scan project for validation errors (missing instructions, invalid parameters)
-  const validationErrors = React.useMemo(
+  const validationErrors = React.useMemo<Array<ValidationError>>(
     () => {
       try {
         return scanProjectForValidationErrors(project);
       } catch (error) {
         console.error('Error scanning project for validation errors:', error);
-        // $FlowFixMe[missing-empty-array-annot]
         return [];
       }
     },

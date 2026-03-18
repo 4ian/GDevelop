@@ -326,9 +326,16 @@ export const swapAsset = (
   object: gdObject,
   assetObject: gdObject,
   assetShortHeader?: ?AssetShortHeader
-) => {
+): boolean => {
   let serializedObject = serializeToJSObject(object);
   const serializedAssetObject = serializeToJSObject(assetObject);
+
+  if (object.getType() !== assetObject.getType()) {
+    console.error(
+      `Cannot swap object of type ${object.getType()} with assets from object of type ${assetObject.getType()}. Not doing any swap.`
+    );
+    return false;
+  }
 
   if (object.getType() === 'Sprite') {
     serializedObject.preScale = evaluatePreScale(
@@ -392,4 +399,6 @@ export const swapAsset = (
     };
   }
   unserializeFromJSObject(object, serializedObject, 'unserializeFrom', project);
+
+  return true;
 };

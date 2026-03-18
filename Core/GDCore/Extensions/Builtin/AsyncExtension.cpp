@@ -19,6 +19,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAsyncExtension(
           _("Functions that defer the execution of the events after it."),
           "Arthur Pacaud (arthuro555)",
           "Open source (MIT License)")
+      .SetShortDescription("Asynchronous tasks that pause sub-event execution until resolved.")
       .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("Asynchronous functions"))
       .SetIcon("res/function32.png");

@@ -10,8 +10,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-// $FlowFixMe[import-type-as-value]
-import { TreeViewItemContent } from '.';
+import { type TreeViewItemContent } from '.';
 import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 import {
@@ -161,6 +160,7 @@ export const addSerializedObjectToObjectsContainer = ({
     project
   );
   newObject.setName(newName); // Unserialization has overwritten the name.
+  newObject.resetPersistentUuid();
 
   return { object: newObject, global };
 };

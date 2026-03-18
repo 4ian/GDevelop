@@ -20,6 +20,7 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
           "line, upper/lowercase, substring, find, replace, etc...",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("String expressions: newline, upper/lowercase, substring, find, replace one/all, length, repeat.")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
   extension.AddInstructionOrExpressionGroupMetadata(_("Text manipulation"))
       .SetIcon("res/actions/text24_black.png");

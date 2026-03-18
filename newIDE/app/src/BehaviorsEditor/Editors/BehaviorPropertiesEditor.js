@@ -18,6 +18,7 @@ const BehaviorPropertiesEditor = ({
   onBehaviorUpdated,
   resourceManagementProps,
   projectScopedContainersAccessor,
+  isAdvancedSectionInitiallyUncollapsed,
 }: Props): React.Node => {
   const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
     gd.JsPlatform.get(),
@@ -58,6 +59,9 @@ const BehaviorPropertiesEditor = ({
             There is nothing to configure for this behavior. You can still use
             events to interact with the object and this behavior.
           </Trans>
+        }
+        isAdvancedSectionInitiallyUncollapsed={
+          isAdvancedSectionInitiallyUncollapsed
         }
       />
     </Column>

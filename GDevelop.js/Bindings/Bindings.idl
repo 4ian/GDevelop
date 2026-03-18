@@ -64,6 +64,11 @@ interface VectorPropertyFolderOrProperty {
     [Const] PropertyFolderOrProperty at(unsigned long index);
 };
 
+interface VectorFunctionFolderOrFunction {
+    unsigned long size();
+    [Const] FunctionFolderOrFunction at(unsigned long index);
+};
+
 interface VectorScreenshot {
     unsigned long size();
     [Const, Ref] Screenshot at(unsigned long index);
@@ -478,6 +483,7 @@ interface ObjectFolderOrObject {
     unsigned long GetChildPosition([Const, Ref] ObjectFolderOrObject child);
     [Ref] ObjectFolderOrObject GetParent();
     [Ref] ObjectFolderOrObject InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+    [Ref] ObjectFolderOrObject GetOrCreateFolderChild([Const] DOMString name);
     void MoveObjectFolderOrObjectToAnotherFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectFolderOrObject newParentFolder, unsigned long newPosition);
     void MoveChild(unsigned long oldIndex, unsigned long newIndex);
     void RemoveFolderChild([Const, Ref] ObjectFolderOrObject childToRemove);
@@ -911,7 +917,7 @@ interface gdObject {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
     [Ref] gdObject ResetPersistentUuid();
-    [Ref] gdObject ClearPersistentUuid();
+    [Const, Ref] DOMString GetPersistentUuid();
 };
 
 interface UniquePtrObject {
@@ -1336,12 +1342,14 @@ interface ResourcesContainer {
     [Value] VectorString FindFilesNotInResources([Const, Ref] VectorString filesToCheck);
     boolean HasResource([Const] DOMString name);
     [Const, Ref] Resource GetResource([Const] DOMString name);
+    [Const, Ref] Resource GetResourceAt(unsigned long index);
     [Const, Ref] DOMString GetResourceNameWithOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
     [Const, Ref] DOMString GetResourceNameWithFile([Const] DOMString file);
     boolean AddResource([Const, Ref] Resource res);
     void RemoveResource([Const] DOMString name);
     void RenameResource([Const] DOMString oldName, [Const] DOMString name);
     unsigned long GetResourcePosition([Const] DOMString name);
+    unsigned long Count();
     boolean MoveResourceUpInList([Const] DOMString oldName);
     boolean MoveResourceDownInList([Const] DOMString oldName);
     void MoveResource(unsigned long oldIndex, unsigned long newIndex);
@@ -1637,7 +1645,11 @@ interface BinarySerializer {
 interface ObjectAssetSerializer {
     void STATIC_SerializeTo([Ref] Project project, [Const, Ref] gdObject obj,
         [Const] DOMString objectFullName, [Ref] SerializerElement element,
-        [Ref] VectorString usedResourceNames);
+        [Ref] VectorString usedResourceNames, [Ref] ExtensionDependencyCache ExtensionDependencyCache);
+};
+
+interface ExtensionDependencyCache {
+    void ExtensionDependencyCache();
 };
 
 interface InstructionsList {
@@ -2284,6 +2296,10 @@ interface PlatformExtension {
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
     [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
     [Ref] PlatformExtension SetCategory([Const] DOMString category);
+    [Ref] PlatformExtension SetShortDescription([Const] DOMString shortDescription);
+    [Const, Ref] DOMString GetShortDescription();
+    [Ref] PlatformExtension SetDimension([Const] DOMString dimension);
+    [Const, Ref] DOMString GetDimension();
     [Ref] InstructionOrExpressionGroupMetadata AddInstructionOrExpressionGroupMetadata([Const] DOMString name);
     void MarkAsDeprecated();
 
@@ -2512,6 +2528,14 @@ interface ForEachEvent {
     [Ref] InstructionsList GetActions();
     [Const, Ref] DOMString GetLoopIndexVariableName();
     void SetLoopIndexVariableName([Const] DOMString name);
+    [Const, Ref] DOMString GetOrderBy();
+    void SetOrderBy([Const] DOMString orderBy);
+    [Const, Ref] Expression GetOrderByExpression();
+    [Const, Ref] DOMString GetOrder();
+    void SetOrder([Const] DOMString order);
+    [Const, Ref] DOMString GetLimit();
+    void SetLimit([Const] DOMString limit);
+    [Const, Ref] Expression GetLimitExpression();
 };
 ForEachEvent implements BaseEvent;
 
@@ -2626,7 +2650,7 @@ interface EventsRefactorer {
         [Const] DOMString oldName,
         [Const] DOMString newName);
     [Value] VectorEventsSearchResult STATIC_ReplaceStringInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString toReplace, [Const] DOMString newString, boolean matchCase, boolean inConditions, boolean inActions,  boolean inEventStrings);
-    [Value] VectorEventsSearchResult STATIC_SearchInEvents([Const, Ref] Platform platform, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings, boolean inEventSentences);
+    [Value] VectorEventsSearchResult STATIC_SearchInEvents([Const, Ref] Platform platform, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings, boolean inEventSentences, boolean inInstructionNames);
 };
 
 interface UnfilledRequiredBehaviorPropertyProblem {
@@ -3276,6 +3300,28 @@ interface EventsFunction {
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
+interface FunctionFolderOrFunction {
+    void FunctionFolderOrFunction();
+    boolean IsFolder();
+    boolean IsRootFolder();
+    [Ref] EventsFunction GetFunction();
+    [Const, Ref] DOMString GetFolderName();
+    void SetFolderName([Const] DOMString name);
+    boolean HasFunctionNamed([Const] DOMString name);
+    [Ref] FunctionFolderOrFunction GetFunctionNamed([Const] DOMString name);
+    unsigned long GetChildrenCount();
+    [Ref] FunctionFolderOrFunction GetChildAt(unsigned long pos);
+    [Ref] FunctionFolderOrFunction GetFunctionChild([Const] DOMString name);
+    [Ref] FunctionFolderOrFunction GetOrCreateChildFolder([Const] DOMString name);
+    unsigned long GetChildPosition([Const, Ref] FunctionFolderOrFunction child);
+    [Ref] FunctionFolderOrFunction GetParent();
+    [Ref] FunctionFolderOrFunction InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+    void MoveFunctionFolderOrFunctionToAnotherFolder([Ref] FunctionFolderOrFunction functionFolderOrFunction, [Ref] FunctionFolderOrFunction newParentFolder, unsigned long newPosition);
+    void MoveChild(unsigned long oldIndex, unsigned long newIndex);
+    void RemoveFolderChild([Const, Ref] FunctionFolderOrFunction childToRemove);
+    boolean IsADescendantOf([Const, Ref] FunctionFolderOrFunction otherFunctionFolderOrFunction);
+};
+
 enum EventsFunctionsContainer_FunctionOwner {
     "EventsFunctionsContainer::Extension",
     "EventsFunctionsContainer::Behavior",
@@ -3292,6 +3338,14 @@ interface EventsFunctionsContainer {
     void MoveEventsFunction(unsigned long oldIndex, unsigned long newIndex);
     unsigned long GetEventsFunctionsCount();
     unsigned long GetEventsFunctionPosition([Const, Ref] EventsFunction eventsFunction);
+
+    [Ref] EventsFunction InsertNewEventsFunctionInFolder(
+        [Const] DOMString name,
+        [Ref] FunctionFolderOrFunction folder,
+        unsigned long pos);
+    [Ref] FunctionFolderOrFunction GetRootFolder();
+    [Value] VectorFunctionFolderOrFunction GetAllFunctionFolderOrFunction();
+    void AddMissingFunctionsInRootFolder();
 };
 
 interface AbstractEventsBasedEntity {
@@ -3515,6 +3569,8 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetShortDescription();
     [Ref] EventsFunctionsExtension SetDescription([Const] DOMString description);
     [Const, Ref] DOMString GetDescription();
+    [Ref] EventsFunctionsExtension SetDimension([Const] DOMString dimension);
+    [Const, Ref] DOMString GetDimension();
     [Ref] EventsFunctionsExtension SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
     [Ref] EventsFunctionsExtension SetFullName([Const] DOMString fullName);
@@ -4361,4 +4417,18 @@ interface MetadataDeclarationHelper {
     boolean STATIC_IsObjectLifecycleEventsFunction([Const] DOMString functionName);
     boolean STATIC_IsExtensionLifecycleEventsFunction([Const] DOMString functionName);
     [Const, Value] DOMString STATIC_ShiftSentenceParamIndexes([Const] DOMString sentence, long offset);
+};
+
+interface MemoryTrackedRegistry {
+    void STATIC_add(long ptr, DOMString className);
+    void STATIC_remove(long ptr, DOMString className);
+    boolean STATIC_isDead(long ptr, DOMString className);
+    long STATIC_getDeadCount();
+    long STATIC_getAliveCount();
+    void STATIC_pruneDead(long maxSize);
+    long STATIC_getAliveCountForClass(DOMString className);
+    long STATIC_getDeadCountForClass(DOMString className);
+    void STATIC_setCurrentCallContextId(long id);
+    long STATIC_getDeadContextId(long ptr, DOMString className);
+    double STATIC_getDeadContextTimeMs(long ptr, DOMString className);
 };

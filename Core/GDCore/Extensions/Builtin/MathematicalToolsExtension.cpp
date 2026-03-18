@@ -17,7 +17,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       _("Mathematical tools"),
       "A set of mathematical functions that can be used in expressions.",
       "Florian Rival",
-      "Open source (MIT License)");
+      "Open source (MIT License)")
+      .SetShortDescription("Random, trigonometry (sin/cos/tan/atan2), min/max, abs, ceil/floor/round, clamp, sign, log, pow, sqrt, lerp.");
   extension.AddInstructionOrExpressionGroupMetadata(_("Mathematical tools"))
       .SetIcon("res/mathfunction.png");
 

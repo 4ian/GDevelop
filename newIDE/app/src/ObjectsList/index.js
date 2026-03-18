@@ -56,6 +56,7 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { EventsScope } from '../InstructionOrExpression/EventsScope';
 import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -245,24 +246,21 @@ class ObjectFolderTreeViewItem implements TreeViewItem {
   }
 
   getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-    try {
-      if (this.objectFolderOrObject.getChildrenCount() === 0) {
-        return this.placeholder ? [this.placeholder] : [];
-      }
-      return mapFor(0, this.objectFolderOrObject.getChildrenCount(), i => {
-        const child = this.objectFolderOrObject.getChildAt(i);
-        return createTreeViewItem({
-          objectFolderOrObject: child,
-          isGlobal: this.global,
-          objectFolderTreeViewItemProps: this.objectFolderTreeViewItemProps,
-          objectTreeViewItemProps: this.objectTreeViewItemProps,
-        });
-      });
-    } catch (e) {
-      // The C++ object may have been destroyed (UseAfterFreeError) while
-      // the React tree view still holds a stale reference.
+    if (!exceptionallyGuardAgainstDeadObject(this.objectFolderOrObject))
+      return this.placeholder ? [this.placeholder] : [];
+
+    if (this.objectFolderOrObject.getChildrenCount() === 0) {
       return this.placeholder ? [this.placeholder] : [];
     }
+    return mapFor(0, this.objectFolderOrObject.getChildrenCount(), i => {
+      const child = this.objectFolderOrObject.getChildAt(i);
+      return createTreeViewItem({
+        objectFolderOrObject: child,
+        isGlobal: this.global,
+        objectFolderTreeViewItemProps: this.objectFolderTreeViewItemProps,
+        objectTreeViewItemProps: this.objectTreeViewItemProps,
+      });
+    });
   }
 }
 

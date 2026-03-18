@@ -20,6 +20,7 @@ import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCu
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -139,21 +140,13 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   getName(): string | React.Node {
-    try {
-      return this.objectFolder.getFolderName();
-    } catch (e) {
-      // The C++ object may have been destroyed (UseAfterFreeError) while
-      // the React tree view still holds a stale reference.
-      return '';
-    }
+    if (!exceptionallyGuardAgainstDeadObject(this.objectFolder)) return '';
+    return this.objectFolder.getFolderName();
   }
 
   getId(): string {
-    try {
-      return getObjectFolderTreeViewItemId(this.objectFolder);
-    } catch (e) {
-      return `deleted-folder-${this.objectFolder.ptr}`;
-    }
+    // getObjectFolderTreeViewItemId only uses .ptr, so it's safe even if dead.
+    return getObjectFolderTreeViewItemId(this.objectFolder);
   }
 
   getHtmlId(index: number): ?string {
@@ -161,14 +154,11 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   getDataSet(): ?HTMLDataset {
-    try {
-      return {
-        folderName: this.objectFolder.getFolderName(),
-        global: this._isGlobal.toString(),
-      };
-    } catch (e) {
-      return null;
-    }
+    if (!exceptionallyGuardAgainstDeadObject(this.objectFolder)) return null;
+    return {
+      folderName: this.objectFolder.getFolderName(),
+      global: this._isGlobal.toString(),
+    };
   }
 
   getThumbnail(): ?string {

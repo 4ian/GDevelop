@@ -21,6 +21,7 @@ import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -30,13 +31,7 @@ export const getObjectTreeViewItemId = (object: gdObject): string => {
   // Use the ptr to avoid display bugs in the rare case a user set an object
   // as global although another layout has an object with the same name,
   // and ignored the warning.
-  try {
-    return `${object.getName()}-${object.ptr}`;
-  } catch (e) {
-    // The C++ object may have been destroyed (UseAfterFreeError) while
-    // the React tree view still holds a stale reference.
-    return `deleted-${object.ptr}`;
-  }
+  return `${object.getName()}-${object.ptr}`;
 };
 
 export type ObjectTreeViewItemCallbacks = {|
@@ -215,33 +210,23 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   is3D(): boolean {
-    try {
-      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-        this.props.project.getCurrentPlatform(),
-        this.object.getObject().getType()
-      );
-      return objectMetadata.isRenderedIn3D();
-    } catch (e) {
-      return false;
-    }
+    if (!exceptionallyGuardAgainstDeadObject(this.object)) return false;
+    const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+      this.props.project.getCurrentPlatform(),
+      this.object.getObject().getType()
+    );
+    return objectMetadata.isRenderedIn3D();
   }
 
   getName(): string | React.Node {
-    try {
-      return this.object.getObject().getName();
-    } catch (e) {
-      // The C++ object may have been destroyed (UseAfterFreeError) while
-      // the React tree view still holds a stale reference.
-      return '';
-    }
+    if (!exceptionallyGuardAgainstDeadObject(this.object)) return '';
+    return this.object.getObject().getName();
   }
 
   getId(): string {
-    try {
-      return getObjectTreeViewItemId(this.object.getObject());
-    } catch (e) {
+    if (!exceptionallyGuardAgainstDeadObject(this.object))
       return `deleted-${this.object.ptr}`;
-    }
+    return getObjectTreeViewItemId(this.object.getObject());
   }
 
   getHtmlId(index: number): ?string {
@@ -249,25 +234,19 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   getDataSet(): ?HTMLDataset {
-    try {
-      return {
-        objectName: this.object.getObject().getName(),
-        global: this._isGlobal.toString(),
-      };
-    } catch (e) {
-      return null;
-    }
+    if (!exceptionallyGuardAgainstDeadObject(this.object)) return null;
+    return {
+      objectName: this.object.getObject().getName(),
+      global: this._isGlobal.toString(),
+    };
   }
 
   getThumbnail(): ?string {
-    try {
-      return this.props.getThumbnail(
-        this.props.project,
-        this.object.getObject().getConfiguration()
-      );
-    } catch (e) {
-      return null;
-    }
+    if (!exceptionallyGuardAgainstDeadObject(this.object)) return null;
+    return this.props.getThumbnail(
+      this.props.project,
+      this.object.getObject().getConfiguration()
+    );
   }
 
   onClick(): void {

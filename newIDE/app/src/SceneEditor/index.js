@@ -3089,6 +3089,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                       onEventsBasedObjectChildrenEdited={
                         this.props.onEventsBasedObjectChildrenEdited
                       }
+                      onWillInstallExtension={this.props.onWillInstallExtension}
+                      onExtensionInstalled={this.props.onExtensionInstalled}
                       onClose={() => {
                         this.openObjectImporterDialog(false);
                         if (this.editorDisplay) {

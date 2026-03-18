@@ -614,7 +614,9 @@ const MainFrame = (props: Props): React.MixedElement => {
   // });
 
   const { currentFileMetadata, updateStatus } = state;
-  const currentProject = exceptionallyGuardAgainstDeadObject(state.currentProject);
+  const currentProject = exceptionallyGuardAgainstDeadObject(
+    state.currentProject
+  );
   const {
     renderShareDialog,
     resourceSources,

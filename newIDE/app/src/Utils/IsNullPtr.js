@@ -31,14 +31,18 @@ export const exceptionallyGuardAgainstDeadObject = <T>(obj: ?T): ?T => {
   if (!obj) return null;
 
   try {
-    // $FlowFixMe[incompatible-call] - obj is an Emscripten wrapper object.
+    // $FlowFixMe[incompatible-type] - obj is an Emscripten wrapper object.
     gd.assertObjectAlive(obj);
   } catch (exception) {
-    console.warn(
-      'Detected a dead object being accessed - returning null instead.',
-      exception
-    );
-    return null;
+    if (exception.name && exception.name === 'UseAfterFreeError') {
+      console.warn(
+        'Detected a dead object being accessed - returning null instead.',
+        exception
+      );
+      return null;
+    }
+
+    throw exception;
   }
 
   return obj;

@@ -15,6 +15,7 @@ set(
 	DraggableBehavior
 	Inventory
 	LinkedObjects
+	Sticker3DBehavior
 	PanelSpriteObject
 	ParticleSystem
 	PathfindingBehavior

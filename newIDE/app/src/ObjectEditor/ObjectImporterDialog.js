@@ -384,6 +384,8 @@ type Props = {|
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onClose: () => void,
 |};
 
@@ -392,6 +394,8 @@ const ObjectImporterDialog = ({
   objectsContainer,
   resourceManagementProps,
   onEventsBasedObjectChildrenEdited,
+  onWillInstallExtension,
+  onExtensionInstalled,
   onClose,
 }: Props): React.Node => {
   const openAssetFile = useOpenAssetFile();
@@ -723,12 +727,17 @@ const ObjectImporterDialog = ({
         const serializedExtension = JSON.parse(await extensionBlob.text());
         serializedExtensions.push(serializedExtension);
       }
+      const installedExtensionNames = serializedExtensions.map(
+        extensions => extensions.name
+      );
+      onWillInstallExtension(installedExtensionNames);
       await addSerializedExtensionsToProject(
         eventsFunctionsExtensionsState,
         project,
         serializedExtensions,
         []
       );
+      onExtensionInstalled(installedExtensionNames);
 
       addOrReplaceVariants(project, newVariantsByObjectType);
       addOrReplaceVariants(project, replacingVariantsByObjectType);
@@ -784,6 +793,8 @@ const ObjectImporterDialog = ({
       objectsContainer,
       onClose,
       onEventsBasedObjectChildrenEdited,
+      onExtensionInstalled,
+      onWillInstallExtension,
       project,
       resourceManagementProps,
     ]

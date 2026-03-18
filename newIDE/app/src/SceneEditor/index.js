@@ -652,6 +652,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     // renderers to avoid keeping any references to existing instances
     if (this.editorDisplay)
       this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
+
+    // Immediately update the properties editor to ensure they keep no reference
+    // to the deleted instances (and their variables containers).
+    this.forceUpdatePropertiesEditor();
+
     this.updateToolbar();
 
     this._sendHotReloadAllInstances();
@@ -1003,6 +1008,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     // /!\ Drop the selection to avoid keeping any references to deleted instances.
     // This could be avoided if the selection used something like UUID to address instances.
     this.instancesSelection.clearSelection();
+
+    // Immediately update the properties editor to ensure they keep no reference
+    // to the deleted instances (and their variables containers).
+    this.forceUpdatePropertiesEditor();
+
     this.setState(
       {
         history: undo(
@@ -1026,6 +1036,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     // /!\ Drop the selection to avoid keeping any references to deleted instances.
     // This could be avoided if the selection used something like UUID to address instances.
     this.instancesSelection.clearSelection();
+
+    // Immediately update the properties editor to ensure they keep no reference
+    // to the deleted instances (and their variables containers).
+    this.forceUpdatePropertiesEditor();
+
     this.setState(
       {
         history: redo(

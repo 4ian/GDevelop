@@ -474,15 +474,6 @@ const Instruction = (props: Props): React.Node => {
                   instruction.getType()
                 );
 
-            if (gd.MetadataProvider.isBadInstructionMetadata(metadata)) {
-              return (
-                <InstructionMissing
-                  instructionType={instruction.getType()}
-                  isCondition={isCondition}
-                />
-              );
-            }
-
             const smallIconFilename = metadata.getSmallIconFilename() || '';
             // The instruction itself can be dragged and is a target for
             // another instruction to be dropped. It's IMPORTANT NOT to have

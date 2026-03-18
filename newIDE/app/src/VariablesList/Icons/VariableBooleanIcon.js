@@ -2,9 +2,7 @@
 import * as React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
-type Props = {};
-
-export default (React.memo<Props>(props => (
+export default React.memo(props => (
   <SvgIcon {...props} viewBox="0 0 17 7">
     <path
       fill="none"
@@ -23,4 +21,4 @@ export default (React.memo<Props>(props => (
       strokeLinejoin="round"
     />
   </SvgIcon>
-)): React.ComponentType<Props>);
+));

@@ -62,4 +62,13 @@ const defaultShortcuts: ShortcutMap = {
   OPEN_EXTENSION_SETTINGS: '',
 };
 
+/**
+ * Secondary (alternative) shortcuts for commands.
+ * These are not user-customizable and provide additional
+ * key bindings for commonly used commands.
+ */
+export const defaultSecondaryShortcuts: ShortcutMap = {
+  OPEN_COMMAND_PALETTE: 'CmdOrCtrl+KeyK',
+};
+
 export default defaultShortcuts;

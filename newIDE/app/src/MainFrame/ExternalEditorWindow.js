@@ -27,22 +27,39 @@ const ExternalEditorWindow = (props: Props): React.Node => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
 
   // Track the external window's dimensions via ResizeObserver.
+  // Use a callback ref so the observer is attached as soon as the DOM node
+  // appears inside the WindowPortal (which creates its container asynchronously).
   const [windowWidth, setWindowWidth] = React.useState<number | null>(null);
   const [windowHeight, setWindowHeight] = React.useState<number | null>(null);
-  const containerRef = React.useRef<?HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const observer = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        setWindowWidth(entry.contentRect.width);
-        setWindowHeight(entry.contentRect.height);
+  const observerRef = React.useRef<ResizeObserver | null>(null);
+  const containerRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      // Disconnect any previous observer.
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
       }
-    });
-    observer.observe(container);
-    return () => observer.disconnect();
+      if (!node) return;
+
+      const observer = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          setWindowWidth(entry.contentRect.width);
+          setWindowHeight(entry.contentRect.height);
+        }
+      });
+      observer.observe(node);
+      observerRef.current = observer;
+    },
+    []
+  );
+
+  // Clean up observer on unmount.
+  React.useEffect(() => {
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
   }, []);
 
   const errorBoundaryProps = getEditorErrorBoundaryProps(editorTab.key);

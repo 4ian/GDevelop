@@ -278,20 +278,23 @@ export const popOutTab = (
   // Append to external pane
   const externalPane = state.panes['external'];
 
+  // Build new panes in two steps to avoid Flow's invalid-computed-prop error.
+  const newPanes = {
+    ...state.panes,
+    external: {
+      ...externalPane,
+      editors: [...externalPane.editors, taggedTab],
+    },
+  };
+  newPanes[sourcePaneIdentifier] = {
+    ...sourcePane,
+    editors: remainingEditors,
+    currentTab: newCurrentTabIndex === -1 ? 0 : newCurrentTabIndex,
+  };
+
   return {
     ...state,
-    panes: {
-      ...state.panes,
-      [sourcePaneIdentifier]: {
-        ...sourcePane,
-        editors: remainingEditors,
-        currentTab: newCurrentTabIndex === -1 ? 0 : newCurrentTabIndex,
-      },
-      external: {
-        ...externalPane,
-        editors: [...externalPane.editors, taggedTab],
-      },
-    },
+    panes: newPanes,
   };
 };
 
@@ -329,21 +332,25 @@ export const popInTab = (
   // Append to target pane and focus it
   const targetPane = state.panes[targetPaneIdentifier];
 
+  // Build new panes in two steps to avoid Flow's invalid-computed-prop error
+  // (computed key could theoretically overwrite the explicit 'external' key).
+  const newPanes = {
+    ...state.panes,
+    external: {
+      ...externalPane,
+      editors: remainingExternal,
+      currentTab: newExternalCurrentTab === -1 ? 0 : newExternalCurrentTab,
+    },
+  };
+  newPanes[targetPaneIdentifier] = {
+    ...targetPane,
+    editors: [...targetPane.editors, restoredTab],
+    currentTab: targetPane.editors.length, // Focus the newly added tab
+  };
+
   return {
     ...state,
-    panes: {
-      ...state.panes,
-      external: {
-        ...externalPane,
-        editors: remainingExternal,
-        currentTab: newExternalCurrentTab === -1 ? 0 : newExternalCurrentTab,
-      },
-      [targetPaneIdentifier]: {
-        ...targetPane,
-        editors: [...targetPane.editors, restoredTab],
-        currentTab: targetPane.editors.length, // Focus the newly added tab
-      },
-    },
+    panes: newPanes,
   };
 };
 

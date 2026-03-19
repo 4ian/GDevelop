@@ -4,7 +4,6 @@ import ExternalEditorWindow from './ExternalEditorWindow';
 import {
   getExternalEditors,
   type EditorTab,
-  type EditorTabsState,
 } from './EditorTabs/EditorTabsHandler';
 import { type EditorTabsPaneCommonProps } from './EditorTabsPane';
 
@@ -14,9 +13,9 @@ type Props = {|
   onPopIn: (editorTab: EditorTab) => void,
 |};
 
-const ExternalEditorWindows = (props: Props) => {
-  const { editorTabs, onClose, onPopIn, ...sharedProps } = props;
-  const externalEditors = getExternalEditors(editorTabs);
+const ExternalEditorWindows = (props: Props): React.Node => {
+  const { onClose, onPopIn, ...sharedProps } = props;
+  const externalEditors = getExternalEditors(props.editorTabs);
 
   if (externalEditors.length === 0) return null;
 

@@ -19,7 +19,7 @@ type Props = {|
   onPopIn: (editorTab: EditorTab) => void,
 |};
 
-const ExternalEditorWindow = (props: Props) => {
+const ExternalEditorWindow = (props: Props): React.Node => {
   const { editorTab, onClose, onPopIn } = props;
 
   const toolbarRef = React.useRef<?ToolbarInterface>(null);

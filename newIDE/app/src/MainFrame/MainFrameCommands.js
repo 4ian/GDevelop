@@ -69,6 +69,11 @@ type CommandHandlers = {|
   onRestartInGameEditor: (reason: string) => void,
   onOpenGlobalSearch: () => void,
   onOpenMemoryTrackerRegistry: () => void,
+  onOpenPreferences: () => void,
+  onOpenAbout: () => void,
+  onOpenLanguage: () => void,
+  onOpenVersionHistory: () => void,
+  onOpenDebugger: () => void,
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
@@ -172,6 +177,26 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
       () => onRestartInGameEditor('relaunched-manually'),
       [onRestartInGameEditor]
     ),
+  });
+
+  useCommand('OPEN_PREFERENCES', true, {
+    handler: handlers.onOpenPreferences,
+  });
+
+  useCommand('OPEN_ABOUT', true, {
+    handler: handlers.onOpenAbout,
+  });
+
+  useCommand('OPEN_LANGUAGE', true, {
+    handler: handlers.onOpenLanguage,
+  });
+
+  useCommand('OPEN_VERSION_HISTORY', !!handlers.project, {
+    handler: handlers.onOpenVersionHistory,
+  });
+
+  useCommand('OPEN_DEBUGGER', !!handlers.project, {
+    handler: handlers.onOpenDebugger,
   });
 
   useCommand('OPEN_MEMORY_TRACKER_REGISTRY', true, {

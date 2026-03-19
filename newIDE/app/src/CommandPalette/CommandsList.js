@@ -48,7 +48,6 @@ export type CommandName =
   | 'OPEN_SETUP_GRID'
   | 'EDIT_LAYER_EFFECTS'
   | 'EDIT_LAYER'
-  | 'EDIT_NETWORK_PREVIEW'
   | 'EDIT_OBJECT'
   | 'EDIT_OBJECT_BEHAVIORS'
   | 'EDIT_OBJECT_EFFECTS'
@@ -68,6 +67,11 @@ export type CommandName =
   | 'SEARCH_EVENTS'
   | 'OPEN_EXTENSION_SETTINGS'
   | 'OPEN_PROFILE'
+  | 'OPEN_PREFERENCES'
+  | 'OPEN_ABOUT'
+  | 'OPEN_LANGUAGE'
+  | 'OPEN_VERSION_HISTORY'
+  | 'OPEN_DEBUGGER'
   | 'OPEN_MEMORY_TRACKER_REGISTRY';
 
 export const commandAreas = {
@@ -348,6 +352,30 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_EXTENSION_SETTINGS: {
     area: 'EVENTS',
     displayText: t`Open extension settings`,
+  },
+
+  // IDE commands
+  OPEN_PREFERENCES: {
+    area: 'IDE',
+    displayText: t`Open preferences`,
+  },
+  OPEN_ABOUT: {
+    area: 'IDE',
+    displayText: t`Open about GDevelop`,
+  },
+  OPEN_LANGUAGE: {
+    area: 'IDE',
+    displayText: t`Change language`,
+  },
+
+  // Project commands
+  OPEN_VERSION_HISTORY: {
+    area: 'PROJECT',
+    displayText: t`Open version history`,
+  },
+  OPEN_DEBUGGER: {
+    area: 'PROJECT',
+    displayText: t`Open debugger`,
   },
 
   // Debug commands

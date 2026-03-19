@@ -4815,6 +4815,11 @@ const MainFrame = (props: Props): React.MixedElement => {
     onRestartInGameEditor,
     onOpenGlobalSearch: openGlobalSearch,
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
+    onOpenPreferences: () => openPreferencesDialog(true),
+    onOpenAbout: () => openAboutDialog(true),
+    onOpenLanguage: () => openLanguageDialog(true),
+    onOpenVersionHistory: openVersionHistoryPanel,
+    onOpenDebugger: openDebugger,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(

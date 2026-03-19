@@ -3,21 +3,38 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 
 const gd: libGDevelop = global.gd;
 
+export type ObjectSizeInfo = {|
+  width: number,
+  height: number,
+  depth: number,
+  originX: number,
+  originY: number,
+  originZ: number,
+  centerX: number,
+  centerY: number,
+  centerZ: number,
+|};
+
 /**
- * Returns size, origin and center for an asset short header.
- * Returns null for object types where this information cannot be determined statically.
+ * Returns the default size, origin and center of an object as numeric values.
+ * Uses PixiResourcesLoader to get the actual texture dimensions for Sprite objects.
+ * Accepts an optional assetShortHeader for Sprite objects installed from the asset store,
+ * where the texture may not yet be loaded in PixiResourcesLoader.
+ * Returns 0 for width/height/depth when dimensions are not available.
  */
-export const getObjectSizeAndOriginInfo = (
+export const getObjectSizeInfo = (
   object: gdObject,
   project: gdProject,
+  pixiResourcesLoader: any,
   assetShortHeader?: AssetShortHeader | null
-): {| size: string, origin: string, center: string |} | null => {
+): ObjectSizeInfo => {
   const objectConfiguration = object.getConfiguration();
   const objectType = object.getType();
 
   if (objectType === 'Sprite') {
     const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
     const animations = spriteConfiguration.getAnimations();
+    const preScale = spriteConfiguration.getPreScale();
     if (
       animations.getAnimationsCount() > 0 &&
       animations.getAnimation(0).getDirectionsCount() > 0 &&
@@ -26,32 +43,64 @@ export const getObjectSizeAndOriginInfo = (
         .getDirection(0)
         .getSpritesCount() > 0
     ) {
-      const sprite = animations
+      const firstSprite = animations
         .getAnimation(0)
         .getDirection(0)
         .getSprite(0);
-      const origin = sprite.getOrigin();
-      const originStr = `${origin.getX()};${origin.getY()}`;
+      const originX = firstSprite.getOrigin().getX();
+      const originY = firstSprite.getOrigin().getY();
 
-      let centerStr;
-      if (sprite.isDefaultCenterPoint()) {
-        centerStr =
-          assetShortHeader != null
-            ? `${assetShortHeader.width / 2};${assetShortHeader.height / 2}`
-            : 'center of image';
+      // Determine texture dimensions: prefer assetShortHeader (reliable for freshly installed
+      // assets whose texture may not be in PixiResourcesLoader yet), then fall back to the loader.
+      let textureWidth = 0;
+      let textureHeight = 0;
+      if (assetShortHeader && assetShortHeader.width > 0) {
+        textureWidth = assetShortHeader.width;
+        textureHeight = assetShortHeader.height;
       } else {
-        const center = sprite.getCenter();
-        centerStr = `${center.getX()};${center.getY()}`;
+        const texture = pixiResourcesLoader.getPIXITexture(
+          project,
+          firstSprite.getImageName()
+        );
+        if (texture && texture.valid && texture.width > 0) {
+          textureWidth = texture.width;
+          textureHeight = texture.height;
+        }
       }
 
-      const sizeStr =
-        assetShortHeader != null
-          ? `${assetShortHeader.width}x${assetShortHeader.height}`
-          : 'unknown';
-
-      return { size: sizeStr, origin: originStr, center: centerStr };
+      if (textureWidth > 0) {
+        const width = textureWidth * preScale;
+        const height = textureHeight * preScale;
+        const centerX = firstSprite.isDefaultCenterPoint()
+          ? width / 2
+          : firstSprite.getCenter().getX();
+        const centerY = firstSprite.isDefaultCenterPoint()
+          ? height / 2
+          : firstSprite.getCenter().getY();
+        return {
+          width,
+          height,
+          depth: 0,
+          originX,
+          originY,
+          originZ: 0,
+          centerX,
+          centerY,
+          centerZ: 0,
+        };
+      }
     }
-    return null;
+    return {
+      width: 0,
+      height: 0,
+      depth: 0,
+      originX: 0,
+      originY: 0,
+      originZ: 0,
+      centerX: 0,
+      centerY: 0,
+      centerZ: 0,
+    };
   }
 
   if (objectType === 'TiledSpriteObject::TiledSprite') {
@@ -59,9 +108,15 @@ export const getObjectSizeAndOriginInfo = (
     const width = config.getWidth();
     const height = config.getHeight();
     return {
-      size: `${width}x${height}`,
-      origin: '0;0',
-      center: `${width / 2};${height / 2}`,
+      width,
+      height,
+      depth: 0,
+      originX: 0,
+      originY: 0,
+      originZ: 0,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: 0,
     };
   }
 
@@ -70,9 +125,15 @@ export const getObjectSizeAndOriginInfo = (
     const width = config.getWidth();
     const height = config.getHeight();
     return {
-      size: `${width}x${height}`,
-      origin: '0;0',
-      center: `${width / 2};${height / 2}`,
+      width,
+      height,
+      depth: 0,
+      originX: 0,
+      originY: 0,
+      originZ: 0,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: 0,
     };
   }
 
@@ -99,16 +160,28 @@ export const getObjectSizeAndOriginInfo = (
     const height = maxY - minY;
     const depth = maxZ - minZ;
 
-    const origin = `${-minX};${-minY}${isRenderedIn3D ? `;${-minZ}` : ''}`;
-    const center = `${width / 2};${height / 2}${
-      isRenderedIn3D ? `;${depth / 2}` : ''
-    }`;
     return {
-      size: `${width}x${height}${isRenderedIn3D ? `x${depth}` : ''}`,
-      origin,
-      center,
+      width,
+      height,
+      depth,
+      originX: -minX || 0,
+      originY: -minY || 0,
+      originZ: -minZ || 0,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: depth / 2,
     };
   }
 
-  return null;
+  return {
+    width: 0,
+    height: 0,
+    depth: 0,
+    originX: 0,
+    originY: 0,
+    originZ: 0,
+    centerX: 0,
+    centerY: 0,
+    centerZ: 0,
+  };
 };

@@ -53,14 +53,14 @@ const DefaultHelpButton = ({
  * Also take a look at EmptyMessage for a less visible message.
  */
 export const EmptyPlaceholder = (props: Props): React.Node => (
-  <Column alignItems="center" noOverflowParent>
+  <Column alignItems="center" noOverflowParent noMargin>
     <Container
       style={{
         maxWidth: '480px',
         whiteSpace: 'normal',
       }}
     >
-      <Column noOverflowParent>
+      <Column noOverflowParent noMargin>
         <Text
           size="block-title"
           align="center"

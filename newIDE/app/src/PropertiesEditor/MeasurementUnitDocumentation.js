@@ -18,7 +18,7 @@ type Props = {|
   elementsWithWords: string,
 |};
 
-export default function sMeasurementUnitDocumentation({
+export default function MeasurementUnitDocumentation({
   label,
   description,
   elementsWithWords,

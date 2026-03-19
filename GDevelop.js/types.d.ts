@@ -3271,6 +3271,9 @@ export class MemoryTrackedRegistry extends EmscriptenObject {
   static pruneDead(maxSize: number): void;
   static getAliveCountForClass(className: string): number;
   static getDeadCountForClass(className: string): number;
+  static setCurrentCallContextId(id: number): void;
+  static getDeadContextId(ptr: number, className: string): number;
+  static getDeadContextTimeMs(ptr: number, className: string): number;
 }
 
 export function toNewVectorString(): VectorString;
@@ -3403,6 +3406,19 @@ export function compare<T extends EmscriptenObject>(object1: T, object2: T): boo
  * The alias {@link EmscriptenObject.delete} is recommended instead, for readability.
  */
 export function destroy(object: EmscriptenObject): void;
+
+/**
+ * Check that an Emscripten object is still alive, i.e. not destroyed from
+ * JavaScript (ptr is 0) or from C++ (only for memory-tracked classes).
+ *
+ * In theory, a dead object should never be accessed. In practice this can
+ * help prevent stale references to objects (deleted by JS: ptr will be 0,
+ * or deleted in C++, only for tracked classes).
+ * This is used just to add extra protection and should usually not be useful.
+ *
+ * @throws if the object is dead.
+ */
+export function assertObjectAlive(object: EmscriptenObject): void;
 
 export function _malloc(size: number): number;
 export function _free(ptr: number): void;

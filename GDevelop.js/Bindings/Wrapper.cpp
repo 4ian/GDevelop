@@ -917,6 +917,9 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_getAliveCount getAliveCount
 #define STATIC_getAliveCountForClass getAliveCountForClass
 #define STATIC_getDeadCountForClass getDeadCountForClass
+#define STATIC_setCurrentCallContextId setCurrentCallContextId
+#define STATIC_getDeadContextId getDeadContextId
+#define STATIC_getDeadContextTimeMs getDeadContextTimeMs
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

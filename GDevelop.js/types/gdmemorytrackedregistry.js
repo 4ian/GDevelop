@@ -8,6 +8,9 @@ declare class gdMemoryTrackedRegistry {
   static pruneDead(maxSize: number): void;
   static getAliveCountForClass(className: string): number;
   static getDeadCountForClass(className: string): number;
+  static setCurrentCallContextId(id: number): void;
+  static getDeadContextId(ptr: number, className: string): number;
+  static getDeadContextTimeMs(ptr: number, className: string): number;
   delete(): void;
   ptr: number;
 };

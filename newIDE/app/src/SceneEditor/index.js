@@ -1515,11 +1515,22 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
     const getNewState = (doRemove: boolean) => {
-      const newState: {| layerRemoved: null, chosenLayer?: string |} = {
+      const newState: {|
+        layerRemoved: null,
+        chosenLayer?: string,
+        selectedLayer?: null,
+      |} = {
         layerRemoved: null,
       };
       if (doRemove && layerName === this.state.chosenLayer) {
         newState.chosenLayer = BASE_LAYER_NAME;
+      }
+      if (
+        doRemove &&
+        this.state.selectedLayer &&
+        this.state.selectedLayer.getName() === layerName
+      ) {
+        newState.selectedLayer = null;
       }
       return newState;
     };
@@ -3078,6 +3089,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                       onEventsBasedObjectChildrenEdited={
                         this.props.onEventsBasedObjectChildrenEdited
                       }
+                      onWillInstallExtension={this.props.onWillInstallExtension}
+                      onExtensionInstalled={this.props.onExtensionInstalled}
                       onClose={() => {
                         this.openObjectImporterDialog(false);
                         if (this.editorDisplay) {

@@ -48,7 +48,7 @@ import CheckCircle from '@material-ui/icons/CheckCircle';
 import Link from '../../UI/Link';
 import { type FileMetadata } from '../../ProjectsStorage';
 import UnsavedChangesContext from '../../MainFrame/UnsavedChangesContext';
-import { exceptionallyGuardAgainstNullPtr } from '../../Utils/IsNullPtr';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 import { OrchestratorPlan } from './OrchestratorPlan';
 import { type FunctionCallItem, type RenderItem } from './Utils';
 
@@ -153,7 +153,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     forkingState,
     onRestore,
   }: Props) {
-    const project = exceptionallyGuardAgainstNullPtr(nullableProject);
+    const project = exceptionallyGuardAgainstDeadObject(nullableProject);
     const theme = React.useContext(GDevelopThemeContext);
     const isLightTheme = theme.palette.type === 'light';
     const {

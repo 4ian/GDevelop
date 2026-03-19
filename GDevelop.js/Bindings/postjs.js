@@ -68,6 +68,14 @@ var adaptNamingConventions = function (gd) {
 
     //Offer a delete method that does what gd.destroy does.
     proto.delete = function () {
+      // Capture destruction context before the pointer is invalidated.
+      // This is only done once per deletion, so the cost of capturing a
+      // stack trace is negligible.
+      this._jsDestructionContext = {
+        source: 'js',
+        stack: new Error('Object destroyed here').stack,
+        time: Date.now(),
+      };
       gd.destroy(this);
       this.ptr = 0;
     };
@@ -330,13 +338,25 @@ adaptNamingConventions(Module);
  * - C++ internally deleted the object but a JS wrapper still references it
  */
 class UseAfterFreeError extends Error {
-  constructor(message) {
+  constructor({ message, useAfterFreeContext }) {
     super(message);
     this.name = 'UseAfterFreeError';
+    this.useAfterFreeContext = useAfterFreeContext;
   }
 }
 
 Module.UseAfterFreeError = UseAfterFreeError;
+
+/**
+ * Maps integer call-context IDs to human-readable labels like
+ * "Project.removeLayout". Built during patchClassesForUseAfterFreeDetection,
+ * read at error time (cold path only).
+ *
+ * ID 0 is reserved for "no context set" — it is the default value when no
+ * wrapped JS method is currently executing (reset after each call returns).
+ * @type {string[]}
+ */
+const callContextLabels = ['<no context set>'];
 
 /**
  * Check that an Emscripten WebIDL object is still alive.
@@ -349,22 +369,70 @@ Module.UseAfterFreeError = UseAfterFreeError;
  */
 function assertAlive(obj, label, gd, className) {
   if (!obj.ptr) {
-    throw new UseAfterFreeError(
-      `${label}: object was already destroyed from JavaScript (ptr is 0).`
-    );
+    let message = `${label}: object was already destroyed from JavaScript (ptr is 0).`;
+
+    const destructionContext = obj._jsDestructionContext;
+    throw new UseAfterFreeError({
+      message,
+      useAfterFreeContext: {
+        timeSinceDestroyedInMs: destructionContext
+          ? Math.round(performance.now() - destructionContext.time)
+          : undefined,
+        destroyedBy: destructionContext ? destructionContext.stack : 'unknown',
+      },
+    });
   }
   if (
     className !== null &&
     gd.MemoryTrackedRegistry.isDead(obj.ptr, className)
   ) {
-    throw new UseAfterFreeError(
-      `${label}: C++ object (${className}) was deleted but JavaScript wrapper still exists and was about to be used (this exception was thrown instead).`
+    let message = `${label}: C++ object (${className}) was destroyed on C++ side but JavaScript wrapper still exists (ptr is not 0) and was about to be used (this exception was thrown instead).`;
+
+    // Gather information about how/when the object was destroyed and last proper usage.
+    let destroyedByCallTo = 'unknown';
+    const deadContextId = gd.MemoryTrackedRegistry.getDeadContextId(
+      obj.ptr,
+      className
     );
+    if (deadContextId >= 0) {
+      destroyedByCallTo =
+        callContextLabels[deadContextId] || `unknown (id=${deadContextId})`;
+    }
+
+    let timeSinceDestroyedInMs = undefined;
+    const deadContextTimeMs = gd.MemoryTrackedRegistry.getDeadContextTimeMs(
+      obj.ptr,
+      className
+    );
+    if (deadContextTimeMs > 0) {
+      // The C++ side uses emscripten_get_now() which maps to performance.now().
+      timeSinceDestroyedInMs = Math.round(
+        performance.now() - deadContextTimeMs
+      );
+    }
+
+    let lastSuccessfulCallToThisWrapper = undefined;
+    if (obj._lastSuccessfulCall) {
+      lastSuccessfulCallToThisWrapper = `${className}.${obj._lastSuccessfulCall}`;
+    }
+
+    throw new UseAfterFreeError({
+      message,
+      useAfterFreeContext: {
+        destroyedByCallTo,
+        timeSinceDestroyedInMs,
+        lastSuccessfulCallToThisWrapper,
+      },
+    });
   }
 }
 
 /**
  * Patch all WebIDL classes to check for use-after-free before every method call.
+ * Also assigns an integer call-context ID to each method (including delete) and
+ * sets it on the C++ side before calling into WASM, so that
+ * MemoryTrackedRegistry::remove() can capture which JS call triggered each
+ * destruction.
  *
  * @param {object} gd - The Module/gd object (after adaptNamingConventions).
  * @param {{skipped: Set<string>, tracked: Set<string>, verbose: boolean}}
@@ -374,6 +442,12 @@ function patchClassesForUseAfterFreeDetection(
   { skippedClassNames, trackedClassNames, verbose }
 ) {
   let patchedCount = 0;
+  // Start at 1 because ID 0 is reserved for "<no context set>".
+  let nextContextId = 1;
+  const setCurrentCallContextId =
+    gd.MemoryTrackedRegistry.setCurrentCallContextId.bind(
+      gd.MemoryTrackedRegistry
+    );
 
   for (const gdClass in gd) {
     if (!gd.hasOwnProperty(gdClass)) continue;
@@ -387,8 +461,15 @@ function patchClassesForUseAfterFreeDetection(
     // Determine if this class is tracked in C++.
     const className = trackedClassNames.has(gdClass) ? gdClass : null;
 
+    // Store the class name on the prototype so that assertObjectAlive can
+    // look it up at runtime without requiring callers to know it.
+    if (className !== null) {
+      proto._memoryTrackedClassName = className;
+    }
+
     Object.getOwnPropertyNames(proto).forEach((methodName) => {
-      // Skip special methods.
+      // Skip internal Emscripten methods (constructor, __destroy__, __class__).
+      // Note: delete is handled separately below.
       if (
         methodName === 'constructor' ||
         methodName === '__destroy__' ||
@@ -400,21 +481,67 @@ function patchClassesForUseAfterFreeDetection(
       const desc = Object.getOwnPropertyDescriptor(proto, methodName);
       if (!desc || typeof desc.value !== 'function') return;
 
-      // Wrap the method with a liveness check.
-      proto[methodName] = (function (original, mName, cName) {
+      // Assign a call-context ID for this (class, method) pair.
+      const contextId = nextContextId++;
+      callContextLabels[contextId] = gdClass + '.' + methodName;
+
+      // Wrap the method with:
+      // 1. A liveness check (assertAlive).
+      // 2. Setting the call-context ID on the C++ side (~50-100ns) so
+      //    MemoryTrackedRegistry::remove() knows which JS call triggered
+      //    any destruction that occurs during this method.
+      // 3. For tracked classes, recording the last successful method name
+      //    on the wrapper for richer error messages.
+      proto[methodName] = (function (
+        original,
+        wrappedMethodName,
+        wrappedClassName,
+        wrappedContextId
+      ) {
         return function useAfterFreeDetectionWrapper() {
-          assertAlive(this, cName ? cName + '.' + mName : mName, gd, cName);
-          return original.apply(this, arguments);
+          assertAlive(
+            this,
+            wrappedClassName
+              ? wrappedClassName + '.' + wrappedMethodName
+              : wrappedMethodName,
+            gd,
+            wrappedClassName
+          );
+          setCurrentCallContextId(wrappedContextId);
+          var result = original.apply(this, arguments);
+          setCurrentCallContextId(0);
+          if (wrappedClassName) {
+            this._lastSuccessfulCall = wrappedMethodName;
+          }
+          return result;
         };
-      })(desc.value, methodName, className);
+      })(desc.value, methodName, className, contextId);
     });
+
+    // Wrap delete() to set the call-context ID before calling gd.destroy().
+    // This is critical: when delete() is called on a tracked object, any
+    // child destructions in C++ will be attributed to "ClassName.delete"
+    // rather than being attributed to nothing.
+    if (typeof proto.delete === 'function') {
+      const deleteContextId = nextContextId++;
+      callContextLabels[deleteContextId] = gdClass + '.delete';
+      const originalDelete = proto.delete;
+      proto.delete = (function (wrappedOriginalDelete, wrappedDeleteContextId) {
+        return function deleteWithContextId() {
+          setCurrentCallContextId(wrappedDeleteContextId);
+          var result = wrappedOriginalDelete.apply(this, arguments);
+          setCurrentCallContextId(0);
+          return result;
+        };
+      })(originalDelete, deleteContextId);
+    }
 
     patchedCount++;
   }
 
   if (verbose) {
     console.log(
-      `[UseAfterFreeDetection] Patched ${patchedCount} classes (${trackedClassNames.size} tracked in C++).`
+      `[UseAfterFreeDetection] Patched ${patchedCount} classes (${trackedClassNames.size} tracked in C++, ${nextContextId} call-context IDs assigned).`
     );
   }
 }
@@ -432,9 +559,27 @@ patchClassesForUseAfterFreeDetection(Module, {
     'EffectsContainer',
     'InitialInstancesContainer',
     'LayersContainer',
+    'ObjectFolderOrObject',
     'ObjectGroupsContainer',
     'ObjectsContainer',
     'VariablesContainer',
   ]),
   verbose: false,
 });
+
+/**
+ * Check that an Emscripten object is still alive, i.e. not destroyed from
+ * JavaScript (ptr is 0) or from C++ (only for memory-tracked classes).
+ *
+ * In theory, a dead object should never be accessed. In practice this can
+ * help prevent stale references to objects (deleted by JS: ptr will be 0,
+ * or deleted in C++, only for tracked classes).
+ * This is used just to add extra protection and should usually not be useful.
+ *
+ * @param {object} obj - The Emscripten wrapper object.
+ * @throws {UseAfterFreeError} if the object is dead.
+ */
+Module.assertObjectAlive = function assertObjectAlive(obj) {
+  const className = obj._memoryTrackedClassName || null;
+  assertAlive(obj, 'assertObjectAlive', Module, className);
+};

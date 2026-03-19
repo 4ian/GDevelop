@@ -14,16 +14,13 @@ import TextField from '@material-ui/core/TextField';
 import ChevronRightIcon from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import filterOptions from './FilterOptions';
-import {
-  type NamedCommand,
-  type CommandOption,
-} from '../CommandManager';
+import { type NamedCommand, type CommandOption } from '../CommandManager';
 import commandsList, { commandAreas } from '../CommandsList';
 import { getShortcutDisplayName } from '../../KeyboardShortcuts';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   listItemContainer: {
     width: '100%',
   },
@@ -150,7 +147,7 @@ const AutocompletePicker = (
       openOnFocus
       autoHighlight
       filterOptions={filterOptions}
-      renderInput={params => (
+      renderInput={(params) => (
         <TextField
           {...params}
           placeholder={props.i18n._(props.placeholder)}

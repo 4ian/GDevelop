@@ -38,17 +38,15 @@ type PaletteMode = 'closed' | 'command' | 'option';
 
 const CommandPalette: React.ComponentType<any> = React.forwardRef<
   {||},
-  CommandPaletteInterface
+  CommandPaletteInterface,
 >((props, ref) => {
   const classes = useStyles();
   const paperClasses = useStylesForPaper();
   const { isMobile } = useResponsiveWindowSize();
   const commandManager = React.useContext(CommandsContext);
   const [mode, setMode] = React.useState<PaletteMode>('closed');
-  const [
-    selectedCommand,
-    selectCommand,
-  ] = React.useState<null | NamedCommandWithOptions>(null);
+  const [selectedCommand, selectCommand] =
+    React.useState<null | NamedCommandWithOptions>(null);
 
   /**
    * Takes a command and if simple command, executes handler.
@@ -92,7 +90,7 @@ const CommandPalette: React.ComponentType<any> = React.forwardRef<
    */
   const launchCommand = React.useCallback(
     // $FlowFixMe[missing-local-annot]
-    commandName => {
+    (commandName) => {
       const command = commandManager.getNamedCommand(commandName);
       if (!command) return;
       handleCommandChoose(command);
@@ -105,16 +103,15 @@ const CommandPalette: React.ComponentType<any> = React.forwardRef<
     launchCommand,
   }));
 
-  const allCommands: Array<NamedCommand> = React.useMemo(
-    () => {
-      return commandManager
+  const allCommands: Array<NamedCommand> = React.useMemo(() => {
+    return (
+      commandManager
         .getAllNamedCommands()
-        .filter(command => !commandsList[command.name].ghost)
+        .filter((command) => !commandsList[command.name].ghost)
         // $FlowFixMe[incompatible-type]
-        .map(command => ({ ...command, icon: <Command /> }));
-    },
-    [commandManager]
-  );
+        .map((command) => ({ ...command, icon: <Command /> }))
+    );
+  }, [commandManager]);
 
   const closeDialog = React.useCallback(() => {
     setMode('closed');
@@ -139,11 +136,7 @@ const CommandPalette: React.ComponentType<any> = React.forwardRef<
             <AutocompletePicker
               i18n={i18n}
               items={allCommands}
-              placeholder={
-                isMobile
-                  ? t`Search`
-                  : t`Start typing a command...`
-              }
+              placeholder={isMobile ? t`Search` : t`Start typing a command...`}
               onClose={closeDialog}
               onSelect={handleCommandChoose}
             />

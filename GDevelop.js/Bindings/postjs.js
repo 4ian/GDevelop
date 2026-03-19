@@ -559,6 +559,7 @@ patchClassesForUseAfterFreeDetection(Module, {
     'EffectsContainer',
     'InitialInstancesContainer',
     'LayersContainer',
+    'ObjectFolderOrObject',
     'ObjectGroupsContainer',
     'ObjectsContainer',
     'VariablesContainer',

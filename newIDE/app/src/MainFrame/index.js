@@ -26,6 +26,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import EditorTabsPane, {
   type EditorTabsPaneCommonProps,
 } from './EditorTabsPane';
+import ExternalEditorWindows from './ExternalEditorWindows';
 import {
   getEditorTabsInitialState,
   openEditorTab,
@@ -49,6 +50,8 @@ import {
   getAllEditorTabs,
   hasEditorsInPane,
   closeEditorTab,
+  popOutTab,
+  popInTab,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -812,6 +815,27 @@ const MainFrame = (props: Props): React.MixedElement => {
       }));
     },
     [setState]
+  );
+
+  const onPopOutTab = React.useCallback(
+    (editorTab: EditorTab) => {
+      setEditorTabs(popOutTab(state.editorTabs, editorTab.key));
+    },
+    [setEditorTabs, state.editorTabs]
+  );
+
+  const onPopInTab = React.useCallback(
+    (editorTab: EditorTab) => {
+      setEditorTabs(popInTab(state.editorTabs, editorTab.key));
+    },
+    [setEditorTabs, state.editorTabs]
+  );
+
+  const onExternalWindowClose = React.useCallback(
+    (editorTab: EditorTab) => {
+      setEditorTabs(closeEditorTab(state.editorTabs, editorTab));
+    },
+    [setEditorTabs, state.editorTabs]
   );
 
   const {
@@ -5036,6 +5060,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     projectPath: currentFileMetadata
       ? getProjectDirectory(currentFileMetadata.fileIdentifier)
       : null,
+    onPopOutTab: onPopOutTab,
   };
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');
@@ -5168,6 +5193,11 @@ const MainFrame = (props: Props): React.MixedElement => {
           )}
         />
       </LeaderboardProvider>
+      <ExternalEditorWindows
+        onClose={onExternalWindowClose}
+        onPopIn={onPopInTab}
+        commonProps={editorTabsPaneProps}
+      />
       <CommandPaletteWithAlgoliaSearch ref={commandPaletteRef} />
       <LoaderModal
         showImmediately={showLoaderImmediately}

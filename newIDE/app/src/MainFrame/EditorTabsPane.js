@@ -58,12 +58,10 @@ import { MuiThemeOnlyProvider } from '../UI/Theme/FullThemeProvider';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useOnResize from '../Utils/UseOnResize';
 import DrawerTopBar from '../UI/DrawerTopBar';
-import WindowPortal from '../UI/WindowPortal';
 import { type FloatingPaneState } from './PanesContainer';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 import { type ToolbarButtonConfig } from './CustomToolbarButton';
-import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
 
 const styles = {
   container: {
@@ -294,6 +292,7 @@ export type EditorTabsPaneCommonProps = {|
   gamesList: GamesList,
 
   setEditorTabs: (editorTabs: EditorTabsState) => void,
+  onPopOutTab?: (editorTab: EditorTab) => void,
 |};
 
 type Props = {|
@@ -402,6 +401,7 @@ const EditorTabsPane: React.ComponentType<{
     triggerHotReloadInGameEditorIfNeeded,
     gamesList,
     setEditorTabs,
+    onPopOutTab,
     onSetPointerEventsNone,
     paneIdentifier,
     isLeftMostPane,
@@ -418,14 +418,6 @@ const EditorTabsPane: React.ComponentType<{
   } = props;
 
   const toolbarRef = React.useRef<?ToolbarInterface>(null);
-  // Ref map for Toolbar instances in popped-out windows.
-  // Each popped-out editor gets its own Toolbar, keyed by editorTab.key.
-  const poppedOutToolbarRefs = React.useRef<{
-    [string]: ?ToolbarInterface,
-  }>({});
-  // Track which popped-out toolbars have had their initial updateToolbar call,
-  // to avoid infinite re-render loops from inline ref callbacks.
-  const initializedPoppedOutToolbars = React.useRef<Set<string>>(new Set());
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const askAiPaneIdentifier = getEditorTabOpenedWithKey(editorTabs, 'ask-ai');
   const containerRef = React.useRef<?HTMLDivElement>(null);
@@ -537,35 +529,6 @@ const EditorTabsPane: React.ComponentType<{
     [editorTabs, paneIdentifier, setEditorTabs]
   );
 
-  // Track which editor tabs are popped out into separate windows, by key.
-  const [poppedOutTabKeys, setPoppedOutTabKeys] = React.useState<
-    Set<string>
-  >(new Set());
-
-  const onPopOutTab = React.useCallback(
-    (editorTab: EditorTab) => {
-      setPoppedOutTabKeys(prev => {
-        const next = new Set(prev);
-        next.add(editorTab.key);
-        return next;
-      });
-    },
-    []
-  );
-
-  const onPopInTab = React.useCallback(
-    (editorTabKey: string) => {
-      delete poppedOutToolbarRefs.current[editorTabKey];
-      initializedPoppedOutToolbars.current.delete(editorTabKey);
-      setPoppedOutTabKeys(prev => {
-        const next = new Set(prev);
-        next.delete(editorTabKey);
-        return next;
-      });
-    },
-    []
-  );
-
   const paneEditorTabs = getEditorsForPane(editorTabs, paneIdentifier);
   const currentTab = getCurrentTabForPane(editorTabs, paneIdentifier);
 
@@ -630,7 +593,6 @@ const EditorTabsPane: React.ComponentType<{
               onClickTab={onChangeEditorTab}
               onCloseTab={(editorTab: EditorTab) => {
                 clearTooltipOnTabClose();
-                onPopInTab(editorTab.key);
                 onEditorTabClosing(editorTab);
                 onCloseEditorTab(editorTab);
               }}
@@ -638,7 +600,6 @@ const EditorTabsPane: React.ComponentType<{
                 clearTooltipOnTabClose();
                 paneEditorTabs.forEach(paneEditorTab => {
                   if (paneEditorTab !== editorTab && paneEditorTab.closable) {
-                    onPopInTab(paneEditorTab.key);
                     onEditorTabClosing(paneEditorTab);
                   }
                 });
@@ -648,7 +609,6 @@ const EditorTabsPane: React.ComponentType<{
                 clearTooltipOnTabClose();
                 paneEditorTabs.forEach(paneEditorTab => {
                   if (paneEditorTab.closable) {
-                    onPopInTab(paneEditorTab.key);
                     onEditorTabClosing(paneEditorTab);
                   }
                 });
@@ -715,10 +675,8 @@ const EditorTabsPane: React.ComponentType<{
             const errorBoundaryProps = getEditorErrorBoundaryProps(
               editorTab.key
             );
-            const isPoppedOut = poppedOutTabKeys.has(editorTab.key);
-
             const editorContent = (
-              <CommandsContextScopedProvider active={isCurrentTab || isPoppedOut}>
+              <CommandsContextScopedProvider active={isCurrentTab}>
                 <ErrorBoundary
                   componentTitle={errorBoundaryProps.componentTitle}
                   scope={errorBoundaryProps.scope}
@@ -727,25 +685,14 @@ const EditorTabsPane: React.ComponentType<{
                     editorId: editorTab.key,
                     gameEditorMode,
                     setGameEditorMode,
-                    isActive: isCurrentTab || isPoppedOut,
+                    isActive: isCurrentTab,
                     extraEditorProps: editorTab.extraEditorProps,
                     project: currentProject,
                     fileMetadata: currentFileMetadata,
                     storageProvider: getStorageProvider(),
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar => {
-                      if (isPoppedOut) {
-                        // Route to the popped-out window's own Toolbar.
-                        const poppedOutToolbar =
-                          poppedOutToolbarRefs.current[editorTab.key];
-                        if (poppedOutToolbar) {
-                          poppedOutToolbar.setEditorToolbar(
-                            editorToolbar || null
-                          );
-                        }
-                      } else {
-                        setEditorToolbar(editorToolbar, isCurrentTab);
-                      }
+                      setEditorToolbar(editorToolbar, isCurrentTab);
                     },
                     setGamesPlatformFrameShown: onSetGamesPlatformFrameShown,
                     projectItemName: editorTab.projectItemName,
@@ -871,95 +818,6 @@ const EditorTabsPane: React.ComponentType<{
                 </ErrorBoundary>
               </CommandsContextScopedProvider>
             );
-
-            if (isPoppedOut) {
-              // Render in a separate window via portal.
-              // Each popped-out editor gets its own Toolbar so that
-              // toolbar buttons interact with the editor and vice versa.
-              return (
-                <WindowPortal
-                  key={`popout-${editorTab.key}`}
-                  title={editorTab.label || 'GDevelop'}
-                  onClose={() => {
-                    onPopInTab(editorTab.key);
-                    onEditorTabClosing(editorTab);
-                    onCloseEditorTab(editorTab);
-                  }}
-                  width={1024}
-                  height={750}
-                >
-                  <FullThemeProvider>
-                    <Toolbar
-                      ref={ref => {
-                        // Ignore null (cleanup) calls — React calls inline ref
-                        // callbacks with null on every re-render before passing
-                        // the new element. Actual cleanup of both the ref and
-                        // the initialized set happens in onPopInTab/onClose.
-                        if (!ref) return;
-
-                        poppedOutToolbarRefs.current[editorTab.key] = ref;
-                        // When the Toolbar first mounts, ask the editor to
-                        // populate it. Only do this once per pop-out lifecycle
-                        // to avoid an infinite re-render loop.
-                        if (
-                          !initializedPoppedOutToolbars.current.has(
-                            editorTab.key
-                          ) &&
-                          editorTab.editorRef
-                        ) {
-                          initializedPoppedOutToolbars.current.add(
-                            editorTab.key
-                          );
-                          editorTab.editorRef.updateToolbar();
-                        }
-                      }}
-                      hidden={false}
-                      showProjectButtons={
-                        !['start page', 'debugger', 'ask-ai', 'global-search'].includes(
-                          editorTab.key
-                        )
-                      }
-                      canSave={canSave}
-                      onSave={saveProject}
-                      openShareDialog={() => openShareDialog()}
-                      isSharingEnabled={isSharingEnabled}
-                      onOpenDebugger={launchDebuggerAndPreview}
-                      hasPreviewsRunning={hasPreviewsRunning}
-                      onPreviewWithoutHotReload={launchNewPreview}
-                      onNetworkPreview={launchNetworkPreview}
-                      onHotReloadPreview={launchHotReloadPreview}
-                      onLaunchPreviewWithDiagnosticReport={
-                        launchPreviewWithDiagnosticReport
-                      }
-                      canDoNetworkPreview={canDoNetworkPreview}
-                      setPreviewOverride={setPreviewOverride}
-                      isPreviewEnabled={
-                        !!currentProject &&
-                        currentProject.getLayoutsCount() > 0
-                      }
-                      previewState={previewState}
-                      onOpenVersionHistory={openVersionHistoryPanel}
-                      checkedOutVersionStatus={checkedOutVersionStatus}
-                      onQuitVersionHistory={onQuitVersionHistory}
-                      canQuitVersionHistory={!isSavingProject}
-                      toolbarButtons={toolbarButtons}
-                      projectPath={projectPath}
-                    />
-                    <div
-                      style={{
-                        display: 'flex',
-                        flex: 1,
-                        width: '100%',
-                        minHeight: 0,
-                        overflow: 'hidden',
-                      }}
-                    >
-                      {editorContent}
-                    </div>
-                  </FullThemeProvider>
-                </WindowPortal>
-              );
-            }
 
             return (
               <TabContentContainer

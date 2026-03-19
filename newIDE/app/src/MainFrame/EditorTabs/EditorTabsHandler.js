@@ -65,6 +65,12 @@ export type EditorTab = {|
   extraEditorProps: ?EditorContainerExtraProps,
   /** If set to false, the tab can't be closed. */
   closable: boolean,
+  /**
+   * When a tab is popped out into an external window, this stores
+   * the pane it came from so it can be returned on "pop back in".
+   * Only set for tabs in the 'external' pane.
+   */
+  originalPaneIdentifier?: string,
 |};
 
 export type EditorTabsState = {|
@@ -120,6 +126,10 @@ export const getEditorTabsInitialState = (): EditorTabsState => {
         editors: [],
         currentTab: 0,
       },
+      external: {
+        editors: [],
+        currentTab: 0,
+      },
     },
   };
 };
@@ -149,6 +159,20 @@ export const openEditorTab = (
       editor => editor.key === key
     );
     if (existingEditorId !== -1) {
+      if (statePaneIdentifier === 'external') {
+        // Tab is popped out in an external window — pop it back in
+        // so the user can see it in the main window.
+        const poppedInState = popInTab(state, key);
+        if (dontFocusTab) return poppedInState;
+        const restored = getEditorTabOpenedWithKey(poppedInState, key);
+        return restored
+          ? changeCurrentTab(
+              poppedInState,
+              restored.paneIdentifier,
+              restored.tabIndex
+            )
+          : poppedInState;
+      }
       return dontFocusTab
         ? { ...state }
         : changeCurrentTab(state, statePaneIdentifier, existingEditorId);
@@ -281,6 +305,112 @@ export const getEditorsForPane = (
   paneIdentifier: string
 ): Array<EditorTab> => {
   return state.panes[paneIdentifier].editors || [];
+};
+
+export const getExternalEditors = (
+  state: EditorTabsState
+): Array<EditorTab> => {
+  return getEditorsForPane(state, 'external');
+};
+
+/**
+ * Move a tab from its current pane into the 'external' pane,
+ * recording where it came from so it can be popped back in.
+ */
+export const popOutTab = (
+  state: EditorTabsState,
+  editorTabKey: string
+): EditorTabsState => {
+  const found = getEditorTabOpenedWithKey(state, editorTabKey);
+  if (!found) return state;
+
+  const { paneIdentifier: sourcePaneId, editorTab, tabIndex } = found;
+  if (sourcePaneId === 'external') return state; // already popped out
+
+  const sourcePane = state.panes[sourcePaneId];
+  const newSourceEditors = sourcePane.editors.filter(
+    (_, i) => i !== tabIndex
+  );
+  // Adjust currentTab: if the removed tab was before or at currentTab, shift back.
+  const newSourceCurrentTab = Math.max(
+    0,
+    Math.min(
+      sourcePane.currentTab >= tabIndex
+        ? sourcePane.currentTab - 1
+        : sourcePane.currentTab,
+      newSourceEditors.length - 1
+    )
+  );
+
+  const externalPane = state.panes.external;
+  const poppedTab: EditorTab = {
+    ...editorTab,
+    originalPaneIdentifier: sourcePaneId,
+  };
+
+  return {
+    ...state,
+    panes: {
+      ...state.panes,
+      [sourcePaneId]: {
+        editors: newSourceEditors,
+        currentTab: newSourceCurrentTab,
+      },
+      external: {
+        editors: [...externalPane.editors, poppedTab],
+        currentTab: externalPane.currentTab,
+      },
+    },
+  };
+};
+
+/**
+ * Move a tab from the 'external' pane back to its original pane.
+ */
+export const popInTab = (
+  state: EditorTabsState,
+  editorTabKey: string
+): EditorTabsState => {
+  const externalPane = state.panes.external;
+  const tabIndex = findIndex(
+    externalPane.editors,
+    editor => editor.key === editorTabKey
+  );
+  if (tabIndex === -1) return state;
+
+  const editorTab = externalPane.editors[tabIndex];
+  const targetPaneId = editorTab.originalPaneIdentifier || 'center';
+
+  const newExternalEditors = externalPane.editors.filter(
+    (_, i) => i !== tabIndex
+  );
+  const newExternalCurrentTab = Math.max(
+    0,
+    Math.min(externalPane.currentTab, newExternalEditors.length - 1)
+  );
+
+  const targetPane = state.panes[targetPaneId];
+  if (!targetPane) return state;
+
+  const restoredTab: EditorTab = {
+    ...editorTab,
+    originalPaneIdentifier: undefined,
+  };
+
+  return {
+    ...state,
+    panes: {
+      ...state.panes,
+      external: {
+        editors: newExternalEditors,
+        currentTab: newExternalCurrentTab,
+      },
+      [targetPaneId]: {
+        editors: [...targetPane.editors, restoredTab],
+        currentTab: targetPane.editors.length, // Focus the restored tab
+      },
+    },
+  };
 };
 
 export const getCurrentTabIndexForPane = (

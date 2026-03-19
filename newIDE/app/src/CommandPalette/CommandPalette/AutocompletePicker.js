@@ -13,7 +13,7 @@ import Chip from '../../UI/Chip';
 import TextField from '@material-ui/core/TextField';
 import ChevronRightIcon from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import filterOptions from './FilterOptions';
+import makeFilterOptions from './FilterOptions';
 import {
   type NamedCommand,
   type CommandOption,
@@ -134,6 +134,10 @@ const AutocompletePicker = (
   const [open, setOpen] = React.useState(true);
   const shortcutMap = useShortcutMap();
   const classes = useStyles();
+  const filterOptions = React.useMemo(
+    () => makeFilterOptions(props.i18n),
+    [props.i18n]
+  );
 
   // $FlowFixMe[missing-local-annot]
   const handleClose = (_, reason) => {

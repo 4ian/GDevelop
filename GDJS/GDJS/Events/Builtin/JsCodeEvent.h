@@ -3,8 +3,8 @@
  *  2008-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#ifndef JSCODEEVENT_H
-#define JSCODEEVENT_H
+#pragma once
+
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Expression.h"
 namespace gd {
@@ -50,18 +50,31 @@ class JsCodeEvent : public gd::BaseEvent {
   bool IsEventsSheetExpanded() const { return eventsSheetExpanded; }
   void SetEventsSheetExpanded(bool enable) { eventsSheetExpanded = enable; };
 
- private:
+  long GetScrollTop() const { return scrollTop; }
+  void SetScrollTop(long value) { scrollTop = value; };
+
+  long GetCursorColumn() const { return cursorColumn; }
+  void SetCursorColumn(long value) { cursorColumn = value; };
+
+  long GetCursorLine() const { return cursorLine; }
+  void SetCursorLine(long value) { cursorLine = value; };
+
+private:
   void Init(const JsCodeEvent& event);
 
   gd::String inlineCode;            ///< Contains the Javascript code of the event.
   gd::Expression parameterObjects;  ///< Name of the (group of) objects to pass as
                                     ///< parameter.
-  bool useStrict;  ///< Should the generated JS function have "use strict". true
-                   ///< by default. Should be removed once all the game engine
-                   ///< is using "use strict".
-  bool eventsSheetExpanded; ///< Is the code block expanded in the events sheet?
+  bool useStrict = true;  ///< Should the generated JS function have "use strict". true
+                          ///< by default. Should be removed once all the game engine
+                          ///< is using "use strict".
+  bool eventsSheetExpanded = false; ///< Is the code block expanded in the events sheet?
+
+  // These members are not serialized.
+  long scrollTop = 0;
+  long cursorColumn = 0;
+  long cursorLine = 0;
 };
 
 }  // namespace gdjs
 
-#endif  // JSCODEEVENT_H

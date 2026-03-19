@@ -16,6 +16,14 @@ export type State = {|
 export type Props = {|
   value: string,
   onChange: string => void,
+  initialScrollTop: number,
+  initialCursorColumn: number,
+  initialCursorLine: number,
+  saveEditorState: ({
+    scrollTop: number,
+    cursorColumn: number,
+    cursorLine: number,
+  }) => void,
   width?: number,
   height?: number,
   onEditorMounted?: () => void,
@@ -97,6 +105,12 @@ export class CodeEditor extends React.Component<Props, State> {
       setupAutocompletions(monaco);
     }
 
+    editor.setScrollTop(this.props.initialScrollTop);
+    editor.setPosition({
+      column: this.props.initialCursorColumn,
+      lineNumber: this.props.initialCursorLine,
+    });
+
     if (this.props.onEditorMounted) this.props.onEditorMounted();
   };
 
@@ -140,6 +154,15 @@ export class CodeEditor extends React.Component<Props, State> {
     event.stopPropagation();
   };
 
+  _saveEditorState = (editor: any, monaco: any) => {
+    const cursorPosition = editor.getPosition();
+    this.props.saveEditorState({
+      scrollTop: editor.getScrollTop(),
+      cursorColumn: cursorPosition.column,
+      cursorLine: cursorPosition.lineNumber,
+    });
+  };
+
   render(): any {
     const { MonacoEditor, error } = this.state;
     if (error) {
@@ -174,6 +197,7 @@ export class CodeEditor extends React.Component<Props, State> {
               onChange={this.props.onChange}
               editorWillMount={this.setupEditorThemes}
               editorDidMount={this.setupEditorCompletions}
+              editorWillUnmount={this._saveEditorState}
               options={{
                 ...monacoEditorOptions,
                 fontSize: preferences.eventsSheetZoomLevel,

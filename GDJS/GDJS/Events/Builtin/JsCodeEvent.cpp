@@ -73,8 +73,6 @@ void JsCodeEvent::UnserializeFrom(gd::Project& project,
 
 JsCodeEvent::JsCodeEvent()
     : BaseEvent(),
-      inlineCode("runtimeScene.setBackgroundColor(100,100,240);\n"),
-      useStrict(true),
-      eventsSheetExpanded(false) {}
+      inlineCode("runtimeScene.setBackgroundColor(100,100,240);\n") {}
 
 }  // namespace gdjs

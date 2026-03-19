@@ -98,6 +98,21 @@ export default class JsCodeEvent extends React.Component<
     jsCodeEvent.setInlineCode(newValue);
   };
 
+  saveEditorState = ({
+    scrollTop,
+    cursorColumn,
+    cursorLine,
+  }: {
+    scrollTop: number,
+    cursorColumn: number,
+    cursorLine: number,
+  }): void => {
+    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
+    jsCodeEvent.setScrollTop(scrollTop);
+    jsCodeEvent.setCursorColumn(cursorColumn);
+    jsCodeEvent.setCursorLine(cursorLine);
+  };
+
   editObject = (domEvent: any) => {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     const parameterObjects = jsCodeEvent.getParameterObjects();
@@ -270,6 +285,10 @@ export default class JsCodeEvent extends React.Component<
             <CodeEditor
               value={jsCodeEvent.getInlineCode()}
               onChange={this.onChange}
+              initialScrollTop={jsCodeEvent.getScrollTop()}
+              initialCursorColumn={jsCodeEvent.getCursorColumn()}
+              initialCursorLine={jsCodeEvent.getCursorLine()}
+              saveEditorState={this.saveEditorState}
               width={contentRect.bounds.width - 5}
               height={this._getCodeEditorHeight()}
               onEditorMounted={() => {

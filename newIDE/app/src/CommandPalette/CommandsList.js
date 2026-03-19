@@ -361,7 +361,7 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   },
   OPEN_ABOUT: {
     area: 'IDE',
-    displayText: t`Open about GDevelop`,
+    displayText: t`Open "About GDevelop" (version)`,
   },
   OPEN_LANGUAGE: {
     area: 'IDE',

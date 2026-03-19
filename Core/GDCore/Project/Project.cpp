@@ -1157,8 +1157,6 @@ void Project::SerializeTo(SerializerElement& element) const {
   // end of compatibility code
 
   extensionProperties.SerializeTo(propElement.AddChild("extensionProperties"));
-  
-  playableDevicesElement.AddChild("").SetStringValue("mobile");
 
   SerializerElement& platformsElement = propElement.AddChild("platforms");
   platformsElement.ConsiderAsArrayOf("platform");

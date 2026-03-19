@@ -103,6 +103,12 @@ const MaterialUIContextMenu = React.forwardRef<
         left: anchorPosition[0],
         top: anchorPosition[1],
       }}
+      // When rendered in a separate window (via WindowPortal), pass the
+      // portalContainer as anchorEl so that MUI's Popover derives the
+      // correct window for viewport-bounds calculations (innerWidth/
+      // innerHeight). Without this, it falls back to the main window.
+      // Positioning is still driven by anchorPosition, not anchorEl.
+      anchorEl={portalContainer || undefined}
       style={{
         zIndex: itemAboveBlockingLayerZIndex,
       }}

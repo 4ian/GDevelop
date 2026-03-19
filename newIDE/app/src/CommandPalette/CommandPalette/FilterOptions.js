@@ -1,17 +1,22 @@
 // @flow
+import { t } from '@lingui/macro';
 import { fuzzyOrEmptyFilter } from '../../Utils/FuzzyOrEmptyFilter';
 
 /**
  * Words that should be treated as synonyms when searching for commands.
  * For example, "Edit scene variables" and "Open scene variables" should both match.
+ * Uses i18n so that synonyms work in all languages.
  */
-const synonymGroups: Array<Array<string>> = [['open', 'edit']];
+const getSynonymGroups = (): Array<Array<string>> => [
+  [t`open`, t`edit`],
+];
 
 /**
  * Returns an alternate version of the search text with synonyms swapped,
  * or null if no synonym applies.
  */
 const getSearchTextWithSynonym = (searchText: string): string | null => {
+  const synonymGroups = getSynonymGroups();
   for (const group of synonymGroups) {
     for (let i = 0; i < group.length; i++) {
       const word = group[i];

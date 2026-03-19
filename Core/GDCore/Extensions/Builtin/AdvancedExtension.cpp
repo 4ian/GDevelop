@@ -21,7 +21,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .SetShortDescription("Copy object parameters between functions. Advanced event function control flow.")
       .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("Event functions"))
-      .SetIcon("res/function32.png");
+      .SetIcon("res/functions/extension_black.svg");
 
   extension
       .AddAction(
@@ -31,8 +31,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
             "number (to be used with \"Expression\" functions)."),
           _("Set return value to number _PARAM0_"),
           "",
-          "res/function32.png",
-          "res/function32.png")
+          "res/functions/expression_black.svg",
+          "res/functions/expression_black.svg")
       .SetHelpPath("/events/functions/return")
       .AddParameter("expression", _("The number to be returned"))
       .SetRelevantForFunctionEventsOnly()
@@ -46,8 +46,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
             "(to be used with \"String Expression\" functions)."),
           _("Set return value to text _PARAM0_"),
           "",
-          "res/function32.png",
-          "res/function32.png")
+          "res/functions/expression_black.svg",
+          "res/functions/expression_black.svg")
       .SetHelpPath("/events/functions/return")
       .AddParameter("string", _("The text to be returned"))
       .SetRelevantForFunctionEventsOnly()
@@ -60,8 +60,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                    "either true (condition will pass) or false."),
                  _("Set return value of the condition to _PARAM0_"),
                  "",
-                 "res/function32.png",
-                 "res/function32.png")
+                 "res/functions/condition_black.svg",
+                 "res/functions/condition_black.svg")
       .SetHelpPath("/events/functions/return")
       .AddParameter("trueorfalse", _("Should the condition be true or false?"))
       .SetRelevantForFunctionEventsOnly()
@@ -75,8 +75,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "The parameter type must be a variable."),
                  _("Copy the parameter _PARAM0_ into the variable _PARAM1_"),
                  "",
-                 "res/function32.png",
-                 "res/function32.png")
+                 "res/functions/extension_black.svg",
+                 "res/functions/extension_black.svg")
       .SetHelpPath("/events/functions/return")
       .AddParameter("functionParameterName", _("Parameter name"), "variable")
       .AddParameter("scenevar", _("Scene variable"))
@@ -90,8 +90,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "The parameter type must be a variable."),
                  _("Copy the parameter _PARAM0_ into the variable _PARAM1_"),
                  "",
-                 "res/function32.png",
-                 "res/function32.png")
+                 "res/functions/extension_black.svg",
+                 "res/functions/extension_black.svg")
       .SetHelpPath("/events/functions/return")
       .AddParameter("functionParameterName", _("Parameter name"), "variable")
       .AddParameter("variable", _("Variable"))
@@ -106,8 +106,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "The parameter type must be a variable."),
                  _("Copy the variable _PARAM1_ into the parameter _PARAM0_"),
                  "",
-                 "res/function32.png",
-                 "res/function32.png")
+                 "res/functions/extension_black.svg",
+                 "res/functions/extension_black.svg")
       .SetHelpPath("/events/functions/return")
       .AddParameter("functionParameterName", _("Parameter name"), "variable")
       .AddParameter("scenevar", _("Scene variable"))
@@ -121,8 +121,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "The parameter type must be a variable."),
                  _("Copy the variable _PARAM1_ into the parameter _PARAM0_"),
                  "",
-                 "res/function32.png",
-                 "res/function32.png")
+                 "res/functions/extension_black.svg",
+                 "res/functions/extension_black.svg")
       .SetHelpPath("/events/functions/return")
       .AddParameter("functionParameterName", _("Parameter name"), "variable")
       .AddParameter("variable", _("Variable"))
@@ -138,8 +138,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                       "If it's a number, 0 is considered as \"false\"."),
                     _("Parameter _PARAM0_ is true"),
                     "",
-                    "res/function32.png",
-                    "res/function32.png")
+                    "res/functions/extension_black.svg",
+                    "res/functions/extension_black.svg")
       .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced()
@@ -151,7 +151,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Get function parameter value"),
           _("Get function parameter (also called \"argument\") value. You don't need this most of the time as you can simply write the parameter name in an expression."),
           "",
-          "res/function16.png")
+          "res/functions/extension_black.svg")
       .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
       .SetRelevantForFunctionEventsOnly()
       .SetHidden();
@@ -162,7 +162,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Get function parameter text"),
           _("Get function parameter (also called \"argument\") text. You don't need this most of the time as you can simply write the parameter name in an expression."),
           "",
-          "res/function16.png")
+          "res/functions/extension_black.svg")
       .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
       .SetRelevantForFunctionEventsOnly()
       .SetHidden();
@@ -174,8 +174,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Compare function parameter (also called \"argument\") value."),
           _("Parameter _PARAM0_"),
           "",
-          "res/function32.png",
-          "res/function16.png")
+          "res/functions/extension_black.svg",
+          "res/functions/extension_black.svg")
       .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
       .UseStandardRelationalOperatorParameters(
           "number", gd::ParameterOptions::MakeNewOptions())
@@ -189,8 +189,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Compare function parameter (also called \"argument\") text."),
           _("Parameter _PARAM0_"),
           "",
-          "res/function32.png",
-          "res/function16.png")
+          "res/functions/extension_black.svg",
+          "res/functions/extension_black.svg")
       .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
       .UseStandardRelationalOperatorParameters(
           "string", gd::ParameterOptions::MakeNewOptions())

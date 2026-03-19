@@ -22,7 +22,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAsyncExtension(
       .SetShortDescription("Asynchronous tasks that pause sub-event execution until resolved.")
       .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("Asynchronous functions"))
-      .SetIcon("res/function32.png");
+      .SetIcon("res/functions/action_black.svg");
 
   extension.AddEvent("Async",
                      _("Async event"),

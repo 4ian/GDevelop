@@ -5,20 +5,14 @@ import * as React from 'react';
 import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
 import FlatButton from '../UI/FlatButton';
 import Subheader from '../UI/Subheader';
-import { List, ListItem } from '../UI/List';
+import { List } from '../UI/List';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
-import Create from '../UI/CustomSvgIcons/Behaviors/Create';
-import Step from '../UI/CustomSvgIcons/Behaviors/Step';
-import Destroy from '../UI/CustomSvgIcons/Behaviors/Destroy';
-import Action from '../UI/CustomSvgIcons/Behaviors/Action';
-import Condition from '../UI/CustomSvgIcons/Behaviors/Condition';
-import Expression from '../UI/CustomSvgIcons/Behaviors/Expression';
-import Activate from '../UI/CustomSvgIcons/Behaviors/Activate';
-import Deactivate from '../UI/CustomSvgIcons/Behaviors/Deactivate';
 import { Line } from '../UI/Grid';
 import Visibility from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
+import { FunctionListItem } from './ExtensionFunctionSelectorDialog';
+
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -26,43 +20,6 @@ type Props = {|
   onCancel: () => void,
   onChoose: (parameters: EventsFunctionCreationParameters) => void,
 |};
-
-const styles = {
-  icon: { width: 40, height: 40 },
-  disabledItem: { opacity: 0.6 },
-};
-
-const MethodListItem = ({
-  icon,
-  disabled,
-  onChoose,
-  name,
-  description,
-}: {|
-  icon: React.Node,
-  disabled: boolean,
-  onChoose: EventsFunctionCreationParameters => void,
-  name: string,
-  description: React.Node,
-|}) => {
-  return (
-    // $FlowFixMe[incompatible-type]
-    <ListItem
-      leftIcon={icon}
-      primaryText={name}
-      secondaryText={description}
-      secondaryTextLines={2}
-      onClick={() =>
-        onChoose({
-          functionType: gd.EventsFunction.Action,
-          name,
-        })
-      }
-      style={disabled ? styles.disabledItem : undefined}
-      disabled={disabled}
-    />
-  );
-};
 
 export default function BehaviorMethodSelectorDialog({
   eventsBasedBehavior,
@@ -91,64 +48,53 @@ export default function BehaviorMethodSelectorDialog({
       ]}
       open
       onRequestClose={onCancel}
+      maxWidth="sm"
     >
       <List>
-        <ListItem
-          leftIcon={<Action style={styles.icon} />}
-          primaryText={<Trans>Action</Trans>}
-          secondaryText={
+        <FunctionListItem
+          functionType={gd.EventsFunction.Action}
+          functionName={null}
+          name={<Trans>Action</Trans>}
+          description={
             <Trans>
               An action that can be used on objects with the behavior. You can
               define the action parameters: objects, texts, numbers, layers,
               etc...
             </Trans>
           }
-          onClick={() =>
-            onChoose({
-              functionType: gd.EventsFunction.Action,
-              name: null,
-            })
-          }
+          onChoose={onChoose}
         />
-        <ListItem
-          leftIcon={<Condition style={styles.icon} />}
-          primaryText={<Trans>Condition</Trans>}
-          secondaryText={
+        <FunctionListItem
+          functionType={gd.EventsFunction.Condition}
+          functionName={null}
+          name={<Trans>Condition</Trans>}
+          description={
             <Trans>
               A condition that can be used on objects with the behavior. You can
               define the condition parameters: objects, texts, numbers, layers,
               etc...
             </Trans>
           }
-          onClick={() =>
-            onChoose({
-              functionType: gd.EventsFunction.Condition,
-              name: null,
-            })
-          }
+          onChoose={onChoose}
         />
-        <ListItem
-          leftIcon={<Expression style={styles.icon} />}
-          primaryText={<Trans>Expression</Trans>}
-          secondaryText={
+        <FunctionListItem
+          functionType={gd.EventsFunction.Expression}
+          functionName={null}
+          name={<Trans>Expression</Trans>}
+          description={
             <Trans>
               An expression that can be used on objects with the behavior. Can
               either return a number or a string, and take some parameters.
             </Trans>
           }
-          onClick={() =>
-            onChoose({
-              functionType: gd.EventsFunction.Expression,
-              name: null,
-            })
-          }
+          onChoose={onChoose}
         />
         <Subheader>
           <Trans>Lifecycle methods</Trans>
         </Subheader>
-        <MethodListItem
-          icon={<Create style={styles.icon} />}
-          name={'onCreated'}
+        <FunctionListItem
+          functionType={gd.EventsFunction.Action}
+          functionName="onCreated"
           disabled={eventsFunctions.hasEventsFunctionNamed('onCreated')}
           onChoose={onChoose}
           description={
@@ -158,9 +104,9 @@ export default function BehaviorMethodSelectorDialog({
             </Trans>
           }
         />
-        <MethodListItem
-          icon={<Step style={styles.icon} />}
-          name={'doStepPreEvents'}
+        <FunctionListItem
+          functionType={gd.EventsFunction.Action}
+          functionName="doStepPreEvents"
           disabled={eventsFunctions.hasEventsFunctionNamed('doStepPreEvents')}
           onChoose={onChoose}
           description={
@@ -171,9 +117,9 @@ export default function BehaviorMethodSelectorDialog({
             </Trans>
           }
         />
-        <MethodListItem
-          icon={<Destroy style={styles.icon} />}
-          name={'onDestroy'}
+        <FunctionListItem
+          functionType={gd.EventsFunction.Action}
+          functionName="onDestroy"
           disabled={
             eventsFunctions.hasEventsFunctionNamed('onOwnerRemovedFromScene') ||
             eventsFunctions.hasEventsFunctionNamed('onDestroy')
@@ -191,9 +137,9 @@ export default function BehaviorMethodSelectorDialog({
             <Subheader>
               <Trans>Other lifecycle methods</Trans>
             </Subheader>
-            <MethodListItem
-              icon={<Deactivate style={styles.icon} />}
-              name={'onDeActivate'}
+            <FunctionListItem
+              functionType={gd.EventsFunction.Action}
+              functionName="onDeActivate"
               disabled={eventsFunctions.hasEventsFunctionNamed('onDeActivate')}
               onChoose={onChoose}
               description={
@@ -204,9 +150,9 @@ export default function BehaviorMethodSelectorDialog({
                 </Trans>
               }
             />
-            <MethodListItem
-              icon={<Activate style={styles.icon} />}
-              name={'onActivate'}
+            <FunctionListItem
+              functionType={gd.EventsFunction.Action}
+              functionName="onActivate"
               disabled={eventsFunctions.hasEventsFunctionNamed('onActivate')}
               onChoose={onChoose}
               description={
@@ -216,9 +162,9 @@ export default function BehaviorMethodSelectorDialog({
                 </Trans>
               }
             />
-            <MethodListItem
-              icon={<Step style={styles.icon} />}
-              name={'doStepPostEvents'}
+            <FunctionListItem
+              functionType={gd.EventsFunction.Action}
+              functionName="doStepPostEvents"
               disabled={eventsFunctions.hasEventsFunctionNamed(
                 'doStepPostEvents'
               )}

@@ -65,6 +65,8 @@ export type EditorTab = {|
   extraEditorProps: ?EditorContainerExtraProps,
   /** If set to false, the tab can't be closed. */
   closable: boolean,
+  /** Set when the tab is in the 'external' pane, to remember where to return it. */
+  originalPaneIdentifier?: string,
 |};
 
 export type EditorTabsState = {|
@@ -120,6 +122,10 @@ export const getEditorTabsInitialState = (): EditorTabsState => {
         editors: [],
         currentTab: 0,
       },
+      external: {
+        editors: [],
+        currentTab: 0,
+      },
     },
   };
 };
@@ -149,6 +155,20 @@ export const openEditorTab = (
       editor => editor.key === key
     );
     if (existingEditorId !== -1) {
+      // If the tab is in the external pane, pop it back in first.
+      if (statePaneIdentifier === 'external') {
+        const editorTab = pane.editors[existingEditorId];
+        const returnState = popInTab(state, editorTab.key);
+        const originalPane = editorTab.originalPaneIdentifier || paneIdentifier;
+        const returnPaneEditors = returnState.panes[originalPane].editors;
+        const returnedTabIndex = findIndex(
+          returnPaneEditors,
+          editor => editor.key === key
+        );
+        return dontFocusTab
+          ? returnState
+          : changeCurrentTab(returnState, originalPane, returnedTabIndex);
+      }
       return dontFocusTab
         ? { ...state }
         : changeCurrentTab(state, statePaneIdentifier, existingEditorId);
@@ -167,6 +187,7 @@ export const openEditorTab = (
     extraEditorProps,
     editorRef: null,
     closable: typeof closable === 'undefined' ? true : !!closable,
+    originalPaneIdentifier: undefined,
   };
 
   const pane = state.panes[paneIdentifier];
@@ -215,6 +236,124 @@ export const changeCurrentTab = (
       },
     },
   };
+};
+
+/**
+ * Move a tab from its current pane to the 'external' pane.
+ * Stores the original pane identifier so it can be returned later.
+ */
+export const popOutTab = (
+  state: EditorTabsState,
+  tabKey: string
+): EditorTabsState => {
+  let sourcePaneIdentifier: string | null = null;
+  let editorTab: EditorTab | null = null;
+
+  for (const paneIdentifier in state.panes) {
+    if (paneIdentifier === 'external') continue;
+    const pane = state.panes[paneIdentifier];
+    const tabIndex = findIndex(pane.editors, editor => editor.key === tabKey);
+    if (tabIndex !== -1) {
+      sourcePaneIdentifier = paneIdentifier;
+      editorTab = pane.editors[tabIndex];
+      break;
+    }
+  }
+
+  if (!sourcePaneIdentifier || !editorTab) return state;
+
+  const taggedTab: EditorTab = {
+    ...editorTab,
+    originalPaneIdentifier: sourcePaneIdentifier,
+  };
+
+  // Remove from source pane
+  const sourcePane = state.panes[sourcePaneIdentifier];
+  const remainingEditors = sourcePane.editors.filter(
+    editor => editor.key !== tabKey
+  );
+  const currentEditorTab = sourcePane.editors[sourcePane.currentTab] || null;
+  const newCurrentTabIndex = remainingEditors.indexOf(currentEditorTab);
+
+  // Append to external pane
+  const externalPane = state.panes['external'];
+
+  return {
+    ...state,
+    panes: {
+      ...state.panes,
+      [sourcePaneIdentifier]: {
+        ...sourcePane,
+        editors: remainingEditors,
+        currentTab: newCurrentTabIndex === -1 ? 0 : newCurrentTabIndex,
+      },
+      external: {
+        ...externalPane,
+        editors: [...externalPane.editors, taggedTab],
+      },
+    },
+  };
+};
+
+/**
+ * Move a tab from the 'external' pane back to its original pane.
+ * Clears the originalPaneIdentifier and focuses the tab in its original pane.
+ */
+export const popInTab = (
+  state: EditorTabsState,
+  tabKey: string
+): EditorTabsState => {
+  const externalPane = state.panes['external'];
+  const tabIndex = findIndex(
+    externalPane.editors,
+    editor => editor.key === tabKey
+  );
+  if (tabIndex === -1) return state;
+
+  const editorTab = externalPane.editors[tabIndex];
+  const targetPaneIdentifier = editorTab.originalPaneIdentifier || 'center';
+
+  const restoredTab: EditorTab = {
+    ...editorTab,
+    originalPaneIdentifier: undefined,
+  };
+
+  // Remove from external pane
+  const remainingExternal = externalPane.editors.filter(
+    editor => editor.key !== tabKey
+  );
+  const currentExternalTab =
+    externalPane.editors[externalPane.currentTab] || null;
+  const newExternalCurrentTab = remainingExternal.indexOf(currentExternalTab);
+
+  // Append to target pane and focus it
+  const targetPane = state.panes[targetPaneIdentifier];
+
+  return {
+    ...state,
+    panes: {
+      ...state.panes,
+      external: {
+        ...externalPane,
+        editors: remainingExternal,
+        currentTab: newExternalCurrentTab === -1 ? 0 : newExternalCurrentTab,
+      },
+      [targetPaneIdentifier]: {
+        ...targetPane,
+        editors: [...targetPane.editors, restoredTab],
+        currentTab: targetPane.editors.length, // Focus the newly added tab
+      },
+    },
+  };
+};
+
+/**
+ * Get all editors currently in the 'external' pane (popped-out windows).
+ */
+export const getExternalEditors = (
+  state: EditorTabsState
+): Array<EditorTab> => {
+  return getEditorsForPane(state, 'external');
 };
 
 export const isStartPageTabPresent = (state: EditorTabsState): boolean => {

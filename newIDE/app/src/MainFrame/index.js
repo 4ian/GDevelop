@@ -26,6 +26,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import EditorTabsPane, {
   type EditorTabsPaneCommonProps,
 } from './EditorTabsPane';
+import ExternalEditorWindows from './ExternalEditorWindows';
 import {
   getEditorTabsInitialState,
   openEditorTab,
@@ -37,6 +38,7 @@ import {
   closeCustomObjectTab,
   closeEventsBasedObjectVariantTab,
   saveUiSettings,
+  type EditorTab,
   type EditorTabsState,
   type EditorKind,
   getEventsFunctionsExtensionEditor,
@@ -49,6 +51,8 @@ import {
   getAllEditorTabs,
   hasEditorsInPane,
   closeEditorTab,
+  popOutTab,
+  popInTab,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -809,6 +813,36 @@ const MainFrame = (props: Props): React.MixedElement => {
       setState(state => ({
         ...state,
         editorTabs: newEditorTabs,
+      }));
+    },
+    [setState]
+  );
+
+  const onPopOutTab = React.useCallback(
+    (editorTab: EditorTab) => {
+      setState(prevState => ({
+        ...prevState,
+        editorTabs: popOutTab(prevState.editorTabs, editorTab.key),
+      }));
+    },
+    [setState]
+  );
+
+  const onPopInTab = React.useCallback(
+    (editorTab: EditorTab) => {
+      setState(prevState => ({
+        ...prevState,
+        editorTabs: popInTab(prevState.editorTabs, editorTab.key),
+      }));
+    },
+    [setState]
+  );
+
+  const onExternalWindowClose = React.useCallback(
+    (editorTab: EditorTab) => {
+      setState(prevState => ({
+        ...prevState,
+        editorTabs: closeEditorTab(prevState.editorTabs, editorTab),
       }));
     },
     [setState]
@@ -5164,10 +5198,16 @@ const MainFrame = (props: Props): React.MixedElement => {
               areSidePanesDrawers={areSidePanesDrawers}
               onSetPointerEventsNone={onSetPointerEventsNone}
               onSetPaneDrawerState={onSetPaneDrawerState}
+              onPopOutTab={onPopOutTab}
             />
           )}
         />
       </LeaderboardProvider>
+      <ExternalEditorWindows
+        {...editorTabsPaneProps}
+        onClose={onExternalWindowClose}
+        onPopIn={onPopInTab}
+      />
       <CommandPaletteWithAlgoliaSearch ref={commandPaletteRef} />
       <LoaderModal
         showImmediately={showLoaderImmediately}

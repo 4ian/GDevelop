@@ -30,7 +30,11 @@ export default class ElementWithMenu extends React.Component<Props, State> {
     if (!_contextMenu) return;
 
     const node = ReactDOM.findDOMNode(this._wrappedElement);
-    if (node instanceof HTMLElement) {
+    // Use nodeType check instead of `instanceof HTMLElement` because
+    // in a cross-window portal the node's constructor comes from the
+    // child window, not the main window.
+    if (node && node.nodeType === 1) {
+      // $FlowFixMe[prop-missing] - nodeType 1 guarantees Element.
       const dimensions = node.getBoundingClientRect();
 
       _contextMenu.open(

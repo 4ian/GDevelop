@@ -75,7 +75,10 @@ export default function InlinePopover(props: Props): React.Node {
         // For a popover, clicking/touching away means validating,
         // as it's very easy to do it and almost the only way to do it on a touch screen.
         // The user can cancel with Escape.
-        if (event instanceof MouseEvent) {
+        // Use event.type instead of `instanceof MouseEvent` because
+        // in a cross-window portal the event's constructor comes from
+        // the child window, not the main window.
+        if (event.type === 'mouseup' || event.type === 'click') {
           // onClickAway is triggered on a "click" (which can actually happen
           // on a touchscreen too!).
           // The click already gave the opportunity to the popover content to

@@ -88,7 +88,11 @@ const WindowPortal = ({
     }
 
     // Copy all stylesheets from parent window to the new window.
-    _copyStyles(document, externalWindow.document);
+    // MUI/JSS styles for components rendered in this window are handled
+    // separately by a dedicated JSS instance in FullThemeProvider (via
+    // portalContainer context), so this mainly copies static CSS files
+    // and pre-existing global styles.
+    const styleObserver = _copyStyles(document, externalWindow.document);
 
     // Listen for the external window being closed.
     const checkClosed = setInterval(() => {
@@ -109,6 +113,7 @@ const WindowPortal = ({
 
     return () => {
       clearInterval(checkClosed);
+      if (styleObserver) styleObserver.disconnect();
       if (!externalWindow.closed) {
         externalWindow.close();
       }
@@ -155,7 +160,7 @@ const WindowPortal = ({
 function _copyStyles(
   sourceDocument: Document,
   targetDocument: Document
-): void {
+): MutationObserver {
   // Copy <style> elements (Material-UI injects styles this way).
   const styleElements = sourceDocument.querySelectorAll('style');
   styleElements.forEach(styleEl => {
@@ -198,6 +203,7 @@ function _copyStyles(
     });
   });
   observer.observe(sourceDocument.head, { childList: true });
+  return observer;
 }
 
 export default WindowPortal;

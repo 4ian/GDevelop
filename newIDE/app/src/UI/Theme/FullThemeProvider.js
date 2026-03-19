@@ -16,6 +16,26 @@ const jss = create({
 });
 
 /**
+ * Create a JSS instance that injects <style> elements into the given
+ * document's <head> instead of the main window's document.
+ * This is needed when rendering MUI components inside a separate browser
+ * window (via WindowPortal) so that styles are actually applied there.
+ */
+const createJssForDocument = (targetDocument: Document) => {
+  // Create a comment node as the insertion point so JSS injects styles
+  // into the target document's head.
+  const insertionPoint = targetDocument.createComment('jss-insertion-point');
+  if (targetDocument.head) {
+    targetDocument.head.appendChild(insertionPoint);
+  }
+
+  return create({
+    plugins: [...jssPreset().plugins, rtl()],
+    insertionPoint,
+  });
+};
+
+/**
  * Given a portal container element (from PortalContainerContext),
  * return MUI theme `props` overrides so that all overlay components
  * (Modal, Dialog, Popover, Menu, Tooltip, Drawer, Popper) render
@@ -131,9 +151,18 @@ export const FullThemeProvider = ({
     [theme.muiTheme, portalContainer, portalContainerThemeProps]
   );
 
+  // When rendering inside a popped-out window, create a JSS instance that
+  // targets the child window's document so styles are injected there.
+  const portalJss = React.useMemo(() => {
+    if (!portalContainer) return null;
+    const ownerDoc = portalContainer.ownerDocument;
+    if (!ownerDoc || ownerDoc === document) return null;
+    return createJssForDocument(ownerDoc);
+  }, [portalContainer]);
+
   return (
     <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
-      <StylesProvider jss={jss}>
+      <StylesProvider jss={portalJss || jss}>
         <ThemeProvider theme={muiTheme}>{children}</ThemeProvider>
       </StylesProvider>
     </GDevelopThemeContext.Provider>

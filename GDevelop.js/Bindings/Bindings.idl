@@ -1353,6 +1353,10 @@ interface ResourcesContainer {
     boolean MoveResourceUpInList([Const] DOMString oldName);
     boolean MoveResourceDownInList([Const] DOMString oldName);
     void MoveResource(unsigned long oldIndex, unsigned long newIndex);
+
+    void STATIC_UnserializeResourceFrom(
+        [Ref] Resource resource,
+        [Const, Ref] SerializerElement resourceElement);
 };
 
 interface ResourcesContainersList {

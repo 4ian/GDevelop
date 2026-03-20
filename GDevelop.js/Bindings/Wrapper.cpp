@@ -873,6 +873,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 
 #define STATIC_CopyAllResourcesTo CopyAllResourcesTo
 #define STATIC_CopyObjectResourcesTo CopyObjectResourcesTo
+#define STATIC_UnserializeResourceFrom UnserializeResourceFrom
 
 #define STATIC_IsExtensionLifecycleEventsFunction \
   IsExtensionLifecycleEventsFunction

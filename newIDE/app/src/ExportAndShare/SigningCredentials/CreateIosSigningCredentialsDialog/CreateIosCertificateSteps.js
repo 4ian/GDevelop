@@ -47,8 +47,7 @@ const getCertificateP12ErrorText = (error: ?Error): React.Node => {
   const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
   if (extractedStatusAndCode) {
     if (
-      extractedStatusAndCode.code ===
-      'certificate-p12/certificate-not-found'
+      extractedStatusAndCode.code === 'certificate-p12/certificate-not-found'
     ) {
       return (
         <Trans>

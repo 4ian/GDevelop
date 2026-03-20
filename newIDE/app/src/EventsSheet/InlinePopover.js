@@ -51,8 +51,37 @@ type Props = {|
 export default function InlinePopover(props: Props): React.Node {
   const startSentinel = React.useRef<?HTMLDivElement>(null);
   const endSentinel = React.useRef<?HTMLDivElement>(null);
+  const popperContentRef = React.useRef<?HTMLElement>(null);
   const { isMobile } = useResponsiveWindowSize();
   const portalContainer = React.useContext(PortalContainerContext);
+
+  // MUI's ClickAwayListener relies on ownerDocument(findDOMNode(child)).
+  // Because Popper portals its content, findDOMNode returns null and the
+  // listener falls back to the main window's `document`. When the popover
+  // lives in an external window (WindowPortal), clicks in that window
+  // never reach the main document so onClickAway never fires.
+  // Work around this by attaching our own mouseup listener on the
+  // external window's document.
+  const { open, onApply } = props;
+  React.useEffect(() => {
+    if (!portalContainer || !open) return;
+
+    const externalDoc = portalContainer.ownerDocument;
+    if (!externalDoc || externalDoc === document) return;
+
+    const handleMouseUp = (event: MouseEvent) => {
+      const content = popperContentRef.current;
+      if (content && content.contains((event.target: any))) return;
+      if (doesPathContainDialog((event: any).composedPath())) return;
+
+      onApply();
+    };
+
+    externalDoc.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      externalDoc.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [portalContainer, open, onApply]);
 
   return (
     <ClickAwayListener
@@ -155,13 +184,15 @@ export default function InlinePopover(props: Props): React.Node {
           }
         }}
       >
-        <Background>
-          <div tabIndex={0} ref={startSentinel} />
-          <Column expand>
-            <Line>{props.children}</Line>
-          </Column>
-          <div tabIndex={0} ref={endSentinel} />
-        </Background>
+        <div ref={popperContentRef}>
+          <Background>
+            <div tabIndex={0} ref={startSentinel} />
+            <Column expand>
+              <Line>{props.children}</Line>
+            </Column>
+            <div tabIndex={0} ref={endSentinel} />
+          </Background>
+        </div>
       </Popper>
     </ClickAwayListener>
   );

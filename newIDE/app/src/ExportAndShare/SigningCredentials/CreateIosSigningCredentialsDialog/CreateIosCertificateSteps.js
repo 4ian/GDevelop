@@ -34,7 +34,7 @@ export const getBase64FromFile = async (file: File): Promise<unknown> => {
       }
       resolve(base64String);
     };
-    reader.onerror = error => {
+    reader.onerror = (error) => {
       reject(error);
     };
     reader.readAsDataURL(file);
@@ -47,8 +47,7 @@ const getCertificateP12ErrorText = (error: ?Error): React.Node => {
   const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
   if (extractedStatusAndCode) {
     if (
-      extractedStatusAndCode.code ===
-      'certificate-p12/certificate-not-found'
+      extractedStatusAndCode.code === 'certificate-p12/certificate-not-found'
     ) {
       return (
         <Trans>
@@ -104,30 +103,24 @@ export const CreateIosCertificateSteps = ({
 
   const [commonName, setCommonName] = React.useState('');
   const [countryName, setCountryName] = React.useState('');
-  const [certificateRequestUuid, setCertificateRequestUuid] = React.useState(
-    ''
-  );
+  const [certificateRequestUuid, setCertificateRequestUuid] =
+    React.useState('');
   const [csrPem, setCsrPem] = React.useState('');
   const [
     isCertificateSigningRequestLoading,
     setIsCertificateSigningRequestLoading,
   ] = React.useState(false);
-  const [
-    certificateSigningRequestError,
-    setCertificateSigningRequestError,
-  ] = React.useState<?Error>(null);
+  const [certificateSigningRequestError, setCertificateSigningRequestError] =
+    React.useState<?Error>(null);
 
-  const onCreateSigningRequest = React.useCallback(
-    async () => {
-      if (!userId) return;
+  const onCreateSigningRequest = React.useCallback(async () => {
+    if (!userId) return;
 
-      try {
-        setIsCertificateSigningRequestLoading(true);
-        setCertificateSigningRequestError(null);
-        const {
-          certificateRequestUuid,
-          csrPem,
-        } = await signingCredentialApi.createCertificateSigningRequest(
+    try {
+      setIsCertificateSigningRequestLoading(true);
+      setCertificateSigningRequestError(null);
+      const { certificateRequestUuid, csrPem } =
+        await signingCredentialApi.createCertificateSigningRequest(
           authenticatedUser.getAuthorizationHeader,
           userId,
           {
@@ -135,24 +128,23 @@ export const CreateIosCertificateSteps = ({
             countryName: countryName || 'US',
           }
         );
-        setCertificateRequestUuid(certificateRequestUuid);
-        setCsrPem(csrPem);
-      } catch (error) {
-        console.error(
-          'Error while creating certificate signing request:',
-          error
-        );
-        setCertificateSigningRequestError(error);
-      } finally {
-        setIsCertificateSigningRequestLoading(false);
-      }
-    },
-    [authenticatedUser.getAuthorizationHeader, userId, commonName, countryName]
-  );
+      setCertificateRequestUuid(certificateRequestUuid);
+      setCsrPem(csrPem);
+    } catch (error) {
+      console.error('Error while creating certificate signing request:', error);
+      setCertificateSigningRequestError(error);
+    } finally {
+      setIsCertificateSigningRequestLoading(false);
+    }
+  }, [
+    authenticatedUser.getAuthorizationHeader,
+    userId,
+    commonName,
+    countryName,
+  ]);
 
-  const [wasCertificateGenerated, setWasCertificateGenerated] = React.useState(
-    false
-  );
+  const [wasCertificateGenerated, setWasCertificateGenerated] =
+    React.useState(false);
   const [certificateError, setCertificateError] = React.useState<?Error>(null);
   const [isCertificateLoading, setIsCertificateLoading] = React.useState(false);
   const [
@@ -160,14 +152,10 @@ export const CreateIosCertificateSteps = ({
     setLastUploadedProvisioningProfileName,
   ] = React.useState('');
 
-  const [
-    mobileProvisionError,
-    setMobileProvisionError,
-  ] = React.useState<?Error>(null);
-  const [
-    isMobileProvisionLoading,
-    setIsMobileProvisionLoading,
-  ] = React.useState(false);
+  const [mobileProvisionError, setMobileProvisionError] =
+    React.useState<?Error>(null);
+  const [isMobileProvisionLoading, setIsMobileProvisionLoading] =
+    React.useState(false);
 
   const onUploadCertificate = React.useCallback(
     async (certificateFile: File) => {
@@ -178,17 +166,15 @@ export const CreateIosCertificateSteps = ({
         setIsCertificateLoading(true);
 
         const certificateAsBase64 = await getBase64FromFile(certificateFile);
-        const {
-          certificateSerial,
-          certificateKind,
-        } = await signingCredentialApi.uploadCertificate(
-          authenticatedUser.getAuthorizationHeader,
-          userId,
-          {
-            // $FlowFixMe[incompatible-type]
-            certificateAsBase64,
-          }
-        );
+        const { certificateSerial, certificateKind } =
+          await signingCredentialApi.uploadCertificate(
+            authenticatedUser.getAuthorizationHeader,
+            userId,
+            {
+              // $FlowFixMe[incompatible-type]
+              certificateAsBase64,
+            }
+          );
         if (certificateKind === 'unknown') {
           const answer = await showConfirmation({
             title: t`Unknown certificate type`,
@@ -233,9 +219,8 @@ export const CreateIosCertificateSteps = ({
         setLastUploadedProvisioningProfileName('');
         setIsMobileProvisionLoading(true);
 
-        const mobileProvisionAsBase64 = await getBase64FromFile(
-          mobileProvisionFile
-        );
+        const mobileProvisionAsBase64 =
+          await getBase64FromFile(mobileProvisionFile);
         const { name } = await signingCredentialApi.uploadMobileProvision(
           authenticatedUser.getAuthorizationHeader,
           userId,
@@ -286,14 +271,14 @@ export const CreateIosCertificateSteps = ({
           fullWidth
           floatingLabelText={<Trans>Company name or full name</Trans>}
           value={commonName}
-          onChange={text => setCommonName(text)}
+          onChange={(text) => setCommonName(text)}
           maxLength={64}
         />
         <SemiControlledTextField
           fullWidth
           floatingLabelText={<Trans>Country name</Trans>}
           value={countryName}
-          onChange={text => setCountryName(text)}
+          onChange={(text) => setCountryName(text)}
           maxLength={64}
         />
       </LineStackLayout>
@@ -351,7 +336,7 @@ export const CreateIosCertificateSteps = ({
               multiple={false}
               type="file"
               disabled={!certificateRequestUuid || isCertificateLoading}
-              onChange={event => {
+              onChange={(event) => {
                 const file = event.currentTarget.files[0] || null;
                 setCertificateError(null);
                 if (file) onUploadCertificate(file);
@@ -395,7 +380,7 @@ export const CreateIosCertificateSteps = ({
               multiple={false}
               type="file"
               disabled={isMobileProvisionLoading}
-              onChange={event => {
+              onChange={(event) => {
                 const file = event.currentTarget.files[0] || null;
                 setMobileProvisionError(null);
                 if (file) onUploadMobileProvision(file);

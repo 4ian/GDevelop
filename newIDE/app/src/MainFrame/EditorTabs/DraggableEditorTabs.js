@@ -120,6 +120,7 @@ export function DraggableEditorTabs({
                   : null
               }
               popOutEnabled={
+                // For now, don't allow popping out anything that can have a 3D editor shown.
                 editorTab.kind !== 'layout' &&
                 editorTab.kind !== 'external layout' &&
                 editorTab.kind !== 'custom object'

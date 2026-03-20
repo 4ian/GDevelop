@@ -14,6 +14,7 @@ import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
 import { type EditorTabsPaneCommonProps } from './EditorTabsPane';
 import IconButton from '../UI/IconButton';
 import RestoreIcon from '../UI/CustomSvgIcons/Restore';
+import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
 
 type Props = {|
   ...EditorTabsPaneCommonProps,
@@ -22,6 +23,7 @@ type Props = {|
   onPopIn: (editorTab: EditorTab) => void,
 |};
 
+// TODO: Rename this (and the file) to PoppedOutEditorContainerWindow.
 const ExternalEditorWindow = (props: Props): React.Node => {
   const { editorTab, onClose, onPopIn } = props;
 
@@ -35,26 +37,23 @@ const ExternalEditorWindow = (props: Props): React.Node => {
   const [windowWidth, setWindowWidth] = React.useState<number | null>(null);
   const [windowHeight, setWindowHeight] = React.useState<number | null>(null);
   const observerRef = React.useRef<ResizeObserver | null>(null);
-  const containerRef = React.useCallback(
-    (node: HTMLDivElement | null) => {
-      // Disconnect any previous observer.
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-        observerRef.current = null;
-      }
-      if (!node) return;
+  const containerRef = React.useCallback((node: HTMLDivElement | null) => {
+    // Disconnect any previous observer.
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+      observerRef.current = null;
+    }
+    if (!node) return;
 
-      const observer = new ResizeObserver(entries => {
-        for (const entry of entries) {
-          setWindowWidth(entry.contentRect.width);
-          setWindowHeight(entry.contentRect.height);
-        }
-      });
-      observer.observe(node);
-      observerRef.current = observer;
-    },
-    []
-  );
+    const observer = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setWindowWidth(entry.contentRect.width);
+        setWindowHeight(entry.contentRect.height);
+      }
+    });
+    observer.observe(node);
+    observerRef.current = observer;
+  }, []);
 
   // Clean up observer on unmount.
   React.useEffect(() => {
@@ -106,7 +105,7 @@ const ExternalEditorWindow = (props: Props): React.Node => {
                 tooltip={t`Pop back into main window`}
                 color="default"
               >
-                <RestoreIcon />
+                <OpenInBrowserIcon />
               </IconButton>
             }
             canSave={props.canSave}
@@ -244,18 +243,14 @@ const ExternalEditorWindow = (props: Props): React.Node => {
                     onCreateEmptyProject: props.createEmptyProject,
                     onCreateProjectFromExample: props.createProjectFromExample,
                     onOpenProfile: props.onOpenProfileDialog,
-                    onOpenLanguageDialog: () =>
-                      props.openLanguageDialog(true),
-                    onOpenPreferences: () =>
-                      props.openPreferencesDialog(true),
+                    onOpenLanguageDialog: () => props.openLanguageDialog(true),
+                    onOpenPreferences: () => props.openPreferencesDialog(true),
                     onOpenAbout: () => props.openAboutDialog(true),
                     selectInAppTutorial: props.selectInAppTutorial,
                     onLoadEventsFunctionsExtensions:
                       props.onLoadEventsFunctionsExtensions,
                     onReloadEventsFunctionsExtensionMetadata: extension => {
-                      if (
-                        props.isProjectClosedSoAvoidReloadingExtensions
-                      ) {
+                      if (props.isProjectClosedSoAvoidReloadingExtensions) {
                         return;
                       }
                       props.eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(
@@ -281,8 +276,7 @@ const ExternalEditorWindow = (props: Props): React.Node => {
                       cb(true);
                     },
                     openBehaviorEvents: props.openBehaviorEvents,
-                    onExtractAsExternalLayout:
-                      props.onExtractAsExternalLayout,
+                    onExtractAsExternalLayout: props.onExtractAsExternalLayout,
                     onExtractAsEventBasedObject:
                       props.onExtractAsEventBasedObject,
                     onEventBasedObjectTypeChanged:

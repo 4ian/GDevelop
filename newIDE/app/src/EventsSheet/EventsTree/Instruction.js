@@ -510,6 +510,7 @@ const Instruction = (props: Props): React.Node => {
                   props.onDoubleClick();
                 }}
                 onContextMenu={e => {
+                  e.preventDefault();
                   e.stopPropagation();
                   onContextMenu(e.clientX, e.clientY);
                 }}

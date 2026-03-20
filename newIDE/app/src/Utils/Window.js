@@ -319,7 +319,9 @@ export default class Window {
     return answer === 0;
   }
 
-  static setUpContextMenu() {
+  static setUpContextMenu(targetWindow?: any) {
+    const win = targetWindow || window;
+    const doc = win.document;
     const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
 
     if (electron) {
@@ -328,7 +330,7 @@ export default class Window {
         'electron-editor-context-menu'
       );
 
-      window.addEventListener('contextmenu', function(e) {
+      win.addEventListener('contextmenu', function(e) {
         // Only show the context menu in text editors.
         if (!e.target.closest(textEditorSelectors)) return;
 
@@ -341,8 +343,8 @@ export default class Window {
           menu.popup({ window: remote.getCurrentWindow() });
         }, 30);
       });
-    } else if (document) {
-      document.addEventListener('contextmenu', function(e: any) {
+    } else if (doc) {
+      doc.addEventListener('contextmenu', function(e: any) {
         // Only show the context menu in text editors.
         if (!e.target.closest(textEditorSelectors)) {
           e.preventDefault();

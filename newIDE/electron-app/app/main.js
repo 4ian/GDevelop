@@ -261,11 +261,48 @@ function createNewWindow(windowArgs = args) {
     }
   });
 
-  // Prevent opening any website or url inside Electron
+  // Allow blank-URL pop-out windows (used by WindowPortal for editor pop-outs),
+  // but open all other URLs in the external browser.
   newWindow.webContents.setWindowOpenHandler(details => {
+    if (details.url === '' || details.url === 'about:blank') {
+      return {
+        action: 'allow',
+        overrideBrowserWindowOptions: {
+          // Standard title bar for pop-out editors (not hidden like the main window).
+          titleBarStyle: 'default',
+          titleBarOverlay: false,
+          webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+            webSecurity: false,
+          },
+        },
+      };
+    }
+
     console.info('Opening in browser (because of new window): ', details.url);
     electron.shell.openExternal(details.url);
     return { action: 'deny' };
+  });
+
+  // When a child window is created (e.g. a popped-out editor), set up security
+  // policies and enable @electron/remote on it.
+  newWindow.webContents.on('did-create-window', (childWindow) => {
+    require('@electron/remote/main').enable(childWindow.webContents);
+
+    // Prevent navigation inside child windows.
+    childWindow.webContents.on('will-navigate', (e, url) => {
+      if (url !== childWindow.webContents.getURL()) {
+        e.preventDefault();
+        electron.shell.openExternal(url);
+      }
+    });
+
+    // Block further nesting of new windows from pop-outs.
+    childWindow.webContents.setWindowOpenHandler(childDetails => {
+      electron.shell.openExternal(childDetails.url);
+      return { action: 'deny' };
+    });
   });
 
   return newWindow;

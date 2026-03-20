@@ -2,6 +2,7 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import PortalContainerContext from './PortalContainerContext';
+import Window from '../Utils/Window';
 
 type Props = {|
   /** The title of the new window. */
@@ -93,6 +94,9 @@ const WindowPortal = ({
     // portalContainer context), so this mainly copies static CSS files
     // and pre-existing global styles.
     const styleObserver = _copyStyles(document, externalWindow.document);
+
+    // Set up context menu in the new window (works for both Electron and web).
+    Window.setUpContextMenu(externalWindow);
 
     // Listen for the external window being closed.
     const checkClosed = setInterval(() => {

@@ -134,3 +134,12 @@ export function unserializeFromJSObject(
   }
   serializedElement.delete();
 }
+
+export function unserializeResourceFromJSObject(
+  resource: gdResource,
+  object: Object
+) {
+  const serializedElement = gd.Serializer.fromJSObject(object);
+  gd.ResourcesContainer.unserializeResourceFrom(resource, serializedElement);
+  serializedElement.delete();
+}

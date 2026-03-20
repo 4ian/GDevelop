@@ -1142,6 +1142,7 @@ export class ResourcesContainer extends EmscriptenObject {
   moveResourceUpInList(oldName: string): boolean;
   moveResourceDownInList(oldName: string): boolean;
   moveResource(oldIndex: number, newIndex: number): void;
+  static unserializeResourceFrom(resource: Resource, resourceElement: SerializerElement): void;
 }
 
 export class ResourcesContainersList extends EmscriptenObject {

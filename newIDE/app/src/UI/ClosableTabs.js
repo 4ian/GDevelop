@@ -142,6 +142,7 @@ export type ClosableTabProps = {|
   onCloseOthers: () => void,
   onCloseAll: () => void,
   onPopOut?: ?(() => void),
+  popOutEnabled?: boolean,
   onClick: () => void,
   onActivated: () => void,
   onHover: (boolean, options: {| isLabelTruncated: boolean |}) => void,
@@ -156,6 +157,7 @@ export function ClosableTab({
   onCloseOthers,
   onCloseAll,
   onPopOut,
+  popOutEnabled = true,
   label,
   icon,
   renderCustomIcon,
@@ -354,7 +356,7 @@ export function ClosableTab({
                 {
                   label: i18n._(t`Pop out in a separate window`),
                   click: onPopOut,
-                  enabled: closable,
+                  enabled: closable && popOutEnabled,
                 },
               ]
             : []),

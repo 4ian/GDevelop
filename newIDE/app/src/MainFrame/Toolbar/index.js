@@ -35,6 +35,8 @@ export type MainFrameToolbarProps = {|
   hidden: boolean,
   toolbarButtons: Array<ToolbarButtonConfig>,
   projectPath: ?string,
+  /** Optional content to render on the left side of the toolbar when showProjectButtons is false. */
+  customLeftContent?: ?React.Node,
 
   ...PreviewAndShareButtonsProps,
 |};
@@ -214,6 +216,8 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               <Spacer />
             </ToolbarGroup>
           </>
+        ) : props.customLeftContent ? (
+          <ToolbarGroup firstChild>{props.customLeftContent}</ToolbarGroup>
         ) : null}
         {editorToolbar || <ToolbarGroup />}
       </Toolbar>

@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { t } from '@lingui/macro';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
 import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
 import ErrorBoundary, {
@@ -11,6 +12,8 @@ import { SpecificDimensionsWindowSizeProvider } from '../UI/Responsive/Responsiv
 import WindowPortal from '../UI/WindowPortal';
 import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
 import { type EditorTabsPaneCommonProps } from './EditorTabsPane';
+import IconButton from '../UI/IconButton';
+import RestoreIcon from '../UI/CustomSvgIcons/Restore';
 
 type Props = {|
   ...EditorTabsPaneCommonProps,
@@ -95,10 +98,16 @@ const ExternalEditorWindow = (props: Props): React.Node => {
               }
             }}
             hidden={false}
-            showProjectButtons={
-              !['start page', 'debugger', 'ask-ai', 'global-search'].includes(
-                editorTab.key
-              )
+            showProjectButtons={false}
+            customLeftContent={
+              <IconButton
+                size="small"
+                onClick={() => onPopIn(editorTab)}
+                tooltip={t`Pop back into main window`}
+                color="default"
+              >
+                <RestoreIcon />
+              </IconButton>
             }
             canSave={props.canSave}
             onSave={props.saveProject}

@@ -119,6 +119,11 @@ export function DraggableEditorTabs({
                   ? () => onPopOutTab(editorTab)
                   : null
               }
+              popOutEnabled={
+                editorTab.kind !== 'layout' &&
+                editorTab.kind !== 'external layout' &&
+                editorTab.kind !== 'custom object'
+              }
               onHover={(
                 enter: boolean,
                 options: {| isLabelTruncated: boolean |}
@@ -160,6 +165,7 @@ export function DraggableClosableTab({
   onCloseOthers,
   onCloseAll,
   onPopOut,
+  popOutEnabled,
   label,
   icon,
   renderCustomIcon,
@@ -203,6 +209,7 @@ export function DraggableClosableTab({
                   onCloseOthers={onCloseOthers}
                   onCloseAll={onCloseAll}
                   onPopOut={onPopOut}
+                  popOutEnabled={popOutEnabled}
                   label={label}
                   icon={icon}
                   renderCustomIcon={renderCustomIcon}

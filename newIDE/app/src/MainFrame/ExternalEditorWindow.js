@@ -140,6 +140,7 @@ const ExternalEditorWindow = (props: Props): React.Node => {
         <CommandPalette ref={localCommandPaletteRef} />
         <div
           ref={containerRef}
+          className="popped-out-frame"
           style={{
             display: 'flex',
             flexDirection: 'column',

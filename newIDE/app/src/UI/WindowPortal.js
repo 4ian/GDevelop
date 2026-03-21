@@ -11,10 +11,10 @@ type Props = {|
   children: React.Node,
   /** Called when the external window is closed by the user. */
   onClose: () => void,
-  /** Optional width for the new window. */
-  width?: number,
-  /** Optional height for the new window. */
-  height?: number,
+  /** Optional initial width for the new window. */
+  initialWidth?: number,
+  /** Optional initial height for the new window. */
+  initialHeight?: number,
   /** Called when the external window is ready (or null when closing). */
   onWindowReady?: (externalWindow: any) => void,
 |};
@@ -35,8 +35,8 @@ const WindowPortal = ({
   title,
   children,
   onClose,
-  width = 800,
-  height = 600,
+  initialWidth = 800,
+  initialHeight = 600,
   onWindowReady,
 }: Props): React.Node => {
   const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
@@ -56,9 +56,9 @@ const WindowPortal = ({
     };
 
     // Open a new blank window.
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
-    const features = `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`;
+    const left = window.screenX + (window.outerWidth - initialWidth) / 2;
+    const top = window.screenY + (window.outerHeight - initialHeight) / 2;
+    const features = `width=${initialWidth},height=${initialHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`;
     const externalWindow = window.open('', '', features);
 
     if (!externalWindow) {

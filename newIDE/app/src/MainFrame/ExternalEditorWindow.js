@@ -27,7 +27,9 @@ type Props = {|
   onPopIn: (editorTab: EditorTab) => void,
 |};
 
-const getPopOutDimensions = (originalPaneIdentifier: ?string) => {
+const getPopOutDimensions = (
+  originalPaneIdentifier: ?string
+): {| popOutWidth: number, popOutHeight: number |} => {
   const screenWidth = window.outerWidth;
   const screenHeight = window.outerHeight;
 
@@ -36,14 +38,14 @@ const getPopOutDimensions = (originalPaneIdentifier: ?string) => {
     originalPaneIdentifier === 'right'
   ) {
     return {
-      width: Math.round(screenWidth / 3),
-      height: screenHeight,
+      popOutWidth: Math.round(screenWidth / 3),
+      popOutHeight: screenHeight,
     };
   }
   // 'center' or fallback: same size as main window
   return {
-    width: screenWidth,
-    height: screenHeight,
+    popOutWidth: screenWidth,
+    popOutHeight: screenHeight,
   };
 };
 
@@ -69,7 +71,7 @@ const ExternalEditorWindow = (props: Props): React.Node => {
   }, []);
 
   // Compute adaptive window size based on which pane the tab came from.
-  const { width: popOutWidth, height: popOutHeight } = React.useMemo(
+  const { popOutWidth, popOutHeight } = React.useMemo(
     () => getPopOutDimensions(editorTab.originalPaneIdentifier),
     [editorTab.originalPaneIdentifier]
   );
@@ -77,7 +79,7 @@ const ExternalEditorWindow = (props: Props): React.Node => {
   // Register keyboard shortcuts in the external window.
   useKeyboardShortcuts({
     targetDocument: externalWindowDocument || undefined,
-    previewDebuggerServer: null,
+    previewDebuggerServer: props.previewDebuggerServer,
     ignoreHandledByElectron: true,
     onRunCommand: React.useCallback((commandName) => {
       if (commandName === 'OPEN_COMMAND_PALETTE') {
@@ -135,8 +137,8 @@ const ExternalEditorWindow = (props: Props): React.Node => {
         props.onEditorTabClosing(editorTab);
         onClose(editorTab);
       }}
-      width={popOutWidth}
-      height={popOutHeight}
+      initialWidth={popOutWidth}
+      initialHeight={popOutHeight}
       onWindowReady={onWindowReady}
     >
       <FullThemeProvider>

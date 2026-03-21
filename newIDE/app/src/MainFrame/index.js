@@ -135,8 +135,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
-import {
-  CommandPaletteWithAlgoliaSearch,
+import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
@@ -5207,7 +5206,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         onClose={onExternalWindowClose}
         onPopIn={onPopInTab}
       />
-      <CommandPaletteWithAlgoliaSearch ref={commandPaletteRef} />
+      <CommandPalette ref={commandPaletteRef} />
       <LoaderModal
         showImmediately={showLoaderImmediately}
         showAfterDelay={showLoaderAfterDelay}

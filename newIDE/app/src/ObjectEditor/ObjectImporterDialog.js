@@ -25,6 +25,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import LoaderModal from '../UI/LoaderModal';
 import AlertMessage from '../UI/AlertMessage';
 import { getOrCreate } from '../Utils/Map';
+import { unserializeResourceFromJSObject } from '../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 
@@ -696,8 +697,7 @@ const ObjectImporterDialog = ({
         }
         // The resource does not exist yet, add it. Note that the "origin" will be preserved.
         const newResource = resourceKindMetadata.createNewResource();
-        unserializeFromJSObject(newResource, serializedResource);
-        newResource.setName(serializedResource.name);
+        unserializeResourceFromJSObject(newResource, serializedResource);
 
         const resourceBlob: Blob = await getFileBlob({
           archiveBlob: assetPackBlob,

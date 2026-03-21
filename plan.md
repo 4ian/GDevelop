@@ -1,201 +1,234 @@
-# Plan: Adapt Popped-Out External Editor Windows for Electron
+# Plan: External Window Shortcuts & Adaptive Sizing
 
 ## Problem
 
-`WindowPortal.js` uses `window.open('')` (line 56) to create pop-out windows. In Electron, this is blocked by `setWindowOpenHandler` in `main.js:265-268` which calls `{ action: 'deny' }` and redirects to the external browser. Pop-out editor windows will silently fail in Electron.
+1. **Keyboard shortcuts don't work in popped-out (external) windows.** `useKeyboardShortcuts` (in `KeyboardShortcuts/index.js`) listens on the main window's `document.keydown`. Since `WindowPortal` creates a *separate* browser window via `window.open()`, its `document` is distinct — keydown events there never reach the main window's listener.
 
-Additionally:
-- `setupContextMenu` (in `Window.js:322-355`) attaches a `contextmenu` listener to the **main window only** (`Window.setUpContextMenu()` is called once in `LocalApp.js:38`). Pop-out windows get their own `document` so the context menu won't work there.
-- The web version has the same context menu gap — the browser-side `document.addEventListener('contextmenu', ...)` in `Window.js:344` only applies to the main document.
+2. **On Electron**, shortcuts like Ctrl+S, Ctrl+O are `handledByElectron` — the Electron main menu intercepts them. The menu sends IPC events (e.g. `main-menu-save`) to the renderer. In `ElectronMainMenu.js`, these IPC listeners are gated by `shouldApply: isFocusedOnMainWindow`, so they're ignored when a popped-out window has focus. The popped-out windows are NOT separate Electron BrowserWindows — they're `window.open()` popups from the same renderer process.
 
-## Approach
+3. **Command palette** (`CommandPalette/index.js`) is rendered once in `MainFrame`, referenced via `commandPaletteRef`. There's no instance in the external window, so even if shortcuts worked, `Ctrl+P` would open the palette in the main window, not the external one.
 
-Use Electron's `BrowserWindow` for pop-out windows instead of `window.open`. The renderer process can create child `BrowserWindow` instances via `@electron/remote` (already enabled, `main.js:209`). For the web, `window.open` continues to work as-is.
+4. **Window sizing** is hardcoded at `width=1024, height=750` regardless of which pane the tab came from.
 
 ---
 
-## Step 1: Update `WindowPortal.js` to use `BrowserWindow` in Electron
+## Part 1: Shortcuts in External Windows
 
-**File:** `newIDE/app/src/UI/WindowPortal.js`
+### Approach: Each external window gets its own `useKeyboardShortcuts` instance
 
-### Changes:
-- Import `optionalRequire` and detect Electron:
-  ```js
-  const electron = optionalRequire('electron');
-  const remote = optionalRequire('@electron/remote');
-  ```
-- In the `useEffect` that opens the window:
-  - **Electron path:** Create a `BrowserWindow` via `remote` with:
-    - `width`, `height`, centered relative to parent (`remote.getCurrentWindow()`)
-    - `webPreferences: { nodeIntegration: true, contextIsolation: false }` (matching main window config from `main.js:150-155`)
-    - `parent: undefined` (independent window, not modal)
-    - No `titleBarStyle: 'hidden'` — pop-out editors should have a standard title bar with native close button
-    - Enable `@electron/remote` on the new window: `require('@electron/remote/main').enable(newWindow.webContents)` — but this must be done from main process. Instead, use IPC (see Step 2).
-    - Load a blank page or `about:blank`, then get the container div from `newWindow.webContents` DOM
-    - Actually, **simpler approach**: load the same `index.html` but that would create a whole new app instance. Instead:
-    - **Best approach**: Use `window.open` but override `setWindowOpenHandler` to allow it. See Step 2.
-  - **Web path:** Keep existing `window.open('')` logic unchanged.
+Rather than forwarding events between windows, each `ExternalEditorWindow` runs its own keyboard shortcut listener against the external window's `document`. This is clean, independent per window, and works for both web and Electron.
 
-### Revised approach — allow `window.open` for pop-outs in Electron:
+### Step 1a: Modify `useKeyboardShortcuts` to accept a `targetDocument` parameter
 
-Rather than creating BrowserWindow directly from the renderer, the cleanest path is:
+**File:** `newIDE/app/src/KeyboardShortcuts/index.js`
 
-1. In `main.js`, modify `setWindowOpenHandler` to **allow** blank-URL pop-outs (used by WindowPortal) instead of denying all.
-2. Configure the returned child window with appropriate options.
-3. Enable `@electron/remote` on the child window's webContents.
-
-This avoids duplicating window creation logic and keeps WindowPortal's portal-based rendering working.
-
----
-
-## Step 2: Update Electron `main.js` — allow pop-out windows
-
-**File:** `newIDE/electron-app/app/main.js`
-
-### Changes to `setWindowOpenHandler` (line 265-268):
-
-Replace the blanket deny with logic that allows blank-URL pop-outs:
+Add an optional `targetDocument` parameter to `UseKeyboardShortcutsProps`:
 
 ```js
-newWindow.webContents.setWindowOpenHandler(details => {
-  // Allow blank pop-out windows (used by WindowPortal for editor pop-outs)
-  if (details.url === '' || details.url === 'about:blank') {
-    return {
-      action: 'allow',
-      overrideBrowserWindowOptions: {
-        // Standard title bar for pop-out editors (not hidden like main window)
-        titleBarStyle: 'default',
-        titleBarOverlay: false,
-        webPreferences: {
-          nodeIntegration: true,
-          contextIsolation: false,
-          webSecurity: false,
-        },
-      },
-    };
-  }
-
-  // All other URLs: open in external browser as before
-  console.info('Opening in browser (because of new window): ', details.url);
-  electron.shell.openExternal(details.url);
-  return { action: 'deny' };
-});
+type UseKeyboardShortcutsProps = {|
+  onRunCommand: (commandName: CommandName) => void,
+  previewDebuggerServer: ?PreviewDebuggerServer,
+  targetDocument?: Document,  // NEW — defaults to window.document
+  ignoreHandledByElectron?: boolean,  // NEW — for external windows
+|};
 ```
 
-### Enable `@electron/remote` on child windows:
-
-Listen for child window creation:
+In the effect that adds the `keydown` listener, use `targetDocument || document`:
 
 ```js
-newWindow.webContents.on('did-create-window', (childWindow) => {
-  require('@electron/remote/main').enable(childWindow.webContents);
-
-  // Also block navigation/external URLs in child windows
-  childWindow.webContents.on('will-navigate', (e, url) => {
-    if (url !== childWindow.webContents.getURL()) {
-      e.preventDefault();
-      electron.shell.openExternal(url);
-    }
-  });
-
-  // Block further nesting of new windows from pop-outs
-  childWindow.webContents.setWindowOpenHandler(childDetails => {
-    electron.shell.openExternal(childDetails.url);
-    return { action: 'deny' };
-  });
-});
+const doc = targetDocument || document;
+doc.addEventListener('keydown', handler);
+return () => doc.removeEventListener('keydown', handler);
 ```
 
----
+Add the `ignoreHandledByElectron` check:
 
-## Step 3: Context menu support in pop-out windows
-
-**File:** `newIDE/app/src/Utils/Window.js`
-
-### Problem:
-`setUpContextMenu()` attaches a listener to the main `window`'s `contextmenu` event. Pop-out windows have a different `window`/`document`, so the listener doesn't fire there.
-
-### Solution — call `setUpContextMenu` from within the pop-out window:
-
-**File:** `newIDE/app/src/UI/WindowPortal.js`
-
-After the external window is created and the container is ready, call the context menu setup on the new window. Two options:
-
-**Option A (Recommended):** Extract the context menu setup logic into a function that accepts a `window` parameter, then call it for each pop-out window:
-
-In `Window.js`, refactor `setUpContextMenu()`:
 ```js
-static setUpContextMenu(targetWindow?: typeof window) {
-  const win = targetWindow || window;
-  const doc = win.document;
-  const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
-
-  if (electron) {
-    var buildEditorContextMenu = remote.require('electron-editor-context-menu');
-    win.addEventListener('contextmenu', function(e) {
-      if (!e.target.closest(textEditorSelectors)) return;
-      var menu = buildEditorContextMenu();
-      setTimeout(function() {
-        menu.popup({ window: remote.getCurrentWindow() });
-      }, 30);
-    });
-  } else if (doc) {
-    doc.addEventListener('contextmenu', function(e: any) {
-      if (!e.target.closest(textEditorSelectors)) {
-        e.preventDefault();
-        return false;
-      }
-      return true;
-    });
-  }
+if (electron && commandsList[commandName].handledByElectron) {
+  if (!ignoreHandledByElectron) return;  // Skip only if NOT in external window
 }
 ```
 
-In `WindowPortal.js`, after the external window is created:
+### Step 1b: Expose external window's `document` from `WindowPortal`
+
+**File:** `newIDE/app/src/UI/WindowPortal.js`
+
+Add an `onWindowReady` callback prop:
+
 ```js
-// Set up context menu for the new window (both Electron and web)
-Window.setUpContextMenu(externalWindow);
+type Props = {|
+  title: string,
+  children: React.Node,
+  onClose: () => void,
+  width?: number,
+  height?: number,
+  onWindowReady?: (externalWindow: any) => void,  // NEW
+|};
 ```
 
-This works for both Electron and web — on web it prevents the default context menu outside text editors (same as main window behavior), and on Electron it sets up the electron-editor-context-menu.
+Call it after the external window is set up:
+
+```js
+if (props.onWindowReady) {
+  props.onWindowReady(externalWindow);
+}
+```
+
+Also call a cleanup when the window closes (pass `null`).
+
+### Step 1c: Use `useKeyboardShortcuts` in `ExternalEditorWindow`
+
+**File:** `newIDE/app/src/MainFrame/ExternalEditorWindow.js`
+
+```js
+const [externalWindowDocument, setExternalWindowDocument] = React.useState(null);
+
+const onWindowReady = React.useCallback((externalWindow) => {
+  setExternalWindowDocument(externalWindow ? externalWindow.document : null);
+}, []);
+
+// ... then pass onWindowReady to WindowPortal
+
+useKeyboardShortcuts({
+  targetDocument: externalWindowDocument,
+  previewDebuggerServer: null,
+  ignoreHandledByElectron: true,
+  onRunCommand: (commandName) => {
+    if (commandName === 'OPEN_COMMAND_PALETTE') {
+      localCommandPaletteRef.current?.open();
+    } else {
+      localCommandPaletteRef.current?.launchCommand(commandName);
+    }
+  },
+});
+```
 
 ---
 
-## Step 4: Handle Electron window closing
+## Part 2: Command Palette in External Windows
 
-**File:** No changes needed to `ExternalEditorWindow.js`
+### Approach: Render a `CommandPalette` per external window
 
-The existing logic already handles this correctly:
-- `WindowPortal.onClose` fires when the window is closed (via `beforeunload` or polling `externalWindow.closed`)
-- `ExternalEditorWindow` calls `props.onEditorTabClosing(editorTab)` then `onClose(editorTab)` which runs `closeEditorTab`
-- The "Pop back in" button calls `onPopIn(editorTab)` which runs `popInTab`, and the WindowPortal unmounts (closing the Electron child window via the cleanup in `WindowPortal`'s useEffect return)
+Each `ExternalEditorWindow` already has `<CommandsContextScopedProvider active={true}>` which registers scoped commands. We add a `CommandPalette` instance inside each external window so the dialog renders in the correct window.
 
-The only consideration: in Electron, when the **main window** is closed, child windows created via `setWindowOpenHandler` with `action: 'allow'` are automatically closed by Electron. The `beforeunload` / polling mechanism in WindowPortal will detect this and trigger `onClose`. No additional handling needed.
+### Step 2a: Add `CommandPaletteWithAlgoliaSearch` to `ExternalEditorWindow`
+
+**File:** `newIDE/app/src/MainFrame/ExternalEditorWindow.js`
+
+```jsx
+const localCommandPaletteRef = React.useRef(null);
+
+// Inside JSX, within FullThemeProvider:
+<CommandPaletteWithAlgoliaSearch ref={localCommandPaletteRef} />
+```
+
+The MUI `Dialog` in `CommandPalette` will render into the external window's DOM because `PortalContainerContext` (provided by `WindowPortal`) points to the external window's `document.body`.
+
+### Step 2b: Verify `CommandPaletteWithAlgoliaSearch` exists and is importable
+
+**File:** `newIDE/app/src/CommandPalette/CommandPalette/index.js`
+
+Check where `CommandPaletteWithAlgoliaSearch` is defined — it's likely a wrapper around `CommandPalette` + `InstantSearch`. Each external window instance needs its own `InstantSearch` provider, which is fine since the wrapper already includes it.
+
+### Edge cases
+- **`isUserTyping()` check**: This function checks `document.activeElement`. In the external window, `document` refers to the main window's document. Need to modify `isUserTyping` to accept an optional `targetDocument`, or check the external window's document. The external window's `useKeyboardShortcuts` should pass its `targetDocument` to `isUserTyping`.
+- **`isDialogOpen()` check**: Similarly checks the main document for open dialogs. Need to either pass the target document, or have the external window's instance check its own document.
+
+### Step 2c: Update `isUserTyping` and `isDialogOpen` for external windows
+
+**File:** `newIDE/app/src/KeyboardShortcuts/IsUserTyping.js`
+
+Modify to accept an optional `targetDocument` parameter:
+
+```js
+const isUserTyping = (targetDocument?: Document): boolean => {
+  const doc = targetDocument || document;
+  const activeElement = doc.activeElement;
+  // ... existing logic using activeElement
+};
+```
+
+**File:** `newIDE/app/src/UI/OpenedDialogChecker.js`
+
+Similarly, modify to accept optional `targetDocument`:
+
+```js
+const isDialogOpen = (targetDocument?: Document): boolean => {
+  const doc = targetDocument || document;
+  // ... check for open MUI dialogs in the doc
+};
+```
+
+Then in `useKeyboardShortcuts`, pass `targetDocument` to both functions.
 
 ---
 
-## Summary of files to modify
+## Part 3: Adaptive Window Sizing
+
+### Current state
+`ExternalEditorWindow` passes hardcoded `width={1024} height={750}` to `WindowPortal`.
+
+### Step 3a: Compute size based on `originalPaneIdentifier`
+
+**File:** `newIDE/app/src/MainFrame/ExternalEditorWindow.js`
+
+```js
+const getPopOutDimensions = (originalPaneIdentifier: ?string) => {
+  const screenWidth = window.outerWidth;
+  const screenHeight = window.outerHeight;
+
+  if (originalPaneIdentifier === 'left' || originalPaneIdentifier === 'right') {
+    return {
+      width: Math.round(screenWidth / 3),
+      height: screenHeight,
+    };
+  }
+  // 'center' or fallback: same size as main window
+  return {
+    width: screenWidth,
+    height: screenHeight,
+  };
+};
+```
+
+### Step 3b: Pass to WindowPortal
+
+```jsx
+const { width, height } = getPopOutDimensions(editorTab.originalPaneIdentifier);
+
+<WindowPortal
+  width={width}
+  height={height}
+  ...
+>
+```
+
+---
+
+## Summary of all file changes
 
 | File | Change |
 |------|--------|
-| `newIDE/electron-app/app/main.js` | Allow blank-URL pop-outs in `setWindowOpenHandler`, enable `@electron/remote` on child windows via `did-create-window`, block navigation/nesting in child windows |
-| `newIDE/app/src/Utils/Window.js` | Make `setUpContextMenu` accept a `targetWindow` parameter |
-| `newIDE/app/src/UI/WindowPortal.js` | Call `Window.setUpContextMenu(externalWindow)` after window creation |
+| `newIDE/app/src/KeyboardShortcuts/index.js` | Add `targetDocument` and `ignoreHandledByElectron` params to `useKeyboardShortcuts`; pass `targetDocument` to `isUserTyping` and `isDialogOpen` |
+| `newIDE/app/src/KeyboardShortcuts/IsUserTyping.js` | Accept optional `targetDocument` param |
+| `newIDE/app/src/UI/OpenedDialogChecker.js` | Accept optional `targetDocument` param |
+| `newIDE/app/src/UI/WindowPortal.js` | Add `onWindowReady` callback prop to expose external window reference |
+| `newIDE/app/src/MainFrame/ExternalEditorWindow.js` | Add local `useKeyboardShortcuts` + local `CommandPaletteWithAlgoliaSearch`, compute adaptive window size from `originalPaneIdentifier` |
 
-## What does NOT need to change
+## Edge cases to consider
 
-- `ExternalEditorWindow.js` — already handles close/pop-in correctly
-- `ExternalEditorWindows.js` — pure container, no changes
-- `EditorTabsHandler.js` — state management is platform-agnostic
-- `EditorTabsPane.js` — no pop-out logic remaining
-- `MainFrame/index.js` — callbacks are platform-agnostic
+- **Multiple external windows**: Each gets its own shortcut listener and command palette — works naturally since each `ExternalEditorWindow` is independent.
+- **Algolia search in CommandPalette**: The `CommandPaletteWithAlgoliaSearch` wraps `CommandPalette` in `<InstantSearch>`. Each external window instance gets its own provider, which is fine.
+- **Command registration scope**: `CommandsContextScopedProvider` in the external window registers editor-specific commands when active. The global commands (save, open, etc.) are registered in the main `CommandManager`. The local `CommandPalette`'s `launchCommand` looks up commands in the context's `CommandManager` — needs to verify it sees both global and scoped commands.
+- **Dialog check in external windows**: MUI Dialogs in external windows render into `PortalContainerContext` (the external window's body). `isDialogOpen` needs to check the correct document.
 
 ## Verification steps
 
-1. **Electron:** Right-click a non-scene tab → "Pop out in a separate window" → verify a native Electron child window opens with the editor content, toolbar, and pop-back-in button
-2. **Electron:** Right-click in a text field in the pop-out → verify the context menu (Cut/Copy/Paste) works
-3. **Electron:** Close the pop-out window via the native close button → verify the tab is removed
-4. **Electron:** Click "Pop back in" → verify the pop-out window closes and the tab returns to its original pane
-5. **Electron:** Close the main window while a pop-out is open → verify clean shutdown (no crashes)
-6. **Web:** Verify all existing pop-out behavior still works unchanged
-7. **Web:** Verify context menu behavior in pop-out windows (right-click suppressed outside text editors)
+1. **Web:** Pop out a tab → press Ctrl+S → verify project saves
+2. **Web:** Pop out a tab → press Ctrl+P → verify command palette opens **in the external window**
+3. **Web:** Pop out a tab → use command palette to save → verify it works
+4. **Electron:** Same tests as above
+5. **Electron:** Verify Ctrl+S works in external window (despite being `handledByElectron`)
+6. **Sizing:** Pop out from center pane → verify window is same size as main window
+7. **Sizing:** Pop out from left/right pane → verify window is 1/3 width, full height
+8. **Multiple pop-outs:** Pop out 2 tabs → verify shortcuts and palette work independently in each

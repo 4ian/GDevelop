@@ -145,6 +145,7 @@ const ExternalEditorWindow = (props: Props): React.Node => {
         <CommandPalette ref={localCommandPaletteRef} />
         <div
           ref={containerRef}
+          className="main-frame"
           style={{
             display: 'flex',
             flexDirection: 'column',

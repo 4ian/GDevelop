@@ -11,12 +11,12 @@ type Props = {|
   children: React.Node,
   /** Called when the external window is closed by the user. */
   onClose: () => void,
-  /** Optional initial width for the new window. */
-  initialWidth?: number,
-  /** Optional initial height for the new window. */
-  initialHeight?: number,
+  /** Initial width for the new window. */
+  initialWidth: number,
+  /** Initial height for the new window. */
+  initialHeight: number,
   /** Called when the external window is ready (or null when closing). */
-  onWindowReady?: (externalWindow: any) => void,
+  onWindowReady: (externalWindow: any) => void,
 |};
 
 /**
@@ -35,8 +35,8 @@ const WindowPortal = ({
   title,
   children,
   onClose,
-  initialWidth = 800,
-  initialHeight = 600,
+  initialWidth,
+  initialHeight,
   onWindowReady,
 }: Props): React.Node => {
   const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
@@ -120,14 +120,10 @@ const WindowPortal = ({
 
     setContainer(containerDiv);
 
-    if (onWindowReadyRef.current) {
-      onWindowReadyRef.current(externalWindow);
-    }
+    onWindowReadyRef.current(externalWindow);
 
     return () => {
-      if (onWindowReadyRef.current) {
-        onWindowReadyRef.current(null);
-      }
+      onWindowReadyRef.current(null);
       clearInterval(checkClosed);
       if (styleObserver) styleObserver.disconnect();
       if (!externalWindow.closed) {

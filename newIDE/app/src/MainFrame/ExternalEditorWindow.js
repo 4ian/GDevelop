@@ -15,6 +15,10 @@ import { type EditorTabsPaneCommonProps } from './EditorTabsPane';
 import IconButton from '../UI/IconButton';
 import RestoreIcon from '../UI/CustomSvgIcons/Restore';
 import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
+import { useKeyboardShortcuts } from '../KeyboardShortcuts';
+import CommandPalette, {
+  type CommandPaletteInterface,
+} from '../CommandPalette/CommandPalette';
 
 type Props = {|
   ...EditorTabsPaneCommonProps,
@@ -23,6 +27,26 @@ type Props = {|
   onPopIn: (editorTab: EditorTab) => void,
 |};
 
+const getPopOutDimensions = (originalPaneIdentifier: ?string) => {
+  const screenWidth = window.outerWidth;
+  const screenHeight = window.outerHeight;
+
+  if (
+    originalPaneIdentifier === 'left' ||
+    originalPaneIdentifier === 'right'
+  ) {
+    return {
+      width: Math.round(screenWidth / 3),
+      height: screenHeight,
+    };
+  }
+  // 'center' or fallback: same size as main window
+  return {
+    width: screenWidth,
+    height: screenHeight,
+  };
+};
+
 // TODO: Rename this (and the file) to PoppedOutEditorContainerWindow.
 const ExternalEditorWindow = (props: Props): React.Node => {
   const { editorTab, onClose, onPopIn } = props;
@@ -30,6 +54,43 @@ const ExternalEditorWindow = (props: Props): React.Node => {
   const toolbarRef = React.useRef<?ToolbarInterface>(null);
   const initializedToolbar = React.useRef<boolean>(false);
   const unsavedChanges = React.useContext(UnsavedChangesContext);
+  const localCommandPaletteRef = React.useRef<?CommandPaletteInterface>(null);
+
+  // Store the external window's document for keyboard shortcuts.
+  const [
+    externalWindowDocument,
+    setExternalWindowDocument,
+  ] = React.useState<?Document>(null);
+
+  const onWindowReady = React.useCallback((externalWindow: any) => {
+    setExternalWindowDocument(
+      externalWindow ? externalWindow.document : null
+    );
+  }, []);
+
+  // Compute adaptive window size based on which pane the tab came from.
+  const { width: popOutWidth, height: popOutHeight } = React.useMemo(
+    () => getPopOutDimensions(editorTab.originalPaneIdentifier),
+    [editorTab.originalPaneIdentifier]
+  );
+
+  // Register keyboard shortcuts in the external window.
+  useKeyboardShortcuts({
+    targetDocument: externalWindowDocument || undefined,
+    previewDebuggerServer: null,
+    ignoreHandledByElectron: true,
+    onRunCommand: React.useCallback((commandName) => {
+      if (commandName === 'OPEN_COMMAND_PALETTE') {
+        if (localCommandPaletteRef.current) {
+          localCommandPaletteRef.current.open();
+        }
+      } else {
+        if (localCommandPaletteRef.current) {
+          localCommandPaletteRef.current.launchCommand(commandName);
+        }
+      }
+    }, []),
+  });
 
   // Track the external window's dimensions via ResizeObserver.
   // Use a callback ref so the observer is attached as soon as the DOM node
@@ -74,10 +135,12 @@ const ExternalEditorWindow = (props: Props): React.Node => {
         props.onEditorTabClosing(editorTab);
         onClose(editorTab);
       }}
-      width={1024}
-      height={750}
+      width={popOutWidth}
+      height={popOutHeight}
+      onWindowReady={onWindowReady}
     >
       <FullThemeProvider>
+        <CommandPalette ref={localCommandPaletteRef} />
         <div
           ref={containerRef}
           style={{

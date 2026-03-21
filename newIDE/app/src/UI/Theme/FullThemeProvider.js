@@ -153,12 +153,15 @@ export const FullThemeProvider = ({
 
   // When rendering inside a popped-out window, create a JSS instance that
   // targets the child window's document so styles are injected there.
-  const portalJss = React.useMemo(() => {
-    if (!portalContainer) return null;
-    const ownerDoc = portalContainer.ownerDocument;
-    if (!ownerDoc || ownerDoc === document) return null;
-    return createJssForDocument(ownerDoc);
-  }, [portalContainer]);
+  const portalJss = React.useMemo(
+    () => {
+      if (!portalContainer) return null;
+      const ownerDoc = portalContainer.ownerDocument;
+      if (!ownerDoc || ownerDoc === document) return null;
+      return createJssForDocument(ownerDoc);
+    },
+    [portalContainer]
+  );
 
   return (
     <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>

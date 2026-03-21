@@ -730,8 +730,7 @@ const EditorTabsPane: React.ComponentType<{
                     onNavigateToEventFromGlobalSearch,
                     unsavedChanges: unsavedChanges,
                     canOpen,
-                    onChooseProject: () =>
-                      openOpenFromStorageProviderDialog(),
+                    onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
                     onOpenNewProjectSetupDialog: openNewProjectDialog,
                     onOpenProjectManager: () => openProjectManager(true),

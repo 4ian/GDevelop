@@ -312,10 +312,7 @@ export default (React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
             PopperComponent={
               portalContainer
                 ? popperProps => (
-                    <Popper
-                      {...popperProps}
-                      container={portalContainer}
-                    />
+                    <Popper {...popperProps} container={portalContainer} />
                   )
                 : undefined
             }

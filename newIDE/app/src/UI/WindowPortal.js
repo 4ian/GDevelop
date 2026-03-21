@@ -136,11 +136,14 @@ const WindowPortal = ({
   }, []);
 
   // Update the title if it changes.
-  React.useEffect(() => {
-    if (externalWindowRef.current && !externalWindowRef.current.closed) {
-      externalWindowRef.current.document.title = title;
-    }
-  }, [title]);
+  React.useEffect(
+    () => {
+      if (externalWindowRef.current && !externalWindowRef.current.closed) {
+        externalWindowRef.current.document.title = title;
+      }
+    },
+    [title]
+  );
 
   if (!container) return null;
 
@@ -195,9 +198,9 @@ function _copyStyles(
 
   // Set up a MutationObserver to copy new <style> elements as they are
   // added (Material-UI adds styles lazily when components mount).
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      mutation.addedNodes.forEach((node) => {
+  const observer = new MutationObserver(mutations => {
+    mutations.forEach(mutation => {
+      mutation.addedNodes.forEach(node => {
         if (node.nodeName === 'STYLE') {
           const newStyle = targetDocument.createElement('style');
           // $FlowFixMe - textContent exists on style nodes

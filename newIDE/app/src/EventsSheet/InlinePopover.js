@@ -63,25 +63,28 @@ export default function InlinePopover(props: Props): React.Node {
   // Work around this by attaching our own mouseup listener on the
   // external window's document.
   const { open, onApply } = props;
-  React.useEffect(() => {
-    if (!portalContainer || !open) return;
+  React.useEffect(
+    () => {
+      if (!portalContainer || !open) return;
 
-    const externalDoc = portalContainer.ownerDocument;
-    if (!externalDoc || externalDoc === document) return;
+      const externalDoc = portalContainer.ownerDocument;
+      if (!externalDoc || externalDoc === document) return;
 
-    const handleMouseUp = (event: MouseEvent) => {
-      const content = popperContentRef.current;
-      if (content && content.contains((event.target: any))) return;
-      if (doesPathContainDialog((event: any).composedPath())) return;
+      const handleMouseUp = (event: MouseEvent) => {
+        const content = popperContentRef.current;
+        if (content && content.contains((event.target: any))) return;
+        if (doesPathContainDialog((event: any).composedPath())) return;
 
-      onApply();
-    };
+        onApply();
+      };
 
-    externalDoc.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      externalDoc.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [portalContainer, open, onApply]);
+      externalDoc.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        externalDoc.removeEventListener('mouseup', handleMouseUp);
+      };
+    },
+    [portalContainer, open, onApply]
+  );
 
   return (
     <ClickAwayListener

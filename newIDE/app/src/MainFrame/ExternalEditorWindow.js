@@ -33,10 +33,7 @@ const getPopOutDimensions = (
   const screenWidth = window.outerWidth;
   const screenHeight = window.outerHeight;
 
-  if (
-    originalPaneIdentifier === 'left' ||
-    originalPaneIdentifier === 'right'
-  ) {
+  if (originalPaneIdentifier === 'left' || originalPaneIdentifier === 'right') {
     return {
       popOutWidth: Math.round(screenWidth / 3),
       popOutHeight: screenHeight,
@@ -65,9 +62,7 @@ const ExternalEditorWindow = (props: Props): React.Node => {
   ] = React.useState<?Document>(null);
 
   const onWindowReady = React.useCallback((externalWindow: any) => {
-    setExternalWindowDocument(
-      externalWindow ? externalWindow.document : null
-    );
+    setExternalWindowDocument(externalWindow ? externalWindow.document : null);
   }, []);
 
   // Compute adaptive window size based on which pane the tab came from.
@@ -81,7 +76,7 @@ const ExternalEditorWindow = (props: Props): React.Node => {
     targetDocument: externalWindowDocument || undefined,
     previewDebuggerServer: props.previewDebuggerServer,
     ignoreHandledByElectron: true,
-    onRunCommand: React.useCallback((commandName) => {
+    onRunCommand: React.useCallback(commandName => {
       if (commandName === 'OPEN_COMMAND_PALETTE') {
         if (localCommandPaletteRef.current) {
           localCommandPaletteRef.current.open();
@@ -145,7 +140,6 @@ const ExternalEditorWindow = (props: Props): React.Node => {
         <CommandPalette ref={localCommandPaletteRef} />
         <div
           ref={containerRef}
-          className="main-frame"
           style={{
             display: 'flex',
             flexDirection: 'column',

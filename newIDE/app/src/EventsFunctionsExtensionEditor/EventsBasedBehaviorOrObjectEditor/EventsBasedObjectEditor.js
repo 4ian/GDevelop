@@ -13,7 +13,6 @@ import { Line } from '../../UI/Grid';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import RaisedButton from '../../UI/RaisedButton';
 import Window from '../../Utils/Window';
-import ScrollView from '../../UI/ScrollView';
 import CompactPropertiesEditorRowField from '../../CompactPropertiesEditor/CompactPropertiesEditorRowField';
 import { CompactTextAreaField } from '../../UI/CompactTextAreaField';
 import CompactSemiControlledTextField from '../../UI/CompactSemiControlledTextField';

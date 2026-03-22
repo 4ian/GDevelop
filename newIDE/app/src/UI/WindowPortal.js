@@ -8,7 +8,9 @@ type Props = {|
   /** The title of the new window. */
   title: string,
   /** The content to render in the new window. */
-  children: React.Node,
+  renderContent: (props: {
+    windowSize: { width: number, height: number },
+  }) => React.Node,
   /** Called when the external window is closed by the user. */
   onClose: () => void,
   /** Initial width for the new window. */
@@ -33,7 +35,7 @@ type Props = {|
  */
 const WindowPortal = ({
   title,
-  children,
+  renderContent,
   onClose,
   initialWidth,
   initialHeight,
@@ -46,6 +48,10 @@ const WindowPortal = ({
   const onWindowReadyRef = React.useRef(onWindowReady);
   onWindowReadyRef.current = onWindowReady;
   const closedRef = React.useRef(false);
+  const [windowSize, setWindowSize] = React.useState<{
+    width: number,
+    height: number,
+  } | null>(null);
 
   React.useEffect(() => {
     // Guard against calling onClose multiple times.
@@ -75,6 +81,7 @@ const WindowPortal = ({
     // Create a container div in the new window.
     const containerDiv = externalWindow.document.createElement('div');
     containerDiv.id = 'window-portal-root';
+    containerDiv.className = 'popped-out-frame';
     externalWindow.document.body.appendChild(containerDiv);
 
     // Style the body of the new window to match the parent.
@@ -120,12 +127,24 @@ const WindowPortal = ({
 
     setContainer(containerDiv);
 
+    // Listen for the size of the container div.
+    const observer = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setWindowSize({
+          width: entry.contentRect.width,
+          height: entry.contentRect.height,
+        });
+      }
+    });
+    observer.observe(containerDiv);
+
     onWindowReadyRef.current(externalWindow);
 
     return () => {
       onWindowReadyRef.current(null);
       clearInterval(checkClosed);
       if (styleObserver) styleObserver.disconnect();
+      if (observer) observer.disconnect();
       if (!externalWindow.closed) {
         externalWindow.close();
       }
@@ -161,7 +180,7 @@ const WindowPortal = ({
 
   return ReactDOM.createPortal(
     <PortalContainerContext.Provider value={portalBody}>
-      {children}
+      {windowSize && renderContent({ windowSize })}
     </PortalContainerContext.Provider>,
     container
   );

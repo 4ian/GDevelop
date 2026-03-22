@@ -13,7 +13,6 @@ import WindowPortal from '../UI/WindowPortal';
 import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
 import { type EditorTabsPaneCommonProps } from './EditorTabsPane';
 import IconButton from '../UI/IconButton';
-import RestoreIcon from '../UI/CustomSvgIcons/Restore';
 import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
 import { useKeyboardShortcuts } from '../KeyboardShortcuts';
 import CommandPalette, {
@@ -36,13 +35,13 @@ const getPopOutDimensions = (
   if (originalPaneIdentifier === 'left' || originalPaneIdentifier === 'right') {
     return {
       popOutWidth: Math.round(screenWidth / 3),
-      popOutHeight: screenHeight,
+      popOutHeight: Math.ceil(screenHeight * 0.8),
     };
   }
   // 'center' or fallback: same size as main window
   return {
-    popOutWidth: screenWidth,
-    popOutHeight: screenHeight,
+    popOutWidth: Math.ceil(screenWidth * 0.9),
+    popOutHeight: Math.ceil(screenHeight * 0.8),
   };
 };
 
@@ -89,39 +88,6 @@ const ExternalEditorWindow = (props: Props): React.Node => {
     }, []),
   });
 
-  // Track the external window's dimensions via ResizeObserver.
-  // Use a callback ref so the observer is attached as soon as the DOM node
-  // appears inside the WindowPortal (which creates its container asynchronously).
-  const [windowWidth, setWindowWidth] = React.useState<number | null>(null);
-  const [windowHeight, setWindowHeight] = React.useState<number | null>(null);
-  const observerRef = React.useRef<ResizeObserver | null>(null);
-  const containerRef = React.useCallback((node: HTMLDivElement | null) => {
-    // Disconnect any previous observer.
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-      observerRef.current = null;
-    }
-    if (!node) return;
-
-    const observer = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        setWindowWidth(entry.contentRect.width);
-        setWindowHeight(entry.contentRect.height);
-      }
-    });
-    observer.observe(node);
-    observerRef.current = observer;
-  }, []);
-
-  // Clean up observer on unmount.
-  React.useEffect(() => {
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, []);
-
   const errorBoundaryProps = getEditorErrorBoundaryProps(editorTab.key);
 
   return (
@@ -135,70 +101,60 @@ const ExternalEditorWindow = (props: Props): React.Node => {
       initialWidth={popOutWidth}
       initialHeight={popOutHeight}
       onWindowReady={onWindowReady}
-    >
-      <FullThemeProvider>
-        <CommandPalette ref={localCommandPaletteRef} />
-        <div
-          ref={containerRef}
-          className="popped-out-frame"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            height: '100%',
-          }}
+      renderContent={({ windowSize }) => (
+        <SpecificDimensionsWindowSizeProvider
+          innerWidth={windowSize.width}
+          innerHeight={windowSize.height}
         >
-          <Toolbar
-            ref={ref => {
-              if (!ref) return;
-              toolbarRef.current = ref;
-              if (!initializedToolbar.current && editorTab.editorRef) {
-                initializedToolbar.current = true;
-                editorTab.editorRef.updateToolbar();
+          <FullThemeProvider>
+            <CommandPalette ref={localCommandPaletteRef} />
+            <Toolbar
+              ref={ref => {
+                if (!ref) return;
+                toolbarRef.current = ref;
+                if (!initializedToolbar.current && editorTab.editorRef) {
+                  initializedToolbar.current = true;
+                  editorTab.editorRef.updateToolbar();
+                }
+              }}
+              hidden={false}
+              showProjectButtons={false}
+              customLeftContent={
+                <IconButton
+                  size="small"
+                  onClick={() => onPopIn(editorTab)}
+                  tooltip={t`Pop back into main window`}
+                  color="default"
+                >
+                  <OpenInBrowserIcon />
+                </IconButton>
               }
-            }}
-            hidden={false}
-            showProjectButtons={false}
-            customLeftContent={
-              <IconButton
-                size="small"
-                onClick={() => onPopIn(editorTab)}
-                tooltip={t`Pop back into main window`}
-                color="default"
-              >
-                <OpenInBrowserIcon />
-              </IconButton>
-            }
-            canSave={props.canSave}
-            onSave={props.saveProject}
-            openShareDialog={() => props.openShareDialog()}
-            isSharingEnabled={props.isSharingEnabled}
-            onOpenDebugger={props.launchDebuggerAndPreview}
-            hasPreviewsRunning={props.hasPreviewsRunning}
-            onPreviewWithoutHotReload={props.launchNewPreview}
-            onNetworkPreview={props.launchNetworkPreview}
-            onHotReloadPreview={props.launchHotReloadPreview}
-            onLaunchPreviewWithDiagnosticReport={
-              props.launchPreviewWithDiagnosticReport
-            }
-            canDoNetworkPreview={props.canDoNetworkPreview}
-            setPreviewOverride={props.setPreviewOverride}
-            isPreviewEnabled={
-              !!props.currentProject &&
-              props.currentProject.getLayoutsCount() > 0
-            }
-            previewState={props.previewState}
-            onOpenVersionHistory={props.openVersionHistoryPanel}
-            checkedOutVersionStatus={props.checkedOutVersionStatus}
-            onQuitVersionHistory={props.onQuitVersionHistory}
-            canQuitVersionHistory={!props.isSavingProject}
-            toolbarButtons={props.toolbarButtons}
-            projectPath={props.projectPath}
-          />
-          <SpecificDimensionsWindowSizeProvider
-            innerWidth={windowWidth}
-            innerHeight={windowHeight}
-          >
+              canSave={props.canSave}
+              onSave={props.saveProject}
+              openShareDialog={() => props.openShareDialog()}
+              isSharingEnabled={props.isSharingEnabled}
+              onOpenDebugger={props.launchDebuggerAndPreview}
+              hasPreviewsRunning={props.hasPreviewsRunning}
+              onPreviewWithoutHotReload={props.launchNewPreview}
+              onNetworkPreview={props.launchNetworkPreview}
+              onHotReloadPreview={props.launchHotReloadPreview}
+              onLaunchPreviewWithDiagnosticReport={
+                props.launchPreviewWithDiagnosticReport
+              }
+              canDoNetworkPreview={props.canDoNetworkPreview}
+              setPreviewOverride={props.setPreviewOverride}
+              isPreviewEnabled={
+                !!props.currentProject &&
+                props.currentProject.getLayoutsCount() > 0
+              }
+              previewState={props.previewState}
+              onOpenVersionHistory={props.openVersionHistoryPanel}
+              checkedOutVersionStatus={props.checkedOutVersionStatus}
+              onQuitVersionHistory={props.onQuitVersionHistory}
+              canQuitVersionHistory={!props.isSavingProject}
+              toolbarButtons={props.toolbarButtons}
+              projectPath={props.projectPath}
+            />
             <div
               style={{
                 display: 'flex',
@@ -374,10 +330,10 @@ const ExternalEditorWindow = (props: Props): React.Node => {
                 </ErrorBoundary>
               </CommandsContextScopedProvider>
             </div>
-          </SpecificDimensionsWindowSizeProvider>
-        </div>
-      </FullThemeProvider>
-    </WindowPortal>
+          </FullThemeProvider>
+        </SpecificDimensionsWindowSizeProvider>
+      )}
+    />
   );
 };
 

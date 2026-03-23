@@ -844,7 +844,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     const selectedInstanceObjectName = this.instancesSelection
       .getSelectedInstances()[0]
       .getObjectName();
-    this.editObjectByName(selectedInstanceObjectName);
+    this.editObjectByName({
+      objectName: selectedInstanceObjectName,
+      initialTab: 'properties',
+      shouldSelectTheObject: false,
+    });
   };
 
   editLayerEffects = (layer: ?gdLayer) => {
@@ -907,11 +911,15 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  editObjectByName = (
+  editObjectByName = ({
+    objectName,
+    initialTab,
+    shouldSelectTheObject,
+  }: {
     objectName: string,
-    initialTab?: ObjectEditorTab,
-    shouldSelectTheObject?: boolean
-  ) => {
+    initialTab: ObjectEditorTab,
+    shouldSelectTheObject: boolean,
+  }) => {
     const { globalObjectsContainer, objectsContainer } = this.props;
     let global = false;
     let container = null;
@@ -1283,7 +1291,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstanceDoubleClicked = (instance: gdInitialInstance) => {
-    this.editObjectByName(instance.getObjectName());
+    this.editObjectByName({
+      objectName: instance.getObjectName(),
+      initialTab: 'properties',
+      shouldSelectTheObject: true,
+    });
   };
 
   _onInstancesMovedAndSendToEditor3D = (
@@ -2393,20 +2405,40 @@ export default class SceneEditor extends React.Component<Props, State> {
         { type: 'separator' },
         {
           label: i18n._(t`Edit object ${shortenString(objectName, 14)}`),
-          click: () => this.editObjectByName(objectName, 'properties', true),
+          click: () =>
+            this.editObjectByName({
+              objectName,
+              initialTab: 'properties',
+              shouldSelectTheObject: true,
+            }),
         },
         {
           label: i18n._(t`Edit object variables`),
-          click: () => this.editObjectByName(objectName, 'variables', true),
+          click: () =>
+            this.editObjectByName({
+              objectName,
+              initialTab: 'variables',
+              shouldSelectTheObject: true,
+            }),
         },
         {
           label: i18n._(t`Edit behaviors`),
-          click: () => this.editObjectByName(objectName, 'behaviors', true),
+          click: () =>
+            this.editObjectByName({
+              objectName,
+              initialTab: 'behaviors',
+              shouldSelectTheObject: true,
+            }),
         },
         objectMetadata
           ? {
               label: i18n._(t`Edit effects`),
-              click: () => this.editObjectByName(objectName, 'effects', true),
+              click: () =>
+                this.editObjectByName({
+                  objectName,
+                  initialTab: 'effects',
+                  shouldSelectTheObject: true,
+                }),
               enabled: objectMetadata.hasDefaultBehavior(
                 'EffectCapability::EffectBehavior'
               ),

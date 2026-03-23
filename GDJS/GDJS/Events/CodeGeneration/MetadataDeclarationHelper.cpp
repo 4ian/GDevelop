@@ -76,7 +76,7 @@ void MetadataDeclarationHelper::DeclareExtensionDependencies(
 }
 
 const gd::String MetadataDeclarationHelper::defaultExtensionIconPath =
-    "res/function24.png";
+    "res/functions/extension_black.svg";
 
 const gd::String &MetadataDeclarationHelper::GetExtensionIconUrl(
     gd::PlatformExtension &extension) {

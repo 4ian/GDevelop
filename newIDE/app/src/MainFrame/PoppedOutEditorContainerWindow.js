@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { type ToolbarInterface } from './Toolbar';
+import Toolbar, { type ToolbarInterface } from './Toolbar';
 import ToolbarTitlebar from './ToolbarTitlebar';
 import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
 import ErrorBoundary, {
@@ -109,35 +109,39 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
             <PoppedOutWindowBackgroundColor />
             <CommandPalette ref={localCommandPaletteRef} />
             <ToolbarTitlebar
-              ref={toolbarRef}
               onPopIn={() => onPopIn(editorTab)}
-              toolbarProps={{
-                hidden: false,
-                showProjectButtons: false,
-                canSave: props.canSave,
-                onSave: props.saveProject,
-                openShareDialog: () => props.openShareDialog(),
-                isSharingEnabled: props.isSharingEnabled,
-                onOpenDebugger: props.launchDebuggerAndPreview,
-                hasPreviewsRunning: props.hasPreviewsRunning,
-                onPreviewWithoutHotReload: props.launchNewPreview,
-                onNetworkPreview: props.launchNetworkPreview,
-                onHotReloadPreview: props.launchHotReloadPreview,
-                onLaunchPreviewWithDiagnosticReport:
-                  props.launchPreviewWithDiagnosticReport,
-                canDoNetworkPreview: props.canDoNetworkPreview,
-                setPreviewOverride: props.setPreviewOverride,
-                isPreviewEnabled:
-                  !!props.currentProject &&
-                  props.currentProject.getLayoutsCount() > 0,
-                previewState: props.previewState,
-                onOpenVersionHistory: props.openVersionHistoryPanel,
-                checkedOutVersionStatus: props.checkedOutVersionStatus,
-                onQuitVersionHistory: props.onQuitVersionHistory,
-                canQuitVersionHistory: !props.isSavingProject,
-                toolbarButtons: props.toolbarButtons,
-                projectPath: props.projectPath,
-              }}
+              renderToolbar={() => (
+                <Toolbar
+                  ref={toolbarRef}
+                  hidden={false}
+                  showProjectButtons={false}
+                  canSave={props.canSave}
+                  onSave={props.saveProject}
+                  openShareDialog={() => props.openShareDialog()}
+                  isSharingEnabled={props.isSharingEnabled}
+                  onOpenDebugger={props.launchDebuggerAndPreview}
+                  hasPreviewsRunning={props.hasPreviewsRunning}
+                  onPreviewWithoutHotReload={props.launchNewPreview}
+                  onNetworkPreview={props.launchNetworkPreview}
+                  onHotReloadPreview={props.launchHotReloadPreview}
+                  onLaunchPreviewWithDiagnosticReport={
+                    props.launchPreviewWithDiagnosticReport
+                  }
+                  canDoNetworkPreview={props.canDoNetworkPreview}
+                  setPreviewOverride={props.setPreviewOverride}
+                  isPreviewEnabled={
+                    !!props.currentProject &&
+                    props.currentProject.getLayoutsCount() > 0
+                  }
+                  previewState={props.previewState}
+                  onOpenVersionHistory={props.openVersionHistoryPanel}
+                  checkedOutVersionStatus={props.checkedOutVersionStatus}
+                  onQuitVersionHistory={props.onQuitVersionHistory}
+                  canQuitVersionHistory={!props.isSavingProject}
+                  toolbarButtons={props.toolbarButtons}
+                  projectPath={props.projectPath}
+                />
+              )}
             />
             <div
               style={{

@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react';
 import { t } from '@lingui/macro';
-import Toolbar, { type ToolbarInterface } from './Toolbar';
-import type { MainFrameToolbarProps } from './Toolbar';
 import IconButton from '../UI/IconButton';
 import PopInIcon from '../UI/CustomSvgIcons/PopIn';
 import {
@@ -21,7 +19,7 @@ const styles = {
 };
 
 type Props = {|
-  toolbarProps: MainFrameToolbarProps,
+  renderToolbar: () => React.Node,
   onPopIn: () => void,
 |};
 
@@ -30,35 +28,32 @@ type Props = {|
  * window controls (like TabsTitlebar does for the main window), the Toolbar,
  * and a pop-in icon button.
  */
-const ToolbarTitlebar = React.forwardRef<Props, ToolbarInterface>(
-  function ToolbarTitlebar({ toolbarProps, onPopIn }: Props, ref) {
-    const gdevelopTheme = React.useContext(GDevelopThemeContext);
+export default function ToolbarTitlebar({
+  renderToolbar,
+  onPopIn,
+}: Props): React.MixedElement {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-    return (
-      <div
-        className="title-bar-draggable-part"
-        style={{
-          ...styles.container,
-          backgroundColor: gdevelopTheme.toolbar.backgroundColor,
-        }}
+  return (
+    <div
+      className="title-bar-draggable-part"
+      style={{
+        ...styles.container,
+        backgroundColor: gdevelopTheme.toolbar.backgroundColor,
+      }}
+    >
+      <TitleBarLeftSafeMargins />
+      <IconButton
+        size="small"
+        onClick={onPopIn}
+        tooltip={t`Pop back into main window`}
+        color="default"
+        className="title-bar-non-draggable-part"
       >
-        <TitleBarLeftSafeMargins />
-        <IconButton
-          size="small"
-          onClick={onPopIn}
-          tooltip={t`Pop back into main window`}
-          color="default"
-          className="title-bar-non-draggable-part"
-        >
-          <PopInIcon />
-        </IconButton>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <Toolbar ref={ref} {...toolbarProps} />
-        </div>
-        <TitleBarRightSafeMargins />
-      </div>
-    );
-  }
-);
-
-export default ToolbarTitlebar;
+        <PopInIcon />
+      </IconButton>
+      <div style={{ flex: 1, minWidth: 0 }}>{renderToolbar()}</div>
+      <TitleBarRightSafeMargins />
+    </div>
+  );
+}

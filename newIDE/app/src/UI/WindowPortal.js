@@ -92,6 +92,14 @@ const WindowPortal = ({
     if (externalWindow.document.head)
       externalWindow.document.head.appendChild(baseTag);
 
+    // Add a <meta name="theme-color"> tag so that
+    // Window.setWindowBackgroundColor can update it for this window.
+    const metaThemeColor = externalWindow.document.createElement('meta');
+    metaThemeColor.name = 'theme-color';
+    metaThemeColor.content = '#000000';
+    if (externalWindow.document.head)
+      externalWindow.document.head.appendChild(metaThemeColor);
+
     // Create a container div in the new window.
     const containerDiv = externalWindow.document.createElement('div');
     containerDiv.id = 'window-portal-root';

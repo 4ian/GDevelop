@@ -20,7 +20,7 @@ type YesNoCancelDialogChoice = 'yes' | 'no' | 'cancel';
  */
 export const POSITIONAL_ARGUMENTS_KEY = '_';
 
-let currentWindowBackgroundColor: ?string = null;
+const windowBackgroundColors: WeakMap<Document, string> = new WeakMap();
 
 const onChangeCallbacks = new Set<() => void>();
 let debouncedGeometryChange = null;
@@ -100,15 +100,21 @@ export default class Window {
     targetDocument?: Document
   ) {
     const doc = targetDocument || document;
-    const isMainWindow = doc === document;
 
-    if (isMainWindow && currentWindowBackgroundColor === newColor) {
+    if (windowBackgroundColors.get(doc) === newColor) {
       // Avoid potentially expensive DOM query/modification if no changes needed.
       return;
     }
 
-    if (isMainWindow && ipcRenderer) {
+    if (doc === document && ipcRenderer) {
       // Update the window controls colors on Windows.
+      // Note: this IPC call only affects the main BrowserWindow. Popped-out
+      // editor windows are opened via window.open (not new BrowserWindow),
+      // so they share the same Electron window and don't need their own
+      // titlebar overlay options. If popped-out windows were ever moved to
+      // separate BrowserWindows, we would need to pass the target
+      // BrowserWindow's webContents id to the main process so it can call
+      // setTitleBarOverlay on the correct window.
       ipcRenderer.invoke('titlebar-set-overlay-options', {
         color: newColor,
         // $FlowFixMe[incompatible-type]
@@ -134,9 +140,7 @@ export default class Window {
       doc.documentElement.style.backgroundColor = newColor;
     }
 
-    if (isMainWindow) {
-      currentWindowBackgroundColor = newColor;
-    }
+    windowBackgroundColors.set(doc, newColor);
   }
 
   static setBounds(x: number, y: number, width: number, height: number) {

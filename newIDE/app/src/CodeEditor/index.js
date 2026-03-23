@@ -42,6 +42,8 @@ export class CodeEditor extends React.Component<Props, State> {
     error: null,
   };
 
+  _editor: any = null;
+
   setupEditorThemes = (monaco: any) => {
     if (!monacoThemesInitialized) {
       monacoThemesInitialized = true;
@@ -65,16 +67,32 @@ export class CodeEditor extends React.Component<Props, State> {
     editor.onDidFocusEditorText(this.props.onFocus);
   };
 
+  /**
+   * Force Monaco to synchronously recalculate layout and repaint all content.
+   * This is needed when the editor lives inside a popped-out window (React
+   * portal) because Monaco defers its content rendering to
+   * requestAnimationFrame on the *main* window, which browsers throttle when
+   * that window loses focus to the popped-out window.
+   */
+  _forceEditorLayoutAndRender = () => {
+    if (!this._editor) return;
+    this._editor.layout();
+    // render(true) forces an immediate, synchronous repaint of all view
+    // parts (lines, line numbers, decorations…) without waiting for rAF.
+    if (typeof this._editor.render === 'function') {
+      this._editor.render(true);
+    }
+  };
+
   setupEditorCompletions = (editor: any, monaco: any) => {
+    this._editor = editor;
     this.setUpEditorFocus(editor);
     this.setUpSaveOnEditorBlur(editor);
 
-    // When the editor is rendered inside a popped-out window (via React portal),
-    // Monaco's CSS may arrive slightly after mount. Schedule a delayed layout
-    // recalculation to ensure the editor renders correctly.
-    setTimeout(() => {
-      editor.layout();
-    }, 100);
+    // Schedule forced renders to handle the popped-out window case where
+    // styles are copied asynchronously and rAF may be throttled.
+    setTimeout(this._forceEditorLayoutAndRender, 80);
+    setTimeout(this._forceEditorLayoutAndRender, 300);
 
     if (!monacoCompletionsInitialized) {
       monacoCompletionsInitialized = true;
@@ -110,6 +128,20 @@ export class CodeEditor extends React.Component<Props, State> {
 
   componentDidMount() {
     this.loadMonacoEditor();
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    // When width or height change (e.g. react-measure provides the real
+    // container size after the initial render), react-monaco-editor calls
+    // editor.layout() but defers the repaint to rAF. Force a synchronous
+    // render so content appears immediately in popped-out windows.
+    if (
+      this._editor &&
+      (this.props.width !== prevProps.width ||
+        this.props.height !== prevProps.height)
+    ) {
+      this._forceEditorLayoutAndRender();
+    }
   }
 
   handleLoadError(error: Error) {

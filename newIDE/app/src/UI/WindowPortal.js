@@ -278,7 +278,6 @@ function copyDocumentStyles(
     mutations.forEach(mutation => {
       mutation.addedNodes.forEach(node => {
         if (node.nodeName === 'STYLE') {
-          // $FlowFixMe - node is an HTMLStyleElement here
           const styleNode: HTMLStyleElement = (node: any);
           // Some libraries add empty <style> elements and then populate
           // them via insertRule(). Delay slightly to allow rules to be added.

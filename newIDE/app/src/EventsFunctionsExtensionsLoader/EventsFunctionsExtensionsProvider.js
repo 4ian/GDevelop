@@ -78,6 +78,7 @@ export const EventsFunctionsExtensionsProvider = ({
     // promise never settles (e.g. due to a crash during code generation
     // or a stuck write operation).
     return Promise.race([
+      // $FlowFixMe[incompatible-use] - we just check it was not null.
       lastLoadPromise.current.then(() => {
         console.info('Events functions extensions finished loading.');
       }),
@@ -100,7 +101,7 @@ export const EventsFunctionsExtensionsProvider = ({
       const previousLastLoadPromise =
         lastLoadPromise.current || Promise.resolve();
 
-      const currentPromise = previousLastLoadPromise
+      const currentPromise: Promise<void> = previousLastLoadPromise
         .then(() =>
           loadProjectEventsFunctionsExtensions(
             project,

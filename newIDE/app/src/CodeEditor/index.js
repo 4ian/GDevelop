@@ -7,6 +7,8 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import PortalContainerContext from '../UI/PortalContainerContext';
+import PoppedOutMonacoEditor from './PoppedOutMonacoEditor';
 import { getAllThemes } from './Theme';
 
 export type State = {|
@@ -41,8 +43,6 @@ export class CodeEditor extends React.Component<Props, State> {
     MonacoEditor: null,
     error: null,
   };
-  _editor: any = null;
-  _poppedOutLayoutTimers: Array<TimeoutID> = [];
 
   setupEditorThemes = (monaco: any) => {
     if (!monacoThemesInitialized) {
@@ -68,29 +68,8 @@ export class CodeEditor extends React.Component<Props, State> {
   };
 
   setupEditorCompletions = (editor: any, monaco: any) => {
-    this._editor = editor;
     this.setUpEditorFocus(editor);
     this.setUpSaveOnEditorBlur(editor);
-
-    // When the editor is rendered inside a popped-out window (via React portal),
-    // CSS styles may not be immediately available in the new window's document.
-    // Schedule layout refreshes so Monaco re-computes dimensions and renders
-    // content correctly once styles have been copied over.
-    const domNode = editor.getDomNode();
-    if (domNode && domNode.ownerDocument !== document) {
-      const forceLayout = () => {
-        if (editor.getDomNode()) {
-          editor.layout();
-        }
-      };
-      // Retry at increasing intervals to handle async style copying.
-      this._poppedOutLayoutTimers = [
-        setTimeout(forceLayout, 50),
-        setTimeout(forceLayout, 150),
-        setTimeout(forceLayout, 500),
-      ];
-    }
-
     if (!monacoCompletionsInitialized) {
       monacoCompletionsInitialized = true;
 
@@ -125,11 +104,6 @@ export class CodeEditor extends React.Component<Props, State> {
 
   componentDidMount() {
     this.loadMonacoEditor();
-  }
-
-  componentWillUnmount() {
-    this._poppedOutLayoutTimers.forEach(timer => clearTimeout(timer));
-    this._poppedOutLayoutTimers = [];
   }
 
   handleLoadError(error: Error) {
@@ -169,53 +143,86 @@ export class CodeEditor extends React.Component<Props, State> {
   };
 
   render(): any {
-    const { MonacoEditor, error } = this.state;
-    if (error) {
-      return (
-        <React.Fragment>
-          <Text>
-            <Trans>Unable to load the code editor</Trans>
-          </Text>
-          <RaisedButton
-            label={<Trans>Retry</Trans>}
-            // $FlowFixMe[method-unbinding]
-            onClick={this.loadMonacoEditor}
-          />
-        </React.Fragment>
-      );
-    }
-
-    if (!MonacoEditor) {
-      return <PlaceholderLoader />;
-    }
-
     return (
-      <div onContextMenu={this._handleContextMenu}>
-        <PreferencesContext.Consumer>
-          {({ values: preferences }) => (
-            <MonacoEditor
-              width={this.props.width || 600}
-              height={this.props.height || 200}
-              language="javascript"
-              theme={preferences.codeEditorThemeName}
-              value={this.props.value}
-              onChange={this.props.onChange}
-              editorWillMount={this.setupEditorThemes}
-              editorDidMount={this.setupEditorCompletions}
-              options={{
-                ...monacoEditorOptions,
-                fontSize: preferences.eventsSheetZoomLevel,
+      <PortalContainerContext.Consumer>
+        {portalContainer => {
+          // When rendered inside a popped-out window (PortalContainerContext
+          // is set), use PoppedOutMonacoEditor which loads Monaco via the
+          // AMD loader in the target window's context. This is necessary
+          // because the webpack-bundled Monaco (react-monaco-editor) has
+          // internal DOM checks that compare against the main window's
+          // document.body — elements in a different window's document are
+          // treated as detached and never rendered.
+          if (portalContainer) {
+            return (
+              <PreferencesContext.Consumer>
+                {({ values: preferences }) => (
+                  <PoppedOutMonacoEditor
+                    value={this.props.value}
+                    onChange={this.props.onChange}
+                    width={this.props.width || 600}
+                    height={this.props.height || 200}
+                    theme={preferences.codeEditorThemeName}
+                    fontSize={preferences.eventsSheetZoomLevel}
+                    onEditorMounted={this.props.onEditorMounted}
+                    onFocus={this.props.onFocus}
+                    onBlur={this.props.onBlur}
+                  />
+                )}
+              </PreferencesContext.Consumer>
+            );
+          }
 
-                // Wrap the code at either the viewport width
-                // (so no need to scroll horizontally
-                // on small code editors) or at 80 columns max
-                // (as a good practice).
-                wordWrap: 'on',
-              }}
-            />
-          )}
-        </PreferencesContext.Consumer>
-      </div>
+          const { MonacoEditor, error } = this.state;
+          if (error) {
+            return (
+              <React.Fragment>
+                <Text>
+                  <Trans>Unable to load the code editor</Trans>
+                </Text>
+                <RaisedButton
+                  label={<Trans>Retry</Trans>}
+                  // $FlowFixMe[method-unbinding]
+                  onClick={this.loadMonacoEditor}
+                />
+              </React.Fragment>
+            );
+          }
+
+          if (!MonacoEditor) {
+            return <PlaceholderLoader />;
+          }
+
+          return (
+            <div onContextMenu={this._handleContextMenu}>
+              <PreferencesContext.Consumer>
+                {({ values: preferences }) => (
+                  <MonacoEditor
+                    width={this.props.width || 600}
+                    height={this.props.height || 200}
+                    language="javascript"
+                    theme={preferences.codeEditorThemeName}
+                    value={this.props.value}
+                    onChange={this.props.onChange}
+                    editorWillMount={this.setupEditorThemes}
+                    editorDidMount={this.setupEditorCompletions}
+                    options={{
+                      ...monacoEditorOptions,
+                      fontSize: preferences.eventsSheetZoomLevel,
+
+                      // Wrap the code at either the viewport width
+                      // (so no need to scroll horizontally
+                      // on small code editors) or at 80 columns max
+                      // (as a good practice).
+                      wordWrap: 'on',
+                    }}
+                  />
+                )}
+              </PreferencesContext.Consumer>
+            </div>
+          );
+        }}
+      </PortalContainerContext.Consumer>
     );
   }
 }

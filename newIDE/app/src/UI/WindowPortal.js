@@ -84,6 +84,14 @@ const WindowPortal = ({
     // Set up the new window's document.
     externalWindow.document.title = title;
 
+    // Set a <base> tag so that relative URLs (e.g. script src for Monaco
+    // AMD loader) resolve against the main window's origin, since the
+    // popped-out window starts as about:blank.
+    const baseTag = externalWindow.document.createElement('base');
+    baseTag.href = window.location.href;
+    if (externalWindow.document.head)
+      externalWindow.document.head.appendChild(baseTag);
+
     // Create a container div in the new window.
     const containerDiv = externalWindow.document.createElement('div');
     containerDiv.id = 'window-portal-root';

@@ -345,11 +345,11 @@ const PoppedOutWindowBackgroundColor = () => {
   React.useEffect(
     () => {
       Window.setWindowBackgroundColor(
-        gdevelopTheme.surface.window.backgroundColor,
+        gdevelopTheme.toolbar.backgroundColor,
         portalContainer ? portalContainer.ownerDocument : undefined
       );
     },
-    [gdevelopTheme.surface.window.backgroundColor, portalContainer]
+    [gdevelopTheme.toolbar.backgroundColor, portalContainer]
   );
 
   return null;

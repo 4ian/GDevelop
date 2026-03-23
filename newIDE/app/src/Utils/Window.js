@@ -95,10 +95,7 @@ export default class Window {
     }
   }
 
-  static setWindowBackgroundColor(
-    newColor: string,
-    targetDocument?: Document
-  ) {
+  static setWindowBackgroundColor(newColor: string, targetDocument?: Document) {
     const doc = targetDocument || document;
 
     if (windowBackgroundColors.get(doc) === newColor) {
@@ -108,13 +105,6 @@ export default class Window {
 
     if (doc === document && ipcRenderer) {
       // Update the window controls colors on Windows.
-      // Note: this IPC call only affects the main BrowserWindow. Popped-out
-      // editor windows are opened via window.open (not new BrowserWindow),
-      // so they share the same Electron window and don't need their own
-      // titlebar overlay options. If popped-out windows were ever moved to
-      // separate BrowserWindows, we would need to pass the target
-      // BrowserWindow's webContents id to the main process so it can call
-      // setTitleBarOverlay on the correct window.
       ipcRenderer.invoke('titlebar-set-overlay-options', {
         color: newColor,
         // $FlowFixMe[incompatible-type]

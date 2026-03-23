@@ -4366,6 +4366,13 @@ interface JsCodeEvent {
     boolean IsFolded();
     void SetFolded(boolean folded);
 
+    long GetScrollTop();
+    void SetScrollTop(long value);
+    long GetCursorColumn();
+    void SetCursorColumn(long value);
+    long GetCursorLine();
+    void SetCursorLine(long value);
+
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };

@@ -3242,6 +3242,12 @@ export class JsCodeEvent extends EmscriptenObject {
   setDisabled(disable: boolean): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
+  getScrollTop(): number;
+  setScrollTop(value: number): void;
+  getCursorColumn(): number;
+  setCursorColumn(value: number): void;
+  getCursorLine(): number;
+  setCursorLine(value: number): void;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
 }

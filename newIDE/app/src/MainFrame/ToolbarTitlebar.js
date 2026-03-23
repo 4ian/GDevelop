@@ -15,6 +15,7 @@ const styles = {
     flexShrink: 0,
     alignItems: 'center',
     position: 'relative', // to ensure it is displayed above any global iframe
+    paddingLeft: 4,
   },
 };
 
@@ -52,7 +53,12 @@ export default function ToolbarTitlebar({
       >
         <PopInIcon />
       </IconButton>
-      <div style={{ flex: 1, minWidth: 0 }}>{renderToolbar()}</div>
+      <div
+        className="title-bar-non-draggable-part"
+        style={{ flex: 1, minWidth: 0 }}
+      >
+        {renderToolbar()}
+      </div>
       <TitleBarRightSafeMargins />
     </div>
   );

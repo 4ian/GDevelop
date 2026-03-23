@@ -63,6 +63,7 @@ const loadMonacoInWindow = (targetWindow: any, doc: Document): Promise<any> => {
     script.onload = () => {
       const amdRequire = targetWindow.require;
       if (!amdRequire || !amdRequire.config) {
+        // $FlowFixMe[unsafe-object-assign]
         Object.assign(targetWindow, savedGlobals);
         const err = new Error(
           'PoppedOutMonacoEditor: AMD loader not available after script load.'
@@ -88,6 +89,7 @@ const loadMonacoInWindow = (targetWindow: any, doc: Document): Promise<any> => {
       });
     };
     script.onerror = () => {
+      // $FlowFixMe[unsafe-object-assign]
       Object.assign(targetWindow, savedGlobals);
       const err = new Error(
         'PoppedOutMonacoEditor: Failed to load Monaco AMD loader.'
@@ -177,13 +179,15 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
     const targetWindow: any = container.ownerDocument.defaultView;
     if (!targetWindow) return;
 
-    loadMonacoInWindow(targetWindow, container.ownerDocument).then(monaco => {
-      // Component may have unmounted while loading.
-      if (this._unmounted || !this._containerRef.current) return;
-      this._createEditor(monaco, this._containerRef.current);
-    }).catch(error => {
-      console.error('PoppedOutMonacoEditor: failed to load Monaco:', error);
-    });
+    loadMonacoInWindow(targetWindow, container.ownerDocument)
+      .then(monaco => {
+        // Component may have unmounted while loading.
+        if (this._unmounted || !this._containerRef.current) return;
+        this._createEditor(monaco, this._containerRef.current);
+      })
+      .catch(error => {
+        console.error('PoppedOutMonacoEditor: failed to load Monaco:', error);
+      });
   };
 
   _createEditor = (monaco: any, container: HTMLDivElement) => {

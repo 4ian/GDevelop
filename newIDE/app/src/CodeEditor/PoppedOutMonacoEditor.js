@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
+import { setupAutocompletions } from './LocalCodeEditorAutocompletions';
 import { getAllThemes } from './Theme';
 
 type Props = {|
@@ -18,6 +19,10 @@ type Props = {|
 type State = {|
   loading: boolean,
 |};
+
+// Track whether completions have been set up for the AMD-loaded Monaco
+// instance (separate from the webpack-bundled one in the main window).
+let amdMonacoCompletionsInitialized = false;
 
 /**
  * Monaco editor component that loads Monaco via the AMD loader in the current
@@ -174,6 +179,23 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
         }
       }
     });
+
+    // Set up compiler options and autocompletions (same as
+    // setupEditorCompletions in CodeEditor/index.js). This AMD-loaded
+    // Monaco instance is separate from the webpack-bundled one, so it
+    // needs its own setup.
+    if (!amdMonacoCompletionsInitialized) {
+      amdMonacoCompletionsInitialized = true;
+
+      monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+        target: monaco.languages.typescript.ScriptTarget.ES6,
+        allowNonTsExtensions: true,
+        allowJs: true,
+        checkJs: true,
+      });
+
+      setupAutocompletions(monaco);
+    }
 
     this._editor = monaco.editor.create(container, {
       value: this.props.value,

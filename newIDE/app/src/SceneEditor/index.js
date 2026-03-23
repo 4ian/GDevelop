@@ -907,15 +907,34 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  editObjectByName = (objectName: string, initialTab?: ObjectEditorTab) => {
+  editObjectByName = (
+    objectName: string,
+    initialTab?: ObjectEditorTab,
+    shouldSelectTheObject?: boolean
+  ) => {
     const { globalObjectsContainer, objectsContainer } = this.props;
-    if (objectsContainer.hasObjectNamed(objectName))
-      this.editObject(objectsContainer.getObject(objectName), initialTab);
-    else if (
+    let global = false;
+    let container = null;
+    if (objectsContainer.hasObjectNamed(objectName)) {
+      container = objectsContainer;
+    } else if (
       globalObjectsContainer &&
       globalObjectsContainer.hasObjectNamed(objectName)
-    )
-      this.editObject(globalObjectsContainer.getObject(objectName), initialTab);
+    ) {
+      global = true;
+      container = globalObjectsContainer;
+    } else {
+      return;
+    }
+    this.editObject(container.getObject(objectName), initialTab);
+    if (shouldSelectTheObject) {
+      this._onObjectFolderOrObjectWithContextSelected({
+        objectFolderOrObject: container
+          .getRootFolder()
+          .getObjectNamed(objectName),
+        global,
+      });
+    }
   };
 
   editObjectInPropertiesPanel = (objectName: string) => {
@@ -2374,20 +2393,20 @@ export default class SceneEditor extends React.Component<Props, State> {
         { type: 'separator' },
         {
           label: i18n._(t`Edit object ${shortenString(objectName, 14)}`),
-          click: () => this.editObjectByName(objectName, 'properties'),
+          click: () => this.editObjectByName(objectName, 'properties', true),
         },
         {
           label: i18n._(t`Edit object variables`),
-          click: () => this.editObjectByName(objectName, 'variables'),
+          click: () => this.editObjectByName(objectName, 'variables', true),
         },
         {
           label: i18n._(t`Edit behaviors`),
-          click: () => this.editObjectByName(objectName, 'behaviors'),
+          click: () => this.editObjectByName(objectName, 'behaviors', true),
         },
         objectMetadata
           ? {
               label: i18n._(t`Edit effects`),
-              click: () => this.editObjectByName(objectName, 'effects'),
+              click: () => this.editObjectByName(objectName, 'effects', true),
               enabled: objectMetadata.hasDefaultBehavior(
                 'EffectCapability::EffectBehavior'
               ),

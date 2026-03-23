@@ -28,3 +28,94 @@ diff --git a/node_modules/monaco-editor/esm/vs/editor/contrib/clipboard/clipboar
      };
      return ExecCommandAction;
  }(EditorAction));
+diff --git a/node_modules/monaco-editor/esm/vs/base/browser/dom.js b/node_modules/monaco-editor/esm/vs/base/browser/dom.js
+--- a/node_modules/monaco-editor/esm/vs/base/browser/dom.js
++++ b/node_modules/monaco-editor/esm/vs/base/browser/dom.js
+@@ -46,15 +46,28 @@
+ import { TimeoutTimer, dispose } from '../common/lifecycle';
+ import * as platform from '../common/platform';
+ import { StandardKeyboardEvent } from './keyboardEvent';
++function getWindowForHTMLElement(node) {
++    var ownerDocument = node && node.ownerDocument ? node.ownerDocument : document;
++    return ownerDocument.defaultView || window;
++}
++function getDocumentForHTMLElement(node) {
++    return node && node.ownerDocument ? node.ownerDocument : document;
++}
+ export function isInDOM(node) {
++    var ownerDocument = getDocumentForHTMLElement(node);
+     while (node) {
+-        if (node === document.body) {
++        if (node === ownerDocument.body) {
+             return true;
+         }
+         node = node.parentNode;
+     }
+     return false;
+ }
+ var _manualClassList = new /** @class */ (function () {
+@@ -445,7 +458,7 @@
+ export function addDisposableThrottledListener(node, type, handler, eventMerger, minimumTimeMs) {
+     return new TimeoutThrottledDomListener(node, type, handler, eventMerger, minimumTimeMs);
+ }
+ export function getComputedStyle(el) {
+-    return document.defaultView.getComputedStyle(el, null);
++    return getWindowForHTMLElement(el).getComputedStyle(el, null);
+ }
+ // Adapted from WinJS
+ // Converts a CSS positioning string for the specified element to pixels.
+@@ -477,17 +490,19 @@
+     }
+     return convertToPixels(element, value);
+ }
+ export function getClientArea(element) {
++    var ownerDocument = getDocumentForHTMLElement(element);
++    var ownerWindow = getWindowForHTMLElement(element);
+     // Try with DOM clientWidth / clientHeight
+-    if (element !== document.body) {
++    if (element !== ownerDocument.body) {
+         return new Dimension(element.clientWidth, element.clientHeight);
+     }
+     // Try innerWidth / innerHeight
+-    if (window.innerWidth && window.innerHeight) {
+-        return new Dimension(window.innerWidth, window.innerHeight);
++    if (ownerWindow.innerWidth && ownerWindow.innerHeight) {
++        return new Dimension(ownerWindow.innerWidth, ownerWindow.innerHeight);
+     }
+     // Try with document.body.clientWidth / document.body.clientHeigh
+-    if (document.body && document.body.clientWidth && document.body.clientWidth) {
+-        return new Dimension(document.body.clientWidth, document.body.clientHeight);
++    if (ownerDocument.body && ownerDocument.body.clientWidth && ownerDocument.body.clientWidth) {
++        return new Dimension(ownerDocument.body.clientWidth, ownerDocument.body.clientHeight);
+     }
+     // Try with document.documentElement.clientWidth / document.documentElement.clientHeight
+-    if (document.documentElement && document.documentElement.clientWidth && document.documentElement.clientHeight) {
+-        return new Dimension(document.documentElement.clientWidth, document.documentElement.clientHeight);
++    if (ownerDocument.documentElement && ownerDocument.documentElement.clientWidth && ownerDocument.documentElement.clientHeight) {
++        return new Dimension(ownerDocument.documentElement.clientWidth, ownerDocument.documentElement.clientHeight);
+     }
+     throw new Error('Unable to figure out browser width and height');
+ }
+@@ -563,7 +578,8 @@
+ export function getTopLeftOffset(element) {
+     // Adapted from WinJS.Utilities.getPosition
+     // and added borders to the mix
++    var ownerDocument = getDocumentForHTMLElement(element);
+     var offsetParent = element.offsetParent, top = element.offsetTop, left = element.offsetLeft;
+-    while ((element = element.parentNode) !== null && element !== document.body && element !== document.documentElement) {
++    while ((element = element.parentNode) !== null && element !== ownerDocument.body && element !== ownerDocument.documentElement) {
+         top -= element.scrollTop;
+         var c = getComputedStyle(element);
+         if (c) {
+@@ -687,9 +703,10 @@
+ // Adapted from WinJS
+ export function createStyleSheet(container) {
+     if (container === void 0) { container = document.getElementsByTagName('head')[0]; }
+-    var style = document.createElement('style');
++    var ownerDocument = container && container.ownerDocument ? container.ownerDocument : document;
++    var style = ownerDocument.createElement('style');
+     style.type = 'text/css';
+     style.media = 'screen';
+     container.appendChild(style);
+     return style;
+ }

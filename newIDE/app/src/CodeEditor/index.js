@@ -15,7 +15,7 @@ export type State = {|
 |};
 export type Props = {|
   value: string,
-  onChange: string => void,
+  onChange: (string) => void,
   width?: number,
   height?: number,
   onEditorMounted?: () => void,
@@ -36,6 +36,11 @@ let monacoCompletionsInitialized = false;
 let monacoThemesInitialized = false;
 
 export class CodeEditor extends React.Component<Props, State> {
+  _editor: ?any;
+  _editorContainer: ?HTMLDivElement;
+  _layoutAnimationFrameIds: Array<number> = [];
+  _editorWindowResizeListener: ?() => void;
+
   // $FlowFixMe[missing-local-annot]
   state = {
     MonacoEditor: null,
@@ -46,7 +51,7 @@ export class CodeEditor extends React.Component<Props, State> {
     if (!monacoThemesInitialized) {
       monacoThemesInitialized = true;
 
-      getAllThemes().forEach(codeEditorTheme => {
+      getAllThemes().forEach((codeEditorTheme) => {
         // Builtin themes don't have themeData, don't redefine them.
         if (codeEditorTheme.themeData) {
           monaco.editor.defineTheme(
@@ -65,7 +70,54 @@ export class CodeEditor extends React.Component<Props, State> {
     editor.onDidFocusEditorText(this.props.onFocus);
   };
 
+  _scheduleEditorLayout = () => {
+    const editor = this._editor;
+    if (!editor) return;
+
+    editor.layout();
+
+    const editorWindow =
+      this._editorContainer && this._editorContainer.ownerDocument
+        ? this._editorContainer.ownerDocument.defaultView
+        : window;
+
+    if (!editorWindow) return;
+
+    [0, 1, 2].forEach(() => {
+      const animationFrameId = editorWindow.requestAnimationFrame(() => {
+        if (this._editor) {
+          this._editor.layout();
+        }
+        this._layoutAnimationFrameIds = this._layoutAnimationFrameIds.filter(
+          (currentAnimationFrameId) =>
+            currentAnimationFrameId !== animationFrameId
+        );
+      });
+      this._layoutAnimationFrameIds.push(animationFrameId);
+    });
+  };
+
+  _setUpEditorWindowResize = () => {
+    if (this._editorWindowResizeListener) {
+      this._editorWindowResizeListener();
+      this._editorWindowResizeListener = null;
+    }
+
+    const editorWindow =
+      this._editorContainer && this._editorContainer.ownerDocument
+        ? this._editorContainer.ownerDocument.defaultView
+        : window;
+
+    if (!editorWindow) return;
+
+    const resizeListener = () => this._scheduleEditorLayout();
+    editorWindow.addEventListener('resize', resizeListener);
+    this._editorWindowResizeListener = () =>
+      editorWindow.removeEventListener('resize', resizeListener);
+  };
+
   setupEditorCompletions = (editor: any, monaco: any) => {
+    this._editor = editor;
     this.setUpEditorFocus(editor);
     this.setUpSaveOnEditorBlur(editor);
     if (!monacoCompletionsInitialized) {
@@ -97,11 +149,32 @@ export class CodeEditor extends React.Component<Props, State> {
       setupAutocompletions(monaco);
     }
 
+    this._setUpEditorWindowResize();
+    this._scheduleEditorLayout();
+
     if (this.props.onEditorMounted) this.props.onEditorMounted();
   };
 
   componentDidMount() {
     this.loadMonacoEditor();
+  }
+
+  componentWillUnmount() {
+    if (this._editorWindowResizeListener) {
+      this._editorWindowResizeListener();
+      this._editorWindowResizeListener = null;
+    }
+
+    const editorWindow =
+      this._editorContainer && this._editorContainer.ownerDocument
+        ? this._editorContainer.ownerDocument.defaultView
+        : window;
+    if (editorWindow) {
+      this._layoutAnimationFrameIds.forEach((animationFrameId) => {
+        editorWindow.cancelAnimationFrame(animationFrameId);
+      });
+    }
+    this._layoutAnimationFrameIds = [];
   }
 
   handleLoadError(error: Error) {
@@ -118,13 +191,13 @@ export class CodeEditor extends React.Component<Props, State> {
     // Define the global variable used by Monaco Editor to find its worker
     // (used, at least, for auto-completions).
     window.MonacoEnvironment = {
-      getWorkerUrl: function(workerId, label) {
+      getWorkerUrl: function (workerId, label) {
         return 'external/monaco-editor-min/vs/base/worker/workerMain.js';
       },
     };
 
     import(/* webpackChunkName: "react-monaco-editor" */ 'react-monaco-editor')
-      .then(module =>
+      .then((module) =>
         this.setState({
           MonacoEditor: module.default,
         })
@@ -162,7 +235,12 @@ export class CodeEditor extends React.Component<Props, State> {
     }
 
     return (
-      <div onContextMenu={this._handleContextMenu}>
+      <div
+        onContextMenu={this._handleContextMenu}
+        ref={(editorContainer) => {
+          this._editorContainer = editorContainer;
+        }}
+      >
         <PreferencesContext.Consumer>
           {({ values: preferences }) => (
             <MonacoEditor
@@ -176,6 +254,7 @@ export class CodeEditor extends React.Component<Props, State> {
               editorDidMount={this.setupEditorCompletions}
               options={{
                 ...monacoEditorOptions,
+                automaticLayout: true,
                 fontSize: preferences.eventsSheetZoomLevel,
 
                 // Wrap the code at either the viewport width

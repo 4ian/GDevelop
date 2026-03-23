@@ -13,7 +13,7 @@ import WindowPortal from '../UI/WindowPortal';
 import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
 import { type EditorTabsPaneCommonProps } from './EditorTabsPane';
 import IconButton from '../UI/IconButton';
-import OpenInBrowserIcon from '../UI/CustomSvgIcons/OpenInBrowser';
+import PopInIcon from '../UI/CustomSvgIcons/PopIn';
 import { useKeyboardShortcuts } from '../KeyboardShortcuts';
 import CommandPalette, {
   type CommandPaletteInterface,
@@ -118,7 +118,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                   tooltip={t`Pop back into main window`}
                   color="default"
                 >
-                  <OpenInBrowserIcon />
+                  <PopInIcon />
                 </IconButton>
               }
               canSave={props.canSave}

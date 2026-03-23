@@ -75,6 +75,11 @@ const loadMonacoInWindow = (targetWindow: any, doc: Document): Promise<any> => {
 
       // Restore Node.js globals that the AMD loader didn't replace.
       // `require` is now the AMD loader's require — don't overwrite it.
+      // Save the original Node.js require so we can use it for
+      // Electron APIs (e.g. clipboard) later.
+      if (savedGlobals.require) {
+        targetWindow.__gdNodeRequire = savedGlobals.require;
+      }
       if (savedGlobals.module) targetWindow.module = savedGlobals.module;
       if (savedGlobals.exports) targetWindow.exports = savedGlobals.exports;
       if (savedGlobals.process) targetWindow.process = savedGlobals.process;
@@ -165,6 +170,14 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
 
   componentWillUnmount() {
     this._unmounted = true;
+    // Clear the active editor reference used by the paste fix.
+    const container = this._containerRef.current;
+    if (container) {
+      const targetWindow: any = container.ownerDocument.defaultView;
+      if (targetWindow && targetWindow.__gdActiveMonacoEditor === this._editor) {
+        targetWindow.__gdActiveMonacoEditor = null;
+      }
+    }
     if (this._editor) {
       this._editor.dispose();
       this._editor = null;
@@ -214,6 +227,14 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
     this._editor.onDidFocusEditorText(this.props.onFocus);
     this._editor.onDidBlurEditorText(this.props.onBlur);
 
+    // Apply Electron paste fix for the popped-out window.
+    // The ESM build has this fix via patch-package (monaco-editor+0.14.3.patch),
+    // but the AMD build loaded here does not. We monkey-patch
+    // document.execCommand on this window's document so that when
+    // execCommand('paste') fails (newer Chromium/Electron), we fall back to
+    // Electron's clipboard API — mirroring the ESM patch.
+    this._patchPasteForElectron(container);
+
     this._editor.layout({
       width: this.props.width,
       height: this.props.height,
@@ -223,6 +244,54 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
 
     if (this.props.onEditorMounted) {
       this.props.onEditorMounted();
+    }
+  };
+
+  /**
+   * Monkey-patch document.execCommand on the popped-out window so that when
+   * execCommand('paste') returns false (broken in newer Chromium/Electron),
+   * we fall back to reading from Electron's clipboard and inserting via
+   * editor.executeEdits. This mirrors the fix in the ESM patch
+   * (monaco-editor+0.14.3.patch) but for the AMD-loaded build.
+   */
+  _patchPasteForElectron = (container: HTMLDivElement) => {
+    const doc = container.ownerDocument;
+    const targetWindow: any = doc.defaultView;
+    const nodeRequire = targetWindow.__gdNodeRequire;
+    if (!nodeRequire || doc.__gdPastePatched) return;
+
+    doc.__gdPastePatched = true;
+
+    const originalExecCommand = doc.execCommand.bind(doc);
+    doc.execCommand = (command: string, showUI?: boolean, value?: string) => {
+      const result = originalExecCommand(command, showUI, value);
+      if (!result && command === 'paste') {
+        try {
+          const text = nodeRequire('electron').clipboard.readText();
+          if (text && targetWindow.__gdActiveMonacoEditor) {
+            const editor = targetWindow.__gdActiveMonacoEditor;
+            const selection = editor.getSelection();
+            editor.executeEdits('paste', [
+              {
+                range: selection,
+                text: text,
+                forceMoveMarkers: true,
+              },
+            ]);
+          }
+        } catch (e) {
+          // Not in Electron environment, ignore
+        }
+      }
+      return result;
+    };
+
+    // Track this editor as the active one for the paste fallback.
+    targetWindow.__gdActiveMonacoEditor = this._editor;
+    if (this._editor) {
+      this._editor.onDidFocusEditorText(() => {
+        targetWindow.__gdActiveMonacoEditor = this._editor;
+      });
     }
   };
 

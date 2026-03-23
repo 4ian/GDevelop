@@ -31,6 +31,7 @@ const createJssForDocument = (targetDocument: Document) => {
 
   return create({
     plugins: [...jssPreset().plugins, rtl()],
+    // $FlowFixMe[incompatible-type] - insertionPoint is a Comment node but accepted by JSS.
     insertionPoint,
   });
 };

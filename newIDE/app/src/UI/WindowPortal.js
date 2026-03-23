@@ -1,8 +1,10 @@
 // @flow
 import * as React from 'react';
+import { t } from '@lingui/macro';
 import ReactDOM from 'react-dom';
 import PortalContainerContext from './PortalContainerContext';
 import Window from '../Utils/Window';
+import useAlertDialog from './Alert/useAlertDialog';
 
 type Props = {|
   /** The title of the new window. */
@@ -52,6 +54,7 @@ const WindowPortal = ({
     width: number,
     height: number,
   } | null>(null);
+  const { showAlert } = useAlertDialog();
 
   React.useEffect(() => {
     // Guard against calling onClose multiple times.
@@ -68,7 +71,10 @@ const WindowPortal = ({
     const externalWindow = window.open('', '', features);
 
     if (!externalWindow) {
-      console.error('WindowPortal: Failed to open new window (popup blocked?)');
+      showAlert({
+        title: t`Unable to open this window`,
+        message: t`Please check if popups are blocked in your browser settings.`,
+      });
       handleClose();
       return;
     }
@@ -105,13 +111,13 @@ const WindowPortal = ({
     // separately by a dedicated JSS instance in FullThemeProvider (via
     // portalContainer context), so this mainly copies static CSS files
     // and pre-existing global styles.
-    const styleObserver = _copyStyles(document, externalWindow.document);
+    const styleObserver = copyDocumentStyles(document, externalWindow.document);
 
     // Set up context menu in the new window (works for both Electron and web).
     Window.setUpContextMenu(externalWindow);
 
     // Listen for the external window being closed.
-    const checkClosed = setInterval(() => {
+    const checkClosed: IntervalID = setInterval(() => {
       if (externalWindow.closed) {
         clearInterval(checkClosed);
         handleClose();
@@ -191,16 +197,19 @@ const WindowPortal = ({
  * source document to the target document. This ensures Material-UI
  * injected styles and CSS files are available in the new window.
  */
-function _copyStyles(
+function copyDocumentStyles(
   sourceDocument: Document,
   targetDocument: Document
-): MutationObserver {
+): MutationObserver | null {
+  if (!sourceDocument || !targetDocument) return null;
+
   // Copy <style> elements (Material-UI injects styles this way).
   const styleElements = sourceDocument.querySelectorAll('style');
   styleElements.forEach(styleEl => {
     const newStyle = targetDocument.createElement('style');
     newStyle.textContent = styleEl.textContent;
-    targetDocument.head.appendChild(newStyle);
+
+    if (targetDocument.head) targetDocument.head.appendChild(newStyle);
   });
 
   // Copy <link rel="stylesheet"> elements.
@@ -208,11 +217,13 @@ function _copyStyles(
     'link[rel="stylesheet"]'
   );
   linkElements.forEach(linkEl => {
+    if (!(linkEl instanceof HTMLLinkElement)) return;
     const newLink = targetDocument.createElement('link');
     newLink.rel = 'stylesheet';
     newLink.href = linkEl.href;
     if (linkEl.type) newLink.type = linkEl.type;
-    targetDocument.head.appendChild(newLink);
+
+    if (targetDocument.head) targetDocument.head.appendChild(newLink);
   });
 
   // Set up a MutationObserver to copy new <style> elements as they are
@@ -222,7 +233,6 @@ function _copyStyles(
       mutation.addedNodes.forEach(node => {
         if (node.nodeName === 'STYLE') {
           const newStyle = targetDocument.createElement('style');
-          // $FlowFixMe - textContent exists on style nodes
           newStyle.textContent = node.textContent;
           // Copy data attributes that MUI uses to identify style sheets.
           if (node instanceof HTMLElement) {
@@ -231,12 +241,16 @@ function _copyStyles(
             const jssAttr = node.getAttribute('data-jss');
             if (jssAttr) newStyle.setAttribute('data-jss', jssAttr);
           }
-          targetDocument.head.appendChild(newStyle);
+
+          if (targetDocument.head) targetDocument.head.appendChild(newStyle);
         }
       });
     });
   });
-  observer.observe(sourceDocument.head, { childList: true });
+  if (sourceDocument.head)
+    observer.observe(sourceDocument.head, { childList: true });
+  else console.error('copyDocumentStyles: Source document has no head.');
+
   return observer;
 }
 

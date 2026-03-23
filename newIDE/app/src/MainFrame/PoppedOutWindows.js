@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import ExternalEditorWindow from './ExternalEditorWindow';
+import PoppedOutEditorContainerWindow from './PoppedOutEditorContainerWindow';
 import {
   getExternalEditors,
   type EditorTab,
@@ -13,7 +13,7 @@ type Props = {|
   onPopIn: (editorTab: EditorTab) => void,
 |};
 
-const ExternalEditorWindows = (props: Props): React.Node => {
+const PoppedOutWindows = (props: Props): React.Node => {
   const { onClose, onPopIn, ...sharedProps } = props;
   const externalEditors = getExternalEditors(props.editorTabs);
 
@@ -22,7 +22,7 @@ const ExternalEditorWindows = (props: Props): React.Node => {
   return (
     <>
       {externalEditors.map(editorTab => (
-        <ExternalEditorWindow
+        <PoppedOutEditorContainerWindow
           key={`external-${editorTab.key}`}
           editorTab={editorTab}
           onClose={onClose}
@@ -34,4 +34,4 @@ const ExternalEditorWindows = (props: Props): React.Node => {
   );
 };
 
-export default ExternalEditorWindows;
+export default PoppedOutWindows;

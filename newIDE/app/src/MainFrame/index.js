@@ -26,7 +26,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import EditorTabsPane, {
   type EditorTabsPaneCommonProps,
 } from './EditorTabsPane';
-import ExternalEditorWindows from './ExternalEditorWindows';
+import PoppedOutWindows from './PoppedOutWindows';
 import {
   getEditorTabsInitialState,
   openEditorTab,
@@ -5201,7 +5201,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           )}
         />
       </LeaderboardProvider>
-      <ExternalEditorWindows
+      <PoppedOutWindows
         {...editorTabsPaneProps}
         onClose={onExternalWindowClose}
         onPopIn={onPopInTab}

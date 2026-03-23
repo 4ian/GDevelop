@@ -45,8 +45,7 @@ const getPopOutDimensions = (
   };
 };
 
-// TODO: Rename this (and the file) to PoppedOutEditorContainerWindow.
-const ExternalEditorWindow = (props: Props): React.Node => {
+const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
   const { editorTab, onClose, onPopIn } = props;
 
   const toolbarRef = React.useRef<?ToolbarInterface>(null);
@@ -109,14 +108,7 @@ const ExternalEditorWindow = (props: Props): React.Node => {
           <FullThemeProvider>
             <CommandPalette ref={localCommandPaletteRef} />
             <Toolbar
-              ref={ref => {
-                if (!ref) return;
-                toolbarRef.current = ref;
-                if (!initializedToolbar.current && editorTab.editorRef) {
-                  initializedToolbar.current = true;
-                  editorTab.editorRef.updateToolbar();
-                }
-              }}
+              ref={toolbarRef}
               hidden={false}
               showProjectButtons={false}
               customLeftContent={
@@ -178,7 +170,15 @@ const ExternalEditorWindow = (props: Props): React.Node => {
                     project: props.currentProject,
                     fileMetadata: props.currentFileMetadata,
                     storageProvider: props.getStorageProvider(),
-                    ref: editorRef => (editorTab.editorRef = editorRef),
+                    ref: editorRef => {
+                      editorTab.editorRef = editorRef;
+
+                      // Take the opportunity to show the toolbar when the editor is first ready.
+                      if (!initializedToolbar.current && editorTab.editorRef) {
+                        initializedToolbar.current = true;
+                        editorTab.editorRef.updateToolbar();
+                      }
+                    },
                     setToolbar: editorToolbar => {
                       const toolbar = toolbarRef.current;
                       if (toolbar) {
@@ -337,4 +337,4 @@ const ExternalEditorWindow = (props: Props): React.Node => {
   );
 };
 
-export default ExternalEditorWindow;
+export default PoppedOutEditorContainerWindow;

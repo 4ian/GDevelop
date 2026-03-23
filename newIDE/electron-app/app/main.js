@@ -296,6 +296,9 @@ function createNewWindow(windowArgs = args) {
   newWindow.webContents.on('did-create-window', (childWindow) => {
     require('@electron/remote/main').enable(childWindow.webContents);
 
+    // Remove the menu bar from popped-out editor windows.
+    childWindow.setMenu(null);
+
     // Prevent navigation inside child windows.
     childWindow.webContents.on('will-navigate', (e, url) => {
       if (url !== childWindow.webContents.getURL()) {

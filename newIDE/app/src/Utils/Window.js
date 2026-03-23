@@ -103,8 +103,12 @@ export default class Window {
       return;
     }
 
-    if (doc === document && ipcRenderer) {
-      // Update the window controls colors on Windows.
+    if (ipcRenderer) {
+      // Update the window controls and background colors on Windows/Linux.
+      // The main process handler uses BrowserWindow.fromWebContents(event.sender)
+      // to resolve the correct window, so this works for both the main window
+      // and popped-out editor windows (which are real BrowserWindows created
+      // by Electron's setWindowOpenHandler).
       ipcRenderer.invoke('titlebar-set-overlay-options', {
         color: newColor,
         // $FlowFixMe[incompatible-type]

@@ -193,6 +193,54 @@ const WindowPortal = ({
 };
 
 /**
+ * Extract the CSS text from a <style> element, handling both styles
+ * set via textContent and styles injected via CSSStyleSheet.insertRule()
+ * (used by Monaco Editor and other libraries).
+ */
+function extractStyleCssText(styleEl: HTMLStyleElement): string {
+  const text = styleEl.textContent;
+  if (text && text.trim()) return text;
+
+  // For styles added via insertRule(), textContent is empty.
+  // Extract rules from the CSSStyleSheet instead.
+  try {
+    const sheet = styleEl.sheet;
+    if (sheet && sheet.cssRules && sheet.cssRules.length > 0) {
+      let cssText = '';
+      for (let i = 0; i < sheet.cssRules.length; i++) {
+        cssText += sheet.cssRules[i].cssText + '\n';
+      }
+      return cssText;
+    }
+  } catch (e) {
+    // Cross-origin stylesheets may throw SecurityError when
+    // accessing cssRules. Fall back to textContent.
+  }
+
+  return text || '';
+}
+
+/**
+ * Copy a <style> element to the target document, preserving data
+ * attributes used by MUI/JSS.
+ */
+function copyStyleElement(
+  sourceStyleEl: HTMLStyleElement,
+  targetDocument: Document
+) {
+  const newStyle = targetDocument.createElement('style');
+  newStyle.textContent = extractStyleCssText(sourceStyleEl);
+
+  // Copy data attributes that MUI uses to identify style sheets.
+  const metaAttr = sourceStyleEl.getAttribute('data-meta');
+  if (metaAttr) newStyle.setAttribute('data-meta', metaAttr);
+  const jssAttr = sourceStyleEl.getAttribute('data-jss');
+  if (jssAttr) newStyle.setAttribute('data-jss', jssAttr);
+
+  if (targetDocument.head) targetDocument.head.appendChild(newStyle);
+}
+
+/**
  * Copy all <style> and <link rel="stylesheet"> elements from the
  * source document to the target document. This ensures Material-UI
  * injected styles and CSS files are available in the new window.
@@ -203,13 +251,13 @@ function copyDocumentStyles(
 ): MutationObserver | null {
   if (!sourceDocument || !targetDocument) return null;
 
-  // Copy <style> elements (Material-UI injects styles this way).
+  // Copy <style> elements (Material-UI injects styles this way,
+  // and Monaco Editor uses insertRule()-based styles).
   const styleElements = sourceDocument.querySelectorAll('style');
   styleElements.forEach(styleEl => {
-    const newStyle = targetDocument.createElement('style');
-    newStyle.textContent = styleEl.textContent;
-
-    if (targetDocument.head) targetDocument.head.appendChild(newStyle);
+    if (styleEl instanceof HTMLStyleElement) {
+      copyStyleElement(styleEl, targetDocument);
+    }
   });
 
   // Copy <link rel="stylesheet"> elements.
@@ -231,18 +279,22 @@ function copyDocumentStyles(
   const observer = new MutationObserver(mutations => {
     mutations.forEach(mutation => {
       mutation.addedNodes.forEach(node => {
-        if (node.nodeName === 'STYLE') {
-          const newStyle = targetDocument.createElement('style');
-          newStyle.textContent = node.textContent;
-          // Copy data attributes that MUI uses to identify style sheets.
-          if (node instanceof HTMLElement) {
-            const metaAttr = node.getAttribute('data-meta');
-            if (metaAttr) newStyle.setAttribute('data-meta', metaAttr);
-            const jssAttr = node.getAttribute('data-jss');
-            if (jssAttr) newStyle.setAttribute('data-jss', jssAttr);
+        if (
+          node.nodeName === 'STYLE' &&
+          node instanceof HTMLStyleElement
+        ) {
+          const cssText = extractStyleCssText(node);
+          if (cssText.trim()) {
+            // Style has content already (textContent or insertRule), copy now.
+            copyStyleElement(node, targetDocument);
+          } else {
+            // Some libraries (e.g., Monaco Editor) add an empty <style>
+            // element first and then populate it via insertRule() shortly
+            // after. Re-check after a short delay to capture those rules.
+            setTimeout(() => {
+              copyStyleElement(node, targetDocument);
+            }, 50);
           }
-
-          if (targetDocument.head) targetDocument.head.appendChild(newStyle);
         }
       });
     });

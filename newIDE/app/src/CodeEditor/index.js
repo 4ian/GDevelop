@@ -68,6 +68,14 @@ export class CodeEditor extends React.Component<Props, State> {
   setupEditorCompletions = (editor: any, monaco: any) => {
     this.setUpEditorFocus(editor);
     this.setUpSaveOnEditorBlur(editor);
+
+    // When the editor is rendered inside a popped-out window (via React portal),
+    // Monaco's CSS may arrive slightly after mount. Schedule a delayed layout
+    // recalculation to ensure the editor renders correctly.
+    setTimeout(() => {
+      editor.layout();
+    }, 100);
+
     if (!monacoCompletionsInitialized) {
       monacoCompletionsInitialized = true;
 

@@ -25,6 +25,86 @@ type State = {|
 let amdMonacoCompletionsInitialized = false;
 
 /**
+ * Load Monaco via the AMD loader in the given window. Returns a promise that
+ * resolves with the Monaco instance. The promise is cached on the window so
+ * that multiple editors mounting concurrently share the same load.
+ */
+const loadMonacoInWindow = (targetWindow: any, doc: Document): Promise<any> => {
+  // Already loaded.
+  if (targetWindow.__gdMonaco) {
+    return Promise.resolve(targetWindow.__gdMonaco);
+  }
+
+  // Loading in progress — return the existing promise.
+  if (targetWindow.__gdMonacoPromise) {
+    return targetWindow.__gdMonacoPromise;
+  }
+
+  // Start a new load and cache the promise.
+  targetWindow.__gdMonacoPromise = new Promise((resolve, reject) => {
+    // In Electron, the popped-out window inherits Node.js globals (require,
+    // module, exports, process). Monaco's AMD loader detects these and uses
+    // Node.js `require()` to load modules — which fails because relative
+    // paths resolve against process.cwd(), not the app directory.
+    // Temporarily hide these globals so the AMD loader falls back to
+    // browser-style <script> tag loading, which respects the <base> tag.
+    const savedGlobals = {
+      require: targetWindow.require,
+      module: targetWindow.module,
+      exports: targetWindow.exports,
+      process: targetWindow.process,
+    };
+    targetWindow.require = undefined;
+    targetWindow.module = undefined;
+    targetWindow.exports = undefined;
+    targetWindow.process = undefined;
+
+    const script = doc.createElement('script');
+    script.src = 'external/monaco-editor-min/vs/loader.js';
+    script.onload = () => {
+      const amdRequire = targetWindow.require;
+      if (!amdRequire || !amdRequire.config) {
+        Object.assign(targetWindow, savedGlobals);
+        const err = new Error(
+          'PoppedOutMonacoEditor: AMD loader not available after script load.'
+        );
+        console.error(err.message);
+        reject(err);
+        return;
+      }
+
+      // Restore Node.js globals that the AMD loader didn't replace.
+      // `require` is now the AMD loader's require — don't overwrite it.
+      if (savedGlobals.module) targetWindow.module = savedGlobals.module;
+      if (savedGlobals.exports) targetWindow.exports = savedGlobals.exports;
+      if (savedGlobals.process) targetWindow.process = savedGlobals.process;
+
+      amdRequire.config({
+        paths: { vs: 'external/monaco-editor-min/vs' },
+      });
+
+      amdRequire(['vs/editor/editor.main'], monaco => {
+        targetWindow.__gdMonaco = monaco;
+        resolve(monaco);
+      });
+    };
+    script.onerror = () => {
+      Object.assign(targetWindow, savedGlobals);
+      const err = new Error(
+        'PoppedOutMonacoEditor: Failed to load Monaco AMD loader.'
+      );
+      console.error(err.message);
+      reject(err);
+    };
+    if (doc.head) {
+      doc.head.appendChild(script);
+    }
+  });
+
+  return targetWindow.__gdMonacoPromise;
+};
+
+/**
  * Monaco editor component that loads Monaco via the AMD loader in the current
  * window's context. This is necessary for popped-out windows (via WindowPortal)
  * because the webpack-bundled Monaco (from react-monaco-editor) uses the main
@@ -42,6 +122,7 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
   _editor: any = null;
   _monaco: any = null;
   _isChangingValue: boolean = false;
+  _unmounted: boolean = false;
 
   componentDidMount() {
     this._loadAndCreateEditor();
@@ -82,6 +163,7 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
+    this._unmounted = true;
     if (this._editor) {
       this._editor.dispose();
       this._editor = null;
@@ -96,71 +178,13 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
     const targetWindow: any = container.ownerDocument.defaultView;
     if (!targetWindow) return;
 
-    // If a Monaco instance was already loaded in this window, reuse it.
-    if (targetWindow.__gdMonaco) {
-      this._createEditor(targetWindow.__gdMonaco, container);
-      return;
-    }
-
-    // In Electron, the popped-out window inherits Node.js globals (require,
-    // module, exports, process). Monaco's AMD loader detects these and uses
-    // Node.js `require()` to load modules — which fails because relative
-    // paths resolve against process.cwd(), not the app directory.
-    // Temporarily hide these globals so the AMD loader falls back to
-    // browser-style <script> tag loading, which respects the <base> tag.
-    const savedGlobals = {
-      require: targetWindow.require,
-      module: targetWindow.module,
-      exports: targetWindow.exports,
-      process: targetWindow.process,
-    };
-    targetWindow.require = undefined;
-    targetWindow.module = undefined;
-    targetWindow.exports = undefined;
-    targetWindow.process = undefined;
-
-    // Load Monaco's AMD loader in the target window.
-    const script = container.ownerDocument.createElement('script');
-    script.src = 'external/monaco-editor-min/vs/loader.js';
-    script.onload = () => {
-      const amdRequire = targetWindow.require;
-      if (!amdRequire || !amdRequire.config) {
-        // Restore Node.js globals on failure.
-        Object.assign(targetWindow, savedGlobals);
-        console.error(
-          'PoppedOutMonacoEditor: AMD loader not available after script load.'
-        );
-        return;
-      }
-
-      // Restore Node.js globals that the AMD loader didn't replace.
-      // `require` is now the AMD loader's require — don't overwrite it.
-      if (savedGlobals.module) targetWindow.module = savedGlobals.module;
-      if (savedGlobals.exports) targetWindow.exports = savedGlobals.exports;
-      if (savedGlobals.process) targetWindow.process = savedGlobals.process;
-
-      amdRequire.config({
-        paths: { vs: 'external/monaco-editor-min/vs' },
-      });
-
-      amdRequire(['vs/editor/editor.main'], monaco => {
-        // Cache the Monaco instance on the window for reuse.
-        targetWindow.__gdMonaco = monaco;
-        if (this._containerRef.current) {
-          this._createEditor(monaco, this._containerRef.current);
-        }
-      });
-    };
-    script.onerror = () => {
-      // Restore Node.js globals on failure.
-      Object.assign(targetWindow, savedGlobals);
-      console.error(
-        'PoppedOutMonacoEditor: Failed to load Monaco AMD loader.'
-      );
-    };
-    if (container.ownerDocument.head) {
-      container.ownerDocument.head.appendChild(script);
-    }
+    loadMonacoInWindow(targetWindow, container.ownerDocument).then(monaco => {
+      // Component may have unmounted while loading.
+      if (this._unmounted || !this._containerRef.current) return;
+      this._createEditor(monaco, this._containerRef.current);
+    }).catch(error => {
+      console.error('PoppedOutMonacoEditor: failed to load Monaco:', error);
+    });
   };
 
   _createEditor = (monaco: any, container: HTMLDivElement) => {

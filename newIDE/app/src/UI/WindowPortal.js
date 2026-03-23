@@ -193,6 +193,55 @@ const WindowPortal = ({
 };
 
 /**
+ * Serialize all CSS rules from a style element's CSSStyleSheet.
+ * Some libraries (e.g. Monaco editor) inject CSS via `sheet.insertRule()`
+ * rather than setting textContent, so we need to read the rules from the
+ * CSSOM to get the actual CSS.
+ */
+function _serializeCSSRules(styleEl: HTMLStyleElement): string {
+  try {
+    const sheet = styleEl.sheet;
+    if (!sheet || !sheet.cssRules || sheet.cssRules.length === 0) return '';
+    let css = '';
+    for (let i = 0; i < sheet.cssRules.length; i++) {
+      css += sheet.cssRules[i].cssText + '\n';
+    }
+    return css;
+  } catch (e) {
+    // cssRules can throw SecurityError for cross-origin stylesheets.
+    return '';
+  }
+}
+
+/**
+ * Copy a <style> element to the target document. Handles both textContent-based
+ * styles and insertRule()-based styles (where textContent is empty but cssRules
+ * contains the actual CSS).
+ */
+function _copyStyleElement(
+  styleEl: HTMLStyleElement,
+  targetDocument: Document
+) {
+  const newStyle = targetDocument.createElement('style');
+  // Prefer textContent if available, otherwise serialize CSSOM rules.
+  const text = styleEl.textContent;
+  if (text) {
+    newStyle.textContent = text;
+  } else {
+    const serialized = _serializeCSSRules(styleEl);
+    if (serialized) {
+      newStyle.textContent = serialized;
+    }
+  }
+  // Copy data attributes that MUI uses to identify style sheets.
+  const metaAttr = styleEl.getAttribute('data-meta');
+  if (metaAttr) newStyle.setAttribute('data-meta', metaAttr);
+  const jssAttr = styleEl.getAttribute('data-jss');
+  if (jssAttr) newStyle.setAttribute('data-jss', jssAttr);
+  if (targetDocument.head) targetDocument.head.appendChild(newStyle);
+}
+
+/**
  * Copy all <style> and <link rel="stylesheet"> elements from the
  * source document to the target document. This ensures Material-UI
  * injected styles and CSS files are available in the new window.
@@ -206,10 +255,7 @@ function copyDocumentStyles(
   // Copy <style> elements (Material-UI injects styles this way).
   const styleElements = sourceDocument.querySelectorAll('style');
   styleElements.forEach(styleEl => {
-    const newStyle = targetDocument.createElement('style');
-    newStyle.textContent = styleEl.textContent;
-
-    if (targetDocument.head) targetDocument.head.appendChild(newStyle);
+    _copyStyleElement(styleEl, targetDocument);
   });
 
   // Copy <link rel="stylesheet"> elements.
@@ -232,17 +278,18 @@ function copyDocumentStyles(
     mutations.forEach(mutation => {
       mutation.addedNodes.forEach(node => {
         if (node.nodeName === 'STYLE') {
-          const newStyle = targetDocument.createElement('style');
-          newStyle.textContent = node.textContent;
-          // Copy data attributes that MUI uses to identify style sheets.
-          if (node instanceof HTMLElement) {
-            const metaAttr = node.getAttribute('data-meta');
-            if (metaAttr) newStyle.setAttribute('data-meta', metaAttr);
-            const jssAttr = node.getAttribute('data-jss');
-            if (jssAttr) newStyle.setAttribute('data-jss', jssAttr);
+          // $FlowFixMe - node is an HTMLStyleElement here
+          const styleNode: HTMLStyleElement = (node: any);
+          // Some libraries add empty <style> elements and then populate
+          // them via insertRule(). Delay slightly to allow rules to be added.
+          const text = styleNode.textContent;
+          if (text) {
+            _copyStyleElement(styleNode, targetDocument);
+          } else {
+            setTimeout(() => {
+              _copyStyleElement(styleNode, targetDocument);
+            }, 0);
           }
-
-          if (targetDocument.head) targetDocument.head.appendChild(newStyle);
         }
       });
     });

@@ -563,7 +563,7 @@ patchClassesForUseAfterFreeDetection(Module, {
     'ObjectGroupsContainer',
     'ObjectsContainer',
     'VariablesContainer',
-    'JSCodeEvent',
+    'JsCodeEvent',
   ]),
   verbose: false,
 });

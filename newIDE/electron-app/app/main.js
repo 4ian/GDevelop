@@ -268,9 +268,15 @@ function createNewWindow(windowArgs = args) {
       return {
         action: 'allow',
         overrideBrowserWindowOptions: {
-          // Standard title bar for pop-out editors (not hidden like the main window).
-          titleBarStyle: 'default',
-          titleBarOverlay: false,
+          // Use hidden title bar with overlay controls, like the main window,
+          // so that ToolbarTitlebar can provide safe margins for window controls.
+          titleBarStyle: 'hidden',
+          titleBarOverlay: {
+            color: '#000000',
+            symbolColor: '#ffffff',
+          },
+          trafficLightPosition: { x: 12, y: 12 },
+          backgroundColor: '#000',
           webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,

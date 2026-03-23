@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
-import { t } from '@lingui/macro';
-import Toolbar, { type ToolbarInterface } from './Toolbar';
+import { type ToolbarInterface } from './Toolbar';
+import ToolbarTitlebar from './ToolbarTitlebar';
 import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
 import ErrorBoundary, {
   getEditorErrorBoundaryProps,
@@ -12,9 +12,9 @@ import { SpecificDimensionsWindowSizeProvider } from '../UI/Responsive/Responsiv
 import WindowPortal from '../UI/WindowPortal';
 import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
 import { type EditorTabsPaneCommonProps } from './EditorTabsPane';
-import IconButton from '../UI/IconButton';
-import PopInIcon from '../UI/CustomSvgIcons/PopIn';
 import { useKeyboardShortcuts } from '../KeyboardShortcuts';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import Window from '../Utils/Window';
 import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
@@ -106,46 +106,38 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
           innerHeight={windowSize.height}
         >
           <FullThemeProvider>
+            <PoppedOutWindowBackgroundColor />
             <CommandPalette ref={localCommandPaletteRef} />
-            <Toolbar
+            <ToolbarTitlebar
               ref={toolbarRef}
-              hidden={false}
-              showProjectButtons={false}
-              customLeftContent={
-                <IconButton
-                  size="small"
-                  onClick={() => onPopIn(editorTab)}
-                  tooltip={t`Pop back into main window`}
-                  color="default"
-                >
-                  <PopInIcon />
-                </IconButton>
-              }
-              canSave={props.canSave}
-              onSave={props.saveProject}
-              openShareDialog={() => props.openShareDialog()}
-              isSharingEnabled={props.isSharingEnabled}
-              onOpenDebugger={props.launchDebuggerAndPreview}
-              hasPreviewsRunning={props.hasPreviewsRunning}
-              onPreviewWithoutHotReload={props.launchNewPreview}
-              onNetworkPreview={props.launchNetworkPreview}
-              onHotReloadPreview={props.launchHotReloadPreview}
-              onLaunchPreviewWithDiagnosticReport={
-                props.launchPreviewWithDiagnosticReport
-              }
-              canDoNetworkPreview={props.canDoNetworkPreview}
-              setPreviewOverride={props.setPreviewOverride}
-              isPreviewEnabled={
-                !!props.currentProject &&
-                props.currentProject.getLayoutsCount() > 0
-              }
-              previewState={props.previewState}
-              onOpenVersionHistory={props.openVersionHistoryPanel}
-              checkedOutVersionStatus={props.checkedOutVersionStatus}
-              onQuitVersionHistory={props.onQuitVersionHistory}
-              canQuitVersionHistory={!props.isSavingProject}
-              toolbarButtons={props.toolbarButtons}
-              projectPath={props.projectPath}
+              onPopIn={() => onPopIn(editorTab)}
+              toolbarProps={{
+                hidden: false,
+                showProjectButtons: false,
+                canSave: props.canSave,
+                onSave: props.saveProject,
+                openShareDialog: () => props.openShareDialog(),
+                isSharingEnabled: props.isSharingEnabled,
+                onOpenDebugger: props.launchDebuggerAndPreview,
+                hasPreviewsRunning: props.hasPreviewsRunning,
+                onPreviewWithoutHotReload: props.launchNewPreview,
+                onNetworkPreview: props.launchNetworkPreview,
+                onHotReloadPreview: props.launchHotReloadPreview,
+                onLaunchPreviewWithDiagnosticReport:
+                  props.launchPreviewWithDiagnosticReport,
+                canDoNetworkPreview: props.canDoNetworkPreview,
+                setPreviewOverride: props.setPreviewOverride,
+                isPreviewEnabled:
+                  !!props.currentProject &&
+                  props.currentProject.getLayoutsCount() > 0,
+                previewState: props.previewState,
+                onOpenVersionHistory: props.openVersionHistoryPanel,
+                checkedOutVersionStatus: props.checkedOutVersionStatus,
+                onQuitVersionHistory: props.onQuitVersionHistory,
+                canQuitVersionHistory: !props.isSavingProject,
+                toolbarButtons: props.toolbarButtons,
+                projectPath: props.projectPath,
+              }}
             />
             <div
               style={{
@@ -335,6 +327,25 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
       )}
     />
   );
+};
+
+/**
+ * Sets the background color of the popped-out window to match the theme,
+ * similar to what ProjectTitlebar does for the main window.
+ */
+const PoppedOutWindowBackgroundColor = () => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+  React.useEffect(
+    () => {
+      Window.setWindowBackgroundColor(
+        gdevelopTheme.surface.window.backgroundColor
+      );
+    },
+    [gdevelopTheme.surface.window.backgroundColor]
+  );
+
+  return null;
 };
 
 export default PoppedOutEditorContainerWindow;

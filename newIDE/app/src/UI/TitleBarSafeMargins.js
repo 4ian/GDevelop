@@ -40,9 +40,11 @@ export const TitleBarLeftSafeMargins = ({
   // we set up a listener to detect any change and force a refresh that will read
   // the latest size of the controls.
   const forceUpdate = useForceUpdate();
-  useWindowControlsOverlayWatcher({ onChanged: forceUpdate });
-
   const currentWindow = useCurrentWindow();
+  useWindowControlsOverlayWatcher({
+    onChanged: forceUpdate,
+    targetWindow: currentWindow,
+  });
 
   let leftSideOffset = 0;
   // macOS displays the "traffic lights" on the left.
@@ -92,9 +94,11 @@ export const TitleBarRightSafeMargins = ({
   // we set up a listener to detect any change and force a refresh that will read
   // the latest size of the controls.
   const forceUpdate = useForceUpdate();
-  useWindowControlsOverlayWatcher({ onChanged: forceUpdate });
-
   const currentWindow = useCurrentWindow();
+  useWindowControlsOverlayWatcher({
+    onChanged: forceUpdate,
+    targetWindow: currentWindow,
+  });
 
   const isDesktopWindowsOrLinux = !!electron && !isMacLike();
   // Windows and Linux have their "window controls" on the right

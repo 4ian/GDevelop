@@ -22,30 +22,34 @@ export const POSITIONAL_ARGUMENTS_KEY = '_';
 
 const windowBackgroundColors: WeakMap<Document, string> = new WeakMap();
 
-const onChangeCallbacks = new Set<() => void>();
-let debouncedGeometryChange = null;
+// Per-navigator watcher state: each window's windowControlsOverlay gets its
+// own debounced listener and set of callbacks.
+type OverlayWatcherState = {|
+  callbacks: Set<() => void>,
+  debouncedHandler: () => void,
+|};
+const overlayWatchers: WeakMap<Object, OverlayWatcherState> = new WeakMap();
 
-const setupWindowControlsOverlayWatcher = () => {
-  if (debouncedGeometryChange) {
-    // Already set up.
-    return;
-  }
+const getOrCreateOverlayWatcher = (
+  windowControlsOverlay: Object
+): OverlayWatcherState => {
+  const existing = overlayWatchers.get(windowControlsOverlay);
+  if (existing) return existing;
 
-  // $FlowFixMe[incompatible-type] - this API is not handled by Flow.
-  // $FlowFixMe[prop-missing]
-  const { windowControlsOverlay } = navigator;
-
-  if (windowControlsOverlay) {
-    debouncedGeometryChange = debounce(() => {
-      for (const callback of onChangeCallbacks) {
+  const state = {
+    callbacks: new Set<() => void>(),
+    debouncedHandler: debounce(() => {
+      for (const callback of state.callbacks) {
         callback();
       }
-    }, 20);
-    windowControlsOverlay.addEventListener(
-      'geometrychange',
-      debouncedGeometryChange
-    );
-  }
+    }, 20),
+  };
+  windowControlsOverlay.addEventListener(
+    'geometrychange',
+    state.debouncedHandler
+  );
+  overlayWatchers.set(windowControlsOverlay, state);
+  return state;
 };
 
 /**
@@ -54,22 +58,32 @@ const setupWindowControlsOverlayWatcher = () => {
  * - An installed PWA can have window controls displayed as overlay. If supported,
  * we set up a listener to detect any change and notify the caller.
  * - On Electron, the window controls are always integrated in the app - so this does nothing.
+ *
+ * Accepts an optional `targetWindow` parameter so that popped-out windows
+ * (which have their own navigator) can watch their own overlay.
  */
 export const useWindowControlsOverlayWatcher = ({
   onChanged,
+  targetWindow,
 }: {|
   onChanged: () => void,
+  targetWindow?: typeof window,
 |}) => {
-  setupWindowControlsOverlayWatcher();
-
   React.useEffect(
     () => {
-      onChangeCallbacks.add(onChanged);
+      const win = targetWindow || window;
+      // $FlowFixMe[incompatible-type] - this API is not handled by Flow.
+      // $FlowFixMe[prop-missing]
+      const { windowControlsOverlay } = win.navigator;
+      if (!windowControlsOverlay) return;
+
+      const state = getOrCreateOverlayWatcher(windowControlsOverlay);
+      state.callbacks.add(onChanged);
       return () => {
-        onChangeCallbacks.delete(onChanged);
+        state.callbacks.delete(onChanged);
       };
     },
-    [onChanged]
+    [onChanged, targetWindow]
   );
 };
 

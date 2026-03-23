@@ -1,8 +1,11 @@
 // @flow
 import * as React from 'react';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import { setupAutocompletions } from './LocalCodeEditorAutocompletions';
-import { getAllThemes } from './Theme';
+import {
+  registerThemes,
+  initializeCompletions,
+  baseEditorOptions,
+} from './MonacoSetup';
 
 type Props = {|
   value: string,
@@ -19,10 +22,6 @@ type Props = {|
 type State = {|
   loading: boolean,
 |};
-
-// Track whether completions have been set up for the AMD-loaded Monaco
-// instance (separate from the webpack-bundled one in the main window).
-let amdMonacoCompletionsInitialized = false;
 
 /**
  * Load Monaco via the AMD loader in the given window. Returns a promise that
@@ -190,45 +189,15 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
   _createEditor = (monaco: any, container: HTMLDivElement) => {
     this._monaco = monaco;
 
-    // Register custom themes.
-    getAllThemes().forEach(codeEditorTheme => {
-      if (codeEditorTheme.themeData) {
-        try {
-          monaco.editor.defineTheme(
-            codeEditorTheme.themeName,
-            codeEditorTheme.themeData
-          );
-        } catch (e) {
-          // Theme might already be defined — ignore.
-        }
-      }
-    });
-
-    // Set up compiler options and autocompletions (same as
-    // setupEditorCompletions in CodeEditor/index.js). This AMD-loaded
-    // Monaco instance is separate from the webpack-bundled one, so it
-    // needs its own setup.
-    if (!amdMonacoCompletionsInitialized) {
-      amdMonacoCompletionsInitialized = true;
-
-      monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-        target: monaco.languages.typescript.ScriptTarget.ES6,
-        allowNonTsExtensions: true,
-        allowJs: true,
-        checkJs: true,
-      });
-
-      setupAutocompletions(monaco);
-    }
+    registerThemes(monaco);
+    initializeCompletions(monaco);
 
     this._editor = monaco.editor.create(container, {
+      ...baseEditorOptions,
       value: this.props.value,
       language: 'javascript',
       theme: this.props.theme,
       fontSize: this.props.fontSize,
-      scrollBeyondLastLine: false,
-      minimap: { enabled: false },
-      wordWrap: 'on',
     });
 
     this._editor.onDidChangeModelContent(() => {

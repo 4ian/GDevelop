@@ -71,13 +71,26 @@ export const EventsFunctionsExtensionsProvider = ({
       );
     } else {
       console.info('Events functions extensions are ready.');
+      return Promise.resolve();
     }
 
-    return lastLoadPromise.current
-      ? lastLoadPromise.current.then(() => {
-          console.info('Events functions extensions finished loading.');
-        })
-      : Promise.resolve();
+    // Race against a timeout to avoid blocking forever if the load
+    // promise never settles (e.g. due to a crash during code generation
+    // or a stuck write operation).
+    return Promise.race([
+      lastLoadPromise.current.then(() => {
+        console.info('Events functions extensions finished loading.');
+      }),
+      new Promise<void>(resolve => {
+        setTimeout(() => {
+          console.warn(
+            'Events functions extensions loading timed out after 15s, proceeding anyway.'
+          );
+          lastLoadPromise.current = null;
+          resolve();
+        }, 15000);
+      }),
+    ]);
   }, []);
 
   const _loadProjectEventsFunctionsExtensions = React.useCallback(
@@ -87,7 +100,7 @@ export const EventsFunctionsExtensionsProvider = ({
       const previousLastLoadPromise =
         lastLoadPromise.current || Promise.resolve();
 
-      lastLoadPromise.current = previousLastLoadPromise
+      const currentPromise = previousLastLoadPromise
         .then(() =>
           loadProjectEventsFunctionsExtensions(
             project,
@@ -107,10 +120,16 @@ export const EventsFunctionsExtensionsProvider = ({
           });
         })
         .then(() => {
-          lastLoadPromise.current = null;
+          // Only clear the ref if no newer load has been queued since.
+          // Without this check, chained loads (A then B) would have A's
+          // cleanup clear B's reference, leading to stuck state.
+          if (lastLoadPromise.current === currentPromise) {
+            lastLoadPromise.current = null;
+          }
         });
 
-      return lastLoadPromise.current;
+      lastLoadPromise.current = currentPromise;
+      return currentPromise;
     },
     [eventsFunctionCodeWriter, i18n]
   );

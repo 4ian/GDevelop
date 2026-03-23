@@ -97,17 +97,42 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
       return;
     }
 
+    // In Electron, the popped-out window inherits Node.js globals (require,
+    // module, exports, process). Monaco's AMD loader detects these and uses
+    // Node.js `require()` to load modules — which fails because relative
+    // paths resolve against process.cwd(), not the app directory.
+    // Temporarily hide these globals so the AMD loader falls back to
+    // browser-style <script> tag loading, which respects the <base> tag.
+    const savedGlobals = {
+      require: targetWindow.require,
+      module: targetWindow.module,
+      exports: targetWindow.exports,
+      process: targetWindow.process,
+    };
+    targetWindow.require = undefined;
+    targetWindow.module = undefined;
+    targetWindow.exports = undefined;
+    targetWindow.process = undefined;
+
     // Load Monaco's AMD loader in the target window.
     const script = container.ownerDocument.createElement('script');
     script.src = 'external/monaco-editor-min/vs/loader.js';
     script.onload = () => {
       const amdRequire = targetWindow.require;
       if (!amdRequire || !amdRequire.config) {
+        // Restore Node.js globals on failure.
+        Object.assign(targetWindow, savedGlobals);
         console.error(
           'PoppedOutMonacoEditor: AMD loader not available after script load.'
         );
         return;
       }
+
+      // Restore Node.js globals that the AMD loader didn't replace.
+      // `require` is now the AMD loader's require — don't overwrite it.
+      if (savedGlobals.module) targetWindow.module = savedGlobals.module;
+      if (savedGlobals.exports) targetWindow.exports = savedGlobals.exports;
+      if (savedGlobals.process) targetWindow.process = savedGlobals.process;
 
       amdRequire.config({
         paths: { vs: 'external/monaco-editor-min/vs' },
@@ -122,6 +147,8 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
       });
     };
     script.onerror = () => {
+      // Restore Node.js globals on failure.
+      Object.assign(targetWindow, savedGlobals);
       console.error(
         'PoppedOutMonacoEditor: Failed to load Monaco AMD loader.'
       );

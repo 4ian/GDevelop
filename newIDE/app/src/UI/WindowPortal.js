@@ -193,6 +193,61 @@ const WindowPortal = ({
 };
 
 /**
+ * Copy the CSS content of a <style> element to the target document.
+ * Handles both textContent-based styles and CSSOM-inserted rules
+ * (e.g., from style-loader using insertRule).
+ */
+function copyStyleElementToDocument(
+  sourceStyleEl: HTMLElement,
+  targetDocument: Document
+) {
+  const newStyle = targetDocument.createElement('style');
+
+  // Copy data attributes that MUI/JSS uses to identify style sheets.
+  if (sourceStyleEl instanceof HTMLElement) {
+    const metaAttr = sourceStyleEl.getAttribute('data-meta');
+    if (metaAttr) newStyle.setAttribute('data-meta', metaAttr);
+    const jssAttr = sourceStyleEl.getAttribute('data-jss');
+    if (jssAttr) newStyle.setAttribute('data-jss', jssAttr);
+  }
+
+  // First try textContent (works when style-loader sets text directly).
+  if (sourceStyleEl.textContent) {
+    newStyle.textContent = sourceStyleEl.textContent;
+  } else if (sourceStyleEl instanceof HTMLStyleElement && sourceStyleEl.sheet) {
+    // Fallback: copy CSS rules from the CSSOM (handles style-loader's
+    // insertRule mode where textContent is empty).
+    try {
+      const rules = sourceStyleEl.sheet.cssRules;
+      let cssText = '';
+      for (let i = 0; i < rules.length; i++) {
+        cssText += rules[i].cssText + '\n';
+      }
+      if (cssText) newStyle.textContent = cssText;
+    } catch (e) {
+      // Cross-origin stylesheets can't be read – skip silently.
+    }
+  }
+
+  if (targetDocument.head) targetDocument.head.appendChild(newStyle);
+}
+
+/**
+ * Copy a <link rel="stylesheet"> element to the target document.
+ */
+function copyLinkElementToDocument(
+  sourceLinkEl: HTMLLinkElement,
+  targetDocument: Document
+) {
+  const newLink = targetDocument.createElement('link');
+  newLink.rel = 'stylesheet';
+  newLink.href = sourceLinkEl.href;
+  if (sourceLinkEl.type) newLink.type = sourceLinkEl.type;
+
+  if (targetDocument.head) targetDocument.head.appendChild(newLink);
+}
+
+/**
  * Copy all <style> and <link rel="stylesheet"> elements from the
  * source document to the target document. This ensures Material-UI
  * injected styles and CSS files are available in the new window.
@@ -206,10 +261,7 @@ function copyDocumentStyles(
   // Copy <style> elements (Material-UI injects styles this way).
   const styleElements = sourceDocument.querySelectorAll('style');
   styleElements.forEach(styleEl => {
-    const newStyle = targetDocument.createElement('style');
-    newStyle.textContent = styleEl.textContent;
-
-    if (targetDocument.head) targetDocument.head.appendChild(newStyle);
+    copyStyleElementToDocument(styleEl, targetDocument);
   });
 
   // Copy <link rel="stylesheet"> elements.
@@ -218,31 +270,23 @@ function copyDocumentStyles(
   );
   linkElements.forEach(linkEl => {
     if (!(linkEl instanceof HTMLLinkElement)) return;
-    const newLink = targetDocument.createElement('link');
-    newLink.rel = 'stylesheet';
-    newLink.href = linkEl.href;
-    if (linkEl.type) newLink.type = linkEl.type;
-
-    if (targetDocument.head) targetDocument.head.appendChild(newLink);
+    copyLinkElementToDocument(linkEl, targetDocument);
   });
 
-  // Set up a MutationObserver to copy new <style> elements as they are
-  // added (Material-UI adds styles lazily when components mount).
+  // Set up a MutationObserver to copy new <style> and <link> elements as
+  // they are added (Material-UI adds styles lazily when components mount,
+  // and webpack may add <link> elements for dynamically loaded CSS chunks).
   const observer = new MutationObserver(mutations => {
     mutations.forEach(mutation => {
       mutation.addedNodes.forEach(node => {
         if (node.nodeName === 'STYLE') {
-          const newStyle = targetDocument.createElement('style');
-          newStyle.textContent = node.textContent;
-          // Copy data attributes that MUI uses to identify style sheets.
-          if (node instanceof HTMLElement) {
-            const metaAttr = node.getAttribute('data-meta');
-            if (metaAttr) newStyle.setAttribute('data-meta', metaAttr);
-            const jssAttr = node.getAttribute('data-jss');
-            if (jssAttr) newStyle.setAttribute('data-jss', jssAttr);
-          }
-
-          if (targetDocument.head) targetDocument.head.appendChild(newStyle);
+          copyStyleElementToDocument((node: any), targetDocument);
+        } else if (
+          node.nodeName === 'LINK' &&
+          node instanceof HTMLLinkElement &&
+          node.rel === 'stylesheet'
+        ) {
+          copyLinkElementToDocument(node, targetDocument);
         }
       });
     });

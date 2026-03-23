@@ -41,6 +41,8 @@ export class CodeEditor extends React.Component<Props, State> {
     MonacoEditor: null,
     error: null,
   };
+  _editor: any = null;
+  _poppedOutLayoutTimers: Array<TimeoutID> = [];
 
   setupEditorThemes = (monaco: any) => {
     if (!monacoThemesInitialized) {
@@ -66,8 +68,29 @@ export class CodeEditor extends React.Component<Props, State> {
   };
 
   setupEditorCompletions = (editor: any, monaco: any) => {
+    this._editor = editor;
     this.setUpEditorFocus(editor);
     this.setUpSaveOnEditorBlur(editor);
+
+    // When the editor is rendered inside a popped-out window (via React portal),
+    // CSS styles may not be immediately available in the new window's document.
+    // Schedule layout refreshes so Monaco re-computes dimensions and renders
+    // content correctly once styles have been copied over.
+    const domNode = editor.getDomNode();
+    if (domNode && domNode.ownerDocument !== document) {
+      const forceLayout = () => {
+        if (editor.getDomNode()) {
+          editor.layout();
+        }
+      };
+      // Retry at increasing intervals to handle async style copying.
+      this._poppedOutLayoutTimers = [
+        setTimeout(forceLayout, 50),
+        setTimeout(forceLayout, 150),
+        setTimeout(forceLayout, 500),
+      ];
+    }
+
     if (!monacoCompletionsInitialized) {
       monacoCompletionsInitialized = true;
 
@@ -102,6 +125,11 @@ export class CodeEditor extends React.Component<Props, State> {
 
   componentDidMount() {
     this.loadMonacoEditor();
+  }
+
+  componentWillUnmount() {
+    this._poppedOutLayoutTimers.forEach(timer => clearTimeout(timer));
+    this._poppedOutLayoutTimers = [];
   }
 
   handleLoadError(error: Error) {

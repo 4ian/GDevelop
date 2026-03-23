@@ -18,6 +18,8 @@ import { type ParameterFieldInterface } from '../../ParameterFields/ParameterFie
 import { Trans } from '@lingui/macro';
 import ChevronArrowTop from '../../../UI/CustomSvgIcons/ChevronArrowTop';
 import ChevronArrowBottom from '../../../UI/CustomSvgIcons/ChevronArrowBottom';
+import { exceptionallyGuardAgainstDeadObject } from '../../../Utils/IsNullPtr';
+
 const gd: libGDevelop = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';
@@ -107,7 +109,12 @@ export default class JsCodeEvent extends React.Component<
     cursorColumn: number,
     cursorLine: number,
   }): void => {
-    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
+    const jsCodeEvent = exceptionallyGuardAgainstDeadObject(
+      gd.asJsCodeEvent(this.props.event)
+    );
+    if (!jsCodeEvent) {
+      return;
+    }
     jsCodeEvent.setScrollTop(scrollTop);
     jsCodeEvent.setCursorColumn(cursorColumn);
     jsCodeEvent.setCursorLine(cursorLine);

@@ -84,6 +84,14 @@ const WindowPortal = ({
     // Set up the new window's document.
     externalWindow.document.title = title;
 
+    // Set a <base> tag so that relative URLs (e.g. script src for Monaco
+    // AMD loader) resolve against the main window's origin, since the
+    // popped-out window starts as about:blank.
+    const baseTag = externalWindow.document.createElement('base');
+    baseTag.href = window.location.href;
+    if (externalWindow.document.head)
+      externalWindow.document.head.appendChild(baseTag);
+
     // Create a container div in the new window.
     const containerDiv = externalWindow.document.createElement('div');
     containerDiv.id = 'window-portal-root';
@@ -193,52 +201,58 @@ const WindowPortal = ({
 };
 
 /**
- * Serialize all CSS rules from a style element's CSSStyleSheet.
- * Some libraries (e.g. Monaco editor) inject CSS via `sheet.insertRule()`
- * rather than setting textContent, so we need to read the rules from the
- * CSSOM to get the actual CSS.
+ * Copy the CSS content of a <style> element to the target document.
+ * Handles both textContent-based styles and CSSOM-inserted rules
+ * (e.g., from style-loader using insertRule).
  */
-function _serializeCSSRules(styleEl: HTMLStyleElement): string {
-  try {
-    const sheet = styleEl.sheet;
-    if (!sheet || !sheet.cssRules || sheet.cssRules.length === 0) return '';
-    let css = '';
-    for (let i = 0; i < sheet.cssRules.length; i++) {
-      css += sheet.cssRules[i].cssText + '\n';
-    }
-    return css;
-  } catch (e) {
-    // cssRules can throw SecurityError for cross-origin stylesheets.
-    return '';
-  }
-}
-
-/**
- * Copy a <style> element to the target document. Handles both textContent-based
- * styles and insertRule()-based styles (where textContent is empty but cssRules
- * contains the actual CSS).
- */
-function _copyStyleElement(
-  styleEl: HTMLStyleElement,
+function copyStyleElementToDocument(
+  sourceStyleEl: HTMLElement,
   targetDocument: Document
 ) {
   const newStyle = targetDocument.createElement('style');
-  // Prefer textContent if available, otherwise serialize CSSOM rules.
-  const text = styleEl.textContent;
-  if (text) {
-    newStyle.textContent = text;
-  } else {
-    const serialized = _serializeCSSRules(styleEl);
-    if (serialized) {
-      newStyle.textContent = serialized;
+
+  // Copy data attributes that MUI/JSS uses to identify style sheets.
+  if (sourceStyleEl instanceof HTMLElement) {
+    const metaAttr = sourceStyleEl.getAttribute('data-meta');
+    if (metaAttr) newStyle.setAttribute('data-meta', metaAttr);
+    const jssAttr = sourceStyleEl.getAttribute('data-jss');
+    if (jssAttr) newStyle.setAttribute('data-jss', jssAttr);
+  }
+
+  // First try textContent (works when style-loader sets text directly).
+  if (sourceStyleEl.textContent) {
+    newStyle.textContent = sourceStyleEl.textContent;
+  } else if (sourceStyleEl instanceof HTMLStyleElement && sourceStyleEl.sheet) {
+    // Fallback: copy CSS rules from the CSSOM (handles style-loader's
+    // insertRule mode where textContent is empty).
+    try {
+      const rules = sourceStyleEl.sheet.cssRules;
+      let cssText = '';
+      for (let i = 0; i < rules.length; i++) {
+        cssText += rules[i].cssText + '\n';
+      }
+      if (cssText) newStyle.textContent = cssText;
+    } catch (e) {
+      // Cross-origin stylesheets can't be read – skip silently.
     }
   }
-  // Copy data attributes that MUI uses to identify style sheets.
-  const metaAttr = styleEl.getAttribute('data-meta');
-  if (metaAttr) newStyle.setAttribute('data-meta', metaAttr);
-  const jssAttr = styleEl.getAttribute('data-jss');
-  if (jssAttr) newStyle.setAttribute('data-jss', jssAttr);
+
   if (targetDocument.head) targetDocument.head.appendChild(newStyle);
+}
+
+/**
+ * Copy a <link rel="stylesheet"> element to the target document.
+ */
+function copyLinkElementToDocument(
+  sourceLinkEl: HTMLLinkElement,
+  targetDocument: Document
+) {
+  const newLink = targetDocument.createElement('link');
+  newLink.rel = 'stylesheet';
+  newLink.href = sourceLinkEl.href;
+  if (sourceLinkEl.type) newLink.type = sourceLinkEl.type;
+
+  if (targetDocument.head) targetDocument.head.appendChild(newLink);
 }
 
 /**
@@ -255,7 +269,7 @@ function copyDocumentStyles(
   // Copy <style> elements (Material-UI injects styles this way).
   const styleElements = sourceDocument.querySelectorAll('style');
   styleElements.forEach(styleEl => {
-    _copyStyleElement(styleEl, targetDocument);
+    copyStyleElementToDocument(styleEl, targetDocument);
   });
 
   // Copy <link rel="stylesheet"> elements.
@@ -264,31 +278,23 @@ function copyDocumentStyles(
   );
   linkElements.forEach(linkEl => {
     if (!(linkEl instanceof HTMLLinkElement)) return;
-    const newLink = targetDocument.createElement('link');
-    newLink.rel = 'stylesheet';
-    newLink.href = linkEl.href;
-    if (linkEl.type) newLink.type = linkEl.type;
-
-    if (targetDocument.head) targetDocument.head.appendChild(newLink);
+    copyLinkElementToDocument(linkEl, targetDocument);
   });
 
-  // Set up a MutationObserver to copy new <style> elements as they are
-  // added (Material-UI adds styles lazily when components mount).
+  // Set up a MutationObserver to copy new <style> and <link> elements as
+  // they are added (Material-UI adds styles lazily when components mount,
+  // and webpack may add <link> elements for dynamically loaded CSS chunks).
   const observer = new MutationObserver(mutations => {
     mutations.forEach(mutation => {
       mutation.addedNodes.forEach(node => {
         if (node.nodeName === 'STYLE') {
-          const styleNode: HTMLStyleElement = (node: any);
-          // Some libraries add empty <style> elements and then populate
-          // them via insertRule(). Delay slightly to allow rules to be added.
-          const text = styleNode.textContent;
-          if (text) {
-            _copyStyleElement(styleNode, targetDocument);
-          } else {
-            setTimeout(() => {
-              _copyStyleElement(styleNode, targetDocument);
-            }, 0);
-          }
+          copyStyleElementToDocument((node: any), targetDocument);
+        } else if (
+          node.nodeName === 'LINK' &&
+          node instanceof HTMLLinkElement &&
+          node.rel === 'stylesheet'
+        ) {
+          copyLinkElementToDocument(node, targetDocument);
         }
       });
     });

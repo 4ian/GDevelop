@@ -15,6 +15,7 @@ import { type EditorTabsPaneCommonProps } from './EditorTabsPane';
 import { useKeyboardShortcuts } from '../KeyboardShortcuts';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Window from '../Utils/Window';
+import PortalContainerContext from '../UI/PortalContainerContext';
 import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
@@ -339,14 +340,35 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
  */
 const PoppedOutWindowBackgroundColor = () => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const portalContainer = React.useContext(PortalContainerContext);
 
   React.useEffect(
     () => {
-      Window.setWindowBackgroundColor(
-        gdevelopTheme.surface.window.backgroundColor
-      );
+      const newColor = gdevelopTheme.surface.window.backgroundColor;
+
+      if (portalContainer) {
+        // We are in a popped-out window: set the background color on the
+        // external window's document directly, rather than the main window's.
+        const doc = portalContainer.ownerDocument;
+        const body = doc.body;
+        if (body) {
+          body.style.backgroundColor = newColor;
+        }
+        if (doc.documentElement) {
+          doc.documentElement.style.backgroundColor = newColor;
+        }
+
+        // Also update the meta theme-color if present in the external window.
+        const metaElement = doc.querySelector('meta[name="theme-color"]');
+        if (metaElement) {
+          metaElement.setAttribute('content', newColor);
+        }
+      } else {
+        // Fallback: use the main window helper.
+        Window.setWindowBackgroundColor(newColor);
+      }
     },
-    [gdevelopTheme.surface.window.backgroundColor]
+    [gdevelopTheme.surface.window.backgroundColor, portalContainer]
   );
 
   return null;

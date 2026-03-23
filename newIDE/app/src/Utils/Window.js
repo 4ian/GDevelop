@@ -95,13 +95,19 @@ export default class Window {
     }
   }
 
-  static setWindowBackgroundColor(newColor: string) {
-    if (currentWindowBackgroundColor === newColor) {
+  static setWindowBackgroundColor(
+    newColor: string,
+    targetDocument?: Document
+  ) {
+    const doc = targetDocument || document;
+    const isMainWindow = doc === document;
+
+    if (isMainWindow && currentWindowBackgroundColor === newColor) {
       // Avoid potentially expensive DOM query/modification if no changes needed.
       return;
     }
 
-    if (ipcRenderer) {
+    if (isMainWindow && ipcRenderer) {
       // Update the window controls colors on Windows.
       ipcRenderer.invoke('titlebar-set-overlay-options', {
         color: newColor,
@@ -113,22 +119,24 @@ export default class Window {
     }
 
     // Update the PWA titlebar/controls color (if it's an installed PWA).
-    const metaElement = document.querySelector('meta[name="theme-color"]');
+    const metaElement = doc.querySelector('meta[name="theme-color"]');
     if (metaElement) {
       metaElement.setAttribute('content', newColor);
     }
 
     // Update the window background color. Update both `body` and `html` elements
     // to ensure the background color is visible when resized.
-    const body = document.body;
+    const body = doc.body;
     if (body) {
       body.style.backgroundColor = newColor;
     }
-    if (document.documentElement) {
-      document.documentElement.style.backgroundColor = newColor;
+    if (doc.documentElement) {
+      doc.documentElement.style.backgroundColor = newColor;
     }
 
-    currentWindowBackgroundColor = newColor;
+    if (isMainWindow) {
+      currentWindowBackgroundColor = newColor;
+    }
   }
 
   static setBounds(x: number, y: number, width: number, height: number) {

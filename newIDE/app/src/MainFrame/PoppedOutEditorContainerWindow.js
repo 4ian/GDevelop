@@ -344,29 +344,10 @@ const PoppedOutWindowBackgroundColor = () => {
 
   React.useEffect(
     () => {
-      const newColor = gdevelopTheme.surface.window.backgroundColor;
-
-      if (portalContainer) {
-        // We are in a popped-out window: set the background color on the
-        // external window's document directly, rather than the main window's.
-        const doc = portalContainer.ownerDocument;
-        const body = doc.body;
-        if (body) {
-          body.style.backgroundColor = newColor;
-        }
-        if (doc.documentElement) {
-          doc.documentElement.style.backgroundColor = newColor;
-        }
-
-        // Also update the meta theme-color if present in the external window.
-        const metaElement = doc.querySelector('meta[name="theme-color"]');
-        if (metaElement) {
-          metaElement.setAttribute('content', newColor);
-        }
-      } else {
-        // Fallback: use the main window helper.
-        Window.setWindowBackgroundColor(newColor);
-      }
+      Window.setWindowBackgroundColor(
+        gdevelopTheme.surface.window.backgroundColor,
+        portalContainer ? portalContainer.ownerDocument : undefined
+      );
     },
     [gdevelopTheme.surface.window.backgroundColor, portalContainer]
   );

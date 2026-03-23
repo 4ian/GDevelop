@@ -13,7 +13,7 @@ import WindowPortal from '../UI/WindowPortal';
 import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
 import { type EditorTabsPaneCommonProps } from './EditorTabsPane';
 import IconButton from '../UI/IconButton';
-import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
+import OpenInBrowserIcon from '../UI/CustomSvgIcons/OpenInBrowser';
 import { useKeyboardShortcuts } from '../KeyboardShortcuts';
 import CommandPalette, {
   type CommandPaletteInterface,

@@ -172,7 +172,7 @@ namespace gdjs {
      * `getDrawableZ()`.
      */
     getCenterZ(): float {
-      return this.getDepth() / 2;
+      return this.getUnscaledCenterZ() * this.getScaleZ();
     }
 
     getCenterZInScene(): float {
@@ -355,15 +355,9 @@ namespace gdjs {
      */
     getUnscaledCenterZ(): float {
       if (this.hasCustomRotationCenter()) {
-        return this._customCenterZ;
+        return this._customCenterZ - this._innerArea.min[2];
       }
-      if (this._innerArea) {
-        return (this._innerArea.min[2] + this._innerArea.max[2]) / 2;
-      }
-      if (this._isUntransformedHitBoxesDirty) {
-        this._updateUntransformedHitBoxes();
-      }
-      return (this._minZ + this._maxZ) / 2;
+      return this.getUnscaledDepth() / 2;
     }
 
     /**

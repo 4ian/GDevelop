@@ -1253,7 +1253,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _setShowJsTypeError(newValue: boolean) {
-    console.log('_setShowJsTypeError', newValue);
     this.setState(
       state => ({
         values: { ...state.values, showJsTypeError: newValue },

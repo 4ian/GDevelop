@@ -43,14 +43,25 @@ const monacoEditorOptions = {
 let monacoCompletionsInitialized = false;
 let monacoThemesInitialized = false;
 
-export class CodeEditor extends React.Component<Props, State> {
-  // $FlowFixMe[missing-local-annot]
-  state = {
-    MonacoEditor: null,
-    error: null,
-  };
+export const CodeEditor = ({
+  value,
+  onChange,
+  initialScrollTop,
+  initialCursorColumn,
+  initialCursorLine,
+  saveEditorState,
+  width,
+  height,
+  onEditorMounted,
+  onFocus,
+  onBlur,
+}: Props): React.Node => {
+  const [MonacoEditor, setMonacoEditor] = React.useState<any>(null);
+  const [error, setError] = React.useState<Error | null>(null);
 
-  setupEditorThemes = (monaco: any) => {
+  const { values: preferences } = React.useContext(PreferencesContext);
+
+  const setupEditorThemes = React.useCallback((monaco: any) => {
     if (!monacoThemesInitialized) {
       monacoThemesInitialized = true;
 
@@ -64,154 +75,157 @@ export class CodeEditor extends React.Component<Props, State> {
         }
       });
     }
-  };
+  }, []);
 
-  setUpSaveOnEditorBlur = (editor: any) => {
-    editor.onDidBlurEditorText(this.props.onBlur);
-  };
-  setUpEditorFocus = (editor: any) => {
-    editor.onDidFocusEditorText(this.props.onFocus);
-  };
+  const setUpSaveOnEditorBlur = React.useCallback(
+    (editor: any) => {
+      editor.onDidBlurEditorText(onBlur);
+    },
+    [onBlur]
+  );
+  const setUpEditorFocus = React.useCallback(
+    (editor: any) => {
+      editor.onDidFocusEditorText(onFocus);
+    },
+    [onFocus]
+  );
 
-  setupEditorCompletions = (editor: any, monaco: any) => {
-    this.setUpEditorFocus(editor);
-    this.setUpSaveOnEditorBlur(editor);
-    if (!monacoCompletionsInitialized) {
-      monacoCompletionsInitialized = true;
+  const setupEditorCompletions = React.useCallback(
+    (editor: any, monaco: any) => {
+      setUpEditorFocus(editor);
+      setUpSaveOnEditorBlur(editor);
+      if (!monacoCompletionsInitialized) {
+        monacoCompletionsInitialized = true;
 
-      // Enable type checking of JavaScript files
-      monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-        // TODO: Uncomment to activate type checking of JS files, once autocompletions are all handled properly.
-        // ...monaco.languages.typescript.javascriptDefaults.getCompilerOptions()
-        target: monaco.languages.typescript.ScriptTarget.ES6,
-        allowNonTsExtensions: true,
-        allowJs: true,
-        checkJs: true,
+        // Enable type checking of JavaScript files
+        monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+          ...monaco.languages.typescript.javascriptDefaults.getCompilerOptions(),
+          target: monaco.languages.typescript.ScriptTarget.ES6,
+          allowNonTsExtensions: true,
+          allowJs: true,
+          checkJs: true,
+        });
+
+        if (preferences.showJsTypeError) {
+          // Activate checks - though this won't work for .d.ts classes/funcions for
+          // some reason. See:
+          // https://microsoft.github.io/monaco-editor/playground.html?source=v0.52.0#XQAAAALxBQAAAAAAAABBqQkHQ5NjdMjwa-jY7SIQ9S7DNlzs5W-mwj0fe1ZCDRFc9ws9XQE0SJE1jc2VKxhaLFIw9vEWSxW3yscw90T9lfa8wm3bKzPN7npWhYaA4x4rxLXXBbB2_OnRSToJ21hOUR_hS9pG2m6stSYmFVtipRHVTrIB91DOr8dFz_2f6wKJhg_ghHcsBt-hKnlu-qt2H4NuwdaqfbMd6vqkrLY5fzdHCB8FZIGGUDanilP6QXPTpV0rme8fvINUj2BklEotLylw-HHch53nHQMCabAMh3iNqg8S_rHB5OZg2IxLB-8POziUzSwFrTcfwxftX7gi3ZIWNPyf4vJOFtRKVr3hJLIKUGJew4RN0hYb1SnPUm1x6B8hb8I5-9WqAgbYz6E0ntlpOU4jvw6zty4iIJ4GQFuyQ1ys6LtVNKef1bnBs7fDr3xFb3LOW7E4RMonCTxapW3_DQvpQ_x4psM1GYFKMZZXr0lCRvrFs4PBf0uXMwEeTfC1PurLOeoNNEEZFLutUE1ojQVjkTgxZC_HCheas9sKTtZRsJ0i6qDWJh3PbNocPFIbvPQ5la2NXuQIph1oaGrDjqgoirRoexyKumFnXVLkvKVoTdglfgXLwEaoheNdItwJfWKdPqmHh18GTsk8Df_mr8zt3r-pLUtNvB6220ZAKaswAMPR0yDrfHfz_7vWaBfDy6yykp-ROV0Ckt2qV83DVNrHW9HNm4e0WC1ByFoDOB8AdJzjQye8YD3aCwy8ft4sSOGvSeNo2FOPoqd2TU-Sr58fhP09rWes4Vgrv1MhMlUtZ5zBNSL_Mpb1R32H8hrNShgxxaT0r048_u6-nFbkNKq-VCjTlFuUoTW-3y8b1UrYxSmTkjmp-KCc9ObqKgzbRV5tPIX_sqYqVCJFOZN0Nndp4s6xm7qmVPi8SMcDfCD4zfPWBpanAohwTcIIbXPJqggntHxMUFvH7h85mh3AZoJ5FPz2v387LTrxdqOZZW7kTGqSl-Y8NHsa_znjlaNDOU-qywr5DypPbH3_wOm2XMeQNg0jX1bBtIoh_PG5BWMQNlJmQRlDnmDtueZf_nTzQw
+          monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+            ...monaco.languages.typescript.javascriptDefaults.getDiagnosticsOptions(),
+            noSemanticValidation: false,
+            noSuggestionDiagnostics: false,
+            noSyntaxValidation: false,
+          });
+        }
+
+        setupAutocompletions(monaco);
+      }
+
+      editor.setScrollTop(initialScrollTop);
+      editor.setPosition({
+        column: initialCursorColumn,
+        lineNumber: initialCursorLine,
       });
 
-      // Activate checks - though this won't work for .d.ts classes/funcions for
-      // some reason. See:
-      // https://microsoft.github.io/monaco-editor/playground.html?source=v0.52.0#XQAAAALxBQAAAAAAAABBqQkHQ5NjdMjwa-jY7SIQ9S7DNlzs5W-mwj0fe1ZCDRFc9ws9XQE0SJE1jc2VKxhaLFIw9vEWSxW3yscw90T9lfa8wm3bKzPN7npWhYaA4x4rxLXXBbB2_OnRSToJ21hOUR_hS9pG2m6stSYmFVtipRHVTrIB91DOr8dFz_2f6wKJhg_ghHcsBt-hKnlu-qt2H4NuwdaqfbMd6vqkrLY5fzdHCB8FZIGGUDanilP6QXPTpV0rme8fvINUj2BklEotLylw-HHch53nHQMCabAMh3iNqg8S_rHB5OZg2IxLB-8POziUzSwFrTcfwxftX7gi3ZIWNPyf4vJOFtRKVr3hJLIKUGJew4RN0hYb1SnPUm1x6B8hb8I5-9WqAgbYz6E0ntlpOU4jvw6zty4iIJ4GQFuyQ1ys6LtVNKef1bnBs7fDr3xFb3LOW7E4RMonCTxapW3_DQvpQ_x4psM1GYFKMZZXr0lCRvrFs4PBf0uXMwEeTfC1PurLOeoNNEEZFLutUE1ojQVjkTgxZC_HCheas9sKTtZRsJ0i6qDWJh3PbNocPFIbvPQ5la2NXuQIph1oaGrDjqgoirRoexyKumFnXVLkvKVoTdglfgXLwEaoheNdItwJfWKdPqmHh18GTsk8Df_mr8zt3r-pLUtNvB6220ZAKaswAMPR0yDrfHfz_7vWaBfDy6yykp-ROV0Ckt2qV83DVNrHW9HNm4e0WC1ByFoDOB8AdJzjQye8YD3aCwy8ft4sSOGvSeNo2FOPoqd2TU-Sr58fhP09rWes4Vgrv1MhMlUtZ5zBNSL_Mpb1R32H8hrNShgxxaT0r048_u6-nFbkNKq-VCjTlFuUoTW-3y8b1UrYxSmTkjmp-KCc9ObqKgzbRV5tPIX_sqYqVCJFOZN0Nndp4s6xm7qmVPi8SMcDfCD4zfPWBpanAohwTcIIbXPJqggntHxMUFvH7h85mh3AZoJ5FPz2v387LTrxdqOZZW7kTGqSl-Y8NHsa_znjlaNDOU-qywr5DypPbH3_wOm2XMeQNg0jX1bBtIoh_PG5BWMQNlJmQRlDnmDtueZf_nTzQw
-      //
-      // TODO: Uncomment to activate type checking of JS files, once autocompletions are all handled properly.
-      //
-      // monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-      //   ...monaco.languages.typescript.javascriptDefaults.getDiagnosticsOptions(),
-      //   noSemanticValidation: false,
-      //   noSuggestionDiagnostics: false,
-      //   noSyntaxValidation: false,
-      // });
+      if (onEditorMounted) onEditorMounted();
+    },
+    [
+      initialCursorColumn,
+      initialCursorLine,
+      initialScrollTop,
+      onEditorMounted,
+      preferences.showJsTypeError,
+      setUpEditorFocus,
+      setUpSaveOnEditorBlur,
+    ]
+  );
 
-      setupAutocompletions(monaco);
-    }
+  const handleLoadError = React.useCallback((error: Error) => {
+    setError(error);
+  }, []);
 
-    editor.setScrollTop(this.props.initialScrollTop);
-    editor.setPosition({
-      column: this.props.initialCursorColumn,
-      lineNumber: this.props.initialCursorLine,
-    });
+  const loadMonacoEditor = React.useCallback(
+    () => {
+      setError(null);
 
-    if (this.props.onEditorMounted) this.props.onEditorMounted();
-  };
+      // Define the global variable used by Monaco Editor to find its worker
+      // (used, at least, for auto-completions).
+      window.MonacoEnvironment = {
+        getWorkerUrl: function(workerId, label) {
+          return 'external/monaco-editor-min/vs/base/worker/workerMain.js';
+        },
+      };
 
-  componentDidMount() {
-    this.loadMonacoEditor();
-  }
+      import(/* webpackChunkName: "react-monaco-editor" */ 'react-monaco-editor')
+        .then(module => setMonacoEditor(oldValue => module.default))
+        .catch(handleLoadError);
+    },
+    [handleLoadError]
+  );
 
-  handleLoadError(error: Error) {
-    this.setState({
-      error,
-    });
-  }
+  // Load the editor on mount.
+  React.useEffect(() => {
+    loadMonacoEditor();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  loadMonacoEditor() {
-    this.setState({
-      error: null,
-    });
-
-    // Define the global variable used by Monaco Editor to find its worker
-    // (used, at least, for auto-completions).
-    window.MonacoEnvironment = {
-      getWorkerUrl: function(workerId, label) {
-        return 'external/monaco-editor-min/vs/base/worker/workerMain.js';
-      },
-    };
-
-    import(/* webpackChunkName: "react-monaco-editor" */ 'react-monaco-editor')
-      .then(module =>
-        this.setState({
-          MonacoEditor: module.default,
-        })
-      )
-      // $FlowFixMe[method-unbinding]
-      .catch(this.handleLoadError);
-  }
-
-  _handleContextMenu = (event: SyntheticEvent<>) => {
+  const _handleContextMenu = React.useCallback((event: SyntheticEvent<>) => {
     // Prevent right click to bubble up and trigger the context menu
     // of the event.
     event.preventDefault();
     event.stopPropagation();
-  };
+  }, []);
 
-  _saveEditorState = (editor: any, monaco: any) => {
-    const cursorPosition = editor.getPosition();
-    this.props.saveEditorState({
-      scrollTop: editor.getScrollTop(),
-      cursorColumn: cursorPosition.column,
-      cursorLine: cursorPosition.lineNumber,
-    });
-  };
+  const _saveEditorState = React.useCallback(
+    (editor: any, monaco: any) => {
+      const cursorPosition = editor.getPosition();
+      saveEditorState({
+        scrollTop: editor.getScrollTop(),
+        cursorColumn: cursorPosition.column,
+        cursorLine: cursorPosition.lineNumber,
+      });
+    },
+    [saveEditorState]
+  );
 
-  render(): any {
-    const { MonacoEditor, error } = this.state;
-    if (error) {
-      return (
-        <React.Fragment>
-          <Text>
-            <Trans>Unable to load the code editor</Trans>
-          </Text>
-          <RaisedButton
-            label={<Trans>Retry</Trans>}
-            // $FlowFixMe[method-unbinding]
-            onClick={this.loadMonacoEditor}
-          />
-        </React.Fragment>
-      );
-    }
-
-    if (!MonacoEditor) {
-      return <PlaceholderLoader />;
-    }
-
+  if (error) {
     return (
-      <div onContextMenu={this._handleContextMenu}>
-        <PreferencesContext.Consumer>
-          {({ values: preferences }) => (
-            <MonacoEditor
-              width={this.props.width || 600}
-              height={this.props.height || 200}
-              language="javascript"
-              theme={preferences.codeEditorThemeName}
-              value={this.props.value}
-              onChange={this.props.onChange}
-              editorWillMount={this.setupEditorThemes}
-              editorDidMount={this.setupEditorCompletions}
-              editorWillUnmount={this._saveEditorState}
-              options={{
-                ...monacoEditorOptions,
-                fontSize: preferences.eventsSheetZoomLevel,
-
-                // Wrap the code at either the viewport width
-                // (so no need to scroll horizontally
-                // on small code editors) or at 80 columns max
-                // (as a good practice).
-                wordWrap: 'on',
-              }}
-            />
-          )}
-        </PreferencesContext.Consumer>
-      </div>
+      <React.Fragment>
+        <Text>
+          <Trans>Unable to load the code editor</Trans>
+        </Text>
+        <RaisedButton label={<Trans>Retry</Trans>} onClick={loadMonacoEditor} />
+      </React.Fragment>
     );
   }
-}
+
+  if (!MonacoEditor) {
+    return <PlaceholderLoader />;
+  }
+
+  return (
+    <div onContextMenu={_handleContextMenu}>
+      <MonacoEditor
+        width={width || 600}
+        height={height || 200}
+        language="javascript"
+        theme={preferences.codeEditorThemeName}
+        value={value}
+        onChange={onChange}
+        editorWillMount={setupEditorThemes}
+        editorDidMount={setupEditorCompletions}
+        editorWillUnmount={_saveEditorState}
+        options={{
+          ...monacoEditorOptions,
+          fontSize: preferences.eventsSheetZoomLevel,
+
+          // Wrap the code at either the viewport width
+          // (so no need to scroll horizontally
+          // on small code editors) or at 80 columns max
+          // (as a good practice).
+          wordWrap: 'on',
+        }}
+      />
+    </div>
+  );
+};

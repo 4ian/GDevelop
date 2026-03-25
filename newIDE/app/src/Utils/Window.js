@@ -22,6 +22,10 @@ export const POSITIONAL_ARGUMENTS_KEY = '_';
 
 const windowBackgroundColors: WeakMap<Document, string> = new WeakMap();
 
+// Maps a popped-out window's Document to the frameName used in window.open(),
+// so that IPC calls can pass it to the main process for BrowserWindow resolution.
+const documentToFrameName: WeakMap<Document, string> = new WeakMap();
+
 // Per-navigator watcher state: each window's windowControlsOverlay gets its
 // own debounced listener and set of callbacks.
 type OverlayWatcherState = {|
@@ -50,6 +54,19 @@ const getOrCreateOverlayWatcher = (
   );
   overlayWatchers.set(windowControlsOverlay, state);
   return state;
+};
+
+/**
+ * Register a mapping from a popped-out window's Document to the frameName
+ * used in window.open(), so that setWindowBackgroundColor can pass it to
+ * the main process for BrowserWindow resolution.
+ */
+export const registerDocumentFrameName = (doc: Document, frameName: string) => {
+  documentToFrameName.set(doc, frameName);
+};
+
+export const unregisterDocumentFrameName = (doc: Document) => {
+  documentToFrameName.delete(doc);
 };
 
 /**
@@ -109,11 +126,7 @@ export default class Window {
     }
   }
 
-  static setWindowBackgroundColor(
-    newColor: string,
-    targetDocument?: Document,
-    windowFrameName?: string
-  ) {
+  static setWindowBackgroundColor(newColor: string, targetDocument?: Document) {
     const doc = targetDocument || document;
 
     if (windowBackgroundColors.get(doc) === newColor) {
@@ -137,7 +150,7 @@ export default class Window {
             ? '#000000'
             : '#ffffff',
         },
-        windowFrameName
+        documentToFrameName.get(doc)
       );
     }
 

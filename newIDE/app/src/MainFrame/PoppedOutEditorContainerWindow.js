@@ -9,9 +9,7 @@ import ErrorBoundary, {
 import { type EditorTab } from './EditorTabs/EditorTabsHandler';
 import UnsavedChangesContext from './UnsavedChangesContext';
 import { SpecificDimensionsWindowSizeProvider } from '../UI/Responsive/ResponsiveWindowMeasurer';
-import WindowPortal, {
-  WindowPortalFrameNameContext,
-} from '../UI/WindowPortal';
+import WindowPortal from '../UI/WindowPortal';
 import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
 import { type EditorTabsPaneCommonProps } from './EditorTabsPane';
 import { useKeyboardShortcuts } from '../KeyboardShortcuts';
@@ -343,17 +341,15 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
 const PoppedOutWindowBackgroundColor = () => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const portalContainer = React.useContext(PortalContainerContext);
-  const windowFrameName = React.useContext(WindowPortalFrameNameContext);
 
   React.useEffect(
     () => {
       Window.setWindowBackgroundColor(
         gdevelopTheme.toolbar.backgroundColor,
-        portalContainer ? portalContainer.ownerDocument : undefined,
-        windowFrameName || undefined
+        portalContainer ? portalContainer.ownerDocument : undefined
       );
     },
-    [gdevelopTheme.toolbar.backgroundColor, portalContainer, windowFrameName]
+    [gdevelopTheme.toolbar.backgroundColor, portalContainer]
   );
 
   return null;

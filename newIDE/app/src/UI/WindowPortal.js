@@ -4,14 +4,11 @@ import { t } from '@lingui/macro';
 import ReactDOM from 'react-dom';
 import PortalContainerContext from './PortalContainerContext';
 import Window from '../Utils/Window';
+import {
+  registerDocumentFrameName,
+  unregisterDocumentFrameName,
+} from '../Utils/Window';
 import useAlertDialog from './Alert/useAlertDialog';
-
-/**
- * Provides the frameName of the popped-out window (used by window.open),
- * so that child components can pass it to IPC calls that need to target
- * the correct BrowserWindow (e.g. titlebar overlay updates).
- */
-export const WindowPortalFrameNameContext = React.createContext<?string>(null);
 
 let popOutCounter = 0;
 
@@ -96,6 +93,10 @@ const WindowPortal = ({
     }
 
     externalWindowRef.current = externalWindow;
+
+    // Register the frameName for this document so that
+    // Window.setWindowBackgroundColor can pass it to the main process.
+    registerDocumentFrameName(externalWindow.document, frameNameRef.current);
 
     // Set up the new window's document.
     externalWindow.document.title = title;
@@ -214,6 +215,7 @@ const WindowPortal = ({
       clearInterval(checkClosed);
       if (styleObserver) styleObserver.disconnect();
       if (observer) observer.disconnect();
+      unregisterDocumentFrameName(externalWindow.document);
       if (!externalWindow.closed) {
         externalWindow.close();
       }
@@ -248,11 +250,9 @@ const WindowPortal = ({
     : container;
 
   return ReactDOM.createPortal(
-    <WindowPortalFrameNameContext.Provider value={frameNameRef.current}>
-      <PortalContainerContext.Provider value={portalBody}>
-        {windowSize && renderContent({ windowSize })}
-      </PortalContainerContext.Provider>
-    </WindowPortalFrameNameContext.Provider>,
+    <PortalContainerContext.Provider value={portalBody}>
+      {windowSize && renderContent({ windowSize })}
+    </PortalContainerContext.Provider>,
     container
   );
 };

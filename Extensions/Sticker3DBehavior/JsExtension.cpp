@@ -74,7 +74,7 @@ class Sticker3DBehaviorJsExtension : public gd::PlatformExtension {
             _("Set X offset"),
             _("Set the X offset from the stuck-to 3D object."),
             _("Set X offset of _PARAM0_ to _PARAM2_"),
-            _("Sticker"),
+            _("Sticker ❯ Offset"),
             "res/conditions/3d_box.svg",
             "res/conditions/3d_box.svg")
         .AddParameter("object", _("Object"), "", false)
@@ -88,7 +88,7 @@ class Sticker3DBehaviorJsExtension : public gd::PlatformExtension {
             _("Set Y offset"),
             _("Set the Y offset from the stuck-to 3D object."),
             _("Set Y offset of _PARAM0_ to _PARAM2_"),
-            _("Sticker"),
+            _("Sticker ❯ Offset"),
             "res/conditions/3d_box.svg",
             "res/conditions/3d_box.svg")
         .AddParameter("object", _("Object"), "", false)
@@ -102,7 +102,7 @@ class Sticker3DBehaviorJsExtension : public gd::PlatformExtension {
             _("Set Z offset"),
             _("Set the Z offset from the stuck-to 3D object."),
             _("Set Z offset of _PARAM0_ to _PARAM2_"),
-            _("Sticker"),
+            _("Sticker ❯ Offset"),
             "res/conditions/3d_box.svg",
             "res/conditions/3d_box.svg")
         .AddParameter("object", _("Object"), "", false)
@@ -115,7 +115,7 @@ class Sticker3DBehaviorJsExtension : public gd::PlatformExtension {
             "OffsetX",
             _("X offset"),
             _("Get the X offset from the stuck-to 3D object."),
-            _("Sticker"),
+            _("Sticker ❯ Offset"),
             "res/conditions/3d_box.svg")
         .AddParameter("object", _("Object"), "", false)
         .AddParameter("behavior", _("Behavior"), "Sticker3DBehavior")
@@ -126,7 +126,7 @@ class Sticker3DBehaviorJsExtension : public gd::PlatformExtension {
             "OffsetY",
             _("Y offset"),
             _("Get the Y offset from the stuck-to 3D object."),
-            _("Sticker"),
+            _("Sticker ❯ Offset"),
             "res/conditions/3d_box.svg")
         .AddParameter("object", _("Object"), "", false)
         .AddParameter("behavior", _("Behavior"), "Sticker3DBehavior")
@@ -137,7 +137,7 @@ class Sticker3DBehaviorJsExtension : public gd::PlatformExtension {
             "OffsetZ",
             _("Z offset"),
             _("Get the Z offset from the stuck-to 3D object."),
-            _("Sticker"),
+            _("Sticker ❯ Offset"),
             "res/conditions/3d_box.svg")
         .AddParameter("object", _("Object"), "", false)
         .AddParameter("behavior", _("Behavior"), "Sticker3DBehavior")

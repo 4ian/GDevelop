@@ -149,9 +149,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
             instance.getDefaultDepth(),
           ];
     }, []);
+
     const _onInstancesModified = React.useCallback(
-      // $FlowFixMe[missing-local-annot]
-      instances => {
+      (instances: Array<gdInitialInstance>) => {
         if (onInstancesModified) onInstancesModified(instances);
         forceUpdateInstancesList();
       },
@@ -160,8 +160,11 @@ const MosaicEditorsDisplay: React.ComponentType<{
     const toggleEditorView = React.useCallback((editorId: EditorId) => {
       if (!editorMosaicRef.current) return;
       const config = defaultPanelConfigByEditor[editorId];
-      // $FlowFixMe[incompatible-type]
-      editorMosaicRef.current.toggleEditor(editorId, config.position);
+      editorMosaicRef.current.toggleEditor(
+        editorId,
+        // $FlowFixMe[incompatible-type]
+        config.position
+      );
     }, []);
     const isEditorVisible = React.useCallback((editorId: EditorId) => {
       if (!editorMosaicRef.current) return false;

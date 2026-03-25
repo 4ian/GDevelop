@@ -112,9 +112,7 @@ void ObjectAssetSerializer::SerializeTo(
     usedResourceNames.push_back(resourceName);
     auto &resource = resourcesManager.GetResource(resourceName);
     SerializerElement &resourceElement = resourcesElement.AddChild("resource");
-    resource.SerializeTo(resourceElement);
-    resourceElement.SetAttribute("kind", resource.GetKind());
-    resourceElement.SetAttribute("name", resource.GetName());
+    gd::ResourcesContainer::SerializeResourceTo(resource, resourceElement);
   }
 
   SerializerElement &requiredExtensionsElement =

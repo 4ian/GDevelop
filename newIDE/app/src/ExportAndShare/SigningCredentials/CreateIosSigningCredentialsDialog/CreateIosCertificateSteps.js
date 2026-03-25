@@ -17,6 +17,7 @@ import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { type AuthenticatedUser } from '../../../Profile/AuthenticatedUserContext';
 import { signingCredentialApi } from '../../../Utils/GDevelopServices/Build';
+import { extractGDevelopApiErrorStatusAndCode } from '../../../Utils/GDevelopServices/Errors';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 
 export const getBase64FromFile = async (file: File): Promise<unknown> => {
@@ -38,6 +39,46 @@ export const getBase64FromFile = async (file: File): Promise<unknown> => {
     };
     reader.readAsDataURL(file);
   });
+};
+
+const getCertificateP12ErrorText = (error: ?Error): React.Node => {
+  if (!error) return null;
+
+  const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
+  if (extractedStatusAndCode) {
+    if (
+      extractedStatusAndCode.code === 'certificate-p12/certificate-not-found'
+    ) {
+      return (
+        <Trans>
+          The certificate could not be found. Please verify it was properly
+          uploaded and try again.
+        </Trans>
+      );
+    }
+    if (
+      extractedStatusAndCode.code ===
+      'certificate-p12/private-key-does-not-match-certificate'
+    ) {
+      return (
+        <Trans>
+          The uploaded certificate does not match the signing request that was
+          generated. Please create a new signing request and generate a new
+          certificate from Apple using it.
+        </Trans>
+      );
+    }
+    if (extractedStatusAndCode.code === 'certificate-p12/malformed-request') {
+      return (
+        <Trans>
+          The request could not be processed. Please verify you uploaded a valid
+          certificate file (.cer) from Apple.
+        </Trans>
+      );
+    }
+  }
+
+  return <Trans>An error occurred while generating the certificate.</Trans>;
 };
 
 const styles = {
@@ -321,7 +362,7 @@ export const CreateIosCertificateSteps = ({
 
       {certificateError && (
         <AlertMessage kind="error">
-          <Trans>An error occured while generating the certificate.</Trans>
+          {getCertificateP12ErrorText(certificateError)}
         </AlertMessage>
       )}
       {wasCertificateGenerated && (

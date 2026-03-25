@@ -42,7 +42,11 @@ export type SceneEditorsDisplayProps = {|
   ) => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
   editInstanceVariables: (instance: ?gdInitialInstance) => void,
-  editObjectByName: (objectName: string, initialTab?: ObjectEditorTab) => void,
+  editObjectByName: ({
+    objectName: string,
+    initialTab: ObjectEditorTab,
+    shouldSelectTheObject: boolean,
+  }) => void,
   editObjectInPropertiesPanel: (objectName: string) => void,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onEffectAdded: () => void,

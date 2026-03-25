@@ -26,9 +26,11 @@ const trackedClasses = [
   'EffectsContainer',
   'InitialInstancesContainer',
   'LayersContainer',
+  'ObjectFolderOrObject',
   'ObjectGroupsContainer',
   'ObjectsContainer',
   'VariablesContainer',
+  'JsCodeEvent',
 ];
 
 type Stats = {|

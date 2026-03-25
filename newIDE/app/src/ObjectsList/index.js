@@ -56,6 +56,7 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { EventsScope } from '../InstructionOrExpression/EventsScope';
 import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -245,6 +246,9 @@ class ObjectFolderTreeViewItem implements TreeViewItem {
   }
 
   getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+    if (!exceptionallyGuardAgainstDeadObject(this.objectFolderOrObject))
+      return this.placeholder ? [this.placeholder] : [];
+
     if (this.objectFolderOrObject.getChildrenCount() === 0) {
       return this.placeholder ? [this.placeholder] : [];
     }

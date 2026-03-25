@@ -259,6 +259,7 @@ export default function InstructionsList({
                     className="add-link"
                     onClick={addNewInstruction}
                     onContextMenu={e => {
+                      e.preventDefault();
                       e.stopPropagation();
                       onAddInstructionContextMenu(
                         e.currentTarget,

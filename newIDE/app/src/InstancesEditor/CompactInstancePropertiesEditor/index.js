@@ -404,6 +404,9 @@ export const CompactInstancePropertiesEditor = ({
                     </Text>
                   )}
                   {allVisibleBehaviors.map(behaviorName => {
+                    if (!object.hasBehaviorNamed(behaviorName)) {
+                      return null;
+                    }
                     const behavior = object.getBehavior(behaviorName);
                     const behaviorTypeName = behavior.getTypeName();
                     const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(

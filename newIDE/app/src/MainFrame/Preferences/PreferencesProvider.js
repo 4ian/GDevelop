@@ -133,6 +133,7 @@ export const getInitialPreferences = (): {
   themeName: any,
   use3DEditor: any,
   useBackgroundSerializerForSaving: boolean,
+  showJsTypeError: boolean,
   useGDJSDevelopmentWatcher: boolean,
   useShortcutToClosePreviewWindow: boolean,
   userShortcutMap: {},
@@ -399,6 +400,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setUseBackgroundSerializerForSaving: (this._setUseBackgroundSerializerForSaving.bind(
       this
     ): any),
+    // $FlowFixMe[method-unbinding]
+    setShowJsTypeError: (this._setShowJsTypeError.bind(this): any),
   };
 
   componentDidMount() {
@@ -1244,6 +1247,15 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this.setState(
       state => ({
         values: { ...state.values, useBackgroundSerializerForSaving: newValue },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setShowJsTypeError(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: { ...state.values, showJsTypeError: newValue },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

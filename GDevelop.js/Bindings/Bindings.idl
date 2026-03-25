@@ -1353,6 +1353,10 @@ interface ResourcesContainer {
     boolean MoveResourceUpInList([Const] DOMString oldName);
     boolean MoveResourceDownInList([Const] DOMString oldName);
     void MoveResource(unsigned long oldIndex, unsigned long newIndex);
+
+    void STATIC_UnserializeResourceFrom(
+        [Ref] Resource resource,
+        [Const, Ref] SerializerElement resourceElement);
 };
 
 interface ResourcesContainersList {
@@ -4361,6 +4365,13 @@ interface JsCodeEvent {
     void SetDisabled(boolean disable);
     boolean IsFolded();
     void SetFolded(boolean folded);
+
+    long GetScrollTop();
+    void SetScrollTop(long value);
+    long GetCursorColumn();
+    void SetCursorColumn(long value);
+    long GetCursorLine();
+    void SetCursorLine(long value);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);

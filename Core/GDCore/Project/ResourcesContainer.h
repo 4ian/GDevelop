@@ -778,6 +778,12 @@ public:
    */
   void UnserializeFrom(const SerializerElement &element);
 
+  /**
+   * \brief Unserialize one resource.
+   */
+  static void UnserializeResourceFrom(gd::Resource &resource,
+                                      const SerializerElement &resourceElement);
+
 private:
   void Init(const ResourcesContainer &other);
 

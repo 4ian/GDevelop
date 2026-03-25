@@ -7,7 +7,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
-import SearchBar from '../UI/SearchBar';
+import CompactSearchBar from '../UI/CompactSearchBar';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import TreeView, {
   type TreeViewInterface,
@@ -1768,9 +1768,8 @@ const EventsFunctionsList = React.forwardRef<
         <Column>
           <LineStackLayout>
             <Column expand noMargin>
-              <SearchBar
+              <CompactSearchBar
                 value={searchText}
-                onRequestSearch={() => {}}
                 onChange={text => setSearchText(text)}
                 placeholder={t`Search functions`}
               />

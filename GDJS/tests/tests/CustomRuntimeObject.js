@@ -21,61 +21,9 @@ describe('gdjs.CustomRuntimeObject', function () {
       behaviors: [],
       effects: [],
       content: {},
-      childrenContent: {
-        MySprite: {
-          updateIfNotVisible: false,
-          animations: [
-            {
-              name: 'animation',
-              directions: [
-                {
-                  sprites: [
-                    {
-                      image: 'base/tests-utils/assets/64x64.jpg',
-                      originPoint: { name: 'Origin', x: 0, y: 0 },
-                      centerPoint: {
-                        name: 'Center',
-                        x: 32,
-                        y: 32,
-                        automatic: false,
-                      },
-                      points: [
-                        { name: 'Center', x: 32, y: 32 },
-                        { name: 'Origin', x: 0, y: 0 },
-                      ],
-                      hasCustomCollisionMask: true,
-                      customCollisionMask: [
-                        [
-                          { x: 64, y: 64 },
-                          { x: 0, y: 64 },
-                          { x: 64, y: 0 },
-                        ],
-                      ],
-                    },
-                  ],
-                  timeBetweenFrames: 0,
-                  looping: false,
-                },
-              ],
-              useMultipleDirections: false,
-            },
-          ],
-        },
-      }
     });
     instanceContainer.addObject(customObject);
     return customObject;
-  };
-
-  /**
-   * @param {gdjs.RuntimeInstanceContainer} parent
-   */
-  const createSpriteObject = (parent) => {
-    const sprite = parent.createObject('MySprite');
-    if (!sprite) {
-      throw new Error("Object couldn't be created");
-    }
-    return sprite;
   };
 
   const createSceneWithLayer = (runtimeGame) => {
@@ -94,29 +42,75 @@ describe('gdjs.CustomRuntimeObject', function () {
     return runtimeScene;
   };
 
+  /**
+   * @param {gdjs.RuntimeInstanceContainer} parent
+   */
+  const createSpriteObject = (parent) => {
+    const sprite = parent.createObject('MySprite');
+    if (!sprite) {
+      throw new Error("Object couldn't be created");
+    }
+    return sprite;
+  };
+
   describe('with 2 sprites', function () {
-    /** @type {gdjs.CustomRuntimeObject} */
-    let customObject;
-    /** @type {gdjs.RuntimeObject} */
-    let leftSprite;
-    /** @type {gdjs.RuntimeObject} */
-    let rightSprite;
+    const instancesSideBySide = [
+      {
+        angle: 0,
+        customSize: true,
+        height: 64,
+        layer: '',
+        name: 'MySprite',
+        persistentUuid: '668db48d-4e12-4b6f-aa6b-f73b74bf608e',
+        width: 64,
+        x: 0,
+        y: 0,
+        zOrder: 1,
+        numberProperties: [],
+        stringProperties: [],
+        initialVariables: [],
+        behaviorOverridings: [],
+      },
+      {
+        angle: 0,
+        customSize: true,
+        height: 64,
+        layer: '',
+        name: 'MySprite',
+        persistentUuid: '668db48d-4e12-4b6f-aa6b-f73b74bf608e',
+        width: 64,
+        x: 64,
+        y: 0,
+        zOrder: 1,
+        numberProperties: [],
+        stringProperties: [],
+        initialVariables: [],
+        behaviorOverridings: [],
+      },
+    ];
 
-    const makeCustomObjectWith2Children = (instanceContainer) => {
-      customObject = createCustomObject(instanceContainer);
-
-      // Child-object creation should be done in the onCreate method of custom object.
-      // TODO EBO Rewrite this test when an events-based object has initialInstances.
-      leftSprite = createSpriteObject(customObject._instanceContainer);
-      rightSprite = createSpriteObject(customObject._instanceContainer);
-
-      rightSprite.setX(64);
+    /**
+     * @return {Promise<{runtimeScene: gdjs.RuntimeScene, customObject: gdjs.CustomRuntimeObject, leftSprite: gdjs.RuntimeObject, rightSprite: gdjs.RuntimeObject}>}
+     */
+    const makeCustomObjectWith2Children = async () => {
+      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets({
+        customObjectInstances: instancesSideBySide,
+      });
+      const runtimeScene = createSceneWithLayer(runtimeGame);
+      const customObject = createCustomObject(runtimeScene);
+      const childrenContainer = customObject.getChildrenContainer();
+      const childrenInstances = childrenContainer.getInstancesOf('MySprite');
+      return {
+        runtimeScene,
+        customObject,
+        leftSprite: childrenInstances[0],
+        rightSprite: childrenInstances[1],
+      };
     };
 
     it('can return hit-boxes according to its children', async () => {
-      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-      const runtimeScene = createSceneWithLayer(runtimeGame);
-      makeCustomObjectWith2Children(runtimeScene);
+      const { runtimeScene, customObject, leftSprite, rightSprite } =
+        await makeCustomObjectWith2Children();
 
       expect(leftSprite.getHitBoxes().length).to.be(1);
       expect(leftSprite.getHitBoxes()[0].vertices).to.eql([
@@ -132,17 +126,6 @@ describe('gdjs.CustomRuntimeObject', function () {
         [128, 0],
       ]);
 
-      expect(customObject.getWidth()).to.be(128);
-      expect(customObject.getHeight()).to.be(64);
-
-      expect(customObject.getAABB()).to.eql({
-        min: [0, 0],
-        max: [128, 64],
-      });
-
-      expect(customObject.getCenterXInScene()).to.be(64);
-      expect(customObject.getCenterYInScene()).to.be(32);
-
       expect(customObject.getHitBoxes().length).to.be(2);
       expect(customObject.getHitBoxes()[0].vertices).to.eql([
         [64, 64],
@@ -157,17 +140,10 @@ describe('gdjs.CustomRuntimeObject', function () {
     });
 
     it('can translate its hit-boxes', async () => {
-      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-      const runtimeScene = createSceneWithLayer(runtimeGame);
-      makeCustomObjectWith2Children(runtimeScene);
+      const { runtimeScene, customObject, leftSprite, rightSprite } =
+        await makeCustomObjectWith2Children();
 
       customObject.setPosition(8, 16);
-
-      expect(customObject.getWidth()).to.be(128);
-      expect(customObject.getHeight()).to.be(64);
-
-      expect(customObject.getCenterXInScene()).to.be(64 + 8);
-      expect(customObject.getCenterYInScene()).to.be(32 + 16);
 
       expect(customObject.getHitBoxes().length).to.be(2);
       expect(customObject.getHitBoxes()[0].vertices).to.eql([
@@ -183,46 +159,60 @@ describe('gdjs.CustomRuntimeObject', function () {
     });
 
     it('can rotate its hit-boxes', async () => {
-      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-      const runtimeScene = createSceneWithLayer(runtimeGame);
-      makeCustomObjectWith2Children(runtimeScene);
+      const { runtimeScene, customObject, leftSprite, rightSprite } =
+        await makeCustomObjectWith2Children();
+
+      expect(customObject.getCenterXInScene()).to.be((-100 + 400) / 2);
+      expect(customObject.getCenterYInScene()).to.be((-200 + 500) / 2);
 
       customObject.setAngle(90);
 
-      expect(customObject.getWidth()).to.be(128);
-      expect(customObject.getHeight()).to.be(64);
-
-      expect(customObject.getCenterXInScene()).to.be(64);
-      expect(customObject.getCenterYInScene()).to.be(32);
-
-      // sin(pi/2) can't be exactly 0
-      // but cos(pi/2) is rounded to 1 because of the mantissa length.
       expect(customObject.getHitBoxes().length).to.be(2);
       expect(customObject.getHitBoxes()[0].vertices).to.eql([
-        [32, 32],
-        [32, -32],
-        [96, 32],
+        [236, 64],
+        [236, 0],
+        [300, 64],
       ]);
       expect(customObject.getHitBoxes()[1].vertices).to.eql([
-        [32, 96],
-        [32, 32],
-        [96, 96],
+        [236, 128],
+        [236, 64],
+        [300, 128],
+      ]);
+    });
+
+    it('can rotate its hit-boxes around a custom center at (0 ; 0)', async () => {
+      const { runtimeScene, customObject, leftSprite, rightSprite } =
+        await makeCustomObjectWith2Children();
+
+      customObject.setRotationCenter(0, 0);
+
+      expect(customObject.getCenterXInScene()).to.be(0);
+      expect(customObject.getCenterYInScene()).to.be(0);
+
+      customObject.setAngle(90);
+
+      expect(customObject.getHitBoxes().length).to.be(2);
+      expect(customObject.getHitBoxes()[0].vertices).to.eql([
+        [-64, 64],
+        [-64, 0],
+        [0, 64],
+      ]);
+      expect(customObject.getHitBoxes()[1].vertices).to.eql([
+        [-64, 128],
+        [-64, 64],
+        [0, 128],
       ]);
     });
 
     it('can scale its hit-boxes', async () => {
-      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-      const runtimeScene = createSceneWithLayer(runtimeGame);
-      makeCustomObjectWith2Children(runtimeScene);
+      const { runtimeScene, customObject, leftSprite, rightSprite } =
+        await makeCustomObjectWith2Children();
 
-      customObject.setWidth(32);
-      customObject.setHeight(96);
+      expect(customObject.getWidth()).to.be(100 + 400);
+      expect(customObject.getHeight()).to.be(200 + 500);
 
-      expect(customObject.getWidth()).to.be(32);
-      expect(customObject.getHeight()).to.be(96);
-
-      expect(customObject.getCenterXInScene()).to.be(16);
-      expect(customObject.getCenterYInScene()).to.be(48);
+      customObject.setWidth((100 + 400) * 0.25);
+      customObject.setHeight((200 + 500) * 1.5);
 
       expect(customObject.getHitBoxes().length).to.be(2);
       expect(customObject.getHitBoxes()[0].vertices).to.eql([
@@ -238,14 +228,13 @@ describe('gdjs.CustomRuntimeObject', function () {
     });
 
     it('can translate, scale and rotate its hit-boxes', async () => {
-      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-      const runtimeScene = createSceneWithLayer(runtimeGame);
-      makeCustomObjectWith2Children(runtimeScene);
+      const { runtimeScene, customObject, leftSprite, rightSprite } =
+        await makeCustomObjectWith2Children();
 
       customObject.setPosition(8, 16);
       customObject.setAngle(90);
-      customObject.setWidth(32);
-      customObject.setHeight(96);
+      customObject.setWidth((100 + 400) * 0.25);
+      customObject.setHeight((200 + 500) * 1.5);
 
       // To draw the transformed shapes:
       // - draw 2 squares side-by-side
@@ -253,123 +242,22 @@ describe('gdjs.CustomRuntimeObject', function () {
       // - rotate the shape keeping the center of the scaled drawing in place
       // - translate it according to the object new position.
 
-      expect(customObject.getWidth()).to.be(32);
-      expect(customObject.getHeight()).to.be(96);
-
-      expect(customObject.getCenterXInScene()).to.be(32 / 2 + 8);
-      expect(customObject.getCenterYInScene()).to.be(96 / 2 + 16);
-
       expect(customObject.getHitBoxes().length).to.be(2);
       expect(customObject.getHitBoxes()[0].vertices).to.eql([
-        [-24, 64],
-        [-24, 48],
-        [72, 64],
+        [174.5, 219.5],
+        [174.5, 203.5],
+        [270.5, 219.5],
       ]);
       expect(customObject.getHitBoxes()[1].vertices).to.eql([
-        [-24, 80],
-        [-24, 64],
-        [72, 80],
-      ]);
-    });
-
-    it('keeps hit-boxes up to date when its children move and push the bottom-right corner', async () => {
-      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-      const runtimeScene = createSceneWithLayer(runtimeGame);
-      makeCustomObjectWith2Children(runtimeScene);
-
-      rightSprite.setPosition(64 + 32, 0 + 8);
-
-      expect(customObject.getWidth()).to.be(128 + 32);
-      expect(customObject.getHeight()).to.be(64 + 8);
-
-      expect(customObject.getX()).to.be(0);
-      expect(customObject.getY()).to.be(0);
-
-      expect(customObject.getCenterXInScene()).to.be(64 + 16);
-      expect(customObject.getCenterYInScene()).to.be(32 + 4);
-
-      expect(customObject.getHitBoxes().length).to.be(2);
-      expect(customObject.getHitBoxes()[0].vertices).to.eql([
-        [64, 64],
-        [0, 64],
-        [64, 0],
-      ]);
-      expect(customObject.getHitBoxes()[1].vertices).to.eql([
-        [160, 72],
-        [96, 72],
-        [160, 8],
-      ]);
-    });
-
-    it('keeps hit-boxes up to date when its children move and push the top-left corner', async () => {
-      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-      const runtimeScene = createSceneWithLayer(runtimeGame);
-      makeCustomObjectWith2Children(runtimeScene);
-
-      leftSprite.setPosition(0 - 32, 0 - 8);
-
-      expect(customObject.getWidth()).to.be(128 + 32);
-      expect(customObject.getHeight()).to.be(64 + 8);
-
-      expect(customObject.getX()).to.be(0);
-      expect(customObject.getY()).to.be(0);
-
-      expect(customObject.getDrawableX()).to.be(-32);
-      expect(customObject.getDrawableY()).to.be(-8);
-
-      expect(customObject.getCenterXInScene()).to.be(64 - 16);
-      expect(customObject.getCenterYInScene()).to.be(32 - 4);
-
-      expect(customObject.getHitBoxes().length).to.be(2);
-      expect(customObject.getHitBoxes()[0].vertices).to.eql([
-        [32, 56],
-        [-32, 56],
-        [32, -8],
-      ]);
-      expect(customObject.getHitBoxes()[1].vertices).to.eql([
-        [128, 64],
-        [64, 64],
-        [128, 0],
-      ]);
-    });
-
-    it('keeps hit-boxes up to date when its children move and shrink the top-left corner', async () => {
-      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-      const runtimeScene = createSceneWithLayer(runtimeGame);
-      makeCustomObjectWith2Children(runtimeScene);
-
-      leftSprite.setPosition(0 + 32, 0 + 8);
-      rightSprite.setPosition(64, 0 + 8);
-
-      expect(customObject.getWidth()).to.be(128 - 32);
-      expect(customObject.getHeight()).to.be(64);
-
-      expect(customObject.getX()).to.be(0);
-      expect(customObject.getY()).to.be(0);
-
-      expect(customObject.getDrawableX()).to.be(32);
-      expect(customObject.getDrawableY()).to.be(8);
-
-      expect(customObject.getCenterXInScene()).to.be(64 + 16);
-      expect(customObject.getCenterYInScene()).to.be(32 + 8);
-
-      expect(customObject.getHitBoxes().length).to.be(2);
-      expect(customObject.getHitBoxes()[0].vertices).to.eql([
-        [96, 72],
-        [32, 72],
-        [96, 8],
-      ]);
-      expect(customObject.getHitBoxes()[1].vertices).to.eql([
-        [128, 72],
-        [64, 72],
-        [128, 8],
+        [174.5, 235.5],
+        [174.5, 219.5],
+        [270.5, 235.5],
       ]);
     });
 
     it('keeps hit-boxes up to date when new children is added', async () => {
-      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-      const runtimeScene = createSceneWithLayer(runtimeGame);
-      makeCustomObjectWith2Children(runtimeScene);
+      const { runtimeScene, customObject, leftSprite, rightSprite } =
+        await makeCustomObjectWith2Children();
 
       const middleSprite = createSpriteObject(customObject._instanceContainer);
       middleSprite.setX(32);
@@ -393,15 +281,11 @@ describe('gdjs.CustomRuntimeObject', function () {
     });
 
     it('properly computes hitboxes and point positions after the scene layer camera has moved', async () => {
-      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-      const runtimeScene = createSceneWithLayer(runtimeGame);
-      makeCustomObjectWith2Children(runtimeScene);
+      const { runtimeScene, customObject, leftSprite, rightSprite } =
+        await makeCustomObjectWith2Children();
       const sceneLayer = runtimeScene.getLayer('');
 
       // Check the hitboxes and positions with default camera position
-      expect(customObject.getCenterXInScene()).to.be(64);
-      expect(customObject.getCenterYInScene()).to.be(32);
-
       expect(customObject.getHitBoxes().length).to.be(2);
       expect(customObject.getHitBoxes()[0].vertices).to.eql([
         [64, 64],
@@ -420,9 +304,6 @@ describe('gdjs.CustomRuntimeObject', function () {
       customObject.invalidateHitboxes();
 
       // The object hitboxes and positions stay the same.
-      expect(customObject.getCenterXInScene()).to.be(64);
-      expect(customObject.getCenterYInScene()).to.be(32);
-
       expect(customObject.getHitBoxes().length).to.be(2);
       expect(customObject.getHitBoxes()[0].vertices).to.eql([
         [64, 64],
@@ -437,17 +318,13 @@ describe('gdjs.CustomRuntimeObject', function () {
     });
 
     it('properly computes hitboxes and point positions after the custom object layer camera has moved', async () => {
-      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-      const runtimeScene = createSceneWithLayer(runtimeGame);
-      makeCustomObjectWith2Children(runtimeScene);
+      const { runtimeScene, customObject, leftSprite, rightSprite } =
+        await makeCustomObjectWith2Children();
       const customObjectLayer = customObject
         .getInstanceContainer()
         .getLayer('');
 
       // Check the hitboxes and positions with default camera position
-      expect(customObject.getCenterXInScene()).to.be(64);
-      expect(customObject.getCenterYInScene()).to.be(32);
-
       expect(customObject.getHitBoxes().length).to.be(2);
       expect(customObject.getHitBoxes()[0].vertices).to.eql([
         [64, 64],
@@ -466,9 +343,6 @@ describe('gdjs.CustomRuntimeObject', function () {
       customObject.invalidateHitboxes();
 
       // The object hitboxes and positions stay the same.
-      expect(customObject.getCenterXInScene()).to.be(64);
-      expect(customObject.getCenterYInScene()).to.be(32);
-
       expect(customObject.getHitBoxes().length).to.be(2);
       expect(customObject.getHitBoxes()[0].vertices).to.eql([
         [64, 64],
@@ -487,52 +361,45 @@ describe('gdjs.CustomRuntimeObject', function () {
 
     describe('convertCoords', function () {
       it('can transform a point from the scene', async () => {
-        const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-        const runtimeScene = createSceneWithLayer(runtimeGame);
-        makeCustomObjectWith2Children(runtimeScene);
+        const { runtimeScene, customObject, leftSprite, rightSprite } =
+          await makeCustomObjectWith2Children();
         const instanceContainer = customObject._instanceContainer;
 
         customObject.setPosition(16, 8);
         expect(instanceContainer.convertCoords(16, 8, workingPoint)).to.eql([
-          0,
-          0,
+          0, 0,
         ]);
       });
 
       it('can transform a point from the scene with a negative AABB min position', async () => {
-        const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-        const runtimeScene = createSceneWithLayer(runtimeGame);
-        makeCustomObjectWith2Children(runtimeScene);
+        const { runtimeScene, customObject, leftSprite, rightSprite } =
+          await makeCustomObjectWith2Children();
         const instanceContainer = customObject._instanceContainer;
 
         leftSprite.setPosition(-16, -8);
         customObject.setPosition(0, 0);
         expect(instanceContainer.convertCoords(0, 0, workingPoint)).to.eql([
-          0,
-          0,
+          0, 0,
         ]);
       });
 
       it('can transform a point from the scene with a positive AABB min position', async () => {
-        const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-        const runtimeScene = createSceneWithLayer(runtimeGame);
-        makeCustomObjectWith2Children(runtimeScene);
+        const { runtimeScene, customObject, leftSprite, rightSprite } =
+          await makeCustomObjectWith2Children();
         const instanceContainer = customObject._instanceContainer;
 
         leftSprite.setPosition(16, 8);
         customObject.setPosition(0, 0);
         expect(instanceContainer.convertCoords(0, 0, workingPoint)).to.eql([
-          0,
-          0,
+          0, 0,
         ]);
       });
     });
 
     describe('convertInverseCoords', function () {
       it('can transform a point to the scene', async () => {
-        const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-        const runtimeScene = createSceneWithLayer(runtimeGame);
-        makeCustomObjectWith2Children(runtimeScene);
+        const { runtimeScene, customObject, leftSprite, rightSprite } =
+          await makeCustomObjectWith2Children();
         const instanceContainer = customObject._instanceContainer;
 
         customObject.setPosition(16, 8);
@@ -542,9 +409,8 @@ describe('gdjs.CustomRuntimeObject', function () {
       });
 
       it('can transform a point to scene with a negative AABB min position', async () => {
-        const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-        const runtimeScene = createSceneWithLayer(runtimeGame);
-        makeCustomObjectWith2Children(runtimeScene);
+        const { runtimeScene, customObject, leftSprite, rightSprite } =
+          await makeCustomObjectWith2Children();
         const instanceContainer = customObject._instanceContainer;
 
         leftSprite.setPosition(-16, -8);
@@ -555,9 +421,8 @@ describe('gdjs.CustomRuntimeObject', function () {
       });
 
       it('can transform a point to the scene with a positive AABB min position', async () => {
-        const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-        const runtimeScene = createSceneWithLayer(runtimeGame);
-        makeCustomObjectWith2Children(runtimeScene);
+        const { runtimeScene, customObject, leftSprite, rightSprite } =
+          await makeCustomObjectWith2Children();
         const instanceContainer = customObject._instanceContainer;
 
         leftSprite.setPosition(16, 8);
@@ -566,167 +431,6 @@ describe('gdjs.CustomRuntimeObject', function () {
           instanceContainer.convertInverseCoords(0, 0, workingPoint)
         ).to.eql([0, 0]);
       });
-    });
-  });
-
-  describe('with custom objects as children', function () {
-    /** @type {gdjs.CustomRuntimeObject} */
-    let rootCustomObject;
-    /** @type {gdjs.CustomRuntimeObject} */
-    let topCustomObject;
-    /** @type {gdjs.RuntimeObject} */
-    // @ts-ignore - we do not use this variable
-    let topLeftSprite;
-    /** @type {gdjs.RuntimeObject} */
-    let topRightSprite;
-    /** @type {gdjs.CustomRuntimeObject} */
-    let bottomCustomObject;
-    /** @type {gdjs.RuntimeObject} */
-    // @ts-ignore - we do not use this variable
-    let bottomLeftSprite;
-    /** @type {gdjs.RuntimeObject} */
-    let bottomRightSprite;
-
-    const makeCustomObjectWith2ChildrenAt2Levels = (instanceContainer) => {
-      rootCustomObject = createCustomObject(instanceContainer);
-      topCustomObject = createCustomObject(rootCustomObject._instanceContainer);
-      // Child-object creation should be done in the onCreate method of custom object.
-      // TODO EBO Rewrite this test when an events-based object has initialInstances.
-      topLeftSprite = createSpriteObject(topCustomObject._instanceContainer);
-      topRightSprite = createSpriteObject(topCustomObject._instanceContainer);
-      topRightSprite.setX(64);
-
-      bottomCustomObject = createCustomObject(
-        rootCustomObject._instanceContainer
-      );
-      // Child-object creation should be done in the onCreate method of custom object.
-      // TODO EBO Rewrite this test when an events-based object has initialInstances.
-      bottomLeftSprite = createSpriteObject(
-        bottomCustomObject._instanceContainer
-      );
-      bottomRightSprite = createSpriteObject(
-        bottomCustomObject._instanceContainer
-      );
-      bottomRightSprite.setX(64);
-
-      bottomCustomObject.setY(64);
-    };
-
-    it('can return hit-boxes according to its children', async () => {
-      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-      const runtimeScene = createSceneWithLayer(runtimeGame);
-      makeCustomObjectWith2ChildrenAt2Levels(runtimeScene);
-
-      expect(rootCustomObject.getWidth()).to.be(128);
-      expect(rootCustomObject.getHeight()).to.be(128);
-
-      expect(rootCustomObject.getAABB()).to.eql({
-        min: [0, 0],
-        max: [128, 128],
-      });
-
-      expect(rootCustomObject.getCenterXInScene()).to.be(64);
-      expect(rootCustomObject.getCenterYInScene()).to.be(64);
-
-      expect(rootCustomObject.getHitBoxes().length).to.be(4);
-      expect(rootCustomObject.getHitBoxes()[0].vertices).to.eql([
-        [64, 64],
-        [0, 64],
-        [64, 0],
-      ]);
-      expect(rootCustomObject.getHitBoxes()[1].vertices).to.eql([
-        [128, 64],
-        [64, 64],
-        [128, 0],
-      ]);
-      expect(rootCustomObject.getHitBoxes()[2].vertices).to.eql([
-        [64, 128],
-        [0, 128],
-        [64, 64],
-      ]);
-      expect(rootCustomObject.getHitBoxes()[3].vertices).to.eql([
-        [128, 128],
-        [64, 128],
-        [128, 64],
-      ]);
-    });
-
-    it('keeps hit-boxes up to date when its children move and push the bottom-right corner', async () => {
-      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-      const runtimeScene = createSceneWithLayer(runtimeGame);
-      makeCustomObjectWith2ChildrenAt2Levels(runtimeScene);
-
-      bottomRightSprite.setPosition(64 + 32, 0 + 8);
-
-      expect(rootCustomObject.getWidth()).to.be(128 + 32);
-      expect(rootCustomObject.getHeight()).to.be(128 + 8);
-
-      expect(rootCustomObject.getX()).to.be(0);
-      expect(rootCustomObject.getY()).to.be(0);
-
-      expect(rootCustomObject.getCenterXInScene()).to.be(64 + 16);
-      expect(rootCustomObject.getCenterYInScene()).to.be(64 + 4);
-
-      expect(rootCustomObject.getHitBoxes().length).to.be(4);
-      expect(rootCustomObject.getHitBoxes()[0].vertices).to.eql([
-        [64, 64],
-        [0, 64],
-        [64, 0],
-      ]);
-      expect(rootCustomObject.getHitBoxes()[1].vertices).to.eql([
-        [128, 64],
-        [64, 64],
-        [128, 0],
-      ]);
-      expect(rootCustomObject.getHitBoxes()[2].vertices).to.eql([
-        [64, 128],
-        [0, 128],
-        [64, 64],
-      ]);
-      expect(rootCustomObject.getHitBoxes()[3].vertices).to.eql([
-        [160, 136],
-        [96, 136],
-        [160, 72],
-      ]);
-    });
-
-    it('keeps hit-boxes up to date when new children is added', async () => {
-      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-      const runtimeScene = createSceneWithLayer(runtimeGame);
-      makeCustomObjectWith2ChildrenAt2Levels(runtimeScene);
-
-      const topMiddleSprite = createSpriteObject(
-        topCustomObject._instanceContainer
-      );
-      topMiddleSprite.setX(32);
-
-      expect(rootCustomObject.getHitBoxes().length).to.be(5);
-      expect(rootCustomObject.getHitBoxes()[0].vertices).to.eql([
-        [64, 64],
-        [0, 64],
-        [64, 0],
-      ]);
-      expect(rootCustomObject.getHitBoxes()[1].vertices).to.eql([
-        [128, 64],
-        [64, 64],
-        [128, 0],
-      ]);
-      // This is the new child.
-      expect(rootCustomObject.getHitBoxes()[2].vertices).to.eql([
-        [96, 64],
-        [32, 64],
-        [96, 0],
-      ]);
-      expect(rootCustomObject.getHitBoxes()[3].vertices).to.eql([
-        [64, 128],
-        [0, 128],
-        [64, 64],
-      ]);
-      expect(rootCustomObject.getHitBoxes()[4].vertices).to.eql([
-        [128, 128],
-        [64, 128],
-        [128, 64],
-      ]);
     });
   });
 });

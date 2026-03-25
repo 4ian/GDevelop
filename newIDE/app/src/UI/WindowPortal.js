@@ -50,9 +50,6 @@ const WindowPortal = ({
   onWindowReady,
 }: Props): React.Node => {
   const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
-  // Stable frameName for the lifetime of this portal, used to correlate
-  // the window.open() call with the BrowserWindow in the main process.
-  const frameNameRef = React.useRef<string>(`gdevelop-popout-${++popOutCounter}`);
   const externalWindowRef = React.useRef<any>(null);
   const onCloseRef = React.useRef(onClose);
   onCloseRef.current = onClose;
@@ -81,7 +78,8 @@ const WindowPortal = ({
     // Use a unique frameName so the main process can track the child
     // BrowserWindow and the renderer can reference it in IPC calls
     // (e.g. titlebar overlay updates).
-    const externalWindow = window.open('', frameNameRef.current, features);
+    const frameName = `gdevelop-popout-${++popOutCounter}`;
+    const externalWindow = window.open('', frameName, features);
 
     if (!externalWindow) {
       showAlert({
@@ -96,7 +94,7 @@ const WindowPortal = ({
 
     // Register the frameName for this document so that
     // Window.setWindowBackgroundColor can pass it to the main process.
-    registerDocumentFrameName(externalWindow.document, frameNameRef.current);
+    registerDocumentFrameName(externalWindow.document, frameName);
 
     // Set up the new window's document.
     externalWindow.document.title = title;

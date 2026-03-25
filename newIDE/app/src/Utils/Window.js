@@ -36,7 +36,7 @@ const getOrCreateOverlayWatcher = (
   const existing = overlayWatchers.get(windowControlsOverlay);
   if (existing) return existing;
 
-  const state = {
+  const state: OverlayWatcherState = {
     callbacks: new Set<() => void>(),
     debouncedHandler: debounce(() => {
       for (const callback of state.callbacks) {

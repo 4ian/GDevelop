@@ -189,6 +189,7 @@ export function ClosableTab({
 
   // $FlowFixMe[missing-local-annot]
   const openContextMenu = event => {
+    event.preventDefault();
     event.stopPropagation();
     if (contextMenu.current) {
       contextMenu.current.open(event.clientX, event.clientY);

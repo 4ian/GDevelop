@@ -21,6 +21,7 @@ declare class gdResourcesContainer {
   moveResourceUpInList(oldName: string): boolean;
   moveResourceDownInList(oldName: string): boolean;
   moveResource(oldIndex: number, newIndex: number): void;
+  static unserializeResourceFrom(resource: gdResource, resourceElement: gdSerializerElement): void;
   delete(): void;
   ptr: number;
 };

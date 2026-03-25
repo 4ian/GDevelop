@@ -70,6 +70,7 @@ export default function EventsBasedObjectSelectorDialog({
       ]}
       open
       onRequestClose={onCancel}
+      maxWidth="sm"
     >
       <List>
         <FunctionListItem

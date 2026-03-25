@@ -369,26 +369,30 @@ void ResourcesContainer::UnserializeFrom(const SerializerElement &element) {
   resourcesElement.ConsiderAsArrayOf("resource", "Resource");
   for (std::size_t i = 0; i < resourcesElement.GetChildrenCount(); ++i) {
     const SerializerElement &resourceElement = resourcesElement.GetChild(i);
+
     gd::String kind = resourceElement.GetStringAttribute("kind");
-    gd::String name = resourceElement.GetStringAttribute("name");
-    gd::String metadata = resourceElement.GetStringAttribute("metadata", "");
-
     std::shared_ptr<Resource> resource = CreateResource(kind);
-    resource->SetName(name);
-    resource->SetMetadata(metadata);
-
-    if (resourceElement.HasChild("origin")) {
-      gd::String originName =
-          resourceElement.GetChild("origin").GetStringAttribute("name", "");
-      gd::String originIdentifier =
-          resourceElement.GetChild("origin").GetStringAttribute("identifier",
-                                                                "");
-      resource->SetOrigin(originName, originIdentifier);
-    }
-    resource->UnserializeFrom(resourceElement);
-
+    UnserializeResourceFrom(*resource, resourceElement);
     resources.push_back(resource);
   }
+}
+
+void ResourcesContainer::UnserializeResourceFrom(
+    gd::Resource &resource, const SerializerElement &resourceElement) {
+  gd::String name = resourceElement.GetStringAttribute("name");
+  gd::String metadata = resourceElement.GetStringAttribute("metadata", "");
+
+  resource.SetName(name);
+  resource.SetMetadata(metadata);
+
+  if (resourceElement.HasChild("origin")) {
+    gd::String originName =
+        resourceElement.GetChild("origin").GetStringAttribute("name", "");
+    gd::String originIdentifier =
+        resourceElement.GetChild("origin").GetStringAttribute("identifier", "");
+    resource.SetOrigin(originName, originIdentifier);
+  }
+  resource.UnserializeFrom(resourceElement);
 }
 
 void ResourcesContainer::SerializeTo(SerializerElement &element) const {

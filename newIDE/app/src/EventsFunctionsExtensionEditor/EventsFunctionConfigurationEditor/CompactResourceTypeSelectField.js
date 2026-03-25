@@ -11,14 +11,12 @@ type Props = {|
   value: string,
   onChange: (value: string) => void,
   onFocus?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
-  fullWidth?: boolean,
 |};
 
 export default function CompactResourceTypeSelectField({
   value,
   onChange,
   onFocus,
-  fullWidth,
 }: Props): React.Node {
   return (
     <I18n>

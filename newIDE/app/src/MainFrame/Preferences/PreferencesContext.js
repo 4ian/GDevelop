@@ -244,6 +244,7 @@ export type PreferencesValues = {|
   automaticallyUseCreditsForAiRequests: boolean,
   useBackgroundSerializerForSaving: boolean,
   disableNpmScriptConfirmation: boolean,
+  showJsTypeError: boolean,
 |};
 
 /**
@@ -369,6 +370,7 @@ export type Preferences = {|
   |}) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
   setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
+  setShowJsTypeError: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -434,6 +436,7 @@ export const initialPreferences = {
     automaticallyUseCreditsForAiRequests: false,
     useBackgroundSerializerForSaving: false,
     disableNpmScriptConfirmation: false,
+    showJsTypeError: false,
   },
   setMultipleValues: () => {},
   setLanguage: () => {},
@@ -520,6 +523,7 @@ export const initialPreferences = {
   setAiState: ({ aiRequestId }: {| aiRequestId: string | null |}) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
+  setShowJsTypeError: (enabled: boolean) => {},
 };
 
 const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(

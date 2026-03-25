@@ -6,7 +6,10 @@ import reservedShortcuts from './ReservedShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
 import isUserTyping from './IsUserTyping';
-import defaultShortcuts, { type ShortcutMap } from './DefaultShortcuts';
+import defaultShortcuts, {
+  defaultSecondaryShortcuts,
+  type ShortcutMap,
+} from './DefaultShortcuts';
 import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
 import optionalRequire from '../Utils/OptionalRequire';
 import { SafeExtractor } from '../Utils/SafeExtractor';
@@ -264,9 +267,14 @@ export const useKeyboardShortcuts = ({
         if (!shortcutData.isValid) return;
 
         // Get corresponding command, if it exists
-        const commandName = Object.keys(shortcutMap).find(
-          name => shortcutMap[name] === shortcutData.shortcutString
-        );
+        const commandName =
+          Object.keys(shortcutMap).find(
+            name => shortcutMap[name] === shortcutData.shortcutString
+          ) ||
+          Object.keys(defaultSecondaryShortcuts).find(
+            name =>
+              defaultSecondaryShortcuts[name] === shortcutData.shortcutString
+          );
         if (!commandName) return;
 
         // On desktop app, ignore shortcuts that are handled by Electron
@@ -342,9 +350,14 @@ export const useKeyboardShortcuts = ({
           if (!shortcutData.isValid) return;
 
           // Get corresponding command, if it exists
-          const commandName = Object.keys(shortcutMap).find(
-            name => shortcutMap[name] === shortcutData.shortcutString
-          );
+          const commandName =
+            Object.keys(shortcutMap).find(
+              name => shortcutMap[name] === shortcutData.shortcutString
+            ) ||
+            Object.keys(defaultSecondaryShortcuts).find(
+              name =>
+                defaultSecondaryShortcuts[name] === shortcutData.shortcutString
+            );
           if (!commandName) return;
 
           const command = commandsList[commandName];

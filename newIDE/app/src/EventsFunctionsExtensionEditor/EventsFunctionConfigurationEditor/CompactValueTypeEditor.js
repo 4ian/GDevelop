@@ -371,7 +371,6 @@ export default function CompactValueTypeEditor({
                 forceUpdate();
                 onTypeUpdated();
               }}
-              fullWidth
             />
           )}
           {(valueTypeMetadata.getName() === 'stringWithSelector' ||

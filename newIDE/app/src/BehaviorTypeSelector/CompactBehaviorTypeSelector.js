@@ -19,6 +19,7 @@ type Props = {|
   onChange: string => void,
   disabled?: boolean,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  onFocus?: () => void,
 |};
 
 export default function CompactBehaviorTypeSelector({
@@ -28,6 +29,7 @@ export default function CompactBehaviorTypeSelector({
   value,
   onChange,
   objectType,
+  onFocus,
 }: Props): React.Node {
   const behaviorMetadataList: Array<EnumeratedBehaviorMetadata> = React.useMemo(
     () =>
@@ -60,6 +62,7 @@ export default function CompactBehaviorTypeSelector({
                 onChange(value);
               }}
               disabled={disabled}
+              onFocus={onFocus}
               renderOptionIcon={className =>
                 behaviorMetadata ? (
                   <ListIcon

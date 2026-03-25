@@ -4,9 +4,7 @@ import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 
 import * as React from 'react';
-import TextField from '../../UI/TextField';
-import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import ObjectTypeSelector from '../../ObjectTypeSelector';
+import CompactObjectTypeSelector from '../../ObjectTypeSelector/CompactObjectTypeSelector';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import AlertMessage from '../../UI/AlertMessage';
 import { ColumnStackLayout } from '../../UI/Layout';
@@ -14,11 +12,14 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import HelpButton from '../../UI/HelpButton';
 import { Line } from '../../UI/Grid';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
-import Checkbox from '../../UI/Checkbox';
 import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
-import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import Window from '../../Utils/Window';
+import CompactPropertiesEditorRowField from '../../CompactPropertiesEditor/CompactPropertiesEditorRowField';
+import { CompactTextAreaField } from '../../UI/CompactTextAreaField';
+import CompactSemiControlledTextField from '../../UI/CompactSemiControlledTextField';
+import CompactSelectField from '../../UI/CompactSelectField';
+import { CompactToggleField } from '../../UI/CompactToggleField';
 
 const gd: libGDevelop = global.gd;
 
@@ -78,26 +79,32 @@ export default function EventsBasedBehaviorEditor({
               description explaining what the behavior is doing to the object.
             </Trans>
           </DismissableAlertMessage>
-          <TextField
-            floatingLabelText={<Trans>Internal Name</Trans>}
-            value={eventsBasedBehavior.getName()}
-            disabled
-            fullWidth
+          <CompactPropertiesEditorRowField
+            label={i18n._(t`Internal Name`)}
+            field={
+              <CompactSemiControlledTextField
+                value={eventsBasedBehavior.getName()}
+                disabled
+                onChange={() => {}}
+              />
+            }
           />
-          <SemiControlledTextField
-            commitOnBlur
-            floatingLabelText={<Trans>Name displayed in editor</Trans>}
-            value={eventsBasedBehavior.getFullName()}
-            onChange={text => {
-              eventsBasedBehavior.setFullName(text);
-              onChange();
-            }}
-            fullWidth
+          <CompactPropertiesEditorRowField
+            label={i18n._(t`Name displayed in editor`)}
+            field={
+              <CompactSemiControlledTextField
+                commitOnBlur
+                value={eventsBasedBehavior.getFullName()}
+                onChange={text => {
+                  eventsBasedBehavior.setFullName(text);
+                  onChange();
+                }}
+              />
+            }
           />
-          <SemiControlledTextField
-            commitOnBlur
-            floatingLabelText={<Trans>Description</Trans>}
-            helperMarkdownText={i18n._(
+          <CompactTextAreaField
+            label={i18n._(`Description`)}
+            placeholder={i18n._(
               t`Explain what the behavior is doing to the object. Start with a verb when possible.`
             )}
             value={eventsBasedBehavior.getDescription()}
@@ -105,16 +112,11 @@ export default function EventsBasedBehaviorEditor({
               eventsBasedBehavior.setDescription(text);
               onChange();
             }}
-            multiline
-            fullWidth
-            rows={3}
           />
-          <ObjectTypeSelector
-            floatingLabelText={
-              <Trans>Object on which this behavior can be used</Trans>
-            }
+          <CompactObjectTypeSelector
             project={project}
             eventsFunctionsExtension={eventsFunctionsExtension}
+            label={i18n._(t`Object on which this behavior can be used`)}
             value={eventsBasedBehavior.getObjectType()}
             onChange={(objectType: string) => {
               eventsBasedBehavior.setObjectType(objectType);
@@ -144,52 +146,52 @@ export default function EventsBasedBehaviorEditor({
             </AlertMessage>
           )}
           {isDev && (
-            <SelectField
-              floatingLabelText={
-                <Trans>Visibility in quick customization dialog</Trans>
+            <CompactPropertiesEditorRowField
+              label={i18n._(t`Visibility in quick customization dialog`)}
+              field={
+                <CompactSelectField
+                  value={eventsBasedBehavior
+                    .getQuickCustomizationVisibility()
+                    .toString()}
+                  onChange={valueString => {
+                    // $FlowFixMe[incompatible-type]
+                    const value: QuickCustomization_Visibility = valueString;
+                    eventsBasedBehavior.setQuickCustomizationVisibility(value);
+                    onChange();
+                  }}
+                >
+                  <SelectOption
+                    value={gd.QuickCustomization.Default}
+                    label={t`Default (visible)`}
+                  />
+                  <SelectOption
+                    value={gd.QuickCustomization.Visible}
+                    label={t`Always visible`}
+                  />
+                  <SelectOption
+                    value={gd.QuickCustomization.Hidden}
+                    label={t`Hidden`}
+                  />
+                </CompactSelectField>
               }
-              value={eventsBasedBehavior.getQuickCustomizationVisibility()}
-              onChange={(e, i, valueString: string) => {
-                // $FlowFixMe[incompatible-type]
-                const value: QuickCustomization_Visibility = valueString;
-                eventsBasedBehavior.setQuickCustomizationVisibility(value);
-                onChange();
-              }}
-              fullWidth
-            >
-              <SelectOption
-                value={gd.QuickCustomization.Default}
-                label={t`Default (visible)`}
-              />
-              <SelectOption
-                value={gd.QuickCustomization.Visible}
-                label={t`Always visible`}
-              />
-              <SelectOption
-                value={gd.QuickCustomization.Hidden}
-                label={t`Hidden`}
-              />
-            </SelectField>
+            />
           )}
-          <Checkbox
-            label={<Trans>Private</Trans>}
+          <CompactToggleField
+            label={i18n._(t`Private`)}
             checked={eventsBasedBehavior.isPrivate()}
-            onCheck={(e, checked) => {
+            onCheck={checked => {
               eventsBasedBehavior.setPrivate(checked);
               if (onConfigurationUpdated) onConfigurationUpdated('isPrivate');
               onChange();
             }}
-            tooltipOrHelperText={
-              eventsBasedBehavior.isPrivate() ? (
-                <Trans>
-                  This behavior won't be visible in the scene and events
-                  editors.
-                </Trans>
-              ) : (
-                <Trans>
-                  This behavior will be visible in the scene and events editors.
-                </Trans>
-              )
+            markdownDescription={
+              eventsBasedBehavior.isPrivate()
+                ? i18n._(
+                    t`This behavior won't be visible in the scene and events editors.`
+                  )
+                : i18n._(
+                    t`This behavior will be visible in the scene and events editors.`
+                  )
             }
           />
           {eventsBasedBehavior

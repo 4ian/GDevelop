@@ -67,7 +67,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetKind("internal-in-game-editor-only-svg");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
-      "", _("Base object"), _("Base object"), "res/objeticon24.png");
+      "", _("Base object"), _("Base object"), "res/functions/object_black.svg");
 
   obj.AddCondition("PosX",
                    _("X position"),
@@ -1106,8 +1106,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Check if the behavior is activated for the object."),
                    _("Behavior _PARAM1_ of _PARAM0_ is activated"),
                    _("Behaviors"),
-                   "res/behavior24.png",
-                   "res/behavior16.png")
+                   "res/functions/activate_black.svg",
+                   "res/functions/activate_black.svg")
 
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"))
@@ -1118,8 +1118,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("De/activate the behavior for the object."),
                 _("Activate behavior _PARAM1_ of _PARAM0_: _PARAM2_"),
                 _("Behaviors"),
-                "res/behavior24.png",
-                "res/behavior16.png")
+                "res/functions/activate_black.svg",
+                "res/functions/activate_black.svg")
 
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"))
@@ -1672,8 +1672,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Include or exclude a child from its parent collision mask."),
                 _("Include _PARAM0_ in parent object collision mask: _PARAM1_"),
                 _("Collision"),
-                "res/function32.png",
-                "res/function32.png")
+                "res/functions/extension.svg",
+                "res/functions/extension.svg")
       .AddParameter("object", _("Object"))
       .AddParameter("yesorno", "Include in parent collision mask")
       .SetRelevantForCustomObjectEventsOnly();

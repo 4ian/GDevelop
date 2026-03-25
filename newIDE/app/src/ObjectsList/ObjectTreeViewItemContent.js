@@ -21,6 +21,7 @@ import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -209,6 +210,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   is3D(): boolean {
+    if (!exceptionallyGuardAgainstDeadObject(this.object)) return false;
     const objectMetadata = gd.MetadataProvider.getObjectMetadata(
       this.props.project.getCurrentPlatform(),
       this.object.getObject().getType()
@@ -217,10 +219,13 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   getName(): string | React.Node {
+    if (!exceptionallyGuardAgainstDeadObject(this.object)) return '';
     return this.object.getObject().getName();
   }
 
   getId(): string {
+    if (!exceptionallyGuardAgainstDeadObject(this.object))
+      return `deleted-${this.object.ptr}`;
     return getObjectTreeViewItemId(this.object.getObject());
   }
 
@@ -229,6 +234,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   getDataSet(): ?HTMLDataset {
+    if (!exceptionallyGuardAgainstDeadObject(this.object)) return null;
     return {
       objectName: this.object.getObject().getName(),
       global: this._isGlobal.toString(),
@@ -236,6 +242,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   getThumbnail(): ?string {
+    if (!exceptionallyGuardAgainstDeadObject(this.object)) return null;
     return this.props.getThumbnail(
       this.props.project,
       this.object.getObject().getConfiguration()

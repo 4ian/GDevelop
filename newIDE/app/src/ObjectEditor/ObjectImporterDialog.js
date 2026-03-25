@@ -25,6 +25,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import LoaderModal from '../UI/LoaderModal';
 import AlertMessage from '../UI/AlertMessage';
 import { getOrCreate } from '../Utils/Map';
+import { unserializeResourceFromJSObject } from '../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 
@@ -384,6 +385,8 @@ type Props = {|
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onClose: () => void,
 |};
 
@@ -392,6 +395,8 @@ const ObjectImporterDialog = ({
   objectsContainer,
   resourceManagementProps,
   onEventsBasedObjectChildrenEdited,
+  onWillInstallExtension,
+  onExtensionInstalled,
   onClose,
 }: Props): React.Node => {
   const openAssetFile = useOpenAssetFile();
@@ -692,8 +697,7 @@ const ObjectImporterDialog = ({
         }
         // The resource does not exist yet, add it. Note that the "origin" will be preserved.
         const newResource = resourceKindMetadata.createNewResource();
-        unserializeFromJSObject(newResource, serializedResource);
-        newResource.setName(serializedResource.name);
+        unserializeResourceFromJSObject(newResource, serializedResource);
 
         const resourceBlob: Blob = await getFileBlob({
           archiveBlob: assetPackBlob,
@@ -723,12 +727,17 @@ const ObjectImporterDialog = ({
         const serializedExtension = JSON.parse(await extensionBlob.text());
         serializedExtensions.push(serializedExtension);
       }
+      const installedExtensionNames = serializedExtensions.map(
+        extensions => extensions.name
+      );
+      onWillInstallExtension(installedExtensionNames);
       await addSerializedExtensionsToProject(
         eventsFunctionsExtensionsState,
         project,
         serializedExtensions,
         []
       );
+      onExtensionInstalled(installedExtensionNames);
 
       addOrReplaceVariants(project, newVariantsByObjectType);
       addOrReplaceVariants(project, replacingVariantsByObjectType);
@@ -784,6 +793,8 @@ const ObjectImporterDialog = ({
       objectsContainer,
       onClose,
       onEventsBasedObjectChildrenEdited,
+      onExtensionInstalled,
+      onWillInstallExtension,
       project,
       resourceManagementProps,
     ]

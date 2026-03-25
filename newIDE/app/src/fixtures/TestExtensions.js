@@ -214,7 +214,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       'FakeBehavior', // Default name is the name
       'A fake behavior with two properties.',
       '',
-      'res/function24.png',
+      'res/functions/extension_black.svg',
       'FakeBehavior', // Class name is the name, actually unused
       fakeBehavior,
       new gd.BehaviorsSharedData()
@@ -277,7 +277,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
         'FakeTextBehavior', // Default name is the name
         'A fake behavior for text objects only.',
         '',
-        'res/function24.png',
+        'res/functions/extension_black.svg',
         'FakeTextBehavior', // Class name is the name, actually unused
         fakeBehavior,
         new gd.BehaviorsSharedData()

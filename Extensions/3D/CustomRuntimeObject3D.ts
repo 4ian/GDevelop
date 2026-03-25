@@ -362,7 +362,7 @@ namespace gdjs {
       if (this.hasCustomRotationCenter()) {
         return this._customCenterZ;
       }
-      return this.getUnscaledDepth() / 2;
+      return this.getUnscaledDepth() / 2 + this.getUnscaledMinZ();
     }
 
     /**

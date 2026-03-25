@@ -84,6 +84,7 @@ export const useNavigationToEvent = ({
                   scrollTimeoutIdRef.current = setTimeout(() => {
                     scrollTimeoutIdRef.current = null;
                     // $FlowFixMe[not-a-function]
+                    // $FlowFixMe[prop-missing]
                     ref.scrollToEventPath(eventPath);
                     setPendingEventNavigation(null);
                   }, FUNCTION_SELECT_DELAY_MS);

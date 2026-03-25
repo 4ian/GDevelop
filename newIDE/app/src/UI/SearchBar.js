@@ -110,8 +110,20 @@ const SearchBar: React.ComponentType<{
 
     const textField = React.useRef<?TextFieldInterface>(null);
 
+    // Track the last value we reported to the parent via onChange,
+    // so we can distinguish parent echoing our value back from
+    // an external parent-driven change.
+    const lastValueReportedToParent = React.useRef<string>(parentValue);
+
     const nonEmpty = !!value && value.length > 0;
-    const debouncedOnChange = useDebounce(onChange ? onChange : noop, 250);
+    const onChangeTrackingRef = React.useCallback(
+      (newValue: string) => {
+        lastValueReportedToParent.current = newValue;
+        if (onChange) onChange(newValue);
+      },
+      [onChange]
+    );
+    const debouncedOnChange = useDebounce(onChangeTrackingRef, 250);
 
     const changeValueDebounced = React.useCallback(
       (newValue: string) => {
@@ -124,6 +136,7 @@ const SearchBar: React.ComponentType<{
     const changeValueImmediately = React.useCallback(
       (newValue: string) => {
         setValue(newValue);
+        lastValueReportedToParent.current = newValue;
         onChange && onChange(newValue);
       },
       [onChange, setValue]
@@ -131,9 +144,15 @@ const SearchBar: React.ComponentType<{
 
     React.useEffect(
       () => {
-        // The value given by the parent has priority: if it changes,
-        // the search bar must display it.
-        setValue(parentValue);
+        // Only sync from parent if the value was changed externally,
+        // not just echoed back from our own debounced onChange callback.
+        // This prevents a race condition where the parent echoes back a
+        // stale debounced value and overwrites characters the user has
+        // typed since then (e.g. typing "qui" fast would become "qi").
+        if (parentValue !== lastValueReportedToParent.current) {
+          setValue(parentValue);
+        }
+        lastValueReportedToParent.current = parentValue;
       },
       [parentValue]
     );

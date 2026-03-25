@@ -384,6 +384,9 @@ interface EventsBasedObjectVariantHelper {
     void STATIC_ComplyVariantsToEventsBasedObject(
         [Ref, Const] Project project,
         [Ref] EventsBasedObject eventsBasedObject);
+    [Value] VectorString STATIC_FindAllChildrenCustomObjectType(
+        [ Ref, Const ] Project project,
+        [ Ref, Const ] EventsBasedObject eventsBasedObject);
 };
 
 interface ObjectGroupsContainer {

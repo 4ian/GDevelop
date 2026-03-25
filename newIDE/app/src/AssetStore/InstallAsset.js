@@ -19,6 +19,7 @@ import {
   checkRequiredExtensionsUpdate,
   type RequiredExtensionInstallation,
 } from './ExtensionStore/InstallExtension.js';
+import { mapVector } from '../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
@@ -397,8 +398,18 @@ export const complyVariantsToEventsBasedObjectOf = (
 ) => {
   const installedVariantObjectTypes = new Set<string>();
   for (const createdObject of createdObjects) {
-    if (project.hasEventsBasedObject(createdObject.getType())) {
+    if (
+      project.hasEventsBasedObject(createdObject.getType()) &&
+      !installedVariantObjectTypes.has(createdObject.getType())
+    ) {
       installedVariantObjectTypes.add(createdObject.getType());
+      mapVector(
+        gd.EventsBasedObjectVariantHelper.findAllChildrenCustomObjectType(
+          project,
+          project.getEventsBasedObject(createdObject.getType())
+        ),
+        objectType => installedVariantObjectTypes.add(objectType)
+      );
     }
   }
   for (const installedVariantObjectType of installedVariantObjectTypes) {

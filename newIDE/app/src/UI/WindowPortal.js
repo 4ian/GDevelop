@@ -4,7 +4,13 @@ import { t } from '@lingui/macro';
 import ReactDOM from 'react-dom';
 import PortalContainerContext from './PortalContainerContext';
 import Window from '../Utils/Window';
+import {
+  registerDocumentFrameName,
+  unregisterDocumentFrameName,
+} from '../Utils/Window';
 import useAlertDialog from './Alert/useAlertDialog';
+
+let popOutCounter = 0;
 
 type Props = {|
   /** The title of the new window. */
@@ -68,7 +74,12 @@ const WindowPortal = ({
     const left = window.screenX + (window.outerWidth - initialWidth) / 2;
     const top = window.screenY + (window.outerHeight - initialHeight) / 2;
     const features = `width=${initialWidth},height=${initialHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`;
-    const externalWindow = window.open('', '', features);
+
+    // Use a unique frameName so the main process can track the child
+    // BrowserWindow and the renderer can reference it in IPC calls
+    // (e.g. titlebar overlay updates).
+    const frameName = `gdevelop-popout-${++popOutCounter}`;
+    const externalWindow = window.open('', frameName, features);
 
     if (!externalWindow) {
       showAlert({
@@ -80,6 +91,10 @@ const WindowPortal = ({
     }
 
     externalWindowRef.current = externalWindow;
+
+    // Register the frameName for this document so that
+    // Window.setWindowBackgroundColor can pass it to the main process.
+    registerDocumentFrameName(externalWindow.document, frameName);
 
     // Set up the new window's document.
     externalWindow.document.title = title;
@@ -198,6 +213,7 @@ const WindowPortal = ({
       clearInterval(checkClosed);
       if (styleObserver) styleObserver.disconnect();
       if (observer) observer.disconnect();
+      unregisterDocumentFrameName(externalWindow.document);
       if (!externalWindow.closed) {
         externalWindow.close();
       }

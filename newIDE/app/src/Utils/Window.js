@@ -22,6 +22,10 @@ export const POSITIONAL_ARGUMENTS_KEY = '_';
 
 const windowBackgroundColors: WeakMap<Document, string> = new WeakMap();
 
+// Maps a popped-out window's Document to the frameName used in window.open(),
+// so that IPC calls can pass it to the main process for BrowserWindow resolution.
+const documentToFrameName: WeakMap<Document, string> = new WeakMap();
+
 // Per-navigator watcher state: each window's windowControlsOverlay gets its
 // own debounced listener and set of callbacks.
 type OverlayWatcherState = {|
@@ -50,6 +54,19 @@ const getOrCreateOverlayWatcher = (
   );
   overlayWatchers.set(windowControlsOverlay, state);
   return state;
+};
+
+/**
+ * Register a mapping from a popped-out window's Document to the frameName
+ * used in window.open(), so that setWindowBackgroundColor can pass it to
+ * the main process for BrowserWindow resolution.
+ */
+export const registerDocumentFrameName = (doc: Document, frameName: string) => {
+  documentToFrameName.set(doc, frameName);
+};
+
+export const unregisterDocumentFrameName = (doc: Document) => {
+  documentToFrameName.delete(doc);
 };
 
 /**
@@ -119,17 +136,22 @@ export default class Window {
 
     if (ipcRenderer) {
       // Update the window controls and background colors on Windows/Linux.
-      // The main process handler uses BrowserWindow.fromWebContents(event.sender)
-      // to resolve the correct window, so this works for both the main window
-      // and popped-out editor windows (which are real BrowserWindows created
-      // by Electron's setWindowOpenHandler).
-      ipcRenderer.invoke('titlebar-set-overlay-options', {
-        color: newColor,
-        // $FlowFixMe[incompatible-type]
-        symbolColor: isLightRgbColor(hexToRGBColor(newColor))
-          ? '#000000'
-          : '#ffffff',
-      });
+      // For the main window, the main process resolves via event.sender.
+      // For popped-out editor windows (opened via window.open and rendered
+      // into via React portals), event.sender is always the main window's
+      // webContents, so we pass the frameName and let the main process
+      // resolve it to the correct BrowserWindow.
+      ipcRenderer.invoke(
+        'titlebar-set-overlay-options',
+        {
+          color: newColor,
+          // $FlowFixMe[incompatible-type]
+          symbolColor: isLightRgbColor(hexToRGBColor(newColor))
+            ? '#000000'
+            : '#ffffff',
+        },
+        documentToFrameName.get(doc)
+      );
     }
 
     // Update the PWA titlebar/controls color (if it's an installed PWA).

@@ -127,6 +127,10 @@ app.on('window-all-closed', function() {
   app.quit();
 });
 
+// Maps frameName (from window.open) to BrowserWindow ID for child windows,
+// so the renderer can look up the correct BrowserWindow for IPC targeting.
+const childWindowIdsByFrameName = new Map();
+
 // Function to create a new GDevelop window
 function createNewWindow(windowArgs = args) {
   const isIntegrated = windowArgs.mode === 'integrated';
@@ -296,8 +300,17 @@ function createNewWindow(windowArgs = args) {
 
   // When a child window is created (e.g. a popped-out editor), set up security
   // policies and enable @electron/remote on it.
-  newWindow.webContents.on('did-create-window', (childWindow) => {
+  newWindow.webContents.on('did-create-window', (childWindow, details) => {
     require('@electron/remote/main').enable(childWindow.webContents);
+
+    // Track child window by frameName so the renderer can look up its
+    // BrowserWindow ID (needed for titlebar overlay IPC targeting).
+    if (details.frameName) {
+      childWindowIdsByFrameName.set(details.frameName, childWindow.id);
+      childWindow.on('closed', () => {
+        childWindowIdsByFrameName.delete(details.frameName);
+      });
+    }
 
     // Remove the menu bar from popped-out editor windows.
     childWindow.setMenu(null);
@@ -452,8 +465,17 @@ app.on('ready', function() {
   // Titlebar handling:
   ipcMain.handle(
     'titlebar-set-overlay-options',
-    async (event, overlayOptions) => {
-      const window = BrowserWindow.fromWebContents(event.sender);
+    async (event, overlayOptions, frameName) => {
+      // When a frameName is provided, resolve it to the child BrowserWindow
+      // (needed for popped-out editor windows, where event.sender is always
+      // the main window's webContents). Otherwise, use event.sender.
+      let window;
+      if (frameName) {
+        const windowId = childWindowIdsByFrameName.get(frameName);
+        window = windowId != null ? BrowserWindow.fromId(windowId) : null;
+      } else {
+        window = BrowserWindow.fromWebContents(event.sender);
+      }
       if (!window) return;
 
       // setTitleBarOverlay seems not defined on macOS.

@@ -127,9 +127,9 @@ app.on('window-all-closed', function() {
   app.quit();
 });
 
-// Maps frameName (from window.open) to BrowserWindow ID for child windows,
-// so the renderer can look up the correct BrowserWindow for IPC targeting.
-const childWindowIdsByFrameName = new Map();
+// Maps target (from window.open) to BrowserWindow ID for child windows.
+// This is used to target the correct BrowserWindow for IPC messages.
+const windowTargetIdToBrowserWindowIds = new Map();
 
 // Function to create a new GDevelop window
 function createNewWindow(windowArgs = args) {
@@ -268,7 +268,7 @@ function createNewWindow(windowArgs = args) {
   // Allow blank-URL pop-out windows (used by WindowPortal for editor pop-outs),
   // but open all other URLs in the external browser.
   newWindow.webContents.setWindowOpenHandler(details => {
-    if (details.url === '' || details.url === 'about:blank') {
+    if (details.frameName.startsWith('GDevelopWindowPortal')) {
       return {
         action: 'allow',
         overrideBrowserWindowOptions: {
@@ -303,12 +303,16 @@ function createNewWindow(windowArgs = args) {
   newWindow.webContents.on('did-create-window', (childWindow, details) => {
     require('@electron/remote/main').enable(childWindow.webContents);
 
+    if (!details.frameName || !details.frameName.startsWith('GDevelopWindowPortal')) {
+      console.warn(`Unexpected frameName for child window: ${details.frameName} - verify handling on Electron side.`);
+    }
+
     // Track child window by frameName so the renderer can look up its
     // BrowserWindow ID (needed for titlebar overlay IPC targeting).
     if (details.frameName) {
-      childWindowIdsByFrameName.set(details.frameName, childWindow.id);
+      windowTargetIdToBrowserWindowIds.set(details.frameName, childWindow.id);
       childWindow.on('closed', () => {
-        childWindowIdsByFrameName.delete(details.frameName);
+        windowTargetIdToBrowserWindowIds.delete(details.frameName);
       });
     }
 
@@ -465,13 +469,13 @@ app.on('ready', function() {
   // Titlebar handling:
   ipcMain.handle(
     'titlebar-set-overlay-options',
-    async (event, overlayOptions, frameName) => {
-      // When a frameName is provided, resolve it to the child BrowserWindow
+    async (event, overlayOptions, optionalTargetId) => {
+      // When a optionalTargetId is provided, resolve it to the child BrowserWindow
       // (needed for popped-out editor windows, where event.sender is always
       // the main window's webContents). Otherwise, use event.sender.
       let window;
-      if (frameName) {
-        const windowId = childWindowIdsByFrameName.get(frameName);
+      if (optionalTargetId) {
+        const windowId = windowTargetIdToBrowserWindowIds.get(optionalTargetId);
         window = windowId != null ? BrowserWindow.fromId(windowId) : null;
       } else {
         window = BrowserWindow.fromWebContents(event.sender);

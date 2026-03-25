@@ -20,11 +20,20 @@ type YesNoCancelDialogChoice = 'yes' | 'no' | 'cancel';
  */
 export const POSITIONAL_ARGUMENTS_KEY = '_';
 
-const windowBackgroundColors: WeakMap<Document, string> = new WeakMap();
+const documentBackgroundColors: WeakMap<Document, string> = new WeakMap();
+const documentToTargetId: WeakMap<Document, string> = new WeakMap();
 
-// Maps a popped-out window's Document to the frameName used in window.open(),
-// so that IPC calls can pass it to the main process for BrowserWindow resolution.
-const documentToFrameName: WeakMap<Document, string> = new WeakMap();
+/**
+ * Register a mapping from a window Document to the target
+ * used in window.open().
+ */
+export const registerDocumentTargetId = (doc: Document, frameName: string) => {
+  documentToTargetId.set(doc, frameName);
+};
+
+export const unregisterDocumentTargetId = (doc: Document) => {
+  documentToTargetId.delete(doc);
+};
 
 // Per-navigator watcher state: each window's windowControlsOverlay gets its
 // own debounced listener and set of callbacks.
@@ -54,19 +63,6 @@ const getOrCreateOverlayWatcher = (
   );
   overlayWatchers.set(windowControlsOverlay, state);
   return state;
-};
-
-/**
- * Register a mapping from a popped-out window's Document to the frameName
- * used in window.open(), so that setWindowBackgroundColor can pass it to
- * the main process for BrowserWindow resolution.
- */
-export const registerDocumentFrameName = (doc: Document, frameName: string) => {
-  documentToFrameName.set(doc, frameName);
-};
-
-export const unregisterDocumentFrameName = (doc: Document) => {
-  documentToFrameName.delete(doc);
 };
 
 /**
@@ -129,7 +125,7 @@ export default class Window {
   static setWindowBackgroundColor(newColor: string, targetDocument?: Document) {
     const doc = targetDocument || document;
 
-    if (windowBackgroundColors.get(doc) === newColor) {
+    if (documentBackgroundColors.get(doc) === newColor) {
       // Avoid potentially expensive DOM query/modification if no changes needed.
       return;
     }
@@ -150,7 +146,7 @@ export default class Window {
             ? '#000000'
             : '#ffffff',
         },
-        documentToFrameName.get(doc)
+        documentToTargetId.get(doc)
       );
     }
 
@@ -170,7 +166,7 @@ export default class Window {
       doc.documentElement.style.backgroundColor = newColor;
     }
 
-    windowBackgroundColors.set(doc, newColor);
+    documentBackgroundColors.set(doc, newColor);
   }
 
   static setBounds(x: number, y: number, width: number, height: number) {

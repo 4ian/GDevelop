@@ -5,8 +5,8 @@ import ReactDOM from 'react-dom';
 import PortalContainerContext from './PortalContainerContext';
 import Window from '../Utils/Window';
 import {
-  registerDocumentFrameName,
-  unregisterDocumentFrameName,
+  registerDocumentTargetId,
+  unregisterDocumentTargetId,
 } from '../Utils/Window';
 import useAlertDialog from './Alert/useAlertDialog';
 
@@ -75,11 +75,8 @@ const WindowPortal = ({
     const top = window.screenY + (window.outerHeight - initialHeight) / 2;
     const features = `width=${initialWidth},height=${initialHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`;
 
-    // Use a unique frameName so the main process can track the child
-    // BrowserWindow and the renderer can reference it in IPC calls
-    // (e.g. titlebar overlay updates).
-    const frameName = `gdevelop-popout-${++popOutCounter}`;
-    const externalWindow = window.open('', frameName, features);
+    const targetId = `GDevelopWindowPortal${++popOutCounter}`;
+    const externalWindow = window.open('', targetId, features);
 
     if (!externalWindow) {
       showAlert({
@@ -92,9 +89,8 @@ const WindowPortal = ({
 
     externalWindowRef.current = externalWindow;
 
-    // Register the frameName for this document so that
-    // Window.setWindowBackgroundColor can pass it to the main process.
-    registerDocumentFrameName(externalWindow.document, frameName);
+    // Register the targetId for this document so we can retrieve it later.
+    registerDocumentTargetId(externalWindow.document, targetId);
 
     // Set up the new window's document.
     externalWindow.document.title = title;
@@ -213,10 +209,14 @@ const WindowPortal = ({
       clearInterval(checkClosed);
       if (styleObserver) styleObserver.disconnect();
       if (observer) observer.disconnect();
-      unregisterDocumentFrameName(externalWindow.document);
-      if (!externalWindow.closed) {
-        externalWindow.close();
-      }
+      unregisterDocumentTargetId(externalWindow.document);
+
+      setTimeout(() => {
+        // TODO: make this more robust against "Uncaught illegal access".
+        if (!externalWindow.closed) {
+          externalWindow.close();
+        }
+      }, 100);
       externalWindowRef.current = null;
     };
     // We intentionally only run this effect once on mount.

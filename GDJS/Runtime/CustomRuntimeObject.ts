@@ -750,7 +750,7 @@ namespace gdjs {
 
     override getCenterX(): float {
       return (
-        (this.getUnscaledCenterX() - this.getUnscaledMinY()) * this.getScaleX()
+        (this.getUnscaledCenterX() - this.getUnscaledMinX()) * this.getScaleX()
       );
     }
 

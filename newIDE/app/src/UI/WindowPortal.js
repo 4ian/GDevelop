@@ -4,7 +4,13 @@ import { t } from '@lingui/macro';
 import ReactDOM from 'react-dom';
 import PortalContainerContext from './PortalContainerContext';
 import Window from '../Utils/Window';
+import {
+  registerDocumentBrowserWindowId,
+  unregisterDocumentBrowserWindowId,
+} from '../Utils/Window';
 import useAlertDialog from './Alert/useAlertDialog';
+import optionalRequire from '../Utils/OptionalRequire';
+const remote = optionalRequire('@electron/remote');
 
 type Props = {|
   /** The title of the new window. */
@@ -68,6 +74,15 @@ const WindowPortal = ({
     const left = window.screenX + (window.outerWidth - initialWidth) / 2;
     const top = window.screenY + (window.outerHeight - initialHeight) / 2;
     const features = `width=${initialWidth},height=${initialHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`;
+
+    // Snapshot existing BrowserWindow IDs before opening, so we can identify
+    // the newly created one (needed for titlebar overlay IPC targeting).
+    const windowIdsBefore = remote
+      ? new Set(
+          remote.BrowserWindow.getAllWindows().map(w => w.id)
+        )
+      : null;
+
     const externalWindow = window.open('', '', features);
 
     if (!externalWindow) {
@@ -178,6 +193,22 @@ const WindowPortal = ({
       }, 10);
     });
 
+    // Register the BrowserWindow ID for the new window so that IPC calls
+    // (e.g. titlebar overlay updates) can target it correctly.
+    let childBrowserWindowId: number | null = null;
+    if (remote && windowIdsBefore) {
+      const newBrowserWindow = remote.BrowserWindow.getAllWindows().find(
+        w => !windowIdsBefore.has(w.id)
+      );
+      if (newBrowserWindow) {
+        childBrowserWindowId = newBrowserWindow.id;
+        registerDocumentBrowserWindowId(
+          externalWindow.document,
+          newBrowserWindow.id
+        );
+      }
+    }
+
     setContainer(containerDiv);
 
     // Listen for the size of the container div.
@@ -198,6 +229,9 @@ const WindowPortal = ({
       clearInterval(checkClosed);
       if (styleObserver) styleObserver.disconnect();
       if (observer) observer.disconnect();
+      if (childBrowserWindowId != null) {
+        unregisterDocumentBrowserWindowId(externalWindow.document);
+      }
       if (!externalWindow.closed) {
         externalWindow.close();
       }

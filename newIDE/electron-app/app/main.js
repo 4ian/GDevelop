@@ -452,8 +452,13 @@ app.on('ready', function() {
   // Titlebar handling:
   ipcMain.handle(
     'titlebar-set-overlay-options',
-    async (event, overlayOptions) => {
-      const window = BrowserWindow.fromWebContents(event.sender);
+    async (event, overlayOptions, targetWindowId) => {
+      // When targetWindowId is provided, use it to find the correct
+      // BrowserWindow (needed for popped-out editor windows, where
+      // event.sender is always the main window's webContents).
+      const window = targetWindowId != null
+        ? BrowserWindow.fromId(targetWindowId)
+        : BrowserWindow.fromWebContents(event.sender);
       if (!window) return;
 
       // setTitleBarOverlay seems not defined on macOS.

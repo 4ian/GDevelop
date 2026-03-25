@@ -22,6 +22,10 @@ export const POSITIONAL_ARGUMENTS_KEY = '_';
 
 const windowBackgroundColors: WeakMap<Document, string> = new WeakMap();
 
+// Maps a Document from a popped-out window to its Electron BrowserWindow ID,
+// so that IPC calls (e.g. titlebar overlay) can target the correct window.
+const documentToBrowserWindowId: WeakMap<Document, number> = new WeakMap();
+
 // Per-navigator watcher state: each window's windowControlsOverlay gets its
 // own debounced listener and set of callbacks.
 type OverlayWatcherState = {|
@@ -50,6 +54,24 @@ const getOrCreateOverlayWatcher = (
   );
   overlayWatchers.set(windowControlsOverlay, state);
   return state;
+};
+
+/**
+ * Register a mapping from a popped-out window's Document to its Electron
+ * BrowserWindow ID, so that IPC calls can target the correct window.
+ */
+export const registerDocumentBrowserWindowId = (
+  doc: Document,
+  browserWindowId: number
+) => {
+  documentToBrowserWindowId.set(doc, browserWindowId);
+};
+
+/**
+ * Remove the Document → BrowserWindow ID mapping (e.g. when the window closes).
+ */
+export const unregisterDocumentBrowserWindowId = (doc: Document) => {
+  documentToBrowserWindowId.delete(doc);
 };
 
 /**
@@ -119,17 +141,23 @@ export default class Window {
 
     if (ipcRenderer) {
       // Update the window controls and background colors on Windows/Linux.
-      // The main process handler uses BrowserWindow.fromWebContents(event.sender)
-      // to resolve the correct window, so this works for both the main window
-      // and popped-out editor windows (which are real BrowserWindows created
-      // by Electron's setWindowOpenHandler).
-      ipcRenderer.invoke('titlebar-set-overlay-options', {
-        color: newColor,
-        // $FlowFixMe[incompatible-type]
-        symbolColor: isLightRgbColor(hexToRGBColor(newColor))
-          ? '#000000'
-          : '#ffffff',
-      });
+      // For the main window, the main process resolves via event.sender.
+      // For popped-out editor windows (opened via window.open and rendered
+      // into via React portals), event.sender is always the main window's
+      // webContents, so we pass the target BrowserWindow ID explicitly.
+      const targetWindowId =
+        doc !== document ? documentToBrowserWindowId.get(doc) : undefined;
+      ipcRenderer.invoke(
+        'titlebar-set-overlay-options',
+        {
+          color: newColor,
+          // $FlowFixMe[incompatible-type]
+          symbolColor: isLightRgbColor(hexToRGBColor(newColor))
+            ? '#000000'
+            : '#ffffff',
+        },
+        targetWindowId
+      );
     }
 
     // Update the PWA titlebar/controls color (if it's an installed PWA).

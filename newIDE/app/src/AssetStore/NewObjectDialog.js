@@ -230,7 +230,7 @@ export const useInstallAsset = ({
       });
       complyVariantsToEventsBasedObjectOf(
         project,
-        addAssetOutput.createdObjects
+        addAssetOutput.createdObjects.map(object => object.getType())
       );
 
       await resourceManagementProps.onFetchNewlyAddedResources();

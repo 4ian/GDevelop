@@ -26,6 +26,7 @@ import LoaderModal from '../UI/LoaderModal';
 import AlertMessage from '../UI/AlertMessage';
 import { getOrCreate } from '../Utils/Map';
 import { unserializeResourceFromJSObject } from '../Utils/Serializer';
+import { complyVariantsToEventsBasedObjectOf } from '../AssetStore/InstallAsset';
 
 const gd: libGDevelop = global.gd;
 
@@ -364,6 +365,9 @@ const addOrReplaceVariants = (
       }
     }
   }
+  complyVariantsToEventsBasedObjectOf(project, [
+    ...variantsByObjectType.keys(),
+  ]);
 };
 
 type AssetPackContent = {|

@@ -394,19 +394,19 @@ export const checkRequiredExtensionsUpdateForAssets = async ({
 
 export const complyVariantsToEventsBasedObjectOf = (
   project: gdProject,
-  createdObjects: Array<gdObject>
+  createdObjectTypes: Array<string>
 ) => {
   const installedVariantObjectTypes = new Set<string>();
-  for (const createdObject of createdObjects) {
+  for (const createdObjectType of createdObjectTypes) {
     if (
-      project.hasEventsBasedObject(createdObject.getType()) &&
-      !installedVariantObjectTypes.has(createdObject.getType())
+      project.hasEventsBasedObject(createdObjectType) &&
+      !installedVariantObjectTypes.has(createdObjectType)
     ) {
-      installedVariantObjectTypes.add(createdObject.getType());
+      installedVariantObjectTypes.add(createdObjectType);
       mapVector(
         gd.EventsBasedObjectVariantHelper.findAllChildrenCustomObjectType(
           project,
-          project.getEventsBasedObject(createdObject.getType())
+          project.getEventsBasedObject(createdObjectType)
         ),
         objectType => installedVariantObjectTypes.add(objectType)
       );

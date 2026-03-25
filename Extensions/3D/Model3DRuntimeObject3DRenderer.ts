@@ -166,7 +166,7 @@ namespace gdjs {
      * When the object change of size, rotation or position,
      * the transformation is done on the parent of `threeObject`.
      *
-     * This function doesn't mutate anything outside of `threeObject`.
+     * This function mutates `threeObject` and stores normalization scale in mesh parts.
      */
     stretchModelIntoUnitaryCube(
       threeObject: THREE.Object3D,
@@ -238,6 +238,10 @@ namespace gdjs {
       scaleMatrix.makeScale(scaleX, -scaleY, scaleZ);
       threeObject.updateMatrix();
       threeObject.applyMatrix4(scaleMatrix);
+
+      // Store the normalization scale for mesh parts positioning
+      // Note: Y scale is negated in the matrix but we store the absolute value
+      this._model3DRuntimeObject._meshParts.setNormalizationScale(scaleX, scaleY, scaleZ);
 
       return boundingBox;
     }
@@ -353,6 +357,9 @@ namespace gdjs {
       this._threeObject = threeObject;
       this.updatePosition();
       this._updateShadow();
+
+      // Build mesh parts map after the model is loaded
+      this._model3DRuntimeObject._meshParts.buildMeshesMap(root, this._model3DRuntimeObject);
 
       // Start the current animation on the new 3D object.
       this._animationMixer = new THREE.AnimationMixer(root);
@@ -499,6 +506,14 @@ namespace gdjs {
         animationName
       );
       return clip ? clip.duration : 0;
+    }
+
+    /**
+     * Get the THREE.Object3D for direct access to meshes.
+     * @returns The THREE.Object3D
+     */
+    getThreeObject(): THREE.Object3D {
+      return this._threeObject;
     }
   }
 

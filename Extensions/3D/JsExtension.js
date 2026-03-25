@@ -1939,265 +1939,6 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('setColor');
 
-    // PointLight3D Object - Professional 3D Light with Editor Visualization
-    {
-      const PointLight3DObject = new gd.ObjectJsImplementation();
-      const parseValidNumber = (rawValue, fallbackValue) => {
-        const value = parseFloat(rawValue);
-        return Number.isFinite(value) ? value : fallbackValue;
-      };
-      const clampNumber = (value, minValue, maxValue) =>
-        Math.max(minValue, Math.min(maxValue, value));
-      PointLight3DObject.updateProperty = function (propertyName, newValue) {
-        const objectContent = this.content;
-
-        if (propertyName === 'color') {
-          objectContent.color = newValue;
-          return true;
-        }
-
-        if (propertyName === 'intensity') {
-          objectContent.intensity = parseValidNumber(
-            newValue,
-            objectContent.intensity !== undefined ? objectContent.intensity : 1
-          );
-          return true;
-        }
-
-        if (propertyName === 'distance') {
-          const rawDistance = parseValidNumber(
-            newValue,
-            objectContent.distance !== undefined ? objectContent.distance : 100
-          );
-          objectContent.distance = Math.max(0, rawDistance);
-          return true;
-        }
-
-        if (propertyName === 'decay') {
-          const rawDecay = parseValidNumber(
-            newValue,
-            objectContent.decay !== undefined ? objectContent.decay : 2
-          );
-          objectContent.decay = clampNumber(rawDecay, 0, 2);
-          return true;
-        }
-
-        if (propertyName === 'castShadow') {
-          objectContent.castShadow = newValue === '1' || newValue === 'true';
-          return true;
-        }
-
-        if (propertyName === 'shadowMapSize') {
-          objectContent.shadowMapSize = parseValidNumber(
-            newValue,
-            objectContent.shadowMapSize !== undefined
-              ? objectContent.shadowMapSize
-              : 1024
-          );
-          return true;
-        }
-
-        return false;
-      };
-
-      PointLight3DObject.getProperties = function () {
-        const objectProperties = new gd.MapStringPropertyDescriptor();
-        const objectContent = this.content;
-
-        // Color
-        objectProperties
-          .getOrCreate('color')
-          .setValue(objectContent.color || '255;255;255')
-          .setType('Color')
-          .setLabel(_('Color'))
-          .setGroup(_('Appearance'));
-
-        // Intensity
-        objectProperties
-          .getOrCreate('intensity')
-          .setValue((objectContent.intensity !== undefined ? objectContent.intensity : 1).toString())
-          .setType('number')
-          .setLabel(_('Intensity'))
-          .setGroup(_('Appearance'));
-
-        // Distance (Range)
-        objectProperties
-          .getOrCreate('distance')
-          .setValue((objectContent.distance !== undefined ? objectContent.distance : 100).toString())
-          .setType('number')
-          .setLabel(_('Range (Distance)'))
-          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setGroup(_('Appearance'));
-
-        // Decay
-        objectProperties
-          .getOrCreate('decay')
-          .setValue((objectContent.decay !== undefined ? objectContent.decay : 2).toString())
-          .setType('number')
-          .setLabel(_('Decay'))
-          .setGroup(_('Appearance'))
-          .setAdvanced(true);
-
-        // Cast Shadow
-        objectProperties
-          .getOrCreate('castShadow')
-          .setValue(objectContent.castShadow ? 'true' : 'false')
-          .setType('boolean')
-          .setLabel(_('Cast Shadow'))
-          .setGroup(_('Shadows'));
-
-        // Shadow Map Size
-        objectProperties
-          .getOrCreate('shadowMapSize')
-          .setValue((objectContent.shadowMapSize !== undefined ? objectContent.shadowMapSize : 1024).toString())
-          .setType('number')
-          .setLabel(_('Shadow Map Size'))
-          .setGroup(_('Shadows'))
-          .setDescription(_('Power of two recommended (256, 512, 1024, 2048, 4096).'))
-          .setAdvanced(true);
-
-        return objectProperties;
-      };
-
-      PointLight3DObject.content = {
-        color: '255;255;255',
-        intensity: 1,
-        distance: 100,
-        decay: 2,
-        castShadow: false,
-        shadowMapSize: 1024,
-      };
-
-      PointLight3DObject.updateInitialInstanceProperty = function (
-        instance,
-        propertyName,
-        newValue
-      ) {
-        return false;
-      };
-
-      PointLight3DObject.getInitialInstanceProperties = function (instance) {
-        const instanceProperties = new gd.MapStringPropertyDescriptor();
-        return instanceProperties;
-      };
-
-      const pointLightObject = extension
-        .addObject(
-          'PointLight3DObject',
-          _('3D Point Light'),
-          _('A professional 3D point light that illuminates the scene. Visible in the editor with range visualization.'),
-          'JsPlatform/Extensions/3d_box.svg',
-          PointLight3DObject
-        )
-        .setCategory('Lighting')
-        .markAsRenderedIn3D()
-        .addDefaultBehavior('Scene3D::Base3DBehavior')
-        .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
-        .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
-        .addIncludeFile('Extensions/3D/ShadowSettings.js')
-        .addIncludeFile('Extensions/3D/PointLight3DRuntimeObject.js')
-        .addIncludeFile('Extensions/3D/PointLight3DRuntimeObjectRenderer.js');
-
-      // Color
-      pointLightObject
-        .addAction(
-          'SetColor',
-          _('Color'),
-          _('Change the color of the light'),
-          _('Change color of _PARAM0_ to _PARAM1_'),
-          _('Appearance'),
-          'res/actions/color24.png',
-          'res/actions/color.png'
-        )
-        .addParameter('object', _('3D Point Light'), 'PointLight3DObject', false)
-        .addParameter('color', _('Color'))
-        .setFunctionName('setColor');
-
-      // Intensity
-      pointLightObject
-        .addExpressionAndConditionAndAction(
-          'number',
-          'Intensity',
-          _('Intensity'),
-          _('the intensity'),
-          _('the intensity'),
-          _('Appearance'),
-          'res/actions/light.png'
-        )
-        .addParameter('object', _('3D Point Light'), 'PointLight3DObject', false)
-        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions());
-
-      // Distance
-      pointLightObject
-        .addExpressionAndConditionAndAction(
-          'number',
-          'Distance',
-          _('Range (Distance)'),
-          _('the range'),
-          _('the range'),
-          _('Appearance'),
-          'res/actions/light.png'
-        )
-        .addParameter('object', _('3D Point Light'), 'PointLight3DObject', false)
-        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions());
-
-      // Decay
-      pointLightObject
-        .addExpressionAndConditionAndAction(
-          'number',
-          'Decay',
-          _('Decay'),
-          _('the decay'),
-          _('the decay'),
-          _('Appearance'),
-          'res/actions/light.png'
-        )
-        .addParameter('object', _('3D Point Light'), 'PointLight3DObject', false)
-        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions());
-
-      pointLightObject
-        .addScopedAction(
-          'SetCastShadow',
-          _('Cast shadow'),
-          _('Enable or disable shadow casting'),
-          _('Cast shadow from _PARAM0_: _PARAM1_'),
-          _('Shadows'),
-          'res/actions/shadow.png',
-          'res/actions/shadow.png'
-        )
-        .addParameter('object', _('3D Point Light'), 'PointLight3DObject', false)
-        .addParameter('yesorno', _('Cast shadow'), '', true)
-        .setDefaultValue('yes')
-        .setFunctionName('setCastShadow');
-
-      pointLightObject
-        .addScopedCondition(
-          'IsCastingShadow',
-          _('Is casting shadow'),
-          _('Check if the light is casting shadows'),
-          _('Light _PARAM0_ is casting shadow'),
-          _('Shadows'),
-          'res/conditions/shadow.png',
-          'res/conditions/shadow.png'
-        )
-        .addParameter('object', _('3D Point Light'), 'PointLight3DObject', false)
-        .setFunctionName('isCastingShadow');
-
-      // Shadow Map Size
-      pointLightObject
-        .addExpressionAndConditionAndAction(
-          'number',
-          'ShadowMapSize',
-          _('Shadow map size'),
-          _('the shadow map size'),
-          _('the shadow map size'),
-          _('Shadows'),
-          'res/actions/shadow.png'
-        )
-        .addParameter('object', _('3D Point Light'), 'PointLight3DObject', false)
-        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions());
-    }
-
     extension
       .addExpressionAndConditionAndAction(
         'number',
@@ -2524,7 +2265,7 @@ module.exports = {
         .setGroup(_('Shadows'));
       properties
         .getOrCreate('frustumSize')
-        .setValue('4000')
+        .setValue('3000')
         .setLabel(_('Shadow frustum size'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -2580,66 +2321,23 @@ module.exports = {
         .setGroup(_('Global'));
       properties
         .getOrCreate('shadowMapType')
-        .setValue('pcfSoft')
-        .addChoice('pcfSoft', _('Soft PCF (recommended default)'))
-        .addChoice('pcf', _('PCF (radius controlled)'))
+        .setValue('pcf')
+        .addChoice('pcf', _('PCF (recommended default)'))
         .addChoice('basic', _('Basic (hard, fastest)'))
         .setLabel(_('Shadow map type'))
-        .setDescription(
-          _(
-            'Selecting a type automatically applies recommended anti-acne tuning values for this type.'
-          )
-        )
+        .setDescription(_('Shadow map type used by the renderer.'))
         .setType('choice')
         .setGroup(_('Global'));
-      properties
-        .getOrCreate('autoUpdate')
-        .setValue('true')
-        .setLabel(_('Auto update shadows'))
-        .setType('boolean')
-        .setGroup(_('Global'))
-        .setAdvanced(true);
       properties
         .getOrCreate('directionalShadowQuality')
         .setValue('medium')
         .addChoice('low', _('Low quality'))
         .addChoice('medium', _('Medium quality'))
         .addChoice('high', _('High quality'))
+        .addChoice('ultra', _('Ultra quality'))
         .setLabel(_('Directional shadow quality'))
         .setType('choice')
         .setGroup(_('Directional light'));
-      properties
-        .getOrCreate('pointLightBaseBias')
-        .setValue('-0.006')
-        .setLabel(_('Point light bias'))
-        .setDescription(
-          _(
-            'Base bias for 3D Point Light objects. Increase absolute value to reduce acne, but too much can detach shadows.'
-          )
-        )
-        .setType('number')
-        .setGroup(_('Point light'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('pointLightNormalBias')
-        .setValue('0.04')
-        .setLabel(_('Point light normal bias'))
-        .setDescription(_('Extra bias along normals to reduce shadow acne.'))
-        .setType('number')
-        .setGroup(_('Point light'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('pointLightRadius')
-        .setValue('1')
-        .setLabel(_('Point light shadow radius'))
-        .setDescription(
-          _(
-            'Softness radius for Point Light shadows. Mainly effective when shadow map type is PCF.'
-          )
-        )
-        .setType('number')
-        .setGroup(_('Point light'))
-        .setAdvanced(true);
     }
     {
       const effect = extension
@@ -2708,32 +2406,126 @@ module.exports = {
         .getOrCreate('rightFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Right face (X+)'));
+        .setLabel(_('Right face (Z+ / pz)'));
       properties
         .getOrCreate('leftFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Left face (X-)'));
+        .setLabel(_('Left face (Z- / nz)'));
       properties
         .getOrCreate('bottomFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Bottom face (Y+)'));
+        .setLabel(_('Bottom face (Y- / ny)'));
       properties
         .getOrCreate('topFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Top face (Y-)'));
+        .setLabel(_('Top face (Y+ / py)'));
       properties
         .getOrCreate('frontFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Front face (Z+)'));
+        .setLabel(_('Front face (X+ / px)'));
       properties
         .getOrCreate('backFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Back face (Z-)'));
+        .setLabel(_('Back face (X- / nx)'));
+    }
+    {
+      const effect = extension
+        .addEffect('Sky')
+        .setFullName(_('Sky (atmosphere)'))
+        .setDescription(
+          _('Procedural sky based on the official Three.js Sky addon.')
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/Sky.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('turbidity')
+        .setValue('2')
+        .setLabel(_('Turbidity'))
+        .setType('number')
+        .setGroup(_('Sky'));
+      properties
+        .getOrCreate('rayleigh')
+        .setValue('1')
+        .setLabel(_('Rayleigh'))
+        .setType('number')
+        .setGroup(_('Sky'));
+      properties
+        .getOrCreate('mieCoefficient')
+        .setValue('0.005')
+        .setLabel(_('Mie coefficient'))
+        .setType('number')
+        .setGroup(_('Sky'));
+      properties
+        .getOrCreate('mieDirectionalG')
+        .setValue('0.8')
+        .setLabel(_('Mie directional G'))
+        .setType('number')
+        .setGroup(_('Sky'));
+      properties
+        .getOrCreate('sunElevation')
+        .setValue('2')
+        .setLabel(_('Sun elevation'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+        .setGroup(_('Sun'))
+        .setDescription(_('Between -90° and 90°.'));
+      properties
+        .getOrCreate('sunAzimuth')
+        .setValue('180')
+        .setLabel(_('Sun azimuth'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+        .setGroup(_('Sun'))
+        .setDescription(_('Between 0° and 360°.'));
+      properties
+        .getOrCreate('scale')
+        .setValue('10000')
+        .setLabel(_('Scale'))
+        .setType('number')
+        .setGroup(_('Sky'));
+      properties
+        .getOrCreate('cloudScale')
+        .setValue('0.0002')
+        .setLabel(_('Cloud scale'))
+        .setType('number')
+        .setGroup(_('Clouds'));
+      properties
+        .getOrCreate('cloudSpeed')
+        .setValue('0.0001')
+        .setLabel(_('Cloud speed'))
+        .setType('number')
+        .setGroup(_('Clouds'));
+      properties
+        .getOrCreate('cloudCoverage')
+        .setValue('0.4')
+        .setLabel(_('Cloud coverage'))
+        .setType('number')
+        .setGroup(_('Clouds'));
+      properties
+        .getOrCreate('cloudDensity')
+        .setValue('0.4')
+        .setLabel(_('Cloud density'))
+        .setType('number')
+        .setGroup(_('Clouds'));
+      properties
+        .getOrCreate('cloudElevation')
+        .setValue('0.5')
+        .setLabel(_('Cloud elevation'))
+        .setType('number')
+        .setGroup(_('Clouds'));
+      properties
+        .getOrCreate('timeScale')
+        .setValue('1')
+        .setLabel(_('Time scale'))
+        .setType('number')
+        .setGroup(_('Clouds'));
     }
     {
       const effect = extension
@@ -3684,190 +3476,6 @@ module.exports = {
     objectsRenderingService.registerInstance3DRenderer(
       'Scene3D::Cube3DObject',
       RenderedCube3DObject3DInstance
-    );
-
-    // PointLight3D Renderers - Professional Visualization
-    class RenderedPointLight3D2DInstance extends RenderedInstance {
-      /** @type {number} */
-      _defaultWidth = 48;
-      /** @type {number} */
-      _defaultHeight = 48;
-
-      constructor(
-        project,
-        instance,
-        associatedObjectConfiguration,
-        pixiContainer,
-        pixiResourcesLoader
-      ) {
-        super(
-          project,
-          instance,
-          associatedObjectConfiguration,
-          pixiContainer,
-          pixiResourcesLoader
-        );
-
-        this._pixiObject = new PIXI.Graphics();
-        this._pixiContainer.addChild(this._pixiObject);
-      }
-
-      onRemovedFromScene() {
-        super.onRemovedFromScene();
-        this._pixiObject.destroy({ children: true });
-      }
-
-      static getThumbnail(project, resourcesLoader, objectConfiguration) {
-        return 'JsPlatform/Extensions/3d_box.svg';
-      }
-
-      update() {
-        const width = 48;
-        const height = 48;
-
-        this._pixiObject.clear();
-        this._pixiObject.beginFill(0x999999, 0.2);
-        this._pixiObject.lineStyle(1, 0xffd900, 0);
-        this._pixiObject.drawRect(-width / 2, -height / 2, width, height);
-        this._pixiObject.endFill();
-        this._pixiObject.hitArea = new PIXI.Circle(0, 0, 24);
-
-        this._pixiObject.position.x = this._instance.getX() + width / 2;
-        this._pixiObject.position.y = this._instance.getY() + height / 2;
-      }
-
-      getDefaultWidth() {
-        return this._defaultWidth;
-      }
-
-      getDefaultHeight() {
-        return this._defaultHeight;
-      }
-
-      getCenterX() {
-        return 24;
-      }
-
-      getCenterY() {
-        return 24;
-      }
-    }
-
-    class RenderedPointLight3D3DInstance extends Rendered3DInstance {
-      _defaultWidth = 48;
-      _defaultHeight = 48;
-      _defaultDepth = 48;
-      /** @type {THREE.Mesh | null} */
-      _iconMesh = null;
-
-      constructor(
-        project,
-        instance,
-        associatedObjectConfiguration,
-        pixiContainer,
-        threeGroup,
-        pixiResourcesLoader
-      ) {
-        super(
-          project,
-          instance,
-          associatedObjectConfiguration,
-          pixiContainer,
-          threeGroup,
-          pixiResourcesLoader
-        );
-
-        // Create PIXI placeholder
-        this._pixiObject = new PIXI.Graphics();
-        this._pixiContainer.addChild(this._pixiObject);
-
-        this._threeObject = new THREE.Group();
-        this._threeObject.rotation.order = 'ZYX';
-
-        const iconGeometry = new THREE.BoxGeometry(12, 12, 12);
-        const iconMaterial = new THREE.MeshBasicMaterial({
-          color: 0xffd84d,
-          transparent: true,
-          opacity: 0.8,
-          depthTest: false,
-          depthWrite: false,
-        });
-        this._iconMesh = new THREE.Mesh(iconGeometry, iconMaterial);
-        this._threeObject.add(this._iconMesh);
-        this._threeGroup.add(this._threeObject);
-      }
-
-      updatePixiObject() {
-        const width = 32;
-        const height = 32;
-
-        this._pixiObject.clear();
-        this._pixiObject.beginFill(0x000000, 0);
-        this._pixiObject.drawRect(-width / 2, -height / 2, width, height);
-        this._pixiObject.endFill();
-        this._pixiObject.hitArea = new PIXI.Circle(0, 0, 24);
-
-        this._pixiObject.position.x = this._instance.getX() + width / 2;
-        this._pixiObject.position.y = this._instance.getY() + height / 2;
-      }
-
-      update() {
-        this.updatePixiObject();
-        const object = gd.castObject(
-          this._associatedObjectConfiguration,
-          gd.ObjectJsImplementation
-        );
-        const color = object.content.color || '255;255;255';
-        const [r = 255, g = 255, b = 255] = color
-          .split(';')
-          .map((v) => parseInt(v, 10));
-        if (this._iconMesh) {
-          const iconMaterial = /** @type {THREE.MeshBasicMaterial} */ (
-            this._iconMesh.material
-          );
-          iconMaterial.color.setRGB(r / 255, g / 255, b / 255);
-        }
-        this._threeObject.position.set(
-          this._instance.getX(),
-          this._instance.getY(),
-          this._instance.getZ()
-        );
-        // Point lights don't have direction.
-        this._threeObject.rotation.set(0, 0, 0);
-      }
-
-      getDefaultWidth() {
-        return this._defaultWidth;
-      }
-
-      getDefaultHeight() {
-        return this._defaultHeight;
-      }
-
-      getDefaultDepth() {
-        return this._defaultDepth;
-      }
-
-      getCenterX() {
-        return 24;
-      }
-
-      getCenterY() {
-        return 24;
-      }
-
-      getCenterZ() {
-        return 24;
-      }
-    }
-
-    objectsRenderingService.registerInstanceRenderer(
-      'Scene3D::PointLight3DObject',
-      RenderedPointLight3D2DInstance
-    );
-    objectsRenderingService.registerInstance3DRenderer(
-      'Scene3D::PointLight3DObject',
-      RenderedPointLight3D3DInstance
     );
 
     const epsilon = 1 / (1 << 16);

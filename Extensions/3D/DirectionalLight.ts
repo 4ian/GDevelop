@@ -15,7 +15,31 @@ namespace gdjs {
     t: string;
   }
   const shadowHelper = false;
-  const lightFollowGridSize = 10;
+
+  const getShadowTexelSize = (
+    runtimeLayer: gdjs.RuntimeLayer | null,
+    frustumSize: number
+  ): number => {
+    const shadowManager = getShadowManager();
+    if (
+      !shadowManager ||
+      typeof shadowManager.getSettings !== 'function' ||
+      typeof shadowManager.getShadowMapSizeForQuality !== 'function'
+    ) {
+      return 0;
+    }
+    const settings = shadowManager.getSettings(runtimeLayer);
+    if (!settings || !settings.enabled) {
+      return 0;
+    }
+    const shadowMapSize = shadowManager.getShadowMapSizeForQuality(
+      settings.directionalShadowQuality
+    );
+    if (!Number.isFinite(shadowMapSize) || shadowMapSize <= 0) {
+      return 0;
+    }
+    return frustumSize / shadowMapSize;
+  };
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::DirectionalLight',
     new (class implements gdjs.PixiFiltersTools.FilterCreator {
@@ -32,7 +56,7 @@ namespace gdjs {
           private _rotation: float = 0;
           private _isCastingShadow: boolean = false;
           private _distanceFromCamera: float = 1500;
-          private _frustumSize: float = 4000;
+          private _frustumSize: float = 3000;
           private _directionalLightBaseBias: float = -0.0002;
           private _directionalLightNormalBias: float = 0.02;
 
@@ -145,9 +169,13 @@ namespace gdjs {
             const y = layer.getCameraY();
             const z = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
 
-            const roundedX = Math.floor(x / lightFollowGridSize) * lightFollowGridSize;
-            const roundedY = Math.floor(y / lightFollowGridSize) * lightFollowGridSize;
-            const roundedZ = Math.floor(z / lightFollowGridSize) * lightFollowGridSize;
+            const texelSize = getShadowTexelSize(layer, this._frustumSize);
+            const roundedX =
+              texelSize > 0 ? Math.floor(x / texelSize) * texelSize : x;
+            const roundedY =
+              texelSize > 0 ? Math.floor(y / texelSize) * texelSize : y;
+            const roundedZ =
+              texelSize > 0 ? Math.floor(z / texelSize) * texelSize : z;
             if (this._top === 'Y-') {
               const posLightX =
                 roundedX +

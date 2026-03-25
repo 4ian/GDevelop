@@ -215,6 +215,10 @@ namespace gdjs {
       | null = null;
     private _threeCameraDirty: boolean = false;
     private _threeEffectComposer: THREE_ADDONS.EffectComposer | null = null;
+    private _threePostProcessingPassesByEffectName: Map<
+      string,
+      THREE_ADDONS.Pass
+    > = new Map();
 
     // For a 2D+3D layer, the 2D rendering is done on the render texture
     // and then must be displayed on a plane in the 3D world:
@@ -328,15 +332,17 @@ namespace gdjs {
       return this._threeEffectComposer;
     }
 
-    addPostProcessingPass(pass: THREE_ADDONS.Pass) {
+    addPostProcessingPass(pass: THREE_ADDONS.Pass, effectName?: string) {
       if (!this._threeEffectComposer) {
         return;
       }
-      const game = this._layer.getRuntimeScene().getGame();
-      // TODO Keep the effects in the same order they are defined
-      // because the order matter for the final result.
-      // There is the same issue with 2D effects too.
+      if (effectName) {
+        this._threePostProcessingPassesByEffectName.set(effectName, pass);
+        this._reorderPostProcessingPasses();
+        return;
+      }
 
+      const game = this._layer.getRuntimeScene().getGame();
       // The composer contains:
       // - RenderPass
       // - inserted passes for effects
@@ -348,11 +354,73 @@ namespace gdjs {
       this._threeEffectComposer.insertPass(pass, index);
     }
 
-    removePostProcessingPass(pass: THREE_ADDONS.Pass) {
+    removePostProcessingPass(pass: THREE_ADDONS.Pass, effectName?: string) {
       if (!this._threeEffectComposer) {
         return;
       }
       this._threeEffectComposer.removePass(pass);
+      if (effectName) {
+        this._threePostProcessingPassesByEffectName.delete(effectName);
+      } else {
+        for (const [name, existingPass] of this
+          ._threePostProcessingPassesByEffectName) {
+          if (existingPass === pass) {
+            this._threePostProcessingPassesByEffectName.delete(name);
+            break;
+          }
+        }
+      }
+      this._reorderPostProcessingPasses();
+    }
+
+    reorderPostProcessingPasses(effectsData?: EffectData[]) {
+      this._reorderPostProcessingPasses(effectsData);
+    }
+
+    private _reorderPostProcessingPasses(effectsData?: EffectData[]) {
+      if (!this._threeEffectComposer) {
+        return;
+      }
+      const composer = this._threeEffectComposer;
+      if (composer.passes.length === 0) return;
+
+      const game = this._layer.getRuntimeScene().getGame();
+      const hasSmaa = game.getAntialiasingMode() !== 'none';
+
+      const renderPass = composer.passes[0];
+      const outputPass = composer.passes[composer.passes.length - 1];
+      const smaaPass = hasSmaa
+        ? composer.passes[composer.passes.length - 2]
+        : null;
+
+      const orderedEffectPasses: THREE_ADDONS.Pass[] = [];
+      const seen = new Set<THREE_ADDONS.Pass>();
+      const orderedEffectsData =
+        effectsData || this._layer.getInitialEffectsData() || [];
+      for (const effectData of orderedEffectsData) {
+        const pass = this._threePostProcessingPassesByEffectName.get(
+          effectData.name
+        );
+        if (pass && !seen.has(pass)) {
+          orderedEffectPasses.push(pass);
+          seen.add(pass);
+        }
+      }
+
+      // Preserve any extra passes (should be none) after the ordered effects.
+      for (const pass of composer.passes) {
+        if (pass === renderPass || pass === outputPass || pass === smaaPass) {
+          continue;
+        }
+        if (seen.has(pass)) continue;
+        orderedEffectPasses.push(pass);
+        seen.add(pass);
+      }
+
+      const newPasses = [renderPass, ...orderedEffectPasses];
+      if (hasSmaa && smaaPass) newPasses.push(smaaPass);
+      newPasses.push(outputPass);
+      composer.passes = newPasses;
     }
 
     hasPostProcessingPass() {

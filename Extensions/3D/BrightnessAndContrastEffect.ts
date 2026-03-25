@@ -16,12 +16,14 @@ namespace gdjs {
         return new (class implements gdjs.PixiFiltersTools.Filter {
           shaderPass: THREE_ADDONS.ShaderPass;
           _isEnabled: boolean;
+          _effectName: string;
 
-          constructor() {
+          constructor(effectName: string) {
             this.shaderPass = new THREE_ADDONS.ShaderPass(
               THREE_ADDONS.BrightnessContrastShader
             );
             this._isEnabled = false;
+            this._effectName = effectName;
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -41,7 +43,9 @@ namespace gdjs {
             if (!(target instanceof gdjs.Layer)) {
               return false;
             }
-            target.getRenderer().addPostProcessingPass(this.shaderPass);
+            target
+              .getRenderer()
+              .addPostProcessingPass(this.shaderPass, this._effectName);
             this._isEnabled = true;
             return true;
           }
@@ -49,7 +53,9 @@ namespace gdjs {
             if (!(target instanceof gdjs.Layer)) {
               return false;
             }
-            target.getRenderer().removePostProcessingPass(this.shaderPass);
+            target
+              .getRenderer()
+              .removePostProcessingPass(this.shaderPass, this._effectName);
             this._isEnabled = false;
             return true;
           }
@@ -89,7 +95,7 @@ namespace gdjs {
             this.shaderPass.uniforms.brightness.value = data.b;
             this.shaderPass.uniforms.contrast.value = data.c;
           }
-        })();
+        })(effectData.name);
       }
     })()
   );

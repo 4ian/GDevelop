@@ -1,0 +1,100 @@
+
+> gdevelop-ide@0.1.0 build
+> npm run import-resources && react-app-rewired build
+
+
+> gdevelop-ide@0.1.0 import-resources
+> npm run make-version-metadata && npm run import-zipped-external-editors && npm run build-theme-resources && npm run make-service-worker && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-external-libs.js
+
+
+> gdevelop-ide@0.1.0 make-version-metadata
+> cd scripts && node make-version-metadata.js
+
+✅ src/Version/VersionMetadata.js properly generated.
+
+> gdevelop-ide@0.1.0 import-zipped-external-editors
+> cd scripts && node import-zipped-editor.js piskel 5.5.228 b161dc74582e428a6d210cd1b74f052ca4aab301d0d522e0be87bdb4962d0fb7 && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.134 ba8558cad00ec9b18cf3c6fd8647f8c1478ca67c894bca94a152a3740af209cc
+
+✅ piskel-editor already existing in public/external/piskel folder and up-to-date - skipping download
+✅ jfxr-editor already existing in public/external/jfxr folder and up-to-date - skipping download
+✅ yarn-editor already existing in public/external/yarn folder and up-to-date - skipping download
+
+> gdevelop-ide@0.1.0 build-theme-resources
+> node scripts/build-theme-resources.js
+
+
+css
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/DefaultDarkTheme/DefaultDarkThemeVariables.css
+
+js
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/DefaultDarkTheme/DefaultDarkThemeVariables.json
+
+css
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/DefaultLightTheme/DefaultLightThemeVariables.css
+
+js
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/DefaultLightTheme/DefaultLightThemeVariables.json
+
+css
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/BlueDarkTheme/BlueDarkThemeVariables.css
+
+js
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/BlueDarkTheme/BlueDarkThemeVariables.json
+
+css
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/NordTheme/NordThemeVariables.css
+
+js
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/NordTheme/NordThemeVariables.json
+
+css
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/SolarizedDarkTheme/SolarizedDarkThemeVariables.css
+
+js
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/SolarizedDarkTheme/SolarizedDarkThemeVariables.json
+
+css
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/OneDarkTheme/OneDarkThemeVariables.css
+
+js
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/OneDarkTheme/OneDarkThemeVariables.json
+
+css
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/RosePineTheme/RosePineThemeVariables.css
+
+js
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/RosePineTheme/RosePineThemeVariables.json
+
+css
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/DeepBlueTheme/DeepBlueThemeVariables.css
+
+js
+✔︎  C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\scripts/../src/UI/Theme/DeepBlueTheme/DeepBlueThemeVariables.json
+
+> gdevelop-ide@0.1.0 make-service-worker
+> cd scripts && node make-service-worker.js
+
+⚠️ workbox warning: One of the glob patterns doesn't match any files. Please remove or fix the following: {
+  "globDirectory": "../public",
+  "globPattern": "static/css/*.css",
+  "globIgnores": [
+    "**/node_modules/**/*",
+    "**/service-worker.js"
+  ]
+}
+ℹ️ 0 files will be precached, totaling 0 MB.
+ℹ️  Copying libGD.js and associated files built locally to newIDE...
+✅ Copied libGD.wasm from Binaries/embuild/GDevelop.js to public and node_modules folders of newIDE/app.
+❌ Error while copying libGD.js from Binaries/embuild/GDevelop.js to public and node_modules folders of newIDE/app
+cp: copyFileSync: could not read src file (C:/Users/batah/OneDrive/المستندات/GitHub/GDevelop/Binaries/embuild/GDevelop.js/libGD.js)
+ℹ️ Cleaning destination first...
+ℹ️ Cleaning destination first...
+✅ GDJS built in 4736ms
+✅ GDJS built in 6755ms
+ℹ️ Copying GDJS and extensions runtime sources to C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\resources\GDJS, C:\Users\batah\OneDrive\المستندات\GitHub\GDevelop\newIDE\app\node_modules\GDJS-for-web-app-only...
+✅ Runtime source files copy done (492 file(s) copied in 3825ms).
+✅ Runtime source files copy done (492 file(s) copied in 3900ms).
+✅ Sources of Monaco Editor properly copied in public folder
+✅ Extracted zip.js.zip to public/external/ folder
+✅ Extracted zlib-asm.zip to public/external/ folder
+Creating an optimized production build...

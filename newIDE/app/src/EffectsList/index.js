@@ -10,6 +10,7 @@ import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import { mapFor } from '../Utils/MapFor';
 import RaisedButton from '../UI/RaisedButton';
+import FlatButton from '../UI/FlatButton';
 import IconButton from '../UI/IconButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
@@ -82,6 +83,49 @@ const styles = {
     flex: 1,
     alignItems: 'center',
   },
+};
+
+// Default ordering for effects based on recommended post-processing flow.
+// Lower numbers are inserted earlier in the list.
+const defaultEffectOrderByType: { [string]: number } = {
+  // Scene/lighting setup.
+  'Scene3D::ShadowSettings': 100,
+  'Scene3D::AmbientLight': 110,
+  'Scene3D::HemisphereLight': 120,
+  'Scene3D::DirectionalLight': 130,
+  'Scene3D::Skybox': 140,
+  'Scene3D::LinearFog': 150,
+  'Scene3D::ExponentialFog': 150,
+
+  // Renderer settings (non-pass).
+  'Scene3D::ToneMapping': 200,
+
+  // Post-processing passes: bloom first, then exposure and color corrections.
+  'Scene3D::Bloom': 300,
+  'Scene3D::Exposure': 320,
+  'Scene3D::HueAndSaturation': 330,
+  'Scene3D::BrightnessAndContrast': 340,
+};
+
+const getDefaultEffectOrder = (effectType: string): number =>
+  defaultEffectOrderByType[effectType] || 1000;
+
+const getDefaultEffectInsertIndex = (
+  effectsContainer: gdEffectsContainer,
+  effectType: string,
+  effectNameToIgnore?: string
+): number => {
+  const newOrder = getDefaultEffectOrder(effectType);
+  const effectsCount = effectsContainer.getEffectsCount();
+  for (let i = 0; i < effectsCount; i++) {
+    const effect = effectsContainer.getEffectAt(i);
+    if (effectNameToIgnore && effect.getName() === effectNameToIgnore) continue;
+    const existingOrder = getDefaultEffectOrder(effect.getEffectType());
+    if (newOrder < existingOrder) {
+      return i;
+    }
+  }
+  return effectsCount;
 };
 
 export const useEffectOverridingAlertDialog = (): ((
@@ -403,6 +447,7 @@ type UseManageEffectsState = {|
   all3DEffectMetadata: Array<EnumeratedEffectMetadata>,
   draggedEffect: {| current: ?gdEffect |},
   addEffect: boolean => void,
+  addEffectWithType: (effectType: string) => void,
   chooseEffectType: (effect: gdEffect, newEffectType: string) => void,
   copyAllEffects: () => void,
   copyEffect: (effect: gdEffect) => void,
@@ -487,13 +532,37 @@ export const useManageEffects = ({
         setEffectDefaultParameters(effect, effectMetadata.effectMetadata);
       }
 
+      if (justAddedEffectName === effect.getName()) {
+        const currentIndex = effectsContainer.getEffectPosition(
+          effect.getName()
+        );
+        const targetIndex = getDefaultEffectInsertIndex(
+          effectsContainer,
+          newEffectType,
+          effect.getName()
+        );
+        if (targetIndex !== currentIndex) {
+          effectsContainer.moveEffect(
+            currentIndex,
+            targetIndex > currentIndex ? targetIndex - 1 : targetIndex
+          );
+        }
+      }
+
       onUpdate();
       onEffectsUpdated();
       // Changing the type is like adding a new effect.
       // TODO Make a new effect dialog like for objects or behaviors to make this clearer.
       onEffectAdded();
     },
-    [allEffectMetadata, onUpdate, onEffectsUpdated, onEffectAdded]
+    [
+      allEffectMetadata,
+      effectsContainer,
+      justAddedEffectName,
+      onUpdate,
+      onEffectsUpdated,
+      onEffectAdded,
+    ]
   );
 
   const _addEffect = React.useCallback(
@@ -501,16 +570,14 @@ export const useManageEffects = ({
       const newName = newNameGenerator('Effect', name =>
         effectsContainer.hasEffectNamed(name)
       );
-      const effect = effectsContainer.insertNewEffect(
-        newName,
-        effectsContainer.getEffectsCount()
+      const defaultEffectType = is3D ? 'Scene3D::DirectionalLight' : 'Outline';
+      const insertIndex = getDefaultEffectInsertIndex(
+        effectsContainer,
+        defaultEffectType
       );
+      const effect = effectsContainer.insertNewEffect(newName, insertIndex);
 
-      if (is3D) {
-        chooseEffectType(effect, 'Scene3D::DirectionalLight');
-      } else {
-        chooseEffectType(effect, 'Outline');
-      }
+      chooseEffectType(effect, defaultEffectType);
 
       onUpdate();
       onEffectsUpdated();
@@ -523,6 +590,25 @@ export const useManageEffects = ({
     authenticatedUser,
     TRIVIAL_FIRST_EFFECT,
     _addEffect
+  );
+
+  const addEffectWithType = React.useCallback(
+    (effectType: string) => {
+      const newName = newNameGenerator('Effect', name =>
+        effectsContainer.hasEffectNamed(name)
+      );
+      const insertIndex = getDefaultEffectInsertIndex(
+        effectsContainer,
+        effectType
+      );
+      const effect = effectsContainer.insertNewEffect(newName, insertIndex);
+      chooseEffectType(effect, effectType);
+
+      onUpdate();
+      onEffectsUpdated();
+      setJustAddedEffectName(newName);
+    },
+    [chooseEffectType, effectsContainer, onUpdate, onEffectsUpdated]
   );
 
   const removeEffect = React.useCallback(
@@ -746,6 +832,7 @@ export const useManageEffects = ({
     all3DEffectMetadata,
     draggedEffect,
     addEffect,
+    addEffectWithType,
     chooseEffectType,
     copyAllEffects,
     copyEffect,
@@ -795,6 +882,7 @@ export default function EffectsList(props: Props): React.Node {
     all2DEffectMetadata,
     all3DEffectMetadata,
     addEffect,
+    addEffectWithType,
     chooseEffectType,
     copyAllEffects,
     copyEffect,
@@ -845,6 +933,31 @@ export default function EffectsList(props: Props): React.Node {
       : props.layerRenderingType === '3d'
       ? effects3DCount
       : effectsContainer.getEffectsCount();
+
+  const buildAdd3DEffectMenuTemplate = React.useCallback(
+    (i18n: I18nType) =>
+      all3DEffectMetadata.map(effectMetadata => ({
+        label: effectMetadata.fullName,
+        enabled:
+          !(target === 'object') ||
+          !effectMetadata.isMarkedAsNotWorkingForObjects,
+        click: () => addEffectWithType(effectMetadata.type),
+      })),
+    [all3DEffectMetadata, addEffectWithType, target]
+  );
+
+  const renderAdd3DEffectButton = () => (
+    <ElementWithMenu
+      element={
+        <RaisedButton
+          primary
+          label={<Trans>Add a 3D effect</Trans>}
+          icon={<Add />}
+        />
+      }
+      buildMenuTemplate={buildAdd3DEffectMenuTemplate}
+    />
+  );
 
   return (
     <I18n>
@@ -1094,14 +1207,8 @@ export default function EffectsList(props: Props): React.Node {
                     />
                   </LineStackLayout>
                   <LineStackLayout justifyContent="flex-end" expand>
-                    {props.layerRenderingType !== '2d' && (
-                      <RaisedButton
-                        primary
-                        label={<Trans>Add a 3D effect</Trans>}
-                        onClick={() => addEffect(true)}
-                        icon={<Add />}
-                      />
-                    )}
+                    {props.layerRenderingType !== '2d' &&
+                      renderAdd3DEffectButton()}
                     {props.layerRenderingType !== '3d' && (
                       <RaisedButton
                         primary
@@ -1123,16 +1230,22 @@ export default function EffectsList(props: Props): React.Node {
                   description={
                     <Trans>Effects create visual changes to the object.</Trans>
                   }
-                  actionLabel={<Trans>Add a 2D effect</Trans>}
+                  actionLabel={<Trans>Add a 3D effect</Trans>}
+                  actionElement={renderAdd3DEffectButton()}
                   helpPagePath={
                     props.target === 'object'
                       ? '/objects/effects'
                       : '/interface/scene-editor/layer-effects'
                   }
-                  onAction={() => addEffect(false)}
-                  secondaryActionIcon={<Add />}
-                  secondaryActionLabel={<Trans>Add a 3D effect</Trans>}
-                  onSecondaryAction={() => addEffect(true)}
+                  onAction={() => {}}
+                  secondaryActionElement={
+                    <FlatButton
+                      label={<Trans>Add a 2D effect</Trans>}
+                      primary
+                      onClick={() => addEffect(false)}
+                      leftIcon={<Add />}
+                    />
+                  }
                 />
               ) : (
                 <EmptyPlaceholder
@@ -1147,12 +1260,21 @@ export default function EffectsList(props: Props): React.Node {
                       <Trans>Add a 2D effect</Trans>
                     )
                   }
+                  actionElement={
+                    props.layerRenderingType === '3d'
+                      ? renderAdd3DEffectButton()
+                      : null
+                  }
                   helpPagePath={
                     props.target === 'object'
                       ? '/objects/effects'
                       : '/interface/scene-editor/layer-effects'
                   }
-                  onAction={() => addEffect(props.layerRenderingType === '3d')}
+                  onAction={() => {
+                    if (props.layerRenderingType !== '3d') {
+                      addEffect(false);
+                    }
+                  }}
                   secondaryActionIcon={<PasteIcon />}
                   secondaryActionLabel={
                     isClipboardContainingEffects ? <Trans>Paste</Trans> : null

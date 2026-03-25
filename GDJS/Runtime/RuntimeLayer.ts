@@ -714,6 +714,22 @@ namespace gdjs {
     }
 
     /**
+     * Reorder effects to match the order in the project data.
+     * This is especially important for post-processing passes.
+     */
+    reorderEffects(effectsData: EffectData[]): void {
+      this._effectsManager.reorderEffects(
+        this._rendererEffects,
+        this,
+        effectsData
+      );
+      const renderer = this.getRenderer();
+      if (renderer && (renderer as any).reorderPostProcessingPasses) {
+        (renderer as any).reorderPostProcessingPasses(effectsData);
+      }
+    }
+
+    /**
      * Set the time scale for the objects on the layer:
      * time will be slower if time scale is < 1, faster if > 1.
      * @param timeScale The new time scale (must be positive).

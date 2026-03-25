@@ -25,7 +25,7 @@ import {
 import { mapFor } from '../../../Utils/MapFor';
 import ResourceSelectorWithThumbnail from '../../../ResourcesList/ResourceSelectorWithThumbnail';
 import PixiResourcesLoader from '../../../ObjectsRendering/PixiResourcesLoader';
-import { type GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import { type GLTF } from 'three/addons/loaders/GLTFLoader';
 import * as THREE from 'three';
 import AlertMessage from '../../../UI/AlertMessage';
 

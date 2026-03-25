@@ -1,31 +1,32 @@
-import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
-import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils';
 
-import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
-import { SelectionBox } from 'three/examples/jsm/interactive/SelectionBox';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
-import { Pass } from 'three/examples/jsm/postprocessing/Pass';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
-import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass';
-import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
-import { BrightnessContrastShader } from 'three/examples/jsm/shaders/BrightnessContrastShader';
-import { ColorCorrectionShader } from 'three/examples/jsm/shaders/ColorCorrectionShader';
-import { HueSaturationShader } from 'three/examples/jsm/shaders/HueSaturationShader';
-import { ExposureShader } from 'three/examples/jsm/shaders/ExposureShader';
+import { TransformControls } from 'three/addons/controls/TransformControls';
+import { SelectionBox } from 'three/addons/interactive/SelectionBox';
+import { Sky } from 'three/addons/objects/Sky';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer';
+import { OutlinePass } from 'three/addons/postprocessing/OutlinePass';
+import { Pass } from 'three/addons/postprocessing/Pass';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass';
+import { SMAAPass } from 'three/addons/postprocessing/SMAAPass';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass';
+import { BrightnessContrastShader } from 'three/addons/shaders/BrightnessContrastShader';
+import { ColorCorrectionShader } from 'three/addons/shaders/ColorCorrectionShader';
+import { HueSaturationShader } from 'three/addons/shaders/HueSaturationShader';
+import { ExposureShader } from 'three/addons/shaders/ExposureShader';
 
 declare global {
   namespace THREE_ADDONS {
     export {
       GLTFLoader,
-      GLTF,
       DRACOLoader,
       SkeletonUtils,
       TransformControls,
       SelectionBox,
+      Sky,
       EffectComposer,
       OutlinePass,
       Pass,

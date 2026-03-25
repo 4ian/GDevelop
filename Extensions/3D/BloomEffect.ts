@@ -17,8 +17,9 @@ namespace gdjs {
         return new (class implements gdjs.PixiFiltersTools.Filter {
           shaderPass: THREE_ADDONS.UnrealBloomPass;
           _isEnabled: boolean;
+          _effectName: string;
 
-          constructor() {
+          constructor(effectName: string) {
             this.shaderPass = new THREE_ADDONS.UnrealBloomPass(
               new THREE.Vector2(256, 256),
               1,
@@ -26,6 +27,7 @@ namespace gdjs {
               0
             );
             this._isEnabled = false;
+            this._effectName = effectName;
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -45,7 +47,9 @@ namespace gdjs {
             if (!(target instanceof gdjs.Layer)) {
               return false;
             }
-            target.getRenderer().addPostProcessingPass(this.shaderPass);
+            target
+              .getRenderer()
+              .addPostProcessingPass(this.shaderPass, this._effectName);
             this._isEnabled = true;
             return true;
           }
@@ -53,7 +57,9 @@ namespace gdjs {
             if (!(target instanceof gdjs.Layer)) {
               return false;
             }
-            target.getRenderer().removePostProcessingPass(this.shaderPass);
+            target
+              .getRenderer()
+              .removePostProcessingPass(this.shaderPass, this._effectName);
             this._isEnabled = false;
             return true;
           }
@@ -99,7 +105,7 @@ namespace gdjs {
             this.shaderPass.radius = data.r;
             this.shaderPass.threshold = data.t;
           }
-        })();
+        })(effectData.name);
       }
     })()
   );

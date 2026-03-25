@@ -1431,6 +1431,16 @@ namespace gdjs {
     }
 
     /**
+     * Reorder effects to match the order in the project data.
+     */
+    reorderEffects(effectsData: EffectData[]): void {
+      this._runtimeScene
+        .getGame()
+        .getEffectsManager()
+        .reorderEffects(this._rendererEffects, this, effectsData);
+    }
+
+    /**
      * Hide (or show) the object.
      * @param enable Set it to true to hide the object, false to show it.
      */

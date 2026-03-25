@@ -9,6 +9,8 @@ import Text from '../../UI/Text';
 import { Trans, t } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
+import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
+import { type MenuItemTemplate } from '../../UI/Menu/Menu.flow';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import Paper from '../../UI/Paper';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
@@ -139,6 +141,7 @@ const TopLevelCollapsibleSection = ({
   noContentMargin,
   onOpenFullEditor,
   onAdd,
+  addMenuTemplate,
 }: {|
   title: React.Node,
   isFolded: boolean,
@@ -148,6 +151,7 @@ const TopLevelCollapsibleSection = ({
   noContentMargin?: boolean,
   onOpenFullEditor: () => void,
   onAdd?: (() => void) | null,
+  addMenuTemplate?: ((i18n: I18nType) => Array<MenuItemTemplate>) | null,
 |}) => (
   <>
     <Separator />
@@ -169,10 +173,21 @@ const TopLevelCollapsibleSection = ({
           <IconButton size="small" onClick={onOpenFullEditor}>
             <ShareExternal style={styles.icon} />
           </IconButton>
-          {onAdd && (
-            <IconButton size="small" onClick={onAdd}>
-              <Add style={styles.icon} />
-            </IconButton>
+          {addMenuTemplate ? (
+            <ElementWithMenu
+              element={
+                <IconButton size="small">
+                  <Add style={styles.icon} />
+                </IconButton>
+              }
+              buildMenuTemplate={addMenuTemplate}
+            />
+          ) : (
+            onAdd && (
+              <IconButton size="small" onClick={onAdd}>
+                <Add style={styles.icon} />
+              </IconButton>
+            )
           )}
         </Line>
       </LineStackLayout>
@@ -226,6 +241,7 @@ export const CompactEffectsListEditor = ({
     all2DEffectMetadata,
     all3DEffectMetadata,
     addEffect,
+    addEffectWithType,
     removeEffect,
     chooseEffectType,
   } = useManageEffects({
@@ -243,6 +259,18 @@ export const CompactEffectsListEditor = ({
   const filteredEffectMetadata =
     layerRenderingType === '3d' ? all3DEffectMetadata : all2DEffectMetadata;
 
+  const buildAdd3DEffectMenuTemplate = React.useCallback(
+    (i18n: I18nType) =>
+      all3DEffectMetadata.map(effectMetadata => ({
+        label: effectMetadata.fullName,
+        enabled:
+          !(target === 'object') ||
+          !effectMetadata.isMarkedAsNotWorkingForObjects,
+        click: () => addEffectWithType(effectMetadata.type),
+      })),
+    [all3DEffectMetadata, addEffectWithType, target]
+  );
+
   return (
     <TopLevelCollapsibleSection
       title={
@@ -257,7 +285,10 @@ export const CompactEffectsListEditor = ({
       isFolded={isEffectsFolded}
       toggleFolded={() => setEffectsFolded(!isEffectsFolded)}
       onOpenFullEditor={onOpenFullEditor}
-      onAdd={() => addEffect(layerRenderingType === '3d')}
+      onAdd={layerRenderingType === '3d' ? null : () => addEffect(false)}
+      addMenuTemplate={
+        layerRenderingType === '3d' ? buildAdd3DEffectMenuTemplate : null
+      }
       renderContent={() => (
         <ColumnStackLayout noMargin>
           {effectsContainer.getEffectsCount() === 0 && (

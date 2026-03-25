@@ -29,9 +29,11 @@ type Props = {|
   actionIcon?: React.Node,
   actionBuildSplitMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   onAction: () => void,
+  actionElement?: React.Node,
   secondaryActionLabel?: React.Node,
   secondaryActionIcon?: React.Node,
   onSecondaryAction?: () => void,
+  secondaryActionElement?: React.Node,
 |};
 
 const DefaultHelpButton = ({
@@ -84,51 +86,53 @@ export const EmptyPlaceholder = (props: Props): React.Node => (
         <LargeSpacer />
         <ColumnStackLayout alignItems="center" noMargin>
           <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
-            {props.secondaryActionLabel && props.onSecondaryAction && (
-              <FlatButton
-                label={props.secondaryActionLabel}
-                primary
-                onClick={props.onSecondaryAction}
-                disabled={!!props.isLoading}
-                leftIcon={props.secondaryActionIcon}
-              />
-            )}
-            {props.actionBuildSplitMenuTemplate ? (
-              <RaisedButtonWithSplitMenu
-                label={props.actionLabel}
-                primary
-                onClick={props.onAction}
-                disabled={!!props.isLoading}
-                icon={
-                  props.isLoading ? (
-                    <CircularProgress size={24} />
-                  ) : props.actionIcon ? (
-                    props.actionIcon
-                  ) : (
-                    <Add />
-                  )
-                }
-                id={props.actionButtonId}
-                buildMenuTemplate={props.actionBuildSplitMenuTemplate}
-              />
-            ) : (
-              <RaisedButton
-                label={props.actionLabel}
-                primary
-                onClick={props.onAction}
-                disabled={!!props.isLoading}
-                icon={
-                  props.isLoading ? (
-                    <CircularProgress size={24} />
-                  ) : props.actionIcon ? (
-                    props.actionIcon
-                  ) : (
-                    <Add />
-                  )
-                }
-                id={props.actionButtonId}
-              />
-            )}
+            {props.secondaryActionElement ||
+              (props.secondaryActionLabel && props.onSecondaryAction && (
+                <FlatButton
+                  label={props.secondaryActionLabel}
+                  primary
+                  onClick={props.onSecondaryAction}
+                  disabled={!!props.isLoading}
+                  leftIcon={props.secondaryActionIcon}
+                />
+              ))}
+            {props.actionElement ||
+              (props.actionBuildSplitMenuTemplate ? (
+                <RaisedButtonWithSplitMenu
+                  label={props.actionLabel}
+                  primary
+                  onClick={props.onAction}
+                  disabled={!!props.isLoading}
+                  icon={
+                    props.isLoading ? (
+                      <CircularProgress size={24} />
+                    ) : props.actionIcon ? (
+                      props.actionIcon
+                    ) : (
+                      <Add />
+                    )
+                  }
+                  id={props.actionButtonId}
+                  buildMenuTemplate={props.actionBuildSplitMenuTemplate}
+                />
+              ) : (
+                <RaisedButton
+                  label={props.actionLabel}
+                  primary
+                  onClick={props.onAction}
+                  disabled={!!props.isLoading}
+                  icon={
+                    props.isLoading ? (
+                      <CircularProgress size={24} />
+                    ) : props.actionIcon ? (
+                      props.actionIcon
+                    ) : (
+                      <Add />
+                    )
+                  }
+                  id={props.actionButtonId}
+                />
+              ))}
           </ResponsiveLineStackLayout>
           {props.tutorialId ? (
             <TutorialButton

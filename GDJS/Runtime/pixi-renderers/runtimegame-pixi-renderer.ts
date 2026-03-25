@@ -130,7 +130,7 @@ namespace gdjs {
             });
             logger.info('WebGL2 context created. 3D renderer enabled.');
             this._threeRenderer.shadowMap.enabled = false;
-            this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            this._threeRenderer.shadowMap.type = THREE.PCFShadowMap;
             this._threeRenderer.outputColorSpace = THREE.SRGBColorSpace;
             this._threeRenderer.toneMapping = THREE.NoToneMapping;
             this._threeRenderer.toneMappingExposure = 1;

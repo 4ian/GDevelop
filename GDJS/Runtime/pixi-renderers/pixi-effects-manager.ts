@@ -135,6 +135,47 @@ namespace gdjs {
     }
 
     /**
+     * Reorder the PixiJS filters to match the order of effects.
+     */
+    reorderEffects(
+      rendererEffects: RendererEffects,
+      target: EffectsTarget,
+      effectsData: EffectData[]
+    ): boolean {
+      const rendererObject = target.getRendererObject() as
+        | PIXI.DisplayObject
+        | null
+        | undefined;
+      if (!rendererObject) {
+        return false;
+      }
+
+      const knownPixiFilters = new Set<PIXI.Filter>();
+      for (const effectName in rendererEffects) {
+        const filter = rendererEffects[effectName];
+        if (filter instanceof gdjs.PixiFiltersTools.PixiFilter) {
+          knownPixiFilters.add(filter.pixiFilter);
+        }
+      }
+
+      const orderedFilters: PIXI.Filter[] = [];
+      for (const effectData of effectsData) {
+        const filter = rendererEffects[effectData.name];
+        if (filter instanceof gdjs.PixiFiltersTools.PixiFilter) {
+          orderedFilters.push(filter.pixiFilter);
+        }
+      }
+
+      const existingFilters: PIXI.Filter[] = rendererObject.filters || [];
+      const extraFilters = existingFilters.filter(
+        (filter) => !knownPixiFilters.has(filter)
+      );
+
+      rendererObject.filters = orderedFilters.concat(extraFilters);
+      return true;
+    }
+
+    /**
      * Update the property of an effect (with a number).
      * @param rendererEffects The collection of PixiJS filters.
      * @param name The effect name

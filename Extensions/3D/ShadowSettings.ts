@@ -1,31 +1,14 @@
 namespace gdjs {
   export namespace scene3d {
     export namespace shadows {
-      export type ShadowMapTypeName = 'pcfSoft' | 'pcf' | 'basic';
-      export type ShadowQualityName = 'low' | 'medium' | 'high';
+      export type ShadowMapTypeName = 'pcf' | 'basic';
+      export type ShadowQualityName = 'low' | 'medium' | 'high' | 'ultra';
 
       export interface GlobalShadowSettings {
         enabled: boolean;
         shadowMapType: ShadowMapTypeName;
         autoUpdate: boolean;
         directionalShadowQuality: ShadowQualityName;
-        pointLightBaseBias: number;
-        pointLightNormalBias: number;
-        pointLightRadius: number;
-      }
-
-      export type ShadowTypeRecommendedSettings = Pick<
-        GlobalShadowSettings,
-        | 'pointLightBaseBias'
-        | 'pointLightNormalBias'
-        | 'pointLightRadius'
-      >;
-
-      export interface ApplyPointLightShadowOptions {
-        castShadow: boolean;
-        shadowMapSize: number;
-        lightDistance: number;
-        forceUpdate?: boolean;
       }
 
       export interface ApplyDirectionalLightShadowOptions {
@@ -39,23 +22,9 @@ namespace gdjs {
 
       const defaultSettings: GlobalShadowSettings = {
         enabled: false,
-        shadowMapType: 'pcfSoft',
+        shadowMapType: 'pcf',
         autoUpdate: true,
         directionalShadowQuality: 'medium',
-        pointLightBaseBias: -0.006,
-        pointLightNormalBias: 0.04,
-        pointLightRadius: 1,
-      };
-
-      type PointLightShadowState = {
-        castShadow: boolean;
-        shadowMapType: ShadowMapTypeName;
-        shadowMapSize: number;
-        shadowCameraFar: number;
-        shadowCameraNear: number;
-        bias: number;
-        normalBias: number;
-        radius: number;
       };
 
       type DirectionalLightShadowState = {
@@ -75,7 +44,6 @@ namespace gdjs {
       type ShadowLayerState = {
         settings: GlobalShadowSettings;
         shadowSettingsObservers: Set<() => void>;
-        pointLightShadowStates: WeakMap<THREE.PointLight, PointLightShadowState>;
         directionalLightShadowStates: WeakMap<
           THREE.DirectionalLight,
           DirectionalLightShadowState
@@ -88,7 +56,6 @@ namespace gdjs {
           ...defaultSettings,
         },
         shadowSettingsObservers: new Set<() => void>(),
-        pointLightShadowStates: new WeakMap<THREE.PointLight, PointLightShadowState>(),
         directionalLightShadowStates: new WeakMap<
           THREE.DirectionalLight,
           DirectionalLightShadowState
@@ -120,41 +87,8 @@ namespace gdjs {
         return createdShadowLayerState;
       };
 
-      const pointLightShadowCameraNear = 0.1;
-      const pointLightInfiniteShadowFar = 5000;
-      const pointLightMinimumFiniteShadowFar = 50;
       const directionalLightShadowCameraNear = 1;
-      const directionalLightExtraFarDistance = 10000;
-
-      const minimumPointLightShadowMapSize = 256;
-      const maximumPointLightShadowMapSize = 4096;
-      const allowedPointLightShadowMapSizes = [256, 512, 1024, 2048, 4096];
-
-      const sanitizePointLightShadowMapSize = (rawSize: number): number => {
-        if (!Number.isFinite(rawSize)) {
-          return 1024;
-        }
-        const roundedSize = Math.round(rawSize);
-        const clampedSize = Math.max(
-          minimumPointLightShadowMapSize,
-          Math.min(maximumPointLightShadowMapSize, roundedSize)
-        );
-        let nearestSize = allowedPointLightShadowMapSizes[0];
-        let nearestDistance = Math.abs(clampedSize - nearestSize);
-        for (
-          let index = 1;
-          index < allowedPointLightShadowMapSizes.length;
-          index++
-        ) {
-          const candidateSize = allowedPointLightShadowMapSizes[index];
-          const candidateDistance = Math.abs(clampedSize - candidateSize);
-          if (candidateDistance < nearestDistance) {
-            nearestSize = candidateSize;
-            nearestDistance = candidateDistance;
-          }
-        }
-        return nearestSize;
-      };
+      const directionalLightExtraFarDistance = 3000;
 
       const requestShadowMapUpdate = (shadowLayerState: ShadowLayerState) => {
         shadowLayerState.shadowMapUpdateRequested = true;
@@ -166,11 +100,7 @@ namespace gdjs {
       ): boolean =>
         left.enabled === right.enabled &&
         left.shadowMapType === right.shadowMapType &&
-        left.autoUpdate === right.autoUpdate &&
-        left.directionalShadowQuality === right.directionalShadowQuality &&
-        left.pointLightBaseBias === right.pointLightBaseBias &&
-        left.pointLightNormalBias === right.pointLightNormalBias &&
-        left.pointLightRadius === right.pointLightRadius;
+        left.directionalShadowQuality === right.directionalShadowQuality;
 
       const getEffectiveShadowBaseBias = (
         rawBaseBias: number,
@@ -181,17 +111,6 @@ namespace gdjs {
         rawNormalBias: number,
         _shadowMapTypeName: ShadowMapTypeName
       ): number => rawNormalBias;
-
-      const getEffectivePointLightShadowRadius = (
-        rawRadius: number,
-        shadowMapTypeName: ShadowMapTypeName
-      ): number => {
-        if (shadowMapTypeName === 'pcf') {
-          return Math.max(0, rawRadius);
-        }
-        // Radius has no meaningful effect for Basic/PCFSoft shadow maps.
-        return 1;
-      };
 
       const notifyShadowSettingsObservers = (shadowLayerState: ShadowLayerState) => {
         shadowLayerState.shadowSettingsObservers.forEach((refreshShadows) => {
@@ -213,6 +132,7 @@ namespace gdjs {
         const shadowLayerState = getShadowLayerState(runtimeLayer);
         const newSettings = {
           ...defaultSettings,
+          autoUpdate: true,
         };
         if (areSettingsEqual(shadowLayerState.settings, newSettings)) {
           return;
@@ -230,6 +150,7 @@ namespace gdjs {
         const newSettings = {
           ...shadowLayerState.settings,
           ...partialSettings,
+          autoUpdate: true,
         };
         if (areSettingsEqual(shadowLayerState.settings, newSettings)) {
           return;
@@ -250,48 +171,13 @@ namespace gdjs {
         };
       };
 
-      // Deprecated alias kept for compatibility with older code paths.
-      export const registerPointLightRenderer = (
-        runtimeLayer: gdjs.RuntimeLayer | null,
-        refreshShadows: () => void
-      ): (() => void) =>
-        registerShadowSettingsObserver(runtimeLayer, refreshShadows);
-
       export const getShadowMapType = (
         shadowMapTypeName: ShadowMapTypeName
       ): THREE.ShadowMapType => {
         if (shadowMapTypeName === 'basic') {
           return THREE.BasicShadowMap;
         }
-        if (shadowMapTypeName === 'pcf') {
-          return THREE.PCFShadowMap;
-        }
-        return THREE.PCFSoftShadowMap;
-      };
-
-      export const getRecommendedSettingsForShadowMapType = (
-        shadowMapTypeName: ShadowMapTypeName
-      ): ShadowTypeRecommendedSettings => {
-        if (shadowMapTypeName === 'basic') {
-          return {
-            pointLightBaseBias: -0.015,
-            pointLightNormalBias: 0.12,
-            pointLightRadius: 1,
-          };
-        }
-        if (shadowMapTypeName === 'pcf') {
-          return {
-            pointLightBaseBias: -0.01,
-            pointLightNormalBias: 0.08,
-            pointLightRadius: 2,
-          };
-        }
-        // pcfSoft default.
-        return {
-          pointLightBaseBias: -0.006,
-          pointLightNormalBias: 0.04,
-          pointLightRadius: 1,
-        };
+        return THREE.PCFShadowMap;
       };
 
       export const getShadowMapSizeForQuality = (quality: string): number => {
@@ -300,6 +186,9 @@ namespace gdjs {
         }
         if (quality === 'high') {
           return 2048;
+        }
+        if (quality === 'ultra') {
+          return 4096;
         }
         return 1024;
       };
@@ -313,11 +202,6 @@ namespace gdjs {
         }
         return 1;
       };
-
-      export const getPointLightShadowCameraFar = (lightDistance: number): number =>
-        !Number.isFinite(lightDistance) || lightDistance <= 0
-          ? pointLightInfiniteShadowFar
-          : Math.max(lightDistance * 1.5, pointLightMinimumFiniteShadowFar);
 
       export const applyToThreeRenderer = (
         runtimeLayer: gdjs.RuntimeLayer | null,
@@ -333,11 +217,11 @@ namespace gdjs {
         const didRendererConfigChange =
           shadowMap.enabled !== settings.enabled ||
           shadowMap.type !== expectedShadowMapType ||
-          shadowMap.autoUpdate !== settings.autoUpdate;
+          shadowMap.autoUpdate !== true;
 
         shadowMap.enabled = settings.enabled;
         shadowMap.type = expectedShadowMapType;
-        shadowMap.autoUpdate = settings.autoUpdate;
+        shadowMap.autoUpdate = true;
 
         if (didRendererConfigChange) {
           requestShadowMapUpdate(shadowLayerState);
@@ -347,106 +231,6 @@ namespace gdjs {
           shadowMap.needsUpdate = true;
           shadowLayerState.shadowMapUpdateRequested = false;
         }
-      };
-
-      export const applyPointLightShadow = (
-        runtimeLayer: gdjs.RuntimeLayer | null,
-        pointLight: THREE.PointLight,
-        options: ApplyPointLightShadowOptions
-      ): void => {
-        const shadowLayerState = getShadowLayerState(runtimeLayer);
-        const settings = shadowLayerState.settings;
-        const pointLightShadowStates = shadowLayerState.pointLightShadowStates;
-        const previousState = pointLightShadowStates.get(pointLight);
-        const shadowMapType = settings.shadowMapType;
-        const castShadow = settings.enabled && options.castShadow;
-        let didUpdate = options.forceUpdate || false;
-
-        if (pointLight.castShadow !== castShadow) {
-          pointLight.castShadow = castShadow;
-          didUpdate = true;
-        }
-        if (!castShadow) {
-          pointLightShadowStates.set(pointLight, {
-            castShadow,
-            shadowMapType,
-            shadowMapSize: sanitizePointLightShadowMapSize(options.shadowMapSize),
-            shadowCameraFar: getPointLightShadowCameraFar(options.lightDistance),
-            shadowCameraNear: pointLightShadowCameraNear,
-            bias: pointLight.shadow.bias,
-            normalBias: pointLight.shadow.normalBias,
-            radius: pointLight.shadow.radius,
-          });
-          return;
-        }
-
-        const shadowMapSize = sanitizePointLightShadowMapSize(options.shadowMapSize);
-        const hasShadowMapSizeChanged =
-          !previousState ||
-          previousState.shadowMapType !== shadowMapType ||
-          previousState.shadowMapSize !== shadowMapSize;
-        if (hasShadowMapSizeChanged) {
-          pointLight.shadow.mapSize.width = shadowMapSize;
-          pointLight.shadow.mapSize.height = shadowMapSize;
-          pointLight.shadow.map?.dispose();
-          pointLight.shadow.map = null;
-          didUpdate = true;
-        }
-
-        const desiredCameraFar = getPointLightShadowCameraFar(options.lightDistance);
-        if (
-          !previousState ||
-          previousState.shadowCameraNear !== pointLightShadowCameraNear ||
-          previousState.shadowCameraFar !== desiredCameraFar
-        ) {
-          pointLight.shadow.camera.near = pointLightShadowCameraNear;
-          pointLight.shadow.camera.far = desiredCameraFar;
-          pointLight.shadow.camera.updateProjectionMatrix();
-          didUpdate = true;
-        }
-
-        const biasMultiplier = getShadowBiasMultiplier(shadowMapSize);
-        const baseBias = getEffectiveShadowBaseBias(
-          settings.pointLightBaseBias,
-          shadowMapType
-        );
-        const normalBias = getEffectiveShadowNormalBias(
-          settings.pointLightNormalBias,
-          shadowMapType
-        );
-        const radius = getEffectivePointLightShadowRadius(
-          settings.pointLightRadius,
-          shadowMapType
-        );
-        const bias = baseBias * biasMultiplier;
-        if (!previousState || previousState.bias !== bias) {
-          pointLight.shadow.bias = bias;
-          didUpdate = true;
-        }
-        if (!previousState || previousState.normalBias !== normalBias) {
-          pointLight.shadow.normalBias = normalBias;
-          didUpdate = true;
-        }
-        if (!previousState || previousState.radius !== radius) {
-          pointLight.shadow.radius = radius;
-          didUpdate = true;
-        }
-
-        if (didUpdate) {
-          pointLight.shadow.needsUpdate = true;
-          requestShadowMapUpdate(shadowLayerState);
-        }
-
-        pointLightShadowStates.set(pointLight, {
-          castShadow,
-          shadowMapType,
-          shadowMapSize,
-          shadowCameraFar: desiredCameraFar,
-          shadowCameraNear: pointLightShadowCameraNear,
-          bias,
-          normalBias,
-          radius,
-        });
       };
 
       export const applyDirectionalLightShadow = (
@@ -562,9 +346,6 @@ namespace gdjs {
     t: gdjs.scene3d.shadows.ShadowMapTypeName;
     a: boolean;
     dq: gdjs.scene3d.shadows.ShadowQualityName;
-    pb: number;
-    pnb: number;
-    pr: number;
   }
 
   gdjs.PixiFiltersTools.registerFilterCreator(
@@ -580,21 +361,6 @@ namespace gdjs {
         return new (class implements gdjs.PixiFiltersTools.Filter {
           private _isEnabled = false;
           private _settings = gdjs.scene3d.shadows.getDefaultSettings();
-          private _isFirstShadowMapTypeSync = true;
-
-          private _applyShadowTypePreset(
-            shadowMapTypeName: gdjs.scene3d.shadows.ShadowMapTypeName
-          ): void {
-            const recommendedSettings =
-              gdjs.scene3d.shadows.getRecommendedSettingsForShadowMapType(
-                shadowMapTypeName
-              );
-            this._settings.pointLightBaseBias =
-              recommendedSettings.pointLightBaseBias;
-            this._settings.pointLightNormalBias =
-              recommendedSettings.pointLightNormalBias;
-            this._settings.pointLightRadius = recommendedSettings.pointLightRadius;
-          }
 
           private _applySettings(target: EffectsTarget): boolean {
             if (!(target instanceof gdjs.Layer)) {
@@ -643,49 +409,27 @@ namespace gdjs {
           }
 
           updateDoubleParameter(parameterName: string, value: number): void {
-            if (parameterName === 'pointLightBaseBias') {
-              this._settings.pointLightBaseBias = value;
-            } else if (parameterName === 'pointLightNormalBias') {
-              this._settings.pointLightNormalBias = value;
-            } else if (parameterName === 'pointLightRadius') {
-              this._settings.pointLightRadius = value;
-            }
+            // No numeric parameters for shadow settings.
           }
 
           getDoubleParameter(parameterName: string): number {
-            if (parameterName === 'pointLightBaseBias') {
-              return this._settings.pointLightBaseBias;
-            }
-            if (parameterName === 'pointLightNormalBias') {
-              return this._settings.pointLightNormalBias;
-            }
-            if (parameterName === 'pointLightRadius') {
-              return this._settings.pointLightRadius;
-            }
             return 0;
           }
 
           updateStringParameter(parameterName: string, value: string): void {
             if (parameterName === 'shadowMapType') {
-              if (
-                value === 'basic' ||
-                value === 'pcf' ||
-                value === 'pcfSoft'
-              ) {
-                const previousShadowMapType = this._settings.shadowMapType;
+              if (value === 'basic' || value === 'pcf') {
                 this._settings.shadowMapType = value;
-                if (
-                  !this._isFirstShadowMapTypeSync &&
-                  previousShadowMapType !== value
-                ) {
-                  this._applyShadowTypePreset(value);
-                }
-                this._isFirstShadowMapTypeSync = false;
               }
             } else if (parameterName === 'directionalShadowQuality') {
-              if (value === 'low' || value === 'medium' || value === 'high') {
-                this._settings.directionalShadowQuality = value;
-              }
+            if (
+              value === 'low' ||
+              value === 'medium' ||
+              value === 'high' ||
+              value === 'ultra'
+            ) {
+              this._settings.directionalShadowQuality = value;
+            }
             }
           }
 
@@ -698,8 +442,6 @@ namespace gdjs {
           updateBooleanParameter(parameterName: string, value: boolean): void {
             if (parameterName === 'enabled') {
               this._settings.enabled = value;
-            } else if (parameterName === 'autoUpdate') {
-              this._settings.autoUpdate = value;
             }
           }
 
@@ -707,11 +449,8 @@ namespace gdjs {
             return {
               e: this._settings.enabled,
               t: this._settings.shadowMapType,
-              a: this._settings.autoUpdate,
+              a: true,
               dq: this._settings.directionalShadowQuality,
-              pb: this._settings.pointLightBaseBias,
-              pnb: this._settings.pointLightNormalBias,
-              pr: this._settings.pointLightRadius,
             };
           }
 
@@ -719,19 +458,12 @@ namespace gdjs {
             syncData: ShadowSettingsFilterNetworkSyncData
           ): void {
             if (syncData.e !== undefined) this._settings.enabled = syncData.e;
-            if (syncData.t !== undefined) this._settings.shadowMapType = syncData.t;
-            if (syncData.a !== undefined) this._settings.autoUpdate = syncData.a;
+            if (syncData.t === 'basic' || syncData.t === 'pcf') {
+              this._settings.shadowMapType = syncData.t;
+            }
+            if (syncData.a !== undefined) this._settings.autoUpdate = true;
             if (syncData.dq !== undefined) {
               this._settings.directionalShadowQuality = syncData.dq;
-            }
-            if (syncData.pb !== undefined) {
-              this._settings.pointLightBaseBias = syncData.pb;
-            }
-            if (syncData.pnb !== undefined) {
-              this._settings.pointLightNormalBias = syncData.pnb;
-            }
-            if (syncData.pr !== undefined) {
-              this._settings.pointLightRadius = syncData.pr;
             }
           }
         })();

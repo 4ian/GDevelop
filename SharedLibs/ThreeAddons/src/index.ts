@@ -3,22 +3,26 @@
  * @module ThreeAddons
  */
 
-export { GLTFLoader } from "./examples/jsm/loaders/GLTFLoader";
-export { DRACOLoader } from "./examples/jsm/loaders/DRACOLoader";
+export { GLTFLoader } from "./addons/loaders/GLTFLoader";
+export { DRACOLoader } from "./addons/loaders/DRACOLoader";
 
-export * as SkeletonUtils from "./examples/jsm/utils/SkeletonUtils";
+export * as SkeletonUtils from "./addons/utils/SkeletonUtils";
 
-export { TransformControls } from "./examples/jsm/controls/TransformControls";
-export { SelectionBox } from "./examples/jsm/interactive/SelectionBox";
+export { TransformControls } from "./addons/controls/TransformControls";
+export { SelectionBox } from "./addons/interactive/SelectionBox";
 
-export { EffectComposer } from "./examples/jsm/postprocessing/EffectComposer";
-export { RenderPass } from "./examples/jsm/postprocessing/RenderPass";
-export { OutlinePass } from "./examples/jsm/postprocessing/OutlinePass";
-export { ShaderPass } from "./examples/jsm/postprocessing/ShaderPass";
-export { SMAAPass } from "./examples/jsm/postprocessing/SMAAPass";
-export { OutputPass } from "./examples/jsm/postprocessing/OutputPass";
-export { UnrealBloomPass } from "./examples/jsm/postprocessing/UnrealBloomPass";
+export { Sky } from "./addons/objects/Sky";
 
-export { BrightnessContrastShader } from "./examples/jsm/shaders/BrightnessContrastShader";
-export { HueSaturationShader } from "./examples/jsm/shaders/HueSaturationShader";
-export { ExposureShader } from "./examples/jsm/shaders/ExposureShader";
+export { EffectComposer } from "./addons/postprocessing/EffectComposer";
+export { RenderPass } from "./addons/postprocessing/RenderPass";
+export { OutlinePass } from "./addons/postprocessing/OutlinePass";
+export { Pass } from "./addons/postprocessing/Pass";
+export { ShaderPass } from "./addons/postprocessing/ShaderPass";
+export { SMAAPass } from "./addons/postprocessing/SMAAPass";
+export { OutputPass } from "./addons/postprocessing/OutputPass";
+export { UnrealBloomPass } from "./addons/postprocessing/UnrealBloomPass";
+
+export { BrightnessContrastShader } from "./addons/shaders/BrightnessContrastShader";
+export { ColorCorrectionShader } from "./addons/shaders/ColorCorrectionShader";
+export { HueSaturationShader } from "./addons/shaders/HueSaturationShader";
+export { ExposureShader } from "./addons/shaders/ExposureShader";

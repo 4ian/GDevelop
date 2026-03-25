@@ -19,7 +19,7 @@ import Rendered3DInstance from './Renderers/Rendered3DInstance';
 import * as PIXI_LEGACY from 'pixi.js-legacy';
 import * as PIXI_SPINE from 'pixi-spine';
 import * as THREE from 'three';
-import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils';
 import optionalRequire from '../Utils/OptionalRequire';
 import {
   rgbOrHexToHexNumber,

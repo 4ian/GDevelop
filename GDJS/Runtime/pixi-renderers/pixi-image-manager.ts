@@ -261,16 +261,16 @@ namespace gdjs {
       }
 
       const cubeTexture = new THREE.CubeTexture();
-      // Faces on X axis need to be swapped.
-      cubeTexture.images[0] = this._getImageSource(xNegativeResourceName);
-      cubeTexture.images[1] = this._getImageSource(xPositiveResourceName);
+      // Use standard cubemap order: +X, -X, +Y, -Y, +Z, -Z.
+      cubeTexture.images[0] = this._getImageSource(xPositiveResourceName);
+      cubeTexture.images[1] = this._getImageSource(xNegativeResourceName);
       // Faces on Y keep the same order.
       cubeTexture.images[2] = this._getImageSource(yPositiveResourceName);
       cubeTexture.images[3] = this._getImageSource(yNegativeResourceName);
       // Faces on Z keep the same order.
       cubeTexture.images[4] = this._getImageSource(zPositiveResourceName);
       cubeTexture.images[5] = this._getImageSource(zNegativeResourceName);
-      // The images also need to be mirrored horizontally by users.
+      cubeTexture.flipY = false;
 
       cubeTexture.magFilter = THREE.LinearFilter;
       cubeTexture.minFilter = THREE.LinearFilter;

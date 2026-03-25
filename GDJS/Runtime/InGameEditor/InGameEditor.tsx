@@ -2247,10 +2247,13 @@ namespace gdjs {
               threeTransformControls
             );
 
-            threeTransformControls.rotation.order = 'ZYX';
-            threeTransformControls.scale.y = -1;
+            const threeTransformControlsHelper =
+              threeTransformControls.getHelper();
+
+            threeTransformControlsHelper.rotation.order = 'ZYX';
+            threeTransformControlsHelper.scale.y = -1;
             threeTransformControls.mode = this._transformControlsMode;
-            threeTransformControls.traverse((obj) => {
+            threeTransformControlsHelper.traverse((obj) => {
               // To be detected correctly by OutlinePass.
               // @ts-ignore
               obj.isTransformControls = true;
@@ -2267,7 +2270,7 @@ namespace gdjs {
             threeScene.add(dummyThreeObject);
 
             threeTransformControls.attach(dummyThreeObject);
-            threeScene.add(threeTransformControls);
+            threeScene.add(threeTransformControlsHelper);
 
             // Keep track of the movement so the editor can apply it to the selection.
             let initialObjectX = 0;
@@ -2523,7 +2526,9 @@ namespace gdjs {
         return;
       }
       this._selectionControls.threeTransformControls.detach();
-      this._selectionControls.threeTransformControls.removeFromParent();
+      this._selectionControls.threeTransformControls
+        .getHelper()
+        .removeFromParent();
       this._selectionControls.dummyThreeObject.removeFromParent();
       this._editorGrid.setVisible(false);
       this._selectionControls = null;

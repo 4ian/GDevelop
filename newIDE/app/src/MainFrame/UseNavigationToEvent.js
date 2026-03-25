@@ -8,6 +8,9 @@ export type EventNavigationTarget = {|
   name: string,
   locationType: LocationType,
   eventPath: EventPath,
+  functionName?: string,
+  behaviorName?: ?string,
+  objectName?: ?string,
 |};
 
 type UseNavigationToEventProps = {|
@@ -19,6 +22,7 @@ type UseNavigationToEventResult = {|
 |};
 
 const EDITOR_MOUNT_DELAY_MS = 300;
+const FUNCTION_SELECT_DELAY_MS = 150;
 
 /**
  * Hook to handle navigation to a specific event in an events editor.
@@ -31,13 +35,21 @@ export const useNavigationToEvent = ({
     pendingEventNavigation,
     setPendingEventNavigation,
   ] = React.useState<?EventNavigationTarget>(null);
+  const scrollTimeoutIdRef = React.useRef<?TimeoutID>(null);
 
   React.useEffect(
     () => {
       if (!pendingEventNavigation) return;
 
       const timeoutId = setTimeout(() => {
-        const { name, locationType, eventPath } = pendingEventNavigation;
+        const {
+          name,
+          locationType,
+          eventPath,
+          functionName,
+          behaviorName,
+          objectName,
+        } = pendingEventNavigation;
         const editorKind =
           locationType === 'layout'
             ? 'layout events'
@@ -51,14 +63,43 @@ export const useNavigationToEvent = ({
             if (
               editor.kind === editorKind &&
               editor.projectItemName === name &&
-              editor.editorRef &&
-              // $FlowFixMe[method-unbinding]
-              editor.editorRef.scrollToEventPath
+              editor.editorRef
             ) {
-              // $FlowFixMe[incompatible-type] - scrollToEventPath is checked above
-              // $FlowFixMe[not-a-function]
-              editor.editorRef.scrollToEventPath(eventPath);
-              setPendingEventNavigation(null);
+              const ref = editor.editorRef;
+
+              if (
+                locationType === 'extension' &&
+                functionName &&
+                // $FlowFixMe[method-unbinding]
+                ref.selectEventsFunctionByName
+              ) {
+                // $FlowFixMe[not-a-function]
+                ref.selectEventsFunctionByName(
+                  functionName,
+                  behaviorName,
+                  objectName
+                );
+                // $FlowFixMe[method-unbinding]
+                if (ref.scrollToEventPath) {
+                  scrollTimeoutIdRef.current = setTimeout(() => {
+                    scrollTimeoutIdRef.current = null;
+                    // $FlowFixMe[not-a-function]
+                    // $FlowFixMe[prop-missing]
+                    ref.scrollToEventPath(eventPath);
+                    setPendingEventNavigation(null);
+                  }, FUNCTION_SELECT_DELAY_MS);
+                } else {
+                  setPendingEventNavigation(null);
+                }
+              } else {
+                // $FlowFixMe[method-unbinding]
+                if (ref.scrollToEventPath) {
+                  // $FlowFixMe[not-a-function]
+                  ref.scrollToEventPath(eventPath);
+                }
+                setPendingEventNavigation(null);
+              }
+
               return;
             }
           }
@@ -67,7 +108,13 @@ export const useNavigationToEvent = ({
         setPendingEventNavigation(null);
       }, EDITOR_MOUNT_DELAY_MS);
 
-      return () => clearTimeout(timeoutId);
+      return () => {
+        clearTimeout(timeoutId);
+        if (scrollTimeoutIdRef.current) {
+          clearTimeout(scrollTimeoutIdRef.current);
+          scrollTimeoutIdRef.current = null;
+        }
+      };
     },
     [pendingEventNavigation, editorTabs]
   );

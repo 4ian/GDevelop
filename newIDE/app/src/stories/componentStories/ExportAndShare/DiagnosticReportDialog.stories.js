@@ -23,6 +23,7 @@ export const Empty = (): React.Node => (
     onClose={action('onClose')}
     onNavigateToLayoutEvent={action('onNavigateToLayoutEvent')}
     onNavigateToExternalEventsEvent={action('onNavigateToExternalEventsEvent')}
+    onNavigateToExtensionEvent={action('onNavigateToExtensionEvent')}
   />
 );
 Empty.storyName = 'Empty (No errors)';
@@ -43,6 +44,21 @@ export const WithNavigationCallbacks = (): React.Node => (
     onNavigateToExternalEventsEvent={(externalEventsName, eventPath) => {
       action('onNavigateToExternalEventsEvent')({
         externalEventsName,
+        eventPath,
+      });
+    }}
+    onNavigateToExtensionEvent={(
+      extensionName,
+      functionName,
+      behaviorName,
+      objectName,
+      eventPath
+    ) => {
+      action('onNavigateToExtensionEvent')({
+        extensionName,
+        functionName,
+        behaviorName,
+        objectName,
         eventPath,
       });
     }}

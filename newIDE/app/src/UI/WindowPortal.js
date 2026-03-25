@@ -4,14 +4,14 @@ import { t } from '@lingui/macro';
 import ReactDOM from 'react-dom';
 import PortalContainerContext from './PortalContainerContext';
 import Window from '../Utils/Window';
-import {
-  registerDocumentBrowserWindowId,
-  unregisterDocumentBrowserWindowId,
-} from '../Utils/Window';
 import useAlertDialog from './Alert/useAlertDialog';
-import optionalRequire from '../Utils/OptionalRequire';
-const electron = optionalRequire('electron');
-const ipcRenderer = electron ? electron.ipcRenderer : null;
+
+/**
+ * Provides the frameName of the popped-out window (used by window.open),
+ * so that child components can pass it to IPC calls that need to target
+ * the correct BrowserWindow (e.g. titlebar overlay updates).
+ */
+export const WindowPortalFrameNameContext = React.createContext<?string>(null);
 
 let popOutCounter = 0;
 
@@ -53,6 +53,9 @@ const WindowPortal = ({
   onWindowReady,
 }: Props): React.Node => {
   const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
+  // Stable frameName for the lifetime of this portal, used to correlate
+  // the window.open() call with the BrowserWindow in the main process.
+  const frameNameRef = React.useRef<string>(`gdevelop-popout-${++popOutCounter}`);
   const externalWindowRef = React.useRef<any>(null);
   const onCloseRef = React.useRef(onClose);
   onCloseRef.current = onClose;
@@ -79,10 +82,9 @@ const WindowPortal = ({
     const features = `width=${initialWidth},height=${initialHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`;
 
     // Use a unique frameName so the main process can track the child
-    // BrowserWindow ID and the renderer can look it up later (needed
-    // for titlebar overlay IPC targeting).
-    const frameName = `gdevelop-popout-${++popOutCounter}`;
-    const externalWindow = window.open('', frameName, features);
+    // BrowserWindow and the renderer can reference it in IPC calls
+    // (e.g. titlebar overlay updates).
+    const externalWindow = window.open('', frameNameRef.current, features);
 
     if (!externalWindow) {
       showAlert({
@@ -192,21 +194,6 @@ const WindowPortal = ({
       }, 10);
     });
 
-    // Look up the child BrowserWindow ID so that IPC calls (e.g. titlebar
-    // overlay updates) can target the correct window.
-    if (ipcRenderer) {
-      ipcRenderer
-        .invoke('get-child-browser-window-id', frameName)
-        .then(browserWindowId => {
-          if (browserWindowId != null && !closedRef.current) {
-            registerDocumentBrowserWindowId(
-              externalWindow.document,
-              browserWindowId
-            );
-          }
-        });
-    }
-
     setContainer(containerDiv);
 
     // Listen for the size of the container div.
@@ -227,8 +214,6 @@ const WindowPortal = ({
       clearInterval(checkClosed);
       if (styleObserver) styleObserver.disconnect();
       if (observer) observer.disconnect();
-      // Always try to unregister (no-op if never registered).
-      unregisterDocumentBrowserWindowId(externalWindow.document);
       if (!externalWindow.closed) {
         externalWindow.close();
       }
@@ -263,9 +248,11 @@ const WindowPortal = ({
     : container;
 
   return ReactDOM.createPortal(
-    <PortalContainerContext.Provider value={portalBody}>
-      {windowSize && renderContent({ windowSize })}
-    </PortalContainerContext.Provider>,
+    <WindowPortalFrameNameContext.Provider value={frameNameRef.current}>
+      <PortalContainerContext.Provider value={portalBody}>
+        {windowSize && renderContent({ windowSize })}
+      </PortalContainerContext.Provider>
+    </WindowPortalFrameNameContext.Provider>,
     container
   );
 };

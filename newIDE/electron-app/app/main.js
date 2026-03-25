@@ -465,13 +465,17 @@ app.on('ready', function() {
   // Titlebar handling:
   ipcMain.handle(
     'titlebar-set-overlay-options',
-    async (event, overlayOptions, targetWindowId) => {
-      // When targetWindowId is provided, use it to find the correct
-      // BrowserWindow (needed for popped-out editor windows, where
-      // event.sender is always the main window's webContents).
-      const window = targetWindowId != null
-        ? BrowserWindow.fromId(targetWindowId)
-        : BrowserWindow.fromWebContents(event.sender);
+    async (event, overlayOptions, frameName) => {
+      // When a frameName is provided, resolve it to the child BrowserWindow
+      // (needed for popped-out editor windows, where event.sender is always
+      // the main window's webContents). Otherwise, use event.sender.
+      let window;
+      if (frameName) {
+        const windowId = childWindowIdsByFrameName.get(frameName);
+        window = windowId != null ? BrowserWindow.fromId(windowId) : null;
+      } else {
+        window = BrowserWindow.fromWebContents(event.sender);
+      }
       if (!window) return;
 
       // setTitleBarOverlay seems not defined on macOS.
@@ -480,11 +484,6 @@ app.on('ready', function() {
         window.setBackgroundColor(overlayOptions.color);
     }
   );
-
-  // Look up a child BrowserWindow ID by the frameName used in window.open().
-  ipcMain.handle('get-child-browser-window-id', async (event, frameName) => {
-    return childWindowIdsByFrameName.get(frameName) || null;
-  });
 
   // Window maximize toggle (for double-click on titlebar):
   ipcMain.handle('window-maximize-toggle', async event => {

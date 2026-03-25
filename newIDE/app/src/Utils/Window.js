@@ -22,10 +22,6 @@ export const POSITIONAL_ARGUMENTS_KEY = '_';
 
 const windowBackgroundColors: WeakMap<Document, string> = new WeakMap();
 
-// Maps a Document from a popped-out window to its Electron BrowserWindow ID,
-// so that IPC calls (e.g. titlebar overlay) can target the correct window.
-const documentToBrowserWindowId: WeakMap<Document, number> = new WeakMap();
-
 // Per-navigator watcher state: each window's windowControlsOverlay gets its
 // own debounced listener and set of callbacks.
 type OverlayWatcherState = {|
@@ -54,24 +50,6 @@ const getOrCreateOverlayWatcher = (
   );
   overlayWatchers.set(windowControlsOverlay, state);
   return state;
-};
-
-/**
- * Register a mapping from a popped-out window's Document to its Electron
- * BrowserWindow ID, so that IPC calls can target the correct window.
- */
-export const registerDocumentBrowserWindowId = (
-  doc: Document,
-  browserWindowId: number
-) => {
-  documentToBrowserWindowId.set(doc, browserWindowId);
-};
-
-/**
- * Remove the Document → BrowserWindow ID mapping (e.g. when the window closes).
- */
-export const unregisterDocumentBrowserWindowId = (doc: Document) => {
-  documentToBrowserWindowId.delete(doc);
 };
 
 /**
@@ -131,7 +109,11 @@ export default class Window {
     }
   }
 
-  static setWindowBackgroundColor(newColor: string, targetDocument?: Document) {
+  static setWindowBackgroundColor(
+    newColor: string,
+    targetDocument?: Document,
+    windowFrameName?: string
+  ) {
     const doc = targetDocument || document;
 
     if (windowBackgroundColors.get(doc) === newColor) {
@@ -144,9 +126,8 @@ export default class Window {
       // For the main window, the main process resolves via event.sender.
       // For popped-out editor windows (opened via window.open and rendered
       // into via React portals), event.sender is always the main window's
-      // webContents, so we pass the target BrowserWindow ID explicitly.
-      const targetWindowId =
-        doc !== document ? documentToBrowserWindowId.get(doc) : undefined;
+      // webContents, so we pass the frameName and let the main process
+      // resolve it to the correct BrowserWindow.
       ipcRenderer.invoke(
         'titlebar-set-overlay-options',
         {
@@ -156,7 +137,7 @@ export default class Window {
             ? '#000000'
             : '#ffffff',
         },
-        targetWindowId
+        windowFrameName
       );
     }
 

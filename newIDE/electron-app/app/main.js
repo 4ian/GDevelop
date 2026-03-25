@@ -127,6 +127,10 @@ app.on('window-all-closed', function() {
   app.quit();
 });
 
+// Maps frameName (from window.open) to BrowserWindow ID for child windows,
+// so the renderer can look up the correct BrowserWindow for IPC targeting.
+const childWindowIdsByFrameName = new Map();
+
 // Function to create a new GDevelop window
 function createNewWindow(windowArgs = args) {
   const isIntegrated = windowArgs.mode === 'integrated';
@@ -296,8 +300,17 @@ function createNewWindow(windowArgs = args) {
 
   // When a child window is created (e.g. a popped-out editor), set up security
   // policies and enable @electron/remote on it.
-  newWindow.webContents.on('did-create-window', (childWindow) => {
+  newWindow.webContents.on('did-create-window', (childWindow, details) => {
     require('@electron/remote/main').enable(childWindow.webContents);
+
+    // Track child window by frameName so the renderer can look up its
+    // BrowserWindow ID (needed for titlebar overlay IPC targeting).
+    if (details.frameName) {
+      childWindowIdsByFrameName.set(details.frameName, childWindow.id);
+      childWindow.on('closed', () => {
+        childWindowIdsByFrameName.delete(details.frameName);
+      });
+    }
 
     // Remove the menu bar from popped-out editor windows.
     childWindow.setMenu(null);
@@ -467,6 +480,11 @@ app.on('ready', function() {
         window.setBackgroundColor(overlayOptions.color);
     }
   );
+
+  // Look up a child BrowserWindow ID by the frameName used in window.open().
+  ipcMain.handle('get-child-browser-window-id', async (event, frameName) => {
+    return childWindowIdsByFrameName.get(frameName) || null;
+  });
 
   // Window maximize toggle (for double-click on titlebar):
   ipcMain.handle('window-maximize-toggle', async event => {

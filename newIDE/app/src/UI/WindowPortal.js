@@ -10,7 +10,10 @@ import {
 } from '../Utils/Window';
 import useAlertDialog from './Alert/useAlertDialog';
 import optionalRequire from '../Utils/OptionalRequire';
-const remote = optionalRequire('@electron/remote');
+const electron = optionalRequire('electron');
+const ipcRenderer = electron ? electron.ipcRenderer : null;
+
+let popOutCounter = 0;
 
 type Props = {|
   /** The title of the new window. */
@@ -75,15 +78,11 @@ const WindowPortal = ({
     const top = window.screenY + (window.outerHeight - initialHeight) / 2;
     const features = `width=${initialWidth},height=${initialHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`;
 
-    // Snapshot existing BrowserWindow IDs before opening, so we can identify
-    // the newly created one (needed for titlebar overlay IPC targeting).
-    const windowIdsBefore = remote
-      ? new Set(
-          remote.BrowserWindow.getAllWindows().map(w => w.id)
-        )
-      : null;
-
-    const externalWindow = window.open('', '', features);
+    // Use a unique frameName so the main process can track the child
+    // BrowserWindow ID and the renderer can look it up later (needed
+    // for titlebar overlay IPC targeting).
+    const frameName = `gdevelop-popout-${++popOutCounter}`;
+    const externalWindow = window.open('', frameName, features);
 
     if (!externalWindow) {
       showAlert({
@@ -193,20 +192,19 @@ const WindowPortal = ({
       }, 10);
     });
 
-    // Register the BrowserWindow ID for the new window so that IPC calls
-    // (e.g. titlebar overlay updates) can target it correctly.
-    let childBrowserWindowId: number | null = null;
-    if (remote && windowIdsBefore) {
-      const newBrowserWindow = remote.BrowserWindow.getAllWindows().find(
-        w => !windowIdsBefore.has(w.id)
-      );
-      if (newBrowserWindow) {
-        childBrowserWindowId = newBrowserWindow.id;
-        registerDocumentBrowserWindowId(
-          externalWindow.document,
-          newBrowserWindow.id
-        );
-      }
+    // Look up the child BrowserWindow ID so that IPC calls (e.g. titlebar
+    // overlay updates) can target the correct window.
+    if (ipcRenderer) {
+      ipcRenderer
+        .invoke('get-child-browser-window-id', frameName)
+        .then(browserWindowId => {
+          if (browserWindowId != null && !closedRef.current) {
+            registerDocumentBrowserWindowId(
+              externalWindow.document,
+              browserWindowId
+            );
+          }
+        });
     }
 
     setContainer(containerDiv);
@@ -229,9 +227,8 @@ const WindowPortal = ({
       clearInterval(checkClosed);
       if (styleObserver) styleObserver.disconnect();
       if (observer) observer.disconnect();
-      if (childBrowserWindowId != null) {
-        unregisterDocumentBrowserWindowId(externalWindow.document);
-      }
+      // Always try to unregister (no-op if never registered).
+      unregisterDocumentBrowserWindowId(externalWindow.document);
       if (!externalWindow.closed) {
         externalWindow.close();
       }

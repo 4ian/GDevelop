@@ -196,9 +196,15 @@ namespace gdjs {
         // It also avoids to have the origin outside of the object box.
         boundingBox.expandByPoint(
           new THREE.Vector3(
-            this._model3DRuntimeObject._originPoint[0] === null ? 0 : boundingBox.min[0],
-            this._model3DRuntimeObject._originPoint[1] === null ? 0 : boundingBox.min[1],
-            this._model3DRuntimeObject._originPoint[2] === null ? 0 : boundingBox.min[2],
+            this._model3DRuntimeObject._originPoint[0] === null
+              ? 0
+              : boundingBox.min[0],
+            this._model3DRuntimeObject._originPoint[1] === null
+              ? 0
+              : boundingBox.min[1],
+            this._model3DRuntimeObject._originPoint[2] === null
+              ? 0
+              : boundingBox.min[2]
           )
         );
       }

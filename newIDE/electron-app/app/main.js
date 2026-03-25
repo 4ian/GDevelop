@@ -278,8 +278,11 @@ function createNewWindow(windowArgs = args) {
           trafficLightPosition: { x: 12, y: 12 },
           backgroundColor: '#000',
           webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
+            // No need for Node.js integration or disabled context isolation, because
+            // popped-out windows are driven by React portals and don't do any Node operations.
+            // Still keep webSecurity enabled to allow local file access.
+            // nodeIntegration: true,
+            // contextIsolation: false,
             webSecurity: false,
           },
         },

@@ -136,15 +136,46 @@ const WindowPortal = ({
     const checkClosed: IntervalID = setInterval(() => {
       if (externalWindow.closed) {
         clearInterval(checkClosed);
-        handleClose();
+
+        // See comment below, taking a safety margin to avoid
+        // potential issues on Electron (even if beforeunload should always be fired,
+        // so this timeout should be useless).
+        setTimeout(() => {
+          handleClose();
+        }, 150);
       }
     }, 250);
 
     // Also listen for beforeunload as a faster signal.
     externalWindow.addEventListener('beforeunload', () => {
-      clearInterval(checkClosed);
-      // Use setTimeout to avoid calling onClose during React render.
-      setTimeout(() => handleClose(), 0);
+      // Disconnect as soon as possible to avoid any further interactions with the window.
+      if (styleObserver) styleObserver.disconnect();
+      if (observer) observer.disconnect();
+
+      // We know the window is closing, but we actually wait for it to be confirmed closed.
+      // If we don't wait before calling handleClose, we run into "Uncaught illegal access" errors from V8/Chrome/Electron on Electron,
+      // when an extension editor is closed. The unmounting of `EventsFunctionsExtensionEditorContainer`
+      // is triggering reloading of extensions, which does fs operations. This seems to interfere
+      // with the closing of the window in a non deterministic way (creating 50-200 "Uncaught illegal access" errors)
+      // and totally breaking fs callbacks which are never resolved.
+      // These "Uncaught illegal access" have no stacktrace, which seems to indicate a problem
+      // deep in Electron or related.
+      //
+      // We can't risk this, so we wait for the window to be confirmed closed.
+      const waitForClose: IntervalID = setInterval(() => {
+        if (externalWindow.closed) {
+          clearInterval(waitForClose);
+
+          // Still wait to avoid "Uncaught illegal access" error to ensure
+          // the BrowserWindow is fully closed.
+          setTimeout(() => {
+            // Window is now fully closed.
+            // Proceed as usual from now on.
+            clearInterval(checkClosed);
+            handleClose();
+          }, 150);
+        }
+      }, 10);
     });
 
     setContainer(containerDiv);

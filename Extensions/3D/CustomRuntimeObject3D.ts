@@ -355,7 +355,7 @@ namespace gdjs {
      */
     getUnscaledCenterZ(): float {
       if (this.hasCustomRotationCenter()) {
-        return this._customCenterZ - this._innerArea.min[2];
+        return this._customCenterZ;
       }
       return this.getUnscaledDepth() / 2;
     }

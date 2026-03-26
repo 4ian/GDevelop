@@ -117,7 +117,7 @@ namespace gdjs {
       this._animationMixer.update(timeDelta);
     }
 
-    updatePosition() {
+    override updatePosition() {
       const originPoint = this.getOriginPoint();
       const centerPoint = this.getCenterPoint();
       this.get3DRendererObject().position.set(

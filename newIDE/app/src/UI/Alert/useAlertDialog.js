@@ -7,6 +7,7 @@ import {
   type ShowConfirmDialogOptions,
   type ShowYesNoCancelDialogOptions,
 } from './AlertContext';
+import PortalContainerContext from '../PortalContainerContext';
 
 const useAlertDialog = (): {
   showAlert: (options: ShowAlertDialogOptions) => Promise<void>,
@@ -23,28 +24,42 @@ const useAlertDialog = (): {
     showYesNoCancelDialog,
   } = React.useContext(AlertContext);
 
+  const portalContainer = React.useContext(PortalContainerContext);
+
   const showAlert = React.useCallback(
     (options: ShowAlertDialogOptions): Promise<void> =>
       new Promise(resolve => {
-        showAlertDialog({ callback: resolve, ...options });
+        showAlertDialog({
+          callback: resolve,
+          portalContainer,
+          ...options,
+        });
       }),
-    [showAlertDialog]
+    [showAlertDialog, portalContainer]
   );
 
   const showConfirmation = React.useCallback(
     (options: ShowConfirmDialogOptions): Promise<boolean> =>
       new Promise(resolve => {
-        showConfirmDialog({ callback: resolve, ...options });
+        showConfirmDialog({
+          callback: resolve,
+          portalContainer,
+          ...options,
+        });
       }),
-    [showConfirmDialog]
+    [showConfirmDialog, portalContainer]
   );
 
   const showDeleteConfirmation = React.useCallback(
     (options: ShowConfirmDeleteDialogOptions): Promise<boolean> =>
       new Promise(resolve => {
-        showConfirmDeleteDialog({ callback: resolve, ...options });
+        showConfirmDeleteDialog({
+          callback: resolve,
+          portalContainer,
+          ...options,
+        });
       }),
-    [showConfirmDeleteDialog]
+    [showConfirmDeleteDialog, portalContainer]
   );
 
   /**
@@ -57,9 +72,13 @@ const useAlertDialog = (): {
   const showYesNoCancel = React.useCallback(
     (options: ShowYesNoCancelDialogOptions): Promise<boolean> =>
       new Promise(resolve => {
-        showYesNoCancelDialog({ callback: resolve, ...options });
+        showYesNoCancelDialog({
+          callback: resolve,
+          portalContainer,
+          ...options,
+        });
       }),
-    [showYesNoCancelDialog]
+    [showYesNoCancelDialog, portalContainer]
   );
 
   return {

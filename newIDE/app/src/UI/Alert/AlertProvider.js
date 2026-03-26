@@ -11,6 +11,7 @@ import {
   type ShowYesNoCancelDialogOptionsWithCallback,
 } from './AlertContext';
 import YesNoCancelDialog from './YesNoCancelDialog';
+import PortalContainerContext from '../PortalContainerContext';
 
 type Props = {| children: React.Node |};
 
@@ -90,80 +91,96 @@ function ConfirmProvider({ children }: Props): React.Node {
     >
       {children}
       {alertDialogConfig && (
-        <AlertDialog
-          open={alertDialogOpen}
-          onDismiss={() => {
-            setAlertDialogOpen(false);
-            alertDialogConfig.callback();
-          }}
-          dismissButtonLabel={alertDialogConfig.dismissButtonLabel}
-          title={alertDialogConfig.title}
-          message={alertDialogConfig.message}
-        />
+        <PortalContainerContext.Provider
+          value={alertDialogConfig.portalContainer}
+        >
+          <AlertDialog
+            open={alertDialogOpen}
+            onDismiss={() => {
+              setAlertDialogOpen(false);
+              alertDialogConfig.callback();
+            }}
+            dismissButtonLabel={alertDialogConfig.dismissButtonLabel}
+            title={alertDialogConfig.title}
+            message={alertDialogConfig.message}
+          />
+        </PortalContainerContext.Provider>
       )}
       {confirmDialogConfig && (
-        <ConfirmDialog
-          open={confirmDialogOpen}
-          onConfirm={() => {
-            setConfirmDialogOpen(false);
-            confirmDialogConfig.callback(true);
-          }}
-          confirmButtonLabel={confirmDialogConfig.confirmButtonLabel}
-          onDismiss={() => {
-            setConfirmDialogOpen(false);
-            confirmDialogConfig.callback(false);
-          }}
-          dismissButtonLabel={confirmDialogConfig.dismissButtonLabel}
-          title={confirmDialogConfig.title}
-          message={confirmDialogConfig.message}
-          level={confirmDialogConfig.level || 'info'}
-          maxWidth={confirmDialogConfig.maxWidth}
-          makeDismissButtonPrimary={
-            confirmDialogConfig.makeDismissButtonPrimary
-          }
-        />
+        <PortalContainerContext.Provider
+          value={confirmDialogConfig.portalContainer}
+        >
+          <ConfirmDialog
+            open={confirmDialogOpen}
+            onConfirm={() => {
+              setConfirmDialogOpen(false);
+              confirmDialogConfig.callback(true);
+            }}
+            confirmButtonLabel={confirmDialogConfig.confirmButtonLabel}
+            onDismiss={() => {
+              setConfirmDialogOpen(false);
+              confirmDialogConfig.callback(false);
+            }}
+            dismissButtonLabel={confirmDialogConfig.dismissButtonLabel}
+            title={confirmDialogConfig.title}
+            message={confirmDialogConfig.message}
+            level={confirmDialogConfig.level || 'info'}
+            maxWidth={confirmDialogConfig.maxWidth}
+            makeDismissButtonPrimary={
+              confirmDialogConfig.makeDismissButtonPrimary
+            }
+          />
+        </PortalContainerContext.Provider>
       )}
       {confirmDeleteDialogConfig && (
-        <ConfirmDeleteDialog
-          open={confirmDeleteDialogOpen}
-          onConfirm={() => {
-            setConfirmDeleteDialogOpen(false);
-            confirmDeleteDialogConfig.callback(true);
-          }}
-          confirmButtonLabel={confirmDeleteDialogConfig.confirmButtonLabel}
-          onDismiss={() => {
-            setConfirmDeleteDialogOpen(false);
-            confirmDeleteDialogConfig.callback(false);
-          }}
-          dismissButtonLabel={confirmDeleteDialogConfig.dismissButtonLabel}
-          title={confirmDeleteDialogConfig.title}
-          message={confirmDeleteDialogConfig.message}
-          fieldMessage={confirmDeleteDialogConfig.fieldMessage}
-          confirmText={confirmDeleteDialogConfig.confirmText}
-          header={confirmDeleteDialogConfig.header}
-        />
+        <PortalContainerContext.Provider
+          value={confirmDeleteDialogConfig.portalContainer}
+        >
+          <ConfirmDeleteDialog
+            open={confirmDeleteDialogOpen}
+            onConfirm={() => {
+              setConfirmDeleteDialogOpen(false);
+              confirmDeleteDialogConfig.callback(true);
+            }}
+            confirmButtonLabel={confirmDeleteDialogConfig.confirmButtonLabel}
+            onDismiss={() => {
+              setConfirmDeleteDialogOpen(false);
+              confirmDeleteDialogConfig.callback(false);
+            }}
+            dismissButtonLabel={confirmDeleteDialogConfig.dismissButtonLabel}
+            title={confirmDeleteDialogConfig.title}
+            message={confirmDeleteDialogConfig.message}
+            fieldMessage={confirmDeleteDialogConfig.fieldMessage}
+            confirmText={confirmDeleteDialogConfig.confirmText}
+            header={confirmDeleteDialogConfig.header}
+          />
+        </PortalContainerContext.Provider>
       )}
       {yesNoCancelDialogConfig && (
-        <YesNoCancelDialog
-          open={yesNoCancelDialogOpen}
-          onClickYes={() => {
-            setYesNoCancelDialogOpen(false);
-            yesNoCancelDialogConfig.callback(0);
-          }}
-          yesButtonLabel={yesNoCancelDialogConfig.yesButtonLabel}
-          onClickNo={() => {
-            setYesNoCancelDialogOpen(false);
-            yesNoCancelDialogConfig.callback(1);
-          }}
-          noButtonLabel={yesNoCancelDialogConfig.noButtonLabel}
-          onClickCancel={() => {
-            setYesNoCancelDialogOpen(false);
-            yesNoCancelDialogConfig.callback(2);
-          }}
-          cancelButtonLabel={yesNoCancelDialogConfig.cancelButtonLabel}
-          title={yesNoCancelDialogConfig.title}
-          message={yesNoCancelDialogConfig.message}
-        />
+        <PortalContainerContext.Provider
+          value={yesNoCancelDialogConfig.portalContainer}
+        >
+          <YesNoCancelDialog
+            open={yesNoCancelDialogOpen}
+            onClickYes={() => {
+              setYesNoCancelDialogOpen(false);
+              yesNoCancelDialogConfig.callback(0);
+            }}
+            yesButtonLabel={yesNoCancelDialogConfig.yesButtonLabel}
+            onClickNo={() => {
+              setYesNoCancelDialogOpen(false);
+              yesNoCancelDialogConfig.callback(1);
+            }}
+            noButtonLabel={yesNoCancelDialogConfig.noButtonLabel}
+            onClickCancel={() => {
+              setYesNoCancelDialogOpen(false);
+              yesNoCancelDialogConfig.callback(2);
+            }}
+            cancelButtonLabel={yesNoCancelDialogConfig.cancelButtonLabel}
+            title={yesNoCancelDialogConfig.title}
+            message={yesNoCancelDialogConfig.message}
+          />
+        </PortalContainerContext.Provider>
       )}
     </AlertContext.Provider>
   );

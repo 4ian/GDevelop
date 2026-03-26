@@ -11,6 +11,7 @@ export type ShowAlertDialogOptions = {|
 export type ShowAlertDialogOptionsWithCallback = {|
   ...ShowAlertDialogOptions,
   callback: Function,
+  portalContainer?: ?HTMLElement,
 |};
 export type ShowAlertFunction = ShowAlertDialogOptions => Promise<void>;
 
@@ -27,6 +28,7 @@ export type ShowConfirmDialogOptions = {|
 export type ShowConfirmDialogOptionsWithCallback = {|
   ...ShowConfirmDialogOptions,
   callback: Function,
+  portalContainer?: ?HTMLElement,
 |};
 export type ShowConfirmFunction = ShowConfirmDialogOptions => Promise<boolean>;
 
@@ -43,6 +45,7 @@ export type ShowConfirmDeleteDialogOptions = {|
 export type ShowConfirmDeleteDialogOptionsWithCallback = {|
   ...ShowConfirmDeleteDialogOptions,
   callback: Function,
+  portalContainer?: ?HTMLElement,
 |};
 export type ShowConfirmDeleteFunction = ShowConfirmDeleteDialogOptions => Promise<boolean>;
 
@@ -57,6 +60,7 @@ export type ShowYesNoCancelDialogOptions = {|
 export type ShowYesNoCancelDialogOptionsWithCallback = {|
   ...ShowYesNoCancelDialogOptions,
   callback: Function,
+  portalContainer?: ?HTMLElement,
 |};
 
 export type ConfirmState = {|

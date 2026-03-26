@@ -9,6 +9,7 @@ import {
   unregisterDocumentTargetId,
 } from '../Utils/Window';
 import useAlertDialog from './Alert/useAlertDialog';
+import { getThemeWindowBackgroundColor } from './Theme';
 
 // There is a high chance of FS operations running while an Electron window is closing.
 // We run into "Uncaught illegal access" errors from V8/Chrome/Electron on Electron when these
@@ -90,7 +91,7 @@ const WindowPortal = ({
     // Open a new blank window.
     const left = window.screenX + (window.outerWidth - initialWidth) / 2;
     const top = window.screenY + (window.outerHeight - initialHeight) / 2;
-    // TODO: pass the background color of the theme?
+    const themeBackgroundColor = getThemeWindowBackgroundColor();
     const features = `width=${initialWidth},height=${initialHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`;
 
     const targetId = `GDevelopWindowPortal${++popOutCounter}`;
@@ -106,6 +107,9 @@ const WindowPortal = ({
     }
 
     externalWindowRef.current = externalWindow;
+
+    // Apply the theme background color as early as possible to avoid a white flash.
+    externalWindow.document.body.style.backgroundColor = themeBackgroundColor;
 
     // Register the targetId for this document so we can retrieve it later.
     registerDocumentTargetId(externalWindow.document, targetId);

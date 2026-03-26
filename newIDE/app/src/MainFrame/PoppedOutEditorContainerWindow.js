@@ -19,6 +19,7 @@ import PortalContainerContext from '../UI/PortalContainerContext';
 import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
+import AlertProvider from '../UI/Alert/AlertProvider';
 
 type Props = {|
   ...EditorTabsPaneCommonProps,
@@ -107,226 +108,237 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
           innerHeight={windowSize.height}
         >
           <FullThemeProvider>
-            <PoppedOutWindowBackgroundColor />
-            <CommandPalette ref={localCommandPaletteRef} />
-            <ToolbarTitlebar
-              onPopIn={() => onPopIn(editorTab)}
-              renderToolbar={() => (
-                <Toolbar
-                  ref={toolbarRef}
-                  hidden={false}
-                  showProjectButtons={false}
-                  canSave={props.canSave}
-                  onSave={props.saveProject}
-                  openShareDialog={() => props.openShareDialog()}
-                  isSharingEnabled={props.isSharingEnabled}
-                  onOpenDebugger={props.launchDebuggerAndPreview}
-                  hasPreviewsRunning={props.hasPreviewsRunning}
-                  onPreviewWithoutHotReload={props.launchNewPreview}
-                  onNetworkPreview={props.launchNetworkPreview}
-                  onHotReloadPreview={props.launchHotReloadPreview}
-                  onLaunchPreviewWithDiagnosticReport={
-                    props.launchPreviewWithDiagnosticReport
-                  }
-                  canDoNetworkPreview={props.canDoNetworkPreview}
-                  setPreviewOverride={props.setPreviewOverride}
-                  isPreviewEnabled={
-                    !!props.currentProject &&
-                    props.currentProject.getLayoutsCount() > 0
-                  }
-                  previewState={props.previewState}
-                  onOpenVersionHistory={props.openVersionHistoryPanel}
-                  checkedOutVersionStatus={props.checkedOutVersionStatus}
-                  onQuitVersionHistory={props.onQuitVersionHistory}
-                  canQuitVersionHistory={!props.isSavingProject}
-                  toolbarButtons={props.toolbarButtons}
-                  projectPath={props.projectPath}
-                />
-              )}
-            />
-            <div
-              style={{
-                display: 'flex',
-                flex: 1,
-                width: '100%',
-                minHeight: 0,
-                overflow: 'hidden',
-              }}
-            >
-              <CommandsContextScopedProvider active={true}>
-                <ErrorBoundary
-                  componentTitle={errorBoundaryProps.componentTitle}
-                  scope={errorBoundaryProps.scope}
-                >
-                  {editorTab.renderEditorContainer({
-                    editorId: editorTab.key,
-                    gameEditorMode: props.gameEditorMode,
-                    setGameEditorMode: props.setGameEditorMode,
-                    isActive: true,
-                    extraEditorProps: editorTab.extraEditorProps,
-                    project: props.currentProject,
-                    fileMetadata: props.currentFileMetadata,
-                    storageProvider: props.getStorageProvider(),
-                    ref: editorRef => {
-                      editorTab.editorRef = editorRef;
+            <AlertProvider>
+              <PoppedOutWindowBackgroundColor />
+              <CommandPalette ref={localCommandPaletteRef} />
+              <ToolbarTitlebar
+                onPopIn={() => onPopIn(editorTab)}
+                renderToolbar={() => (
+                  <Toolbar
+                    ref={toolbarRef}
+                    hidden={false}
+                    showProjectButtons={false}
+                    canSave={props.canSave}
+                    onSave={props.saveProject}
+                    openShareDialog={() => props.openShareDialog()}
+                    isSharingEnabled={props.isSharingEnabled}
+                    onOpenDebugger={props.launchDebuggerAndPreview}
+                    hasPreviewsRunning={props.hasPreviewsRunning}
+                    onPreviewWithoutHotReload={props.launchNewPreview}
+                    onNetworkPreview={props.launchNetworkPreview}
+                    onHotReloadPreview={props.launchHotReloadPreview}
+                    onLaunchPreviewWithDiagnosticReport={
+                      props.launchPreviewWithDiagnosticReport
+                    }
+                    canDoNetworkPreview={props.canDoNetworkPreview}
+                    setPreviewOverride={props.setPreviewOverride}
+                    isPreviewEnabled={
+                      !!props.currentProject &&
+                      props.currentProject.getLayoutsCount() > 0
+                    }
+                    previewState={props.previewState}
+                    onOpenVersionHistory={props.openVersionHistoryPanel}
+                    checkedOutVersionStatus={props.checkedOutVersionStatus}
+                    onQuitVersionHistory={props.onQuitVersionHistory}
+                    canQuitVersionHistory={!props.isSavingProject}
+                    toolbarButtons={props.toolbarButtons}
+                    projectPath={props.projectPath}
+                  />
+                )}
+              />
+              <div
+                style={{
+                  display: 'flex',
+                  flex: 1,
+                  width: '100%',
+                  minHeight: 0,
+                  overflow: 'hidden',
+                }}
+              >
+                <CommandsContextScopedProvider active={true}>
+                  <ErrorBoundary
+                    componentTitle={errorBoundaryProps.componentTitle}
+                    scope={errorBoundaryProps.scope}
+                  >
+                    {editorTab.renderEditorContainer({
+                      editorId: editorTab.key,
+                      gameEditorMode: props.gameEditorMode,
+                      setGameEditorMode: props.setGameEditorMode,
+                      isActive: true,
+                      extraEditorProps: editorTab.extraEditorProps,
+                      project: props.currentProject,
+                      fileMetadata: props.currentFileMetadata,
+                      storageProvider: props.getStorageProvider(),
+                      ref: editorRef => {
+                        editorTab.editorRef = editorRef;
 
-                      // Take the opportunity to show the toolbar when the editor is first ready.
-                      if (!initializedToolbar.current && editorTab.editorRef) {
-                        initializedToolbar.current = true;
-                        editorTab.editorRef.updateToolbar();
-                      }
-                    },
-                    setToolbar: editorToolbar => {
-                      const toolbar = toolbarRef.current;
-                      if (toolbar) {
-                        toolbar.setEditorToolbar(editorToolbar || null);
-                      }
-                    },
-                    setGamesPlatformFrameShown: () => {},
-                    projectItemName: editorTab.projectItemName,
-                    setPreviewedLayout: props.setPreviewedLayout,
-                    onOpenAskAi: props.onOpenAskAi,
-                    onCloseAskAi: props.onCloseAskAi,
-                    onOpenExternalEvents: props.openExternalEvents,
-                    onOpenEvents: (sceneName: string) => {
-                      props.openLayout(sceneName, {
-                        openEventsEditor: true,
-                        openSceneEditor: false,
-                        focusWhenOpened: 'events',
-                      });
-                    },
-                    onOpenLayout: props.openLayout,
-                    onOpenTemplateFromTutorial: props.openTemplateFromTutorial,
-                    onOpenTemplateFromCourseChapter:
-                      props.openTemplateFromCourseChapter,
-                    previewDebuggerServer: props.previewDebuggerServer,
-                    hotReloadPreviewButtonProps:
-                      props.hotReloadPreviewButtonProps,
-                    onRestartInGameEditor: props.onRestartInGameEditor,
-                    showRestartInGameEditorAfterErrorButton:
-                      props.showRestartInGameEditorAfterErrorButton,
-                    resourceManagementProps: props.resourceManagementProps,
-                    onSave: props.saveProject,
-                    onSaveProjectAsWithStorageProvider:
-                      props.saveProjectAsWithStorageProvider,
-                    canSave: props.canSave,
-                    onCheckoutVersion: props.onCheckoutVersion,
-                    getOrLoadProjectVersion: props.getOrLoadProjectVersion,
-                    onCreateEventsFunction: props.onCreateEventsFunction,
-                    openInstructionOrExpression:
-                      props.openInstructionOrExpression,
-                    onOpenCustomObjectEditor: props.onOpenCustomObjectEditor,
-                    onOpenEventsFunctionsExtension:
-                      props.onOpenEventsFunctionsExtension,
-                    onRenamedEventsBasedObject:
-                      props.onRenamedEventsBasedObject,
-                    onDeletedEventsBasedObject:
-                      props.onDeletedEventsBasedObject,
-                    openObjectEvents: props.openObjectEvents,
-                    onNavigateToEventFromGlobalSearch:
-                      props.onNavigateToEventFromGlobalSearch,
-                    unsavedChanges: unsavedChanges,
-                    canOpen: props.canOpen,
-                    onChooseProject: () =>
-                      props.openOpenFromStorageProviderDialog(),
-                    onOpenRecentFile:
-                      props.openFromFileMetadataWithStorageProvider,
-                    onOpenNewProjectSetupDialog: props.openNewProjectDialog,
-                    onOpenProjectManager: () => props.openProjectManager(true),
-                    onOpenVersionHistory: props.openVersionHistoryPanel,
-                    askToCloseProject: props.askToCloseProject,
-                    closeProject: props.closeProject,
-                    onSelectExampleShortHeader: exampleShortHeader => {
-                      props.onSelectExampleShortHeader({
-                        exampleShortHeader,
-                        preventBackHome: true,
-                      });
-                    },
-                    onSelectPrivateGameTemplateListingData: privateGameTemplateListingData => {
-                      props.onSelectPrivateGameTemplateListingData({
-                        privateGameTemplateListingData,
-                        preventBackHome: true,
-                      });
-                    },
-                    onOpenPrivateGameTemplateListingData: privateGameTemplateListingData => {
-                      props.onSelectPrivateGameTemplateListingData({
-                        privateGameTemplateListingData,
-                        preventBackHome: true,
-                      });
-                    },
-                    onCreateEmptyProject: props.createEmptyProject,
-                    onCreateProjectFromExample: props.createProjectFromExample,
-                    onOpenProfile: props.onOpenProfileDialog,
-                    onOpenLanguageDialog: () => props.openLanguageDialog(true),
-                    onOpenPreferences: () => props.openPreferencesDialog(true),
-                    onOpenAbout: () => props.openAboutDialog(true),
-                    selectInAppTutorial: props.selectInAppTutorial,
-                    onLoadEventsFunctionsExtensions:
-                      props.onLoadEventsFunctionsExtensions,
-                    onReloadEventsFunctionsExtensionMetadata: extension => {
-                      if (props.isProjectClosedSoAvoidReloadingExtensions) {
-                        return;
-                      }
-                      props.eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(
-                        props.currentProject,
-                        extension
-                      );
-                    },
-                    onDeleteResource: (
-                      resource: gdResource,
-                      cb: boolean => void
-                    ) => {
-                      cb(true);
-                    },
-                    onRenameResource: (
-                      resource: gdResource,
-                      newName: string,
-                      cb: boolean => void
-                    ) => {
-                      if (props.currentProject)
-                        props.renameResourcesInProject(props.currentProject, {
-                          [resource.getName()]: newName,
+                        // Take the opportunity to show the toolbar when the editor is first ready.
+                        if (
+                          !initializedToolbar.current &&
+                          editorTab.editorRef
+                        ) {
+                          initializedToolbar.current = true;
+                          editorTab.editorRef.updateToolbar();
+                        }
+                      },
+                      setToolbar: editorToolbar => {
+                        const toolbar = toolbarRef.current;
+                        if (toolbar) {
+                          toolbar.setEditorToolbar(editorToolbar || null);
+                        }
+                      },
+                      setGamesPlatformFrameShown: () => {},
+                      projectItemName: editorTab.projectItemName,
+                      setPreviewedLayout: props.setPreviewedLayout,
+                      onOpenAskAi: props.onOpenAskAi,
+                      onCloseAskAi: props.onCloseAskAi,
+                      onOpenExternalEvents: props.openExternalEvents,
+                      onOpenEvents: (sceneName: string) => {
+                        props.openLayout(sceneName, {
+                          openEventsEditor: true,
+                          openSceneEditor: false,
+                          focusWhenOpened: 'events',
                         });
-                      cb(true);
-                    },
-                    openBehaviorEvents: props.openBehaviorEvents,
-                    onExtractAsExternalLayout: props.onExtractAsExternalLayout,
-                    onExtractAsEventBasedObject:
-                      props.onExtractAsEventBasedObject,
-                    onEventBasedObjectTypeChanged:
-                      props.onEventBasedObjectTypeChanged,
-                    onOpenEventBasedObjectEditor:
-                      props.onOpenEventBasedObjectEditor,
-                    onOpenEventBasedObjectVariantEditor:
-                      props.onOpenEventBasedObjectVariantEditor,
-                    onDeleteEventsBasedObjectVariant:
-                      props.deleteEventsBasedObjectVariant,
-                    onEventsBasedObjectChildrenEdited:
-                      props.onEventsBasedObjectChildrenEdited,
-                    onSceneObjectEdited: props.onSceneObjectEdited,
-                    onSceneObjectsDeleted: props.onSceneObjectsDeleted,
-                    onSceneEventsModifiedOutsideEditor:
-                      props.onSceneEventsModifiedOutsideEditor,
-                    onInstancesModifiedOutsideEditor:
-                      props.onInstancesModifiedOutsideEditor,
-                    onObjectsModifiedOutsideEditor:
-                      props.onObjectsModifiedOutsideEditor,
-                    onObjectGroupsModifiedOutsideEditor:
-                      props.onObjectGroupsModifiedOutsideEditor,
-                    onWillInstallExtension: props.onWillInstallExtension,
-                    onExtensionInstalled: props.onExtensionInstalled,
-                    onEffectAdded: props.onEffectAdded,
-                    onObjectListsModified: props.onObjectListsModified,
-                    onExternalLayoutAssociationChanged:
-                      props.onExternalLayoutAssociationChanged,
-                    triggerHotReloadInGameEditorIfNeeded:
-                      props.triggerHotReloadInGameEditorIfNeeded,
-                    gamesList: props.gamesList,
-                    gamesPlatformFrameTools: props.gamesPlatformFrameTools,
-                  })}
-                </ErrorBoundary>
-              </CommandsContextScopedProvider>
-            </div>
+                      },
+                      onOpenLayout: props.openLayout,
+                      onOpenTemplateFromTutorial:
+                        props.openTemplateFromTutorial,
+                      onOpenTemplateFromCourseChapter:
+                        props.openTemplateFromCourseChapter,
+                      previewDebuggerServer: props.previewDebuggerServer,
+                      hotReloadPreviewButtonProps:
+                        props.hotReloadPreviewButtonProps,
+                      onRestartInGameEditor: props.onRestartInGameEditor,
+                      showRestartInGameEditorAfterErrorButton:
+                        props.showRestartInGameEditorAfterErrorButton,
+                      resourceManagementProps: props.resourceManagementProps,
+                      onSave: props.saveProject,
+                      onSaveProjectAsWithStorageProvider:
+                        props.saveProjectAsWithStorageProvider,
+                      canSave: props.canSave,
+                      onCheckoutVersion: props.onCheckoutVersion,
+                      getOrLoadProjectVersion: props.getOrLoadProjectVersion,
+                      onCreateEventsFunction: props.onCreateEventsFunction,
+                      openInstructionOrExpression:
+                        props.openInstructionOrExpression,
+                      onOpenCustomObjectEditor: props.onOpenCustomObjectEditor,
+                      onOpenEventsFunctionsExtension:
+                        props.onOpenEventsFunctionsExtension,
+                      onRenamedEventsBasedObject:
+                        props.onRenamedEventsBasedObject,
+                      onDeletedEventsBasedObject:
+                        props.onDeletedEventsBasedObject,
+                      openObjectEvents: props.openObjectEvents,
+                      onNavigateToEventFromGlobalSearch:
+                        props.onNavigateToEventFromGlobalSearch,
+                      unsavedChanges: unsavedChanges,
+                      canOpen: props.canOpen,
+                      onChooseProject: () =>
+                        props.openOpenFromStorageProviderDialog(),
+                      onOpenRecentFile:
+                        props.openFromFileMetadataWithStorageProvider,
+                      onOpenNewProjectSetupDialog: props.openNewProjectDialog,
+                      onOpenProjectManager: () =>
+                        props.openProjectManager(true),
+                      onOpenVersionHistory: props.openVersionHistoryPanel,
+                      askToCloseProject: props.askToCloseProject,
+                      closeProject: props.closeProject,
+                      onSelectExampleShortHeader: exampleShortHeader => {
+                        props.onSelectExampleShortHeader({
+                          exampleShortHeader,
+                          preventBackHome: true,
+                        });
+                      },
+                      onSelectPrivateGameTemplateListingData: privateGameTemplateListingData => {
+                        props.onSelectPrivateGameTemplateListingData({
+                          privateGameTemplateListingData,
+                          preventBackHome: true,
+                        });
+                      },
+                      onOpenPrivateGameTemplateListingData: privateGameTemplateListingData => {
+                        props.onSelectPrivateGameTemplateListingData({
+                          privateGameTemplateListingData,
+                          preventBackHome: true,
+                        });
+                      },
+                      onCreateEmptyProject: props.createEmptyProject,
+                      onCreateProjectFromExample:
+                        props.createProjectFromExample,
+                      onOpenProfile: props.onOpenProfileDialog,
+                      onOpenLanguageDialog: () =>
+                        props.openLanguageDialog(true),
+                      onOpenPreferences: () =>
+                        props.openPreferencesDialog(true),
+                      onOpenAbout: () => props.openAboutDialog(true),
+                      selectInAppTutorial: props.selectInAppTutorial,
+                      onLoadEventsFunctionsExtensions:
+                        props.onLoadEventsFunctionsExtensions,
+                      onReloadEventsFunctionsExtensionMetadata: extension => {
+                        if (props.isProjectClosedSoAvoidReloadingExtensions) {
+                          return;
+                        }
+                        props.eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(
+                          props.currentProject,
+                          extension
+                        );
+                      },
+                      onDeleteResource: (
+                        resource: gdResource,
+                        cb: boolean => void
+                      ) => {
+                        cb(true);
+                      },
+                      onRenameResource: (
+                        resource: gdResource,
+                        newName: string,
+                        cb: boolean => void
+                      ) => {
+                        if (props.currentProject)
+                          props.renameResourcesInProject(props.currentProject, {
+                            [resource.getName()]: newName,
+                          });
+                        cb(true);
+                      },
+                      openBehaviorEvents: props.openBehaviorEvents,
+                      onExtractAsExternalLayout:
+                        props.onExtractAsExternalLayout,
+                      onExtractAsEventBasedObject:
+                        props.onExtractAsEventBasedObject,
+                      onEventBasedObjectTypeChanged:
+                        props.onEventBasedObjectTypeChanged,
+                      onOpenEventBasedObjectEditor:
+                        props.onOpenEventBasedObjectEditor,
+                      onOpenEventBasedObjectVariantEditor:
+                        props.onOpenEventBasedObjectVariantEditor,
+                      onDeleteEventsBasedObjectVariant:
+                        props.deleteEventsBasedObjectVariant,
+                      onEventsBasedObjectChildrenEdited:
+                        props.onEventsBasedObjectChildrenEdited,
+                      onSceneObjectEdited: props.onSceneObjectEdited,
+                      onSceneObjectsDeleted: props.onSceneObjectsDeleted,
+                      onSceneEventsModifiedOutsideEditor:
+                        props.onSceneEventsModifiedOutsideEditor,
+                      onInstancesModifiedOutsideEditor:
+                        props.onInstancesModifiedOutsideEditor,
+                      onObjectsModifiedOutsideEditor:
+                        props.onObjectsModifiedOutsideEditor,
+                      onObjectGroupsModifiedOutsideEditor:
+                        props.onObjectGroupsModifiedOutsideEditor,
+                      onWillInstallExtension: props.onWillInstallExtension,
+                      onExtensionInstalled: props.onExtensionInstalled,
+                      onEffectAdded: props.onEffectAdded,
+                      onObjectListsModified: props.onObjectListsModified,
+                      onExternalLayoutAssociationChanged:
+                        props.onExternalLayoutAssociationChanged,
+                      triggerHotReloadInGameEditorIfNeeded:
+                        props.triggerHotReloadInGameEditorIfNeeded,
+                      gamesList: props.gamesList,
+                      gamesPlatformFrameTools: props.gamesPlatformFrameTools,
+                    })}
+                  </ErrorBoundary>
+                </CommandsContextScopedProvider>
+              </div>
+            </AlertProvider>
           </FullThemeProvider>
         </SpecificDimensionsWindowSizeProvider>
       )}

@@ -88,7 +88,7 @@ namespace gdjs {
      *
      * Coordinates are between 0 and 1.
      *
-     * Its value is `null` when the point is configured to `"ModelOrigin"`
+     * Its coordinates are `null` when the point is configured to `"ModelOrigin"`
      * because the model origin needs to be evaluated according to the object
      * configuration.
      * @see gdjs.Model3DRuntimeObject3DRenderer.getOriginPoint

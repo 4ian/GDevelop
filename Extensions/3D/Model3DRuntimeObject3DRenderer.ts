@@ -185,13 +185,28 @@ namespace gdjs {
       threeObject.updateMatrixWorld(true);
       const boundingBox = new THREE.Box3().setFromObject(threeObject);
 
-      const shouldKeepModelOrigin = !this._model3DRuntimeObject._originPoint;
+      const shouldKeepModelOrigin =
+        this._model3DRuntimeObject._originPoint[0] === null ||
+        this._model3DRuntimeObject._originPoint[1] === null ||
+        this._model3DRuntimeObject._originPoint[2] === null;
       if (shouldKeepModelOrigin) {
         // Keep the origin as part of the model.
         // For instance, a model can be 1 face of a cube and we want to keep the
         // inside as part of the object even if it's just void.
         // It also avoids to have the origin outside of the object box.
-        boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));
+        boundingBox.expandByPoint(
+          new THREE.Vector3(
+            this._model3DRuntimeObject._originPoint[0] === null
+              ? 0
+              : boundingBox.min[0],
+            this._model3DRuntimeObject._originPoint[1] === null
+              ? 0
+              : boundingBox.min[1],
+            this._model3DRuntimeObject._originPoint[2] === null
+              ? 0
+              : boundingBox.min[2]
+          )
+        );
       }
       const modelWidth = boundingBox.max.x - boundingBox.min.x;
       const modelHeight = boundingBox.max.y - boundingBox.min.y;

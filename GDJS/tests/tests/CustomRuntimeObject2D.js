@@ -1,8 +1,5 @@
 // @ts-check
 
-/**
- * Basic tests for gdjs.SpriteRuntimeObject
- */
 describe('gdjs.CustomRuntimeObject', function () {
   /**
    * Create a CustomRuntimeObject with a SpriteRuntimeObject using a 64x64

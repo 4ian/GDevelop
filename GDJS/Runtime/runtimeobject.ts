@@ -507,26 +507,29 @@ namespace gdjs {
           this._timers.items[timerName].getNetworkSyncData();
       }
 
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
+
       const networkSyncData: ObjectNetworkSyncData = {
         x: this.x,
         y: this.y,
-        w: this.getWidth(),
-        h: this.getHeight(),
-        zo: this.zOrder,
-        a: this.angle,
-        hid: this.hidden,
-        lay: this.layer,
-        if: this._instantForces.map((force) => force.getNetworkSyncData()),
-        pfx: this._permanentForceX,
-        pfy: this._permanentForceY,
-        beh: behaviorNetworkSyncData,
-        var: variablesNetworkSyncData,
-        eff: effectsNetworkSyncData,
-        tim: timersNetworkSyncData,
+        [getKey('w', 'width')]: this.getWidth(),
+        [getKey('h', 'height')]: this.getHeight(),
+        [getKey('zo', 'zOrder')]: this.zOrder,
+        [getKey('a', 'angle')]: this.angle,
+        [getKey('hid', 'hidden')]: this.hidden,
+        [getKey('lay', 'layer')]: this.layer,
+        [getKey('if', 'instantForces')]: this._instantForces.map((force) => force.getNetworkSyncData(syncOptions)),
+        [getKey('pfx', 'permanentForceX')]: this._permanentForceX,
+        [getKey('pfy', 'permanentForceY')]: this._permanentForceY,
+        [getKey('beh', 'behaviors')]: behaviorNetworkSyncData,
+        [getKey('var', 'variables')]: variablesNetworkSyncData,
+        [getKey('eff', 'effects')]: effectsNetworkSyncData,
+        [getKey('tim', 'timers')]: timersNetworkSyncData,
       };
 
       if (syncOptions.syncObjectIdentifiers) {
-        networkSyncData.n = this.name;
+        networkSyncData[getKey('n', 'objectName')] = this.name;
         if (!this.networkId) {
           // If this is the first time the object is synced
           // with identifier, then generate a networkId,

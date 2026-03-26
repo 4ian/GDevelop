@@ -175,13 +175,15 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): SimpleTileMapNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       const syncData: SimpleTileMapNetworkSyncData = {
         ...super.getNetworkSyncData(syncOptions),
-        op: this._opacity,
+        [getKey('op', 'opacity')]: this._opacity,
       };
       if (this._tileMap && syncOptions.syncFullTileMaps) {
         const currentTileMapAsJsObject = this._tileMap.toJSObject();
-        syncData.tm = currentTileMapAsJsObject;
+        syncData[getKey('tm', 'tileMap')] = currentTileMapAsJsObject;
       }
 
       return syncData;

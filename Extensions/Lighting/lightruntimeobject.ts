@@ -104,10 +104,12 @@ namespace gdjs {
     override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): LightNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        rad: this.getRadius(),
-        col: this.getColor(),
+        [getKey('rad', 'radius')]: this.getRadius(),
+        [getKey('col', 'color')]: this.getColor(),
       };
     }
 

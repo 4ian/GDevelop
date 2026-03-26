@@ -55,6 +55,12 @@ declare type GetNetworkSyncDataOptions = {
   syncAsyncTasks?: boolean;
   syncSceneVisualProps?: boolean;
   syncFullTileMaps?: boolean;
+  /**
+   * When true, behaviors should use full human-readable property names instead
+   * of the abbreviated network-sync keys (e.g. `currentSpeed` instead of `cs`).
+   * Use for tooling / AI inspection where readability matters.
+   */
+  useFullNames?: boolean;
 };
 
 declare type UpdateFromNetworkSyncDataOptions = {

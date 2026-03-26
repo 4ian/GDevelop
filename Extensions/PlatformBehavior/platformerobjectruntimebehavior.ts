@@ -239,30 +239,38 @@ namespace gdjs {
 
       return {
         ...super.getNetworkSyncData(syncOptions),
-        props: {
-          cs: this._currentSpeed,
+        props: syncOptions.useFullNames
+          ? {
+              currentSpeed: this._currentSpeed,
+              currentFallSpeed: this._currentFallSpeed,
+              canJump: this._canJump,
+              lastDirectionIsLeft: this._lastDirectionIsLeft,
+              state: this._state.toString(),
+            }
+          : {
+              cs: this._currentSpeed,
 
-          // TODO Try to remove these 3 fields from the synch
-          // They are reset every frame and are not part of the state.
-          rdx: this._requestedDeltaX,
-          rdy: this._requestedDeltaY,
-          ldy: this._lastDeltaY,
+              // TODO Try to remove these 3 fields from the synch
+              // They are reset every frame and are not part of the state.
+              rdx: this._requestedDeltaX,
+              rdy: this._requestedDeltaY,
+              ldy: this._lastDeltaY,
 
-          cfs: this._currentFallSpeed,
-          cj: this._canJump,
-          ldl: this._lastDirectionIsLeft,
-          lek: this._wasLeftKeyPressed,
-          rik: this._wasRightKeyPressed,
-          lak: this._wasLadderKeyPressed,
-          upk: this._wasUpKeyPressed,
-          dok: this._wasDownKeyPressed,
-          juk: this._wasJumpKeyPressed,
-          rpk: this._wasReleasePlatformKeyPressed,
-          rlk: this._wasReleaseLadderKeyPressed,
-          jkhsjs: this._jumpKeyHeldSinceJumpStart,
-          sn: this._state.toString(),
-          ssd: this._state.getNetworkSyncData(),
-        },
+              cfs: this._currentFallSpeed,
+              cj: this._canJump,
+              ldl: this._lastDirectionIsLeft,
+              lek: this._wasLeftKeyPressed,
+              rik: this._wasRightKeyPressed,
+              lak: this._wasLadderKeyPressed,
+              upk: this._wasUpKeyPressed,
+              dok: this._wasDownKeyPressed,
+              juk: this._wasJumpKeyPressed,
+              rpk: this._wasReleasePlatformKeyPressed,
+              rlk: this._wasReleaseLadderKeyPressed,
+              jkhsjs: this._jumpKeyHeldSinceJumpStart,
+              sn: this._state.toString(),
+              ssd: this._state.getNetworkSyncData(),
+            },
       };
     }
 

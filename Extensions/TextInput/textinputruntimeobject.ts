@@ -283,23 +283,25 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): TextInputNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        opa: this.getOpacity(),
-        txt: this.getText(),
-        frn: this.getFontResourceName(),
-        fs: this.getFontSize(),
-        place: this.getPlaceholder(),
-        it: this.getInputType(),
-        tc: this.getTextColor(),
-        fc: this.getFillColor(),
-        fo: this.getFillOpacity(),
-        bc: this.getBorderColor(),
-        bo: this.getBorderOpacity(),
-        bw: this.getBorderWidth(),
-        dis: this.isDisabled(),
-        ro: this.isReadOnly(),
-        sc: this.isSpellCheckEnabled(),
+        [getKey('opa', 'opacity')]: this.getOpacity(),
+        [getKey('txt', 'text')]: this.getText(),
+        [getKey('frn', 'fontResourceName')]: this.getFontResourceName(),
+        [getKey('fs', 'fontSize')]: this.getFontSize(),
+        [getKey('place', 'placeholder')]: this.getPlaceholder(),
+        [getKey('it', 'inputType')]: this.getInputType(),
+        [getKey('tc', 'textColor')]: this.getTextColor(),
+        [getKey('fc', 'fillColor')]: this.getFillColor(),
+        [getKey('fo', 'fillOpacity')]: this.getFillOpacity(),
+        [getKey('bc', 'borderColor')]: this.getBorderColor(),
+        [getKey('bo', 'borderOpacity')]: this.getBorderOpacity(),
+        [getKey('bw', 'borderWidth')]: this.getBorderWidth(),
+        [getKey('dis', 'isDisabled')]: this.isDisabled(),
+        [getKey('ro', 'isReadOnly')]: this.isReadOnly(),
+        [getKey('sc', 'isSpellCheckEnabled')]: this.isSpellCheckEnabled(),
       };
     }
 

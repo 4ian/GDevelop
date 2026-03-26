@@ -515,6 +515,8 @@ namespace gdjs {
     override getNetworkSyncData(
       options: GetNetworkSyncDataOptions
     ): Physics3DNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        options.useFullNames ? full : abbrev;
       let bodyProps;
       if (this._body) {
         const position = this._body.GetPosition();
@@ -522,37 +524,37 @@ namespace gdjs {
         const linearVelocity = this._body.GetLinearVelocity();
         const angularVelocity = this._body.GetAngularVelocity();
         bodyProps = {
-          px: position.GetX(),
-          py: position.GetY(),
-          pz: position.GetZ(),
-          rx: rotation.GetX(),
-          ry: rotation.GetY(),
-          rz: rotation.GetZ(),
-          rw: rotation.GetW(),
-          lvx: linearVelocity.GetX(),
-          lvy: linearVelocity.GetY(),
-          lvz: linearVelocity.GetZ(),
-          avx: angularVelocity.GetX(),
-          avy: angularVelocity.GetY(),
-          avz: angularVelocity.GetZ(),
-          aw: this._body.IsActive(),
+          [getKey('px', 'positionX')]: position.GetX(),
+          [getKey('py', 'positionY')]: position.GetY(),
+          [getKey('pz', 'positionZ')]: position.GetZ(),
+          [getKey('rx', 'rotationX')]: rotation.GetX(),
+          [getKey('ry', 'rotationY')]: rotation.GetY(),
+          [getKey('rz', 'rotationZ')]: rotation.GetZ(),
+          [getKey('rw', 'rotationW')]: rotation.GetW(),
+          [getKey('lvx', 'linearVelocityX')]: linearVelocity.GetX(),
+          [getKey('lvy', 'linearVelocityY')]: linearVelocity.GetY(),
+          [getKey('lvz', 'linearVelocityZ')]: linearVelocity.GetZ(),
+          [getKey('avx', 'angularVelocityX')]: angularVelocity.GetX(),
+          [getKey('avy', 'angularVelocityY')]: angularVelocity.GetY(),
+          [getKey('avz', 'angularVelocityZ')]: angularVelocity.GetZ(),
+          [getKey('aw', 'isActive')]: this._body.IsActive(),
         };
       } else {
         bodyProps = {
-          px: undefined,
-          py: undefined,
-          pz: undefined,
-          rx: undefined,
-          ry: undefined,
-          rz: undefined,
-          rw: undefined,
-          lvx: undefined,
-          lvy: undefined,
-          lvz: undefined,
-          avx: undefined,
-          avy: undefined,
-          avz: undefined,
-          aw: undefined,
+          [getKey('px', 'positionX')]: undefined,
+          [getKey('py', 'positionY')]: undefined,
+          [getKey('pz', 'positionZ')]: undefined,
+          [getKey('rx', 'rotationX')]: undefined,
+          [getKey('ry', 'rotationY')]: undefined,
+          [getKey('rz', 'rotationZ')]: undefined,
+          [getKey('rw', 'rotationW')]: undefined,
+          [getKey('lvx', 'linearVelocityX')]: undefined,
+          [getKey('lvy', 'linearVelocityY')]: undefined,
+          [getKey('lvz', 'linearVelocityZ')]: undefined,
+          [getKey('avx', 'angularVelocityX')]: undefined,
+          [getKey('avy', 'angularVelocityY')]: undefined,
+          [getKey('avz', 'angularVelocityZ')]: undefined,
+          [getKey('aw', 'isActive')]: undefined,
         };
       }
       return {

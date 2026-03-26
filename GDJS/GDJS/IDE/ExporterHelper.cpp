@@ -500,6 +500,10 @@ void ExporterHelper::SerializeRuntimeGameOptions(
     scriptFilesElement.ConsiderAsArrayOf("scriptFile");
 
     for (const auto &includeFile : includesFiles) {
+      // Non-JS files (e.g. .wasm binaries) are not script files and should
+      // not be in the scriptFiles list used by the hot-reloader.
+      if (includeFile.size() >= 5 && includeFile.substr(includeFile.size() - 5) == ".wasm") continue;
+
       auto hashIt = options.includeFileHashes.find(includeFile);
       gd::String scriptSrc = GetExportedIncludeFilename(fs, gdjsRoot, includeFile);
       scriptFilesElement.AddChild("scriptFile")
@@ -1089,6 +1093,11 @@ bool ExporterHelper::CompleteIndexFile(
     gd::String scriptSrc =
         GetExportedIncludeFilename(fs, gdjsRoot, include, nonRuntimeScriptsCacheBurst);
 
+    // Non-JS files (e.g. .wasm binaries) must be copied to the export
+    // directory but must NOT be loaded as <script> tags, as the browser
+    // would attempt to parse their binary content as JavaScript.
+    if (include.size() >= 5 && include.substr(include.size() - 5) == ".wasm") continue;
+
     // Sanity check if the file exists - if not skip it to avoid
     // including it in the list of scripts.
     gd::String absoluteFilename = scriptSrc;
@@ -1198,6 +1207,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   if (includeWindowMessageDebuggerClient) {
     InsertUnique(includesFiles,
                  "debugger-client/window-message-debugger-client.js");
+    InsertUnique(includesFiles, "simulation-harness.js");
   }
   if (includeMinimalDebuggerClient) {
     InsertUnique(includesFiles, "debugger-client/minimal-debugger-client.js");

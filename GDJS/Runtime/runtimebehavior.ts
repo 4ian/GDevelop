@@ -104,10 +104,12 @@ namespace gdjs {
     ): BehaviorNetworkSyncData {
       // To be redefined by behaviors that need to synchronize properties
       // while calling super() to get the common properties.
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
-        act: this._activated,
+        [getKey('act', 'activated')]: this._activated,
         props: {},
-      };
+      } as BehaviorNetworkSyncData;
     }
 
     /**

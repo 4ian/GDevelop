@@ -116,13 +116,15 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): VideoObjectNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        op: this._opacity,
-        pla: this.isPlayed(),
+        [getKey('op', 'opacity')]: this._opacity,
+        [getKey('pla', 'played')]: this.isPlayed(),
         loop: this.isLooped(),
-        ct: this.getCurrentTime(),
-        ps: this.getPlaybackSpeed(),
+        [getKey('ct', 'currentTime')]: this.getCurrentTime(),
+        [getKey('ps', 'playbackSpeed')]: this.getPlaybackSpeed(),
       };
     }
 

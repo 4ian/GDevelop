@@ -162,17 +162,19 @@ namespace gdjs {
     override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): BBTextObjectNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
         text: this._text,
-        o: this._opacity,
-        c: this._color,
-        ff: this._fontFamily,
-        fs: this._fontSize,
-        wwrap: this._wrapping,
-        wwidth: this._wrappingWidth,
-        align: this._textAlign,
-        vta: this._verticalTextAlignment,
+        [getKey('o', 'opacity')]: this._opacity,
+        [getKey('c', 'color')]: this._color,
+        [getKey('ff', 'fontFamily')]: this._fontFamily,
+        [getKey('fs', 'fontSize')]: this._fontSize,
+        [getKey('wwrap', 'wordWrap')]: this._wrapping,
+        [getKey('wwidth', 'wrappingWidth')]: this._wrappingWidth,
+        [getKey('align', 'textAlignment')]: this._textAlign,
+        [getKey('vta', 'verticalTextAlignment')]: this._verticalTextAlignment,
         hidden: this.hidden,
       };
     }

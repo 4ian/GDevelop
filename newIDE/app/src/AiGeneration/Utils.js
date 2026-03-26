@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
+import { getGlobalSimulationRunner } from './SimulationRuntimeManager';
 import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
@@ -34,7 +35,6 @@ import { useSearchAndInstallAsset } from './UseSearchAndInstallAsset';
 import { useSearchAndInstallResource } from './UseSearchAndInstallResource';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AiRequestContext } from './AiRequestContext';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 import { delay } from '../Utils/Delay';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
@@ -90,7 +90,7 @@ export const useRefreshLimits = (
 
 export const AI_AGENT_TOOLS_VERSION = 'v8';
 export const AI_CHAT_TOOLS_VERSION = 'v8';
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v1';
+export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v2';
 
 export const useProcessFunctionCalls = ({
   i18n,
@@ -216,7 +216,28 @@ export const useProcessFunctionCalls = ({
           project,
           editorCallbacks,
           // $FlowFixMe[incompatible-type]
-          toolOptions: selectedAiRequest.toolOptions || null,
+          toolOptions: (() => {
+            const simulationRunner = getGlobalSimulationRunner();
+            const base = selectedAiRequest.toolOptions || {};
+            if (simulationRunner && project) {
+              const capturedProject = project;
+              return {
+                ...base,
+                testGameplay: (
+                  sceneName: string,
+                  scriptBody: string,
+                  timeoutMs: number
+                ) =>
+                  simulationRunner(
+                    capturedProject,
+                    sceneName,
+                    scriptBody,
+                    timeoutMs
+                  ),
+              };
+            }
+            return base;
+          })(),
           i18n,
           functionCalls: functionCallsToProcess.map(functionCall => ({
             name: functionCall.name,
@@ -346,7 +367,6 @@ export const useAiRequestState = ({
   savingProjectForMessageId: ?string,
   selectedAiRequest: any,
   selectedAiRequestId: any,
-  setAiState: any,
 } => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, getAuthorizationHeader } = authenticatedUser;
@@ -355,15 +375,31 @@ export const useAiRequestState = ({
     editorFunctionCallResultsStorage,
     isFetchingSuggestions,
     setIsFetchingSuggestions,
+    selectedAiRequestId,
+    setSelectedAiRequestId,
+    selectedAiRequest,
   } = React.useContext(AiRequestContext);
-  const { aiRequests, updateAiRequest, isSendingAiRequest } = aiRequestStorage;
+  const { updateAiRequest, isSendingAiRequest } = aiRequestStorage;
   const { getEditorFunctionCallResults } = editorFunctionCallResultsStorage;
 
-  const { values, setAiState } = React.useContext(PreferencesContext);
-  const selectedAiRequestId = values.aiState.aiRequestId;
+  const prevProjectRef = React.useRef(project);
+  React.useEffect(
+    () => {
+      if (prevProjectRef.current !== project) {
+        const hadPreviousProject = prevProjectRef.current !== null;
+        prevProjectRef.current = project;
+        // Only clear the selected request when switching away from an existing
+        // project (closing or switching projects). Do NOT clear when a project
+        // is first opened from scratch (null → project), e.g. when the AI
+        // creates a new project — we want to keep the in-progress request.
+        if (hadPreviousProject) {
+          setSelectedAiRequestId(null);
+        }
+      }
+    },
+    [project, setSelectedAiRequestId]
+  );
 
-  const selectedAiRequest =
-    (selectedAiRequestId && aiRequests[selectedAiRequestId]) || null;
   const [
     savingProjectForMessageId,
     setSavingProjectForMessageId,
@@ -831,12 +867,10 @@ export const useAiRequestState = ({
     () => {
       // Reset selected request if user logs out.
       if (!profile) {
-        setAiState({
-          aiRequestId: null,
-        });
+        setSelectedAiRequestId(null);
       }
     },
-    [profile, setAiState]
+    [profile, setSelectedAiRequestId]
   );
 
   React.useEffect(
@@ -858,9 +892,7 @@ export const useAiRequestState = ({
               error
             );
             // If fetch fails, reset the selected request to avoid staying stuck
-            setAiState({
-              aiRequestId: null,
-            });
+            setSelectedAiRequestId(null);
           }
         })();
       }
@@ -871,14 +903,13 @@ export const useAiRequestState = ({
       profile,
       getAuthorizationHeader,
       updateAiRequest,
-      setAiState,
+      setSelectedAiRequestId,
     ]
   );
 
   return {
     selectedAiRequest,
     selectedAiRequestId,
-    setAiState,
     isFetchingSuggestions,
     savingProjectForMessageId,
   };

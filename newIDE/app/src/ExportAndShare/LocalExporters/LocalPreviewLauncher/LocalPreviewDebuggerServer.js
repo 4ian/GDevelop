@@ -17,15 +17,20 @@ const responseCallbacks = new Map<number, (value: Object) => void>();
 let nextMessageWithResponseId = 1;
 
 let embeddedGameFrameWindow: WindowProxy | null = null;
+let simulationFrameWindow: WindowProxy | null = null;
 let isWindowMessageListenerRegistered = false;
 
 const getExistingDebuggerIds = (): Array<DebuggerId> => [
   ...getExistingEmbeddedGameFrameDebuggerIds(),
+  ...getExistingSimulationFrameDebuggerIds(),
   ...getExistingPreviewDebuggerIds(),
 ];
 
 const getExistingEmbeddedGameFrameDebuggerIds = (): Array<DebuggerId> =>
   embeddedGameFrameWindow ? ['embedded-game-frame'] : [];
+
+const getExistingSimulationFrameDebuggerIds = (): Array<DebuggerId> =>
+  simulationFrameWindow ? ['simulation-frame'] : [];
 
 const getExistingPreviewDebuggerIds = (): Array<DebuggerId> => debuggerIds;
 
@@ -87,20 +92,36 @@ class LocalPreviewDebuggerServer {
 
     if (!isWindowMessageListenerRegistered) {
       window.addEventListener('message', event => {
-        if (!embeddedGameFrameWindow) return;
-        if (event.source !== embeddedGameFrameWindow) return;
-
-        let parsedMessage = null;
-        try {
-          parsedMessage = JSON.parse(event.data);
-        } catch (error) {
-          console.warn(
-            'Error while parsing a message received from the embedded game frame:',
-            error
-          );
+        if (
+          embeddedGameFrameWindow &&
+          event.source === embeddedGameFrameWindow
+        ) {
+          let parsedMessage = null;
+          try {
+            parsedMessage = JSON.parse(event.data);
+          } catch (error) {
+            console.warn(
+              'Error while parsing a message received from the embedded game frame:',
+              error
+            );
+          }
+          handleParsedMessage('embedded-game-frame', parsedMessage);
+          return;
         }
 
-        handleParsedMessage('embedded-game-frame', parsedMessage);
+        if (simulationFrameWindow && event.source === simulationFrameWindow) {
+          let parsedMessage = null;
+          try {
+            parsedMessage = JSON.parse(event.data);
+          } catch (error) {
+            console.warn(
+              'Error while parsing a message received from the simulation frame:',
+              error
+            );
+          }
+          handleParsedMessage('simulation-frame', parsedMessage);
+          return;
+        }
       });
       isWindowMessageListenerRegistered = true;
     }
@@ -205,6 +226,18 @@ class LocalPreviewDebuggerServer {
       return;
     }
 
+    if (id === 'simulation-frame') {
+      if (!simulationFrameWindow) {
+        console.error(
+          'Cannot send message to the simulation frame as it is not registered.'
+        );
+        return;
+      }
+
+      simulationFrameWindow.postMessage(message, '*');
+      return;
+    }
+
     if (!ipcRenderer) return;
     if (debuggerServerState === 'stopped') {
       console.error('Cannot send message when debugger server is stopped.');
@@ -254,6 +287,10 @@ class LocalPreviewDebuggerServer {
     return getExistingPreviewDebuggerIds();
   }
   // $FlowFixMe[missing-local-annot]
+  getExistingSimulationFrameDebuggerIds() {
+    return getExistingSimulationFrameDebuggerIds();
+  }
+  // $FlowFixMe[missing-local-annot]
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);
 
@@ -292,6 +329,23 @@ class LocalPreviewDebuggerServer {
     embeddedGameFrameWindow = null;
     notifyConnectionClosed('embedded-game-frame');
   }
+  registerSimulationFrame(window: WindowProxy) {
+    if (window === simulationFrameWindow) return;
+
+    simulationFrameWindow = window;
+    callbacksList.forEach(({ onConnectionOpened }) =>
+      onConnectionOpened({
+        id: 'simulation-frame',
+        debuggerIds: getExistingDebuggerIds(),
+      })
+    );
+  }
+  unregisterSimulationFrame(window: WindowProxy) {
+    if (simulationFrameWindow !== window) return;
+
+    simulationFrameWindow = null;
+    notifyConnectionClosed('simulation-frame');
+  }
   closeAllConnections() {
     const previousDebuggerIds = [...debuggerIds];
     debuggerIds.length = 0;
@@ -309,6 +363,11 @@ class LocalPreviewDebuggerServer {
     if (embeddedGameFrameWindow) {
       embeddedGameFrameWindow = null;
       notifyConnectionClosed('embedded-game-frame');
+    }
+
+    if (simulationFrameWindow) {
+      simulationFrameWindow = null;
+      notifyConnectionClosed('simulation-frame');
     }
   }
 }

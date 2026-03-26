@@ -76,7 +76,7 @@ type Props = {|
 /**
  * Helper for Mainframe to create a new project.
  */
-type _UseCreateProjectReturnType = {
+export type UseCreateProjectReturnType = {
   createEmptyProject: (
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
@@ -113,7 +113,7 @@ const useCreateProject = ({
   onProjectSaved,
   ensureResourcesAreMoved,
   onGameRegistered,
-}: Props): _UseCreateProjectReturnType => {
+}: Props): UseCreateProjectReturnType => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const profile = authenticatedUser.profile;
   const unsavedChanges = React.useContext(UnsavedChangesContext);

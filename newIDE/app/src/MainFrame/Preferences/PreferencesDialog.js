@@ -77,6 +77,7 @@ const PreferencesDialog = ({
     setShowDeprecatedInstructionWarning,
     setUse3DEditor,
     setShowBasicProfilingCounters,
+    setShowSimulationPreview,
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
     setWatchProjectFolderFilesForLocalProjects,
@@ -429,6 +430,13 @@ const PreferencesDialog = ({
                 onCheck={setAutosaveOnPreview}
                 checked={values.autosaveOnPreview}
                 label={i18n._(t`Auto-save project on preview`)}
+              />
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setShowSimulationPreview}
+                checked={values.showSimulationPreview}
+                label={i18n._(t`Show simulation preview (bottom-left)`)}
               />
               <CompactToggleField
                 labelColor="primary"

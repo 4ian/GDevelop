@@ -225,20 +225,22 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): ShapePainterNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        cbf: this._clearBetweenFrames,
-        aa: this._antialiasing,
-        ac: this._useAbsoluteCoordinates,
-        fc: this._fillColor,
-        oc: this._outlineColor,
-        os: this._outlineSize,
-        fo: this._fillOpacity,
-        oo: this._outlineOpacity,
+        [getKey('cbf', 'clearBetweenFrames')]: this._clearBetweenFrames,
+        [getKey('aa', 'antialiasing')]: this._antialiasing,
+        [getKey('ac', 'useAbsoluteCoordinates')]: this._useAbsoluteCoordinates,
+        [getKey('fc', 'fillColor')]: this._fillColor,
+        [getKey('oc', 'outlineColor')]: this._outlineColor,
+        [getKey('os', 'outlineSize')]: this._outlineSize,
+        [getKey('fo', 'fillOpacity')]: this._fillOpacity,
+        [getKey('oo', 'outlineOpacity')]: this._outlineOpacity,
         scaleX: this.getScaleX(),
         scaleY: this.getScaleY(),
-        ifx: this._flippedX,
-        ify: this._flippedY,
+        [getKey('ifx', 'isFlippedX')]: this._flippedX,
+        [getKey('ify', 'isFlippedY')]: this._flippedY,
       };
     }
 

@@ -254,17 +254,19 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): Model3DObjectNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        mt: this._materialType,
-        op: this._originPoint,
-        cp: this._centerPoint,
+        [getKey('mt', 'materialType')]: this._materialType,
+        [getKey('op', 'originPoint')]: this._originPoint,
+        [getKey('cp', 'centerPoint')]: this._centerPoint,
         anis: this._animations,
-        ai: this._currentAnimationIndex,
-        ass: this._animationSpeedScale,
-        aet: this.getAnimationElapsedTime(),
-        ap: this._animationPaused,
-        cfd: this._crossfadeDuration,
+        [getKey('ai', 'animationIndex')]: this._currentAnimationIndex,
+        [getKey('ass', 'animationSpeedScale')]: this._animationSpeedScale,
+        [getKey('aet', 'animationElapsedTime')]: this.getAnimationElapsedTime(),
+        [getKey('ap', 'animationPaused')]: this._animationPaused,
+        [getKey('cfd', 'crossfadeDuration')]: this._crossfadeDuration,
       };
     }
 

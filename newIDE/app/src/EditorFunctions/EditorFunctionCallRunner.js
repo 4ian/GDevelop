@@ -227,6 +227,10 @@ export const processEditorFunctionCalls = async ({
       }
 
       const { success, meta, ...output } = result;
+      const editorFunctionDef = editorFunction || editorFunctionWithoutProject;
+      if (editorFunctionDef && editorFunctionDef.modifiesProject && success) {
+        output.didModifyProject = true;
+      }
       results.push({
         status: 'finished',
         call_id,

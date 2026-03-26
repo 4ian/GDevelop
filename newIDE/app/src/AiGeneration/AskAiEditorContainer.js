@@ -69,6 +69,7 @@ import {
   setEditorHotReloadNeeded,
   type HotReloadSteps,
 } from '../EmbeddedGame/EmbeddedGameFrame';
+import { cancelGlobalSimulation } from './SimulationRuntimeManager';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import {
   useAiRequestState,
@@ -313,7 +314,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       const {
         selectedAiRequest,
         selectedAiRequestId,
-        setAiState,
+        setSelectedAiRequestId,
+      } = React.useContext(AiRequestContext);
+      const {
         isFetchingSuggestions,
         savingProjectForMessageId,
       } = useAiRequestState({
@@ -546,9 +549,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               // Select the new AI request just created - unless the user switched to another one
               // in the meantime.
               if (!upToDateSelectedAiRequestId.current) {
-                setAiState({
-                  aiRequestId: aiRequest.id,
-                });
+                setSelectedAiRequestId(aiRequest.id);
               }
 
               const aiRequestChatRefCurrent = aiRequestChatRef.current;
@@ -594,7 +595,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           quota,
           selectedAiRequestId,
           setLastSendError,
-          setAiState,
+          setSelectedAiRequestId,
           setSendingAiRequest,
           setIsSendingUserMessage,
           upToDateSelectedAiRequestId,
@@ -724,8 +725,16 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                     callId: output.call_id,
                   }) === 'initialize_project'
               );
-            if (functionCallOutputs.length > 0) {
-              // Assume changes have happened, trigger unsaved changes.
+            if (
+              functionCallOutputs.some(output => {
+                try {
+                  const parsed = JSON.parse(output.output);
+                  return parsed && parsed.didModifyProject;
+                } catch {
+                  return false;
+                }
+              })
+            ) {
               triggerUnsavedChanges();
             }
 
@@ -875,9 +884,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         // ensure we reset the selection if not logged in.
         if (selectedAiRequestId) {
           if (!profile) {
-            setAiState({
-              aiRequestId: null,
-            });
+            setSelectedAiRequestId(null);
             return;
           }
         }
@@ -911,11 +918,11 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 );
               });
             }
-            setAiState(options);
+            setSelectedAiRequestId(options.aiRequestId);
           }
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [setAiState, selectedAiRequest]
+        [setSelectedAiRequestId, selectedAiRequest]
       );
       const onStartNewChat = React.useCallback(
         () => {
@@ -1008,6 +1015,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             )
           )
             return;
+          // Cancel any in-progress simulation so the iframe stops stepping frames.
+          cancelGlobalSimulation();
+
           // Optimistic update: mark as suspended locally immediately so that
           // any in-flight async code (e.g. processEditorFunctionCalls,
           // prepareAiUserContent) sees the suspended status after the next
@@ -1439,9 +1449,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               }
               // Immediately switch the UI and refresh in the background.
               updateAiRequest(requestToOpen.id, () => requestToOpen);
-              setAiState({
-                aiRequestId: requestToOpen.id,
-              });
+              setSelectedAiRequestId(requestToOpen.id);
               refreshAiRequest(requestToOpen.id);
               onCloseHistory();
             }}

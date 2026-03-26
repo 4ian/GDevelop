@@ -123,12 +123,14 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): Object3DNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
         z: this.getZ(),
-        d: this.getDepth(),
-        rx: this.getRotationX(),
-        ry: this.getRotationY(),
+        [getKey('d', 'depth')]: this.getDepth(),
+        [getKey('rx', 'rotationX')]: this.getRotationX(),
+        [getKey('ry', 'rotationY')]: this.getRotationY(),
         flipX: this.isFlippedX(),
         flipY: this.isFlippedY(),
         flipZ: this.isFlippedZ(),

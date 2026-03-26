@@ -138,17 +138,26 @@ namespace gdjs {
     ): PathfindingNetworkSyncData {
       return {
         ...super.getNetworkSyncData(options),
-        props: {
-          path: this._path,
-          pf: this._pathFound,
-          sp: this._speed,
-          as: this._angularSpeed,
-          cs: this._currentSegment,
-          tss: this._totalSegmentDistance,
-          re: this._reachedEnd,
-          ma: this._movementAngle,
-          dos: this._distanceOnSegment,
-        },
+        props: options.useFullNames
+          ? {
+              path: this._path,
+              pathFound: this._pathFound,
+              speed: this._speed,
+              angularSpeed: this._angularSpeed,
+              reachedEnd: this._reachedEnd,
+              movementAngle: this._movementAngle,
+            }
+          : {
+              path: this._path,
+              pf: this._pathFound,
+              sp: this._speed,
+              as: this._angularSpeed,
+              cs: this._currentSegment,
+              tss: this._totalSegmentDistance,
+              re: this._reachedEnd,
+              ma: this._movementAngle,
+              dos: this._distanceOnSegment,
+            },
       };
     }
 

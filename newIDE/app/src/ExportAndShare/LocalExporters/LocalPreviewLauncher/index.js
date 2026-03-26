@@ -51,8 +51,10 @@ type State = {|
 
 const prepareExporter = async ({
   isForInGameEdition,
+  isForSimulation,
 }: {
   isForInGameEdition: boolean,
+  isForSimulation?: boolean,
 }): Promise<{|
   outputDir: string,
   exporter: gdjsExporter,
@@ -67,7 +69,11 @@ const prepareExporter = async ({
   const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
   const outputDir = path.join(
     fileSystem.getTempDir(),
-    isForInGameEdition ? 'in-game-editor-preview' : 'preview'
+    isForSimulation
+      ? 'simulation-preview'
+      : isForInGameEdition
+      ? 'in-game-editor-preview'
+      : 'preview'
   );
   const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
@@ -457,6 +463,109 @@ export default class LocalPreviewLauncher extends React.Component<
       `[LocalPreviewLauncher] Preview #${previewId} took ${previewStopTime -
         previewStartTime}ms`
     );
+  };
+
+  launchSimulationPreview = async ({
+    project,
+    sceneName,
+    hotReload,
+    shouldHardReload,
+    shouldReloadProjectData,
+    shouldReloadLibraries,
+    shouldReloadResources,
+  }: {|
+    project: gdProject,
+    sceneName: string,
+    hotReload: boolean,
+    shouldHardReload: boolean,
+    shouldReloadProjectData: boolean,
+    shouldReloadLibraries: boolean,
+    shouldReloadResources: boolean,
+  |}): Promise<string> => {
+    try {
+      await this.getPreviewDebuggerServer().startServer({});
+    } catch (err) {
+      console.error(
+        '[LocalPreviewLauncher] Unable to start the Debugger Server for the simulation preview:',
+        err
+      );
+    }
+
+    const { outputDir, exporter } = await prepareExporter({
+      isForInGameEdition: false,
+      isForSimulation: true,
+    });
+
+    const simulationDebuggerIds = this.getPreviewDebuggerServer().getExistingSimulationFrameDebuggerIds();
+    const shouldDoHotReload = hotReload && !!simulationDebuggerIds.length;
+
+    const previewExportOptions = new gd.PreviewExportOptions(
+      project,
+      outputDir
+    );
+    previewExportOptions.setLayoutName(sceneName);
+    previewExportOptions.setIsDevelopmentEnvironment(Window.isDev());
+    previewExportOptions.setIsInGameEdition(false);
+    previewExportOptions.useWindowMessageDebuggerClient();
+
+    const includeFileHashs = this.props.getIncludeFileHashs();
+    for (const includeFile in includeFileHashs) {
+      const hash = includeFileHashs[includeFile];
+      previewExportOptions.setIncludeFileHash(includeFile, hash);
+    }
+
+    if (shouldDoHotReload) {
+      previewExportOptions.setShouldClearExportFolder(shouldHardReload);
+      previewExportOptions.setShouldReloadProjectData(false);
+      previewExportOptions.setShouldReloadLibraries(
+        shouldReloadLibraries || shouldReloadProjectData
+      );
+    }
+
+    exporter.exportProjectForPixiPreview(previewExportOptions);
+
+    if (shouldDoHotReload) {
+      if (shouldHardReload) {
+        simulationDebuggerIds.forEach(debuggerId => {
+          this.getPreviewDebuggerServer().sendMessage(debuggerId, {
+            command: 'hardReload',
+          });
+        });
+      } else {
+        const projectDataElement = new gd.SerializerElement();
+        exporter.serializeProjectData(
+          project,
+          previewExportOptions,
+          projectDataElement
+        );
+        const projectData = JSON.parse(
+          gd.Serializer.toJSON(projectDataElement)
+        );
+        projectDataElement.delete();
+
+        const runtimeGameOptionsElement = new gd.SerializerElement();
+        exporter.serializeRuntimeGameOptions(
+          previewExportOptions,
+          runtimeGameOptionsElement
+        );
+        const runtimeGameOptions = JSON.parse(
+          gd.Serializer.toJSON(runtimeGameOptionsElement)
+        );
+        runtimeGameOptionsElement.delete();
+
+        simulationDebuggerIds.forEach(debuggerId => {
+          this.getPreviewDebuggerServer().sendMessage(debuggerId, {
+            command: 'hotReload',
+            payload: { shouldReloadResources, projectData, runtimeGameOptions },
+          });
+        });
+      }
+    }
+
+    previewExportOptions.delete();
+    exporter.delete();
+
+    return `file://${outputDir}/index.html`;
   };
 
   getPreviewDebuggerServer(): any {

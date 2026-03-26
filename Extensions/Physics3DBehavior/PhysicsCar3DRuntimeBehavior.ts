@@ -295,20 +295,22 @@ namespace gdjs {
       // Let's clear the inputs between frames as we control it.
       this._clearInputsBetweenFrames = true;
 
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
         props: {
-          lek: this._wasLeftKeyPressed,
-          rik: this._wasRightKeyPressed,
-          upk: this._wasForwardKeyPressed,
-          dok: this._wasBackwardKeyPressed,
-          hbk: this._wasHandBrakeKeyPressed,
-          asf: this._previousAcceleratorStickForce,
-          ssf: this._previousSteeringStickForce,
-          etm: this._engineTorqueMax,
-          esm: this._engineSpeedMax,
-          ei: this._engineInertia,
-          es: this.getEngineSpeed(),
+          [getKey('lek', 'wasLeftKeyPressed')]: this._wasLeftKeyPressed,
+          [getKey('rik', 'wasRightKeyPressed')]: this._wasRightKeyPressed,
+          [getKey('upk', 'wasForwardKeyPressed')]: this._wasForwardKeyPressed,
+          [getKey('dok', 'wasBackwardKeyPressed')]: this._wasBackwardKeyPressed,
+          [getKey('hbk', 'wasHandBrakeKeyPressed')]: this._wasHandBrakeKeyPressed,
+          [getKey('asf', 'previousAcceleratorStickForce')]: this._previousAcceleratorStickForce,
+          [getKey('ssf', 'previousSteeringStickForce')]: this._previousSteeringStickForce,
+          [getKey('etm', 'engineTorqueMax')]: this._engineTorqueMax,
+          [getKey('esm', 'engineSpeedMax')]: this._engineSpeedMax,
+          [getKey('ei', 'engineInertia')]: this._engineInertia,
+          [getKey('es', 'engineSpeed')]: this.getEngineSpeed(),
         },
       };
     }

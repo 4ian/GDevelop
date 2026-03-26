@@ -415,14 +415,19 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): SpriteAnimatorNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions?: GetNetworkSyncDataOptions
+    ): SpriteAnimatorNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions?.useFullNames ? full : abbrev;
       return {
-        an: this._currentAnimation,
-        di: this._currentDirection,
-        fr: this._currentFrameIndex,
-        et: this._animationElapsedTime,
-        ss: this._animationSpeedScale,
-        pa: this._animationPaused,
+        [getKey('an', 'animationIndex')]: this._currentAnimation,
+        [getKey('aname', 'animationName')]: this.getAnimationName(),
+        [getKey('di', 'direction')]: this._currentDirection,
+        [getKey('fr', 'frameIndex')]: this._currentFrameIndex,
+        [getKey('et', 'elapsedTime')]: this._animationElapsedTime,
+        [getKey('ss', 'speedScale')]: this._animationSpeedScale,
+        [getKey('pa', 'paused')]: this._animationPaused,
       };
     }
 

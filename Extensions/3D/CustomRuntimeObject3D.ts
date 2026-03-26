@@ -88,14 +88,16 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): CustomObject3DNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
         z: this.getZ(),
-        d: this.getDepth(),
-        rx: this.getRotationX(),
-        ry: this.getRotationY(),
-        ifz: this.isFlippedZ(),
-        ccz: this._customCenterZ,
+        [getKey('d', 'depth')]: this.getDepth(),
+        [getKey('rx', 'rotationX')]: this.getRotationX(),
+        [getKey('ry', 'rotationY')]: this.getRotationY(),
+        [getKey('ifz', 'isFlippedZ')]: this.isFlippedZ(),
+        [getKey('ccz', 'customCenterZ')]: this._customCenterZ,
       };
     }
 

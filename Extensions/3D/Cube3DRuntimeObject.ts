@@ -460,14 +460,16 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): Cube3DObjectNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        mt: this._materialType,
-        fo: this._facesOrientation,
-        bfu: this._backFaceUpThroughWhichAxisRotation,
-        vfb: this._visibleFacesBitmask,
-        trfb: this._textureRepeatFacesBitmask,
-        frn: this._faceResourceNames,
+        [getKey('mt', 'materialType')]: this._materialType,
+        [getKey('fo', 'facesOrientation')]: this._facesOrientation,
+        [getKey('bfu', 'backFaceUpThroughWhichAxisRotation')]: this._backFaceUpThroughWhichAxisRotation,
+        [getKey('vfb', 'visibleFacesBitmask')]: this._visibleFacesBitmask,
+        [getKey('trfb', 'textureRepeatFacesBitmask')]: this._textureRepeatFacesBitmask,
+        [getKey('frn', 'faceResourceNames')]: this._faceResourceNames,
         tint: this._tint,
       };
     }

@@ -140,9 +140,11 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): PanelSpriteNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        op: this.getOpacity(),
+        [getKey('op', 'opacity')]: this.getOpacity(),
         color: this.getColor(),
       };
     }

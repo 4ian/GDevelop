@@ -149,14 +149,16 @@ namespace gdjs {
       this._multiplier = multiplier;
     }
 
-    getNetworkSyncData(): ForceNetworkSyncData {
+    getNetworkSyncData(syncOptions?: GetNetworkSyncDataOptions): ForceNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions?.useFullNames ? full : abbrev;
       return {
         x: this._x,
         y: this._y,
-        a: this._angle,
-        l: this._length,
-        m: this._multiplier,
-      };
+        [getKey('a', 'angle')]: this._angle,
+        [getKey('l', 'length')]: this._length,
+        [getKey('m', 'multiplier')]: this._multiplier,
+      } as ForceNetworkSyncData;
     }
 
     updateFromNetworkSyncData(syncData: ForceNetworkSyncData) {

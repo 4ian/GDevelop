@@ -34,6 +34,8 @@ namespace gdjs {
     sy: float;
     op: float;
     cc?: [float, float];
+    /** Sync data for each named child object (keyed by child object name). */
+    ch?: { [childName: string]: ObjectNetworkSyncData[] };
   };
 
   /**
@@ -234,20 +236,38 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): CustomObjectNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       const animator = this.getAnimator();
       const networkSyncData: CustomObjectNetworkSyncData = {
         ...super.getNetworkSyncData(syncOptions),
-        ifx: this.isFlippedX(),
-        ify: this.isFlippedY(),
-        sx: this._scaleX,
-        sy: this._scaleY,
-        op: this.opacity,
+        [getKey('ifx', 'isFlippedX')]: this.isFlippedX(),
+        [getKey('ify', 'isFlippedY')]: this.isFlippedY(),
+        [getKey('sx', 'scaleX')]: this._scaleX,
+        [getKey('sy', 'scaleY')]: this._scaleY,
+        [getKey('op', 'opacity')]: this.opacity,
       };
       if (animator) {
-        networkSyncData.anim = animator.getNetworkSyncData();
+        networkSyncData[getKey('anim', 'animation')] = animator.getNetworkSyncData(syncOptions);
       }
       if (this._customCenter) {
-        networkSyncData.cc = this._customCenter;
+        networkSyncData[getKey('cc', 'customCenter')] = this._customCenter;
+      }
+      // Include children so callers (harness, multiplayer, debugger) can read
+      // child object state — e.g. a Text child that displays a score value.
+      const childNames: string[] = [];
+      this._instanceContainer._objects.keys(childNames);
+      if (childNames.length > 0) {
+        const children: { [childName: string]: ObjectNetworkSyncData[] } = {};
+        for (const childName of childNames) {
+          const childObjs = this._instanceContainer.getObjects(childName);
+          if (childObjs.length > 0) {
+            children[childName] = childObjs.map((child) =>
+              child.getNetworkSyncData(syncOptions)
+            );
+          }
+        }
+        networkSyncData[getKey('ch', 'children')] = children;
       }
       return networkSyncData;
     }
@@ -280,6 +300,22 @@ namespace gdjs {
       }
       if (networkSyncData.cc) {
         this.setRotationCenter(networkSyncData.cc[0], networkSyncData.cc[1]);
+      }
+      if (networkSyncData.ch) {
+        for (const childName in networkSyncData.ch) {
+          const childSyncDataList = networkSyncData.ch[childName];
+          const childObjs = this._instanceContainer.getObjects(childName);
+          for (
+            let i = 0;
+            i < childSyncDataList.length && i < childObjs.length;
+            i++
+          ) {
+            childObjs[i].updateFromNetworkSyncData(
+              childSyncDataList[i],
+              options
+            );
+          }
+        }
       }
       if (
         networkSyncData.ifx !== undefined ||

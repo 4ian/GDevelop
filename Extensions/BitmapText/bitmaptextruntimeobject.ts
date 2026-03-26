@@ -172,18 +172,20 @@ namespace gdjs {
     override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): BitmapTextObjectNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
         text: this._text,
-        opa: this._opacity,
+        [getKey('opa', 'opacity')]: this._opacity,
         tint: this._tint,
-        bfrn: this._bitmapFontResourceName,
-        tarn: this._textureAtlasResourceName,
+        [getKey('bfrn', 'bitmapFontResourceName')]: this._bitmapFontResourceName,
+        [getKey('tarn', 'textureAtlasResourceName')]: this._textureAtlasResourceName,
         scale: this.getScale(),
-        wwrap: this._wrapping,
-        wwidth: this._wrappingWidth,
-        align: this._textAlign,
-        vta: this._verticalTextAlignment,
+        [getKey('wwrap', 'wordWrap')]: this._wrapping,
+        [getKey('wwidth', 'wrappingWidth')]: this._wrappingWidth,
+        [getKey('align', 'textAlignment')]: this._textAlign,
+        [getKey('vta', 'verticalTextAlignment')]: this._verticalTextAlignment,
       };
     }
 

@@ -514,24 +514,26 @@ namespace gdjs {
     getNetworkSyncData(
       options: GetNetworkSyncDataOptions
     ): Physics2NetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        options.useFullNames ? full : abbrev;
       const bodyProps = this._body
         ? {
-            tpx: this._body.GetTransform().get_p().get_x(),
-            tpy: this._body.GetTransform().get_p().get_y(),
-            tqa: this._body.GetTransform().get_q().GetAngle(),
-            lvx: this._body.GetLinearVelocity().get_x(),
-            lvy: this._body.GetLinearVelocity().get_y(),
-            av: this._body.GetAngularVelocity(),
-            aw: this._body.IsAwake(),
+            [getKey('tpx', 'transformPositionX')]: this._body.GetTransform().get_p().get_x(),
+            [getKey('tpy', 'transformPositionY')]: this._body.GetTransform().get_p().get_y(),
+            [getKey('tqa', 'transformAngle')]: this._body.GetTransform().get_q().GetAngle(),
+            [getKey('lvx', 'linearVelocityX')]: this._body.GetLinearVelocity().get_x(),
+            [getKey('lvy', 'linearVelocityY')]: this._body.GetLinearVelocity().get_y(),
+            [getKey('av', 'angularVelocity')]: this._body.GetAngularVelocity(),
+            [getKey('aw', 'isAwake')]: this._body.IsAwake(),
           }
         : {
-            tpx: undefined,
-            tpy: undefined,
-            tqa: undefined,
-            lvx: undefined,
-            lvy: undefined,
-            av: undefined,
-            aw: undefined,
+            [getKey('tpx', 'transformPositionX')]: undefined,
+            [getKey('tpy', 'transformPositionY')]: undefined,
+            [getKey('tqa', 'transformAngle')]: undefined,
+            [getKey('lvx', 'linearVelocityX')]: undefined,
+            [getKey('lvy', 'linearVelocityY')]: undefined,
+            [getKey('av', 'angularVelocity')]: undefined,
+            [getKey('aw', 'isAwake')]: undefined,
           };
       return {
         ...super.getNetworkSyncData(options),

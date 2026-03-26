@@ -167,6 +167,7 @@ namespace gdjs {
     _hotReloader: gdjs.HotReloader;
     _originalConsole = originalConsole;
     _inGameDebugger: gdjs.InGameDebugger;
+    _currentSimulationHarness: gdjs.SimulationHarness | null = null;
 
     _hasLoggedUncaughtException = false;
 
@@ -489,6 +490,44 @@ namespace gdjs {
           // This usually means that the preview was modified so much that an entire reload
           // is needed, or that the runtime itself could have been modified.
           this.launchHardReload();
+        } else if (data.command === 'cancelSimulation') {
+          if (this._currentSimulationHarness) {
+            this._currentSimulationHarness.cancel();
+          }
+        } else if (data.command === 'runSimulation') {
+          const harness = new gdjs.SimulationHarness(this._runtimegame);
+          this._currentSimulationHarness = harness;
+          harness
+            .execute(data.payload.sceneName, data.payload.scriptBody)
+            .then(() => {
+              this._currentSimulationHarness = null;
+              this._runtimegame.getSoundManager().clearAll();
+              that._sendMessage(
+                JSON.stringify({
+                  command: 'simulationResult',
+                  payload: harness.getResult(),
+                })
+              );
+            })
+            .catch((err: Error) => {
+              this._currentSimulationHarness = null;
+              this._runtimegame.getSoundManager().clearAll();
+              that._sendMessage(
+                JSON.stringify({
+                  command: 'simulationResult',
+                  payload: {
+                    passed: false,
+                    errors: [err instanceof Error ? err.message : String(err)],
+                    assertions: [],
+                    framesExecuted: 0,
+                    objectStates: {},
+                    sceneVariables: {},
+                    consoleLogs: [],
+                    eventLog: [],
+                  },
+                })
+              );
+            });
         } else {
           logger.info(
             'Unknown command "' + data.command + '" received by the debugger.'

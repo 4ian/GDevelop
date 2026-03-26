@@ -121,19 +121,26 @@ namespace gdjs {
 
       return {
         ...super.getNetworkSyncData(options),
-        props: {
-          a: this._angle,
-          xv: this._xVelocity,
-          yv: this._yVelocity,
-          as: this._angularSpeed,
-          lk: this._wasLeftKeyPressed,
-          rk: this._wasRightKeyPressed,
-          uk: this._wasUpKeyPressed,
-          dk: this._wasDownKeyPressed,
-          wsu: this._wasStickUsed,
-          sa: this._stickAngle,
-          sf: this._stickForce,
-        },
+        props: options.useFullNames
+          ? {
+              angle: this._angle,
+              xVelocity: this._xVelocity,
+              yVelocity: this._yVelocity,
+              angularSpeed: this._angularSpeed,
+            }
+          : {
+              a: this._angle,
+              xv: this._xVelocity,
+              yv: this._yVelocity,
+              as: this._angularSpeed,
+              lk: this._wasLeftKeyPressed,
+              rk: this._wasRightKeyPressed,
+              uk: this._wasUpKeyPressed,
+              dk: this._wasDownKeyPressed,
+              wsu: this._wasStickUsed,
+              sa: this._stickAngle,
+              sf: this._stickForce,
+            },
       };
     }
 

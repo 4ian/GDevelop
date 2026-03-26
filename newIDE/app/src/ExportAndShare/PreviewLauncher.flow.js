@@ -136,12 +136,15 @@ export interface PreviewDebuggerServer {
   getServerState(): 'started' | 'stopped';
   getExistingDebuggerIds(): Array<DebuggerId>;
   getExistingEmbeddedGameFrameDebuggerIds(): Array<DebuggerId>;
+  getExistingSimulationFrameDebuggerIds(): Array<DebuggerId>;
   getExistingPreviewDebuggerIds(): Array<DebuggerId>;
   sendMessage(id: DebuggerId, message: Object): void;
   sendMessageWithResponse(message: Object): Promise<Object>;
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;
   registerEmbeddedGameFrame(window: WindowProxy): void;
   unregisterEmbeddedGameFrame(window: WindowProxy): void;
+  registerSimulationFrame(window: WindowProxy): void;
+  unregisterSimulationFrame(window: WindowProxy): void;
   closeAllConnections(): void;
 }
 
@@ -156,11 +159,24 @@ export type HotReloaderLog = {|
  * TODO: Use strict typing when the components that implement this interface
  * are functional component with strict interfaces.
  */
+export type SimulationPreviewOptions = {|
+  project: gdProject,
+  sceneName: string,
+  hotReload: boolean,
+  shouldHardReload: boolean,
+  shouldReloadProjectData: boolean,
+  shouldReloadLibraries: boolean,
+  shouldReloadResources: boolean,
+|};
+
 export type PreviewLauncherInterface = {
   +immediatelyPreparePreviewWindows?: (
     options: PreparePreviewWindowsOptions
   ) => Array<WindowProxy> | null,
   launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
+  +launchSimulationPreview?: (
+    options: SimulationPreviewOptions
+  ) => Promise<string>,
   canDoNetworkPreview: () => boolean,
   +closePreview?: (windowId: number) => void,
   +closeAllPreviews?: () => void,

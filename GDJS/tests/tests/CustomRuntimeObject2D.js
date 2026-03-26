@@ -90,7 +90,7 @@ describe('gdjs.CustomRuntimeObject', function () {
     ];
 
     /**
-     * @return {Promise<{runtimeScene: gdjs.RuntimeScene, customObject: gdjs.CustomRuntimeObject, leftSprite: gdjs.RuntimeObject, rightSprite: gdjs.RuntimeObject}>}
+     * @return {Promise<{runtimeScene: gdjs.RuntimeScene, customObject: gdjs.CustomRuntimeObject2D, leftSprite: gdjs.RuntimeObject, rightSprite: gdjs.RuntimeObject}>}
      */
     const makeCustomObjectWith2Children = async () => {
       const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets({

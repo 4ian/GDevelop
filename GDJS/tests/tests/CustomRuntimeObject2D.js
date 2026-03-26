@@ -109,7 +109,7 @@ describe('gdjs.CustomRuntimeObject', function () {
     };
 
     it('can return hit-boxes according to its children', async () => {
-      const { runtimeScene, customObject, leftSprite, rightSprite } =
+      const { customObject, leftSprite, rightSprite } =
         await makeCustomObjectWith2Children();
 
       expect(leftSprite.getHitBoxes().length).to.be(1);
@@ -140,8 +140,7 @@ describe('gdjs.CustomRuntimeObject', function () {
     });
 
     it('can translate its hit-boxes', async () => {
-      const { runtimeScene, customObject, leftSprite, rightSprite } =
-        await makeCustomObjectWith2Children();
+      const { customObject } = await makeCustomObjectWith2Children();
 
       customObject.setPosition(8, 16);
 
@@ -159,8 +158,7 @@ describe('gdjs.CustomRuntimeObject', function () {
     });
 
     it('can rotate its hit-boxes', async () => {
-      const { runtimeScene, customObject, leftSprite, rightSprite } =
-        await makeCustomObjectWith2Children();
+      const { customObject } = await makeCustomObjectWith2Children();
 
       expect(customObject.getCenterXInScene()).to.be((-100 + 400) / 2);
       expect(customObject.getCenterYInScene()).to.be((-200 + 500) / 2);
@@ -181,8 +179,7 @@ describe('gdjs.CustomRuntimeObject', function () {
     });
 
     it('can rotate its hit-boxes around a custom center at (0 ; 0)', async () => {
-      const { runtimeScene, customObject, leftSprite, rightSprite } =
-        await makeCustomObjectWith2Children();
+      const { customObject } = await makeCustomObjectWith2Children();
 
       customObject.setRotationCenter(0, 0);
 
@@ -209,8 +206,7 @@ describe('gdjs.CustomRuntimeObject', function () {
     });
 
     it('can scale its hit-boxes', async () => {
-      const { runtimeScene, customObject, leftSprite, rightSprite } =
-        await makeCustomObjectWith2Children();
+      const { customObject } = await makeCustomObjectWith2Children();
 
       expect(customObject.getWidth()).to.be(100 + 400);
       expect(customObject.getHeight()).to.be(200 + 500);
@@ -232,8 +228,7 @@ describe('gdjs.CustomRuntimeObject', function () {
     });
 
     it('can translate, scale and rotate its hit-boxes', async () => {
-      const { runtimeScene, customObject, leftSprite, rightSprite } =
-        await makeCustomObjectWith2Children();
+      const { customObject } = await makeCustomObjectWith2Children();
 
       customObject.setPosition(8, 16);
       customObject.setAngle(90);
@@ -277,8 +272,7 @@ describe('gdjs.CustomRuntimeObject', function () {
     });
 
     it('keeps hit-boxes up to date when new children is added', async () => {
-      const { runtimeScene, customObject, leftSprite, rightSprite } =
-        await makeCustomObjectWith2Children();
+      const { customObject } = await makeCustomObjectWith2Children();
 
       const middleSprite = createSpriteObject(customObject._instanceContainer);
       middleSprite.setX(32);
@@ -302,7 +296,7 @@ describe('gdjs.CustomRuntimeObject', function () {
     });
 
     it('properly computes hitboxes and point positions after the scene layer camera has moved', async () => {
-      const { runtimeScene, customObject, leftSprite, rightSprite } =
+      const { runtimeScene, customObject } =
         await makeCustomObjectWith2Children();
       const sceneLayer = runtimeScene.getLayer('');
 
@@ -339,8 +333,7 @@ describe('gdjs.CustomRuntimeObject', function () {
     });
 
     it('properly computes hitboxes and point positions after the custom object layer camera has moved', async () => {
-      const { runtimeScene, customObject, leftSprite, rightSprite } =
-        await makeCustomObjectWith2Children();
+      const { customObject } = await makeCustomObjectWith2Children();
       const customObjectLayer = customObject
         .getInstanceContainer()
         .getLayer('');
@@ -382,8 +375,7 @@ describe('gdjs.CustomRuntimeObject', function () {
 
     describe('convertCoords', function () {
       it('can transform a point from the scene', async () => {
-        const { runtimeScene, customObject, leftSprite, rightSprite } =
-          await makeCustomObjectWith2Children();
+        const { customObject } = await makeCustomObjectWith2Children();
         const instanceContainer = customObject._instanceContainer;
 
         customObject.setPosition(16, 8);
@@ -393,7 +385,7 @@ describe('gdjs.CustomRuntimeObject', function () {
       });
 
       it('can transform a point from the scene with a negative AABB min position', async () => {
-        const { runtimeScene, customObject, leftSprite, rightSprite } =
+        const { customObject, leftSprite } =
           await makeCustomObjectWith2Children();
         const instanceContainer = customObject._instanceContainer;
 
@@ -405,7 +397,7 @@ describe('gdjs.CustomRuntimeObject', function () {
       });
 
       it('can transform a point from the scene with a positive AABB min position', async () => {
-        const { runtimeScene, customObject, leftSprite, rightSprite } =
+        const { customObject, leftSprite } =
           await makeCustomObjectWith2Children();
         const instanceContainer = customObject._instanceContainer;
 
@@ -419,8 +411,7 @@ describe('gdjs.CustomRuntimeObject', function () {
 
     describe('convertInverseCoords', function () {
       it('can transform a point to the scene', async () => {
-        const { runtimeScene, customObject, leftSprite, rightSprite } =
-          await makeCustomObjectWith2Children();
+        const { customObject } = await makeCustomObjectWith2Children();
         const instanceContainer = customObject._instanceContainer;
 
         customObject.setPosition(16, 8);
@@ -430,7 +421,7 @@ describe('gdjs.CustomRuntimeObject', function () {
       });
 
       it('can transform a point to scene with a negative AABB min position', async () => {
-        const { runtimeScene, customObject, leftSprite, rightSprite } =
+        const { customObject, leftSprite } =
           await makeCustomObjectWith2Children();
         const instanceContainer = customObject._instanceContainer;
 
@@ -442,7 +433,7 @@ describe('gdjs.CustomRuntimeObject', function () {
       });
 
       it('can transform a point to the scene with a positive AABB min position', async () => {
-        const { runtimeScene, customObject, leftSprite, rightSprite } =
+        const { customObject, leftSprite } =
           await makeCustomObjectWith2Children();
         const instanceContainer = customObject._instanceContainer;
 

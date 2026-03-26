@@ -20,7 +20,8 @@ describe('gdjs.CustomRuntimeObject3D', function () {
       variables: [],
       behaviors: [],
       effects: [],
-      content: {},
+      // Custom objects don't use these dimensions.
+      content: { width: 0, height: 0, depth: 0 },
     });
     instanceContainer.addObject(customObject);
     return customObject;
@@ -43,18 +44,7 @@ describe('gdjs.CustomRuntimeObject3D', function () {
   };
 
   /**
-   * @param {gdjs.RuntimeInstanceContainer} parent
-   */
-  const createSpriteObject = (parent) => {
-    const sprite = parent.createObject('MySprite');
-    if (!sprite) {
-      throw new Error("Object couldn't be created");
-    }
-    return sprite;
-  };
-
-  /**
-   * @return {Promise<{runtimeScene: gdjs.RuntimeScene, customObject: gdjs.CustomRuntimeObject3D, leftSprite: gdjs.RuntimeObject, rightSprite: gdjs.RuntimeObject}>}
+   * @return {Promise<{runtimeScene: gdjs.RuntimeScene, customObject: gdjs.CustomRuntimeObject3D}>}
    */
   const makeCustomObject3D = async () => {
     const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
@@ -67,8 +57,7 @@ describe('gdjs.CustomRuntimeObject3D', function () {
   };
 
   it('can translate, scale and rotate', async () => {
-    const { runtimeScene, customObject } =
-      await makeCustomObject3D();
+    const { customObject } = await makeCustomObject3D();
 
     customObject.setPosition(8, 16);
     customObject.setZ(32);
@@ -97,5 +86,4 @@ describe('gdjs.CustomRuntimeObject3D', function () {
     expect(customObject.getDrawableY()).to.be(16 - 200 * 1.5);
     expect(customObject.getDrawableZ()).to.be(32 - 300 * 0.5);
   });
-
 });

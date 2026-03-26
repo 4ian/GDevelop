@@ -65,7 +65,8 @@ export const EventsFunctionsExtensionsProvider = ({
   );
 
   const ensureLoadFinished = React.useCallback((): Promise<void> => {
-    if (lastLoadPromise.current) {
+    const currentLastLoadPromise = lastLoadPromise.current;
+    if (currentLastLoadPromise) {
       console.info(
         'Waiting on the events functions extensions to finish loading...'
       );
@@ -74,24 +75,9 @@ export const EventsFunctionsExtensionsProvider = ({
       return Promise.resolve();
     }
 
-    // Race against a timeout to avoid blocking forever if the load
-    // promise never settles (e.g. due to a crash during code generation
-    // or a stuck write operation).
-    return Promise.race([
-      // $FlowFixMe[incompatible-use] - we just check it was not null.
-      lastLoadPromise.current.then(() => {
-        console.info('Events functions extensions finished loading.');
-      }),
-      new Promise<void>(resolve => {
-        setTimeout(() => {
-          console.warn(
-            'Events functions extensions loading timed out after 15s, proceeding anyway.'
-          );
-          lastLoadPromise.current = null;
-          resolve();
-        }, 15000);
-      }),
-    ]);
+    return currentLastLoadPromise.then(() => {
+      console.info('Events functions extensions finished loading.');
+    });
   }, []);
 
   const _loadProjectEventsFunctionsExtensions = React.useCallback(
@@ -101,14 +87,18 @@ export const EventsFunctionsExtensionsProvider = ({
       const previousLastLoadPromise =
         lastLoadPromise.current || Promise.resolve();
 
+      let startTime;
+
       const currentPromise: Promise<void> = previousLastLoadPromise
-        .then(() =>
-          loadProjectEventsFunctionsExtensions(
+        .then(() => {
+          console.info('Loading project extensions...');
+          startTime = Date.now();
+          return loadProjectEventsFunctionsExtensions(
             project,
             eventsFunctionCodeWriter,
             i18n
-          )
-        )
+          );
+        })
         .then(() => setEventsFunctionsExtensionsError(null))
         .catch((eventsFunctionsExtensionsError: Error) => {
           setEventsFunctionsExtensionsError(eventsFunctionsExtensionsError);
@@ -121,6 +111,11 @@ export const EventsFunctionsExtensionsProvider = ({
           });
         })
         .then(() => {
+          console.info(
+            `Finished loading project extensions in ${(
+              Date.now() - startTime
+            ).toFixed(2)}ms.`
+          );
           // Only clear the ref if no newer load has been queued since.
           // Without this check, chained loads (A then B) would have A's
           // cleanup clear B's reference, leading to stuck state.

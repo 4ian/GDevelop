@@ -10,6 +10,23 @@ import {
 } from '../Utils/Window';
 import useAlertDialog from './Alert/useAlertDialog';
 
+// There is a high chance of FS operations running while an Electron window is closing.
+// We run into "Uncaught illegal access" errors from V8/Chrome/Electron on Electron when these
+// FS operations are running while a BrowserWindow is destroyed (see WindowPortal).
+// These "Uncaught illegal access" have no stacktrace, which seems to indicate a problem
+// deep in Electron or related.
+//
+// We can't risk this.
+//
+// To avoid this, we use `startWindowClosingIfSafe`/`waitToSafelyStartWindowClosing` to only
+// trigger the closing of a window when it's safe to do so. Conversely, when a window is closing,
+// FS operations will be prevented.
+import {
+  notifyWindowClosed,
+  startWindowClosingIfSafe,
+  waitToSafelyStartWindowClosing,
+} from '../Utils/ElectronConflictingOperationsMutex';
+
 let popOutCounter = 0;
 
 type Props = {|
@@ -73,6 +90,7 @@ const WindowPortal = ({
     // Open a new blank window.
     const left = window.screenX + (window.outerWidth - initialWidth) / 2;
     const top = window.screenY + (window.outerHeight - initialHeight) / 2;
+    // TODO: pass the background color of the theme?
     const features = `width=${initialWidth},height=${initialHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`;
 
     const targetId = `GDevelopWindowPortal${++popOutCounter}`;
@@ -148,45 +166,47 @@ const WindowPortal = ({
       if (externalWindow.closed) {
         clearInterval(checkClosed);
 
-        // See comment below, taking a safety margin to avoid
-        // potential issues on Electron (even if beforeunload should always be fired,
-        // so this timeout should be useless).
-        setTimeout(() => {
-          handleClose();
-        }, 150);
+        // The window is now considered as fully closed, so we can notify it's the case
+        // which will let conflicting operations able to run.
+        notifyWindowClosed(targetId);
+
+        // Only call "handleClose" once the window is fully closed.
+        handleClose();
       }
     }, 250);
 
-    // Also listen for beforeunload as a faster signal.
-    externalWindow.addEventListener('beforeunload', () => {
+    // Listen to "beforeunload" to know when a window is being closed.
+    externalWindow.addEventListener('beforeunload', event => {
       // Disconnect as soon as possible to avoid any further interactions with the window.
       if (styleObserver) styleObserver.disconnect();
       if (observer) observer.disconnect();
 
-      // We know the window is closing, but we actually wait for it to be confirmed closed.
-      // If we don't wait before calling handleClose, we run into "Uncaught illegal access" errors from V8/Chrome/Electron on Electron,
-      // when an extension editor is closed. The unmounting of `EventsFunctionsExtensionEditorContainer`
-      // is triggering reloading of extensions, which does fs operations. This seems to interfere
-      // with the closing of the window in a non deterministic way (creating 50-200 "Uncaught illegal access" errors)
-      // and totally breaking fs callbacks which are never resolved.
-      // These "Uncaught illegal access" have no stacktrace, which seems to indicate a problem
-      // deep in Electron or related.
-      //
-      // We can't risk this, so we wait for the window to be confirmed closed.
-      const waitForClose: IntervalID = setInterval(() => {
-        if (externalWindow.closed) {
-          clearInterval(waitForClose);
+      // Notify the window wants to be closed.
+      const isSafeToClose = startWindowClosingIfSafe(targetId);
 
-          // Still wait to avoid "Uncaught illegal access" error to ensure
-          // the BrowserWindow is fully closed.
-          setTimeout(() => {
-            // Window is now fully closed.
-            // Proceed as usual from now on.
-            clearInterval(checkClosed);
-            handleClose();
-          }, 150);
-        }
-      }, 10);
+      if (!isSafeToClose) {
+        // Something (a FS operation) is preventing the window from closing.
+        // Only close it later, when it's safe to do so.
+        console.info(
+          `Window "${targetId}" is prevented from closing (beforeunload event) as unsafe.`
+        );
+
+        (async () => {
+          await waitToSafelyStartWindowClosing(targetId);
+          console.info(
+            `Triggering close of window "${targetId}" (after previously prevented unload)...`
+          );
+          externalWindow.close(); // It's now safe to close the window.
+        })();
+
+        // Prevent the window from closing immediately in the meantime.
+        event.preventDefault();
+        event.returnValue = 'Waiting for the window to be closed...';
+        return;
+      }
+
+      // Let the window closing be done normally (nothing prevents it).
+      console.info(`Window "${targetId}" is unloaded.`);
     });
 
     setContainer(containerDiv);
@@ -206,17 +226,22 @@ const WindowPortal = ({
 
     return () => {
       onWindowReadyRef.current(null);
-      clearInterval(checkClosed);
+
+      // Component is unmounted: deconnect listeners and clear things...
       if (styleObserver) styleObserver.disconnect();
       if (observer) observer.disconnect();
       unregisterDocumentTargetId(externalWindow.document);
 
-      setTimeout(() => {
-        // TODO: make this more robust against "Uncaught illegal access".
-        if (!externalWindow.closed) {
-          externalWindow.close();
-        }
-      }, 100);
+      // ...and close the window if it's not already.
+      if (!externalWindow.closed) {
+        (async () => {
+          await waitToSafelyStartWindowClosing(targetId);
+          console.info(
+            `Triggering close of window "${targetId}" (WindowPortal unmounted)...`
+          );
+          externalWindow.close(); // It's now safe to close the window.
+        })();
+      }
       externalWindowRef.current = null;
     };
     // We intentionally only run this effect once on mount.

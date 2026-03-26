@@ -16,6 +16,7 @@ import { useKeyboardShortcuts } from '../KeyboardShortcuts';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Window from '../Utils/Window';
 import PortalContainerContext from '../UI/PortalContainerContext';
+import AlertProvider from '../UI/Alert/AlertProvider';
 import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
@@ -107,6 +108,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
           innerHeight={windowSize.height}
         >
           <FullThemeProvider>
+          <AlertProvider>
             <PoppedOutWindowBackgroundColor />
             <CommandPalette ref={localCommandPaletteRef} />
             <ToolbarTitlebar
@@ -327,6 +329,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                 </ErrorBoundary>
               </CommandsContextScopedProvider>
             </div>
+          </AlertProvider>
           </FullThemeProvider>
         </SpecificDimensionsWindowSizeProvider>
       )}

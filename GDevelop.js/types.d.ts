@@ -418,6 +418,7 @@ export class ObjectVariableHelper extends EmscriptenObject {
 
 export class EventsBasedObjectVariantHelper extends EmscriptenObject {
   static complyVariantsToEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject): void;
+  static findAllChildrenCustomObjectType(project: Project, eventsBasedObject: EventsBasedObject): VectorString;
 }
 
 export class ObjectGroupsContainer extends EmscriptenObject {

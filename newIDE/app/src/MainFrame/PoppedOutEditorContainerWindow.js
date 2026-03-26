@@ -20,6 +20,8 @@ import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
 import AlertProvider from '../UI/Alert/AlertProvider';
+import ExternalWindowDndBridge from '../UI/DragAndDrop/ExternalWindowDndBridge';
+import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 
 type Props = {|
   ...EditorTabsPaneCommonProps,
@@ -109,6 +111,8 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
         >
           <FullThemeProvider>
             <AlertProvider>
+              <ExternalWindowDndBridge />
+              <CustomDragLayer />
               <PoppedOutWindowBackgroundColor />
               <CommandPalette ref={localCommandPaletteRef} />
               <ToolbarTitlebar

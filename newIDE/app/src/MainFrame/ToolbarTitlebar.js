@@ -53,9 +53,7 @@ export default function ToolbarTitlebar({
       >
         <PopInIcon />
       </IconButton>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        {renderToolbar()}
-      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>{renderToolbar()}</div>
       <TitleBarRightSafeMargins />
     </div>
   );

@@ -53,10 +53,7 @@ export default function ToolbarTitlebar({
       >
         <PopInIcon />
       </IconButton>
-      <div
-        className="title-bar-non-draggable-part"
-        style={{ flex: 1, minWidth: 0 }}
-      >
+      <div style={{ flex: 1, minWidth: 0 }}>
         {renderToolbar()}
       </div>
       <TitleBarRightSafeMargins />

@@ -92,7 +92,7 @@ const WindowPortal = ({
     const left = window.screenX + (window.outerWidth - initialWidth) / 2;
     const top = window.screenY + (window.outerHeight - initialHeight) / 2;
     const themeBackgroundColor = getThemeWindowBackgroundColor();
-    const features = `width=${initialWidth},height=${initialHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`;
+    const features = `width=${initialWidth},height=${initialHeight},left=${left},top=${top},resizable=yes,scrollbars=yes,themeBackgroundColor=${encodeURIComponent(themeBackgroundColor)}`;
 
     const targetId = `GDevelopWindowPortal${++popOutCounter}`;
     const externalWindow = window.open('', targetId, features);

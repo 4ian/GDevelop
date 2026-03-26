@@ -269,6 +269,18 @@ function createNewWindow(windowArgs = args) {
   // but open all other URLs in the external browser.
   newWindow.webContents.setWindowOpenHandler(details => {
     if (details.frameName.startsWith('GDevelopWindowPortal')) {
+      // Extract the theme background color passed via the features string
+      // by WindowPortal (e.g. "...,themeBackgroundColor=%23282828").
+      let backgroundColor = '#000';
+      const match = details.features.match(
+        /themeBackgroundColor=([^,]*)/
+      );
+      if (match) {
+        try {
+          backgroundColor = decodeURIComponent(match[1]);
+        } catch (e) {}
+      }
+
       return {
         action: 'allow',
         overrideBrowserWindowOptions: {
@@ -280,7 +292,7 @@ function createNewWindow(windowArgs = args) {
             symbolColor: '#ffffff',
           },
           trafficLightPosition: { x: 12, y: 12 },
-          backgroundColor: '#000',
+          backgroundColor,
           webPreferences: {
             // No need for Node.js integration or disabled context isolation, because
             // popped-out windows are driven by React portals and don't do any Node operations.

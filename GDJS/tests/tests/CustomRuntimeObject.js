@@ -186,8 +186,12 @@ describe('gdjs.CustomRuntimeObject', function () {
 
       customObject.setRotationCenter(0, 0);
 
+      expect(customObject.getCenterX()).to.be(100);
+      expect(customObject.getCenterY()).to.be(200);
       expect(customObject.getCenterXInScene()).to.be(0);
       expect(customObject.getCenterYInScene()).to.be(0);
+      expect(customObject.getDrawableX()).to.be(-100);
+      expect(customObject.getDrawableY()).to.be(-200);
 
       customObject.setAngle(90);
 
@@ -233,8 +237,25 @@ describe('gdjs.CustomRuntimeObject', function () {
 
       customObject.setPosition(8, 16);
       customObject.setAngle(90);
-      customObject.setWidth((100 + 400) * 0.25);
-      customObject.setHeight((200 + 500) * 1.5);
+      const width = (100 + 400) * 0.25;
+      const height = (200 + 500) * 1.5;
+      customObject.setWidth(width);
+      customObject.setHeight(height);
+
+      expect(customObject.getWidth()).to.be(width);
+      expect(customObject.getHeight()).to.be(height);
+      expect(customObject.getScaleX()).to.be(0.25);
+      expect(customObject.getScaleY()).to.be(1.5);
+      expect(customObject.getCenterX()).to.be(width / 2);
+      expect(customObject.getCenterY()).to.be(height / 2);
+      expect(customObject.getCenterXInScene()).to.be(
+        8 + width / 2 - 100 * 0.25
+      );
+      expect(customObject.getCenterYInScene()).to.be(
+        16 + height / 2 - 200 * 1.5
+      );
+      expect(customObject.getDrawableX()).to.be(8 - 100 * 0.25);
+      expect(customObject.getDrawableY()).to.be(16 - 200 * 1.5);
 
       // To draw the transformed shapes:
       // - draw 2 squares side-by-side

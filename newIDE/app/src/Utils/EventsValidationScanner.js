@@ -329,9 +329,7 @@ export const scanProjectForValidationErrors = (
     worker.delete();
   });
 
-  // Scan all extension functions (free, behavior, object) using C++ traversal.
-  // This uses ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents which
-  // handles creating proper ProjectScopedContainers for each function type.
+  // Scan all extension functions (free, behavior, object).
   mapFor(0, project.getEventsFunctionsExtensionsCount(), extensionIndex => {
     const extension = project.getEventsFunctionsExtensionAt(extensionIndex);
 
@@ -340,9 +338,6 @@ export const scanProjectForValidationErrors = (
       return;
     }
 
-    // Create a single worker for the entire extension. The worker uses
-    // doOnLaunch to rebuild the event path map for each function,
-    // and derives the extension scope from projectScopedContainers.
     const worker = createValidationWorker(platform, errors, {
       locationType: 'extension',
     });

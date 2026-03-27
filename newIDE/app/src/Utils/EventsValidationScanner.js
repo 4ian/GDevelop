@@ -65,7 +65,7 @@ const createValidationWorker = (
   locationType: 'scene' | 'external-events' | 'extension',
   eventPtrToPathMap: Map<number, EventPath>,
   errors: Array<ValidationError>,
-  extensionMeta?: {|
+  extensionScope?: {|
     extensionName: string,
     functionName: string,
     behaviorName?: ?string,
@@ -135,7 +135,7 @@ const createValidationWorker = (
         locationName,
         locationType,
         eventPath: [...currentEventPath],
-        ...(extensionMeta || {}),
+        ...(extensionScope || {}),
       });
       return;
     }
@@ -199,7 +199,7 @@ const createValidationWorker = (
           locationName,
           locationType,
           eventPath: [...currentEventPath],
-          ...(extensionMeta || {}),
+          ...(extensionScope || {}),
         });
       }
     });
@@ -287,11 +287,15 @@ export const scanProjectForValidationErrors = (
     const extensionName = extension.getName();
 
     // Helper: scan a single events function with proper scoped containers.
-    const scanEventsFunction = (
+    const scanEventsFunction = ({
+      eventsFunction,
+      eventsBasedBehavior,
+      eventsBasedObject,
+    }: {|
       eventsFunction: gdEventsFunction,
       eventsBasedBehavior: ?gdEventsBasedBehavior,
-      eventsBasedObject: ?gdEventsBasedObject
-    ) => {
+      eventsBasedObject: ?gdEventsBasedObject,
+    |}) => {
       const functionName = eventsFunction.getName();
       const objContainer = new gd.ObjectsContainer(
         gd.ObjectsContainer.Function
@@ -397,11 +401,11 @@ export const scanProjectForValidationErrors = (
     // Free functions
     const freeFunctions = extension.getEventsFunctions();
     mapFor(0, freeFunctions.getEventsFunctionsCount(), functionIndex => {
-      scanEventsFunction(
-        freeFunctions.getEventsFunctionAt(functionIndex),
-        null,
-        null
-      );
+      scanEventsFunction({
+        eventsFunction: freeFunctions.getEventsFunctionAt(functionIndex),
+        eventsBasedBehavior: null,
+        eventsBasedObject: null,
+      });
     });
 
     // Behavior functions
@@ -410,11 +414,11 @@ export const scanProjectForValidationErrors = (
       const behavior = eventsBasedBehaviors.getAt(behaviorIndex);
       const behaviorFunctions = behavior.getEventsFunctions();
       mapFor(0, behaviorFunctions.getEventsFunctionsCount(), functionIndex => {
-        scanEventsFunction(
-          behaviorFunctions.getEventsFunctionAt(functionIndex),
-          behavior,
-          null
-        );
+        scanEventsFunction({
+          eventsFunction: behaviorFunctions.getEventsFunctionAt(functionIndex),
+          eventsBasedBehavior: behavior,
+          eventsBasedObject: null,
+        });
       });
     });
 
@@ -424,11 +428,11 @@ export const scanProjectForValidationErrors = (
       const object = eventsBasedObjects.getAt(objectIndex);
       const objectFunctions = object.getEventsFunctions();
       mapFor(0, objectFunctions.getEventsFunctionsCount(), functionIndex => {
-        scanEventsFunction(
-          objectFunctions.getEventsFunctionAt(functionIndex),
-          null,
-          object
-        );
+        scanEventsFunction({
+          eventsFunction: objectFunctions.getEventsFunctionAt(functionIndex),
+          eventsBasedBehavior: null,
+          eventsBasedObject: object,
+        });
       });
     });
   });

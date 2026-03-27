@@ -47,20 +47,8 @@ export const WithNavigationCallbacks = (): React.Node => (
         eventPath,
       });
     }}
-    onNavigateToExtensionEvent={(
-      extensionName,
-      functionName,
-      behaviorName,
-      objectName,
-      eventPath
-    ) => {
-      action('onNavigateToExtensionEvent')({
-        extensionName,
-        functionName,
-        behaviorName,
-        objectName,
-        eventPath,
-      });
+    onNavigateToExtensionEvent={params => {
+      action('onNavigateToExtensionEvent')(params);
     }}
   />
 );

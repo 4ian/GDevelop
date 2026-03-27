@@ -5451,13 +5451,13 @@ const MainFrame = (props: Props): React.MixedElement => {
             });
             openExternalEvents(externalEventsName);
           }}
-          onNavigateToExtensionEvent={(
+          onNavigateToExtensionEvent={({
             extensionName,
             functionName,
             behaviorName,
             objectName,
-            eventPath
-          ) => {
+            eventPath,
+          }) => {
             setPendingEventNavigation({
               name: extensionName,
               locationType: 'extension',

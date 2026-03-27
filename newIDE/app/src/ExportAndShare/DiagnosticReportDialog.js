@@ -111,9 +111,7 @@ const InvalidParameterRow = ({
       <TableRowColumn style={styles.locationCell}>
         <div style={styles.locationText}>
           <Link href="#" onClick={() => navigateToError(error)}>
-            {error.locationType === 'extension'
-              ? `extension: ${error.locationName}`
-              : `${error.locationType}: ${error.locationName}`}
+            {`${error.locationType}: ${error.locationName}`}
           </Link>
         </div>
       </TableRowColumn>
@@ -223,13 +221,13 @@ type Props = {|
     externalEventsName: string,
     eventPath: EventPath
   ) => void,
-  onNavigateToExtensionEvent: (
+  onNavigateToExtensionEvent: ({|
     extensionName: string,
     functionName: string,
     behaviorName: ?string,
     objectName: ?string,
-    eventPath: EventPath
-  ) => void,
+    eventPath: EventPath,
+  |}) => void,
 |};
 
 // $FlowFixMe[missing-local-annot]
@@ -293,13 +291,13 @@ export default function DiagnosticReportDialog({
         error.extensionName &&
         error.functionName
       ) {
-        onNavigateToExtensionEvent(
-          error.extensionName,
-          error.functionName,
-          error.behaviorName || null,
-          error.objectName || null,
-          error.eventPath
-        );
+        onNavigateToExtensionEvent({
+          extensionName: error.extensionName,
+          functionName: error.functionName,
+          behaviorName: error.behaviorName || null,
+          objectName: error.objectName || null,
+          eventPath: error.eventPath,
+        });
       }
     },
     [

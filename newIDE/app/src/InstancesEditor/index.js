@@ -253,6 +253,10 @@ export default class InstancesEditor extends Component<Props, State> {
 
     let gameCanvas: HTMLCanvasElement;
     this._showObjectInstancesIn3D = this.props.showObjectInstancesIn3D;
+    // Ensure we don't initialize with 0 dimensions, which is invalid for PixiJS/WebGL
+    // and can cause shader creation to fail on some platforms (e.g. Windows with ANGLE).
+    const initialWidth = this.props.width || 1;
+    const initialHeight = this.props.height || 1;
     // TODO (3D): Should it handle preference changes without needing to reopen tabs?
     if (this._showObjectInstancesIn3D) {
       gameCanvas = document.createElement('canvas');
@@ -260,14 +264,14 @@ export default class InstancesEditor extends Component<Props, State> {
         canvas: gameCanvas,
       });
       threeRenderer.autoClear = false;
-      threeRenderer.setSize(this.props.width, this.props.height);
+      threeRenderer.setSize(initialWidth, initialHeight);
 
       // Create a PixiJS renderer that use the same GL context as Three.js
       // so that both can render to the canvas and even have PixiJS rendering
       // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
       this.pixiRenderer = new PIXI.Renderer({
-        width: this.props.width,
-        height: this.props.height,
+        width: initialWidth,
+        height: initialHeight,
         view: gameCanvas,
         context: threeRenderer.getContext(),
         clearBeforeRender: false,
@@ -284,8 +288,8 @@ export default class InstancesEditor extends Component<Props, State> {
     } else {
       // Create the renderer and setup the rendering area for scene editor.
       this.pixiRenderer = PIXI.autoDetectRenderer({
-        width: this.props.width,
-        height: this.props.height,
+        width: initialWidth,
+        height: initialHeight,
         // "preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
         preserveDrawingBuffer: true,
         // Disable anti-aliasing (default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.

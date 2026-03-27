@@ -243,6 +243,32 @@ class ProjectScopedContainers {
   };
 
   /**
+   * \brief Return the name of the scene (layout) in scope, or an empty string
+   * if the scope is not a scene.
+   */
+  const gd::String &GetScopeSceneName() const {
+    return scopeSceneName;
+  };
+
+  /**
+   * \brief Return the name of the external events in scope, or an empty string
+   * if the scope is not external events.
+   */
+  const gd::String &GetScopeExternalEventsName() const {
+    return scopeExternalEventsName;
+  };
+
+  /**
+   * \brief Set the external events name for the scope. Used by
+   * ProjectBrowserHelper when scanning external events.
+   */
+  ProjectScopedContainers &SetScopeExternalEventsName(
+      const gd::String &externalEventsName) {
+    scopeExternalEventsName = externalEventsName;
+    return *this;
+  };
+
+  /**
    * \brief Return the name of the extension in scope, or an empty string if
    * the scope is not an extension function.
    */
@@ -288,6 +314,8 @@ private:
   std::vector<const ParameterMetadataContainer *> parametersVectorsList;
   gd::ResourcesContainersList resourcesContainersList;
 
+  gd::String scopeSceneName;
+  gd::String scopeExternalEventsName;
   gd::String scopeExtensionName;
   gd::String scopeFunctionName;
   gd::String scopeBehaviorName;

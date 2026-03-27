@@ -69,6 +69,19 @@ public:
       gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker);
 
   /**
+   * \brief Call the specified worker on all events of the project (layout and
+   * external events) but not events from extensions (read-only version with
+   * context).
+   *
+   * The ProjectScopedContainers passed to the worker will have
+   * scopeSceneName set for layouts and scopeExternalEventsName set for
+   * external events.
+   */
+  static void ExposeProjectEventsWithoutExtensions(
+      gd::Project &project,
+      gd::ReadOnlyArbitraryEventsWorkerWithContext &worker);
+
+  /**
    * \brief Call the specified worker on all events of a layout and
    * its external events.
    */

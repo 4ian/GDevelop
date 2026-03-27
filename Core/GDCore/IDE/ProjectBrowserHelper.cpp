@@ -203,6 +203,34 @@ void ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
   }
 }
 
+void ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
+    gd::Project& project, gd::ReadOnlyArbitraryEventsWorkerWithContext& worker) {
+  // Add layouts events
+  for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
+    auto &layout = project.GetLayout(s);
+    auto projectScopedContainers =
+      gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
+    worker.Launch(layout.GetEvents(), projectScopedContainers);
+  }
+  // Add external events events
+  for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
+    const auto &externalEvents = project.GetExternalEvents(s);
+    const gd::String &associatedLayout = externalEvents.GetAssociatedLayout();
+    if (project.HasLayoutNamed(associatedLayout)) {
+      auto &layout = project.GetLayout(associatedLayout);
+      auto projectScopedContainers =
+        gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
+      projectScopedContainers.SetScopeExternalEventsName(externalEvents.GetName());
+      worker.Launch(externalEvents.GetEvents(), projectScopedContainers);
+    } else {
+      auto projectScopedContainers =
+        gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProject(project);
+      projectScopedContainers.SetScopeExternalEventsName(externalEvents.GetName());
+      worker.Launch(externalEvents.GetEvents(), projectScopedContainers);
+    }
+  }
+}
+
 void ProjectBrowserHelper::ExposeLayoutEventsAndExternalEvents(
     gd::Project &project, gd::Layout &layout,
     gd::ArbitraryEventsWorker &worker) {

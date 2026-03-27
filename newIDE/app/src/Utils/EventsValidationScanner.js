@@ -55,81 +55,30 @@ const buildEventPtrToPathMap = (
 };
 
 /**
- * Derive the location name and extension scope from a ProjectScopedContainers.
- * For extension functions, the scope info is stored on the containers by the
- * C++ factory methods.
- */
-const getExtensionScopeFromContainers = (
-  projectScopedContainers: gdProjectScopedContainers
-): {|
-  locationName: string,
-  extensionScope: {|
-    extensionName: string,
-    functionName: string,
-    behaviorName: ?string,
-    objectName: ?string,
-  |},
-|} => {
-  const extensionName = projectScopedContainers.getScopeExtensionName();
-  const functionName = projectScopedContainers.getScopeFunctionName();
-  const behaviorName = projectScopedContainers.getScopeBehaviorName() || null;
-  const objectName = projectScopedContainers.getScopeObjectName() || null;
-
-  const locationName = behaviorName
-    ? `${extensionName} / ${behaviorName} / ${functionName}`
-    : objectName
-    ? `${extensionName} / ${objectName} / ${functionName}`
-    : `${extensionName} / ${functionName}`;
-
-  return {
-    locationName,
-    extensionScope: {
-      extensionName,
-      functionName,
-      behaviorName,
-      objectName,
-    },
-  };
-};
-
-/**
  * Create a validation worker that uses C++ event traversal.
  * This leverages ReadOnlyArbitraryEventsWorkerWithContext which properly
  * handles local variable scoping as it traverses the event tree.
  *
- * The worker can be used across multiple Launch calls (e.g. from
- * ProjectBrowserHelper). For extension scanning, it derives the extension
- * scope from the ProjectScopedContainers.
+ * The worker derives location info (scene name, external layout name, or
+ * extension scope) entirely from the ProjectScopedContainers passed by C++,
+ * so no options are needed.
  */
 const createValidationWorker = (
   platform: gdPlatform,
-  errors: Array<ValidationError>,
-  options: {|
-    /** Fixed location info for layout/external-events scanning. */
-    locationName?: string,
-    locationType: 'scene' | 'external-events' | 'extension',
-    /** If provided, this is used for the event ptr to path map. */
-    eventPtrToPathMap?: Map<number, EventPath>,
-  |}
+  errors: Array<ValidationError>
 ): gdReadOnlyArbitraryEventsWorkerWithContextJS => {
   const worker = new gd.ReadOnlyArbitraryEventsWorkerWithContextJS();
   worker.setSkipDisabledEvents(true);
 
   let currentEventPath: EventPath = [];
-  // For multi-function traversal (extensions), the path map is rebuilt
-  // at each Launch via doOnLaunch.
-  let eventPtrToPathMap: Map<number, EventPath> =
-    options.eventPtrToPathMap || new Map();
+  let eventPtrToPathMap: Map<number, EventPath> = new Map();
 
   // $FlowFixMe[incompatible-type] - overriding C++ method:
   // $FlowFixMe[cannot-write]
   worker.doOnLaunch = (events: gdEventsList) => {
-    // Rebuild the event path map for the new events list being launched.
-    // This is called at the start of each Launch (e.g. for each function
-    // in an extension).
-    if (!options.eventPtrToPathMap) {
-      eventPtrToPathMap = buildEventPtrToPathMap(events);
-    }
+    // Rebuild the event path map for each new events list (each scene,
+    // external layout, or extension function).
+    eventPtrToPathMap = buildEventPtrToPathMap(events);
   };
 
   // $FlowFixMe[incompatible-type] - overriding C++ method:
@@ -155,10 +104,13 @@ const createValidationWorker = (
       return;
     }
 
-    // Derive location info: for extensions, read from projectScopedContainers;
-    // for scenes/external events, use the fixed values.
+    // Derive location info from ProjectScopedContainers scope.
+    const extensionName = projectScopedContainers.getScopeExtensionName();
+    const externalEventsName = projectScopedContainers.getScopeExternalEventsName();
+    const sceneName = projectScopedContainers.getScopeSceneName();
+
     let locationName: string;
-    let locationType = options.locationType;
+    let locationType: 'scene' | 'external-events' | 'extension';
     let extensionScope: ?{|
       extensionName: string,
       functionName: string,
@@ -166,14 +118,32 @@ const createValidationWorker = (
       objectName: ?string,
     |} = undefined;
 
-    if (locationType === 'extension') {
-      const scopeInfo = getExtensionScopeFromContainers(
-        projectScopedContainers
-      );
-      locationName = scopeInfo.locationName;
-      extensionScope = scopeInfo.extensionScope;
+    if (extensionName) {
+      locationType = 'extension';
+      const functionName = projectScopedContainers.getScopeFunctionName();
+      const behaviorName =
+        projectScopedContainers.getScopeBehaviorName() || null;
+      const objectName =
+        projectScopedContainers.getScopeObjectName() || null;
+
+      locationName = behaviorName
+        ? `${extensionName} / ${behaviorName} / ${functionName}`
+        : objectName
+        ? `${extensionName} / ${objectName} / ${functionName}`
+        : `${extensionName} / ${functionName}`;
+
+      extensionScope = {
+        extensionName,
+        functionName,
+        behaviorName,
+        objectName,
+      };
+    } else if (externalEventsName) {
+      locationType = 'external-events';
+      locationName = externalEventsName;
     } else {
-      locationName = options.locationName || '';
+      locationType = 'scene';
+      locationName = sceneName;
     }
 
     // Get metadata
@@ -277,57 +247,15 @@ export const scanProjectForValidationErrors = (
   const errors: Array<ValidationError> = [];
   const platform = gd.JsPlatform.get();
 
-  // Scan all layouts (scenes)
-  mapFor(0, project.getLayoutsCount(), index => {
-    const layout = project.getLayoutAt(index);
-    const locationName = layout.getName();
+  // Create a single worker for the entire scan. The worker derives
+  // location info from ProjectScopedContainers set by the C++ traversal.
+  const worker = createValidationWorker(platform, errors);
 
-    const projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
-      project,
-      layout
-    );
-
-    const eventPtrToPathMap = buildEventPtrToPathMap(layout.getEvents());
-    const worker = createValidationWorker(platform, errors, {
-      locationName,
-      locationType: 'scene',
-      eventPtrToPathMap,
-    });
-    worker.launch(layout.getEvents(), projectScopedContainers);
-    worker.delete();
-  });
-
-  // Scan all external events
-  mapFor(0, project.getExternalEventsCount(), index => {
-    const externalEvents = project.getExternalEventsAt(index);
-    const locationName = externalEvents.getName();
-
-    // External events are associated with a layout
-    const associatedLayoutName = externalEvents.getAssociatedLayout();
-    let projectScopedContainers;
-    if (associatedLayoutName && project.hasLayoutNamed(associatedLayoutName)) {
-      const layout = project.getLayout(associatedLayoutName);
-      projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
-        project,
-        layout
-      );
-    } else {
-      projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProject(
-        project
-      );
-    }
-
-    const eventPtrToPathMap = buildEventPtrToPathMap(
-      externalEvents.getEvents()
-    );
-    const worker = createValidationWorker(platform, errors, {
-      locationName,
-      locationType: 'external-events',
-      eventPtrToPathMap,
-    });
-    worker.launch(externalEvents.getEvents(), projectScopedContainers);
-    worker.delete();
-  });
+  // Scan all layouts (scenes) and external events via C++ traversal.
+  gd.ProjectBrowserHelper.exposeProjectEventsWithoutExtensions(
+    project,
+    worker
+  );
 
   // Scan all extension functions (free, behavior, object).
   mapFor(0, project.getEventsFunctionsExtensionsCount(), extensionIndex => {
@@ -338,18 +266,14 @@ export const scanProjectForValidationErrors = (
       return;
     }
 
-    const worker = createValidationWorker(platform, errors, {
-      locationType: 'extension',
-    });
-
     gd.ProjectBrowserHelper.exposeEventsFunctionsExtensionEvents(
       project,
       extension,
       worker
     );
-
-    worker.delete();
   });
+
+  worker.delete();
 
   return errors;
 };

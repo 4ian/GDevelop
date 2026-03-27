@@ -695,6 +695,8 @@ export class ProjectScopedContainers extends EmscriptenObject {
   getObjectsContainersList(): ObjectsContainersList;
   getVariablesContainersList(): VariablesContainersList;
   getResourcesContainersList(): ResourcesContainersList;
+  getScopeSceneName(): string;
+  getScopeExternalEventsName(): string;
   getScopeExtensionName(): string;
   getScopeFunctionName(): string;
   getScopeBehaviorName(): string;
@@ -2075,6 +2077,7 @@ export class VectorUnfilledRequiredBehaviorPropertyProblem extends EmscriptenObj
 
 export class ProjectBrowserHelper extends EmscriptenObject {
   static exposeProjectEvents(project: Project, worker: ArbitraryEventsWorker): void;
+  static exposeProjectEventsWithoutExtensions(project: Project, worker: ReadOnlyArbitraryEventsWorkerWithContext): void;
   static exposeProjectObjects(project: Project, worker: ArbitraryObjectsWorker): void;
   static exposeEventsFunctionsExtensionEvents(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, worker: ReadOnlyArbitraryEventsWorkerWithContext): void;
 }

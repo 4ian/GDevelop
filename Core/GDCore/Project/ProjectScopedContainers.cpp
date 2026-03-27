@@ -25,6 +25,8 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(
       ResourcesContainersList::MakeNewResourcesContainersListForProject(
           project));
 
+  projectScopedContainers.scopeSceneName = layout.GetName();
+
   return projectScopedContainers;
 }
 

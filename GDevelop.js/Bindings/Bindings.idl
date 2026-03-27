@@ -788,6 +788,8 @@ interface ProjectScopedContainers {
   [Const, Ref] VariablesContainersList GetVariablesContainersList();
   [Const, Ref] ResourcesContainersList GetResourcesContainersList();
 
+  [Const, Ref] DOMString GetScopeSceneName();
+  [Const, Ref] DOMString GetScopeExternalEventsName();
   [Const, Ref] DOMString GetScopeExtensionName();
   [Const, Ref] DOMString GetScopeFunctionName();
   [Const, Ref] DOMString GetScopeBehaviorName();
@@ -2680,6 +2682,7 @@ interface VectorUnfilledRequiredBehaviorPropertyProblem {
 
 interface ProjectBrowserHelper {
     void STATIC_ExposeProjectEvents([Ref] Project project, [Ref] ArbitraryEventsWorker worker);
+    void STATIC_ExposeProjectEventsWithoutExtensions([Ref] Project project, [Ref] ReadOnlyArbitraryEventsWorkerWithContext worker);
     void STATIC_ExposeProjectObjects([Ref] Project project, [Ref] ArbitraryObjectsWorker worker);
     void STATIC_ExposeEventsFunctionsExtensionEvents([Ref] Project project, [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Ref] ReadOnlyArbitraryEventsWorkerWithContext worker);
 };

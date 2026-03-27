@@ -859,24 +859,5 @@ module.exports = {
       'BitmapText::BitmapTextObject',
       RenderedBitmapTextInstance
     );
-
-    // Register a cache clearing method to uninstall bitmap fonts whose
-    // backing textures have been destroyed (e.g. after a resource reload).
-    // This ensures stale fonts are removed before instances are recreated.
-    objectsRenderingService.registerClearCache((project) => {
-      for (const key of Object.keys(PIXI.BitmapFont.available)) {
-        if (key === defaultBitmapFontInstallKey) continue;
-        const font = PIXI.BitmapFont.available[key];
-        const pageTextures = font.pageTextures;
-        if (pageTextures) {
-          const hasDestroyedTexture = Object.values(pageTextures).some(
-            (tex) => tex.baseTexture && tex.baseTexture.destroyed
-          );
-          if (hasDestroyedTexture) {
-            PIXI.BitmapFont.uninstall(key);
-          }
-        }
-      }
-    });
   },
 };

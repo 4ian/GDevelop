@@ -733,15 +733,22 @@ module.exports = {
 
         if (
           this._currentBitmapFontResourceName !== bitmapFontResourceName ||
-          this._currentTextureAtlasResourceName !== textureAtlasResourceName
+          this._currentTextureAtlasResourceName !== textureAtlasResourceName ||
+          // Belt & suspenders: also reload if the font was externally
+          // uninstalled (e.g. by clearCache after a resource reload).
+          !PIXI.BitmapFont.available[this._pixiObject.fontName]
         ) {
-          // Release the old font (if it was installed).
-          releaseBitmapFont(this._pixiObject.fontName);
+          const oldFontName = this._pixiObject.fontName;
 
           // Temporarily go back to the default font, as the PIXI.BitmapText
           // object does not support being displayed with a font not installed at all.
           // It will be replaced as soon as the proper font is loaded.
           this._pixiObject.fontName = getDefaultBitmapFont().font;
+
+          // Release the old font (if it's still installed).
+          if (PIXI.BitmapFont.available[oldFontName]) {
+            releaseBitmapFont(oldFontName);
+          }
 
           this._currentBitmapFontResourceName = bitmapFontResourceName;
           this._currentTextureAtlasResourceName = textureAtlasResourceName;
@@ -815,8 +822,15 @@ module.exports = {
         RenderedInstance.prototype.onRemovedFromScene.call(this);
 
         const fontName = this._pixiObject.fontName;
+        // Belt & suspenders: if the font was already uninstalled (e.g. by
+        // clearCache), switch to default before destroy to avoid a PIXI crash.
+        if (!PIXI.BitmapFont.available[fontName]) {
+          this._pixiObject.fontName = getDefaultBitmapFont().font;
+        }
         this._pixiObject.destroy();
-        releaseBitmapFont(fontName);
+        if (PIXI.BitmapFont.available[fontName]) {
+          releaseBitmapFont(fontName);
+        }
       }
 
       getDefaultWidth() {

@@ -80,16 +80,20 @@ namespace gdjs {
           this._object._textureAtlasResourceName
         );
 
-      // Mark the old font as not used anymore
+      const oldFontName = this._pixiObject.fontName;
+
+      // Update the font on the PIXI object first, so that if releasing the
+      // old font uninstalls it, the PIXI object already references the new one.
+      this._pixiObject.fontName = bitmapFont.font;
+      this._pixiObject.fontSize = bitmapFont.size;
+
+      // Mark the old font as not used anymore.
       this._object
         .getInstanceContainer()
         .getGame()
         .getBitmapFontManager()
-        .releaseBitmapFont(this._pixiObject.fontName);
+        .releaseBitmapFont(oldFontName);
 
-      // Update the font used by the object:
-      this._pixiObject.fontName = bitmapFont.font;
-      this._pixiObject.fontSize = bitmapFont.size;
       this.updatePosition();
     }
 

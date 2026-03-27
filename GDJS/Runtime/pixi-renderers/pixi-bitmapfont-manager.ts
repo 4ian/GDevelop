@@ -327,12 +327,11 @@ namespace gdjs {
     unloadResource(resourceData: ResourceData): void {
       this._loadedFontsData.delete(resourceData);
 
-      for (const bitmapFontInstallKey in this._pixiBitmapFontsInUse) {
-        if (bitmapFontInstallKey.startsWith(resourceData.name + '@')) {
-          PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
-          delete this._pixiBitmapFontsInUse[bitmapFontInstallKey];
-        }
-      }
+      // Don't eagerly uninstall fonts that are still in use by active objects.
+      // Uninstalling them here would cause PIXI.BitmapText.destroy to crash
+      // (accessing distanceFieldType on undefined) when those objects are
+      // later destroyed during hot-reload. The owning objects will release
+      // the fonts themselves via releaseBitmapFont when they are destroyed.
 
       for (
         let index = 0;

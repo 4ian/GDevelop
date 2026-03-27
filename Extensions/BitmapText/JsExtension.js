@@ -557,10 +557,28 @@ module.exports = {
         bitmapFontResourceName + '@' + textureAtlasResourceName;
 
       if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
-        // Return the existing BitmapFont that is already in memory and already installed.
-        bitmapFontUsageCount[bitmapFontInstallKey] =
-          (bitmapFontUsageCount[bitmapFontInstallKey] || 0) + 1;
-        return Promise.resolve(PIXI.BitmapFont.available[bitmapFontInstallKey]);
+        // Check if the font's textures are still valid (they can be destroyed
+        // when a resource is reloaded by PixiResourcesLoader.reloadResource).
+        const existingFont = PIXI.BitmapFont.available[bitmapFontInstallKey];
+        const pageTextures = existingFont.pageTextures;
+        const hasDestroyedTexture =
+          pageTextures &&
+          Object.values(pageTextures).some(
+            (tex) => tex.baseTexture && tex.baseTexture.destroyed
+          );
+
+        if (!hasDestroyedTexture) {
+          // Return the existing BitmapFont that is already in memory and already installed.
+          bitmapFontUsageCount[bitmapFontInstallKey] =
+            (bitmapFontUsageCount[bitmapFontInstallKey] || 0) + 1;
+          return Promise.resolve(existingFont);
+        }
+
+        // Texture was destroyed during resource reload. Uninstall the stale font
+        // so it can be reinstalled with the new texture below.
+        // Keep the existing usage count - other instances still referencing the old
+        // font will release it when they are destroyed during the reset cycle.
+        PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
       }
 
       // Get the atlas texture, the bitmap font data and install the font:
@@ -827,5 +845,24 @@ module.exports = {
       'BitmapText::BitmapTextObject',
       RenderedBitmapTextInstance
     );
+
+    // Register a cache clearing method to uninstall bitmap fonts whose
+    // backing textures have been destroyed (e.g. after a resource reload).
+    // This ensures stale fonts are removed before instances are recreated.
+    objectsRenderingService.registerClearCache((project) => {
+      for (const key of Object.keys(PIXI.BitmapFont.available)) {
+        if (key === defaultBitmapFontInstallKey) continue;
+        const font = PIXI.BitmapFont.available[key];
+        const pageTextures = font.pageTextures;
+        if (pageTextures) {
+          const hasDestroyedTexture = Object.values(pageTextures).some(
+            (tex) => tex.baseTexture && tex.baseTexture.destroyed
+          );
+          if (hasDestroyedTexture) {
+            PIXI.BitmapFont.uninstall(key);
+          }
+        }
+      }
+    });
   },
 };

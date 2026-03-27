@@ -15,6 +15,9 @@ import Tooltip from '@material-ui/core/Tooltip';
 import CircledInfo from '../../UI/CustomSvgIcons/SmallCircledInfo';
 import IconButton from '../../UI/IconButton';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import Star from '@material-ui/icons/Star';
+import StarBorder from '@material-ui/icons/StarBorder';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 const styles = {
   button: { width: '100%' },
@@ -44,6 +47,7 @@ export const ExtensionListItem = ({
   onHeightComputed,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const preferences = React.useContext(PreferencesContext);
 
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
@@ -81,6 +85,17 @@ export const ExtensionListItem = ({
   };
 
   const [hover, setHover] = React.useState(false);
+
+  const isFavorite = preferences.isFavoriteExtension(extensionShortHeader.name);
+
+  const handleFavoriteClick = (event: any) => {
+    event.stopPropagation();
+    if (isFavorite) {
+      preferences.removeFavoriteExtension(extensionShortHeader.name);
+    } else {
+      preferences.addFavoriteExtension(extensionShortHeader.name);
+    }
+  };
 
   return (
     <ButtonBase id={id} onClick={onChoose} focusRipple style={styles.button}>
@@ -153,6 +168,25 @@ export const ExtensionListItem = ({
                 >
                   <IconButton size="small">
                     <CircledInfo />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {(hover || isFavorite) && (
+                <Tooltip
+                  title={
+                    isFavorite ? (
+                      <Trans>Remove from favorites</Trans>
+                    ) : (
+                      <Trans>Add to favorites</Trans>
+                    )
+                  }
+                >
+                  <IconButton size="small" onClick={handleFavoriteClick}>
+                    {isFavorite ? (
+                      <Star style={{ color: '#FFD700' }} />
+                    ) : (
+                      <StarBorder />
+                    )}
                   </IconButton>
                 </Tooltip>
               )}

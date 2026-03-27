@@ -5,7 +5,9 @@ import SearchBar from '../../UI/SearchBar';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 import { ExtensionStoreContext } from './ExtensionStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
+import { GridSearchResults } from '../../UI/Search/GridSearchResults';
 import { ExtensionListItem } from './ExtensionListItem';
+import { ExtensionGridItem } from './ExtensionGridItem';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import {
@@ -13,7 +15,7 @@ import {
   sendExtensionAddedToProject,
 } from '../../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { Column, Line } from '../../UI/Grid';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
@@ -23,6 +25,11 @@ import SelectOption from '../../UI/SelectOption';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import IconButton from '../../UI/IconButton';
 import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import ViewList from '@material-ui/icons/ViewList';
+import ViewModule from '@material-ui/icons/ViewModule';
+import Tooltip from '@material-ui/core/Tooltip';
 
 type Props = {|
   isInstalling: boolean,
@@ -45,6 +52,18 @@ export const ExtensionStore = ({
     selectedExtensionShortHeader,
     setSelectedExtensionShortHeader,
   ] = React.useState<?ExtensionShortHeader>(null);
+  const [currentTab, setCurrentTab] = React.useState<'all' | 'favorites'>(
+    'all'
+  );
+  const [viewMode, setViewMode] = React.useState<'list' | 'grid'>(
+    preferences.values.extensionStoreViewMode || 'list'
+  );
+
+  const handleViewModeChange = (newMode: 'list' | 'grid') => {
+    setViewMode(newMode);
+    preferences.setExtensionStoreViewMode(newMode);
+  };
+
   const {
     searchResults,
     error,
@@ -64,11 +83,17 @@ export const ExtensionStore = ({
   );
 
   const filteredSearchResults = searchResults
-    ? searchResults.filter(
-        ({ item: extensionShortHeader }) =>
+    ? searchResults.filter(({ item: extensionShortHeader }) => {
+        const matchesBehaviorFilter =
           !showOnlyWithBehaviors ||
-          extensionShortHeader.eventsBasedBehaviorsCount > 0
-      )
+          extensionShortHeader.eventsBasedBehaviorsCount > 0;
+
+        const matchesFavoriteFilter =
+          currentTab === 'all' ||
+          preferences.isFavoriteExtension(extensionShortHeader.name);
+
+        return matchesBehaviorFilter && matchesFavoriteFilter;
+      })
     : null;
 
   const getExtensionsMatches = (
@@ -88,6 +113,35 @@ export const ExtensionStore = ({
   return (
     <React.Fragment>
       <ColumnStackLayout expand noMargin useFullHeight>
+        <Line noMargin alignItems="center" justifyContent="space-between">
+          <Tabs
+            value={currentTab}
+            onChange={(event, newValue) => setCurrentTab(newValue)}
+            indicatorColor="primary"
+            textColor="primary"
+          >
+            <Tab value="all" label={<Trans>All Extensions</Trans>} />
+            <Tab value="favorites" label={<Trans>Favorites</Trans>} />
+          </Tabs>
+          <Tooltip
+            title={
+              viewMode === 'list' ? (
+                <Trans>Switch to grid view</Trans>
+              ) : (
+                <Trans>Switch to list view</Trans>
+              )
+            }
+          >
+            <IconButton
+              size="small"
+              onClick={() =>
+                handleViewModeChange(viewMode === 'list' ? 'grid' : 'list')
+              }
+            >
+              {viewMode === 'list' ? <ViewModule /> : <ViewList />}
+            </IconButton>
+          </Tooltip>
+        </Line>
         <ColumnStackLayout noMargin>
           <ResponsiveLineStackLayout noMargin>
             <SearchBarSelectField
@@ -140,31 +194,60 @@ export const ExtensionStore = ({
           </ResponsiveLineStackLayout>
           {DismissableTutorialMessage}
         </ColumnStackLayout>
-        <ListSearchResults
-          disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
-          onRetry={fetchExtensionsAndFilters}
-          error={error}
-          searchItems={
-            filteredSearchResults &&
-            filteredSearchResults.map(({ item }) => item)
-          }
-          getSearchItemUniqueId={getExtensionName}
-          // $FlowFixMe[missing-local-annot]
-          renderSearchItem={(extensionShortHeader, onHeightComputed) => (
-            <ExtensionListItem
-              id={`extension-list-item-${extensionShortHeader.name}`}
-              key={extensionShortHeader.name}
-              project={project}
-              onHeightComputed={onHeightComputed}
-              extensionShortHeader={extensionShortHeader}
-              matches={getExtensionsMatches(extensionShortHeader)}
-              onChoose={() => {
-                sendExtensionDetailsOpened(extensionShortHeader.name);
-                setSelectedExtensionShortHeader(extensionShortHeader);
-              }}
-            />
-          )}
-        />
+        {viewMode === 'list' ? (
+          <ListSearchResults
+            disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
+            onRetry={fetchExtensionsAndFilters}
+            error={error}
+            searchItems={
+              filteredSearchResults &&
+              filteredSearchResults.map(({ item }) => item)
+            }
+            getSearchItemUniqueId={getExtensionName}
+            // $FlowFixMe[missing-local-annot]
+            renderSearchItem={(extensionShortHeader, onHeightComputed) => (
+              <ExtensionListItem
+                id={`extension-list-item-${extensionShortHeader.name}`}
+                key={extensionShortHeader.name}
+                project={project}
+                onHeightComputed={onHeightComputed}
+                extensionShortHeader={extensionShortHeader}
+                matches={getExtensionsMatches(extensionShortHeader)}
+                onChoose={() => {
+                  sendExtensionDetailsOpened(extensionShortHeader.name);
+                  setSelectedExtensionShortHeader(extensionShortHeader);
+                }}
+              />
+            )}
+          />
+        ) : (
+          <GridSearchResults
+            disableAutoTranslate
+            onRetry={fetchExtensionsAndFilters}
+            error={error}
+            searchItems={
+              filteredSearchResults &&
+              filteredSearchResults.map(({ item }) => item)
+            }
+            getSearchItemUniqueId={getExtensionName}
+            columnCount={4}
+            // $FlowFixMe[missing-local-annot]
+            renderSearchItem={(extensionShortHeader, onHeightComputed) => (
+              <ExtensionGridItem
+                id={`extension-grid-item-${extensionShortHeader.name}`}
+                key={extensionShortHeader.name}
+                project={project}
+                onHeightComputed={onHeightComputed}
+                extensionShortHeader={extensionShortHeader}
+                matches={getExtensionsMatches(extensionShortHeader)}
+                onChoose={() => {
+                  sendExtensionDetailsOpened(extensionShortHeader.name);
+                  setSelectedExtensionShortHeader(extensionShortHeader);
+                }}
+              />
+            )}
+          />
+        )}
       </ColumnStackLayout>
       {!!selectedExtensionShortHeader && (
         <ExtensionInstallDialog

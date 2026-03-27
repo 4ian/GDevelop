@@ -245,6 +245,8 @@ export type PreferencesValues = {|
   useBackgroundSerializerForSaving: boolean,
   disableNpmScriptConfirmation: boolean,
   showJsTypeError: boolean,
+  favoriteExtensions: Array<string>,
+  extensionStoreViewMode: 'list' | 'grid',
 |};
 
 /**
@@ -371,6 +373,10 @@ export type Preferences = {|
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
   setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
   setShowJsTypeError: (enabled: boolean) => void,
+  addFavoriteExtension: (extensionName: string) => void,
+  removeFavoriteExtension: (extensionName: string) => void,
+  isFavoriteExtension: (extensionName: string) => boolean,
+  setExtensionStoreViewMode: (mode: 'list' | 'grid') => void,
 |};
 
 export const initialPreferences = {
@@ -437,6 +443,8 @@ export const initialPreferences = {
     useBackgroundSerializerForSaving: false,
     disableNpmScriptConfirmation: false,
     showJsTypeError: false,
+    favoriteExtensions: ([]: Array<string>),
+    extensionStoreViewMode: 'list',
   },
   setMultipleValues: () => {},
   setLanguage: () => {},
@@ -524,6 +532,10 @@ export const initialPreferences = {
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
   setShowJsTypeError: (enabled: boolean) => {},
+  addFavoriteExtension: (extensionName: string) => {},
+  removeFavoriteExtension: (extensionName: string) => {},
+  isFavoriteExtension: (extensionName: string): boolean => false,
+  setExtensionStoreViewMode: (mode: 'list' | 'grid') => {},
 };
 
 const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(

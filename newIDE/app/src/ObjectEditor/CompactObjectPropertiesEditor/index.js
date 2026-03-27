@@ -558,7 +558,16 @@ export const CompactObjectPropertiesEditor = ({
                   <Object2d style={styles.icon} />
                 )}
                 <Text size="body" noMargin>
-                  <Trans>{objectMetadata.getFullName()}</Trans>
+                  <Trans>{objectMetadata.getFullName()} - </Trans>
+                </Text>
+                <Text
+                  allowSelection
+                  displayInlineAsSpan
+                  noMargin
+                  size="body"
+                  noMargin
+                >
+                  {object.getName()}
                 </Text>
                 {helpLink && (
                   <IconButton
@@ -572,11 +581,6 @@ export const CompactObjectPropertiesEditor = ({
                 )}
               </LineStackLayout>
             </LineStackLayout>
-            <CompactTextField
-              value={object.getName()}
-              onChange={() => {}}
-              disabled
-            />
           </ColumnStackLayout>
           <TopLevelCollapsibleSection
             title={<Trans>Properties</Trans>}

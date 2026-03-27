@@ -224,19 +224,20 @@ namespace gdjs {
       const bitmapFontInstallKey =
         bitmapFontResourceName + '@' + textureAtlasResourceName;
 
+      if (
+        PIXI.BitmapFont.available[bitmapFontInstallKey] &&
+        isBitmapFontTextureStale(
+          PIXI.BitmapFont.available[bitmapFontInstallKey],
+          this._imageManager.getPIXITexture(textureAtlasResourceName)
+        )
+      ) {
+        // Texture was replaced, reinstall the font with the current texture.
+        PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+      }
+
       if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
-        if (
-          isBitmapFontTextureStale(
-            PIXI.BitmapFont.available[bitmapFontInstallKey],
-            this._imageManager.getPIXITexture(textureAtlasResourceName)
-          )
-        ) {
-          // Texture was replaced, reinstall the font with the current texture.
-          PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
-        } else {
-          this._markBitmapFontAsUsed(bitmapFontInstallKey);
-          return PIXI.BitmapFont.available[bitmapFontInstallKey];
-        }
+        this._markBitmapFontAsUsed(bitmapFontInstallKey);
+        return PIXI.BitmapFont.available[bitmapFontInstallKey];
       }
 
       // The Bitmap Font is not loaded, load it in memory.

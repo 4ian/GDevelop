@@ -577,23 +577,24 @@ module.exports = {
       const bitmapFontInstallKey =
         bitmapFontResourceName + '@' + textureAtlasResourceName;
 
+      if (
+        PIXI.BitmapFont.available[bitmapFontInstallKey] &&
+        isBitmapFontTextureStale(
+          PIXI.BitmapFont.available[bitmapFontInstallKey],
+          pixiResourcesLoader.getPIXITexture(project, textureAtlasResourceName)
+        )
+      ) {
+        // Texture was replaced during resource reload. Uninstall the stale font
+        // so it can be reinstalled with the new texture below.
+        PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+      }
+
       if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
-        if (
-          isBitmapFontTextureStale(
-            PIXI.BitmapFont.available[bitmapFontInstallKey],
-            pixiResourcesLoader.getPIXITexture(project, textureAtlasResourceName)
-          )
-        ) {
-          // Texture was replaced during resource reload. Uninstall the stale font
-          // so it can be reinstalled with the new texture below.
-          PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
-        } else {
-          bitmapFontUsageCount[bitmapFontInstallKey] =
-            (bitmapFontUsageCount[bitmapFontInstallKey] || 0) + 1;
-          return Promise.resolve(
-            PIXI.BitmapFont.available[bitmapFontInstallKey]
-          );
-        }
+        bitmapFontUsageCount[bitmapFontInstallKey] =
+          (bitmapFontUsageCount[bitmapFontInstallKey] || 0) + 1;
+        return Promise.resolve(
+          PIXI.BitmapFont.available[bitmapFontInstallKey]
+        );
       }
 
       // Get the atlas texture, the bitmap font data and install the font:

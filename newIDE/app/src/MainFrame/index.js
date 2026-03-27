@@ -5451,6 +5451,28 @@ const MainFrame = (props: Props): React.MixedElement => {
             });
             openExternalEvents(externalEventsName);
           }}
+          onNavigateToExtensionEvent={({
+            extensionName,
+            functionName,
+            behaviorName,
+            objectName,
+            eventPath,
+          }) => {
+            setPendingEventNavigation({
+              name: extensionName,
+              locationType: 'extension',
+              eventPath,
+              functionName,
+              behaviorName,
+              objectName,
+            });
+            openEventsFunctionsExtension(
+              extensionName,
+              functionName,
+              behaviorName,
+              objectName
+            );
+          }}
         />
       )}
       {standaloneDialogOpen && (

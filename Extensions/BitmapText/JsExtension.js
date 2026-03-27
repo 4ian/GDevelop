@@ -537,6 +537,27 @@ module.exports = {
     };
 
     /**
+     * Workaround: PIXI.BitmapFont keeps a direct reference to the texture it
+     * was installed with (`pageTextures`). When a resource is reloaded (e.g.
+     * the image file changes on disk), PixiResourcesLoader creates a new
+     * PIXI.Texture but the existing BitmapFont still points to the old one.
+     * Ideally bitmap font resources would declare their image dependency via
+     * `embeddedResourcesMapping` so that `reloadResource` can cascade the
+     * invalidation automatically. Until then, we detect stale textures here.
+     */
+    const isBitmapFontTextureStale = (bitmapFont, currentTexture) => {
+      const pageTextures = bitmapFont.pageTextures;
+      return (
+        pageTextures &&
+        Object.values(pageTextures).some(
+          (tex) =>
+            (tex.baseTexture && tex.baseTexture.destroyed) ||
+            tex.baseTexture !== currentTexture.baseTexture
+        )
+      );
+    };
+
+    /**
      * Given a bitmap font resource name and a texture atlas resource name, returns the PIXI.BitmapFont
      * for it.
      * The font must be released with `releaseBitmapFont` when not used anymore - so that it can be removed
@@ -557,35 +578,21 @@ module.exports = {
         bitmapFontResourceName + '@' + textureAtlasResourceName;
 
       if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
-        // Check if the font's texture still matches the currently loaded one.
-        // After a resource reload, PixiResourcesLoader replaces the texture
-        // in its cache, but the old BitmapFont still references the previous
-        // (now stale) texture object.
-        const currentTexture = pixiResourcesLoader.getPIXITexture(
-          project,
-          textureAtlasResourceName
-        );
-        const existingFont = PIXI.BitmapFont.available[bitmapFontInstallKey];
-        const pageTextures = existingFont.pageTextures;
-        const isTextureStale =
-          pageTextures &&
-          Object.values(pageTextures).some(
-            (tex) =>
-              (tex.baseTexture && tex.baseTexture.destroyed) ||
-              tex.baseTexture !== currentTexture.baseTexture
-          );
-
-        if (!isTextureStale) {
-          // Return the existing BitmapFont that is already in memory and already installed.
+        if (
+          !isBitmapFontTextureStale(
+            PIXI.BitmapFont.available[bitmapFontInstallKey],
+            pixiResourcesLoader.getPIXITexture(project, textureAtlasResourceName)
+          )
+        ) {
           bitmapFontUsageCount[bitmapFontInstallKey] =
             (bitmapFontUsageCount[bitmapFontInstallKey] || 0) + 1;
-          return Promise.resolve(existingFont);
+          return Promise.resolve(
+            PIXI.BitmapFont.available[bitmapFontInstallKey]
+          );
         }
 
         // Texture was replaced during resource reload. Uninstall the stale font
         // so it can be reinstalled with the new texture below.
-        // Keep the existing usage count - other instances still referencing the old
-        // font will release it when they are destroyed during the reset cycle.
         PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
       }
 

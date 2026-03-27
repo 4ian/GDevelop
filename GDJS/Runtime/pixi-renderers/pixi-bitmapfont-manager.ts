@@ -15,6 +15,30 @@ namespace gdjs {
   const uninstallCacheSize = 5;
 
   /**
+   * Workaround: PIXI.BitmapFont keeps a direct reference to the texture it
+   * was installed with (`pageTextures`). When a resource is reloaded (e.g.
+   * during hot-reload after the image file changes on disk), the image manager
+   * creates a new PIXI.Texture but the existing BitmapFont still points to the
+   * old one. Ideally bitmap font resources would declare their image dependency
+   * via `embeddedResourcesMapping` so that resource unloading can cascade the
+   * invalidation automatically. Until then, we detect stale textures here.
+   */
+  const isBitmapFontTextureStale = (
+    bitmapFont: PIXI.BitmapFont,
+    currentTexture: PIXI.Texture
+  ): boolean => {
+    const pageTextures = bitmapFont.pageTextures;
+    return (
+      pageTextures &&
+      Object.values(pageTextures).some(
+        (tex: PIXI.Texture) =>
+          (tex.baseTexture && tex.baseTexture.destroyed) ||
+          tex.baseTexture !== currentTexture.baseTexture
+      )
+    );
+  };
+
+  /**
    * We patch the installed font to use a name that is unique for each font data and texture,
    * to avoid conflicts between different font files using the same font name (by default, the
    * font name used by Pixi is the one inside the font data, but this name is not necessarily unique.
@@ -201,25 +225,12 @@ namespace gdjs {
         bitmapFontResourceName + '@' + textureAtlasResourceName;
 
       if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
-        // Check if the font's texture still matches the currently loaded one.
-        // After a resource reload (e.g. hot-reload), the image manager replaces
-        // the texture, but the old BitmapFont still references the previous
-        // (now stale) texture object.
-        const currentTexture = this._imageManager.getPIXITexture(
-          textureAtlasResourceName
-        );
-        const existingFont = PIXI.BitmapFont.available[bitmapFontInstallKey];
-        const pageTextures = existingFont.pageTextures;
-        const isTextureStale =
-          pageTextures &&
-          Object.values(pageTextures).some(
-            (tex: PIXI.Texture) =>
-              (tex.baseTexture && tex.baseTexture.destroyed) ||
-              tex.baseTexture !== currentTexture.baseTexture
-          );
-
-        if (!isTextureStale) {
-          // Return the existing BitmapFont that is already in memory and already installed.
+        if (
+          !isBitmapFontTextureStale(
+            PIXI.BitmapFont.available[bitmapFontInstallKey],
+            this._imageManager.getPIXITexture(textureAtlasResourceName)
+          )
+        ) {
           this._markBitmapFontAsUsed(bitmapFontInstallKey);
           return PIXI.BitmapFont.available[bitmapFontInstallKey];
         }

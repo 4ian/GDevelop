@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.axisGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.buttonGroups {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.buttonGroups > * {
+  flex: 1;
+}

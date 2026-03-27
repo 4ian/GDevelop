@@ -592,9 +592,7 @@ module.exports = {
       if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
         bitmapFontUsageCount[bitmapFontInstallKey] =
           (bitmapFontUsageCount[bitmapFontInstallKey] || 0) + 1;
-        return Promise.resolve(
-          PIXI.BitmapFont.available[bitmapFontInstallKey]
-        );
+        return Promise.resolve(PIXI.BitmapFont.available[bitmapFontInstallKey]);
       }
 
       // Get the atlas texture, the bitmap font data and install the font:

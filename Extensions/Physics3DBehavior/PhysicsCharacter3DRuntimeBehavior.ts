@@ -34,8 +34,7 @@ namespace gdjs {
   }
 
   /** @category Behaviors > Physics 3D */
-  export interface PhysicsCharacter3DNetworkSyncData
-    extends BehaviorNetworkSyncData {
+  export interface PhysicsCharacter3DNetworkSyncData extends BehaviorNetworkSyncData {
     props: PhysicsCharacter3DNetworkSyncDataType;
   }
 
@@ -1907,7 +1906,15 @@ namespace gdjs {
           const bodyLockInterface =
             _sharedData.physicsSystem.GetBodyLockInterface();
           const body = bodyLockInterface.TryGetBody(contact.mBodyB);
-          const behavior = body.gdjsAssociatedBehavior;
+          let behavior = body.gdjsAssociatedBehavior;
+          if (!behavior) {
+            // For some reason, the body is different that the character inner body.
+            // So, we go through the character instead.
+            const body = bodyLockInterface.TryGetBody(
+              contact.mCharacterB.GetInnerBodyID()
+            );
+            behavior = body.gdjsAssociatedBehavior;
+          }
           if (behavior) {
             this._currentContacts.push(behavior);
           }

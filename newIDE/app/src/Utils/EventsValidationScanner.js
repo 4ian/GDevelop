@@ -73,13 +73,9 @@ const createValidationWorker = (
   |}
 ): gdReadOnlyArbitraryEventsWorkerWithContextJS => {
   const worker = new gd.ReadOnlyArbitraryEventsWorkerWithContextJS();
+  worker.setSkipDisabledEvents(true);
 
   let currentEventPath: EventPath = [];
-  // Track disabled events: the C++ worker visits all events including
-  // disabled ones and their children. We skip them by remembering
-  // the path depth where a disabled event was found.
-  let disabledAtPathLen: number | null = null;
-  let isInsideDisabledEvent: boolean = false;
 
   // $FlowFixMe[incompatible-type] - overriding C++ method:
   // $FlowFixMe[cannot-write]
@@ -87,18 +83,6 @@ const createValidationWorker = (
     const path = eventPtrToPathMap.get(event.ptr);
     if (path) {
       currentEventPath = path;
-
-      // If we were inside a disabled subtree and have moved to a sibling
-      // or ancestor, we've left that subtree.
-      if (disabledAtPathLen !== null && path.length <= disabledAtPathLen) {
-        disabledAtPathLen = null;
-      }
-
-      if (disabledAtPathLen === null && event.isDisabled()) {
-        disabledAtPathLen = path.length;
-      }
-
-      isInsideDisabledEvent = disabledAtPathLen !== null;
     }
   };
 
@@ -109,8 +93,6 @@ const createValidationWorker = (
     isCondition: boolean,
     projectScopedContainers: gdProjectScopedContainers
   ) => {
-    if (isInsideDisabledEvent) return;
-
     const type = instruction.getType();
 
     // Skip empty instruction types

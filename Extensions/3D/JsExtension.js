@@ -2436,7 +2436,7 @@ module.exports = {
     {
       const effect = extension
         .addEffect('Sky')
-        .setFullName(_('Sky (atmosphere)'))
+        .setFullName(_('Sky (experimental)'))
         .setDescription(
           _('Procedural sky based on the official Three.js Sky addon.')
         )

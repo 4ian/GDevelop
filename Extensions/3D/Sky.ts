@@ -36,6 +36,7 @@ namespace gdjs {
           _cameraUp: THREE.Vector3;
           _cachedCameraUp: THREE.Vector3;
           _orientationQuat: THREE.Quaternion;
+          _orientationEuler: THREE.Euler;
           _isEnabled: boolean = false;
           _time: number = 0;
 
@@ -57,12 +58,40 @@ namespace gdjs {
           constructor() {
             this._sky = new THREE_ADDONS.Sky();
             this._sky.frustumCulled = false;
-            this._sky.scale.setScalar(this._scale);
+            this._sky.scale.set(this._scale, -this._scale, this._scale);
             this._sun = new THREE.Vector3();
             this._skyUp = new THREE.Vector3(0, 1, 0);
             this._cameraUp = new THREE.Vector3(0, 1, 0);
             this._cachedCameraUp = new THREE.Vector3(0, 1, 0);
             this._orientationQuat = new THREE.Quaternion();
+
+            // The Sky shader natively hardcodes direction.y in many places (for clouds, etc).
+            // To support varying "Up" axes (like Z, when the game is a top-down 3D game),
+            // we dynamically patch the vertex shader to rotate vWorldPosition to match camera.up.
+            const material = this._sky.material as THREE.ShaderMaterial;
+            material.uniforms.upTransform = { value: new THREE.Matrix3().identity() };
+            material.vertexShader = material.vertexShader
+              .replace(
+                'uniform vec3 up;',
+                'uniform vec3 up;\nuniform mat3 upTransform;'
+              )
+              .replace(
+                'vWorldPosition = worldPosition.xyz;',
+                'vWorldPosition = cameraPosition + (upTransform * (worldPosition.xyz - cameraPosition));'
+              );
+
+            // REWRITING SHADER TO MAP Y TO Z (GDEVELOP HEIGHT AXIS)
+            // GDevelop uses Z as the height (depth) axis in 3D levels.
+            // The native Sky shader uses Y as the height axis.
+            // By swapping Y and Z (direction = direction.xzy), the shader naturally evaluates the Z axis!
+            material.fragmentShader = material.fragmentShader
+              .replace(
+                'vec3 direction = normalize( vWorldPosition - cameraPosition );',
+                'vec3 direction = normalize( vWorldPosition - cameraPosition );\n' +
+                '// Map Three.js Y (Height) to GDevelop Z (Height)\n' +
+                'direction = direction.xzy;'
+              );
+
             this._applyUniforms();
           }
 
@@ -75,22 +104,18 @@ namespace gdjs {
                 : null;
             if (!camera) return;
 
+            // Automatically sync the Sky's up vector with the Camera's up vector!
             this._cameraUp.copy(camera.up);
             if (this._cameraUp.lengthSq() === 0) return;
             this._cameraUp.normalize();
-
-            if (
-              this._cameraUp.distanceToSquared(this._cachedCameraUp) < 1e-10
-            ) {
+            
+            if (this._cameraUp.distanceToSquared(this._cachedCameraUp) < 1e-10) {
               return;
             }
             this._cachedCameraUp.copy(this._cameraUp);
-            this._orientationQuat.setFromUnitVectors(
-              this._skyUp,
-              this._cachedCameraUp
-            );
-            this._sky.quaternion.copy(this._orientationQuat);
-            this._updateSun();
+            
+            // Pass the camera's up vector directly to the shader uniform
+            this._sky.material.uniforms.up.value.copy(this._cameraUp);
           }
 
           _applyUniforms() {
@@ -110,9 +135,7 @@ namespace gdjs {
           _updateSun() {
             const phi = THREE.MathUtils.degToRad(90 - this._sunElevation);
             const theta = THREE.MathUtils.degToRad(this._sunAzimuth);
-            this._sun
-              .setFromSphericalCoords(1, phi, theta)
-              .applyQuaternion(this._orientationQuat);
+            this._sun.setFromSphericalCoords(1, phi, theta);
             this._sky.material.uniforms.sunPosition.value.copy(this._sun);
           }
 
@@ -140,7 +163,6 @@ namespace gdjs {
               return false;
             }
             scene.add(this._sky);
-            this._updateOrientation(target);
             this._isEnabled = true;
             return true;
           }
@@ -194,7 +216,7 @@ namespace gdjs {
                 break;
               case 'scale':
                 this._scale = value;
-                this._sky.scale.setScalar(value);
+                this._sky.scale.set(value, -value, value);
                 break;
               case 'cloudScale':
                 this._cloudScale = value;
@@ -293,7 +315,7 @@ namespace gdjs {
             this._cloudDensity = data.cd;
             this._cloudElevation = data.ce;
             this._timeScale = data.ts;
-            this._sky.scale.setScalar(this._scale);
+            this._sky.scale.set(this._scale, -this._scale, this._scale);
             this._applyUniforms();
           }
         })();

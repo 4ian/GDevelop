@@ -2739,7 +2739,7 @@ export class ReadOnlyArbitraryEventsWorkerWithContext extends EmscriptenObject {
 
 export class ReadOnlyArbitraryEventsWorkerWithContextJS extends ReadOnlyArbitraryEventsWorkerWithContext {
   constructor();
-  doStartLaunch(events: EventsList): void;
+  doOnLaunch(events: EventsList): void;
   doVisitEvent(event: BaseEvent): void;
   doVisitInstruction(instruction: Instruction, isCondition: boolean, projectScopedContainers: ProjectScopedContainers): void;
 }

@@ -409,12 +409,12 @@ class ReadOnlyArbitraryEventsWorkerWithContextJS : public ReadOnlyArbitraryEvent
         (int)&GetProjectScopedContainers());
   }
 
-  virtual void DoStartLaunch(const gd::EventsList &events) {
+  virtual void DoOnLaunch(const gd::EventsList &events) {
     EM_ASM(
         {
           var self = Module['getCache'](Module['ReadOnlyArbitraryEventsWorkerWithContextJS'])[$0];
-          if (self.hasOwnProperty('doStartLaunch'))
-            self.doStartLaunch(wrapPointer($1, Module['EventsList']));
+          if (self.hasOwnProperty('doOnLaunch'))
+            self.doOnLaunch(wrapPointer($1, Module['EventsList']));
         },
         (int)this,
         (int)&events);

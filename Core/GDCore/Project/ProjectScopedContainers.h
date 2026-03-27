@@ -259,7 +259,7 @@ class ProjectScopedContainers {
   };
 
   /**
-   * \brief Return the name of the behavior in scope, or an empty string if
+   * \brief Return the name of the custom behavior in scope, or an empty string if
    * the scope is not a behavior function.
    */
   const gd::String &GetScopeBehaviorName() const {
@@ -267,7 +267,7 @@ class ProjectScopedContainers {
   };
 
   /**
-   * \brief Return the name of the object in scope, or an empty string if
+   * \brief Return the name of the custom object in scope, or an empty string if
    * the scope is not an object function.
    */
   const gd::String &GetScopeObjectName() const {

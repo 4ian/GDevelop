@@ -294,7 +294,7 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorkerWithContext
   void Launch(const gd::EventsList& events,
               const gd::ProjectScopedContainers& projectScopedContainers) {
     currentProjectScopedContainers = &projectScopedContainers;
-    DoStartLaunch(events);
+    DoOnLaunch(events);
     AbstractReadOnlyArbitraryEventsWorker::VisitEventList(events);
   };
 
@@ -309,7 +309,7 @@ protected:
    * \brief Called at the start of each Launch, before event traversal begins.
    * Override this to perform setup when a new events list is being processed.
    */
-  virtual void DoStartLaunch(const gd::EventsList& events) {};
+  virtual void DoOnLaunch(const gd::EventsList& events) {};
 
  private:
   void VisitEvent(const gd::BaseEvent& event) override;

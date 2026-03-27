@@ -3720,7 +3720,7 @@ interface ReadOnlyArbitraryEventsWorkerWithContextJS {
     void ReadOnlyArbitraryEventsWorkerWithContextJS();
 
     // Called at the start of each Launch, before event traversal begins
-    void DoStartLaunch([Const, Ref] EventsList events);
+    void DoOnLaunch([Const, Ref] EventsList events);
 
     // Called for each event visited
     void DoVisitEvent([Const, Ref] BaseEvent event);

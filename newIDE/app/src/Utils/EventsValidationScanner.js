@@ -117,13 +117,13 @@ const createValidationWorker = (
 
   let currentEventPath: EventPath = [];
   // For multi-function traversal (extensions), the path map is rebuilt
-  // at each Launch via doStartLaunch.
+  // at each Launch via doOnLaunch.
   let eventPtrToPathMap: Map<number, EventPath> =
     options.eventPtrToPathMap || new Map();
 
   // $FlowFixMe[incompatible-type] - overriding C++ method:
   // $FlowFixMe[cannot-write]
-  worker.doStartLaunch = (events: gdEventsList) => {
+  worker.doOnLaunch = (events: gdEventsList) => {
     // Rebuild the event path map for the new events list being launched.
     // This is called at the start of each Launch (e.g. for each function
     // in an extension).
@@ -341,7 +341,7 @@ export const scanProjectForValidationErrors = (
     }
 
     // Create a single worker for the entire extension. The worker uses
-    // doStartLaunch to rebuild the event path map for each function,
+    // doOnLaunch to rebuild the event path map for each function,
     // and derives the extension scope from projectScopedContainers.
     const worker = createValidationWorker(platform, errors, {
       locationType: 'extension',

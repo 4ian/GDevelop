@@ -1909,8 +1909,8 @@ namespace gdjs {
           const body = bodyLockInterface.TryGetBody(contact.mBodyB);
           let behavior = body.gdjsAssociatedBehavior;
           if (!behavior) {
-            // For some reason, the body is different that the character inner body.
-            // So, we go through the character instead.
+            // For some reason, the body can be different than the character
+            // inner body. So, we go through the character instead.
             const body = bodyLockInterface.TryGetBody(
               contact.mCharacterB.GetInnerBodyID()
             );

@@ -25,6 +25,12 @@ export type InstancesEditorSettings = {|
 
   /** Show 3D physics collision shapes in the in-game editor */
   showPhysics3DCollisionShapes: boolean,
+  /** Show axes helper in the in-game editor */
+  showAxesHelper: boolean,
+  /** Color of the 3D physics collision shapes in the in-game editor */
+  physics3DCollisionShapeColor: number,
+  /** Size of the axes helper in the in-game editor */
+  axesHelperSize: number,
 
   /** The name of the layer selected to place instances on. */
   selectedLayer: string,
@@ -67,6 +73,13 @@ export const prepareInstancesEditorSettings = (
     ),
     windowMask: object.windowMask || false,
     showPhysics3DCollisionShapes: object.showPhysics3DCollisionShapes || false,
+    showAxesHelper: object.showAxesHelper || false,
+    physics3DCollisionShapeColor:
+      object.physics3DCollisionShapeColor !== undefined
+        ? object.physics3DCollisionShapeColor
+        : 0x43c1ff,
+    axesHelperSize:
+      object.axesHelperSize !== undefined ? object.axesHelperSize : 200,
     selectedLayer: object.selectedLayer || '',
     gameEditorMode: object.gameEditorMode || 'instances-editor',
   };
@@ -87,6 +100,9 @@ export const cloneInstancesEditorSettings = (
   gridType: 'isometric' | 'rectangular',
   gridWidth: number,
   showPhysics3DCollisionShapes: boolean,
+  showAxesHelper: boolean,
+  physics3DCollisionShapeColor: number,
+  axesHelperSize: number,
   selectedLayer: string,
   snap: boolean,
   windowMask: boolean,

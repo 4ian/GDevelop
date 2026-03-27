@@ -54,9 +54,12 @@ type Props = {|
   toggleWindowMask: () => void,
   isPhysics3DCollisionShapesShown: boolean,
   togglePhysics3DCollisionShapes: () => void,
+  isAxesHelperShown: boolean,
+  toggleAxesHelper: () => void,
   isGridShown: boolean,
   toggleGrid: () => void,
   openSetupGrid: () => void,
+  openSetupDebug: () => void,
   getContextMenuZoomItems: I18nType => Array<MenuItemTemplate>,
   setZoomFactor: number => void,
   onOpenSettings?: ?() => void,
@@ -113,26 +116,6 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
             },
           ]}
         />
-        <ElementWithMenu
-          element={
-            <IconButton
-              size="small"
-              color="default"
-              tooltip={t`3D debug helpers`}
-            >
-              <DebugIcon />
-            </IconButton>
-          }
-          buildMenuTemplate={(i18n: I18nType) => [
-            {
-              type: 'checkbox',
-              label: i18n._(t`Show 3D collision shapes`),
-              checked: props.isPhysics3DCollisionShapesShown,
-              click: () => props.togglePhysics3DCollisionShapes(),
-            },
-          ]}
-        />
-        <ToolbarSeparator />
         <IconButton
           size="small"
           color="default"
@@ -230,6 +213,36 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
             {
               label: i18n._(t`Setup grid`),
               click: () => props.openSetupGrid(),
+            },
+          ]}
+        />
+        <ElementWithMenu
+          element={
+            <IconButton
+              size="small"
+              color="default"
+              tooltip={t`3D debug helpers`}
+            >
+              <DebugIcon />
+            </IconButton>
+          }
+          buildMenuTemplate={(i18n: I18nType) => [
+            {
+              type: 'checkbox',
+              label: i18n._(t`Show 3D collision shapes`),
+              checked: props.isPhysics3DCollisionShapesShown,
+              click: () => props.togglePhysics3DCollisionShapes(),
+            },
+            {
+              type: 'checkbox',
+              label: i18n._(t`Show axes helper`),
+              checked: props.isAxesHelperShown,
+              click: () => props.toggleAxesHelper(),
+            },
+            { type: 'separator' },
+            {
+              label: i18n._(t`Setup debug`),
+              click: () => props.openSetupDebug(),
             },
           ]}
         />

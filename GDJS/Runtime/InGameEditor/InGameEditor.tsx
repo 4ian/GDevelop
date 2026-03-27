@@ -853,6 +853,8 @@ namespace gdjs {
       any,
       Physics3DCollisionShapeHelper
     > = new Map();
+    private _axesHelper: THREE.AxesHelper | null = null;
+    private _axesHelperSize: number | null = null;
     private _objectMover = new ObjectMover(this);
 
     private _wasMouseLeftButtonPressed = false;
@@ -972,7 +974,9 @@ namespace gdjs {
         this._unregisterContextLostListener();
         this._unregisterContextLostListener = null;
       }
+      
       this._clearPhysics3DCollisionShapes();
+      this._clearAxesHelper();
     }
 
     private _applyInGameEditorSettings() {
@@ -1136,6 +1140,7 @@ namespace gdjs {
       // Clear any reference to `RuntimeObject` from the unloaded scene.
       this._selectionBoxes.clear();
       this._clearPhysics3DCollisionShapes();
+      this._clearAxesHelper();
       this._selectionControls = null;
       this._draggedNewObject = null;
       this._draggedSelectedObject = null;
@@ -2150,6 +2155,23 @@ namespace gdjs {
       this._physics3DCollisionShapes.clear();
     }
 
+    private _clearAxesHelper(): void {
+      if (!this._axesHelper) return;
+
+      this._axesHelper.removeFromParent();
+      if (this._axesHelper.geometry) {
+        this._axesHelper.geometry.dispose();
+      }
+      const material = this._axesHelper.material;
+      if (Array.isArray(material)) {
+        material.forEach((material) => material.dispose());
+      } else if (material) {
+        material.dispose();
+      }
+      this._axesHelper = null;
+      this._axesHelperSize = null;
+    }
+
     private _updatePhysics3DCollisionShapes(): void {
       if (
         !this._currentScene ||
@@ -2200,8 +2222,73 @@ namespace gdjs {
           threeGroup.add(helper.container);
         }
 
+        if (
+          this._instancesEditorSettings.physics3DCollisionShapeColor !==
+          undefined
+        ) {
+          helper.setColor(
+            this._instancesEditorSettings.physics3DCollisionShapeColor
+          );
+        }
         helper.updateFromBehavior();
       }
+    }
+
+    private _updateAxesHelper(): void {
+      if (
+        !this._currentScene ||
+        !this._instancesEditorSettings ||
+        !this._instancesEditorSettings.showAxesHelper
+      ) {
+        this._clearAxesHelper();
+        return;
+      }
+
+      const baseLayer = this.getEditorLayer('');
+      if (!baseLayer) {
+        this._clearAxesHelper();
+        return;
+      }
+
+      const threeGroup = baseLayer.getRenderer().getThreeGroup();
+      if (!threeGroup) {
+        this._clearAxesHelper();
+        return;
+      }
+
+      const targetSize =
+        this._instancesEditorSettings.axesHelperSize !== undefined
+          ? Math.max(1, this._instancesEditorSettings.axesHelperSize)
+          : 200;
+
+      if (!this._axesHelper || this._axesHelperSize !== targetSize) {
+        this._clearAxesHelper();
+        const axesHelper = new THREE.AxesHelper(targetSize);
+        axesHelper.name = 'InGameEditorAxesHelper';
+        axesHelper.renderOrder = 1;
+        axesHelper.traverse((child: THREE.Object3D) => {
+          const material = (child as any).material;
+          if (!material) return;
+          if (Array.isArray(material)) {
+            material.forEach((material) => {
+              material.depthTest = false;
+              material.transparent = true;
+            });
+          } else {
+            material.depthTest = false;
+            material.transparent = true;
+          }
+        });
+        this._axesHelper = axesHelper;
+        this._axesHelperSize = targetSize;
+        threeGroup.add(axesHelper);
+      } else if (this._axesHelper.parent !== threeGroup) {
+        this._axesHelper.removeFromParent();
+        threeGroup.add(this._axesHelper);
+      }
+
+      this._axesHelper.position.set(0, 0, 0);
+      this._axesHelper.updateMatrixWorld(true);
     }
 
     private _getTransformControlsMode(): 'translate' | 'rotate' | 'scale' {
@@ -3299,6 +3386,9 @@ namespace gdjs {
       this._raycaster.layers.set(0);
       this._selectionBoxes.forEach((box) => box.setLayer(1));
       this._physics3DCollisionShapes.forEach((helper) => helper.setLayer(1));
+      if (this._axesHelper) {
+        this._axesHelper.layers.set(1);
+      }
       if (this._threeInnerArea) {
         for (const child of this._threeInnerArea.children) {
           child.layers.set(1);
@@ -3349,6 +3439,9 @@ namespace gdjs {
       // Reset selection boxes layers so they are properly displayed.
       this._selectionBoxes.forEach((box) => box.setLayer(0));
       this._physics3DCollisionShapes.forEach((helper) => helper.setLayer(0));
+      if (this._axesHelper) {
+        this._axesHelper.layers.set(0);
+      }
       if (this._threeInnerArea) {
         for (const child of this._threeInnerArea.children) {
           child.layers.set(0);
@@ -3622,6 +3715,7 @@ namespace gdjs {
       this._handleSelection({ objectUnderCursor });
       this._updateSelectionOutline({ objectUnderCursor });
       this._updatePhysics3DCollisionShapes();
+      this._updateAxesHelper();
       // Custom objects only update their position at the end of the frame
       // because they don't override position setters like built-in objects do.
       // Since the instance position is not yet set when `onCreated` is called,
@@ -4197,6 +4291,7 @@ namespace gdjs {
     }
 
     step(): void {
+
       const runtimeGame = this.editor.getRuntimeGame();
       const inputManager = runtimeGame.getInputManager();
 
@@ -5506,6 +5601,11 @@ namespace gdjs {
       this.container.traverse((object) => {
         object.layers.set(layer);
       });
+    }
+
+    setColor(color: THREE.ColorRepresentation): void {
+      this._lineMaterial.color.set(color);
+      this._lineMaterial.needsUpdate = true;
     }
 
     dispose(): void {

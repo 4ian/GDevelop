@@ -14,6 +14,7 @@ import ObjectImporterDialog from '../ObjectEditor/ObjectImporterDialog';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
+import SetupDebugDialog from './SetupDebugDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
 import EventsBasedObjectScenePropertiesDialog from './EventsBasedObjectScenePropertiesDialog';
 import ExtractAsExternalLayoutDialog from './ExtractAsExternalLayoutDialog';
@@ -251,6 +252,7 @@ type Props = {|
 
 type State = {|
   setupGridOpen: boolean,
+  setupDebugOpen: boolean,
   scenePropertiesDialogOpen: boolean,
   layersListOpen: boolean,
   onCloseLayerRemoveDialog: ?(
@@ -313,6 +315,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.state = {
       setupGridOpen: false,
+      setupDebugOpen: false,
       scenePropertiesDialogOpen: false,
       layersListOpen: false,
       onCloseLayerRemoveDialog: null,
@@ -698,9 +701,14 @@ export default class SceneEditor extends React.Component<Props, State> {
           isPhysics3DCollisionShapesShown={
             !!this.state.instancesEditorSettings.showPhysics3DCollisionShapes
           }
+          toggleAxesHelper={this.toggleAxesHelper}
+          isAxesHelperShown={
+            !!this.state.instancesEditorSettings.showAxesHelper
+          }
           toggleGrid={this.toggleGrid}
           isGridShown={!!this.state.instancesEditorSettings.grid}
           openSetupGrid={this.openSetupGrid}
+          openSetupDebug={this.openSetupDebug}
           setZoomFactor={this.setZoomFactor}
           getContextMenuZoomItems={this.getContextMenuZoomItems}
           canUndo={canUndo(this.state.history)}
@@ -732,9 +740,14 @@ export default class SceneEditor extends React.Component<Props, State> {
           isPhysics3DCollisionShapesShown={
             !!this.state.instancesEditorSettings.showPhysics3DCollisionShapes
           }
+          toggleAxesHelper={this.toggleAxesHelper}
+          isAxesHelperShown={
+            !!this.state.instancesEditorSettings.showAxesHelper
+          }
           toggleGrid={this.toggleGrid}
           isGridShown={!!this.state.instancesEditorSettings.grid}
           openSetupGrid={this.openSetupGrid}
+          openSetupDebug={this.openSetupDebug}
           setZoomFactor={this.setZoomFactor}
           getContextMenuZoomItems={this.getContextMenuZoomItems}
           canUndo={canUndo(this.state.history)}
@@ -835,6 +848,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
+  toggleAxesHelper = () => {
+    this.setInstancesEditorSettings({
+      ...this.state.instancesEditorSettings,
+      showAxesHelper: !this.state.instancesEditorSettings.showAxesHelper,
+    });
+  };
+
   setGameEditorMode = (newMode: 'instances-editor' | 'embedded-game') => {
     this.setInstancesEditorSettings({
       ...this.state.instancesEditorSettings,
@@ -847,6 +867,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   openSetupGrid = (open: boolean = true) => {
     this.setState({ setupGridOpen: open });
+  };
+
+  openSetupDebug = (open: boolean = true) => {
+    this.setState({ setupDebugOpen: open });
   };
 
   openSceneProperties = (open: boolean = true) => {
@@ -3228,6 +3252,18 @@ export default class SceneEditor extends React.Component<Props, State> {
                       }
                       onCancel={() => this.openSetupGrid(false)}
                       onApply={() => this.openSetupGrid(false)}
+                    />
+                  )}
+                  {this.state.setupDebugOpen && (
+                    <SetupDebugDialog
+                      instancesEditorSettings={
+                        this.state.instancesEditorSettings
+                      }
+                      onChangeInstancesEditorSettings={
+                        this.setInstancesEditorSettings
+                      }
+                      onCancel={() => this.openSetupDebug(false)}
+                      onApply={() => this.openSetupDebug(false)}
                     />
                   )}
                   {!!this.state.variablesEditedInstance &&

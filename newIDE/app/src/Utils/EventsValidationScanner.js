@@ -28,6 +28,52 @@ export type ValidationError = {|
   objectName?: ?string,
 |};
 
+const getValidationErrorLocationInformationFromProjectScopedContainers = (
+  projectScopedContainers: gdProjectScopedContainers
+): {
+  locationName: string,
+  locationType: 'scene' | 'external-events' | 'extension',
+  extensionName?: string,
+  functionName?: string,
+  behaviorName?: ?string,
+  objectName?: ?string,
+} => {
+  const extensionName = projectScopedContainers.getScopeExtensionName();
+  const externalEventsName = projectScopedContainers.getScopeExternalEventsName();
+  const sceneName = projectScopedContainers.getScopeSceneName();
+
+  if (extensionName) {
+    const functionName = projectScopedContainers.getScopeFunctionName();
+    const behaviorName = projectScopedContainers.getScopeBehaviorName() || null;
+    const objectName = projectScopedContainers.getScopeObjectName() || null;
+
+    const locationName = behaviorName
+      ? `${extensionName} / ${behaviorName} / ${functionName}`
+      : objectName
+      ? `${extensionName} / ${objectName} / ${functionName}`
+      : `${extensionName} / ${functionName}`;
+
+    return {
+      locationType: 'extension',
+      locationName,
+      extensionName,
+      functionName,
+      behaviorName,
+      objectName,
+    };
+  } else if (externalEventsName) {
+    return {
+      locationType: 'external-events',
+      locationName: externalEventsName,
+    };
+  } else {
+    return {
+      locationType: 'scene',
+      locationName: sceneName,
+    };
+  }
+};
+
 /**
  * Build a map from event pointer to its path in the events list.
  * This allows us to track event paths when using the C++ worker.
@@ -58,10 +104,6 @@ const buildEventPtrToPathMap = (
  * Create a validation worker that uses C++ event traversal.
  * This leverages ReadOnlyArbitraryEventsWorkerWithContext which properly
  * handles local variable scoping as it traverses the event tree.
- *
- * The worker derives location info (scene name, external layout name, or
- * extension scope) entirely from the ProjectScopedContainers passed by C++,
- * so no options are needed.
  */
 const createValidationWorker = (
   platform: gdPlatform,
@@ -104,48 +146,6 @@ const createValidationWorker = (
       return;
     }
 
-    // Derive location info from ProjectScopedContainers scope.
-    const extensionName = projectScopedContainers.getScopeExtensionName();
-    const externalEventsName = projectScopedContainers.getScopeExternalEventsName();
-    const sceneName = projectScopedContainers.getScopeSceneName();
-
-    let locationName: string;
-    let locationType: 'scene' | 'external-events' | 'extension';
-    let extensionScope: ?{|
-      extensionName: string,
-      functionName: string,
-      behaviorName: ?string,
-      objectName: ?string,
-    |} = undefined;
-
-    if (extensionName) {
-      locationType = 'extension';
-      const functionName = projectScopedContainers.getScopeFunctionName();
-      const behaviorName =
-        projectScopedContainers.getScopeBehaviorName() || null;
-      const objectName =
-        projectScopedContainers.getScopeObjectName() || null;
-
-      locationName = behaviorName
-        ? `${extensionName} / ${behaviorName} / ${functionName}`
-        : objectName
-        ? `${extensionName} / ${objectName} / ${functionName}`
-        : `${extensionName} / ${functionName}`;
-
-      extensionScope = {
-        extensionName,
-        functionName,
-        behaviorName,
-        objectName,
-      };
-    } else if (externalEventsName) {
-      locationType = 'external-events';
-      locationName = externalEventsName;
-    } else {
-      locationType = 'scene';
-      locationName = sceneName;
-    }
-
     // Get metadata
     const metadata = isCondition
       ? gd.MetadataProvider.getConditionMetadata(gd.JsPlatform.get(), type)
@@ -160,18 +160,13 @@ const createValidationWorker = (
         isCondition,
         instructionType: type,
         instructionSentence: type,
-        locationName,
-        locationType,
         eventPath: [...currentEventPath],
-        ...(extensionScope || {}),
+        ...getValidationErrorLocationInformationFromProjectScopedContainers(
+          projectScopedContainers
+        ),
       });
       return;
     }
-
-    const instructionSentence = renderInstructionSentenceAsPlainText(
-      instruction,
-      metadata
-    );
 
     // Validate parameters
     const parametersCount = metadata.getParametersCount();
@@ -217,6 +212,11 @@ const createValidationWorker = (
       );
 
       if (!isValid) {
+        const instructionSentence = renderInstructionSentenceAsPlainText(
+          instruction,
+          metadata
+        );
+
         errors.push({
           type: value === '' ? 'missing-parameter' : 'invalid-parameter',
           isCondition,
@@ -224,10 +224,10 @@ const createValidationWorker = (
           instructionSentence,
           parameterIndex,
           parameterValue: value,
-          locationName,
-          locationType,
           eventPath: [...currentEventPath],
-          ...(extensionScope || {}),
+          ...getValidationErrorLocationInformationFromProjectScopedContainers(
+            projectScopedContainers
+          ),
         });
       }
     });
@@ -252,10 +252,7 @@ export const scanProjectForValidationErrors = (
   const worker = createValidationWorker(platform, errors);
 
   // Scan all layouts (scenes) and external events via C++ traversal.
-  gd.ProjectBrowserHelper.exposeProjectEventsWithoutExtensions(
-    project,
-    worker
-  );
+  gd.ProjectBrowserHelper.exposeProjectEventsWithoutExtensions(project, worker);
 
   // Scan all extension functions (free, behavior, object).
   mapFor(0, project.getEventsFunctionsExtensionsCount(), extensionIndex => {

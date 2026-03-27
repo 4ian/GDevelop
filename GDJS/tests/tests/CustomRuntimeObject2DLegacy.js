@@ -1,8 +1,5 @@
 // @ts-check
 
-/**
- * Basic tests for gdjs.SpriteRuntimeObject
- */
 describe('gdjs.CustomRuntimeObject', function () {
   /**
    * Create a CustomRuntimeObject with a SpriteRuntimeObject using a 64x64
@@ -14,7 +11,7 @@ describe('gdjs.CustomRuntimeObject', function () {
     // getPixiRuntimeGameWithAssets.
     const customObject = new gdjs.CustomRuntimeObject2D(instanceContainer, {
       name: 'MyCustomObject',
-      type: 'MyExtension::MyEventsBasedObject',
+      type: 'MyExtension::MyLegacyEventsBasedObject',
       variant: '',
       isInnerAreaFollowingParentSize: false,
       variables: [],

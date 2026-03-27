@@ -1,5 +1,22 @@
 // @ts-check
 
+const defaultInstance = {
+  angle: 0,
+  customSize: true,
+  height: 64,
+  layer: '',
+  name: 'MySprite',
+  persistentUuid: '668db48d-4e12-4b6f-aa6b-f73b74bf608e',
+  width: 64,
+  x: 0,
+  y: 0,
+  zOrder: 1,
+  numberProperties: [],
+  stringProperties: [],
+  initialVariables: [],
+  locked: false,
+};
+
 /**
  * Create and return a game with a few assets loaded, to be used in tests
  * needing real images.
@@ -136,6 +153,69 @@ gdjs.getPixiRuntimeGameWithAssets = (props = null) => {
                 // @ts-ignore This is the object configuration.
                 updateIfNotVisible: false,
                 // @ts-ignore This is the object configuration.
+                animations: [
+                  {
+                    name: 'animation',
+                    directions: [
+                      {
+                        sprites: [
+                          {
+                            image: 'base/tests-utils/assets/64x64.jpg',
+                            originPoint: { name: 'Origin', x: 0, y: 0 },
+                            centerPoint: {
+                              name: 'Center',
+                              x: 32,
+                              y: 32,
+                              automatic: false,
+                            },
+                            points: [
+                              { name: 'Center', x: 32, y: 32 },
+                              { name: 'Origin', x: 0, y: 0 },
+                            ],
+                            hasCustomCollisionMask: true,
+                            customCollisionMask: [
+                              [
+                                { x: 64, y: 64 },
+                                { x: 0, y: 64 },
+                                { x: 64, y: 0 },
+                              ],
+                            ],
+                          },
+                        ],
+                        timeBetweenFrames: 0,
+                        looping: false,
+                      },
+                    ],
+                    useMultipleDirections: false,
+                  },
+                ],
+              },
+            ],
+            instances: (props && props.customObjectInstances) || [
+              defaultInstance,
+            ],
+            layers: [],
+            areaMinX: -100,
+            areaMinY: -200,
+            areaMinZ: -300,
+            areaMaxX: 400,
+            areaMaxY: 500,
+            areaMaxZ: 600,
+            _initialInnerArea: null,
+            variants: [],
+          },
+          {
+            name: 'MyLegacyEventsBasedObject',
+            objects: [
+              {
+                name: 'MySprite',
+                type: 'Sprite',
+                variables: [],
+                behaviors: [],
+                effects: [],
+                // @ts-ignore This is the object configuration.
+                updateIfNotVisible: false,
+                // @ts-ignore This is the object configuration.
                 animations: [],
               },
             ],
@@ -212,22 +292,7 @@ gdjs.getPixiRuntimeGameWithAssets = (props = null) => {
               },
             ],
             instances: (props && props.customObjectInstances) || [
-              {
-                angle: 0,
-                customSize: true,
-                height: 64,
-                layer: '',
-                name: 'MySprite',
-                persistentUuid: '668db48d-4e12-4b6f-aa6b-f73b74bf608e',
-                width: 64,
-                x: 0,
-                y: 0,
-                zOrder: 1,
-                numberProperties: [],
-                stringProperties: [],
-                initialVariables: [],
-                locked: false,
-              },
+              defaultInstance,
             ],
             layers: [],
             areaMinX: 0,

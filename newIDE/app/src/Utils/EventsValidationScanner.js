@@ -22,6 +22,10 @@ export type ValidationError = {|
   locationName: string,
   locationType: 'scene' | 'external-events' | 'extension',
   eventPath: EventPath,
+  extensionName?: string,
+  functionName?: string,
+  behaviorName?: ?string,
+  objectName?: ?string,
 |};
 
 /**
@@ -60,11 +64,22 @@ const createValidationWorker = (
   locationName: string,
   locationType: 'scene' | 'external-events' | 'extension',
   eventPtrToPathMap: Map<number, EventPath>,
-  errors: Array<ValidationError>
+  errors: Array<ValidationError>,
+  extensionScope?: {|
+    extensionName: string,
+    functionName: string,
+    behaviorName?: ?string,
+    objectName?: ?string,
+  |}
 ): gdReadOnlyArbitraryEventsWorkerWithContextJS => {
   const worker = new gd.ReadOnlyArbitraryEventsWorkerWithContextJS();
 
   let currentEventPath: EventPath = [];
+  // Track disabled events: the C++ worker visits all events including
+  // disabled ones and their children. We skip them by remembering
+  // the path depth where a disabled event was found.
+  let disabledAtPathLen: number | null = null;
+  let isInsideDisabledEvent: boolean = false;
 
   // $FlowFixMe[incompatible-type] - overriding C++ method:
   // $FlowFixMe[cannot-write]
@@ -72,6 +87,18 @@ const createValidationWorker = (
     const path = eventPtrToPathMap.get(event.ptr);
     if (path) {
       currentEventPath = path;
+
+      // If we were inside a disabled subtree and have moved to a sibling
+      // or ancestor, we've left that subtree.
+      if (disabledAtPathLen !== null && path.length <= disabledAtPathLen) {
+        disabledAtPathLen = null;
+      }
+
+      if (disabledAtPathLen === null && event.isDisabled()) {
+        disabledAtPathLen = path.length;
+      }
+
+      isInsideDisabledEvent = disabledAtPathLen !== null;
     }
   };
 
@@ -82,6 +109,8 @@ const createValidationWorker = (
     isCondition: boolean,
     projectScopedContainers: gdProjectScopedContainers
   ) => {
+    if (isInsideDisabledEvent) return;
+
     const type = instruction.getType();
 
     // Skip empty instruction types
@@ -106,6 +135,7 @@ const createValidationWorker = (
         locationName,
         locationType,
         eventPath: [...currentEventPath],
+        ...(extensionScope || {}),
       });
       return;
     }
@@ -169,6 +199,7 @@ const createValidationWorker = (
           locationName,
           locationType,
           eventPath: [...currentEventPath],
+          ...(extensionScope || {}),
         });
       }
     });
@@ -244,6 +275,168 @@ export const scanProjectForValidationErrors = (
     worker.delete();
   });
 
+  // Scan all extension functions (free, behavior, object)
+  mapFor(0, project.getEventsFunctionsExtensionsCount(), extensionIndex => {
+    const extension = project.getEventsFunctionsExtensionAt(extensionIndex);
+
+    // Skip store extensions - users cannot edit them.
+    if (extension.getOriginName() === 'gdevelop-extension-store') {
+      return;
+    }
+
+    const extensionName = extension.getName();
+
+    // Helper: scan a single events function with proper scoped containers.
+    const scanEventsFunction = ({
+      eventsFunction,
+      eventsBasedBehavior,
+      eventsBasedObject,
+    }: {|
+      eventsFunction: gdEventsFunction,
+      eventsBasedBehavior: ?gdEventsBasedBehavior,
+      eventsBasedObject: ?gdEventsBasedObject,
+    |}) => {
+      const functionName = eventsFunction.getName();
+      const objContainer = new gd.ObjectsContainer(
+        gd.ObjectsContainer.Function
+      );
+      const paramVarContainer = new gd.VariablesContainer(
+        gd.VariablesContainer.Parameters
+      );
+      const paramResContainer = new gd.ResourcesContainer(
+        gd.ResourcesContainer.Parameters
+      );
+
+      let projectScopedContainers;
+      let propVarContainer: ?gdVariablesContainer;
+      let propResContainer: ?gdResourcesContainer;
+
+      try {
+        if (eventsBasedBehavior) {
+          propVarContainer = new gd.VariablesContainer(
+            gd.VariablesContainer.Properties
+          );
+          propResContainer = new gd.ResourcesContainer(
+            gd.ResourcesContainer.Properties
+          );
+          projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForBehaviorEventsFunction(
+            project,
+            extension,
+            eventsBasedBehavior,
+            eventsFunction,
+            objContainer,
+            paramVarContainer,
+            propVarContainer,
+            paramResContainer,
+            propResContainer
+          );
+        } else if (eventsBasedObject) {
+          propVarContainer = new gd.VariablesContainer(
+            gd.VariablesContainer.Properties
+          );
+          propResContainer = new gd.ResourcesContainer(
+            gd.ResourcesContainer.Properties
+          );
+          projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForObjectEventsFunction(
+            project,
+            extension,
+            eventsBasedObject,
+            eventsFunction,
+            objContainer,
+            paramVarContainer,
+            propVarContainer,
+            paramResContainer,
+            propResContainer
+          );
+        } else {
+          projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForFreeEventsFunction(
+            project,
+            extension,
+            eventsFunction,
+            objContainer,
+            paramVarContainer,
+            paramResContainer
+          );
+        }
+
+        const behaviorName = eventsBasedBehavior
+          ? eventsBasedBehavior.getName()
+          : null;
+        const objectName = eventsBasedObject
+          ? eventsBasedObject.getName()
+          : null;
+        const locationName = behaviorName
+          ? `${extensionName} / ${behaviorName} / ${functionName}`
+          : objectName
+          ? `${extensionName} / ${objectName} / ${functionName}`
+          : `${extensionName} / ${functionName}`;
+
+        const eventPtrToPathMap = buildEventPtrToPathMap(
+          eventsFunction.getEvents()
+        );
+        const worker = createValidationWorker(
+          platform,
+          locationName,
+          'extension',
+          eventPtrToPathMap,
+          errors,
+          {
+            extensionName,
+            functionName,
+            behaviorName,
+            objectName,
+          }
+        );
+        worker.launch(eventsFunction.getEvents(), projectScopedContainers);
+        worker.delete();
+      } finally {
+        objContainer.delete();
+        paramVarContainer.delete();
+        paramResContainer.delete();
+        if (propVarContainer) propVarContainer.delete();
+        if (propResContainer) propResContainer.delete();
+      }
+    };
+
+    // Free functions
+    const freeFunctions = extension.getEventsFunctions();
+    mapFor(0, freeFunctions.getEventsFunctionsCount(), functionIndex => {
+      scanEventsFunction({
+        eventsFunction: freeFunctions.getEventsFunctionAt(functionIndex),
+        eventsBasedBehavior: null,
+        eventsBasedObject: null,
+      });
+    });
+
+    // Behavior functions
+    const eventsBasedBehaviors = extension.getEventsBasedBehaviors();
+    mapFor(0, eventsBasedBehaviors.getCount(), behaviorIndex => {
+      const behavior = eventsBasedBehaviors.getAt(behaviorIndex);
+      const behaviorFunctions = behavior.getEventsFunctions();
+      mapFor(0, behaviorFunctions.getEventsFunctionsCount(), functionIndex => {
+        scanEventsFunction({
+          eventsFunction: behaviorFunctions.getEventsFunctionAt(functionIndex),
+          eventsBasedBehavior: behavior,
+          eventsBasedObject: null,
+        });
+      });
+    });
+
+    // Object functions
+    const eventsBasedObjects = extension.getEventsBasedObjects();
+    mapFor(0, eventsBasedObjects.getCount(), objectIndex => {
+      const object = eventsBasedObjects.getAt(objectIndex);
+      const objectFunctions = object.getEventsFunctions();
+      mapFor(0, objectFunctions.getEventsFunctionsCount(), functionIndex => {
+        scanEventsFunction({
+          eventsFunction: objectFunctions.getEventsFunctionAt(functionIndex),
+          eventsBasedBehavior: null,
+          eventsBasedObject: object,
+        });
+      });
+    });
+  });
+
   return errors;
 };
 
@@ -305,8 +498,11 @@ export const groupValidationErrors = (
       const missingList = missingInstructions.get(key);
       if (missingList) missingList.push(error);
     } else {
-      // Group by location
-      const key = `${error.locationType}: ${error.locationName}`;
+      // Group by location (extension errors include function path)
+      const key =
+        error.locationType === 'extension'
+          ? `extension: ${error.locationName}`
+          : `${error.locationType}: ${error.locationName}`;
       if (!invalidParameters.has(key)) {
         invalidParameters.set(key, []);
       }

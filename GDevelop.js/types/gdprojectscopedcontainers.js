@@ -13,6 +13,10 @@ declare class gdProjectScopedContainers {
   getObjectsContainersList(): gdObjectsContainersList;
   getVariablesContainersList(): gdVariablesContainersList;
   getResourcesContainersList(): gdResourcesContainersList;
+  getScopeExtensionName(): string;
+  getScopeFunctionName(): string;
+  getScopeBehaviorName(): string;
+  getScopeObjectName(): string;
   delete(): void;
   ptr: number;
 };

@@ -23,8 +23,120 @@
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/String.h"
 #include "GDCore/IDE/DependenciesAnalyzer.h"
+#include "GDCore/Project/ObjectsContainer.h"
 
 namespace gd {
+
+namespace {
+// Template helper to implement ExposeEventsBasedBehaviorEvents for both
+// ArbitraryEventsWorkerWithContext and ReadOnlyArbitraryEventsWorkerWithContext.
+template <typename WorkerType>
+void ExposeEventsBasedBehaviorEventsImpl(
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::EventsBasedBehavior &eventsBasedBehavior,
+    gd::VariablesContainer &propertyVariablesContainer,
+    WorkerType &worker) {
+  auto &behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
+  for (auto &&eventsFunction : behaviorEventsFunctions.GetInternalVector()) {
+
+    gd::ObjectsContainer parameterObjectsContainers(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    gd::ResourcesContainer parameterResourcesContainer(
+        gd::ResourcesContainer::SourceType::Parameters);
+    gd::ResourcesContainer propertyResourcesContainer(
+        gd::ResourcesContainer::SourceType::Properties);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForBehaviorEventsFunction(
+            project, eventsFunctionsExtension, eventsBasedBehavior,
+            *eventsFunction, parameterObjectsContainers,
+            parameterVariablesContainer, propertyVariablesContainer,
+            parameterResourcesContainer, propertyResourcesContainer);
+
+    worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
+  }
+}
+
+// Template helper to implement ExposeEventsBasedObjectEvents for both
+// ArbitraryEventsWorkerWithContext and ReadOnlyArbitraryEventsWorkerWithContext.
+template <typename WorkerType>
+void ExposeEventsBasedObjectEventsImpl(
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::EventsBasedObject &eventsBasedObject,
+    gd::VariablesContainer &propertyVariablesContainer,
+    WorkerType &worker) {
+  auto &objectEventsFunctions = eventsBasedObject.GetEventsFunctions();
+  for (auto &&eventsFunction : objectEventsFunctions.GetInternalVector()) {
+
+    gd::ObjectsContainer parameterObjectsContainers(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    gd::ResourcesContainer parameterResourcesContainer(
+        gd::ResourcesContainer::SourceType::Parameters);
+    gd::ResourcesContainer propertyResourcesContainer(
+        gd::ResourcesContainer::SourceType::Properties);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForObjectEventsFunction(
+            project, eventsFunctionsExtension, eventsBasedObject,
+            *eventsFunction, parameterObjectsContainers,
+            parameterVariablesContainer, propertyVariablesContainer,
+            parameterResourcesContainer, propertyResourcesContainer);
+
+    worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
+  }
+}
+
+// Template helper to implement ExposeEventsFunctionsExtensionEvents for both
+// ArbitraryEventsWorkerWithContext and ReadOnlyArbitraryEventsWorkerWithContext.
+template <typename WorkerType>
+void ExposeEventsFunctionsExtensionEventsImpl(
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    WorkerType &worker) {
+  // Add (free) events functions
+  for (auto &&eventsFunction :
+       eventsFunctionsExtension.GetEventsFunctions().GetInternalVector()) {
+    gd::ObjectsContainer parameterObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    gd::ResourcesContainer parameterResourcesContainer(
+        gd::ResourcesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsFunctionsExtension, *eventsFunction,
+            parameterObjectsContainer, parameterVariablesContainer,
+            parameterResourcesContainer);
+
+    worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
+  }
+
+  // Add (behavior) events functions
+  for (auto &&eventsBasedBehavior :
+       eventsFunctionsExtension.GetEventsBasedBehaviors()
+           .GetInternalVector()) {
+    gd::VariablesContainer propertyVariablesContainer(
+        gd::VariablesContainer::SourceType::Properties);
+    ExposeEventsBasedBehaviorEventsImpl(
+        project, eventsFunctionsExtension, *eventsBasedBehavior,
+        propertyVariablesContainer, worker);
+  }
+
+  // Add (object) events functions
+  for (auto &&eventsBasedObject :
+       eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
+    gd::VariablesContainer propertyVariablesContainer(
+        gd::VariablesContainer::SourceType::Properties);
+    ExposeEventsBasedObjectEventsImpl(
+        project, eventsFunctionsExtension, *eventsBasedObject,
+        propertyVariablesContainer, worker);
+  }
+}
+} // anonymous namespace
 
 void ProjectBrowserHelper::ExposeProjectEvents(
     gd::Project &project, gd::ArbitraryEventsWorker &worker) {
@@ -177,36 +289,8 @@ void ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
 void ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
     gd::Project &project, const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     gd::ArbitraryEventsWorkerWithContext &worker) {
-    // Add (free) events functions
-    for (auto &&eventsFunction :
-         eventsFunctionsExtension.GetEventsFunctions().GetInternalVector()) {
-      gd::ObjectsContainer parameterObjectsContainer(
-          gd::ObjectsContainer::SourceType::Function);
-      gd::VariablesContainer parameterVariablesContainer(
-          gd::VariablesContainer::SourceType::Parameters);
-      gd::ResourcesContainer parameterResourcesContainer(
-          gd::ResourcesContainer::SourceType::Parameters);
-      auto projectScopedContainers = gd::ProjectScopedContainers::
-          MakeNewProjectScopedContainersForFreeEventsFunction(
-              project, eventsFunctionsExtension, *eventsFunction,
-              parameterObjectsContainer, parameterVariablesContainer,
-              parameterResourcesContainer);
-
-      worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
-    }
-
-    // Add (behavior) events functions
-    for (auto &&eventsBasedBehavior :
-         eventsFunctionsExtension.GetEventsBasedBehaviors()
-             .GetInternalVector()) {
-      ExposeEventsBasedBehaviorEvents(project, eventsFunctionsExtension, *eventsBasedBehavior, worker);
-    }
-
-    // Add (object) events functions
-    for (auto &&eventsBasedObject :
-         eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
-      ExposeEventsBasedObjectEvents(project, eventsFunctionsExtension, *eventsBasedObject, worker);
-    }
+  ExposeEventsFunctionsExtensionEventsImpl(
+      project, eventsFunctionsExtension, worker);
 }
 
 void ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
@@ -236,26 +320,9 @@ void ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
     const gd::EventsBasedBehavior &eventsBasedBehavior,
     gd::VariablesContainer &propertyVariablesContainer,
     gd::ArbitraryEventsWorkerWithContext &worker) {
-  auto &behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
-  for (auto &&eventsFunction : behaviorEventsFunctions.GetInternalVector()) {
-
-    gd::ObjectsContainer parameterObjectsContainers(
-        gd::ObjectsContainer::SourceType::Function);
-    gd::VariablesContainer parameterVariablesContainer(
-        gd::VariablesContainer::SourceType::Parameters);
-    gd::ResourcesContainer parameterResourcesContainer(
-        gd::ResourcesContainer::SourceType::Parameters);
-    gd::ResourcesContainer propertyResourcesContainer(
-        gd::ResourcesContainer::SourceType::Properties);
-    auto projectScopedContainers = gd::ProjectScopedContainers::
-        MakeNewProjectScopedContainersForBehaviorEventsFunction(
-            project, eventsFunctionsExtension, eventsBasedBehavior,
-            *eventsFunction, parameterObjectsContainers,
-            parameterVariablesContainer, propertyVariablesContainer,
-            parameterResourcesContainer, propertyResourcesContainer);
-
-    worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
-  }
+  ExposeEventsBasedBehaviorEventsImpl(
+      project, eventsFunctionsExtension, eventsBasedBehavior,
+      propertyVariablesContainer, worker);
 }
 
 void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
@@ -274,7 +341,7 @@ void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
     gd::ArbitraryEventsWorkerWithContext &worker) {
   gd::VariablesContainer propertyVariablesContainer(
       gd::VariablesContainer::SourceType::Properties);
-  gd::ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
+  ExposeEventsBasedObjectEventsImpl(
       project, eventsFunctionsExtension, eventsBasedObject,
       propertyVariablesContainer, worker);
 }
@@ -285,26 +352,43 @@ void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
     const gd::EventsBasedObject &eventsBasedObject,
     gd::VariablesContainer &propertyVariablesContainer,
     gd::ArbitraryEventsWorkerWithContext &worker) {
-  auto &objectEventsFunctions = eventsBasedObject.GetEventsFunctions();
-  for (auto &&eventsFunction : objectEventsFunctions.GetInternalVector()) {
+  ExposeEventsBasedObjectEventsImpl(
+      project, eventsFunctionsExtension, eventsBasedObject,
+      propertyVariablesContainer, worker);
+}
 
-    gd::ObjectsContainer parameterObjectsContainers(
-        gd::ObjectsContainer::SourceType::Function);
-    gd::VariablesContainer parameterVariablesContainer(
-        gd::VariablesContainer::SourceType::Parameters);
-    gd::ResourcesContainer parameterResourcesContainer(
-        gd::ResourcesContainer::SourceType::Parameters);
-    gd::ResourcesContainer propertyResourcesContainer(
-        gd::ResourcesContainer::SourceType::Properties);
-    auto projectScopedContainers = gd::ProjectScopedContainers::
-        MakeNewProjectScopedContainersForObjectEventsFunction(
-            project, eventsFunctionsExtension, eventsBasedObject,
-            *eventsFunction, parameterObjectsContainers,
-            parameterVariablesContainer, propertyVariablesContainer,
-            parameterResourcesContainer, propertyResourcesContainer);
+void ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    gd::ReadOnlyArbitraryEventsWorkerWithContext &worker) {
+  ExposeEventsFunctionsExtensionEventsImpl(
+      project, eventsFunctionsExtension, worker);
+}
 
-    worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
-  }
+void ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::EventsBasedBehavior &eventsBasedBehavior,
+    gd::ReadOnlyArbitraryEventsWorkerWithContext &worker) {
+  gd::VariablesContainer propertyVariablesContainer(
+      gd::VariablesContainer::SourceType::Properties);
+  ExposeEventsBasedBehaviorEventsImpl(
+    project, eventsFunctionsExtension,
+    eventsBasedBehavior,
+    propertyVariablesContainer,
+    worker);
+}
+
+void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::EventsBasedObject &eventsBasedObject,
+    gd::ReadOnlyArbitraryEventsWorkerWithContext &worker) {
+  gd::VariablesContainer propertyVariablesContainer(
+      gd::VariablesContainer::SourceType::Properties);
+  ExposeEventsBasedObjectEventsImpl(
+      project, eventsFunctionsExtension, eventsBasedObject,
+      propertyVariablesContainer, worker);
 }
 
 void ProjectBrowserHelper::ExposeProjectObjects(

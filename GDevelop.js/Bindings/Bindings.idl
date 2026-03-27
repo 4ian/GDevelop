@@ -787,6 +787,11 @@ interface ProjectScopedContainers {
   [Const, Ref] ObjectsContainersList GetObjectsContainersList();
   [Const, Ref] VariablesContainersList GetVariablesContainersList();
   [Const, Ref] ResourcesContainersList GetResourcesContainersList();
+
+  [Const, Ref] DOMString GetScopeExtensionName();
+  [Const, Ref] DOMString GetScopeFunctionName();
+  [Const, Ref] DOMString GetScopeBehaviorName();
+  [Const, Ref] DOMString GetScopeObjectName();
 };
 
 interface ExtensionProperties {
@@ -2676,6 +2681,7 @@ interface VectorUnfilledRequiredBehaviorPropertyProblem {
 interface ProjectBrowserHelper {
     void STATIC_ExposeProjectEvents([Ref] Project project, [Ref] ArbitraryEventsWorker worker);
     void STATIC_ExposeProjectObjects([Ref] Project project, [Ref] ArbitraryObjectsWorker worker);
+    void STATIC_ExposeEventsFunctionsExtensionEvents([Ref] Project project, [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Ref] ReadOnlyArbitraryEventsWorkerWithContext worker);
 };
 
 interface ResourceExposer {
@@ -3712,6 +3718,9 @@ interface ReadOnlyArbitraryEventsWorkerWithContext {
 [JSImplementation=ReadOnlyArbitraryEventsWorkerWithContext]
 interface ReadOnlyArbitraryEventsWorkerWithContextJS {
     void ReadOnlyArbitraryEventsWorkerWithContextJS();
+
+    // Called at the start of each Launch, before event traversal begins
+    void DoStartLaunch([Const, Ref] EventsList events);
 
     // Called for each event visited
     void DoVisitEvent([Const, Ref] BaseEvent event);

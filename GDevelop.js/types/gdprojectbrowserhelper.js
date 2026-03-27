@@ -2,6 +2,7 @@
 declare class gdProjectBrowserHelper {
   static exposeProjectEvents(project: gdProject, worker: gdArbitraryEventsWorker): void;
   static exposeProjectObjects(project: gdProject, worker: gdArbitraryObjectsWorker): void;
+  static exposeEventsFunctionsExtensionEvents(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, worker: gdReadOnlyArbitraryEventsWorkerWithContext): void;
   delete(): void;
   ptr: number;
 };

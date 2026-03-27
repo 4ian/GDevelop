@@ -408,6 +408,17 @@ class ReadOnlyArbitraryEventsWorkerWithContextJS : public ReadOnlyArbitraryEvent
         isCondition,
         (int)&GetProjectScopedContainers());
   }
+
+  virtual void DoStartLaunch(const gd::EventsList &events) {
+    EM_ASM(
+        {
+          var self = Module['getCache'](Module['ReadOnlyArbitraryEventsWorkerWithContextJS'])[$0];
+          if (self.hasOwnProperty('doStartLaunch'))
+            self.doStartLaunch(wrapPointer($1, Module['EventsList']));
+        },
+        (int)this,
+        (int)&events);
+  }
 };
 
 class InitialInstanceJSFunctorWrapper : public gd::InitialInstanceFunctor {
@@ -665,6 +676,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_ReplaceStringInEvents ReplaceStringInEvents
 #define STATIC_ExposeProjectEvents ExposeProjectEvents
 #define STATIC_ExposeProjectObjects ExposeProjectObjects
+#define STATIC_ExposeEventsFunctionsExtensionEvents ExposeEventsFunctionsExtensionEvents
 #define STATIC_ExposeWholeProjectResources ExposeWholeProjectResources
 #define STATIC_GetResourceTypes GetResourceTypes
 

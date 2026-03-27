@@ -2,6 +2,7 @@
 #include <set>
 
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
+#include "GDCore/String.h"
 #include "ObjectsContainersList.h"
 #include "PropertiesContainersList.h"
 #include "VariablesContainersList.h"
@@ -241,6 +242,38 @@ class ProjectScopedContainers {
     return resourcesContainersList;
   };
 
+  /**
+   * \brief Return the name of the extension in scope, or an empty string if
+   * the scope is not an extension function.
+   */
+  const gd::String &GetScopeExtensionName() const {
+    return scopeExtensionName;
+  };
+
+  /**
+   * \brief Return the name of the function in scope, or an empty string if
+   * the scope is not an extension function.
+   */
+  const gd::String &GetScopeFunctionName() const {
+    return scopeFunctionName;
+  };
+
+  /**
+   * \brief Return the name of the behavior in scope, or an empty string if
+   * the scope is not a behavior function.
+   */
+  const gd::String &GetScopeBehaviorName() const {
+    return scopeBehaviorName;
+  };
+
+  /**
+   * \brief Return the name of the object in scope, or an empty string if
+   * the scope is not an object function.
+   */
+  const gd::String &GetScopeObjectName() const {
+    return scopeObjectName;
+  };
+
   /** Do not use - should be private but accessible to let Emscripten create a
    * temporary. */
   ProjectScopedContainers()
@@ -254,6 +287,11 @@ private:
   gd::PropertiesContainersList propertiesContainersList;
   std::vector<const ParameterMetadataContainer *> parametersVectorsList;
   gd::ResourcesContainersList resourcesContainersList;
+
+  gd::String scopeExtensionName;
+  gd::String scopeFunctionName;
+  gd::String scopeBehaviorName;
+  gd::String scopeObjectName;
 };
 
 }  // namespace gd

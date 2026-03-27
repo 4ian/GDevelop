@@ -16,6 +16,7 @@ class EventsBasedObject;
 class EventsBasedObjectVariant;
 class ArbitraryEventsWorker;
 class ArbitraryEventsWorkerWithContext;
+class ReadOnlyArbitraryEventsWorkerWithContext;
 class ArbitraryEventsFunctionsWorker;
 class ArbitraryObjectsWorker;
 class ArbitraryEventBasedBehaviorsWorker;
@@ -116,6 +117,15 @@ public:
 
   /**
    * \brief Call the specified worker on all events of the event-based
+   * extension (read-only version with context).
+   */
+  static void ExposeEventsFunctionsExtensionEvents(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::ReadOnlyArbitraryEventsWorkerWithContext &worker);
+
+  /**
+   * \brief Call the specified worker on all events of the event-based
    * behavior.
    *
    * This should be the preferred way to traverse all the events of an events
@@ -151,6 +161,16 @@ public:
       const gd::EventsBasedBehavior &eventsBasedBehavior,
       gd::VariablesContainer &propertyVariablesContainer,
       gd::ArbitraryEventsWorkerWithContext &worker);
+
+  /**
+   * \brief Call the specified worker on all events of the event-based
+   * behavior (read-only version with context).
+   */
+  static void ExposeEventsBasedBehaviorEvents(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedBehavior &eventsBasedBehavior,
+      gd::ReadOnlyArbitraryEventsWorkerWithContext &worker);
 
   /**
    * \brief Call the specified worker on all events of the event-based
@@ -190,6 +210,16 @@ public:
       const gd::EventsBasedObject &eventsBasedObject,
       gd::VariablesContainer &propertyVariablesContainer,
       gd::ArbitraryEventsWorkerWithContext &worker);
+
+  /**
+   * \brief Call the specified worker on all events of the event-based
+   * object (read-only version with context).
+   */
+  static void ExposeEventsBasedObjectEvents(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedObject &eventsBasedObject,
+      gd::ReadOnlyArbitraryEventsWorkerWithContext &worker);
 
   /**
    * \brief Call the specified worker on all ObjectContainers of the project

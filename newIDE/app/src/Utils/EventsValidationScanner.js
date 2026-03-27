@@ -480,11 +480,8 @@ export const groupValidationErrors = (
       const missingList = missingInstructions.get(key);
       if (missingList) missingList.push(error);
     } else {
-      // Group by location (extension errors include function path)
-      const key =
-        error.locationType === 'extension'
-          ? `extension: ${error.locationName}`
-          : `${error.locationType}: ${error.locationName}`;
+      // Group by location
+      const key = `${error.locationType}: ${error.locationName}`;
       if (!invalidParameters.has(key)) {
         invalidParameters.set(key, []);
       }

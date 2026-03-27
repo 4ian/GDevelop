@@ -2728,6 +2728,7 @@ export class EventsContextAnalyzer extends EmscriptenObject {
 }
 
 export class ReadOnlyArbitraryEventsWorkerWithContext extends EmscriptenObject {
+  setSkipDisabledEvents(skip: boolean): void;
   launch(events: EventsList, projectScopedContainers: ProjectScopedContainers): void;
 }
 

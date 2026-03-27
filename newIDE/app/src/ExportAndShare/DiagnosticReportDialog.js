@@ -111,8 +111,7 @@ const InvalidParameterRow = ({
       <TableRowColumn style={styles.locationCell}>
         <div style={styles.locationText}>
           <Link href="#" onClick={() => navigateToError(error)}>
-            {error.locationType === 'scene' ? 'scene' : 'external-events'}:{' '}
-            {error.locationName}
+            {`${error.locationType}: ${error.locationName}`}
           </Link>
         </div>
       </TableRowColumn>
@@ -222,6 +221,13 @@ type Props = {|
     externalEventsName: string,
     eventPath: EventPath
   ) => void,
+  onNavigateToExtensionEvent: ({|
+    extensionName: string,
+    functionName: string,
+    behaviorName: ?string,
+    objectName: ?string,
+    eventPath: EventPath,
+  |}) => void,
 |};
 
 // $FlowFixMe[missing-local-annot]
@@ -240,6 +246,7 @@ export default function DiagnosticReportDialog({
   onClose,
   onNavigateToLayoutEvent,
   onNavigateToExternalEventsEvent,
+  onNavigateToExtensionEvent,
 }: Props): React.Node {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const preferences = React.useContext(PreferencesContext);
@@ -279,9 +286,26 @@ export default function DiagnosticReportDialog({
         onNavigateToLayoutEvent(error.locationName, error.eventPath);
       } else if (error.locationType === 'external-events') {
         onNavigateToExternalEventsEvent(error.locationName, error.eventPath);
+      } else if (
+        error.locationType === 'extension' &&
+        error.extensionName &&
+        error.functionName
+      ) {
+        onNavigateToExtensionEvent({
+          extensionName: error.extensionName,
+          functionName: error.functionName,
+          behaviorName: error.behaviorName || null,
+          objectName: error.objectName || null,
+          eventPath: error.eventPath,
+        });
       }
     },
-    [onClose, onNavigateToLayoutEvent, onNavigateToExternalEventsEvent]
+    [
+      onClose,
+      onNavigateToLayoutEvent,
+      onNavigateToExternalEventsEvent,
+      onNavigateToExtensionEvent,
+    ]
   );
 
   const renderMissingInstructionName = (type: string) => {

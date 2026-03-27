@@ -39,11 +39,18 @@ class GD_CORE_API AbstractArbitraryEventsWorker : private EventVisitor {
   AbstractArbitraryEventsWorker(){};
   virtual ~AbstractArbitraryEventsWorker();
 
+  /**
+   * \brief When enabled, disabled events and their entire subtree are skipped
+   * during traversal.
+   */
+  void SetSkipDisabledEvents(bool skip) { skipDisabledEvents_ = skip; }
+
 protected:
   virtual bool VisitEvent(gd::BaseEvent& event) override;
   void VisitEventList(gd::EventsList& events);
 
  private:
+  bool skipDisabledEvents_ = false;
   bool VisitLinkEvent(gd::LinkEvent& linkEvent) override;
   void VisitInstructionList(gd::InstructionsList& instructions,
                             bool areConditions);
@@ -181,6 +188,12 @@ class GD_CORE_API AbstractReadOnlyArbitraryEventsWorker : private ReadOnlyEventV
   AbstractReadOnlyArbitraryEventsWorker() : shouldStopIteration(false) {};
   virtual ~AbstractReadOnlyArbitraryEventsWorker();
 
+  /**
+   * \brief When enabled, disabled events and their entire subtree are skipped
+   * during traversal.
+   */
+  void SetSkipDisabledEvents(bool skip) { skipDisabledEvents_ = skip; }
+
 protected:
   void StopAnyEventIteration() override;
   virtual void VisitEvent(const gd::BaseEvent& event) override;
@@ -188,6 +201,7 @@ protected:
   void VisitEventList(const gd::EventsList& events);
 
  private:
+  bool skipDisabledEvents_ = false;
   void VisitLinkEvent(const gd::LinkEvent& linkEvent) override;
   void VisitInstructionList(const gd::InstructionsList& instructions,
                             bool areConditions);

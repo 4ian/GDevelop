@@ -777,7 +777,10 @@ export const CompactObjectPropertiesEditor = ({
                           behaviorOverriding={null}
                           initialInstance={null}
                           object={object}
-                          onBehaviorUpdated={() => {}}
+                          onBehaviorUpdated={() => {
+                            onObjectsModified([object]);
+                            forceUpdate();
+                          }}
                           resourceManagementProps={resourceManagementProps}
                           onOpenFullEditor={() =>
                             onEditObject(object, 'behaviors')

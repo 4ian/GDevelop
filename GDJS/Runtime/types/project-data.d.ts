@@ -306,6 +306,7 @@ declare interface InstancesEditorSettings {
   gridColor: int;
   gridAlpha: float;
   snap: boolean;
+  showPhysics3DCollisionShapes?: boolean;
 }
 
 declare interface LayoutNetworkSyncData {

@@ -694,6 +694,10 @@ export default class SceneEditor extends React.Component<Props, State> {
           isLayersListShown={editorDisplay.isEditorVisible('layers-list')}
           toggleWindowMask={this.toggleWindowMask}
           isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
+          togglePhysics3DCollisionShapes={this.togglePhysics3DCollisionShapes}
+          isPhysics3DCollisionShapesShown={
+            !!this.state.instancesEditorSettings.showPhysics3DCollisionShapes
+          }
           toggleGrid={this.toggleGrid}
           isGridShown={!!this.state.instancesEditorSettings.grid}
           openSetupGrid={this.openSetupGrid}
@@ -724,6 +728,10 @@ export default class SceneEditor extends React.Component<Props, State> {
           toggleLayersList={this.toggleLayersList}
           toggleWindowMask={this.toggleWindowMask}
           isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
+          togglePhysics3DCollisionShapes={this.togglePhysics3DCollisionShapes}
+          isPhysics3DCollisionShapesShown={
+            !!this.state.instancesEditorSettings.showPhysics3DCollisionShapes
+          }
           toggleGrid={this.toggleGrid}
           isGridShown={!!this.state.instancesEditorSettings.grid}
           openSetupGrid={this.openSetupGrid}
@@ -816,6 +824,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       ...this.state.instancesEditorSettings,
       grid: !this.state.instancesEditorSettings.grid,
       snap: !this.state.instancesEditorSettings.grid,
+    });
+  };
+
+  togglePhysics3DCollisionShapes = () => {
+    this.setInstancesEditorSettings({
+      ...this.state.instancesEditorSettings,
+      showPhysics3DCollisionShapes: !this.state.instancesEditorSettings
+        .showPhysics3DCollisionShapes,
     });
   };
 

@@ -441,6 +441,132 @@ namespace gdjs {
       this._sharedData.addToBehaviorsList(this);
     }
 
+    override updateFromBehaviorData(
+      oldBehaviorData: BehaviorData,
+      newBehaviorData: BehaviorData
+    ): boolean {
+      const behaviorDiff: BehaviorData = {
+        name: newBehaviorData.name,
+        type: newBehaviorData.type,
+      };
+
+      const oldShape = oldBehaviorData.shape;
+      const newShape = newBehaviorData.shape;
+      if (oldShape !== newShape && newShape !== undefined) {
+        behaviorDiff.shape = newShape;
+      }
+
+      const oldShapeOrientation =
+        oldShape === 'Box'
+          ? 'Z'
+          : oldBehaviorData.shapeOrientation || undefined;
+      const newShapeOrientation =
+        newShape === 'Box'
+          ? 'Z'
+          : newBehaviorData.shapeOrientation || undefined;
+      if (
+        oldShapeOrientation !== newShapeOrientation &&
+        newShapeOrientation !== undefined
+      ) {
+        behaviorDiff.shapeOrientation = newShapeOrientation;
+      }
+
+      const oldMeshShapeResourceName = oldBehaviorData.meshShapeResourceName || '';
+      const newMeshShapeResourceName = newBehaviorData.meshShapeResourceName || '';
+      if (oldMeshShapeResourceName !== newMeshShapeResourceName) {
+        behaviorDiff.meshShapeResourceName = newMeshShapeResourceName;
+      }
+
+      const oldShapeDimensionA = oldBehaviorData.shapeDimensionA ?? 0;
+      const newShapeDimensionA = newBehaviorData.shapeDimensionA ?? 0;
+      if (oldShapeDimensionA !== newShapeDimensionA) {
+        behaviorDiff.shapeDimensionA = newShapeDimensionA;
+      }
+      const oldShapeDimensionB = oldBehaviorData.shapeDimensionB ?? 0;
+      const newShapeDimensionB = newBehaviorData.shapeDimensionB ?? 0;
+      if (oldShapeDimensionB !== newShapeDimensionB) {
+        behaviorDiff.shapeDimensionB = newShapeDimensionB;
+      }
+      const oldShapeDimensionC = oldBehaviorData.shapeDimensionC ?? 0;
+      const newShapeDimensionC = newBehaviorData.shapeDimensionC ?? 0;
+      if (oldShapeDimensionC !== newShapeDimensionC) {
+        behaviorDiff.shapeDimensionC = newShapeDimensionC;
+      }
+
+      const oldShapeOffsetX = oldBehaviorData.shapeOffsetX ?? 0;
+      const newShapeOffsetX = newBehaviorData.shapeOffsetX ?? 0;
+      if (oldShapeOffsetX !== newShapeOffsetX) {
+        behaviorDiff.shapeOffsetX = newShapeOffsetX;
+      }
+      const oldShapeOffsetY = oldBehaviorData.shapeOffsetY ?? 0;
+      const newShapeOffsetY = newBehaviorData.shapeOffsetY ?? 0;
+      if (oldShapeOffsetY !== newShapeOffsetY) {
+        behaviorDiff.shapeOffsetY = newShapeOffsetY;
+      }
+      const oldShapeOffsetZ = oldBehaviorData.shapeOffsetZ ?? 0;
+      const newShapeOffsetZ = newBehaviorData.shapeOffsetZ ?? 0;
+      if (oldShapeOffsetZ !== newShapeOffsetZ) {
+        behaviorDiff.shapeOffsetZ = newShapeOffsetZ;
+      }
+
+      const oldShapeScale = oldBehaviorData.shapeScale ?? 1;
+      const newShapeScale = newBehaviorData.shapeScale ?? 1;
+      if (oldShapeScale !== newShapeScale) {
+        behaviorDiff.shapeScale = newShapeScale;
+      }
+
+      const oldBullet = oldBehaviorData.bullet ?? false;
+      const newBullet = newBehaviorData.bullet ?? false;
+      if (oldBullet !== newBullet) {
+        behaviorDiff.bullet = newBullet;
+      }
+
+      const oldFixedRotation = oldBehaviorData.fixedRotation ?? false;
+      const newFixedRotation = newBehaviorData.fixedRotation ?? false;
+      if (oldFixedRotation !== newFixedRotation) {
+        behaviorDiff.fixedRotation = newFixedRotation;
+      }
+
+      if (
+        oldBehaviorData.density !== newBehaviorData.density &&
+        newBehaviorData.density !== undefined
+      ) {
+        behaviorDiff.density = newBehaviorData.density;
+      }
+      if (
+        oldBehaviorData.friction !== newBehaviorData.friction &&
+        newBehaviorData.friction !== undefined
+      ) {
+        behaviorDiff.friction = newBehaviorData.friction;
+      }
+      if (
+        oldBehaviorData.restitution !== newBehaviorData.restitution &&
+        newBehaviorData.restitution !== undefined
+      ) {
+        behaviorDiff.restitution = newBehaviorData.restitution;
+      }
+      if (
+        oldBehaviorData.linearDamping !== newBehaviorData.linearDamping &&
+        newBehaviorData.linearDamping !== undefined
+      ) {
+        behaviorDiff.linearDamping = newBehaviorData.linearDamping;
+      }
+      if (
+        oldBehaviorData.angularDamping !== newBehaviorData.angularDamping &&
+        newBehaviorData.angularDamping !== undefined
+      ) {
+        behaviorDiff.angularDamping = newBehaviorData.angularDamping;
+      }
+      if (
+        oldBehaviorData.gravityScale !== newBehaviorData.gravityScale &&
+        newBehaviorData.gravityScale !== undefined
+      ) {
+        behaviorDiff.gravityScale = newBehaviorData.gravityScale;
+      }
+
+      return this.applyBehaviorOverriding(behaviorDiff);
+    }
+
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
       const tempVec3 = this._sharedData._tempVec3;
       tempVec3.Set(x, y, z);
@@ -466,6 +592,24 @@ namespace gdjs {
       if (behaviorData.fixedRotation !== undefined) {
         this.setFixedRotation(behaviorData.fixedRotation);
       }
+      if (behaviorData.shape !== undefined) {
+        this._shape = behaviorData.shape;
+        this.meshShapeResourceName = behaviorData.meshShapeResourceName || '';
+        this.shapeOrientation =
+          behaviorData.shape === 'Box' ? 'Z' : behaviorData.shapeOrientation;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.meshShapeResourceName !== undefined) {
+        this.meshShapeResourceName = behaviorData.meshShapeResourceName || '';
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.shapeOrientation !== undefined) {
+        this.shapeOrientation =
+          behaviorData.shape === 'Box'
+            ? 'Z'
+            : behaviorData.shapeOrientation || this.shapeOrientation;
+        this._needToRecreateShape = true;
+      }
       if (behaviorData.shapeDimensionA !== undefined) {
         this.shapeDimensionA = behaviorData.shapeDimensionA;
         this._needToRecreateShape = true;
@@ -473,6 +617,22 @@ namespace gdjs {
       if (behaviorData.shapeDimensionB !== undefined) {
         this.shapeDimensionB = behaviorData.shapeDimensionB;
         this._needToRecreateShape = true;
+      }
+      if (behaviorData.shapeDimensionC !== undefined) {
+        this.shapeDimensionC = behaviorData.shapeDimensionC;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.shapeOffsetX !== undefined) {
+        this.setShapeOffsetX(behaviorData.shapeOffsetX);
+      }
+      if (behaviorData.shapeOffsetY !== undefined) {
+        this.setShapeOffsetY(behaviorData.shapeOffsetY);
+      }
+      if (behaviorData.shapeOffsetZ !== undefined) {
+        this.setShapeOffsetZ(behaviorData.shapeOffsetZ);
+      }
+      if (behaviorData.shapeScale !== undefined) {
+        this.setShapeScale(behaviorData.shapeScale);
       }
       if (behaviorData.density !== undefined) {
         this.setDensity(behaviorData.density);
@@ -504,9 +664,6 @@ namespace gdjs {
         return false;
       }
       if (behaviorData.bodyType !== undefined) {
-        return false;
-      }
-      if (behaviorData.shape !== undefined) {
         return false;
       }
       return true;

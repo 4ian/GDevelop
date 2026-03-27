@@ -849,6 +849,10 @@ namespace gdjs {
     private _selection = new Selection();
     private _selectionBoxes: Map<RuntimeObject, ObjectSelectionBoxHelper> =
       new Map();
+    private _physics3DCollisionShapes: Map<
+      any,
+      Physics3DCollisionShapeHelper
+    > = new Map();
     private _objectMover = new ObjectMover(this);
 
     private _wasMouseLeftButtonPressed = false;
@@ -968,6 +972,7 @@ namespace gdjs {
         this._unregisterContextLostListener();
         this._unregisterContextLostListener = null;
       }
+      this._clearPhysics3DCollisionShapes();
     }
 
     private _applyInGameEditorSettings() {
@@ -1130,6 +1135,7 @@ namespace gdjs {
       this._selectedLayerName = '';
       // Clear any reference to `RuntimeObject` from the unloaded scene.
       this._selectionBoxes.clear();
+      this._clearPhysics3DCollisionShapes();
       this._selectionControls = null;
       this._draggedNewObject = null;
       this._draggedSelectedObject = null;
@@ -2137,6 +2143,65 @@ namespace gdjs {
       const objectBoxHelper = new ObjectSelectionBoxHelper(object);
       threeGroup.add(objectBoxHelper.container);
       this._selectionBoxes.set(object, objectBoxHelper);
+    }
+
+    private _clearPhysics3DCollisionShapes(): void {
+      this._physics3DCollisionShapes.forEach((helper) => helper.dispose());
+      this._physics3DCollisionShapes.clear();
+    }
+
+    private _updatePhysics3DCollisionShapes(): void {
+      if (
+        !this._currentScene ||
+        !this._instancesEditorSettings ||
+        !this._instancesEditorSettings.showPhysics3DCollisionShapes
+      ) {
+        this._clearPhysics3DCollisionShapes();
+        return;
+      }
+
+      const physics3DSharedData = (this._currentScene as any)
+        .physics3DSharedData;
+      const registeredBehaviors: Set<any> | null =
+        physics3DSharedData && physics3DSharedData._registeredBehaviors
+          ? physics3DSharedData._registeredBehaviors
+          : null;
+
+      if (!registeredBehaviors) {
+        this._clearPhysics3DCollisionShapes();
+        return;
+      }
+
+      // Remove helpers for behaviors that no longer exist.
+      this._physics3DCollisionShapes.forEach((helper, behavior) => {
+        if (!registeredBehaviors.has(behavior)) {
+          helper.dispose();
+          this._physics3DCollisionShapes.delete(behavior);
+        }
+      });
+
+      for (const behavior of registeredBehaviors) {
+        if (!behavior || !behavior.owner3D) continue;
+
+        const owner3D = behavior.owner3D;
+        const objectLayer = this.getEditorLayer(owner3D.getLayer());
+        if (!objectLayer) continue;
+
+        const threeGroup = objectLayer.getRenderer().getThreeGroup();
+        if (!threeGroup) continue;
+
+        let helper = this._physics3DCollisionShapes.get(behavior);
+        if (!helper) {
+          helper = new Physics3DCollisionShapeHelper(behavior);
+          this._physics3DCollisionShapes.set(behavior, helper);
+          threeGroup.add(helper.container);
+        } else if (helper.container.parent !== threeGroup) {
+          helper.container.removeFromParent();
+          threeGroup.add(helper.container);
+        }
+
+        helper.updateFromBehavior();
+      }
     }
 
     private _getTransformControlsMode(): 'translate' | 'rotate' | 'scale' {
@@ -3233,6 +3298,7 @@ namespace gdjs {
       // are not considered by raycasting.
       this._raycaster.layers.set(0);
       this._selectionBoxes.forEach((box) => box.setLayer(1));
+      this._physics3DCollisionShapes.forEach((helper) => helper.setLayer(1));
       if (this._threeInnerArea) {
         for (const child of this._threeInnerArea.children) {
           child.layers.set(1);
@@ -3282,6 +3348,7 @@ namespace gdjs {
 
       // Reset selection boxes layers so they are properly displayed.
       this._selectionBoxes.forEach((box) => box.setLayer(0));
+      this._physics3DCollisionShapes.forEach((helper) => helper.setLayer(0));
       if (this._threeInnerArea) {
         for (const child of this._threeInnerArea.children) {
           child.layers.set(0);
@@ -3554,6 +3621,7 @@ namespace gdjs {
       this._updateSelectionBox();
       this._handleSelection({ objectUnderCursor });
       this._updateSelectionOutline({ objectUnderCursor });
+      this._updatePhysics3DCollisionShapes();
       // Custom objects only update their position at the end of the frame
       // because they don't override position setters like built-in objects do.
       // Since the instance position is not yet set when `onCreated` is called,
@@ -5073,6 +5141,377 @@ namespace gdjs {
     setColor(color: THREE.ColorRepresentation) {
       this.boxHelper.material.color.set(color);
       this.boxHelper.material.needsUpdate = true;
+    }
+  }
+
+  class Physics3DCollisionShapeHelper {
+    behavior: any;
+    container: THREE.Group;
+    private _shapeRoot: THREE.Group;
+    private _shapeContent: THREE.Group;
+    private _shapeObject: THREE.Object3D | null = null;
+    private _signature: string | null = null;
+    private _lineMaterial: THREE.LineBasicMaterial;
+
+    constructor(behavior: any) {
+      this.behavior = behavior;
+      this.container = new THREE.Group();
+      this.container.rotation.order = 'ZYX';
+      this.container.userData.isCollisionShapeHelper = true;
+
+      this._shapeRoot = new THREE.Group();
+      this._shapeRoot.rotation.order = 'ZYX';
+
+      this._shapeContent = new THREE.Group();
+      this._shapeContent.rotation.order = 'ZYX';
+
+      this._lineMaterial = new THREE.LineBasicMaterial({
+        color: 0x43c1ff,
+        transparent: true,
+        opacity: 0.7,
+        depthTest: false,
+        depthWrite: false,
+      });
+
+      this._shapeRoot.add(this._shapeContent);
+      this.container.add(this._shapeRoot);
+    }
+
+    updateFromBehavior(): void {
+      const behavior = this.behavior;
+      if (!behavior || !behavior.owner3D) return;
+
+      const owner3D = behavior.owner3D;
+      const object3D = owner3D.get3DRendererObject
+        ? owner3D.get3DRendererObject()
+        : null;
+      if (!object3D) return;
+
+      object3D.updateMatrixWorld(true);
+
+      const shapeScale = behavior.shapeScale || 1;
+      const shapeOffsetX = (behavior.shapeOffsetX || 0) * shapeScale;
+      const shapeOffsetY = (behavior.shapeOffsetY || 0) * shapeScale;
+      const shapeOffsetZ = (behavior.shapeOffsetZ || 0) * shapeScale;
+
+      const rawShape: string = behavior._shape || 'Sphere';
+      const shapeOrientation: string =
+        rawShape === 'Box' ? 'Z' : behavior.shapeOrientation || 'Z';
+
+      let width = owner3D.getWidth();
+      let height = owner3D.getHeight();
+      let depth = owner3D.getDepth();
+      if (shapeOrientation === 'X') {
+        const swap = depth;
+        depth = width;
+        width = swap;
+      } else if (shapeOrientation === 'Y') {
+        const swap = depth;
+        depth = height;
+        height = swap;
+      }
+
+      const shapeDimensionA = (behavior.shapeDimensionA || 0) * shapeScale;
+      const shapeDimensionB = (behavior.shapeDimensionB || 0) * shapeScale;
+      const shapeDimensionC = (behavior.shapeDimensionC || 0) * shapeScale;
+      const onePixel = 1;
+
+      let signature = '';
+      if (rawShape === 'Mesh') {
+        const meshSignatureParts: Array<string> = [];
+        object3D.traverse((child) => {
+          if (child && child.isMesh && child.geometry) {
+            meshSignatureParts.push(
+              `${child.uuid}:${child.geometry.uuid}:${
+                child.geometry.attributes?.position?.count || 0
+              }`
+            );
+          }
+        });
+        const meshResourceName = behavior.meshShapeResourceName || '';
+        let meshResourceReady = false;
+        if (meshResourceName && owner3D && owner3D.getInstanceContainer) {
+          const model = owner3D
+            .getInstanceContainer()
+            .getGame()
+            .getModel3DManager()
+            .getModel(meshResourceName);
+          meshResourceReady = !!model;
+        }
+        signature = `mesh|${meshResourceName}|${meshResourceReady}|${meshSignatureParts.join(',')}`;
+      } else {
+        const format = (value: number) => value.toFixed(4);
+        signature = [
+          rawShape,
+          shapeOrientation,
+          format(shapeScale),
+          format(shapeDimensionA),
+          format(shapeDimensionB),
+          format(shapeDimensionC),
+          format(width),
+          format(height),
+          format(depth),
+        ].join('|');
+      }
+
+      if (signature !== this._signature) {
+        this._rebuildShapeObject({
+          shape: rawShape,
+          width,
+          height,
+          depth,
+          shapeDimensionA,
+          shapeDimensionB,
+          shapeDimensionC,
+          onePixel,
+          object3D,
+          owner3D,
+          behavior,
+        });
+        this._signature = signature;
+      }
+
+      this._shapeRoot.position.set(
+        owner3D.getCenterXInScene(),
+        owner3D.getCenterYInScene(),
+        owner3D.getCenterZInScene()
+      );
+      this._shapeRoot.quaternion.copy(object3D.quaternion);
+      if (rawShape === 'Mesh') {
+        this._shapeRoot.scale.copy(object3D.scale);
+      } else {
+        this._shapeRoot.scale.set(1, 1, 1);
+      }
+
+      this._shapeContent.position.set(
+        shapeOffsetX,
+        shapeOffsetY,
+        shapeOffsetZ
+      );
+      this._shapeContent.rotation.set(0, 0, 0);
+      if (rawShape === 'Capsule' || rawShape === 'Cylinder') {
+        if (shapeOrientation === 'X') {
+          this._shapeContent.rotation.z = -Math.PI / 2;
+        } else if (shapeOrientation === 'Z') {
+          this._shapeContent.rotation.x = Math.PI / 2;
+        }
+      }
+    }
+
+    private _rebuildShapeObject({
+      shape,
+      width,
+      height,
+      depth,
+      shapeDimensionA,
+      shapeDimensionB,
+      shapeDimensionC,
+      onePixel,
+      object3D,
+      owner3D,
+      behavior,
+    }: {
+      shape: string;
+      width: number;
+      height: number;
+      depth: number;
+      shapeDimensionA: number;
+      shapeDimensionB: number;
+      shapeDimensionC: number;
+      onePixel: number;
+      object3D: THREE.Object3D;
+      owner3D: any;
+      behavior: any;
+    }): void {
+      this._disposeShapeObject();
+
+      let shapeObject: THREE.Object3D;
+      if (shape === 'Mesh') {
+        shapeObject = this._buildMeshWireframeFromBehavior(
+          object3D,
+          owner3D,
+          behavior
+        );
+      } else {
+        let geometry: THREE.BufferGeometry;
+        if (shape === 'Box') {
+          const boxWidth =
+            shapeDimensionA > 0
+              ? shapeDimensionA
+              : width > 0
+                ? width
+                : onePixel;
+          const boxHeight =
+            shapeDimensionB > 0
+              ? shapeDimensionB
+              : height > 0
+                ? height
+                : onePixel;
+          const boxDepth =
+            shapeDimensionC > 0
+              ? shapeDimensionC
+              : depth > 0
+                ? depth
+                : onePixel;
+          geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+        } else if (shape === 'Capsule') {
+          const radius =
+            shapeDimensionA > 0
+              ? shapeDimensionA
+              : width > 0
+                ? Math.sqrt(width * height) / 2
+                : onePixel;
+          const capsuleDepth =
+            shapeDimensionB > 0
+              ? shapeDimensionB
+              : depth > 0
+                ? depth
+                : onePixel;
+          geometry = new THREE.CapsuleGeometry(
+            radius,
+            Math.max(0, capsuleDepth - 2 * radius),
+            6,
+            12
+          );
+        } else if (shape === 'Cylinder') {
+          const radius =
+            shapeDimensionA > 0
+              ? shapeDimensionA
+              : width > 0
+                ? Math.sqrt(width * height) / 2
+                : onePixel;
+          const cylinderDepth =
+            shapeDimensionB > 0
+              ? shapeDimensionB
+              : depth > 0
+                ? depth
+                : onePixel;
+          geometry = new THREE.CylinderGeometry(
+            radius,
+            radius,
+            cylinderDepth,
+            12
+          );
+        } else {
+          const radius =
+            shapeDimensionA > 0
+              ? shapeDimensionA
+              : width > 0
+                ? Math.sqrt(width * height) / 2
+                : onePixel;
+          geometry = new THREE.SphereGeometry(radius, 16, 12);
+        }
+
+        const wireframeGeometry = new THREE.WireframeGeometry(geometry);
+        shapeObject = new THREE.LineSegments(
+          wireframeGeometry,
+          this._lineMaterial
+        );
+      }
+
+      shapeObject.traverse((object) => {
+        object.userData.isCollisionShapeHelper = true;
+      });
+      this._shapeObject = shapeObject;
+      this._shapeContent.add(shapeObject);
+    }
+
+    private _buildMeshWireframeFromBehavior(
+      object3D: THREE.Object3D,
+      owner3D: any,
+      behavior: any
+    ): THREE.Object3D {
+      const meshShapeResourceName = behavior.meshShapeResourceName || '';
+      if (
+        meshShapeResourceName &&
+        owner3D &&
+        owner3D._renderer &&
+        owner3D._data &&
+        owner3D.getInstanceContainer
+      ) {
+        const originalModel = owner3D
+          .getInstanceContainer()
+          .getGame()
+          .getModel3DManager()
+          .getModel(meshShapeResourceName);
+        if (originalModel) {
+          const modelInCube = new THREE.Group();
+          modelInCube.rotation.order = 'ZYX';
+          const root = THREE_ADDONS.SkeletonUtils.clone(originalModel.scene);
+          modelInCube.add(root);
+
+          owner3D._renderer.stretchModelIntoUnitaryCube(
+            modelInCube,
+            owner3D._data.content.rotationX,
+            owner3D._data.content.rotationY,
+            owner3D._data.content.rotationZ
+          );
+
+          const threeObject = new THREE.Group();
+          threeObject.rotation.order = 'ZYX';
+          threeObject.add(modelInCube);
+          threeObject.scale.set(
+            owner3D.isFlippedX() ? -owner3D.getWidth() : owner3D.getWidth(),
+            owner3D.isFlippedY() ? -owner3D.getHeight() : owner3D.getHeight(),
+            owner3D.isFlippedZ() ? -owner3D.getDepth() : owner3D.getDepth()
+          );
+          threeObject.updateMatrixWorld(true);
+          return this._buildMeshWireframe(threeObject);
+        }
+      }
+
+      return this._buildMeshWireframe(object3D);
+    }
+
+    private _buildMeshWireframe(object3D: THREE.Object3D): THREE.Object3D {
+      const group = new THREE.Group();
+      const rootInverse = new THREE.Matrix4()
+        .copy(object3D.matrixWorld)
+        .invert();
+
+      object3D.traverse((child) => {
+        if (!child || !child.isMesh || !child.geometry) return;
+        const wireframeGeometry = new THREE.WireframeGeometry(child.geometry);
+        const lines = new THREE.LineSegments(
+          wireframeGeometry,
+          this._lineMaterial
+        );
+        const relativeMatrix = new THREE.Matrix4().multiplyMatrices(
+          rootInverse,
+          child.matrixWorld
+        );
+        lines.matrixAutoUpdate = false;
+        lines.matrix.copy(relativeMatrix);
+        group.add(lines);
+      });
+
+      return group;
+    }
+
+    private _disposeShapeObject(): void {
+      if (!this._shapeObject) return;
+      this._shapeObject.traverse((object) => {
+        if (object.geometry) object.geometry.dispose();
+        if (object.material && Array.isArray(object.material)) {
+          object.material.forEach((material) => material.dispose());
+        } else if (object.material) {
+          object.material.dispose();
+        }
+      });
+      this._shapeObject.removeFromParent();
+      this._shapeObject = null;
+    }
+
+    setLayer(layer: number): void {
+      this.container.traverse((object) => {
+        object.layers.set(layer);
+      });
+    }
+
+    dispose(): void {
+      this._disposeShapeObject();
+      this.container.removeFromParent();
+      this._lineMaterial.dispose();
     }
   }
 

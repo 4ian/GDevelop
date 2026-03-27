@@ -14,6 +14,7 @@ import TrashIcon from '../../UI/CustomSvgIcons/Trash';
 import GridIcon from '../../UI/CustomSvgIcons/Grid';
 import ZoomInIcon from '../../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
+import DebugIcon from '../../UI/CustomSvgIcons/Debug';
 import CompactToggleButtons from '../../UI/CompactToggleButtons';
 import Grid2d from '../../UI/CustomSvgIcons/Grid2d';
 import Grid3d from '../../UI/CustomSvgIcons/Grid3d';
@@ -34,6 +35,8 @@ type Props = {|
   selectedInstancesCount: number,
   isWindowMaskShown: boolean,
   toggleWindowMask: () => void,
+  isPhysics3DCollisionShapesShown: boolean,
+  togglePhysics3DCollisionShapes: () => void,
   isGridShown: boolean,
   toggleGrid: () => void,
   openSetupGrid: () => void,
@@ -87,6 +90,25 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function(props) {
               props.setGameEditorMode('embedded-game');
             },
             isActive: props.gameEditorMode === 'embedded-game',
+          },
+        ]}
+      />
+      <ElementWithMenu
+        element={
+          <IconButton
+            size="small"
+            color="default"
+            tooltip={t`3D debug helpers`}
+          >
+            <DebugIcon />
+          </IconButton>
+        }
+        buildMenuTemplate={(i18n: I18nType) => [
+          {
+            type: 'checkbox',
+            label: i18n._(t`Show 3D collision shapes`),
+            checked: props.isPhysics3DCollisionShapesShown,
+            click: () => props.togglePhysics3DCollisionShapes(),
           },
         ]}
       />

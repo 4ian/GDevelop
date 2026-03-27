@@ -23,6 +23,9 @@ export type InstancesEditorSettings = {|
   /** Is the window mask shown? */
   windowMask: boolean,
 
+  /** Show 3D physics collision shapes in the in-game editor */
+  showPhysics3DCollisionShapes: boolean,
+
   /** The name of the layer selected to place instances on. */
   selectedLayer: string,
 
@@ -63,6 +66,7 @@ export const prepareInstancesEditorSettings = (
       0.01
     ),
     windowMask: object.windowMask || false,
+    showPhysics3DCollisionShapes: object.showPhysics3DCollisionShapes || false,
     selectedLayer: object.selectedLayer || '',
     gameEditorMode: object.gameEditorMode || 'instances-editor',
   };
@@ -82,6 +86,7 @@ export const cloneInstancesEditorSettings = (
   gridOffsetZ: number,
   gridType: 'isometric' | 'rectangular',
   gridWidth: number,
+  showPhysics3DCollisionShapes: boolean,
   selectedLayer: string,
   snap: boolean,
   windowMask: boolean,

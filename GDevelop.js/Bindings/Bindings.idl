@@ -3706,6 +3706,7 @@ interface EventsContextAnalyzer {
 };
 
 interface ReadOnlyArbitraryEventsWorkerWithContext {
+    void SetSkipDisabledEvents(boolean skip);
     void Launch([Const, Ref] EventsList events, [Const, Ref] ProjectScopedContainers projectScopedContainers);
 };
 [JSImplementation=ReadOnlyArbitraryEventsWorkerWithContext]

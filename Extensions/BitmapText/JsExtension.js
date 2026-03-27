@@ -557,24 +557,32 @@ module.exports = {
         bitmapFontResourceName + '@' + textureAtlasResourceName;
 
       if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
-        // Check if the font's textures are still valid (they can be destroyed
-        // when a resource is reloaded by PixiResourcesLoader.reloadResource).
+        // Check if the font's texture still matches the currently loaded one.
+        // After a resource reload, PixiResourcesLoader replaces the texture
+        // in its cache, but the old BitmapFont still references the previous
+        // (now stale) texture object.
+        const currentTexture = pixiResourcesLoader.getPIXITexture(
+          project,
+          textureAtlasResourceName
+        );
         const existingFont = PIXI.BitmapFont.available[bitmapFontInstallKey];
         const pageTextures = existingFont.pageTextures;
-        const hasDestroyedTexture =
+        const isTextureStale =
           pageTextures &&
           Object.values(pageTextures).some(
-            (tex) => tex.baseTexture && tex.baseTexture.destroyed
+            (tex) =>
+              (tex.baseTexture && tex.baseTexture.destroyed) ||
+              tex.baseTexture !== currentTexture.baseTexture
           );
 
-        if (!hasDestroyedTexture) {
+        if (!isTextureStale) {
           // Return the existing BitmapFont that is already in memory and already installed.
           bitmapFontUsageCount[bitmapFontInstallKey] =
             (bitmapFontUsageCount[bitmapFontInstallKey] || 0) + 1;
           return Promise.resolve(existingFont);
         }
 
-        // Texture was destroyed during resource reload. Uninstall the stale font
+        // Texture was replaced during resource reload. Uninstall the stale font
         // so it can be reinstalled with the new texture below.
         // Keep the existing usage count - other instances still referencing the old
         // font will release it when they are destroyed during the reset cycle.

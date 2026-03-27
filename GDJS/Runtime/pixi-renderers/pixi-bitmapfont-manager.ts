@@ -201,9 +201,31 @@ namespace gdjs {
         bitmapFontResourceName + '@' + textureAtlasResourceName;
 
       if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
-        // Return the existing BitmapFont that is already in memory and already installed.
-        this._markBitmapFontAsUsed(bitmapFontInstallKey);
-        return PIXI.BitmapFont.available[bitmapFontInstallKey];
+        // Check if the font's texture still matches the currently loaded one.
+        // After a resource reload (e.g. hot-reload), the image manager replaces
+        // the texture, but the old BitmapFont still references the previous
+        // (now stale) texture object.
+        const currentTexture = this._imageManager.getPIXITexture(
+          textureAtlasResourceName
+        );
+        const existingFont = PIXI.BitmapFont.available[bitmapFontInstallKey];
+        const pageTextures = existingFont.pageTextures;
+        const isTextureStale =
+          pageTextures &&
+          Object.values(pageTextures).some(
+            (tex: PIXI.Texture) =>
+              (tex.baseTexture && tex.baseTexture.destroyed) ||
+              tex.baseTexture !== currentTexture.baseTexture
+          );
+
+        if (!isTextureStale) {
+          // Return the existing BitmapFont that is already in memory and already installed.
+          this._markBitmapFontAsUsed(bitmapFontInstallKey);
+          return PIXI.BitmapFont.available[bitmapFontInstallKey];
+        }
+
+        // Texture was replaced, reinstall the font with the current texture.
+        PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
       }
 
       // The Bitmap Font is not loaded, load it in memory.

@@ -317,6 +317,12 @@ const editWithBrowserExternalEditor = async ({
     resourceManagementProps.onNewResourcesAdded();
   }
 
+  // Notify that the resource files have changed so that PIXI textures,
+  // instance renderers, and the in-game editor are refreshed.
+  modifiedResources.forEach(({ resource }) => {
+    resourceManagementProps.onResourceFileChanged(resource.getFile());
+  });
+
   // Some editors (Piskel) need to have resource names persisted.
   patchExternalEditorMetadataWithResourcesNamesIfNecessary(
     modifiedResources.map(({ resource }) => resource.getName()),

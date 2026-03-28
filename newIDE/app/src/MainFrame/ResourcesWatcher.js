@@ -26,6 +26,22 @@ export const unregisterOnResourceExternallyChangedCallback = (
   delete callbacks[callbackId];
 };
 
+/**
+ * Notify all registered editors that a resource file has changed.
+ * This should be called whenever a resource's file is updated via a UI action
+ * (e.g., replacing a resource file in the Resource Editor, or an external editor
+ * updating a resource), so that PIXI textures, instance renderers, and the
+ * in-game editor are all refreshed.
+ */
+export const notifyResourceFileChanged = (resourceInfo: {|
+  identifier: string,
+|}) => {
+  ResourcesLoader.burstAllUrlsCache();
+  Object.keys(callbacks).forEach(callbackId =>
+    callbacks[callbackId](resourceInfo)
+  );
+};
+
 const useResourcesWatcher = ({
   getStorageProvider,
   fileMetadata,
@@ -44,10 +60,7 @@ const useResourcesWatcher = ({
 
   const informEditorsResourceExternallyChanged = React.useCallback(
     (resourceInfo: {| identifier: string |}) => {
-      ResourcesLoader.burstAllUrlsCache();
-      Object.keys(callbacks).forEach(callbackId =>
-        callbacks[callbackId](resourceInfo)
-      );
+      notifyResourceFileChanged(resourceInfo);
     },
     []
   );

@@ -190,7 +190,9 @@ import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
-import useResourcesWatcher from './ResourcesWatcher';
+import useResourcesWatcher, {
+  notifyResourceFileChanged,
+} from './ResourcesWatcher';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
@@ -1843,6 +1845,13 @@ const MainFrame = (props: Props): React.MixedElement => {
       });
     },
     [notifyChangesToInGameEditor]
+  );
+
+  const onResourceFileChanged = React.useCallback(
+    (resourceFile: string) => {
+      notifyResourceFileChanged({ identifier: resourceFile });
+    },
+    []
   );
 
   const onResourceUsageChanged = React.useCallback(
@@ -4827,6 +4836,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
+      onResourceFileChanged,
     }),
     [
       resourceSources,
@@ -4838,6 +4848,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
+      onResourceFileChanged,
     ]
   );
 

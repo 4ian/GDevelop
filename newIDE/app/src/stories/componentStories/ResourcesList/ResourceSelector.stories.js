@@ -74,6 +74,7 @@ export const ImageWithMultipleExternalEditors = (): React.Node => (
       canInstallPrivateAsset: () => false,
       onNewResourcesAdded: () => {},
       onResourceUsageChanged: () => {},
+      onResourceFileChanged: () => {},
     }}
     initialResourceName=""
     onChange={action('on change')}

@@ -107,6 +107,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
 
         await resourceManagementProps.onFetchNewlyAddedResources();
         resourceManagementProps.onNewResourcesAdded();
+        resourceManagementProps.onResourceFileChanged(resource.getFile());
       },
       [
         resourceManagementProps,

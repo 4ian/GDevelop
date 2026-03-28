@@ -190,6 +190,7 @@ export default class InstancesEditor extends Component<Props, State> {
   background: Background;
   _unmounted = false;
   _renderingPaused = false;
+  _textureReloadInProgress = false;
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
@@ -1754,6 +1755,7 @@ export default class InstancesEditor extends Component<Props, State> {
     // Protect against rendering scheduled after the component is unmounted.
     if (this._unmounted) return;
     if (this._renderingPaused) return;
+    if (this._textureReloadInProgress) return;
 
     // Avoid killing the CPU by limiting the rendering calls.
     try {
@@ -1816,10 +1818,34 @@ export default class InstancesEditor extends Component<Props, State> {
 
   restartSceneRendering = () => {
     this._renderingPaused = false;
+    if (this._textureReloadInProgress) return;
     this._renderScene();
     this.instancesRenderer.getPixiContainer().eventMode = 'auto';
 
     startPIXITicker();
+  };
+
+  /**
+   * Prevent rendering while textures are being reloaded.
+   * Unlike pauseSceneRendering/restartSceneRendering, this cannot be
+   * overridden by the pauseRendering prop changes, ensuring no render
+   * happens with destroyed textures.
+   */
+  setTextureReloadInProgress = (inProgress: boolean) => {
+    this._textureReloadInProgress = inProgress;
+    if (inProgress) {
+      // Deactivate interactions to prevent the PIXI event system from
+      // accessing destroyed textures.
+      this.instancesRenderer.getPixiContainer().eventMode = 'none';
+      stopPIXITicker();
+    } else {
+      if (!this._renderingPaused) {
+        this.instancesRenderer.getPixiContainer().eventMode = 'auto';
+        startPIXITicker();
+        // Ensure the render loop is running after texture reload.
+        this._renderScene();
+      }
+    }
   };
 
   getInstanceSize = (

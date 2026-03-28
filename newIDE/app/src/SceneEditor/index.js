@@ -616,8 +616,12 @@ export default class SceneEditor extends React.Component<Props, State> {
         // When reloading textures, there can be a short time during which
         // the existing texture is removed but the InstancesEditor tries to use it
         // through the RenderedInstance's, triggering crashes. So the scene rendering
-        // is paused during this period.
-        editorDisplay.startSceneRendering(false);
+        // is blocked during this period.
+        // Use setTextureReloadInProgress instead of startSceneRendering to
+        // prevent rendering even if a pauseRendering prop change triggers
+        // restartSceneRendering (e.g., when the user switches to the scene
+        // editor tab while the async reload is running).
+        editorDisplay.instancesHandlers.setTextureReloadInProgress(true);
         await PixiResourcesLoader.reloadResource(project, resourceName);
 
         editorDisplay.forceUpdateObjectsList();
@@ -638,7 +642,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
         });
       } finally {
-        editorDisplay.startSceneRendering(true);
+        editorDisplay.instancesHandlers.setTextureReloadInProgress(false);
       }
     }
   };

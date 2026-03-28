@@ -247,6 +247,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
             ? editor.resetInstanceRenderersFor
             : noop,
           forceRemountInstancesRenderers: editor ? editor.forceRemount : noop,
+          setTextureReloadInProgress: editor
+            ? editor.setTextureReloadInProgress
+            : noop,
           addSerializedInstances: editor
             ? editor.addSerializedInstances
             : () => [],

@@ -202,6 +202,7 @@ export type SceneEditorsDisplayInterface = {|
     clearHighlightedInstance: () => void,
     resetInstanceRenderersFor: (objectName: string) => void,
     forceRemountInstancesRenderers: () => void,
+    setTextureReloadInProgress: (inProgress: boolean) => void,
     addSerializedInstances: ({|
       position: [number, number],
       copyReferential: [number, number],

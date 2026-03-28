@@ -537,6 +537,27 @@ module.exports = {
     };
 
     /**
+     * Workaround: PIXI.BitmapFont keeps a direct reference to the texture it
+     * was installed with (`pageTextures`). When a resource is reloaded (e.g.
+     * the image file changes on disk), PixiResourcesLoader creates a new
+     * PIXI.Texture but the existing BitmapFont still points to the old one.
+     * Ideally bitmap font resources would declare their image dependency via
+     * `embeddedResourcesMapping` so that `reloadResource` can cascade the
+     * invalidation automatically. Until then, we detect stale textures here.
+     */
+    const isBitmapFontTextureStale = (bitmapFont, currentTexture) => {
+      const pageTextures = bitmapFont.pageTextures;
+      return (
+        pageTextures &&
+        Object.values(pageTextures).some(
+          (tex) =>
+            (tex.baseTexture && tex.baseTexture.destroyed) ||
+            tex.baseTexture !== currentTexture.baseTexture
+        )
+      );
+    };
+
+    /**
      * Given a bitmap font resource name and a texture atlas resource name, returns the PIXI.BitmapFont
      * for it.
      * The font must be released with `releaseBitmapFont` when not used anymore - so that it can be removed
@@ -556,8 +577,19 @@ module.exports = {
       const bitmapFontInstallKey =
         bitmapFontResourceName + '@' + textureAtlasResourceName;
 
+      if (
+        PIXI.BitmapFont.available[bitmapFontInstallKey] &&
+        isBitmapFontTextureStale(
+          PIXI.BitmapFont.available[bitmapFontInstallKey],
+          pixiResourcesLoader.getPIXITexture(project, textureAtlasResourceName)
+        )
+      ) {
+        // Texture was replaced during resource reload. Uninstall the stale font
+        // so it can be reinstalled with the new texture below.
+        PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+      }
+
       if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
-        // Return the existing BitmapFont that is already in memory and already installed.
         bitmapFontUsageCount[bitmapFontInstallKey] =
           (bitmapFontUsageCount[bitmapFontInstallKey] || 0) + 1;
         return Promise.resolve(PIXI.BitmapFont.available[bitmapFontInstallKey]);
@@ -715,15 +747,22 @@ module.exports = {
 
         if (
           this._currentBitmapFontResourceName !== bitmapFontResourceName ||
-          this._currentTextureAtlasResourceName !== textureAtlasResourceName
+          this._currentTextureAtlasResourceName !== textureAtlasResourceName ||
+          // Belt & suspenders: also reload if the font was externally
+          // uninstalled (e.g. by clearCache after a resource reload).
+          !PIXI.BitmapFont.available[this._pixiObject.fontName]
         ) {
-          // Release the old font (if it was installed).
-          releaseBitmapFont(this._pixiObject.fontName);
+          const oldFontName = this._pixiObject.fontName;
 
           // Temporarily go back to the default font, as the PIXI.BitmapText
           // object does not support being displayed with a font not installed at all.
           // It will be replaced as soon as the proper font is loaded.
           this._pixiObject.fontName = getDefaultBitmapFont().font;
+
+          // Release the old font (if it's still installed).
+          if (PIXI.BitmapFont.available[oldFontName]) {
+            releaseBitmapFont(oldFontName);
+          }
 
           this._currentBitmapFontResourceName = bitmapFontResourceName;
           this._currentTextureAtlasResourceName = textureAtlasResourceName;
@@ -797,8 +836,15 @@ module.exports = {
         RenderedInstance.prototype.onRemovedFromScene.call(this);
 
         const fontName = this._pixiObject.fontName;
+        // Belt & suspenders: if the font was already uninstalled (e.g. by
+        // clearCache), switch to default before destroy to avoid a PIXI crash.
+        if (!PIXI.BitmapFont.available[fontName]) {
+          this._pixiObject.fontName = getDefaultBitmapFont().font;
+        }
         this._pixiObject.destroy();
-        releaseBitmapFont(fontName);
+        if (PIXI.BitmapFont.available[fontName]) {
+          releaseBitmapFont(fontName);
+        }
       }
 
       getDefaultWidth() {

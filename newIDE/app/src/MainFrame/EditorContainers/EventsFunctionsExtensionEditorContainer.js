@@ -90,6 +90,10 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No thing to be done.
   }
 
+  onResourceFileChanged(resourceName: string) {
+    // No thing to be done.
+  }
+
   onSceneObjectsDeleted(scene: gdLayout) {
     // No thing to be done.
   }

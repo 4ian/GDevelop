@@ -168,6 +168,13 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     // No thing to be done.
   }
 
+  onResourceFileChanged(resourceName: string) {
+    const { editor } = this;
+    if (editor) {
+      editor.forceReloadResource(resourceName);
+    }
+  }
+
   onSceneObjectsDeleted(scene: gdLayout) {
     // No thing to be done.
   }

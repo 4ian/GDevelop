@@ -45,6 +45,7 @@ import {
   saveToHistory,
 } from '../Utils/History';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import ResourcesLoader from '../ResourcesLoader';
 import {
   type ObjectWithContext,
   type GroupWithContext,
@@ -2770,6 +2771,41 @@ export default class SceneEditor extends React.Component<Props, State> {
           );
         });
       }
+      this.forceUpdateObjectsList();
+    });
+  };
+
+  /**
+   * Reload a resource texture and update all objects using it.
+   * Unlike `onResourceExternallyChanged` (which destroys the old texture via
+   * PIXI.Assets.unload), this uses `loadTextures` which safely overwrites the
+   * cached texture entry without destroying the old one — avoiding crashes
+   * when sprites still reference it during rendering.
+   */
+  forceReloadResource = (resourceName: string) => {
+    const { project } = this.props;
+
+    ResourcesLoader.burstUrlsCacheForResources(project, [resourceName]);
+    PixiResourcesLoader.loadTextures(project, [resourceName]).then(() => {
+      const objectsCollector = new gd.ObjectsUsingResourceCollector(
+        project.getResourcesManager(),
+        resourceName
+      );
+      // $FlowIgnore
+      // $FlowFixMe[incompatible-type]
+      gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
+      const objectNames = objectsCollector.getObjectNames().toJSArray();
+      objectsCollector.delete();
+      ObjectsRenderingService.renderersCacheClearingMethods.forEach(clear =>
+        clear(project)
+      );
+      objectNames.forEach(objectName => {
+        if (this.editorDisplay) {
+          this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+            objectName
+          );
+        }
+      });
       this.forceUpdateObjectsList();
     });
   };

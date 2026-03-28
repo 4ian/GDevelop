@@ -55,6 +55,10 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     // No thing to be done.
   }
 
+  onResourceFileChanged(resourceName: string) {
+    // No thing to be done.
+  }
+
   onSceneObjectsDeleted(scene: gdLayout) {
     // No thing to be done.
   }

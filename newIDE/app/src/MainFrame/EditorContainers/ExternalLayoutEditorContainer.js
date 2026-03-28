@@ -183,6 +183,13 @@ export class ExternalLayoutEditorContainer extends React.Component<
     }
   }
 
+  onResourceFileChanged(resourceName: string) {
+    const { editor } = this;
+    if (editor) {
+      editor.forceReloadResource(resourceName);
+    }
+  }
+
   onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
     const { editor } = this;
     const externalLayout = this.getExternalLayout();

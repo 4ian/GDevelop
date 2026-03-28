@@ -3368,6 +3368,25 @@ const MainFrame = (props: Props): React.MixedElement => {
     [state.editorTabs]
   );
 
+  const onResourceFileChanged = React.useCallback(
+    (resourceName: string) => {
+      for (const editor of getAllEditorTabs(state.editorTabs)) {
+        const { editorRef } = editor;
+        if (editorRef) {
+          editorRef.onResourceFileChanged(resourceName);
+        }
+      }
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldReloadResources: true,
+        shouldHardReload: false,
+        reasons: ['resource-file-changed'],
+      });
+    },
+    [state.editorTabs, notifyChangesToInGameEditor]
+  );
+
   const onSceneObjectsDeleted = React.useCallback(
     (scene: gdLayout) => {
       for (const editor of getAllEditorTabs(state.editorTabs)) {
@@ -4653,7 +4672,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
-        shouldReloadResources: false,
+        shouldReloadResources: true,
         shouldHardReload: false,
         reasons: ['added-new-resources'],
       });
@@ -4827,6 +4846,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
+      onResourceFileChanged,
     }),
     [
       resourceSources,
@@ -4838,6 +4858,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
+      onResourceFileChanged,
     ]
   );
 

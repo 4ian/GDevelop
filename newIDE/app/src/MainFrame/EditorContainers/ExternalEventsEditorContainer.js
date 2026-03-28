@@ -132,6 +132,10 @@ export class ExternalEventsEditorContainer extends React.Component<
     // No thing to be done.
   }
 
+  onResourceFileChanged(resourceName: string) {
+    // No thing to be done.
+  }
+
   onSceneObjectsDeleted(scene: gdLayout) {
     // No thing to be done.
   }

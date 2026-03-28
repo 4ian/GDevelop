@@ -62,6 +62,10 @@ export class GlobalEventsSearchEditorContainer extends React.Component<RenderEdi
     // Nothing to do.
   }
 
+  onResourceFileChanged(resourceName: string) {
+    // No thing to be done.
+  }
+
   onSceneObjectsDeleted(scene: gdLayout) {
     // Nothing to do.
   }

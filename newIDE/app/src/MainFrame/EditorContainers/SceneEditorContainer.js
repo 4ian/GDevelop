@@ -143,6 +143,13 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   }
 
+  onResourceFileChanged(resourceName: string) {
+    const { editor } = this;
+    if (editor) {
+      editor.forceReloadResource(resourceName);
+    }
+  }
+
   onSceneObjectsDeleted(scene: gdLayout) {
     const layout = this.getLayout();
     if (!layout) {

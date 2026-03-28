@@ -26,20 +26,6 @@ export const unregisterOnResourceExternallyChangedCallback = (
   delete callbacks[callbackId];
 };
 
-/**
- * Notify all registered editors that a resource has changed (e.g. its file
- * property was updated). This triggers the same reload flow as the file
- * watcher: URL cache burst, texture reload, instance renderer reset, etc.
- */
-export const notifyResourceChanged = (resourceInfo: {|
-  identifier: string,
-|}) => {
-  ResourcesLoader.burstAllUrlsCache();
-  Object.keys(callbacks).forEach(callbackId =>
-    callbacks[callbackId](resourceInfo)
-  );
-};
-
 const useResourcesWatcher = ({
   getStorageProvider,
   fileMetadata,

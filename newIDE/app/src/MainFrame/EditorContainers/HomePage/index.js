@@ -549,6 +549,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
         forceUpdateEditor: noop,
         onEventsBasedObjectChildrenEdited: noop,
         onSceneObjectEdited: noop,
+        onResourceFileChanged: noop,
         onSceneObjectsDeleted: noop,
         onSceneEventsModifiedOutsideEditor: noop,
         notifyChangesToInGameEditor: setEditorHotReloadNeeded,

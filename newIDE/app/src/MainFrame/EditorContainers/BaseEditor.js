@@ -228,6 +228,7 @@ export type RenderEditorContainerProps = {|
     scene: gdLayout,
     objectWithContext: ObjectWithContext
   ) => void,
+  onResourceFileChanged: (resourceName: string) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,
 

@@ -15,6 +15,7 @@ import {
   type ResourceSource,
   type ResourceManagementProps,
 } from '../../ResourcesList/ResourceSource';
+import { notifyResourceChanged } from '../../MainFrame/ResourcesWatcher';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { EmbeddedResourcesMappingTable } from './EmbeddedResourcesMappingTable';
 import { Spacer } from '../../UI/Grid';
@@ -105,6 +106,10 @@ const ResourcePropertiesEditor: React.ComponentType<{
         onResourcePathUpdated();
         forceUpdate();
 
+        // Notify editors (scene renderers, in-game editor, etc.) that the
+        // resource file has changed so they reload the texture/data.
+        notifyResourceChanged({ identifier: resource.getFile() });
+
         await resourceManagementProps.onFetchNewlyAddedResources();
         resourceManagementProps.onNewResourcesAdded();
       },
@@ -131,8 +136,10 @@ const ResourcePropertiesEditor: React.ComponentType<{
           name: 'File',
           valueType: 'string',
           getValue: (resource: gdResource) => resource.getFile(),
-          setValue: (resource: gdResource, newValue: string) =>
-            resource.setFile(newValue),
+          setValue: (resource: gdResource, newValue: string) => {
+            resource.setFile(newValue);
+            notifyResourceChanged({ identifier: newValue });
+          },
           onEditButtonClick: () => {
             const firstResourceSource = resourceSources[0];
             if (firstResourceSource) chooseResourcePath(firstResourceSource);

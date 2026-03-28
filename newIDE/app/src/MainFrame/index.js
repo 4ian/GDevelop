@@ -1851,7 +1851,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         notifyChangesToInGameEditor({
           shouldReloadProjectData: false,
           shouldReloadLibraries: false,
-          shouldReloadResources: false,
+          shouldReloadResources: true,
           shouldHardReload: false,
           reasons: ['resource-usage-changed'],
         });
@@ -1859,7 +1859,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         notifyChangesToInGameEditor({
           shouldReloadProjectData: true,
           shouldReloadLibraries: false,
-          shouldReloadResources: false,
+          shouldReloadResources: true,
           shouldHardReload: false,
           reasons: ['resource-usage-changed'],
         });

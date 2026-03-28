@@ -19,7 +19,6 @@ import TrashIcon from '../../UI/CustomSvgIcons/Trash';
 import GridIcon from '../../UI/CustomSvgIcons/Grid';
 import ZoomInIcon from '../../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
-import DebugIcon from '../../UI/CustomSvgIcons/Debug';
 import {
   OPEN_INSTANCES_PANEL_BUTTON_ID,
   OPEN_LAYERS_PANEL_BUTTON_ID,
@@ -116,6 +115,7 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
             },
           ]}
         />
+        <ToolbarSeparator />
         <IconButton
           size="small"
           color="default"
@@ -209,24 +209,6 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
               checked: props.isGridShown,
               click: () => props.toggleGrid(),
             },
-            { type: 'separator' },
-            {
-              label: i18n._(t`Setup grid`),
-              click: () => props.openSetupGrid(),
-            },
-          ]}
-        />
-        <ElementWithMenu
-          element={
-            <IconButton
-              size="small"
-              color="default"
-              tooltip={t`3D debug helpers`}
-            >
-              <DebugIcon />
-            </IconButton>
-          }
-          buildMenuTemplate={(i18n: I18nType) => [
             {
               type: 'checkbox',
               label: i18n._(t`Show 3D collision shapes`),
@@ -240,6 +222,10 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
               click: () => props.toggleAxesHelper(),
             },
             { type: 'separator' },
+            {
+              label: i18n._(t`Setup grid`),
+              click: () => props.openSetupGrid(),
+            },
             {
               label: i18n._(t`Setup debug`),
               click: () => props.openSetupDebug(),

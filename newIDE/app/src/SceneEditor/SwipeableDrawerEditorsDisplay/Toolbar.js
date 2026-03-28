@@ -14,7 +14,6 @@ import TrashIcon from '../../UI/CustomSvgIcons/Trash';
 import GridIcon from '../../UI/CustomSvgIcons/Grid';
 import ZoomInIcon from '../../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
-import DebugIcon from '../../UI/CustomSvgIcons/Debug';
 import CompactToggleButtons from '../../UI/CompactToggleButtons';
 import Grid2d from '../../UI/CustomSvgIcons/Grid2d';
 import Grid3d from '../../UI/CustomSvgIcons/Grid3d';
@@ -96,66 +95,6 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function(props) {
           },
         ]}
       />
-      <ElementWithMenu
-        element={
-          <IconButton
-            size="small"
-            color="default"
-            tooltip={t`Toggle/edit grid`}
-          >
-            <GridIcon />
-          </IconButton>
-        }
-        buildMenuTemplate={(i18n: I18nType) => [
-          {
-            type: 'checkbox',
-            label: i18n._(t`Show Mask`),
-            checked: props.isWindowMaskShown,
-            click: () => props.toggleWindowMask(),
-          },
-          {
-            type: 'checkbox',
-            label: i18n._(t`Show grid`),
-            checked: props.isGridShown,
-            click: () => props.toggleGrid(),
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`Setup grid`),
-            click: () => props.openSetupGrid(),
-          },
-        ]}
-      />
-      <ElementWithMenu
-        element={
-          <IconButton
-            size="small"
-            color="default"
-            tooltip={t`3D debug helpers`}
-          >
-            <DebugIcon />
-          </IconButton>
-        }
-        buildMenuTemplate={(i18n: I18nType) => [
-          {
-            type: 'checkbox',
-            label: i18n._(t`Show 3D collision shapes`),
-            checked: props.isPhysics3DCollisionShapesShown,
-            click: () => props.togglePhysics3DCollisionShapes(),
-          },
-          {
-            type: 'checkbox',
-            label: i18n._(t`Show axes helper`),
-            checked: props.isAxesHelperShown,
-            click: () => props.toggleAxesHelper(),
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`Setup debug`),
-            click: () => props.openSetupDebug(),
-          },
-        ]}
-      />
       <IconButton
         size="small"
         color="default"
@@ -208,6 +147,53 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function(props) {
       </IconButton>
       <ToolbarSeparator />
       <ToolbarGroup lastChild>
+        <ElementWithMenu
+          element={
+            <IconButton
+              size="small"
+              color="default"
+              tooltip={t`Toggle/edit grid`}
+            >
+              <GridIcon />
+            </IconButton>
+          }
+          buildMenuTemplate={(i18n: I18nType) => [
+            {
+              type: 'checkbox',
+              label: i18n._(t`Show Mask`),
+              checked: props.isWindowMaskShown,
+              click: () => props.toggleWindowMask(),
+            },
+            {
+              type: 'checkbox',
+              label: i18n._(t`Show grid`),
+              checked: props.isGridShown,
+              click: () => props.toggleGrid(),
+            },
+            {
+              type: 'checkbox',
+              label: i18n._(t`Show 3D collision shapes`),
+              checked: props.isPhysics3DCollisionShapesShown,
+              click: () => props.togglePhysics3DCollisionShapes(),
+            },
+            {
+              type: 'checkbox',
+              label: i18n._(t`Show axes helper`),
+              checked: props.isAxesHelperShown,
+              click: () => props.toggleAxesHelper(),
+            },
+            { type: 'separator' },
+            {
+              label: i18n._(t`Setup grid`),
+              click: () => props.openSetupGrid(),
+            },
+            {
+              label: i18n._(t`Setup debug`),
+              click: () => props.openSetupDebug(),
+            },
+          ]}
+        />
+        <ToolbarSeparator />
         <IconButton
           size="small"
           color="default"

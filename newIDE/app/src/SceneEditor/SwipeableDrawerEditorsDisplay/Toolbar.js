@@ -14,6 +14,7 @@ import TrashIcon from '../../UI/CustomSvgIcons/Trash';
 import GridIcon from '../../UI/CustomSvgIcons/Grid';
 import ZoomInIcon from '../../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
+import DebugIcon from '../../UI/CustomSvgIcons/Debug';
 import CompactToggleButtons from '../../UI/CompactToggleButtons';
 import Grid2d from '../../UI/CustomSvgIcons/Grid2d';
 import Grid3d from '../../UI/CustomSvgIcons/Grid3d';
@@ -152,9 +153,9 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function(props) {
             <IconButton
               size="small"
               color="default"
-              tooltip={t`Toggle/edit grid`}
+              tooltip={t`Toggle/edit grid and debug helpers`}
             >
-              <GridIcon />
+              <DebugIcon />
             </IconButton>
           }
           buildMenuTemplate={(i18n: I18nType) => [

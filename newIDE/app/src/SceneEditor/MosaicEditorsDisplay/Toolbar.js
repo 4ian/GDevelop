@@ -19,6 +19,7 @@ import TrashIcon from '../../UI/CustomSvgIcons/Trash';
 import GridIcon from '../../UI/CustomSvgIcons/Grid';
 import ZoomInIcon from '../../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
+import DebugIcon from '../../UI/CustomSvgIcons/Debug';
 import {
   OPEN_INSTANCES_PANEL_BUTTON_ID,
   OPEN_LAYERS_PANEL_BUTTON_ID,
@@ -191,9 +192,9 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
             <IconButton
               size="small"
               color="default"
-              tooltip={t`Toggle/edit grid`}
+              tooltip={t`Toggle/edit grid and debug helpers`}
             >
-              <GridIcon />
+              <DebugIcon />
             </IconButton>
           }
           buildMenuTemplate={(i18n: I18nType) => [

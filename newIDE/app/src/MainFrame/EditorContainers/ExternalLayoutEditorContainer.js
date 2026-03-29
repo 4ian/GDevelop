@@ -352,6 +352,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             ref={editor => (this.editor = editor)}
             project={project}
+            fileMetadata={this.props.fileMetadata}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             layout={layout}
             eventsFunctionsExtension={null}

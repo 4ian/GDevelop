@@ -34,6 +34,7 @@ import getObjectByName from '../Utils/GetObjectByName';
 import UseSceneEditorCommands from './UseSceneEditorCommands';
 import { type InstancesEditorSettings } from '../InstancesEditor/InstancesEditorSettings';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import { type FileMetadata } from '../ProjectsStorage';
 import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import {
@@ -191,6 +192,7 @@ type Props = {|
   onRestartInGameEditor: (reason: string) => void,
   showRestartInGameEditorAfterErrorButton: boolean,
   project: gdProject,
+  fileMetadata: ?FileMetadata,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   layout: gdLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
@@ -2921,6 +2923,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                       this.props.showRestartInGameEditorAfterErrorButton
                     }
                     project={project}
+                    fileMetadata={this.props.fileMetadata}
                     layout={layout}
                     eventsFunctionsExtension={eventsFunctionsExtension}
                     eventsBasedObject={eventsBasedObject}

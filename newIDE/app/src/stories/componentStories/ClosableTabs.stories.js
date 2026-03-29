@@ -298,6 +298,7 @@ export const WithObjectsList = (): React.Node => (
                 <ObjectsList
                   getThumbnail={() => 'res/unknown32.png'}
                   project={testProject.project}
+                  fileMetadata={null}
                   layout={testProject.testLayout}
                   eventsFunctionsExtension={null}
                   eventsBasedObject={null}

@@ -63,16 +63,21 @@ import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 import {
   applyResourceDefaults,
-  copyAllToProjectFolder,
+  copyDroppedFileToProjectFolder,
 } from '../ResourcesList/ResourceUtils';
 import {
   PROJECT_RESOURCE_MAX_SIZE_IN_BYTES,
   uploadProjectResourceFiles,
 } from '../Utils/GDevelopServices/Project';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import ListIcon from '../UI/ListIcon';
 import optionalRequire from '../Utils/OptionalRequire';
+import DroppedFileObjectSelectorOverlay, {
+  type DroppedFileObjectSelectorOptionMarker,
+} from './DroppedFileObjectSelectorOverlay';
+import {
+  getDroppedSupportedFile,
+  type DroppedSupportedFile,
+} from './DroppedFileObjectSelectorUtils';
 
 const gd: libGDevelop = global.gd;
 const nodePath = optionalRequire('path');
@@ -96,123 +101,13 @@ const styles = {
   },
   autoSizerContainer: { flex: 1 },
   autoSizer: { width: '100%' },
-  dropOverlay: {
-    position: 'absolute',
-    inset: 0,
-    zIndex: 2,
-    pointerEvents: 'none',
-  },
-  dropOverlayBackdrop: {
-    position: 'absolute',
-    inset: 0,
-  },
-  radialWrapper: {
-    position: 'absolute',
-    left: '50%',
-    top: '50%',
-    width: 'min(70vw, 360px)',
-    height: 'min(70vw, 360px)',
-    transform: 'translate(-50%, -50%)',
-    borderRadius: '50%',
-    overflow: 'hidden',
-  },
-  radialInnerHole: {
-    position: 'absolute',
-    inset: '28%',
-    borderRadius: '50%',
-  },
-  radialOptionMarker: {
-    position: 'absolute',
-    width: 96,
-    transform: 'translate(-50%, -50%)',
-    textAlign: 'center',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 4,
-  },
 };
 
-const imageExtensions = ['png', 'jpg', 'jpeg', 'webp'];
-const modelExtensions = ['glb'];
 const droppedImageObjectTypes = [
   'Sprite',
   'PanelSpriteObject::PanelSprite',
   'TiledSpriteObject::TiledSprite',
 ];
-
-type DroppedSupportedFile = {|
-  file: ?File,
-  resourceKind: 'image' | 'model3D',
-|};
-
-const getFileExtension = (filename: string): string => {
-  const dotIndex = filename.lastIndexOf('.');
-  if (dotIndex === -1) return '';
-  return filename.substring(dotIndex + 1).toLowerCase();
-};
-
-const getResourceKindFromExtension = (
-  extension: string
-): ?('image' | 'model3D') => {
-  if (imageExtensions.includes(extension)) {
-    return 'image';
-  }
-  if (modelExtensions.includes(extension)) {
-    return 'model3D';
-  }
-  return null;
-};
-
-const getResourceKindFromMimeType = (
-  mimeType: string
-): ?('image' | 'model3D') => {
-  const normalizedMimeType = mimeType.toLowerCase();
-  if (normalizedMimeType.startsWith('image/')) {
-    return 'image';
-  }
-  if (normalizedMimeType === 'model/gltf-binary') {
-    return 'model3D';
-  }
-  return null;
-};
-
-const getDroppedSupportedFile = (entries: any): ?DroppedSupportedFile => {
-  const firstEntry = Array.isArray(entries)
-    ? entries[0]
-    : entries && entries[0];
-  if (!firstEntry) return null;
-
-  if (typeof firstEntry.kind === 'string') {
-    if (firstEntry.kind !== 'file') return null;
-
-    const firstFile = firstEntry.getAsFile ? firstEntry.getAsFile() : null;
-    const resourceKindFromFile = firstFile
-      ? getResourceKindFromExtension(getFileExtension(firstFile.name || ''))
-      : null;
-    const resourceKind =
-      resourceKindFromFile ||
-      getResourceKindFromMimeType(firstEntry.type || '');
-
-    if (!resourceKind) return null;
-
-    return {
-      file: firstFile,
-      resourceKind,
-    };
-  }
-
-  const firstFile = firstEntry;
-  const resourceKind = getResourceKindFromExtension(
-    getFileExtension(firstFile.name || '')
-  );
-  if (!resourceKind) return null;
-
-  return {
-    file: firstFile,
-    resourceKind,
-  };
-};
 
 export const getLabelsForObjectsAndGroupsLists = (
   scope: EventsScope
@@ -698,7 +593,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );
-    const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const authenticatedUser = React.useContext(AuthenticatedUserContext);
     const [searchText, setSearchText] = React.useState('');
     const { showDeleteConfirmation, showAlert } = useAlertDialog();
@@ -978,18 +872,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           resourceManagementProps.onNewResourcesAdded();
           return resourceName;
         }
-        const droppedFilePath = droppedFile.file.path;
-        if (!droppedFilePath || !nodePath) {
+        if (!nodePath) {
           newResource.delete();
           return null;
         }
         const newToOldFilePaths = new Map<string, string>();
-        const copiedPaths = await copyAllToProjectFolder(
+        const copiedPath = await copyDroppedFileToProjectFolder(
           project,
-          [droppedFilePath],
+          droppedFile.file,
           newToOldFilePaths
         );
-        const copiedPath = copiedPaths[0];
         if (!copiedPath) {
           newResource.delete();
           return null;
@@ -1972,7 +1864,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [project, eventsFunctionsExtension]
     );
 
-    const radialOptionMarkers = React.useMemo(
+    const radialOptionMarkers = React.useMemo<
+      Array<DroppedFileObjectSelectorOptionMarker>
+    >(
       () =>
         droppedImageObjectOptions.map((objectMetadata, index) => {
           const angle = -30 + index * 120;
@@ -1989,14 +1883,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           };
         }),
       [droppedImageObjectOptions]
-    );
-
-    const getSectorBackgroundColor = React.useCallback(
-      (sectorObjectType: string): string =>
-        highlightedDroppedImageObjectType === sectorObjectType
-          ? gdevelopTheme.listItem.selectedBackgroundColor
-          : gdevelopTheme.list.itemsBackgroundColor,
-      [highlightedDroppedImageObjectType, gdevelopTheme]
     );
 
     const onFileDragEnter = React.useCallback(event => {
@@ -2232,71 +2118,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             )}
           </I18n>
           {isDropOverlayVisible && droppedSupportedFile && (
-            <div style={styles.dropOverlay}>
-              <div
-                style={{
-                  ...styles.dropOverlayBackdrop,
-                  backgroundColor: gdevelopTheme.palette.canvasColor,
-                  opacity: 0.55,
-                }}
-              />
-              <div style={styles.radialWrapper}>
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    borderRadius: '50%',
-                    background: `conic-gradient(
-                      ${getSectorBackgroundColor('Sprite')} 0deg 120deg,
-                      ${getSectorBackgroundColor(
-                        'PanelSpriteObject::PanelSprite'
-                      )} 120deg 240deg,
-                      ${getSectorBackgroundColor(
-                        'TiledSpriteObject::TiledSprite'
-                      )} 240deg 360deg
-                    )`,
-                    opacity: isDropCreationLoading ? 0.35 : 0.88,
-                  }}
-                />
-                <div
-                  style={{
-                    ...styles.radialInnerHole,
-                    backgroundColor: gdevelopTheme.paper.backgroundColor.dark,
-                    opacity: 0.85,
-                  }}
-                />
-                {radialOptionMarkers.map(marker => (
-                  <div
-                    key={marker.objectType}
-                    style={{
-                      ...styles.radialOptionMarker,
-                      left: marker.left,
-                      top: marker.top,
-                      opacity:
-                        highlightedDroppedImageObjectType === marker.objectType
-                          ? 1
-                          : 0.78,
-                    }}
-                  >
-                    <ListIcon
-                      src={marker.iconUrl}
-                      iconSize={28}
-                      padding={4}
-                      useExactIconSize
-                    />
-                    <div
-                      style={{
-                        color: gdevelopTheme.text.color.primary,
-                        fontSize: 11,
-                        lineHeight: '14px',
-                      }}
-                    >
-                      {marker.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <DroppedFileObjectSelectorOverlay
+              optionMarkers={radialOptionMarkers}
+              highlightedObjectType={highlightedDroppedImageObjectType}
+              isLoading={isDropCreationLoading}
+            />
           )}
         </div>
         {newObjectDialogOpen && (

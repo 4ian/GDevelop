@@ -57,6 +57,7 @@ let loadedOrLoadingThreeMaterials: ResourcePromise<THREE.Material> = {};
 let loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> = {};
 let spineAtlasPromises: ResourcePromise<SpineTextureAtlasOrLoadingError> = {};
 let spineDataPromises: ResourcePromise<SpineDataOrLoadingError> = {};
+let ongoingResourceReloads: ResourcePromise<void> = {};
 
 // $FlowFixMe[value-as-type]
 const createInvalidModel = (): GLTF => {
@@ -264,6 +265,7 @@ export default class PixiResourcesLoader {
     loadedOrLoading3DModelPromises = {};
     spineAtlasPromises = {};
     spineDataPromises = {};
+    ongoingResourceReloads = {};
   }
 
   static async _reloadEmbedderResources(
@@ -283,7 +285,7 @@ export default class PixiResourcesLoader {
     );
   }
 
-  static async reloadResource(project: gdProject, resourceName: string) {
+  static async _doReloadResource(project: gdProject, resourceName: string) {
     // $FlowFixMe[invalid-computed-prop]
     const loadedTexture = loadedTextures[resourceName];
     if (loadedTexture && loadedTexture.textureCacheIds) {
@@ -361,6 +363,22 @@ export default class PixiResourcesLoader {
           delete loadedOrLoadingThreeMaterials[key];
         })
       );
+    }
+  }
+
+  static async reloadResource(project: gdProject, resourceName: string) {
+    const previousReload =
+      ongoingResourceReloads[resourceName] || Promise.resolve();
+    const currentReload = previousReload.then(() =>
+      this._doReloadResource(project, resourceName)
+    );
+    ongoingResourceReloads[resourceName] = currentReload;
+    try {
+      await currentReload;
+    } finally {
+      if (ongoingResourceReloads[resourceName] === currentReload) {
+        delete ongoingResourceReloads[resourceName];
+      }
     }
   }
   /**

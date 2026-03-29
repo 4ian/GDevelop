@@ -490,11 +490,22 @@ export default class PixiResourcesLoader {
   static getPIXITexture(project: gdProject, resourceName: string): any {
     // $FlowFixMe[invalid-computed-prop]
     if (loadedTextures[resourceName]) {
-      // TODO: we never consider textures as not valid anymore. When we
-      // update the IDE to unload textures, we should handle loading them again
-      // here (and also be careful to return the same texture if it's not valid
-      // but still loading, when multiple objects are rapidly asking for the same texture).
-      return loadedTextures[resourceName];
+      // If the texture's baseTexture was destroyed (e.g., by a concurrent
+      // reloadResource call from another SceneEditor callback), evict it
+      // from the cache and recreate it below.
+      if (
+        !loadedTextures[resourceName].baseTexture ||
+        loadedTextures[resourceName].baseTexture.destroyed
+      ) {
+        // $FlowFixMe[prop-missing]
+        delete loadedTextures[resourceName];
+      } else {
+        // TODO: we never consider textures as not valid anymore. When we
+        // update the IDE to unload textures, we should handle loading them again
+        // here (and also be careful to return the same texture if it's not valid
+        // but still loading, when multiple objects are rapidly asking for the same texture).
+        return loadedTextures[resourceName];
+      }
     }
 
     if (

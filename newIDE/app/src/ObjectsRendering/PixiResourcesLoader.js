@@ -287,16 +287,17 @@ export default class PixiResourcesLoader {
     // $FlowFixMe[invalid-computed-prop]
     const loadedTexture = loadedTextures[resourceName];
     if (loadedTexture && loadedTexture.textureCacheIds) {
+      // Remove the cached texture BEFORE awaiting the unload.
+      // PIXI.Assets.unload destroys the BaseTexture synchronously, which sets
+      // baseTexture to null on the texture. If getPIXITexture is called before
+      // the cache entry is removed, it would return the destroyed texture.
+      // $FlowFixMe[prop-missing]
+      delete loadedTextures[resourceName];
+
       // The property textureCacheIds indicates that the PIXI.Texture object has some
       // items cached in PIXI caches (PIXI.utils.BaseTextureCache and PIXI.utils.TextureCache).
       // PIXI.Assets.unload will handle the clearing of those caches.
       await PIXI.Assets.unload(loadedTexture.textureCacheIds);
-      // The cached texture is also removed. This is to handle cases where an empty texture
-      // has been cached (if file was not found for instance), and a corresponding file has
-      // been added and detected by file watcher. When reloading the texture, the cache must
-      // be cleaned too.
-      // $FlowFixMe[prop-missing]
-      delete loadedTextures[resourceName];
 
       // Also reload any resource embedding this resource:
       await this._reloadEmbedderResources(project, resourceName, 'atlas');

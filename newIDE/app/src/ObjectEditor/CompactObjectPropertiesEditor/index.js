@@ -605,7 +605,6 @@ export const CompactObjectPropertiesEditor = ({
                       onEditObject,
                     })
                   }
-                  // $FlowFixMe[incompatible-type]
                   onRefreshAllFields={forceRecomputeSchema}
                 />
                 {shouldDisplayVariant && (

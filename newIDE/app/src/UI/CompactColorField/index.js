@@ -32,11 +32,29 @@ export const CompactColorField = ({
   placeholder,
 }: CompactColorFieldProps): React.MixedElement => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
+
   const [colorValue, setColorValue] = React.useState<string>(color);
-  // alpha can be equal to 0, so we have to check if it is not undefined
   const [alphaValue, setAlphaValue] = React.useState<number>(
+    // alpha can be equal to 0, so we have to check if it is not undefined
     // $FlowFixMe[constant-condition]
     !disableAlpha && alpha !== undefined ? alpha : 1
+  );
+
+  React.useEffect(
+    () => {
+      setColorValue(color);
+    },
+    [color]
+  );
+
+  React.useEffect(
+    () => {
+      // $FlowFixMe[constant-condition]
+      if (!disableAlpha && alpha !== undefined) {
+        setAlphaValue(alpha);
+      }
+    },
+    [alpha, disableAlpha]
   );
 
   const handleChange = (newColor: string, newAlpha: number) => {
@@ -58,7 +76,7 @@ export const CompactColorField = ({
     // $FlowFixMe[constant-condition]
     const newAlpha = disableAlpha ? 1 : color.rgb.a;
     setColorValue(rgbString);
-    if (newAlpha) setAlphaValue(newAlpha);
+    if (newAlpha !== undefined) setAlphaValue(newAlpha);
     onChange(rgbString, newAlpha);
   };
 

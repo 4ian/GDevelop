@@ -338,6 +338,8 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onEventsBasedObjectChildrenEdited={
                   props.onEventsBasedObjectChildrenEdited
                 }
+                onBackgroundColorChanged={props.onBackgroundColorChanged}
+                openSceneVariables={props.openSceneVariables}
               />
             )}
           </I18n>

@@ -58,6 +58,7 @@ let loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> = {
 let spineAtlasPromises: ResourcePromise<SpineTextureAtlasOrLoadingError> = {};
 let spineDataPromises: ResourcePromise<SpineDataOrLoadingError> = {};
 let ongoingResourceReloads: Promise<void> | null = null;
+let pendingResourceReloadPromises: { [resourceName: string]: Promise<void> } = {};
 
 // $FlowFixMe[value-as-type]
 const createInvalidModel = (): GLTF => {
@@ -266,6 +267,7 @@ export default class PixiResourcesLoader {
     spineAtlasPromises = {};
     spineDataPromises = {};
     ongoingResourceReloads = null;
+    pendingResourceReloadPromises = {};
   }
 
   static async _reloadEmbedderResources(
@@ -380,6 +382,17 @@ export default class PixiResourcesLoader {
   }
 
   static async reloadResource(project: gdProject, resourceName: string) {
+    // If a reload for this specific resource is already pending, wait for it
+    // instead of queuing a duplicate. This prevents a race condition when
+    // multiple SceneEditors are open: both get notified of a resource change
+    // and both call reloadResource. Without deduplication, the second reload
+    // would unload the texture that was just freshly loaded by the first,
+    // destroying textures that active renderers are already using.
+    if (pendingResourceReloadPromises[resourceName]) {
+      await pendingResourceReloadPromises[resourceName];
+      return;
+    }
+
     const currentReload = (ongoingResourceReloads || Promise.resolve()).then(
       () => {
         console.log(`Starting reload of resource "${resourceName}".`);
@@ -387,9 +400,11 @@ export default class PixiResourcesLoader {
       }
     );
     ongoingResourceReloads = currentReload;
+    pendingResourceReloadPromises[resourceName] = currentReload;
     try {
       await currentReload;
     } finally {
+      delete pendingResourceReloadPromises[resourceName];
       console.log(`Finished reload of resource "${resourceName}".`);
       if (ongoingResourceReloads === currentReload) {
         ongoingResourceReloads = null;

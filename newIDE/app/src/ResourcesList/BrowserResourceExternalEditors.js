@@ -22,6 +22,7 @@ import {
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { displayBlackLoadingScreenOrThrow } from '../Utils/BrowserExternalWindowUtils';
 import { UserCancellationError } from '../LoginProvider/Utils';
+import { triggerOnResourceExternallyChanged } from '../MainFrame/ResourcesWatcher';
 let nextExternalEditorWindowId = 0;
 
 const externalEditorIndexHtml: { ['piskel' | 'yarn' | 'jfxr']: string } = {
@@ -317,11 +318,27 @@ const editWithBrowserExternalEditor = async ({
     resourceManagementProps.onNewResourcesAdded();
   }
 
+  const modifiedResourceNames = modifiedResources.map(({ resource }) =>
+    resource.getName()
+  );
+
   // Some editors (Piskel) need to have resource names persisted.
   patchExternalEditorMetadataWithResourcesNamesIfNecessary(
-    modifiedResources.map(({ resource }) => resource.getName()),
+    modifiedResourceNames,
     externalEditorOutput.externalEditorData
   );
+
+  // Manually trigger a "resource externally changed" for the resources that were modified.
+  modifiedResourceNames.forEach(resourceName => {
+    if (!project.getResourcesManager().hasResource(resourceName)) return;
+    const resource = project.getResourcesManager().getResource(resourceName);
+    const file = resource.getFile();
+    if (!file) return;
+
+    triggerOnResourceExternallyChanged({
+      identifier: file,
+    });
+  });
 
   return {
     resources: modifiedResources.map(({ resource, originalIndex }) => ({

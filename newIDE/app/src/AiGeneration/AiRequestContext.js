@@ -14,7 +14,6 @@ import Window from '../Utils/Window';
 import { AI_SETTINGS_FETCH_TIMEOUT } from '../Utils/GlobalFetchTimeouts';
 import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { useInterval } from '../Utils/UseInterval';
 import useForceUpdate from '../Utils/UseForceUpdate';
 
@@ -456,6 +455,9 @@ type AiRequestContextState = {|
   getAiSettings: () => AiSettings | null,
   isFetchingSuggestions: boolean,
   setIsFetchingSuggestions: (value: boolean) => void,
+  selectedAiRequestId: string | null,
+  setSelectedAiRequestId: (aiRequestId: string | null) => void,
+  selectedAiRequest: AiRequest | null,
 |};
 
 export const initialAiRequestContextState: AiRequestContextState = {
@@ -487,6 +489,9 @@ export const initialAiRequestContextState: AiRequestContextState = {
   getAiSettings: () => null,
   isFetchingSuggestions: false,
   setIsFetchingSuggestions: () => {},
+  selectedAiRequestId: null,
+  setSelectedAiRequestId: () => {},
+  selectedAiRequest: null,
 };
 export const AiRequestContext: React.Context<AiRequestContextState> = React.createContext<AiRequestContextState>(
   initialAiRequestContextState
@@ -506,8 +511,9 @@ export const AiRequestProvider = ({
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
-  const { values } = React.useContext(PreferencesContext);
-  const selectedAiRequestId = values.aiState.aiRequestId;
+  const [selectedAiRequestId, setSelectedAiRequestId] = React.useState<
+    string | null
+  >(null);
   const { aiRequests, updateAiRequest } = aiRequestStorage;
   const selectedAiRequest =
     (selectedAiRequestId && aiRequests[selectedAiRequestId]) || null;
@@ -671,6 +677,9 @@ export const AiRequestProvider = ({
       getAiSettings,
       isFetchingSuggestions,
       setIsFetchingSuggestions,
+      selectedAiRequestId,
+      setSelectedAiRequestId,
+      selectedAiRequest,
     }),
     [
       aiRequestStorage,
@@ -679,6 +688,9 @@ export const AiRequestProvider = ({
       getAiSettings,
       isFetchingSuggestions,
       setIsFetchingSuggestions,
+      selectedAiRequestId,
+      setSelectedAiRequestId,
+      selectedAiRequest,
     ]
   );
 

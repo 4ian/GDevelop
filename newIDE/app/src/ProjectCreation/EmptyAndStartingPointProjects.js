@@ -181,7 +181,7 @@ const EmptyAndStartingPointProjects = ({
               <ExampleTile
                 exampleShortHeader={exampleShortHeader}
                 onSelect={() => onSelectExampleShortHeader(exampleShortHeader)}
-                key={exampleShortHeader.name}
+                key={exampleShortHeader.id}
                 disabled={disabled}
                 centerTitle
               />

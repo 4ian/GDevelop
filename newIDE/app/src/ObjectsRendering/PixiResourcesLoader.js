@@ -564,9 +564,8 @@ export default class PixiResourcesLoader {
   static getPIXITexture(project: gdProject, resourceName: string): any {
     // $FlowFixMe[invalid-computed-prop]
     if (loadedTextures[resourceName]) {
-      // If the texture's baseTexture was destroyed (e.g., by a concurrent
-      // reloadResource call from another SceneEditor callback), evict it
-      // from the cache and recreate it below.
+      // Extra safety: If the texture's baseTexture was destroyed somehow,
+      // evict it from the cache and recreate it below.
       if (
         !loadedTextures[resourceName].baseTexture ||
         loadedTextures[resourceName].baseTexture.destroyed
@@ -979,11 +978,9 @@ export default class PixiResourcesLoader {
    * if this event is triggered.
    */
   static getPIXIVideoTexture(project: gdProject, resourceName: string): any {
-    // $FlowFixMe[invalid-computed-prop]
     if (loadedTextures[resourceName]) {
-      // If the texture's baseTexture was destroyed (e.g., by a concurrent
-      // reloadResource call from another SceneEditor callback), evict it
-      // from the cache and recreate it below.
+      // Extra safety: If the texture's baseTexture was destroyed somehow,
+      // evict it from the cache and recreate it below.
       if (
         !loadedTextures[resourceName].baseTexture ||
         loadedTextures[resourceName].baseTexture.destroyed

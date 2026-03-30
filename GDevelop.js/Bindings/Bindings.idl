@@ -1354,7 +1354,7 @@ interface ResourcesContainer {
     [Const, Ref] Resource GetResource([Const] DOMString name);
     [Const, Ref] Resource GetResourceAt(unsigned long index);
     [Const, Ref] DOMString GetResourceNameWithOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
-    [Const, Ref] DOMString GetResourceNameWithFile([Const] DOMString file);
+    [Value] VectorString GetResourceNamesWithFile([Const] DOMString file);
     boolean AddResource([Const, Ref] Resource res);
     void RemoveResource([Const] DOMString name);
     void RenameResource([Const] DOMString oldName, [Const] DOMString name);

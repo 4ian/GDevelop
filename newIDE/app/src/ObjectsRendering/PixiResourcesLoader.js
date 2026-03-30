@@ -57,7 +57,7 @@ let loadedOrLoadingThreeMaterials: ResourcePromise<THREE.Material> = {};
 let loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> = {};
 let spineAtlasPromises: ResourcePromise<SpineTextureAtlasOrLoadingError> = {};
 let spineDataPromises: ResourcePromise<SpineDataOrLoadingError> = {};
-let ongoingResourceReloads: ResourcePromise<void> = {};
+let ongoingResourceReloads: Promise<void> | null = null;
 
 // $FlowFixMe[value-as-type]
 const createInvalidModel = (): GLTF => {
@@ -265,7 +265,7 @@ export default class PixiResourcesLoader {
     loadedOrLoading3DModelPromises = {};
     spineAtlasPromises = {};
     spineDataPromises = {};
-    ongoingResourceReloads = {};
+    ongoingResourceReloads = null;
   }
 
   static async _reloadEmbedderResources(
@@ -288,22 +288,35 @@ export default class PixiResourcesLoader {
   static async _doReloadResource(project: gdProject, resourceName: string) {
     // $FlowFixMe[invalid-computed-prop]
     const loadedTexture = loadedTextures[resourceName];
-    if (loadedTexture && loadedTexture.textureCacheIds) {
-      // The property textureCacheIds indicates that the PIXI.Texture object has some
-      // items cached in PIXI caches (PIXI.utils.BaseTextureCache and PIXI.utils.TextureCache).
-      // PIXI.Assets.unload will handle the clearing of those caches.
-      await PIXI.Assets.unload(loadedTexture.textureCacheIds);
-      // The cached texture is also removed. This is to handle cases where an empty texture
-      // has been cached (if file was not found for instance), and a corresponding file has
-      // been added and detected by file watcher. When reloading the texture, the cache must
-      // be cleaned too.
+    if (loadedTexture) {
+      // Remove the cached texture BEFORE awaiting the unload.
+      // PIXI.Assets.unload destroys the BaseTexture synchronously, which sets
+      // baseTexture to null on the texture. If getPIXITexture is called before
+      // the cache entry is removed, it would return the destroyed texture.
       // $FlowFixMe[prop-missing]
       delete loadedTextures[resourceName];
+
+      if (
+        loadedTexture.textureCacheIds &&
+        loadedTexture !== invalidTexture &&
+        loadedTexture !== loadingTexture
+      ) {
+        console.info(`Unloading texture cache for resource "${resourceName}".`);
+        // The property textureCacheIds indicates that the PIXI.Texture object has some
+        // items cached in PIXI caches (PIXI.utils.BaseTextureCache and PIXI.utils.TextureCache).
+        // PIXI.Assets.unload will handle the clearing of those caches.
+        await PIXI.Assets.unload(loadedTexture.textureCacheIds);
+      } else {
+        console.info(
+          `Texture for resource "${resourceName}" was invalid or has no textureCacheIds (so nothing to unload).`
+        );
+      }
 
       // Also reload any resource embedding this resource:
       await this._reloadEmbedderResources(project, resourceName, 'atlas');
     }
 
+    console.info(`Now loading new texture(s) for resource "${resourceName}".`);
     await PixiResourcesLoader.loadTextures(project, [resourceName]);
 
     if (loadedOrLoading3DModelPromises[resourceName]) {
@@ -367,17 +380,20 @@ export default class PixiResourcesLoader {
   }
 
   static async reloadResource(project: gdProject, resourceName: string) {
-    const previousReload =
-      ongoingResourceReloads[resourceName] || Promise.resolve();
-    const currentReload = previousReload.then(() =>
-      this._doReloadResource(project, resourceName)
+    const currentReload = (ongoingResourceReloads || Promise.resolve()).then(
+      () => {
+        console.log(`Starting reload of resource "${resourceName}".`);
+        return this._doReloadResource(project, resourceName);
+      }
     );
-    ongoingResourceReloads[resourceName] = currentReload;
+    ongoingResourceReloads = currentReload;
     try {
       await currentReload;
     } finally {
-      if (ongoingResourceReloads[resourceName] === currentReload) {
-        delete ongoingResourceReloads[resourceName];
+      console.log(`Finished reload of resource "${resourceName}".`);
+      if (ongoingResourceReloads === currentReload) {
+        ongoingResourceReloads = null;
+        console.log(`No more reload are queued.`);
       }
     }
   }
@@ -433,11 +449,19 @@ export default class PixiResourcesLoader {
             crossOrigin: determineCrossOrigin(url),
           });
           const loadedTexture = await PIXI.Assets.load(url);
+          if (!loadedTexture) {
+            throw new Error(
+              `Texture loading for "${url}" returned null/undefined.`
+            );
+          }
+
           // $FlowFixMe[prop-missing]
           loadedTextures[resourceName] = loadedTexture;
           // TODO What if 2 assets share the same file with different settings?
           applyPixiTextureSettings(resource, loadedTexture);
         } catch (error) {
+          // $FlowFixMe[prop-missing]
+          loadedTextures[resourceName] = invalidTexture;
           console.error(
             `Unable to load file ${resource.getFile()} for image resource ${resourceName}:`,
             error ? error : '(unknown error)'
@@ -507,11 +531,23 @@ export default class PixiResourcesLoader {
   static getPIXITexture(project: gdProject, resourceName: string): any {
     // $FlowFixMe[invalid-computed-prop]
     if (loadedTextures[resourceName]) {
-      // TODO: we never consider textures as not valid anymore. When we
-      // update the IDE to unload textures, we should handle loading them again
-      // here (and also be careful to return the same texture if it's not valid
-      // but still loading, when multiple objects are rapidly asking for the same texture).
-      return loadedTextures[resourceName];
+      // If the texture's baseTexture was destroyed (e.g., by a concurrent
+      // reloadResource call from another SceneEditor callback), evict it
+      // from the cache and recreate it below.
+      if (
+        !loadedTextures[resourceName].baseTexture ||
+        loadedTextures[resourceName].baseTexture.destroyed
+      ) {
+        console.warn(
+          `Texture for resource "${resourceName}" was requested but destroyed. Evicting it from the cache and recreating it.`
+        );
+        // $FlowFixMe[prop-missing]
+        delete loadedTextures[resourceName];
+
+        // Then we let the new texture be loaded below.
+      } else {
+        return loadedTextures[resourceName];
+      }
     }
 
     if (
@@ -549,6 +585,17 @@ export default class PixiResourcesLoader {
 
     // $FlowFixMe[invalid-computed-prop]
     applyPixiTextureSettings(resource, loadedTextures[resourceName]);
+
+    if (
+      !loadedTextures[resourceName].baseTexture ||
+      loadedTextures[resourceName].baseTexture.destroyed
+    ) {
+      console.error(
+        `Texture for resource "${resourceName}" was requested, loaded, but still has no baseTexture.`
+      );
+      return invalidTexture;
+    }
+
     // $FlowFixMe[invalid-computed-prop]
     return loadedTextures[resourceName];
   }

@@ -606,22 +606,40 @@ export default class SceneEditor extends React.Component<Props, State> {
   |}) => {
     const { project } = this.props;
 
-    const resourceName = project
+    const resourceNames = project
       .getResourcesManager()
-      .getResourceNameWithFile(resourceInfo.identifier);
-    if (resourceName) {
-      const { editorDisplay } = this;
-      if (!editorDisplay) return;
-      try {
-        // When reloading textures, there can be a short time during which
-        // the existing texture is removed but the InstancesEditor tries to use it
-        // through the RenderedInstance's, triggering crashes. So the scene rendering
-        // is paused during this period.
-        editorDisplay.startSceneRendering(false);
+      .getResourceNamesWithFile(resourceInfo.identifier)
+      .toJSArray();
+    if (resourceNames.length === 0) {
+      console.warn(
+        `A resource with file "${
+          resourceInfo.identifier
+        }" was changed, but no resource(s) with this file were found.`
+      );
+      return;
+    }
+
+    const { editorDisplay } = this;
+    if (!editorDisplay) return;
+    try {
+      // When reloading textures, there can be a short time during which
+      // the existing texture is removed but the InstancesEditor tries to use it
+      // through the RenderedInstance's, triggering crashes. So the scene rendering
+      // is paused during this period.
+      console.log(
+        `Pausing scene rendering after resource(s) externally changed (file: ${
+          resourceInfo.identifier
+        }, resources: ${resourceNames.join(', ')}).`
+      );
+      editorDisplay.startSceneRendering(false, 'resource-reload');
+      for (const resourceName of resourceNames) {
         await PixiResourcesLoader.reloadResource(project, resourceName);
+      }
 
-        editorDisplay.forceUpdateObjectsList();
+      editorDisplay.forceUpdateObjectsList();
 
+      const objectNames = new Set<string>();
+      for (const resourceName of resourceNames) {
         const objectsCollector = new gd.ObjectsUsingResourceCollector(
           project.getResourcesManager(),
           resourceName
@@ -629,17 +647,31 @@ export default class SceneEditor extends React.Component<Props, State> {
         // $FlowIgnore - Flow does not know ObjectsUsingResourceCollector inherits from ArbitraryObjectsWorker
         // $FlowFixMe[incompatible-type]
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
-        const objectNames = objectsCollector.getObjectNames().toJSArray();
+        objectsCollector
+          .getObjectNames()
+          .toJSArray()
+          .forEach(objectName => {
+            objectNames.add(objectName);
+          });
         objectsCollector.delete();
-        ObjectsRenderingService.renderersCacheClearingMethods.forEach(clear =>
-          clear(project)
-        );
-        objectNames.forEach(objectName => {
-          editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
-        });
-      } finally {
-        editorDisplay.startSceneRendering(true);
       }
+      ObjectsRenderingService.renderersCacheClearingMethods.forEach(clear =>
+        clear(project)
+      );
+
+      console.log(
+        `resetInstanceRenderersFor: ${[...objectNames].join(
+          ', '
+        )} - on resource externally changed path.`
+      );
+      objectNames.forEach(objectName => {
+        editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
+      });
+    } finally {
+      console.log(
+        `Starting scene rendering after resource externally changed.`
+      );
+      editorDisplay.startSceneRendering(true, 'resource-reload');
     }
   };
 

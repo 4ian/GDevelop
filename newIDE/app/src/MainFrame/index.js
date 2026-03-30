@@ -1849,7 +1849,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     () => {
       if (isEditorHotReloadNeeded()) {
         notifyChangesToInGameEditor({
-          shouldReloadProjectData: false,
+          shouldReloadProjectData: true,
           shouldReloadLibraries: false,
           shouldReloadResources: true,
           shouldHardReload: false,

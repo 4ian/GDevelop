@@ -184,7 +184,9 @@ import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
 import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
-import useCreateProject from '../Utils/UseCreateProject';
+import useCreateProject, {
+  type UseCreateProjectReturnType,
+} from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
@@ -1404,7 +1406,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     createProjectFromInAppTutorial,
     createProjectFromTutorial,
     createProjectFromCourseChapter,
-  } = useCreateProject({
+  }: UseCreateProjectReturnType = useCreateProject({
     beforeCreatingProject: () => {
       setIsProjectOpening(true);
     },
@@ -1430,7 +1432,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           currentFileMetadata: newFileMetadata,
         }));
       }
-      setNewProjectSetupDialogOpen(false);
+      closeNewProjectDialog();
       if (options.openQuickCustomizationDialog) {
         setQuickCustomizationDialogOpenedFromGameId(oldProjectId);
       } else {
@@ -1446,7 +1448,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           })
         : openSceneOrProjectManager({
             currentProject: project,
-            editorTabs: editorTabs,
+            editorTabs,
           });
       // If Ask AI editor was opened, reposition it.
       const openedAskAIEditor = getOpenedAskAiEditor(editorTabs);
@@ -4855,6 +4857,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     renderNewProjectDialog,
     fetchAndOpenNewProjectSetupDialogForExample,
     openNewProjectDialog,
+    closeNewProjectDialog,
   } = useNewProjectDialog({
     project: state.currentProject,
     fileMetadata: currentFileMetadata,
@@ -4868,7 +4871,18 @@ const MainFrame = (props: Props): React.MixedElement => {
     storageProviders: props.storageProviders,
     storageProvider: getStorageProvider(),
     resourceManagementProps,
-    onOpenLayout: (name, options) => openLayout(name, options),
+    onOpenLayout: (
+      name: string,
+      options?: {|
+        openEventsEditor: boolean,
+        openSceneEditor: boolean,
+        focusWhenOpened:
+          | 'scene-or-events-otherwise'
+          | 'scene'
+          | 'events'
+          | 'none',
+      |}
+    ) => openLayout(name, options),
     onWillInstallExtension,
     onExtensionInstalled,
   });

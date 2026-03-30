@@ -309,11 +309,11 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           forkingState,
           setForkingState,
         },
+        selectedAiRequestId,
+        selectedAiRequest,
+        setSelectedAiRequestId,
       } = React.useContext(AiRequestContext);
       const {
-        selectedAiRequest,
-        selectedAiRequestId,
-        setAiState,
         isFetchingSuggestions,
         savingProjectForMessageId,
       } = useAiRequestState({
@@ -549,9 +549,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               // Select the new AI request just created - unless the user switched to another one
               // in the meantime.
               if (!upToDateSelectedAiRequestId.current) {
-                setAiState({
-                  aiRequestId: aiRequest.id,
-                });
+                setSelectedAiRequestId(aiRequest.id);
               }
 
               const aiRequestChatRefCurrent = aiRequestChatRef.current;
@@ -597,7 +595,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           quota,
           selectedAiRequestId,
           setLastSendError,
-          setAiState,
+          setSelectedAiRequestId,
           setSendingAiRequest,
           setIsSendingUserMessage,
           upToDateSelectedAiRequestId,
@@ -878,9 +876,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         // ensure we reset the selection if not logged in.
         if (selectedAiRequestId) {
           if (!profile) {
-            setAiState({
-              aiRequestId: null,
-            });
+            setSelectedAiRequestId(null);
             return;
           }
         }
@@ -914,11 +910,11 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 );
               });
             }
-            setAiState(options);
+            setSelectedAiRequestId(options.aiRequestId);
           }
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [setAiState, selectedAiRequest]
+        [setSelectedAiRequestId, selectedAiRequest]
       );
       const onStartNewChat = React.useCallback(
         () => {
@@ -1442,9 +1438,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               }
               // Immediately switch the UI and refresh in the background.
               updateAiRequest(requestToOpen.id, () => requestToOpen);
-              setAiState({
-                aiRequestId: requestToOpen.id,
-              });
+              setSelectedAiRequestId(requestToOpen.id);
               refreshAiRequest(requestToOpen.id);
               onCloseHistory();
             }}

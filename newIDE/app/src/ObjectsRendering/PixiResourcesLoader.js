@@ -325,10 +325,20 @@ export default class PixiResourcesLoader {
       // $FlowFixMe[prop-missing]
       delete loadedTextures[resourceName];
 
-      // The property textureCacheIds indicates that the PIXI.Texture object has some
-      // items cached in PIXI caches (PIXI.utils.BaseTextureCache and PIXI.utils.TextureCache).
-      // PIXI.Assets.unload will handle the clearing of those caches.
-      await PIXI.Assets.unload(loadedTexture.textureCacheIds);
+      // Check if another resource still references the same texture object
+      // (happens when multiple resources point to the same file/URL).
+      // If so, skip PIXI.Assets.unload to avoid destroying the shared
+      // BaseTexture — the other resource's entry still needs it.
+      const isTextureStillUsed = Object.keys(loadedTextures).some(
+        otherName => loadedTextures[otherName] === loadedTexture
+      );
+
+      if (!isTextureStillUsed) {
+        // The property textureCacheIds indicates that the PIXI.Texture object has some
+        // items cached in PIXI caches (PIXI.utils.BaseTextureCache and PIXI.utils.TextureCache).
+        // PIXI.Assets.unload will handle the clearing of those caches.
+        await PIXI.Assets.unload(loadedTexture.textureCacheIds);
+      }
 
       // Also reload any resource embedding this resource:
       await this._reloadEmbedderResources(project, resourceName, 'atlas');

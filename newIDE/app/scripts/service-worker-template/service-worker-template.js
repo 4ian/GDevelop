@@ -280,7 +280,7 @@ if (workbox) {
   }
 
   /* injection point for manifest files.  */
-  workbox.precaching.precacheAndRoute([]);
+  workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);
 
   /* custom cache rules*/
   workbox.routing.registerNavigationRoute('/index.html', {

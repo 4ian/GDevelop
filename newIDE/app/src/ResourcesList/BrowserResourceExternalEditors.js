@@ -329,6 +329,11 @@ const editWithBrowserExternalEditor = async ({
   );
 
   // Manually trigger a "resource externally changed" for the resources that were modified.
+  console.log(
+    `External editor triggering resource changed events for resources "${modifiedResourceNames.join(
+      ', '
+    )}".`
+  );
   modifiedResourceNames.forEach(resourceName => {
     if (!project.getResourcesManager().hasResource(resourceName)) return;
     const resource = project.getResourcesManager().getResource(resourceName);

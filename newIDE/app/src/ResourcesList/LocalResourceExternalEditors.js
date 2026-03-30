@@ -256,19 +256,14 @@ const editWithLocalExternalEditor = async ({
 
   // Manually trigger a "resource externally changed" for the resources that were modified.
   console.log(
-    'triggering resource externally changed for resources:',
-    modifiedResourceNames
+    `External editor triggering resource changed events for resources "${modifiedResourceNames.join(
+      ', '
+    )}".`
   );
   modifiedResourceNames.forEach(resourceName => {
     if (!project.getResourcesManager().hasResource(resourceName)) return;
     const resource = project.getResourcesManager().getResource(resourceName);
     const file = resource.getFile();
-    console.log(
-      'triggering resource externally changed for resource:',
-      resourceName,
-      'file:',
-      file
-    );
     if (!file) return;
 
     triggerOnResourceExternallyChanged({

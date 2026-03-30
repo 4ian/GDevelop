@@ -192,6 +192,7 @@ type Props = {|
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   layout: gdLayout | null,
+  externalLayout?: gdExternalLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
   eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
@@ -602,15 +603,32 @@ export default class SceneEditor extends React.Component<Props, State> {
   }
 
   _reloadResources = async (resourceNames: string[], reason: string) => {
-    const { project } = this.props;
+    const {
+      project,
+      layout,
+      externalLayout,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      eventsBasedObjectVariant,
+    } = this.props;
     const { editorDisplay } = this;
+
+    const name = externalLayout
+      ? externalLayout.getName()
+      : layout
+      ? layout.getName()
+      : [eventsFunctionsExtension, eventsBasedObject, eventsBasedObjectVariant]
+          .filter(Boolean)
+          .map(item => item.getName())
+          .join(' > ');
+
     if (!editorDisplay) return;
 
     try {
       console.info(
         `Reloading resources "${resourceNames.join(
           ', '
-        )}" for scene rendering (reason: ${reason}).`
+        )}" for scene "${name}" rendering (reason: ${reason}).`
       );
 
       // When reloading textures, there can be a short time during which
@@ -649,7 +667,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       console.info(
         `Resetting instance renderers for objects using resources "${resourceNames.join(
           ', '
-        )}": ${[...objectNames].join(', ')}.`
+        )}": ${[...objectNames].join(', ')} (scene: "${name}").`
       );
       objectNames.forEach(objectName => {
         editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
@@ -658,7 +676,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       console.info(
         `Starting scene rendering again after reloading resources "${resourceNames.join(
           ', '
-        )}".`
+        )}": (scene: "${name}").`
       );
       editorDisplay.startSceneRendering(true, 'resource-reload');
     }

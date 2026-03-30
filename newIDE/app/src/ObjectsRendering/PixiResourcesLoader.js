@@ -286,7 +286,14 @@ export default class PixiResourcesLoader {
   static async reloadResource(project: gdProject, resourceName: string) {
     // $FlowFixMe[invalid-computed-prop]
     const loadedTexture = loadedTextures[resourceName];
-    if (loadedTexture && loadedTexture.textureCacheIds) {
+    if (loadedTexture === invalidTexture) {
+      // The resource previously failed to load and was set to the shared
+      // invalidTexture singleton. Just remove the cache entry so it gets
+      // freshly loaded below — never unload invalidTexture as it would
+      // destroy the shared fallback BaseTexture used by all error states.
+      // $FlowFixMe[prop-missing]
+      delete loadedTextures[resourceName];
+    } else if (loadedTexture && loadedTexture.textureCacheIds) {
       // Remove the cached texture BEFORE awaiting the unload.
       // PIXI.Assets.unload destroys the BaseTexture synchronously, which sets
       // baseTexture to null on the texture. If getPIXITexture is called before

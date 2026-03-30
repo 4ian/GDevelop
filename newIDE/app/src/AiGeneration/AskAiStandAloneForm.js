@@ -156,6 +156,7 @@ export const AskAiStandAloneForm = ({
     aiRequestStorage,
     editorFunctionCallResultsStorage,
     getAiSettings,
+    setSelectedAiRequestId,
   } = React.useContext(AiRequestContext);
   const {
     getEditorFunctionCallResults,
@@ -185,9 +186,7 @@ export const AskAiStandAloneForm = ({
   );
   const {
     values: { automaticallyUseCreditsForAiRequests },
-    setAiState,
   } = React.useContext(PreferencesContext);
-
   const {
     profile,
     getAuthorizationHeader,
@@ -316,9 +315,7 @@ export const AskAiStandAloneForm = ({
             setAiRequestIdForForm(aiRequest.id);
             // Also set the global selected AI request state,
             // so that the editor is in sync, when we'll open it.
-            setAiState({
-              aiRequestId: aiRequest.id,
-            });
+            setSelectedAiRequestId(aiRequest.id);
           }
 
           sendAiRequestStarted({
@@ -356,7 +353,7 @@ export const AskAiStandAloneForm = ({
       aiRequestIdForForm,
       setLastSendError,
       aiRequestModeForForm,
-      setAiState,
+      setSelectedAiRequestId,
       setSendingAiRequest,
       upToDateSelectedAiRequestId,
       updateAiRequest,

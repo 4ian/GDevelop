@@ -82,7 +82,6 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
 };
 
 export const getInitialPreferences = (): {
-  aiState: { aiRequestId: null },
   autoDisplayChangelog: boolean,
   autoDownloadUpdates: boolean,
   autoOpenMostRecentProject: boolean,
@@ -390,8 +389,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setShowAiAskButtonInTitleBar: (this._setShowAiAskButtonInTitleBar.bind(
       this
     ): any),
-    // $FlowFixMe[method-unbinding]
-    setAiState: (this._setAiState.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setAutomaticallyUseCreditsForAiRequests: (this._setAutomaticallyUseCreditsForAiRequests.bind(
       this
@@ -1374,21 +1371,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           showAiAskButtonInTitleBar: newValue,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
-  _setAiState(newValue: {| aiRequestId: string | null |}) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          aiState: {
-            ...state.values.aiState,
-            ...newValue,
-          },
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

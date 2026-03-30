@@ -45,6 +45,12 @@ type ResourcePromise<T> = { [resourceName: string]: Promise<T> };
 let loadedBitmapFonts = {};
 let loadedFontFamilies = {};
 let loadedTextures = {};
+// Tracks in-flight reload promises so that concurrent reloadResource calls
+// for the same resource name are deduplicated. Without this, when multiple
+// SceneEditors are open, each one fires its own reloadResource — the second
+// call would unload the texture that the first call just loaded, causing
+// crashes (null baseTexture / width).
+let pendingReloads: { [resourceName: string]: Promise<void> } = {};
 const invalidTexture = PIXI.Texture.from('res/invalid_texture.png');
 const loadingTexture = PIXI.Texture.from(
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAAA1BMVEXX19f5cgrAAAAAAXRSTlMz/za5cAAAAApJREFUCNdjQAMAABAAAbSqgB8AAAAASUVORK5CYII='
@@ -284,6 +290,24 @@ export default class PixiResourcesLoader {
   }
 
   static async reloadResource(project: gdProject, resourceName: string) {
+    // Deduplicate concurrent calls for the same resource. When multiple
+    // SceneEditors are open, each one calls reloadResource for the same
+    // resource. Without deduplication, the second call would unload the
+    // texture that the first call just loaded, causing null-baseTexture crashes.
+    if (pendingReloads[resourceName]) {
+      return pendingReloads[resourceName];
+    }
+
+    const promise = this._doReloadResource(project, resourceName);
+    pendingReloads[resourceName] = promise;
+    try {
+      await promise;
+    } finally {
+      delete pendingReloads[resourceName];
+    }
+  }
+
+  static async _doReloadResource(project: gdProject, resourceName: string) {
     // $FlowFixMe[invalid-computed-prop]
     const loadedTexture = loadedTextures[resourceName];
     if (loadedTexture === invalidTexture) {

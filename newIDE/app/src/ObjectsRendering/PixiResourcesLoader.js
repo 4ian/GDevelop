@@ -58,7 +58,9 @@ let loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> = {
 let spineAtlasPromises: ResourcePromise<SpineTextureAtlasOrLoadingError> = {};
 let spineDataPromises: ResourcePromise<SpineDataOrLoadingError> = {};
 let ongoingResourceReloads: Promise<void> | null = null;
-let pendingResourceReloadPromises: { [resourceName: string]: Promise<void> } = {};
+let pendingResourceReloadPromises: {
+  [resourceName: string]: { promise: Promise<void>, reReloadNeeded: boolean },
+} = {};
 
 // $FlowFixMe[value-as-type]
 const createInvalidModel = (): GLTF => {
@@ -382,35 +384,68 @@ export default class PixiResourcesLoader {
   }
 
   static async reloadResource(project: gdProject, resourceName: string) {
-    // If a reload for this specific resource is already pending, wait for it
-    // instead of queuing a duplicate. This prevents a race condition when
+    // If a reload for this specific resource is already pending, coalesce with
+    // it instead of queuing a duplicate. This prevents a race condition when
     // multiple SceneEditors are open: both get notified of a resource change
     // and both call reloadResource. Without deduplication, the second reload
     // would unload the texture that was just freshly loaded by the first,
     // destroying textures that active renderers are already using.
-    if (pendingResourceReloadPromises[resourceName]) {
-      await pendingResourceReloadPromises[resourceName];
+    const pendingReload = pendingResourceReloadPromises[resourceName];
+    if (pendingReload) {
+      // Mark that another reload was requested while one is in-flight, so
+      // that when the current reload finishes we run one more pass to pick
+      // up any URL-cache changes that happened after the in-flight reload
+      // resolved its URLs.
+      pendingReload.reReloadNeeded = true;
+      await pendingReload.promise;
       return;
     }
 
-    const currentReload = (ongoingResourceReloads || Promise.resolve()).then(
-      () => {
-        console.log(`Starting reload of resource "${resourceName}".`);
-        return this._doReloadResource(project, resourceName);
+    const reloadEntry: {
+      promise: Promise<void>,
+      reReloadNeeded: boolean,
+    } = {
+      promise: Promise.resolve(), // Replaced below.
+      reReloadNeeded: false,
+    };
+
+    const doReload = async () => {
+      const currentReload = (ongoingResourceReloads || Promise.resolve()).then(
+        () => {
+          console.log(`Starting reload of resource "${resourceName}".`);
+          return this._doReloadResource(project, resourceName);
+        }
+      );
+      ongoingResourceReloads = currentReload;
+      try {
+        await currentReload;
+      } finally {
+        if (ongoingResourceReloads === currentReload) {
+          ongoingResourceReloads = null;
+          console.log(`No more reload are queued.`);
+        }
       }
-    );
-    ongoingResourceReloads = currentReload;
-    pendingResourceReloadPromises[resourceName] = currentReload;
-    try {
-      await currentReload;
-    } finally {
-      delete pendingResourceReloadPromises[resourceName];
-      console.log(`Finished reload of resource "${resourceName}".`);
-      if (ongoingResourceReloads === currentReload) {
-        ongoingResourceReloads = null;
-        console.log(`No more reload are queued.`);
+    };
+
+    reloadEntry.promise = (async () => {
+      try {
+        await doReload();
+
+        // If another caller requested a reload while we were in-flight,
+        // run one more pass so the latest file state is picked up.
+        if (reloadEntry.reReloadNeeded) {
+          reloadEntry.reReloadNeeded = false;
+          console.log(`Re-reload needed for resource "${resourceName}".`);
+          await doReload();
+        }
+      } finally {
+        delete pendingResourceReloadPromises[resourceName];
+        console.log(`Finished reload of resource "${resourceName}".`);
       }
-    }
+    })();
+
+    pendingResourceReloadPromises[resourceName] = reloadEntry;
+    await reloadEntry.promise;
   }
   /**
    * (Re)load the PIXI texture represented by the given resources.

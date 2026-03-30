@@ -2,6 +2,7 @@
 import * as React from 'react';
 // Import the worker (will be handled by worker-loader)
 import Resource3DPreviewWorker from './Resource3DPreview.worker';
+import { checkIfCredentialsRequired } from '../../Utils/CrossOrigin';
 
 type WorkerInitMessage = {|
   type: 'INIT',
@@ -10,6 +11,8 @@ type WorkerInitMessage = {|
 type WorkerRenderModelMessage = {|
   type: 'RENDER_MODEL',
   resourceUrl: string,
+  resourceData: ArrayBuffer,
+  basePath: string,
 |};
 
 type WorkerOutInitMessage = {|
@@ -135,7 +138,11 @@ class Resource3DPreviewWorkerManager {
     this.worker.postMessage(message);
   }
 
-  renderModel(resourceUrl: string): Promise<string> {
+  renderModel(
+    resourceUrl: string,
+    resourceData: ArrayBuffer,
+    basePath: string
+  ): Promise<string> {
     return new Promise((resolve, reject) => {
       if (!this.isInitialized) {
         resolve(this.fallbackImagePath);
@@ -147,8 +154,11 @@ class Resource3DPreviewWorkerManager {
         // $FlowFixMe[incompatible-type]
         type: MESSAGE_TYPES.RENDER_MODEL,
         resourceUrl,
+        resourceData,
+        basePath,
       };
-      this.worker.postMessage(message);
+      // Transfer the ArrayBuffer to avoid copying it across threads.
+      this.worker.postMessage(message, [resourceData]);
     });
   }
 
@@ -210,12 +220,36 @@ export const Resource3DPreviewProvider = ({
   }, []);
 
   const renderModel = React.useCallback(async (url: string) => {
-    if (!workerManagerRef.current) {
+    const workerManager = workerManagerRef.current;
+    if (!workerManager) {
       return null;
     }
 
+    // Fetch the resource data on the main thread. Workers in Electron cannot
+    // fetch file:// URLs because webSecurity:false only applies to the renderer
+    // process, not the network service process used by workers.
+    let resourceData: ArrayBuffer;
     try {
-      const dataUrl = await workerManagerRef.current.renderModel(url);
+      const response = await fetch(url, {
+        credentials: checkIfCredentialsRequired(url)
+          ? 'include'
+          : 'same-origin',
+      });
+      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+      resourceData = await response.arrayBuffer();
+    } catch (error) {
+      console.error('Error fetching 3D model resource:', error);
+      return 'JsPlatform/Extensions/3d_model.svg';
+    }
+
+    const basePath = url.substring(0, url.lastIndexOf('/') + 1);
+
+    try {
+      const dataUrl = await workerManager.renderModel(
+        url,
+        resourceData,
+        basePath
+      );
       return dataUrl;
     } catch (error) {
       console.error('Error rendering 3D model:', error);

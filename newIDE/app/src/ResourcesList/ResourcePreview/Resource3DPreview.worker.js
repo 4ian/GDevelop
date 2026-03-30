@@ -3,29 +3,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
-const isNativeMobileApp = false;
-
-// Copied from Utils/CrossOrigin.js
-// $FlowFixMe[missing-local-annot]
-const checkIfIsGDevelopCloudBucketUrl = url => {
-  return (
-    url.startsWith('https://project-resources.gdevelop.io/') ||
-    url.startsWith('https://project-resources-dev.gdevelop.io/')
-  );
-};
-
-// Copied from Utils/CrossOrigin.js
-// $FlowFixMe[missing-local-annot]
-const checkIfCredentialsRequired = url => {
-  // Any resource stored on the GDevelop Cloud buckets needs credentials
-  // $FlowFixMe[constant-condition]
-  if (isNativeMobileApp) return false;
-  if (checkIfIsGDevelopCloudBucketUrl(url)) return true;
-
-  // For other resources, use the default way of loading resources
-  return false;
-};
-
 // Copied from PixiResourcesLoader.js
 // $FlowFixMe[missing-local-annot]
 const removeMetalness = material => {
@@ -81,9 +58,11 @@ const initRenderer = () => {
   return true;
 };
 
-// Render a 3D model to the offscreen canvas and return the data URL
+// Render a 3D model to the offscreen canvas and return the data URL.
+// resourceData is an ArrayBuffer fetched by the main thread (workers cannot
+// fetch file:// URLs in Electron due to network service sandboxing).
 // $FlowFixMe[missing-local-annot]
-const renderModel = async resourceUrl => {
+const renderModel = async (resourceUrl, resourceData, basePath) => {
   if (!renderer) {
     throw new Error('Renderer not initialized');
   }
@@ -100,13 +79,14 @@ const renderModel = async resourceUrl => {
   lightGroup.add(light);
   scene.add(lightGroup);
 
-  // Load the model
+  // Parse the pre-fetched model data instead of fetching the URL,
+  // so the worker never needs to make any network/file requests.
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
-    loader.withCredentials = checkIfCredentialsRequired(resourceUrl);
 
-    loader.load(
-      resourceUrl,
+    loader.parse(
+      resourceData,
+      basePath,
       gltf => {
         if (!renderer) {
           throw new Error('Renderer not initialized');
@@ -207,7 +187,12 @@ self.onmessage = async event => {
           throw new Error('Renderer not initialized');
         }
 
-        const screenshot = await renderModel(resourceUrl);
+        const { resourceData, basePath } = event.data;
+        const screenshot = await renderModel(
+          resourceUrl,
+          resourceData,
+          basePath
+        );
         // eslint-disable-next-line no-restricted-globals
         self.postMessage({
           type: MESSAGE_TYPES.RENDER_COMPLETE,

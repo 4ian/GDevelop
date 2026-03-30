@@ -3588,6 +3588,10 @@ namespace gdjs {
       }
 
       this._isFirstFrame = false;
+
+      for (let i = 0; i < gdjs.callbacksInGameEditorPostStep.length; ++i) {
+        gdjs.callbacksInGameEditorPostStep[i](this);
+      }
     }
 
     private _getEditorCamera(): EditorCamera {

@@ -655,9 +655,33 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading bundle purchases:', error);
       }
     );
-    this._fetchUserBadges();
+    getUserBadges(firebaseUser.uid).then(
+      badges =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            badges,
+          },
+        })),
+      error => {
+        console.error('Error while loading user badges:', error);
+      }
+    );
+    listNotifications(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      notifications =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            notifications,
+          },
+        })),
+      error => {
+        console.error('Error while loading user notifications:', error);
+      }
+    );
     this._fetchAchievements();
-    this._fetchUserNotifications();
 
     // Load and wait for the user profile to be fetched.
     // (and let the error propagate if any).
@@ -1185,17 +1209,17 @@ export default class AuthenticatedUserProvider extends React.Component<
     const { authentication } = this.props;
     if (!authentication) return;
 
-    this.setState({
+    this.setState(({ authenticatedUser }) => ({
       // This function is used for both account creation & login.
       createAccountInProgress: true,
       loginInProgress: true,
       apiCallError: null,
       authenticatedUser: {
-        ...this.state.authenticatedUser,
+        ...authenticatedUser,
         creatingOrLoggingInAccount: true,
         authenticationError: null,
       },
-    });
+    }));
     this._automaticallyUpdateUserProfile = false;
     try {
       this._abortController = new AbortController();
@@ -1223,23 +1247,23 @@ export default class AuthenticatedUserProvider extends React.Component<
           doNotReport: true,
           message: `An error occurred while logging in with provider ${provider}. Please check your internet connection or try again later.`,
         });
-        this.setState({
+        this.setState(({ authenticatedUser }) => ({
           apiCallError,
           authenticatedUser: {
-            ...this.state.authenticatedUser,
+            ...authenticatedUser,
             authenticationError: apiCallError,
           },
-        });
+        }));
       }
     }
-    this.setState({
+    this.setState(({ authenticatedUser }) => ({
       createAccountInProgress: false,
       loginInProgress: false,
       authenticatedUser: {
-        ...this.state.authenticatedUser,
+        ...authenticatedUser,
         creatingOrLoggingInAccount: false,
       },
-    });
+    }));
     this._automaticallyUpdateUserProfile = true;
   };
 
@@ -1254,15 +1278,15 @@ export default class AuthenticatedUserProvider extends React.Component<
     const { authentication } = this.props;
     if (!authentication) return;
 
-    this.setState({
+    this.setState(({ authenticatedUser }) => ({
       loginInProgress: true,
       apiCallError: null,
       authenticatedUser: {
-        ...this.state.authenticatedUser,
+        ...authenticatedUser,
         creatingOrLoggingInAccount: true,
         authenticationError: null,
       },
-    });
+    }));
     this._automaticallyUpdateUserProfile = false;
     try {
       await authentication.login(form);
@@ -1274,21 +1298,21 @@ export default class AuthenticatedUserProvider extends React.Component<
       );
       this._showLoginSnackbar(this.state.authenticatedUser);
     } catch (apiCallError) {
-      this.setState({
+      this.setState(({ authenticatedUser }) => ({
         apiCallError,
         authenticatedUser: {
-          ...this.state.authenticatedUser,
+          ...authenticatedUser,
           authenticationError: apiCallError,
         },
-      });
+      }));
     }
-    this.setState({
+    this.setState(({ authenticatedUser }) => ({
       loginInProgress: false,
       authenticatedUser: {
-        ...this.state.authenticatedUser,
+        ...authenticatedUser,
         creatingOrLoggingInAccount: false,
       },
-    });
+    }));
     this._automaticallyUpdateUserProfile = true;
   };
 
@@ -1344,15 +1368,15 @@ export default class AuthenticatedUserProvider extends React.Component<
     const { authentication } = this.props;
     if (!authentication) return;
 
-    this.setState({
+    this.setState(({ authenticatedUser }) => ({
       createAccountInProgress: true,
       apiCallError: null,
       authenticatedUser: {
-        ...this.state.authenticatedUser,
+        ...authenticatedUser,
         creatingOrLoggingInAccount: true,
         authenticationError: null,
       },
-    });
+    }));
     this._automaticallyUpdateUserProfile = false;
     try {
       await authentication.createFirebaseAccount(form);
@@ -1392,21 +1416,21 @@ export default class AuthenticatedUserProvider extends React.Component<
         ),
       });
     } catch (apiCallError) {
-      this.setState({
+      this.setState(({ authenticatedUser }) => ({
         apiCallError,
         authenticatedUser: {
-          ...this.state.authenticatedUser,
+          ...authenticatedUser,
           authenticationError: apiCallError,
         },
-      });
+      }));
     }
-    this.setState({
+    this.setState(({ authenticatedUser }) => ({
       createAccountInProgress: false,
       authenticatedUser: {
-        ...this.state.authenticatedUser,
+        ...authenticatedUser,
         creatingOrLoggingInAccount: false,
       },
-    });
+    }));
     this._automaticallyUpdateUserProfile = true;
   };
 

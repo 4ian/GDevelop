@@ -224,7 +224,6 @@ export const CompactEventsFunctionPropertiesEditor = ({
                 >
                   {getterFunction ? null : (
                     <SelectOption
-                      key="--empty-value--"
                       value={''}
                       label={i18n._(t`Select a function...`)}
                     />

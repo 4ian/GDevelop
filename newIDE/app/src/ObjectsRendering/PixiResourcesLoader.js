@@ -310,6 +310,23 @@ export default class PixiResourcesLoader {
         // items cached in PIXI caches (PIXI.utils.BaseTextureCache and PIXI.utils.TextureCache).
         // PIXI.Assets.unload will handle the clearing of those caches.
         await PIXI.Assets.unload(loadedTexture.textureCacheIds);
+
+        // When multiple resources point to the same file, they share the same
+        // PIXI texture (same URL → same cache entry). The unload above destroys
+        // the shared BaseTexture, which invalidates any other loadedTextures
+        // entry still referencing it. Evict those so they get loaded fresh.
+        for (const otherName in loadedTextures) {
+          const otherTexture = loadedTextures[otherName];
+          if (
+            otherTexture &&
+            otherTexture !== invalidTexture &&
+            otherTexture !== loadingTexture &&
+            (!otherTexture.baseTexture || otherTexture.baseTexture.destroyed)
+          ) {
+            // $FlowFixMe[prop-missing]
+            delete loadedTextures[otherName];
+          }
+        }
       } else {
         console.info(
           `Texture for resource "${resourceName}" was invalid or has no textureCacheIds (so nothing to unload).`

@@ -1449,7 +1449,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             editorTabs: editorTabs,
           });
       // If Ask AI editor was opened, reposition it.
-      const openedAskAIEditor = getOpenedAskAiEditor(state.editorTabs);
+      const openedAskAIEditor = getOpenedAskAiEditor(editorTabs);
       if (openedAskAIEditor || options.forceOpenAskAiEditor) {
         openAskAi({
           paneIdentifier: 'right',

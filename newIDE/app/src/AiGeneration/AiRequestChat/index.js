@@ -752,11 +752,12 @@ export const AiRequestChat: React.ComponentType<{
     // Calculate feedback banner visibility for sticky behavior
     // (must be before conditional returns to follow React hooks rules)
     const shouldDisplayFeedbackBannerNow =
-      !hasWorkingFunctionCalls &&
-      !isSending &&
       !!aiRequest &&
-      aiRequest.status === 'ready' &&
-      (aiRequest.mode === 'agent' || aiRequest.mode === 'orchestrator');
+      (aiRequest.mode === 'agent' || aiRequest.mode === 'orchestrator') &&
+      (aiRequest.status === 'suspended' ||
+        (!hasWorkingFunctionCalls &&
+          !isSending &&
+          aiRequest.status === 'ready'));
     const shouldDisplayFeedbackBanner = useStickyVisibility({
       shouldShow: shouldDisplayFeedbackBannerNow,
       showDelayMs: 1000,

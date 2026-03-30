@@ -23,6 +23,7 @@ type Props = {|
   tasks: Array<AiRequestPlanTask>,
   messageId: string,
   followingText?: string,
+  feedbackButtons?: React.Node,
   functionCallItemsByTaskId: Map<string, Array<FunctionCallItem>>,
   project: ?gdProject,
   onProcessFunctionCalls: (
@@ -202,6 +203,7 @@ export const OrchestratorPlan = ({
   tasks,
   messageId,
   followingText,
+  feedbackButtons,
   functionCallItemsByTaskId,
   project,
   onProcessFunctionCalls,
@@ -226,7 +228,7 @@ export const OrchestratorPlan = ({
     // sibling item won't render on its own since it's in absorbedMessageContentIndices).
     if (!followingText) return null;
     return (
-      <ChatBubble role="assistant">
+      <ChatBubble role="assistant" feedbackButtons={feedbackButtons}>
         <ChatMarkdownText source={followingText} />
       </ChatBubble>
     );
@@ -235,7 +237,7 @@ export const OrchestratorPlan = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <ChatBubble role="assistant">
+        <ChatBubble role="assistant" feedbackButtons={feedbackButtons}>
           <Column expand noMargin>
             <Line noMargin>
               <ChatMarkdownText

@@ -214,11 +214,21 @@ export const CompactEventsFunctionPropertiesEditor = ({
                 <CompactSelectField
                   value={(getterFunction && getterFunction.getName()) || ''}
                   onChange={value => {
+                    if (!value) {
+                      return;
+                    }
                     eventsFunction.setGetterName(value);
                     if (onConfigurationUpdated) onConfigurationUpdated();
                     forceUpdate();
                   }}
                 >
+                  {getterFunction ? null : (
+                    <SelectOption
+                      key="--empty-value--"
+                      value={''}
+                      label={i18n._(t`Select a function...`)}
+                    />
+                  )}
                   {eventsFunctionsContainer
                     ? mapFor(
                         0,

@@ -100,7 +100,6 @@ export const CodeEditor = ({
         // Enable type checking of JavaScript files
         monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
           ...monaco.languages.typescript.javascriptDefaults.getCompilerOptions(),
-          target: monaco.languages.typescript.ScriptTarget.ES6,
           allowNonTsExtensions: true,
           allowJs: true,
           checkJs: true,

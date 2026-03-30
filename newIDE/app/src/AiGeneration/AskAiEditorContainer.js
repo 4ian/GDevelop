@@ -365,8 +365,11 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         },
         // Fetch when the editor becomes active, but only if there were no
         // requests done (as we provide a way to refresh in the history).
+        // fetchAiRequests is also a dependency so that if the profile was not
+        // yet loaded when the editor first became active, the fetch is retried
+        // once it becomes available.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [isActive]
+        [isActive, fetchAiRequests]
       );
 
       const canStartNewChat = !!selectedAiRequestId;

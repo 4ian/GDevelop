@@ -601,36 +601,22 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   }
 
-  onResourceExternallyChanged = async (resourceInfo: {|
-    identifier: string,
-  |}) => {
+  _reloadResources = async (resourceNames: string[], reason: string) => {
     const { project } = this.props;
-
-    const resourceNames = project
-      .getResourcesManager()
-      .getResourceNamesWithFile(resourceInfo.identifier)
-      .toJSArray();
-    if (resourceNames.length === 0) {
-      console.warn(
-        `A resource with file "${
-          resourceInfo.identifier
-        }" was changed, but no resource(s) with this file were found.`
-      );
-      return;
-    }
-
     const { editorDisplay } = this;
     if (!editorDisplay) return;
+
     try {
+      console.info(
+        `Reloading resources "${resourceNames.join(
+          ', '
+        )}" for scene rendering (reason: ${reason}).`
+      );
+
       // When reloading textures, there can be a short time during which
       // the existing texture is removed but the InstancesEditor tries to use it
       // through the RenderedInstance's, triggering crashes. So the scene rendering
       // is paused during this period.
-      console.log(
-        `Pausing scene rendering after resource(s) externally changed (file: ${
-          resourceInfo.identifier
-        }, resources: ${resourceNames.join(', ')}).`
-      );
       editorDisplay.startSceneRendering(false, 'resource-reload');
       for (const resourceName of resourceNames) {
         await PixiResourcesLoader.reloadResource(project, resourceName);
@@ -638,6 +624,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       editorDisplay.forceUpdateObjectsList();
 
+      // Find all the objects using the resources that were reloaded.
       const objectNames = new Set<string>();
       for (const resourceName of resourceNames) {
         const objectsCollector = new gd.ObjectsUsingResourceCollector(
@@ -659,20 +646,43 @@ export default class SceneEditor extends React.Component<Props, State> {
         clear(project)
       );
 
-      console.log(
-        `resetInstanceRenderersFor: ${[...objectNames].join(
+      console.info(
+        `Resetting instance renderers for objects using resources "${resourceNames.join(
           ', '
-        )} - on resource externally changed path.`
+        )}": ${[...objectNames].join(', ')}.`
       );
       objectNames.forEach(objectName => {
         editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
       });
     } finally {
-      console.log(
-        `Starting scene rendering after resource externally changed.`
+      console.info(
+        `Starting scene rendering again after reloading resources "${resourceNames.join(
+          ', '
+        )}".`
       );
       editorDisplay.startSceneRendering(true, 'resource-reload');
     }
+  };
+
+  onResourceExternallyChanged = async (resourceInfo: {|
+    identifier: string,
+  |}) => {
+    const { project } = this.props;
+
+    const resourceNames = project
+      .getResourcesManager()
+      .getResourceNamesWithFile(resourceInfo.identifier)
+      .toJSArray();
+    if (resourceNames.length === 0) {
+      console.warn(
+        `A resource with file "${
+          resourceInfo.identifier
+        }" was changed, but no resource(s) with this file were found.`
+      );
+      return;
+    }
+
+    await this._reloadResources(resourceNames, 'resource file changed');
   };
 
   onInstancesModifiedOutsideEditor = () => {
@@ -2792,18 +2802,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       .toJSArray();
     resourcesInUse.delete();
 
-    PixiResourcesLoader.loadTextures(project, objectResourceNames).then(() => {
-      // This callback is executed even if there is no image to load.
-      const { editorDisplay } = this;
-      if (editorDisplay) {
-        projectScopedContainersAccessor.forEachObject(object => {
-          editorDisplay.instancesHandlers.resetInstanceRenderersFor(
-            object.getName()
-          );
-        });
-      }
-      this.forceUpdateObjectsList();
-    });
+    this._reloadResources(objectResourceNames, 'custom object edited');
   };
 
   forceUpdateRenderedInstancesOfObject = (object: gdObject) => {
@@ -2819,17 +2818,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       .toJSArray();
     resourcesInUse.delete();
 
-    PixiResourcesLoader.loadTextures(project, objectResourceNames).then(() => {
-      // This callback is executed even if there is no image to load.
-      // Images need to be loaded first because instance renderers use the
-      // image dimensions to evaluate theirs. It may cause flickering otherwise.
-      if (this.editorDisplay) {
-        this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
-          object.getName()
-        );
-      }
-      this.forceUpdateObjectsList();
-    });
+    this._reloadResources(objectResourceNames, 'object edited');
   };
 
   render(): any {

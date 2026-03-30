@@ -21,7 +21,6 @@ import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EXTENSION,
 } from '../../Utils/GDevelopServices/Badge';
-import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import Download from '../../UI/CustomSvgIcons/Download';
 import Add from '../../UI/CustomSvgIcons/Add';
 import ErrorBoundary from '../../UI/ErrorBoundary';
@@ -51,7 +50,6 @@ const ExtensionsSearchDialog = ({
   onCreateNew,
 }: Props) => {
   const preferences = React.useContext(PreferencesContext);
-  const { isMobile } = useResponsiveWindowSize();
   const installExtension = useInstallExtension();
   const {
     translatedExtensionShortHeadersByName: extensionShortHeadersByName,
@@ -161,6 +159,7 @@ const ExtensionsSearchDialog = ({
           title={<Trans>Search for New Extensions</Trans>}
           id="extension-search-dialog"
           fullHeight
+          maxWidth="sm"
           actions={[
             <FlatButton
               id="close-button"
@@ -177,13 +176,7 @@ const ExtensionsSearchDialog = ({
               <FlatButton
                 leftIcon={<Download />}
                 key="import"
-                label={
-                  isMobile ? (
-                    <Trans>Import</Trans>
-                  ) : (
-                    <Trans>Import extension</Trans>
-                  )
-                }
+                label={<Trans>Import</Trans>}
                 onClick={() => {
                   installOrImportExtension(i18n);
                 }}
@@ -194,13 +187,7 @@ const ExtensionsSearchDialog = ({
               <FlatButton
                 key="create-new"
                 onClick={onCreateNew}
-                label={
-                  isMobile ? (
-                    <Trans>Create</Trans>
-                  ) : (
-                    <Trans>Create a new extension</Trans>
-                  )
-                }
+                label={<Trans>Create</Trans>}
                 leftIcon={<Add />}
               />
             ) : null,

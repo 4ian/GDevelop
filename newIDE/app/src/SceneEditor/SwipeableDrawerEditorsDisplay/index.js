@@ -199,13 +199,16 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       ]
     );
 
-    const startSceneRendering = React.useCallback((start: boolean) => {
-      const editor = editorRef.current;
-      if (!editor) return;
+    const startSceneRendering = React.useCallback(
+      (start: boolean, reason: string) => {
+        const editor = editorRef.current;
+        if (!editor) return;
 
-      if (start) editor.restartSceneRendering();
-      else editor.pauseSceneRendering();
-    }, []);
+        if (start) editor.resumeSceneRendering(reason);
+        else editor.pauseSceneRendering(reason);
+      },
+      []
+    );
 
     React.useLayoutEffect(
       () => {

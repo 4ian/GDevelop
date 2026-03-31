@@ -68,9 +68,9 @@ export const installResource = (
           resourceOriginIdentifier
         )
       : '';
-  const existingResourceNameWithSameFile = resourcesManager.getResourceNameWithFile(
-    resourceFileUrl
-  );
+  const existingResourceNameWithSameFile =
+    resourcesManager.getResourceNamesWithFile(resourceFileUrl).toJSArray()[0] ||
+    null;
 
   if (existingResourceNameFromSameOrigin) {
     // There is a resource with the same origin, use it.

@@ -21,6 +21,7 @@ import { Spacer } from '../../UI/Grid';
 import ScrollView from '../../UI/ScrollView';
 import { ColumnStackLayout } from '../../UI/Layout';
 import AlertMessage from '../../UI/AlertMessage';
+import { triggerOnResourceExternallyChanged } from '../../MainFrame/ResourcesWatcher';
 
 type Props = {|
   project: gdProject,
@@ -96,7 +97,11 @@ const ResourcePropertiesEditor: React.ComponentType<{
         );
         if (!selectedResourceSource) return;
 
-        resource.setFile(selectedResources[0].getFile());
+        const newResourceFile = selectedResources[0].getFile();
+        resource.setFile(newResourceFile);
+        triggerOnResourceExternallyChanged({
+          identifier: newResourceFile,
+        });
 
         // Important, we are responsible for deleting the resources that were given to us.
         // Otherwise we have a memory leak.
@@ -131,8 +136,12 @@ const ResourcePropertiesEditor: React.ComponentType<{
           name: 'File',
           valueType: 'string',
           getValue: (resource: gdResource) => resource.getFile(),
-          setValue: (resource: gdResource, newValue: string) =>
-            resource.setFile(newValue),
+          setValue: (resource: gdResource, newValue: string) => {
+            resource.setFile(newValue);
+            triggerOnResourceExternallyChanged({
+              identifier: newValue,
+            });
+          },
           onEditButtonClick: () => {
             const firstResourceSource = resourceSources[0];
             if (firstResourceSource) chooseResourcePath(firstResourceSource);

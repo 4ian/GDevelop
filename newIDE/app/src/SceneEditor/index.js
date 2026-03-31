@@ -2803,7 +2803,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay) this.editorDisplay.forceUpdatePropertiesEditor();
   };
 
-  forceUpdateCustomObjectRenderedInstances = () => {
+  forceUpdateCustomObjectRenderedInstances = async () => {
     const { project, projectScopedContainersAccessor } = this.props;
 
     const resourcesInUse = new gd.ResourcesInUseHelper(
@@ -2815,12 +2815,20 @@ export default class SceneEditor extends React.Component<Props, State> {
       }
     });
     const objectResourceNames = resourcesInUse
-      .getAllImages()
+      .getAllImages() // TODO: should probably check all resources.
       .toNewVectorString()
       .toJSArray();
     resourcesInUse.delete();
 
-    this._reloadResources(objectResourceNames, 'custom object edited');
+    await this._reloadResources(objectResourceNames, 'custom object edited');
+    const { editorDisplay } = this;
+    if (editorDisplay) {
+      projectScopedContainersAccessor.forEachObject(object => {
+        editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+          object.getName()
+        );
+      });
+    }
   };
 
   forceUpdateRenderedInstancesOfObject = (object: gdObject) => {
@@ -2831,7 +2839,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
     object.getConfiguration().exposeResources(resourcesInUse);
     const objectResourceNames = resourcesInUse
-      .getAllImages()
+      .getAllImages() // TODO: should probably check all resources.
       .toNewVectorString()
       .toJSArray();
     resourcesInUse.delete();

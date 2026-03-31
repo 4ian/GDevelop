@@ -247,6 +247,7 @@ export type PreferencesValues = {|
   favoriteExtensions: Array<string>,
   extensionStoreViewMode: 'list' | 'grid',
   behaviorStoreViewMode: 'list' | 'grid',
+  homePageMenuIsCollapsed: boolean,
 |};
 
 /**
@@ -375,6 +376,7 @@ export type Preferences = {|
   isFavoriteExtension: (extensionName: string) => boolean,
   setExtensionStoreViewMode: (mode: 'list' | 'grid') => void,
   setBehaviorStoreViewMode: (mode: 'list' | 'grid') => void,
+  setHomePageMenuIsCollapsed: (collapsed: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -443,6 +445,7 @@ export const initialPreferences = {
     favoriteExtensions: ([]: Array<string>),
     extensionStoreViewMode: 'list',
     behaviorStoreViewMode: 'list',
+    homePageMenuIsCollapsed: false,
   },
   setMultipleValues: () => {},
   setLanguage: () => {},
@@ -534,6 +537,7 @@ export const initialPreferences = {
   isFavoriteExtension: (extensionName: string): boolean => false,
   setExtensionStoreViewMode: (mode: 'list' | 'grid') => {},
   setBehaviorStoreViewMode: (mode: 'list' | 'grid') => {},
+  setHomePageMenuIsCollapsed: (collapsed: boolean) => {},
 };
 
 const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(

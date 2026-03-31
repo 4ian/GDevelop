@@ -384,6 +384,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                           ObjectsRenderingService
                         )}
                         project={project}
+                        fileMetadata={props.fileMetadata}
                         projectScopedContainersAccessor={
                           projectScopedContainersAccessor
                         }

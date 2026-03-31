@@ -246,6 +246,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         unsavedChanges={this.props.unsavedChanges}
         ref={editor => (this.editor = editor)}
         project={project}
+        fileMetadata={this.props.fileMetadata}
         projectScopedContainersAccessor={projectScopedContainersAccessor}
         layout={layout}
         eventsFunctionsExtension={null}

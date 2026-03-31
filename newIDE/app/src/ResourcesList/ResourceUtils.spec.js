@@ -1,9 +1,12 @@
 // @flow
 import {
+  copyDroppedFileToProjectFolder,
   parseLocalFilePathOrExtensionFromMetadata,
   renameResourcesInProject,
   updateResourceJsonMetadata,
 } from './ResourceUtils';
+import fs from 'fs';
+import path from 'path';
 const gd: libGDevelop = global.gd;
 
 const addNewAnimationWithImageToSpriteObject = (
@@ -222,5 +225,33 @@ describe('ResourceUtils', () => {
         }
       `);
     });
+  });
+
+  it('can write a dropped file without a local path into the project folder', async () => {
+    const temporaryRoot = fs.mkdtempSync(
+      path.join(process.cwd(), 'resource-utils-drop-')
+    );
+    const projectFolder = path.join(temporaryRoot, 'project');
+    fs.mkdirSync(projectFolder);
+    try {
+      const copiedPath = await copyDroppedFileToProjectFolder(
+        {
+          getProjectFile: () => path.join(projectFolder, 'game.json'),
+        },
+        {
+          name: 'hero.png',
+          arrayBuffer: async () => Uint8Array.from([1, 2, 3, 4]).buffer,
+        },
+        new Map()
+      );
+
+      expect(copiedPath).toBe(path.join(projectFolder, 'hero.png'));
+      expect(fs.existsSync(path.join(projectFolder, 'hero.png'))).toBe(true);
+      expect(
+        Array.from(fs.readFileSync(path.join(projectFolder, 'hero.png')))
+      ).toEqual([1, 2, 3, 4]);
+    } finally {
+      fs.rmSync(temporaryRoot, { recursive: true, force: true });
+    }
   });
 });

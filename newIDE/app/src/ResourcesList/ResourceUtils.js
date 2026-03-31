@@ -117,6 +117,82 @@ export const copyAllToProjectFolder = (
   );
 };
 
+const getUniqueProjectFilePath = (
+  project: gdProject,
+  fileName: string
+): ?string => {
+  if (!fs || !path || !fileName) {
+    return null;
+  }
+
+  const projectPath = path.dirname(project.getProjectFile());
+  const resourceBasename = path.basename(fileName);
+  const fileExtension = path.extname(resourceBasename);
+  const fileNameWithoutExtension = path.basename(
+    resourceBasename,
+    fileExtension
+  );
+  const newFileNameWithoutExtension = newNameGenerator(
+    fileNameWithoutExtension,
+    tentativeFileName => {
+      const tentativePath =
+        path.join(projectPath, tentativeFileName) + fileExtension;
+      return fs.existsSync(tentativePath);
+    }
+  );
+
+  return path.join(projectPath, newFileNameWithoutExtension + fileExtension);
+};
+
+export const copyDroppedFileToProjectFolder = async (
+  project: gdProject,
+  droppedFile: any,
+  newToOldFilePaths: Map<string, string>
+): Promise<?string> => {
+  const droppedFilePath =
+    droppedFile && typeof droppedFile.path === 'string'
+      ? droppedFile.path
+      : null;
+  if (droppedFilePath) {
+    const copiedPaths = await copyAllToProjectFolder(
+      project,
+      [droppedFilePath],
+      newToOldFilePaths
+    );
+    return copiedPaths[0] || null;
+  }
+
+  if (
+    !fs ||
+    !path ||
+    !droppedFile ||
+    typeof droppedFile.name !== 'string' ||
+    typeof droppedFile.arrayBuffer !== 'function'
+  ) {
+    return null;
+  }
+
+  const resourceNewPath = getUniqueProjectFilePath(project, droppedFile.name);
+  if (!resourceNewPath) {
+    return null;
+  }
+
+  const arrayBuffer = await droppedFile.arrayBuffer();
+  await new Promise((resolve, reject) => {
+    fs.writeFile(resourceNewPath, new Uint8Array(arrayBuffer), err => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      resolve();
+    });
+  });
+
+  newToOldFilePaths.set(resourceNewPath, droppedFile.name);
+  return resourceNewPath;
+};
+
 export const getResourceFilePathStatus = (
   project: gdProject,
   resourceName: string

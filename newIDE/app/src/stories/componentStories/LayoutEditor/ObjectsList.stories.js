@@ -26,6 +26,7 @@ export const Default = (): React.Node => (
       <ObjectsList
         getThumbnail={() => 'res/unknown32.png'}
         project={testProject.project}
+        fileMetadata={null}
         layout={testProject.testLayout}
         eventsFunctionsExtension={null}
         eventsBasedObject={null}
@@ -69,6 +70,7 @@ export const WithSerializedObjectView = (): React.Node => (
         <ObjectsList
           getThumbnail={() => 'res/unknown32.png'}
           project={testProject.project}
+          fileMetadata={null}
           layout={testProject.testLayout}
           eventsFunctionsExtension={null}
           eventsBasedObject={null}
@@ -112,6 +114,7 @@ export const Locked = (): React.Node => (
       <ObjectsList
         getThumbnail={() => 'res/unknown32.png'}
         project={testProject.project}
+        fileMetadata={null}
         layout={testProject.testLayout}
         eventsFunctionsExtension={null}
         eventsBasedObject={null}

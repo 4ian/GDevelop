@@ -459,6 +459,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                   ObjectsRenderingService
                 )}
                 project={project}
+                fileMetadata={props.fileMetadata}
                 layout={layout}
                 eventsFunctionsExtension={eventsFunctionsExtension}
                 eventsBasedObject={eventsBasedObject}

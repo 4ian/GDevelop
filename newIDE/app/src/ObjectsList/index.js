@@ -14,7 +14,10 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import Window from '../Utils/Window';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
-import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
+import {
+  enumerateObjectTypes,
+  type ObjectWithContext,
+} from '../ObjectsList/EnumerateObjects';
 import TreeView, {
   type TreeViewInterface,
   type MenuButton,
@@ -40,6 +43,7 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
+import { type FileMetadata } from '../ProjectsStorage';
 import {
   ObjectTreeViewItemContent,
   getObjectTreeViewItemId,
@@ -57,8 +61,26 @@ import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { EventsScope } from '../InstructionOrExpression/EventsScope';
 import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
+import {
+  applyResourceDefaults,
+  copyDroppedFileToProjectFolder,
+} from '../ResourcesList/ResourceUtils';
+import {
+  PROJECT_RESOURCE_MAX_SIZE_IN_BYTES,
+  uploadProjectResourceFiles,
+} from '../Utils/GDevelopServices/Project';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import optionalRequire from '../Utils/OptionalRequire';
+import DroppedFileObjectSelectorOverlay, {
+  type DroppedFileObjectSelectorOptionMarker,
+} from './DroppedFileObjectSelectorOverlay';
+import {
+  getDroppedSupportedFile,
+  type DroppedSupportedFile,
+} from './DroppedFileObjectSelectorUtils';
 
 const gd: libGDevelop = global.gd;
+const nodePath = optionalRequire('path');
 
 const sceneObjectsRootFolderId = 'scene-objects';
 const globalObjectsRootFolderId = 'global-objects';
@@ -75,10 +97,17 @@ const styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
+    position: 'relative',
   },
   autoSizerContainer: { flex: 1 },
   autoSizer: { width: '100%' },
 };
+
+const droppedImageObjectTypes = [
+  'Sprite',
+  'PanelSpriteObject::PanelSprite',
+  'TiledSpriteObject::TiledSprite',
+];
 
 export const getLabelsForObjectsAndGroupsLists = (
   scope: EventsScope
@@ -439,6 +468,7 @@ export type ObjectsListInterface = {|
 
 type Props = {|
   project: gdProject,
+  fileMetadata: ?FileMetadata,
   layout: ?gdLayout,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
@@ -521,6 +551,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
   (
     {
       project,
+      fileMetadata,
       layout,
       eventsFunctionsExtension,
       eventsBasedObject,
@@ -562,11 +593,28 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );
+    const authenticatedUser = React.useContext(AuthenticatedUserContext);
     const [searchText, setSearchText] = React.useState('');
-    const { showDeleteConfirmation } = useAlertDialog();
+    const { showDeleteConfirmation, showAlert } = useAlertDialog();
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
+    const objectListContainerRef = React.useRef<?HTMLDivElement>(null);
+    const dragEnterCount = React.useRef(0);
     const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
+    const [isDropOverlayVisible, setIsDropOverlayVisible] = React.useState(
+      false
+    );
+    const [isDropCreationLoading, setIsDropCreationLoading] = React.useState(
+      false
+    );
+    const [
+      droppedSupportedFile,
+      setDroppedSupportedFile,
+    ] = React.useState<?DroppedSupportedFile>(null);
+    const [
+      highlightedDroppedImageObjectType,
+      setHighlightedDroppedImageObjectType,
+    ] = React.useState<?string>(null);
 
     const forceUpdateList = React.useCallback(
       () => {
@@ -613,6 +661,253 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         treeViewRef.current.scrollToItemFromId(itemId);
       }
     }, []);
+
+    const resetDroppedFileState = React.useCallback(() => {
+      dragEnterCount.current = 0;
+      setDroppedSupportedFile(null);
+      setHighlightedDroppedImageObjectType(null);
+      setIsDropOverlayVisible(false);
+    }, []);
+
+    const getObjectTypeForDroppedImagePosition = React.useCallback(
+      (clientX: number, clientY: number): ?string => {
+        const container = objectListContainerRef.current;
+        if (!container) return null;
+        const rect = container.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const distanceX = clientX - centerX;
+        const distanceY = clientY - centerY;
+        const radius = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+        const outerRadius = Math.min(rect.width, rect.height) * 0.43;
+        const innerRadius = outerRadius * 0.32;
+        if (radius < innerRadius || radius > outerRadius) return null;
+        const angle =
+          ((Math.atan2(distanceY, distanceX) * 180) / Math.PI + 360) % 360;
+        const topStartingAngle = (angle + 90) % 360;
+        const sectionIndex = Math.floor(topStartingAngle / 120);
+        return droppedImageObjectTypes[sectionIndex] || null;
+      },
+      []
+    );
+
+    const getUniqueResourceName = React.useCallback(
+      (baseName: string): string => {
+        if (!nodePath) return baseName;
+        const extension = nodePath.extname(baseName);
+        const nameWithoutExtension = nodePath.basename(baseName, extension);
+        const generatedNameWithoutExtension = newNameGenerator(
+          nameWithoutExtension || 'Resource',
+          candidateName =>
+            project
+              .getResourcesManager()
+              .hasResource(`${candidateName}${extension}`)
+        );
+        return `${generatedNameWithoutExtension}${extension}`;
+      },
+      [project]
+    );
+
+    const insertObjectFromDroppedResource = React.useCallback(
+      ({
+        objectType,
+        resourceName,
+        sourceFileName,
+      }: {|
+        objectType: string,
+        resourceName: string,
+        sourceFileName: string,
+      |}) => {
+        const sourceBaseName = nodePath
+          ? nodePath.basename(sourceFileName, nodePath.extname(sourceFileName))
+          : sourceFileName.replace(/\.[^/.]+$/, '');
+        const fallbackName =
+          // $FlowFixMe[invalid-computed-prop]
+          objectTypeToDefaultName[objectType] || 'NewObject';
+        const defaultObjectName = sourceBaseName || fallbackName;
+        const objectName = newNameGenerator(
+          defaultObjectName,
+          candidateName =>
+            objectsContainer.hasObjectNamed(candidateName) ||
+            (!!globalObjectsContainer &&
+              globalObjectsContainer.hasObjectNamed(candidateName))
+        );
+        const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+          project,
+          objectType
+        );
+        const selectedItem = selectedObjectFolderOrObjectsWithContext[0];
+        let createdObject;
+        let createdObjectFolderOrObjectWithContext;
+        if (selectedItem && !selectedItem.global) {
+          const {
+            folder: parentFolder,
+            position,
+          } = getInsertionParentAndPositionFromSelection(
+            selectedItem.objectFolderOrObject
+          );
+          createdObject = objectsContainer.insertNewObjectInFolder(
+            project,
+            objectType,
+            objectName,
+            parentFolder,
+            position
+          );
+          createdObjectFolderOrObjectWithContext = {
+            objectFolderOrObject: parentFolder.getObjectChild(objectName),
+            global: false,
+          };
+          if (treeViewRef.current) {
+            treeViewRef.current.openItems([
+              getObjectFolderTreeViewItemId(parentFolder),
+            ]);
+          }
+        } else {
+          createdObject = objectsContainer.insertNewObject(
+            project,
+            objectType,
+            objectName,
+            objectsContainer.getObjectsCount()
+          );
+          createdObjectFolderOrObjectWithContext = {
+            objectFolderOrObject: objectsContainer
+              .getRootFolder()
+              .getObjectChild(objectName),
+            global: false,
+          };
+        }
+        if (objectType === 'Sprite') {
+          const spriteConfiguration = gd.asSpriteConfiguration(
+            createdObject.getConfiguration()
+          );
+          const animations = spriteConfiguration.getAnimations();
+          if (animations.getAnimationsCount() === 0) {
+            const animation = new gd.Animation();
+            animation.setDirectionsCount(1);
+            animations.addAnimation(animation);
+            animation.delete();
+          }
+          const animation = animations.getAnimation(0);
+          if (animation.getDirectionsCount() === 0) {
+            animation.setDirectionsCount(1);
+          }
+          const direction = animation.getDirection(0);
+          while (direction.getSpritesCount() > 0) {
+            direction.removeSprite(0);
+          }
+          const sprite = new gd.Sprite();
+          sprite.setImageName(resourceName);
+          direction.addSprite(sprite);
+          sprite.delete();
+        } else if (objectType === 'PanelSpriteObject::PanelSprite') {
+          const panelSpriteConfiguration = gd.asPanelSpriteConfiguration(
+            createdObject.getConfiguration()
+          );
+          panelSpriteConfiguration.setTexture(resourceName);
+        } else if (objectType === 'TiledSpriteObject::TiledSprite') {
+          const tiledSpriteConfiguration = gd.asTiledSpriteConfiguration(
+            createdObject.getConfiguration()
+          );
+          tiledSpriteConfiguration.setTexture(resourceName);
+        } else if (objectType === 'Scene3D::Model3DObject') {
+          createdObject
+            .getConfiguration()
+            .updateProperty('modelResourceName', resourceName);
+        }
+        if (treeViewRef.current) {
+          treeViewRef.current.openItems([sceneObjectsRootFolderId]);
+        }
+        setTimeout(() => {
+          scrollToItem(getObjectTreeViewItemId(createdObject));
+        }, 100);
+        onObjectFolderOrObjectWithContextSelected(
+          createdObjectFolderOrObjectWithContext
+        );
+        onObjectCreated([createdObject], isTheFirstOfItsTypeInProject);
+      },
+      [
+        project,
+        objectsContainer,
+        globalObjectsContainer,
+        selectedObjectFolderOrObjectsWithContext,
+        scrollToItem,
+        onObjectFolderOrObjectWithContextSelected,
+        onObjectCreated,
+      ]
+    );
+
+    const createProjectResourceFromDroppedFile = React.useCallback(
+      async (droppedFile: DroppedSupportedFile): Promise<?string> => {
+        if (!droppedFile.file) return null;
+        const storageProvider = resourceManagementProps.getStorageProvider();
+        const resourcesManager = project.getResourcesManager();
+        const newResource =
+          droppedFile.resourceKind === 'image'
+            ? new gd.ImageResource()
+            : new gd.Model3DResource();
+        if (storageProvider.internalName === 'Cloud') {
+          if (!fileMetadata || !authenticatedUser.authenticated) {
+            newResource.delete();
+            return null;
+          }
+          const uploadResults = await uploadProjectResourceFiles(
+            authenticatedUser,
+            fileMetadata.fileIdentifier,
+            [droppedFile.file],
+            () => {}
+          );
+          const uploadedFile = uploadResults.find(({ url }) => !!url);
+          if (!uploadedFile || !uploadedFile.url) {
+            newResource.delete();
+            return null;
+          }
+          const resourceName = getUniqueResourceName(droppedFile.file.name);
+          newResource.setFile(uploadedFile.url);
+          newResource.setName(resourceName);
+          newResource.setOrigin('cloud-project-resource', uploadedFile.url);
+          applyResourceDefaults(project, newResource);
+          resourcesManager.addResource(newResource);
+          newResource.delete();
+          await resourceManagementProps.onFetchNewlyAddedResources();
+          resourceManagementProps.onNewResourcesAdded();
+          return resourceName;
+        }
+        if (!nodePath) {
+          newResource.delete();
+          return null;
+        }
+        const newToOldFilePaths = new Map<string, string>();
+        const copiedPath = await copyDroppedFileToProjectFolder(
+          project,
+          droppedFile.file,
+          newToOldFilePaths
+        );
+        if (!copiedPath) {
+          newResource.delete();
+          return null;
+        }
+        const projectPath = nodePath.dirname(project.getProjectFile());
+        const resourceFile = nodePath.relative(projectPath, copiedPath);
+        const resourceName = getUniqueResourceName(
+          nodePath.basename(resourceFile)
+        );
+        newResource.setFile(resourceFile);
+        newResource.setName(resourceName);
+        applyResourceDefaults(project, newResource);
+        resourcesManager.addResource(newResource);
+        newResource.delete();
+        await resourceManagementProps.onFetchNewlyAddedResources();
+        resourceManagementProps.onNewResourcesAdded();
+        return resourceName;
+      },
+      [
+        resourceManagementProps,
+        project,
+        fileMetadata,
+        authenticatedUser,
+        getUniqueResourceName,
+      ]
+    );
 
     const addObject = React.useCallback(
       (objectType: string) => {
@@ -1555,6 +1850,186 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [objectFolderTreeViewItemProps, objectTreeViewItemProps]
     );
 
+    const droppedImageObjectOptions = React.useMemo(
+      () =>
+        enumerateObjectTypes(project, eventsFunctionsExtension)
+          .filter(objectMetadata =>
+            droppedImageObjectTypes.includes(objectMetadata.type)
+          )
+          .sort(
+            (a, b) =>
+              droppedImageObjectTypes.indexOf(a.type) -
+              droppedImageObjectTypes.indexOf(b.type)
+          ),
+      [project, eventsFunctionsExtension]
+    );
+
+    const radialOptionMarkers = React.useMemo<
+      Array<DroppedFileObjectSelectorOptionMarker>
+    >(
+      () =>
+        droppedImageObjectOptions.map((objectMetadata, index) => {
+          const angle = -30 + index * 120;
+          const angleInRadians = (angle * Math.PI) / 180;
+          const radius = 36;
+          const left = `${50 + radius * Math.cos(angleInRadians)}%`;
+          const top = `${50 + radius * Math.sin(angleInRadians)}%`;
+          return {
+            objectType: objectMetadata.type,
+            iconUrl: objectMetadata.iconFilename,
+            label: objectMetadata.fullName,
+            left,
+            top,
+          };
+        }),
+      [droppedImageObjectOptions]
+    );
+
+    const onFileDragEnter = React.useCallback(event => {
+      const droppedFile = getDroppedSupportedFile(
+        event.dataTransfer.items || event.dataTransfer.files
+      );
+      if (!droppedFile) return;
+      event.preventDefault();
+      dragEnterCount.current += 1;
+      setDroppedSupportedFile(droppedFile);
+      setIsDropOverlayVisible(droppedFile.resourceKind === 'image');
+    }, []);
+
+    const onFileDragOver = React.useCallback(
+      event => {
+        const droppedFile = getDroppedSupportedFile(
+          event.dataTransfer.items || event.dataTransfer.files
+        );
+        if (!droppedFile) return;
+        event.preventDefault();
+        setDroppedSupportedFile(droppedFile);
+        if (droppedFile.resourceKind === 'image') {
+          setIsDropOverlayVisible(true);
+          setHighlightedDroppedImageObjectType(
+            getObjectTypeForDroppedImagePosition(event.clientX, event.clientY)
+          );
+        } else {
+          setIsDropOverlayVisible(false);
+          setHighlightedDroppedImageObjectType(null);
+        }
+      },
+      [getObjectTypeForDroppedImagePosition]
+    );
+
+    const onFileDragLeave = React.useCallback(
+      event => {
+        if (!droppedSupportedFile) return;
+        event.preventDefault();
+        dragEnterCount.current -= 1;
+        if (dragEnterCount.current <= 0) {
+          resetDroppedFileState();
+        }
+      },
+      [droppedSupportedFile, resetDroppedFileState]
+    );
+
+    const onFileDrop = React.useCallback(
+      async event => {
+        const droppedFile = getDroppedSupportedFile(
+          event.dataTransfer.files || event.dataTransfer.items
+        );
+        if (!droppedFile) {
+          resetDroppedFileState();
+          return;
+        }
+        event.preventDefault();
+        if (!droppedFile.file) {
+          resetDroppedFileState();
+          return;
+        }
+        const storageProvider = resourceManagementProps.getStorageProvider();
+        const canUseInStorageProvider =
+          (storageProvider.internalName === 'LocalFile' ||
+            storageProvider.internalName === 'Cloud') &&
+          !!fileMetadata;
+        if (!canUseInStorageProvider) {
+          await showAlert({
+            title: t`Drag and drop is unavailable`,
+            message:
+              storageProvider.internalName === 'Cloud'
+                ? t`You need to save the project on cloud first before using drag and drop in the objects panel.`
+                : t`You need to save the project locally or on cloud first before using drag and drop in the objects panel.`,
+          });
+          resetDroppedFileState();
+          return;
+        }
+        if (droppedFile.file.size > PROJECT_RESOURCE_MAX_SIZE_IN_BYTES) {
+          await showAlert({
+            title: t`File is too large`,
+            message: t`The file is too large for the project limits.`,
+          });
+          resetDroppedFileState();
+          return;
+        }
+        let objectTypeToCreate = null;
+        if (droppedFile.resourceKind === 'image') {
+          objectTypeToCreate = getObjectTypeForDroppedImagePosition(
+            event.clientX,
+            event.clientY
+          );
+          if (!objectTypeToCreate) {
+            resetDroppedFileState();
+            return;
+          }
+        } else {
+          objectTypeToCreate = 'Scene3D::Model3DObject';
+        }
+        if (
+          storageProvider.internalName === 'Cloud' &&
+          !authenticatedUser.authenticated
+        ) {
+          await showAlert({
+            title: t`Login required`,
+            message: t`You need to be logged in to upload files to this cloud project.`,
+          });
+          resetDroppedFileState();
+          return;
+        }
+        setIsDropCreationLoading(true);
+        try {
+          const resourceName = await createProjectResourceFromDroppedFile(
+            droppedFile
+          );
+          if (!resourceName) {
+            await showAlert({
+              title: t`Could not import file`,
+              message: t`The dropped file could not be imported as a project resource.`,
+            });
+            return;
+          }
+          insertObjectFromDroppedResource({
+            objectType: objectTypeToCreate,
+            resourceName,
+            sourceFileName: droppedFile.file.name,
+          });
+        } catch (error) {
+          await showAlert({
+            title: t`Could not import file`,
+            message: t`The dropped file could not be imported as a project resource.`,
+          });
+        } finally {
+          setIsDropCreationLoading(false);
+          resetDroppedFileState();
+        }
+      },
+      [
+        resourceManagementProps,
+        fileMetadata,
+        showAlert,
+        getObjectTypeForDroppedImagePosition,
+        authenticatedUser,
+        createProjectResourceFromDroppedFile,
+        insertObjectFromDroppedResource,
+        resetDroppedFileState,
+      ]
+    );
+
     return (
       <Background maxWidth>
         <LineStackLayout>
@@ -1568,8 +2043,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         </LineStackLayout>
         <div
           style={styles.listContainer}
+          ref={objectListContainerRef}
           onKeyDown={keyboardShortcutsRef.current.onKeyDown}
           onKeyUp={keyboardShortcutsRef.current.onKeyUp}
+          onDragEnter={onFileDragEnter}
+          onDragOver={onFileDragOver}
+          onDragLeave={onFileDragLeave}
+          onDrop={onFileDrop}
           id="objects-list"
         >
           <I18n>
@@ -1637,6 +2117,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               </div>
             )}
           </I18n>
+          {isDropOverlayVisible && droppedSupportedFile && (
+            <DroppedFileObjectSelectorOverlay
+              optionMarkers={radialOptionMarkers}
+              highlightedObjectType={highlightedDroppedImageObjectType}
+              isLoading={isDropCreationLoading}
+            />
+          )}
         </div>
         {newObjectDialogOpen && (
           <NewObjectDialog
@@ -1689,6 +2176,8 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.selectedObjectFolderOrObjectsWithContext ===
     nextProps.selectedObjectFolderOrObjectsWithContext &&
   prevProps.project === nextProps.project &&
+  prevProps.fileMetadata === nextProps.fileMetadata &&
+  prevProps.resourceManagementProps === nextProps.resourceManagementProps &&
   prevProps.globalObjectsContainer === nextProps.globalObjectsContainer &&
   prevProps.objectsContainer === nextProps.objectsContainer;
 

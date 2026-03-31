@@ -312,6 +312,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           unsavedChanges={this.props.unsavedChanges}
           ref={editor => (this.editor = editor)}
           project={project}
+          fileMetadata={this.props.fileMetadata}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
           layout={null}
           eventsFunctionsExtension={eventsFunctionsExtension}

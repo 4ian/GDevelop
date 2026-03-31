@@ -409,6 +409,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setExtensionStoreViewMode: (this._setExtensionStoreViewMode.bind(
       this
     ): any),
+    // $FlowFixMe[method-unbinding]
+    setBehaviorStoreViewMode: (this._setBehaviorStoreViewMode.bind(this): any),
   };
 
   componentDidMount() {
@@ -1432,6 +1434,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           extensionStoreViewMode: mode,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setBehaviorStoreViewMode(mode: 'list' | 'grid') {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          behaviorStoreViewMode: mode,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

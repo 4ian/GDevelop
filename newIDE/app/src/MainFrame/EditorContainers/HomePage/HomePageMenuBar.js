@@ -94,6 +94,16 @@ export const styles = {
   desktopTabsColumn: {
     paddingTop: 22,
   },
+  navigationIcon: {
+    fontSize: 17,
+  },
+  collapsedNavigationIcon: {
+    fontSize: 23,
+  },
+  navigationLabel: {
+    fontSize: 15,
+    fontWeight: 500,
+  },
 };
 
 type Props = {|
@@ -122,7 +132,9 @@ const HomePageMenuBar = ({
   const menuWidth = shouldHideLabels
     ? homepageMediumMenuBarWidth
     : homepageDesktopMenuBarWidth;
-
+  const navigationIconStyle = shouldHideLabels
+    ? styles.collapsedNavigationIcon
+    : styles.navigationIcon;
   const largeScreenOnlyButtons: {
     label: React.Node,
     getIcon: GetIconFunction,
@@ -262,6 +274,9 @@ const HomePageMenuBar = ({
               isActive={activeTab === tab}
               hideLabel={shouldHideLabels}
               id={id}
+              iconStyle={navigationIconStyle}
+              iconFontSize="inherit"
+              labelStyle={styles.navigationLabel}
             />
           ))}
         </Column>
@@ -278,6 +293,9 @@ const HomePageMenuBar = ({
               isActive={false}
               hideLabel={shouldHideLabels}
               id={id}
+              iconStyle={navigationIconStyle}
+              iconFontSize="inherit"
+              labelStyle={styles.navigationLabel}
             />
           ))}
         </Column>

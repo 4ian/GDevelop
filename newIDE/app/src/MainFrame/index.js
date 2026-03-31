@@ -1834,6 +1834,9 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const onResourceExternallyChanged = React.useCallback(
     () => {
+      console.info(
+        'Resource externally changed: notifying changes to in-game editor.'
+      );
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true, // A resource file might have been changed.
         shouldReloadLibraries: false,
@@ -1847,6 +1850,9 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const onResourceUsageChanged = React.useCallback(
     () => {
+      console.info(
+        'Resource usage changed: notifying changes to in-game editor.'
+      );
       if (isEditorHotReloadNeeded()) {
         notifyChangesToInGameEditor({
           shouldReloadProjectData: true,

@@ -189,7 +189,7 @@ export default class InstancesEditor extends Component<Props, State> {
   grid: Grid;
   background: Background;
   _unmounted = false;
-  _renderingPaused = false;
+  _renderingPausedReasons: Set<string> = new Set();
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
@@ -750,10 +750,10 @@ export default class InstancesEditor extends Component<Props, State> {
     // For avoiding useless renderings, which is costly for CPU/GPU, when the editor
     // is not displayed, `pauseRendering` prop can be set to true.
     if (nextProps.pauseRendering && !this.props.pauseRendering)
-      this.pauseSceneRendering();
+      this.pauseSceneRendering('inactive');
 
     if (!nextProps.pauseRendering && this.props.pauseRendering)
-      this.restartSceneRendering();
+      this.resumeSceneRendering('inactive');
   }
 
   /**
@@ -1752,7 +1752,7 @@ export default class InstancesEditor extends Component<Props, State> {
   _renderScene = () => {
     // Protect against rendering scheduled after the component is unmounted.
     if (this._unmounted) return;
-    if (this._renderingPaused) return;
+    if (this._renderingPausedReasons.size > 0) return;
 
     // Avoid killing the CPU by limiting the rendering calls.
     try {
@@ -1800,9 +1800,9 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   };
 
-  pauseSceneRendering = () => {
+  pauseSceneRendering = (reason: string) => {
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
-    this._renderingPaused = true;
+    this._renderingPausedReasons.add(reason);
     // Deactivate interactions when the scene is paused.
     // Useful when the scene is paused to reload textures. The event system
     // might try to check if pointer is over a PIXI object using the texture
@@ -1813,8 +1813,18 @@ export default class InstancesEditor extends Component<Props, State> {
     stopPIXITicker();
   };
 
-  restartSceneRendering = () => {
-    this._renderingPaused = false;
+  resumeSceneRendering = (reason: string) => {
+    this._renderingPausedReasons.delete(reason);
+    if (this._renderingPausedReasons.size > 0) {
+      console.info(
+        `Scene rendering is still paused (reasons: ${[
+          ...this._renderingPausedReasons,
+        ].join(', ')}) after reason "${reason}" is removed.`
+      );
+      return;
+    }
+
+    console.info(`Resuming scene rendering (last reason: ${reason}).`);
     this._renderScene();
     this.instancesRenderer.getPixiContainer().eventMode = 'auto';
 

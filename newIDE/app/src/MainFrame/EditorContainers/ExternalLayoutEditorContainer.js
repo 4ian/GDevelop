@@ -355,6 +355,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             fileMetadata={this.props.fileMetadata}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             layout={layout}
+            externalLayout={externalLayout}
             eventsFunctionsExtension={null}
             eventsBasedObject={null}
             eventsBasedObjectVariant={null}

@@ -192,7 +192,7 @@ export type SceneEditorsDisplayInterface = {|
     getLastContextMenuSceneCoordinates: () => [number, number],
     getViewPosition: () => ?ViewPosition,
   |},
-  startSceneRendering: (start: boolean) => void,
+  startSceneRendering: (start: boolean, reason: string) => void,
   instancesHandlers: {|
     getContentAABB: () => Rectangle | null,
     getSelectionAABB: () => Rectangle,

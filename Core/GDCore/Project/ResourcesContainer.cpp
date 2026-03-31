@@ -75,18 +75,19 @@ const gd::String &ResourcesContainer::GetResourceNameWithOrigin(
   return badResourceName;
 }
 
-const gd::String &
-ResourcesContainer::GetResourceNameWithFile(const gd::String &file) const {
+std::vector<gd::String>
+ResourcesContainer::GetResourceNamesWithFile(const gd::String &file) const {
+  std::vector<gd::String> resourceNames;
   for (const auto &resource : resources) {
     if (!resource)
       continue;
 
     if (resource->GetFile() == file) {
-      return resource->GetName();
+      resourceNames.push_back(resource->GetName());
     }
   }
 
-  return badResourceName;
+  return resourceNames;
 }
 
 std::vector<gd::String> ResourcesContainer::FindFilesNotInResources(

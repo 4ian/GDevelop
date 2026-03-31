@@ -68,42 +68,76 @@ namespace gdjs {
     // TODO: ensure we only send props that change to optimize the sync.
     // dirty attributes are not synced, they are defined by the update method if the value has changed.
     // Particle Rotation Speed
-    prms: number;
-    prmx: number;
+    prms?: number;
+    particleRotationMinSpeed?: number;
+
+    prmx?: number;
+    particleRotationMaxSpeed?: number;
+
     // Max Particles Count
-    mpc: number;
+    mpc?: number;
+    maxParticlesCount?: number;
+
     // Additive Rendering
-    addr: boolean;
+    addr?: boolean;
+    additiveRendering?: boolean;
+
     // Angle
-    angb: number;
+    angb?: number;
+    angleB?: number;
+
     // Force
-    formin: number;
-    formax: number;
+    formin?: number;
+    forceMin?: number;
+
+    formax?: number;
+    forceMax?: number;
+
     // Zone Radius
-    zr: number;
+    zr?: number;
+    zoneRadius?: number;
+
     // Life Time
-    ltmin: number;
-    ltmax: number;
+    ltmin?: number;
+    lifeTimeMin?: number;
+
+    ltmax?: number;
+    lifeTimeMax?: number;
+
     // Gravity
-    gravx: number;
-    gravy: number;
+    gravx?: number;
+    gravityX?: number;
+
+    gravy?: number;
+    gravityY?: number;
+
     // Color
-    color1: number;
-    color2: number;
+    color1?: number;
+    color2?: number;
+
     // Size
-    size1: number;
-    size2: number;
+    size1?: number;
+    size2?: number;
+
     // Alpha
-    alp1: number;
-    alp2: number;
+    alp1?: number;
+    alpha1?: number;
+
+    alp2?: number;
+    alpha2?: number;
+
     // Flow
-    flow: number;
+    flow?: number;
+
     // Tank
-    tank: number;
+    tank?: number;
+
     // Texture
-    text: string;
+    text?: string;
+    texture?: string;
+
     // Pause
-    paused: boolean;
+    paused?: boolean;
   };
 
   /** @category Objects > Particle Emitter */
@@ -391,29 +425,33 @@ namespace gdjs {
     override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): ParticleEmitterObjectNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        prms: this.particleRotationMinSpeed,
-        prmx: this.particleRotationMaxSpeed,
-        mpc: this.maxParticlesCount,
-        addr: this.additiveRendering,
-        angb: this.angleB,
-        formin: this.forceMin,
-        formax: this.forceMax,
-        zr: this.zoneRadius,
-        ltmin: this.lifeTimeMin,
-        ltmax: this.lifeTimeMax,
-        gravx: this.gravityX,
-        gravy: this.gravityY,
+        [getKey('prms', 'particleRotationMinSpeed')]:
+          this.particleRotationMinSpeed,
+        [getKey('prmx', 'particleRotationMaxSpeed')]:
+          this.particleRotationMaxSpeed,
+        [getKey('mpc', 'maxParticlesCount')]: this.maxParticlesCount,
+        [getKey('addr', 'additiveRendering')]: this.additiveRendering,
+        [getKey('angb', 'angleB')]: this.angleB,
+        [getKey('formin', 'forceMin')]: this.forceMin,
+        [getKey('formax', 'forceMax')]: this.forceMax,
+        [getKey('zr', 'zoneRadius')]: this.zoneRadius,
+        [getKey('ltmin', 'lifeTimeMin')]: this.lifeTimeMin,
+        [getKey('ltmax', 'lifeTimeMax')]: this.lifeTimeMax,
+        [getKey('gravx', 'gravityX')]: this.gravityX,
+        [getKey('gravy', 'gravityY')]: this.gravityY,
         color1: this.color1,
         color2: this.color2,
         size1: this.size1,
         size2: this.size2,
-        alp1: this.alpha1,
-        alp2: this.alpha2,
+        [getKey('alp1', 'alpha1')]: this.alpha1,
+        [getKey('alp2', 'alpha2')]: this.alpha2,
         flow: this.flow,
         tank: this.tank,
-        text: this.texture,
+        [getKey('text', 'texture')]: this.texture,
         paused: this._isEmissionPaused,
       };
     }

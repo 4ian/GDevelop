@@ -26,13 +26,25 @@ namespace gdjs {
    * @category Objects > Sprite
    */
   export type SpriteNetworkSyncDataType = {
-    anim: SpriteAnimatorNetworkSyncData;
-    ifx: boolean;
-    ify: boolean;
-    sx: float;
-    sy: float;
-    op: float;
-    color: string;
+    anim?: SpriteAnimatorNetworkSyncData;
+    animation?: SpriteAnimatorNetworkSyncData;
+
+    ifx?: boolean;
+    isFlippedX?: boolean;
+
+    ify?: boolean;
+    isFlippedY?: boolean;
+
+    sx?: float;
+    scaleX?: float;
+
+    sy?: float;
+    scaleY?: float;
+
+    op?: float;
+    opacity?: float;
+
+    color?: string;
   };
 
   /**
@@ -132,14 +144,17 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): SpriteNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        anim: this._animator.getNetworkSyncData(),
-        ifx: this.isFlippedX(),
-        ify: this.isFlippedY(),
-        sx: this._scaleX,
-        sy: this._scaleY,
-        op: this.opacity,
+        [getKey('anim', 'animation')]:
+          this._animator.getNetworkSyncData(syncOptions),
+        [getKey('ifx', 'isFlippedX')]: this.isFlippedX(),
+        [getKey('ify', 'isFlippedY')]: this.isFlippedY(),
+        [getKey('sx', 'scaleX')]: this._scaleX,
+        [getKey('sy', 'scaleY')]: this._scaleY,
+        [getKey('op', 'opacity')]: this.opacity,
         color: this.getColor(),
       };
     }

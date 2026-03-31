@@ -29,8 +29,10 @@ let nextPreviewId = 1;
 
 const prepareExporter = async ({
   isForInGameEdition,
+  isForSimulation,
 }: {
   isForInGameEdition: boolean,
+  isForSimulation?: boolean,
 }): Promise<{|
   outputDir: string,
   exporter: gdjsExporter,
@@ -42,7 +44,11 @@ const prepareExporter = async ({
   const baseUrl = getBrowserSWPreviewBaseUrl();
   const rootUrl = getBrowserSWPreviewRootUrl();
   const outputDir = `${baseUrl}/${
-    isForInGameEdition ? 'in-game-editor-preview' : 'preview'
+    isForSimulation
+      ? 'simulation-preview'
+      : isForInGameEdition
+      ? 'in-game-editor-preview'
+      : 'preview'
   }`;
 
   console.log(
@@ -403,6 +409,117 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         error,
       });
     }
+  };
+
+  launchSimulationPreview = async ({
+    project,
+    sceneName,
+    hotReload,
+    shouldHardReload,
+    shouldReloadProjectData,
+    shouldReloadLibraries,
+    shouldReloadResources,
+  }: {|
+    project: gdProject,
+    sceneName: string,
+    hotReload: boolean,
+    shouldHardReload: boolean,
+    shouldReloadProjectData: boolean,
+    shouldReloadLibraries: boolean,
+    shouldReloadResources: boolean,
+  |}): Promise<string> => {
+    console.log('[BrowserSWPreviewLauncher] Launching simulation preview...');
+
+    try {
+      await this.getPreviewDebuggerServer().startServer({
+        origin: new URL(getBrowserSWPreviewBaseUrl()).origin,
+      });
+    } catch (err) {
+      console.error(
+        '[BrowserSWPreviewLauncher] Unable to start the Debugger Server for the simulation preview:',
+        err
+      );
+    }
+
+    const { exporter, outputDir, browserSWFileSystem } = await prepareExporter({
+      isForInGameEdition: false,
+      isForSimulation: true,
+    });
+
+    const simulationDebuggerIds = this.getPreviewDebuggerServer().getExistingSimulationFrameDebuggerIds();
+    const shouldDoHotReload = hotReload && !!simulationDebuggerIds.length;
+
+    const previewExportOptions = new gd.PreviewExportOptions(
+      project,
+      outputDir
+    );
+    previewExportOptions.setLayoutName(sceneName);
+    previewExportOptions.setIsDevelopmentEnvironment(Window.isDev());
+    previewExportOptions.setIsInGameEdition(true);
+    previewExportOptions.useWindowMessageDebuggerClient();
+
+    const includeFileHashs = this.props.getIncludeFileHashs();
+    for (const includeFile in includeFileHashs) {
+      const hash = includeFileHashs[includeFile];
+      previewExportOptions.setIncludeFileHash(includeFile, hash);
+    }
+
+    if (shouldDoHotReload) {
+      previewExportOptions.setShouldClearExportFolder(shouldHardReload);
+      previewExportOptions.setShouldReloadProjectData(
+        !shouldReloadProjectData ? false : true
+      );
+      previewExportOptions.setShouldReloadLibraries(
+        shouldReloadLibraries || shouldReloadProjectData
+      );
+      previewExportOptions.setShouldGenerateScenesEventsCode(false);
+    }
+
+    exporter.exportProjectForPixiPreview(previewExportOptions);
+    await browserSWFileSystem.applyPendingOperations();
+
+    if (shouldDoHotReload) {
+      if (shouldHardReload) {
+        simulationDebuggerIds.forEach(debuggerId => {
+          this.getPreviewDebuggerServer().sendMessage(debuggerId, {
+            command: 'hardReload',
+          });
+        });
+      } else {
+        const projectDataElement = new gd.SerializerElement();
+        exporter.serializeProjectData(
+          project,
+          previewExportOptions,
+          projectDataElement
+        );
+        const projectData = JSON.parse(
+          gd.Serializer.toJSON(projectDataElement)
+        );
+        projectDataElement.delete();
+
+        const runtimeGameOptionsElement = new gd.SerializerElement();
+        exporter.serializeRuntimeGameOptions(
+          previewExportOptions,
+          runtimeGameOptionsElement
+        );
+        const runtimeGameOptions = JSON.parse(
+          gd.Serializer.toJSON(runtimeGameOptionsElement)
+        );
+        runtimeGameOptionsElement.delete();
+
+        simulationDebuggerIds.forEach(debuggerId => {
+          this.getPreviewDebuggerServer().sendMessage(debuggerId, {
+            command: 'hotReload',
+            payload: { shouldReloadResources, projectData, runtimeGameOptions },
+          });
+        });
+      }
+    }
+
+    previewExportOptions.delete();
+    exporter.delete();
+
+    return outputDir + '/index.html';
   };
 
   getPreviewDebuggerServer(): any {

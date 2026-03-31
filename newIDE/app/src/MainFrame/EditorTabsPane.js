@@ -288,6 +288,7 @@ export type EditorTabsPaneCommonProps = {|
   onEffectAdded: () => void,
   onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
   onExternalLayoutAssociationChanged: () => void,
+  onInstancesModifiedForSimulation?: () => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,
   gamesList: GamesList,
 
@@ -397,6 +398,7 @@ const EditorTabsPane: React.ComponentType<{
     onEffectAdded,
     onObjectListsModified,
     onExternalLayoutAssociationChanged,
+    onInstancesModifiedForSimulation,
     triggerHotReloadInGameEditorIfNeeded,
     gamesList,
     setEditorTabs,
@@ -818,6 +820,7 @@ const EditorTabsPane: React.ComponentType<{
                       onEffectAdded: onEffectAdded,
                       onObjectListsModified: onObjectListsModified,
                       onExternalLayoutAssociationChanged,
+                      onInstancesModifiedForSimulation,
                       triggerHotReloadInGameEditorIfNeeded: triggerHotReloadInGameEditorIfNeeded,
                       gamesList,
                       gamesPlatformFrameTools,

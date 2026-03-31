@@ -289,6 +289,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         triggerHotReloadInGameEditorIfNeeded={
           this.props.triggerHotReloadInGameEditorIfNeeded
         }
+        onInstancesModifiedForSimulation={
+          this.props.onInstancesModifiedForSimulation
+        }
         // It's only used to refresh events-based object variants.
         onObjectGroupEdited={() => {}}
         onObjectGroupsDeleted={() => {}}

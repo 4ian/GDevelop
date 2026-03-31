@@ -88,12 +88,26 @@ namespace gdjs {
    * @category Objects > Animations
    */
   export type SpriteAnimatorNetworkSyncData = {
-    an: integer;
-    di: integer;
-    fr: integer;
-    et: float;
-    ss: float;
-    pa: boolean;
+    an?: integer;
+    animationIndex?: integer;
+
+    aname?: string;
+    animationName?: string;
+
+    di?: integer;
+    direction?: integer;
+
+    fr?: integer;
+    frameIndex?: integer;
+
+    et?: float;
+    elapsedTime?: float;
+
+    ss?: float;
+    speedScale?: float;
+
+    pa?: boolean;
+    paused?: boolean;
   };
 
   /**
@@ -415,24 +429,35 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): SpriteAnimatorNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions?: GetNetworkSyncDataOptions
+    ): SpriteAnimatorNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions?.useFullNames ? full : abbrev;
       return {
-        an: this._currentAnimation,
-        di: this._currentDirection,
-        fr: this._currentFrameIndex,
-        et: this._animationElapsedTime,
-        ss: this._animationSpeedScale,
-        pa: this._animationPaused,
+        [getKey('an', 'animationIndex')]: this._currentAnimation,
+        [getKey('aname', 'animationName')]: this.getAnimationName(),
+        [getKey('di', 'direction')]: this._currentDirection,
+        [getKey('fr', 'frameIndex')]: this._currentFrameIndex,
+        [getKey('et', 'elapsedTime')]: this._animationElapsedTime,
+        [getKey('ss', 'speedScale')]: this._animationSpeedScale,
+        [getKey('pa', 'paused')]: this._animationPaused,
       };
     }
 
     updateFromNetworkSyncData(networkSyncData: SpriteAnimatorNetworkSyncData) {
-      this._currentAnimation = networkSyncData.an;
-      this._currentDirection = networkSyncData.di;
-      this._currentFrameIndex = networkSyncData.fr;
-      this._animationElapsedTime = networkSyncData.et;
-      this._animationSpeedScale = networkSyncData.ss;
-      this._animationPaused = networkSyncData.pa;
+      if (networkSyncData.an !== undefined)
+        this._currentAnimation = networkSyncData.an;
+      if (networkSyncData.di !== undefined)
+        this._currentDirection = networkSyncData.di;
+      if (networkSyncData.fr !== undefined)
+        this._currentFrameIndex = networkSyncData.fr;
+      if (networkSyncData.et !== undefined)
+        this._animationElapsedTime = networkSyncData.et;
+      if (networkSyncData.ss !== undefined)
+        this._animationSpeedScale = networkSyncData.ss;
+      if (networkSyncData.pa !== undefined)
+        this._animationPaused = networkSyncData.pa;
       this.invalidateFrame();
     }
 

@@ -69,6 +69,7 @@ import {
   setEditorHotReloadNeeded,
   type HotReloadSteps,
 } from '../EmbeddedGame/EmbeddedGameFrame';
+import { cancelGlobalSimulation } from './SimulationRuntimeManager';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import {
   useAiRequestState,
@@ -725,8 +726,16 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                     callId: output.call_id,
                   }) === 'initialize_project'
               );
-            if (functionCallOutputs.length > 0) {
-              // Assume changes have happened, trigger unsaved changes.
+            if (
+              functionCallOutputs.some(output => {
+                try {
+                  const parsed = JSON.parse(output.output);
+                  return parsed && parsed.didModifyProject;
+                } catch {
+                  return false;
+                }
+              })
+            ) {
               triggerUnsavedChanges();
             }
 
@@ -1007,6 +1016,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             )
           )
             return;
+          // Cancel any in-progress simulation so the iframe stops stepping frames.
+          cancelGlobalSimulation();
+
           // Optimistic update: mark as suspended locally immediately so that
           // any in-flight async code (e.g. processEditorFunctionCalls,
           // prepareAiUserContent) sees the suspended status after the next

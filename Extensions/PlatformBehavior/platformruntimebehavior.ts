@@ -192,7 +192,15 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): BehaviorNetworkSyncData {
-      return super.getNetworkSyncData(syncOptions);
+      const base = super.getNetworkSyncData(syncOptions);
+      if (syncOptions.useFullNames) {
+        const typeNames = ['Platform', 'Jumpthru', 'Ladder'];
+        (base as any).props = {
+          platformType: typeNames[this._platformType] ?? 'Platform',
+          canBeGrabbed: this._canBeGrabbed,
+        };
+      }
+      return base;
     }
 
     updateFromNetworkSyncData(

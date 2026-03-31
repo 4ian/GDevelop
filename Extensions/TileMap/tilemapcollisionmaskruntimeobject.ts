@@ -27,14 +27,29 @@ namespace gdjs {
    * @category Objects > Tile Map
    */
   export type TilemapCollisionMaskNetworkSyncDataType = {
-    tmjf: string;
-    tsjf: string;
-    dm: boolean;
-    oc: integer;
-    fc: integer;
-    os: float;
-    fo: float;
-    oo: float;
+    tmjf?: string;
+    tilemapJsonFile?: string;
+
+    tsjf?: string;
+    tilesetJsonFile?: string;
+
+    dm?: boolean;
+    debugMode?: boolean;
+
+    oc?: integer;
+    outlineColor?: integer;
+
+    fc?: integer;
+    fillColor?: integer;
+
+    os?: float;
+    outlineSize?: float;
+
+    fo?: float;
+    fillOpacity?: float;
+
+    oo?: float;
+    outlineOpacity?: float;
   };
 
   /**
@@ -209,16 +224,18 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): TilemapCollisionMaskNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        tmjf: this.getTilemapJsonFile(),
-        tsjf: this.getTilesetJsonFile(),
-        dm: this.getDebugMode(),
-        oc: this.getOutlineColor(),
-        fc: this.getFillColor(),
-        os: this.getOutlineSize(),
-        fo: this.getFillOpacity(),
-        oo: this.getOutlineOpacity(),
+        [getKey('tmjf', 'tilemapJsonFile')]: this.getTilemapJsonFile(),
+        [getKey('tsjf', 'tilesetJsonFile')]: this.getTilesetJsonFile(),
+        [getKey('dm', 'debugMode')]: this.getDebugMode(),
+        [getKey('oc', 'outlineColor')]: this.getOutlineColor(),
+        [getKey('fc', 'fillColor')]: this.getFillColor(),
+        [getKey('os', 'outlineSize')]: this.getOutlineSize(),
+        [getKey('fo', 'fillOpacity')]: this.getFillOpacity(),
+        [getKey('oo', 'outlineOpacity')]: this.getOutlineOpacity(),
       };
     }
 

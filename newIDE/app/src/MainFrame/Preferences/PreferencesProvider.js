@@ -123,6 +123,7 @@ export const getInitialPreferences = (): {
   shareDialogDefaultTab: string,
   showAiAskButtonInTitleBar: boolean,
   showBasicProfilingCounters: boolean,
+  showSimulationPreview: boolean,
   showCreateSectionByDefault: boolean,
   showDeprecatedInstructionWarning: string,
   showEffectParameterNames: boolean,
@@ -337,6 +338,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setShowBasicProfilingCounters: (this._setShowBasicProfilingCounters.bind(
       this
     ): any),
+    // $FlowFixMe[method-unbinding]
+    setShowSimulationPreview: (this._setShowSimulationPreview.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setDisableNpmScriptConfirmation: (this._setDisableNpmScriptConfirmation.bind(
       this
@@ -760,6 +763,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           showBasicProfilingCounters,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setShowSimulationPreview(showSimulationPreview: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showSimulationPreview,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

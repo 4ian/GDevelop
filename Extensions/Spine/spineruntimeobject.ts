@@ -17,16 +17,32 @@ namespace gdjs {
 
   /** @category Objects > Spine */
   export type SpineNetworkSyncDataType = {
-    opa: float;
-    scaX: float;
-    scaY: float;
-    flipX: boolean;
-    flipY: boolean;
-    ani: number;
-    anmd: number;
-    anp: boolean;
-    anss: float;
-    anet: number;
+    opa?: float;
+    opacity?: float;
+
+    scaX?: float;
+    scaleX?: float;
+
+    scaY?: float;
+    scaleY?: float;
+
+    flipX?: boolean;
+    flipY?: boolean;
+
+    ani?: number;
+    animationIndex?: number;
+
+    anmd?: number;
+    animationMixingDuration?: number;
+
+    anp?: boolean;
+    animationPaused?: boolean;
+
+    anss?: float;
+    animationSpeedScale?: float;
+
+    anet?: number;
+    animationElapsedTime?: number;
   };
 
   /** @category Objects > Spine */
@@ -136,18 +152,22 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): SpineNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        opa: this._opacity,
-        scaX: this.getScaleX(),
-        scaY: this.getScaleY(),
+        [getKey('opa', 'opacity')]: this._opacity,
+        [getKey('scaX', 'scaleX')]: this.getScaleX(),
+        [getKey('scaY', 'scaleY')]: this.getScaleY(),
         flipX: this.isFlippedX(),
         flipY: this.isFlippedY(),
-        ani: this.getAnimationIndex(),
-        anmd: this.getAnimationMixingDuration(),
-        anp: this.isAnimationPaused(),
-        anss: this.getAnimationSpeedScale(),
-        anet: this.getAnimationElapsedTime(),
+        [getKey('ani', 'animationIndex')]: this.getAnimationIndex(),
+        [getKey('anmd', 'animationMixingDuration')]:
+          this.getAnimationMixingDuration(),
+        [getKey('anp', 'animationPaused')]: this.isAnimationPaused(),
+        [getKey('anss', 'animationSpeedScale')]: this.getAnimationSpeedScale(),
+        [getKey('anet', 'animationElapsedTime')]:
+          this.getAnimationElapsedTime(),
       };
     }
 

@@ -28,12 +28,29 @@ namespace gdjs {
    */
   export type CustomObjectNetworkSyncDataType = {
     anim?: SpriteAnimatorNetworkSyncData;
-    ifx: boolean;
-    ify: boolean;
-    sx: float;
-    sy: float;
-    op: float;
+    animation?: SpriteAnimatorNetworkSyncData;
+
+    ifx?: boolean;
+    isFlippedX?: boolean;
+
+    ify?: boolean;
+    isFlippedY?: boolean;
+
+    sx?: float;
+    scaleX?: float;
+
+    sy?: float;
+    scaleY?: float;
+
+    op?: float;
+    opacity?: float;
+
     cc?: [float, float];
+    customCenter?: [float, float];
+
+    /** Sync data for each named child object (keyed by child object name). */
+    ch?: { [childName: string]: ObjectNetworkSyncData[] };
+    children?: { [childName: string]: ObjectNetworkSyncData[] };
   };
 
   /**
@@ -234,20 +251,39 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): CustomObjectNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       const animator = this.getAnimator();
       const networkSyncData: CustomObjectNetworkSyncData = {
         ...super.getNetworkSyncData(syncOptions),
-        ifx: this.isFlippedX(),
-        ify: this.isFlippedY(),
-        sx: this._scaleX,
-        sy: this._scaleY,
-        op: this.opacity,
+        [getKey('ifx', 'isFlippedX')]: this.isFlippedX(),
+        [getKey('ify', 'isFlippedY')]: this.isFlippedY(),
+        [getKey('sx', 'scaleX')]: this._scaleX,
+        [getKey('sy', 'scaleY')]: this._scaleY,
+        [getKey('op', 'opacity')]: this.opacity,
       };
       if (animator) {
-        networkSyncData.anim = animator.getNetworkSyncData();
+        networkSyncData[getKey('anim', 'animation')] =
+          animator.getNetworkSyncData(syncOptions);
       }
       if (this._customCenter) {
-        networkSyncData.cc = this._customCenter;
+        networkSyncData[getKey('cc', 'customCenter')] = this._customCenter;
+      }
+      // Include children so callers (harness, multiplayer, debugger) can read
+      // child object state — e.g. a Text child that displays a score value.
+      const childNames: string[] = [];
+      this._instanceContainer._objects.keys(childNames);
+      if (childNames.length > 0) {
+        const children: { [childName: string]: ObjectNetworkSyncData[] } = {};
+        for (const childName of childNames) {
+          const childObjs = this._instanceContainer.getObjects(childName);
+          if (childObjs.length > 0) {
+            children[childName] = childObjs.map((child) =>
+              child.getNetworkSyncData(syncOptions)
+            );
+          }
+        }
+        networkSyncData[getKey('ch', 'children')] = children;
       }
       return networkSyncData;
     }
@@ -280,6 +316,22 @@ namespace gdjs {
       }
       if (networkSyncData.cc) {
         this.setRotationCenter(networkSyncData.cc[0], networkSyncData.cc[1]);
+      }
+      if (networkSyncData.ch) {
+        for (const childName in networkSyncData.ch) {
+          const childSyncDataList = networkSyncData.ch[childName];
+          const childObjs = this._instanceContainer.getObjects(childName);
+          for (
+            let i = 0;
+            i < childSyncDataList.length && i < childObjs.length;
+            i++
+          ) {
+            childObjs[i].updateFromNetworkSyncData(
+              childSyncDataList[i],
+              options
+            );
+          }
+        }
       }
       if (
         networkSyncData.ifx !== undefined ||

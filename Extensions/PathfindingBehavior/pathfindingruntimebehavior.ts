@@ -7,15 +7,31 @@ namespace gdjs {
 
   interface PathfindingNetworkSyncDataType {
     // Syncing the path and its position on it should be enough to have a good prediction.
-    path: FloatPoint[];
-    pf: boolean;
-    sp: number;
-    as: number;
-    cs: number;
-    tss: number;
-    re: boolean;
-    ma: number;
-    dos: number;
+    path?: FloatPoint[];
+
+    pf?: boolean;
+    pathFound?: boolean;
+
+    sp?: number;
+    speed?: number;
+
+    as?: number;
+    angularSpeed?: number;
+
+    cs?: number;
+    currentSegment?: number;
+
+    tss?: number;
+    totalSegmentDistance?: number;
+
+    re?: boolean;
+    reachedEnd?: boolean;
+
+    ma?: number;
+    movementAngle?: number;
+
+    dos?: number;
+    distanceOnSegment?: number;
   }
 
   /** @category Behaviors > 2D Pathfinding */
@@ -136,19 +152,21 @@ namespace gdjs {
     getNetworkSyncData(
       options: GetNetworkSyncDataOptions
     ): PathfindingNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        options.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(options),
         props: {
           path: this._path,
-          pf: this._pathFound,
-          sp: this._speed,
-          as: this._angularSpeed,
-          cs: this._currentSegment,
-          tss: this._totalSegmentDistance,
-          re: this._reachedEnd,
-          ma: this._movementAngle,
-          dos: this._distanceOnSegment,
-        },
+          [getKey('pf', 'pathFound')]: this._pathFound,
+          [getKey('sp', 'speed')]: this._speed,
+          [getKey('as', 'angularSpeed')]: this._angularSpeed,
+          [getKey('cs', 'currentSegment')]: this._currentSegment,
+          [getKey('tss', 'totalSegmentDistance')]: this._totalSegmentDistance,
+          [getKey('re', 'reachedEnd')]: this._reachedEnd,
+          [getKey('ma', 'movementAngle')]: this._movementAngle,
+          [getKey('dos', 'distanceOnSegment')]: this._distanceOnSegment,
+        } as PathfindingNetworkSyncDataType,
       };
     }
 

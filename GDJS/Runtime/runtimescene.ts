@@ -876,7 +876,7 @@ namespace gdjs {
         const layersSyncData = {};
         for (const layerName in this._layers.items) {
           layersSyncData[layerName] =
-            this._layers.items[layerName].getNetworkSyncData();
+            this._layers.items[layerName].getNetworkSyncData(syncOptions);
         }
         networkSyncData.layers = layersSyncData;
       }

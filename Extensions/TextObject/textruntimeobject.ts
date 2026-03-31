@@ -51,30 +51,76 @@ namespace gdjs {
    * @category Objects > Text
    */
   export type TextObjectNetworkSyncDataType = {
-    str: string;
-    o: float;
-    cs: number;
-    fn: string;
-    b: boolean;
-    i: boolean;
-    u: boolean;
-    c: number[];
-    scale: number;
-    ta: string;
-    vta: string;
-    wrap: boolean;
-    wrapw: float;
-    oena: boolean;
-    ot: float;
-    oc: number[];
-    sh: boolean;
-    shc: number[];
-    sho: float;
-    shd: float;
-    sha: float;
-    shb: float;
-    pad: integer;
-    lh: float;
+    str?: string;
+    text?: string;
+
+    o?: float;
+    opacity?: float;
+
+    cs?: number;
+    characterSize?: number;
+
+    fn?: string;
+    fontName?: string;
+
+    b?: boolean;
+    bold?: boolean;
+
+    i?: boolean;
+    italic?: boolean;
+
+    u?: boolean;
+    underlined?: boolean;
+
+    c?: number[];
+    color?: number[];
+
+    scale?: number;
+
+    ta?: string;
+    textAlignment?: string;
+
+    vta?: string;
+    verticalTextAlignment?: string;
+
+    wrap?: boolean;
+    wrapping?: boolean;
+
+    wrapw?: float;
+    wrappingWidth?: float;
+
+    oena?: boolean;
+    outlineEnabled?: boolean;
+
+    ot?: float;
+    outlineThickness?: float;
+
+    oc?: number[];
+    outlineColor?: number[];
+
+    sh?: boolean;
+    shadowEnabled?: boolean;
+
+    shc?: number[];
+    shadowColor?: number[];
+
+    sho?: float;
+    shadowOpacity?: float;
+
+    shd?: float;
+    shadowDistance?: float;
+
+    sha?: float;
+    shadowAngle?: float;
+
+    shb?: float;
+    shadowBlur?: float;
+
+    pad?: integer;
+    padding?: integer;
+
+    lh?: float;
+    lineHeight?: float;
   };
 
   /**
@@ -242,32 +288,34 @@ namespace gdjs {
     override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): TextObjectNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        str: this._str,
-        o: this.opacity,
-        cs: this._characterSize,
-        fn: this._fontName,
-        b: this._bold,
-        i: this._italic,
-        u: this._underlined,
-        c: this._color,
+        [getKey('str', 'text')]: this._str,
+        [getKey('o', 'opacity')]: this.opacity,
+        [getKey('cs', 'characterSize')]: this._characterSize,
+        [getKey('fn', 'fontName')]: this._fontName,
+        [getKey('b', 'bold')]: this._bold,
+        [getKey('i', 'italic')]: this._italic,
+        [getKey('u', 'underlined')]: this._underlined,
+        [getKey('c', 'color')]: this._color,
         scale: this.getScale(),
-        ta: this._textAlign,
-        vta: this._verticalTextAlignment,
-        wrap: this._wrapping,
-        wrapw: this._wrappingWidth,
-        oena: this._isOutlineEnabled,
-        ot: this._outlineThickness,
-        oc: this._outlineColor,
-        sh: this._shadow,
-        shc: this._shadowColor,
-        sho: this._shadowOpacity,
-        shd: this._shadowDistance,
-        sha: this._shadowAngle,
-        shb: this._shadowBlur,
-        lh: this._lineHeight,
-        pad: this._padding,
+        [getKey('ta', 'textAlignment')]: this._textAlign,
+        [getKey('vta', 'verticalTextAlignment')]: this._verticalTextAlignment,
+        [getKey('wrap', 'wrapping')]: this._wrapping,
+        [getKey('wrapw', 'wrappingWidth')]: this._wrappingWidth,
+        [getKey('oena', 'outlineEnabled')]: this._isOutlineEnabled,
+        [getKey('ot', 'outlineThickness')]: this._outlineThickness,
+        [getKey('oc', 'outlineColor')]: this._outlineColor,
+        [getKey('sh', 'shadowEnabled')]: this._shadow,
+        [getKey('shc', 'shadowColor')]: this._shadowColor,
+        [getKey('sho', 'shadowOpacity')]: this._shadowOpacity,
+        [getKey('shd', 'shadowDistance')]: this._shadowDistance,
+        [getKey('sha', 'shadowAngle')]: this._shadowAngle,
+        [getKey('shb', 'shadowBlur')]: this._shadowBlur,
+        [getKey('lh', 'lineHeight')]: this._lineHeight,
+        [getKey('pad', 'padding')]: this._padding,
       };
     }
 

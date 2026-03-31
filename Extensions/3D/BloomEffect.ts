@@ -1,8 +1,13 @@
 namespace gdjs {
   interface BloomFilterNetworkSyncData {
-    s: number;
-    r: number;
-    t: number;
+    s?: number;
+    strength?: number;
+
+    r?: number;
+    radius?: number;
+
+    t?: number;
+    threshold?: number;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::Bloom',
@@ -87,17 +92,21 @@ namespace gdjs {
             return 0;
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
-          getNetworkSyncData(): BloomFilterNetworkSyncData {
+          getNetworkSyncData(
+            syncOptions: GetNetworkSyncDataOptions
+          ): BloomFilterNetworkSyncData {
+            const getKey = (abbrev: string, full: string) =>
+              syncOptions.useFullNames ? full : abbrev;
             return {
-              s: this.shaderPass.strength,
-              r: this.shaderPass.radius,
-              t: this.shaderPass.threshold,
-            };
+              [getKey('s', 'strength')]: this.shaderPass.strength,
+              [getKey('r', 'radius')]: this.shaderPass.radius,
+              [getKey('t', 'threshold')]: this.shaderPass.threshold,
+            } as BloomFilterNetworkSyncData;
           }
           updateFromNetworkSyncData(data: BloomFilterNetworkSyncData) {
-            this.shaderPass.strength = data.s;
-            this.shaderPass.radius = data.r;
-            this.shaderPass.threshold = data.t;
+            if (data.s !== undefined) this.shaderPass.strength = data.s;
+            if (data.r !== undefined) this.shaderPass.radius = data.r;
+            if (data.t !== undefined) this.shaderPass.threshold = data.t;
           }
         })();
       }

@@ -18,14 +18,19 @@ const existingPreviewWindows: {
 } = {};
 
 let embbededGameFrameWindow: WindowProxy | null = null;
+let simulationFrameWindow: WindowProxy | null = null;
 
 const getExistingDebuggerIds = (): Array<DebuggerId> => [
   ...getExistingEmbeddedGameFrameDebuggerIds(),
+  ...getExistingSimulationFrameDebuggerIds(),
   ...getExistingPreviewDebuggerIds(),
 ];
 
 const getExistingEmbeddedGameFrameDebuggerIds = (): Array<DebuggerId> =>
   embbededGameFrameWindow ? ['embedded-game-frame'] : [];
+
+const getExistingSimulationFrameDebuggerIds = (): Array<DebuggerId> =>
+  simulationFrameWindow ? ['simulation-frame'] : [];
 
 const getExistingPreviewDebuggerIds = (): Array<DebuggerId> =>
   Object.keys(existingPreviewWindows).map(key => key);
@@ -35,6 +40,9 @@ const getDebuggerIdForPreviewWindow = (
 ): DebuggerId | null => {
   if (embbededGameFrameWindow && embbededGameFrameWindow === previewWindow) {
     return 'embedded-game-frame';
+  }
+  if (simulationFrameWindow && simulationFrameWindow === previewWindow) {
+    return 'simulation-frame';
   }
 
   for (const id in existingPreviewWindows) {
@@ -134,6 +142,8 @@ class BrowserPreviewDebuggerServer {
     const theWindow =
       id === 'embedded-game-frame'
         ? embbededGameFrameWindow
+        : id === 'simulation-frame'
+        ? simulationFrameWindow
         : existingPreviewWindows[id];
     if (!theWindow) return;
 
@@ -184,6 +194,10 @@ class BrowserPreviewDebuggerServer {
     return getExistingPreviewDebuggerIds();
   }
   // $FlowFixMe[missing-local-annot]
+  getExistingSimulationFrameDebuggerIds() {
+    return getExistingSimulationFrameDebuggerIds();
+  }
+  // $FlowFixMe[missing-local-annot]
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);
 
@@ -215,6 +229,23 @@ class BrowserPreviewDebuggerServer {
     );
     embbededGameFrameWindow = null;
     notifyConnectionClosed('embedded-game-frame');
+  }
+  registerSimulationFrame(window: WindowProxy) {
+    if (window === simulationFrameWindow) return;
+
+    console.info(
+      'Registered the simulation frame window in the debugger server.'
+    );
+    simulationFrameWindow = window;
+  }
+  unregisterSimulationFrame(window: WindowProxy) {
+    if (simulationFrameWindow !== window) return;
+
+    console.info(
+      'Unregistered the simulation frame window in the debugger server.'
+    );
+    simulationFrameWindow = null;
+    notifyConnectionClosed('simulation-frame');
   }
   closeAllConnections() {
     console.info(

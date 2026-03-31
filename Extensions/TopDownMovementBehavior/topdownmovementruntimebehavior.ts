@@ -5,17 +5,38 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 
 namespace gdjs {
   interface TopDownMovementNetworkSyncDataType {
-    a: float;
-    xv: float;
-    yv: float;
-    as: float;
-    lk: boolean;
-    rk: boolean;
-    uk: boolean;
-    dk: boolean;
-    wsu: boolean;
-    sa: float;
-    sf: float;
+    a?: float;
+    angle?: float;
+
+    xv?: float;
+    xVelocity?: float;
+
+    yv?: float;
+    yVelocity?: float;
+
+    as?: float;
+    angularSpeed?: float;
+
+    lk?: boolean;
+    leftKey?: boolean;
+
+    rk?: boolean;
+    rightKey?: boolean;
+
+    uk?: boolean;
+    upKey?: boolean;
+
+    dk?: boolean;
+    downKey?: boolean;
+
+    wsu?: boolean;
+    wasStickUsed?: boolean;
+
+    sa?: float;
+    stickAngle?: float;
+
+    sf?: float;
+    stickForce?: float;
   }
 
   /** @category Behaviors > Top-down movement */
@@ -119,21 +140,23 @@ namespace gdjs {
       this._clearInputsBetweenFrames = true;
       this._ignoreDefaultControlsAsSyncedByNetwork = false;
 
+      const getKey = (abbrev: string, full: string) =>
+        options.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(options),
         props: {
-          a: this._angle,
-          xv: this._xVelocity,
-          yv: this._yVelocity,
-          as: this._angularSpeed,
-          lk: this._wasLeftKeyPressed,
-          rk: this._wasRightKeyPressed,
-          uk: this._wasUpKeyPressed,
-          dk: this._wasDownKeyPressed,
-          wsu: this._wasStickUsed,
-          sa: this._stickAngle,
-          sf: this._stickForce,
-        },
+          [getKey('a', 'angle')]: this._angle,
+          [getKey('xv', 'xVelocity')]: this._xVelocity,
+          [getKey('yv', 'yVelocity')]: this._yVelocity,
+          [getKey('as', 'angularSpeed')]: this._angularSpeed,
+          [getKey('lk', 'leftKey')]: this._wasLeftKeyPressed,
+          [getKey('rk', 'rightKey')]: this._wasRightKeyPressed,
+          [getKey('uk', 'upKey')]: this._wasUpKeyPressed,
+          [getKey('dk', 'downKey')]: this._wasDownKeyPressed,
+          [getKey('wsu', 'wasStickUsed')]: this._wasStickUsed,
+          [getKey('sa', 'stickAngle')]: this._stickAngle,
+          [getKey('sf', 'stickForce')]: this._stickForce,
+        } as TopDownMovementNetworkSyncDataType,
       };
     }
 

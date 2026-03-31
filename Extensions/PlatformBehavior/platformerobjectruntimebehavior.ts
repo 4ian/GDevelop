@@ -13,22 +13,35 @@ namespace gdjs {
   };
 
   interface OnFloorStateNetworkSyncData {
-    flx: number;
-    fly: number;
-    oh: number;
+    flx?: number;
+    floorLastX?: number;
+
+    fly?: number;
+    floorLastY?: number;
+
+    oh?: number;
+    oldHeight?: number;
   }
 
   interface FallingStateNetworkSyncData {}
 
   interface JumpingStateNetworkSyncData {
-    cjs: number;
-    tscjs: number;
-    jfd: boolean;
+    cjs?: number;
+    currentJumpSpeed?: number;
+
+    tscjs?: number;
+    timeSinceCurrentJumpStart?: number;
+
+    jfd?: boolean;
+    jumpingFirstDelta?: boolean;
   }
 
   interface GrabbingPlatformStateNetworkSyncData {
-    gplx: float;
-    gply: float;
+    gplx?: float;
+    grabbedPlatformLastX?: float;
+
+    gply?: float;
+    grabbedPlatformLastY?: float;
   }
 
   interface OnLadderStateNetworkSyncData {}
@@ -41,24 +54,59 @@ namespace gdjs {
     | OnLadderStateNetworkSyncData;
 
   interface PlatformerObjectNetworkSyncDataType {
-    cs: float;
-    rdx: float;
-    rdy: float;
-    ldy: float;
-    cfs: float;
-    cj: boolean;
-    ldl: boolean;
-    lek: boolean;
-    rik: boolean;
-    lak: boolean;
-    upk: boolean;
-    dok: boolean;
-    juk: boolean;
-    rpk: boolean;
-    rlk: boolean;
-    jkhsjs: boolean;
-    sn: string;
-    ssd: StateNetworkSyncData;
+    cs?: float;
+    currentSpeed?: float;
+
+    rdx?: float;
+    requestedDeltaX?: float;
+
+    rdy?: float;
+    requestedDeltaY?: float;
+
+    ldy?: float;
+    lastDeltaY?: float;
+
+    cfs?: float;
+    currentFallSpeed?: float;
+
+    cj?: boolean;
+    canJump?: boolean;
+
+    ldl?: boolean;
+    lastDirectionIsLeft?: boolean;
+
+    lek?: boolean;
+    wasLeftKeyPressed?: boolean;
+
+    rik?: boolean;
+    wasRightKeyPressed?: boolean;
+
+    lak?: boolean;
+    wasLadderKeyPressed?: boolean;
+
+    upk?: boolean;
+    wasUpKeyPressed?: boolean;
+
+    dok?: boolean;
+    wasDownKeyPressed?: boolean;
+
+    juk?: boolean;
+    wasJumpKeyPressed?: boolean;
+
+    rpk?: boolean;
+    wasReleasePlatformKeyPressed?: boolean;
+
+    rlk?: boolean;
+    wasReleaseLadderKeyPressed?: boolean;
+
+    jkhsjs?: boolean;
+    jumpKeyHeldSinceJumpStart?: boolean;
+
+    sn?: string;
+    state?: string;
+
+    ssd?: StateNetworkSyncData;
+    stateSyncData?: StateNetworkSyncData;
   }
 
   /** @category Behaviors > Platform */
@@ -237,31 +285,38 @@ namespace gdjs {
       this._clearInputsBetweenFrames = true;
       this._ignoreDefaultControlsAsSyncedByNetwork = false;
 
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
+
       return {
         ...super.getNetworkSyncData(syncOptions),
         props: {
-          cs: this._currentSpeed,
+          [getKey('cs', 'currentSpeed')]: this._currentSpeed,
 
           // TODO Try to remove these 3 fields from the synch
           // They are reset every frame and are not part of the state.
-          rdx: this._requestedDeltaX,
-          rdy: this._requestedDeltaY,
-          ldy: this._lastDeltaY,
+          [getKey('rdx', 'requestedDeltaX')]: this._requestedDeltaX,
+          [getKey('rdy', 'requestedDeltaY')]: this._requestedDeltaY,
+          [getKey('ldy', 'lastDeltaY')]: this._lastDeltaY,
 
-          cfs: this._currentFallSpeed,
-          cj: this._canJump,
-          ldl: this._lastDirectionIsLeft,
-          lek: this._wasLeftKeyPressed,
-          rik: this._wasRightKeyPressed,
-          lak: this._wasLadderKeyPressed,
-          upk: this._wasUpKeyPressed,
-          dok: this._wasDownKeyPressed,
-          juk: this._wasJumpKeyPressed,
-          rpk: this._wasReleasePlatformKeyPressed,
-          rlk: this._wasReleaseLadderKeyPressed,
-          jkhsjs: this._jumpKeyHeldSinceJumpStart,
-          sn: this._state.toString(),
-          ssd: this._state.getNetworkSyncData(),
+          [getKey('cfs', 'currentFallSpeed')]: this._currentFallSpeed,
+          [getKey('cj', 'canJump')]: this._canJump,
+          [getKey('ldl', 'lastDirectionIsLeft')]: this._lastDirectionIsLeft,
+          [getKey('lek', 'wasLeftKeyPressed')]: this._wasLeftKeyPressed,
+          [getKey('rik', 'wasRightKeyPressed')]: this._wasRightKeyPressed,
+          [getKey('lak', 'wasLadderKeyPressed')]: this._wasLadderKeyPressed,
+          [getKey('upk', 'wasUpKeyPressed')]: this._wasUpKeyPressed,
+          [getKey('dok', 'wasDownKeyPressed')]: this._wasDownKeyPressed,
+          [getKey('juk', 'wasJumpKeyPressed')]: this._wasJumpKeyPressed,
+          [getKey('rpk', 'wasReleasePlatformKeyPressed')]:
+            this._wasReleasePlatformKeyPressed,
+          [getKey('rlk', 'wasReleaseLadderKeyPressed')]:
+            this._wasReleaseLadderKeyPressed,
+          [getKey('jkhsjs', 'jumpKeyHeldSinceJumpStart')]:
+            this._jumpKeyHeldSinceJumpStart,
+          [getKey('sn', 'state')]: this._state.toString(),
+          [getKey('ssd', 'stateSyncData')]:
+            this._state.getNetworkSyncData(syncOptions),
         },
       };
     }
@@ -274,91 +329,141 @@ namespace gdjs {
 
       const behaviorSpecificProps = networkSyncData.props;
 
-      switch (behaviorSpecificProps.sn) {
-        case 'Falling':
-          if (behaviorSpecificProps.sn !== this._state.toString()) {
-            this._setFalling();
-          }
-          this._falling.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
-          break;
-        case 'OnFloor':
-          // Let it handle automatically as we don't know which platform to land on.
-          // @ts-ignore - we assume it's OnFloorStateNetworkSyncData
-          this._onFloor.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
-          break;
-        case 'Jumping':
-          if (behaviorSpecificProps.sn !== this._state.toString()) {
-            this._setJumping();
-          }
-          // @ts-ignore - we assume it's JumpingStateNetworkSyncData
-          this._jumping.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
-          break;
-        case 'GrabbingPlatform':
-          // Let it handle automatically as we don't know which platform to grab.
-          this._grabbingPlatform.updateFromNetworkSyncData(
-            // @ts-ignore - we assume it's GrabbingPlatformStateNetworkSyncData
-            behaviorSpecificProps.ssd
-          );
-          break;
-        case 'OnLadder':
-          if (behaviorSpecificProps.sn !== this._state.toString()) {
-            this._setOnLadder();
-          }
-          this._onLadder.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
-          break;
-        default:
-          console.error(
-            'Unknown state name: ' + behaviorSpecificProps.sn + '.'
-          );
-          break;
+      if (behaviorSpecificProps.ssd !== undefined) {
+        switch (behaviorSpecificProps.sn) {
+          case 'Falling':
+            if (behaviorSpecificProps.sn !== this._state.toString()) {
+              this._setFalling();
+            }
+            this._falling.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
+            break;
+          case 'OnFloor':
+            // Let it handle automatically as we don't know which platform to land on.
+            // @ts-ignore - we assume it's OnFloorStateNetworkSyncData
+            this._onFloor.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
+            break;
+          case 'Jumping':
+            if (behaviorSpecificProps.sn !== this._state.toString()) {
+              this._setJumping();
+            }
+            // @ts-ignore - we assume it's JumpingStateNetworkSyncData
+            this._jumping.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
+            break;
+          case 'GrabbingPlatform':
+            // Let it handle automatically as we don't know which platform to grab.
+            this._grabbingPlatform.updateFromNetworkSyncData(
+              // @ts-ignore - we assume it's GrabbingPlatformStateNetworkSyncData
+              behaviorSpecificProps.ssd
+            );
+            break;
+          case 'OnLadder':
+            if (behaviorSpecificProps.sn !== this._state.toString()) {
+              this._setOnLadder();
+            }
+            this._onLadder.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
+            break;
+          default:
+            console.error(
+              'Unknown state name: ' + behaviorSpecificProps.sn + '.'
+            );
+            break;
+        }
       }
 
-      if (behaviorSpecificProps.cs !== this._currentSpeed) {
+      if (
+        behaviorSpecificProps.cs !== undefined &&
+        behaviorSpecificProps.cs !== this._currentSpeed
+      ) {
         this._currentSpeed = behaviorSpecificProps.cs;
       }
-      if (behaviorSpecificProps.rdx !== this._requestedDeltaX) {
+      if (
+        behaviorSpecificProps.rdx !== undefined &&
+        behaviorSpecificProps.rdx !== this._requestedDeltaX
+      ) {
         this._requestedDeltaX = behaviorSpecificProps.rdx;
       }
-      if (behaviorSpecificProps.rdy !== this._requestedDeltaY) {
+      if (
+        behaviorSpecificProps.rdy !== undefined &&
+        behaviorSpecificProps.rdy !== this._requestedDeltaY
+      ) {
         this._requestedDeltaY = behaviorSpecificProps.rdy;
       }
-      if (behaviorSpecificProps.ldy !== this._lastDeltaY) {
+      if (
+        behaviorSpecificProps.ldy !== undefined &&
+        behaviorSpecificProps.ldy !== this._lastDeltaY
+      ) {
         this._lastDeltaY = behaviorSpecificProps.ldy;
       }
-      if (behaviorSpecificProps.cfs !== this._currentFallSpeed) {
+      if (
+        behaviorSpecificProps.cfs !== undefined &&
+        behaviorSpecificProps.cfs !== this._currentFallSpeed
+      ) {
         this._currentFallSpeed = behaviorSpecificProps.cfs;
       }
-      if (behaviorSpecificProps.cj !== this._canJump) {
+      if (
+        behaviorSpecificProps.cj !== undefined &&
+        behaviorSpecificProps.cj !== this._canJump
+      ) {
         this._canJump = behaviorSpecificProps.cj;
       }
-      if (behaviorSpecificProps.ldl !== this._lastDirectionIsLeft) {
+      if (
+        behaviorSpecificProps.ldl !== undefined &&
+        behaviorSpecificProps.ldl !== this._lastDirectionIsLeft
+      ) {
         this._lastDirectionIsLeft = behaviorSpecificProps.ldl;
       }
-      if (behaviorSpecificProps.lek !== this._leftKey) {
+      if (
+        behaviorSpecificProps.lek !== undefined &&
+        behaviorSpecificProps.lek !== this._leftKey
+      ) {
         this._leftKey = behaviorSpecificProps.lek;
       }
-      if (behaviorSpecificProps.rik !== this._rightKey) {
+      if (
+        behaviorSpecificProps.rik !== undefined &&
+        behaviorSpecificProps.rik !== this._rightKey
+      ) {
         this._rightKey = behaviorSpecificProps.rik;
       }
-      if (behaviorSpecificProps.lak !== this._ladderKey) {
+      if (
+        behaviorSpecificProps.lak !== undefined &&
+        behaviorSpecificProps.lak !== this._ladderKey
+      ) {
         this._ladderKey = behaviorSpecificProps.lak;
       }
-      if (behaviorSpecificProps.upk !== this._upKey) {
+      if (
+        behaviorSpecificProps.upk !== undefined &&
+        behaviorSpecificProps.upk !== this._upKey
+      ) {
         this._upKey = behaviorSpecificProps.upk;
       }
-      if (behaviorSpecificProps.dok !== this._downKey) {
+      if (
+        behaviorSpecificProps.dok !== undefined &&
+        behaviorSpecificProps.dok !== this._downKey
+      ) {
         this._downKey = behaviorSpecificProps.dok;
       }
-      if (behaviorSpecificProps.juk !== this._jumpKey) {
+      if (
+        behaviorSpecificProps.juk !== undefined &&
+        behaviorSpecificProps.juk !== this._jumpKey
+      ) {
         this._jumpKey = behaviorSpecificProps.juk;
       }
-      if (behaviorSpecificProps.rpk !== this._releasePlatformKey) {
+      if (
+        behaviorSpecificProps.rpk !== undefined &&
+        behaviorSpecificProps.rpk !== this._releasePlatformKey
+      ) {
         this._releasePlatformKey = behaviorSpecificProps.rpk;
       }
-      if (behaviorSpecificProps.rlk !== this._releaseLadderKey) {
+      if (
+        behaviorSpecificProps.rlk !== undefined &&
+        behaviorSpecificProps.rlk !== this._releaseLadderKey
+      ) {
         this._releaseLadderKey = behaviorSpecificProps.rlk;
       }
-      if (behaviorSpecificProps.jkhsjs !== this._jumpKeyHeldSinceJumpStart) {
+      if (
+        behaviorSpecificProps.jkhsjs !== undefined &&
+        behaviorSpecificProps.jkhsjs !== this._jumpKeyHeldSinceJumpStart
+      ) {
         this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
       }
 
@@ -1910,7 +2015,9 @@ namespace gdjs {
      */
     beforeMovingY(timeDelta: float, oldX: float): void;
 
-    getNetworkSyncData(): StateNetworkSyncData;
+    getNetworkSyncData(
+      options: GetNetworkSyncDataOptions
+    ): StateNetworkSyncData;
 
     updateFromNetworkSyncData(syncData: StateNetworkSyncData): void;
   }
@@ -2214,18 +2321,22 @@ namespace gdjs {
       }
     }
 
-    getNetworkSyncData(): OnFloorStateNetworkSyncData {
+    getNetworkSyncData(
+      options: GetNetworkSyncDataOptions
+    ): OnFloorStateNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        options.useFullNames ? full : abbrev;
       return {
-        flx: this._floorLastX,
-        fly: this._floorLastY,
-        oh: this._oldHeight,
-      };
+        [getKey('flx', 'floorLastX')]: this._floorLastX,
+        [getKey('fly', 'floorLastY')]: this._floorLastY,
+        [getKey('oh', 'oldHeight')]: this._oldHeight,
+      } as OnFloorStateNetworkSyncData;
     }
 
     updateFromNetworkSyncData(data: OnFloorStateNetworkSyncData) {
-      this._floorLastX = data.flx;
-      this._floorLastY = data.fly;
-      this._oldHeight = data.oh;
+      if (data.flx !== undefined) this._floorLastX = data.flx;
+      if (data.fly !== undefined) this._floorLastY = data.fly;
+      if (data.oh !== undefined) this._oldHeight = data.oh;
     }
 
     toString(): String {
@@ -2285,7 +2396,9 @@ namespace gdjs {
       this._behavior._fall(timeDelta);
     }
 
-    getNetworkSyncData(): FallingStateNetworkSyncData {
+    getNetworkSyncData(
+      _options: GetNetworkSyncDataOptions
+    ): FallingStateNetworkSyncData {
       return {};
     }
 
@@ -2398,18 +2511,24 @@ namespace gdjs {
       }
     }
 
-    getNetworkSyncData(): JumpingStateNetworkSyncData {
+    getNetworkSyncData(
+      options: GetNetworkSyncDataOptions
+    ): JumpingStateNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        options.useFullNames ? full : abbrev;
       return {
-        cjs: this._currentJumpSpeed,
-        tscjs: this._timeSinceCurrentJumpStart,
-        jfd: this._jumpingFirstDelta,
-      };
+        [getKey('cjs', 'currentJumpSpeed')]: this._currentJumpSpeed,
+        [getKey('tscjs', 'timeSinceCurrentJumpStart')]:
+          this._timeSinceCurrentJumpStart,
+        [getKey('jfd', 'jumpingFirstDelta')]: this._jumpingFirstDelta,
+      } as JumpingStateNetworkSyncData;
     }
 
     updateFromNetworkSyncData(data: JumpingStateNetworkSyncData) {
-      this._currentJumpSpeed = data.cjs;
-      this._timeSinceCurrentJumpStart = data.tscjs;
-      this._jumpingFirstDelta = data.jfd;
+      if (data.cjs !== undefined) this._currentJumpSpeed = data.cjs;
+      if (data.tscjs !== undefined)
+        this._timeSinceCurrentJumpStart = data.tscjs;
+      if (data.jfd !== undefined) this._jumpingFirstDelta = data.jfd;
     }
 
     toString(): String {
@@ -2484,16 +2603,20 @@ namespace gdjs {
       this._grabbedPlatformLastY = this._grabbedPlatform.owner.getY();
     }
 
-    getNetworkSyncData(): GrabbingPlatformStateNetworkSyncData {
+    getNetworkSyncData(
+      options: GetNetworkSyncDataOptions
+    ): GrabbingPlatformStateNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        options.useFullNames ? full : abbrev;
       return {
-        gplx: this._grabbedPlatformLastX,
-        gply: this._grabbedPlatformLastY,
-      };
+        [getKey('gplx', 'grabbedPlatformLastX')]: this._grabbedPlatformLastX,
+        [getKey('gply', 'grabbedPlatformLastY')]: this._grabbedPlatformLastY,
+      } as GrabbingPlatformStateNetworkSyncData;
     }
 
     updateFromNetworkSyncData(data: GrabbingPlatformStateNetworkSyncData) {
-      this._grabbedPlatformLastX = data.gplx;
-      this._grabbedPlatformLastY = data.gply;
+      if (data.gplx !== undefined) this._grabbedPlatformLastX = data.gplx;
+      if (data.gply !== undefined) this._grabbedPlatformLastY = data.gply;
     }
 
     toString(): String {
@@ -2552,7 +2675,9 @@ namespace gdjs {
       }
     }
 
-    getNetworkSyncData(): OnLadderStateNetworkSyncData {
+    getNetworkSyncData(
+      _options: GetNetworkSyncDataOptions
+    ): OnLadderStateNetworkSyncData {
       return {};
     }
 

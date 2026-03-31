@@ -218,6 +218,13 @@ import {
   setEditorHotReloadNeeded,
   isEditorHotReloadNeeded,
 } from '../EmbeddedGame/EmbeddedGameFrame';
+import {
+  SimulationRuntimeManager,
+  setGlobalSimulationRunner,
+  clearGlobalSimulationRunner,
+  getGlobalSimulationRunner,
+  setGlobalSimulationManager,
+} from '../AiGeneration/SimulationRuntimeManager';
 import useHomePageSwitch from './useHomePageSwitch';
 import { useNavigationToEvent } from './UseNavigationToEvent';
 import useNavigateFromGlobalSearch from './UseNavigateFromGlobalSearch';
@@ -532,6 +539,10 @@ const MainFrame = (props: Props): React.MixedElement => {
   const eventsFunctionsExtensionsContext = React.useContext(
     EventsFunctionsExtensionsContext
   );
+  const simulationManagerRef = React.useRef<SimulationRuntimeManager | null>(
+    null
+  );
+
   const previewDebuggerServer =
     _previewLauncher.current &&
     _previewLauncher.current.getPreviewDebuggerServer();
@@ -545,6 +556,53 @@ const MainFrame = (props: Props): React.MixedElement => {
     clearEditorUncaughtError,
     hardReloadAllPreviews,
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
+
+  React.useEffect(
+    () => {
+      if (!previewDebuggerServer) {
+        console.log(
+          '[SimulationRunner] Waiting: no previewDebuggerServer yet.'
+        );
+        return;
+      }
+      const previewLauncher = _previewLauncher.current;
+      if (!previewLauncher) {
+        console.log('[SimulationRunner] Waiting: no previewLauncher yet.');
+        return;
+      }
+      if (!previewLauncher.launchSimulationPreview) {
+        console.warn(
+          '[SimulationRunner] previewLauncher does not support launchSimulationPreview (desktop IDE?).',
+          previewLauncher
+        );
+        return;
+      }
+
+      const launchSimulationPreview = previewLauncher.launchSimulationPreview.bind(
+        previewLauncher
+      );
+      const manager = new SimulationRuntimeManager({
+        previewDebuggerServer,
+        onLaunchSimulationPreview: launchSimulationPreview,
+        getShowPreview: () => preferences.values.showSimulationPreview,
+      });
+
+      simulationManagerRef.current = manager;
+      setGlobalSimulationManager(manager);
+      setGlobalSimulationRunner((project, sceneName, scriptBody, timeoutMs) =>
+        manager.runSimulation(project, sceneName, scriptBody, timeoutMs)
+      );
+
+      return () => {
+        simulationManagerRef.current = null;
+        setGlobalSimulationManager(null);
+        clearGlobalSimulationRunner();
+        manager.destroy();
+      };
+    },
+    [previewDebuggerServer] // eslint-disable-line react-hooks/exhaustive-deps
+  );
+
   const {
     ensureInteractionHappened,
     renderOpenConfirmDialog,
@@ -681,6 +739,34 @@ const MainFrame = (props: Props): React.MixedElement => {
    * See `isCurrentProjectFresh`.
    */
   const currentProjectRef = useStableUpToDateRef(currentProject);
+
+  React.useEffect(
+    () => {
+      // $FlowFixMe[prop-missing]
+      window.__gdTestSimulation = (
+        sceneName: string,
+        scriptBody: string,
+        timeoutMs?: number
+      ) => {
+        const runner = getGlobalSimulationRunner();
+        if (!runner) {
+          return Promise.reject(
+            new Error('No simulation runner available. Open a project first.')
+          );
+        }
+        const project = currentProjectRef.current;
+        if (!project) {
+          return Promise.reject(new Error('No project loaded.'));
+        }
+        return runner(project, sceneName, scriptBody, timeoutMs || 15000);
+      };
+      return () => {
+        // $FlowFixMe[prop-missing]
+        delete window.__gdTestSimulation;
+      };
+    },
+    [currentProjectRef]
+  );
 
   const getEditorOpeningOptions = React.useCallback(
     ({
@@ -1726,6 +1812,10 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const notifyChangesToInGameEditor = React.useCallback(
     (hotReloadSteps: HotReloadSteps) => {
+      // Notify the simulation manager so the next simulation run uses fresh data.
+      if (simulationManagerRef.current) {
+        simulationManagerRef.current.setHotReloadNeeded(hotReloadSteps);
+      }
       let hasReloadIfNeeded = false;
       for (const paneIdentifier in state.editorTabs.panes) {
         const currentTab = getCurrentTabForPane(
@@ -5047,6 +5137,17 @@ const MainFrame = (props: Props): React.MixedElement => {
     onEffectAdded: onEffectAdded,
     onObjectListsModified: onObjectListsModified,
     onExternalLayoutAssociationChanged,
+    onInstancesModifiedForSimulation: () => {
+      if (simulationManagerRef.current) {
+        simulationManagerRef.current.setHotReloadNeeded({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: false,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['instances-modified'],
+        });
+      }
+    },
     gamesList: gamesList,
     triggerHotReloadInGameEditorIfNeeded,
     onRestartInGameEditor,

@@ -24,10 +24,16 @@ namespace gdjs {
    * @category Objects > Tiled Sprite
    */
   export type TiledSpriteNetworkSyncDataType = {
-    xo: number;
-    yo: number;
-    op: number;
-    color: string;
+    xo?: number;
+    xOffset?: number;
+
+    yo?: number;
+    yOffset?: number;
+
+    op?: number;
+    opacity?: number;
+
+    color?: string;
   };
 
   /**
@@ -99,11 +105,13 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptons: GetNetworkSyncDataOptions
     ): TiledSpriteNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptons.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptons),
-        xo: this.getXOffset(),
-        yo: this.getYOffset(),
-        op: this.getOpacity(),
+        [getKey('xo', 'xOffset')]: this.getXOffset(),
+        [getKey('yo', 'yOffset')]: this.getYOffset(),
+        [getKey('op', 'opacity')]: this.getOpacity(),
         color: this.getColor(),
       };
     }

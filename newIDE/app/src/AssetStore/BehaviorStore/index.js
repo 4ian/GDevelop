@@ -11,12 +11,14 @@ import {
 import { type BehaviorShortHeader } from '../../Utils/GDevelopServices/Extension';
 import { BehaviorStoreContext } from './BehaviorStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
+import { GridSearchResults } from '../../UI/Search/GridSearchResults';
 import { BehaviorListItem } from './BehaviorListItem';
+import { BehaviorGridItem } from './BehaviorGridItem';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import { sendExtensionAddedToProject } from '../../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
-import { t } from '@lingui/macro';
-import { ColumnStackLayout } from '../../UI/Layout';
+import { t, Trans } from '@lingui/macro';
+import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import { Column, Line } from '../../UI/Grid';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
@@ -29,6 +31,22 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import ExtensionInstallDialog from '../ExtensionStore/ExtensionInstallDialog';
 import { getIDEVersion } from '../../Version';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
+import ViewList from '@material-ui/icons/ViewList';
+import ViewModule from '@material-ui/icons/ViewModule';
+import Tooltip from '@material-ui/core/Tooltip';
+import ButtonBase from '@material-ui/core/ButtonBase';
+import Text from '../../UI/Text';
+import FolderIcon from '../../UI/CustomSvgIcons/Folder';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import SettingsIcon from '@material-ui/icons/Settings';
+import PhotoCameraIcon from '@material-ui/icons/PhotoCamera';
+import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
+import CategoryIcon from '@material-ui/icons/Category';
+import KeyboardIcon from '@material-ui/icons/Keyboard';
+import DirectionsRunIcon from '@material-ui/icons/DirectionsRun';
+import PeopleIcon from '@material-ui/icons/People';
+import WebIcon from '@material-ui/icons/Web';
+import PaletteIcon from '@material-ui/icons/Palette';
 
 export const useExtensionUpdateAlertDialog = (): ((
   project: gdProject,
@@ -71,10 +89,183 @@ type Props = {|
   deprecatedBehaviorMetadataList: Array<BehaviorShortHeader>,
   onInstall: (behaviorShortHeader: BehaviorShortHeader) => Promise<boolean>,
   onChoose: (behaviorType: string) => void,
+  onCategoryFolderNavigationChange?: (isInsideCategoryFolder: boolean) => void,
+  backToCategoryFoldersSignal?: number,
 |};
 
 const getBehaviorType = (behaviorShortHeader: BehaviorShortHeader) =>
   behaviorShortHeader.type;
+
+const NONE_CATEGORY_VALUE = '__none__';
+const ALL_CATEGORIES_VALUE = '__all__';
+
+const getBehaviorCategoryIcon = (category: string): React.Node => {
+  const normalizedCategory = category.toLowerCase();
+
+  if (normalizedCategory === 'advanced') return <SettingsIcon />;
+  if (normalizedCategory === 'camera') return <PhotoCameraIcon />;
+  if (normalizedCategory === 'game mechanic') return <SportsEsportsIcon />;
+  if (normalizedCategory === 'general') return <CategoryIcon />;
+  if (normalizedCategory === 'input') return <KeyboardIcon />;
+  if (normalizedCategory === 'movement') return <DirectionsRunIcon />;
+  if (normalizedCategory === 'players') return <PeopleIcon />;
+  if (normalizedCategory === 'user interface') return <WebIcon />;
+  if (normalizedCategory === 'visual effect') return <PaletteIcon />;
+
+  return <FolderIcon />;
+};
+
+const categoryItemStyles = {
+  button: { width: '100%' },
+  listContainer: {
+    display: 'flex',
+    textAlign: 'left',
+    overflow: 'hidden',
+    width: '100%',
+  },
+  gridWrapper: {
+    paddingTop: 4,
+    paddingRight: 1,
+    paddingBottom: 4,
+    paddingLeft: 1,
+    boxSizing: 'border-box',
+  },
+  gridButton: {
+    width: '100%',
+    display: 'block',
+    aspectRatio: '1 / 0.88',
+  },
+  gridContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 14,
+    padding: 24,
+    boxSizing: 'border-box',
+  },
+};
+
+const BehaviorCategoryListItem = ({
+  category,
+  onChoose,
+  onHeightComputed,
+}: {|
+  category: string,
+  onChoose: () => void,
+  onHeightComputed: number => void,
+|}): React.Node => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const [hover, setHover] = React.useState(false);
+  const containerRef = React.useRef<?HTMLDivElement>(null);
+  React.useLayoutEffect(() => {
+    if (containerRef.current)
+      onHeightComputed(
+        Math.ceil(containerRef.current.getBoundingClientRect().height)
+      );
+  });
+
+  return (
+    <ButtonBase
+      style={categoryItemStyles.button}
+      onClick={onChoose}
+      focusRipple
+    >
+      <div
+        ref={containerRef}
+        style={
+          hover
+            ? {
+                ...categoryItemStyles.listContainer,
+                ...gdevelopTheme.list.hover,
+              }
+            : categoryItemStyles.listContainer
+        }
+        onPointerEnter={() => setHover(true)}
+        onPointerLeave={() => setHover(false)}
+      >
+        <LineStackLayout alignItems="center">
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {React.cloneElement(getBehaviorCategoryIcon(category), {
+              style: { fontSize: 48 },
+            })}
+          </div>
+          <Column expand>
+            <Text noMargin style={{ fontSize: '1.2rem', fontWeight: 600 }}>
+              {category}
+            </Text>
+            <Text noMargin size="body2" color="secondary">
+              <Trans>Show behaviors in this category</Trans>
+            </Text>
+          </Column>
+        </LineStackLayout>
+      </div>
+    </ButtonBase>
+  );
+};
+
+const BehaviorCategoryGridItem = ({
+  category,
+  onChoose,
+  onHeightComputed,
+}: {|
+  category: string,
+  onChoose: () => void,
+  onHeightComputed: number => void,
+|}): React.Node => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const [hover, setHover] = React.useState(false);
+  const containerRef = React.useRef<?HTMLDivElement>(null);
+  React.useLayoutEffect(() => {
+    if (containerRef.current)
+      onHeightComputed(
+        Math.ceil(containerRef.current.getBoundingClientRect().height)
+      );
+  });
+
+  return (
+    <div ref={containerRef} style={categoryItemStyles.gridWrapper}>
+      <ButtonBase
+        style={categoryItemStyles.gridButton}
+        onClick={onChoose}
+        focusRipple
+      >
+        <div
+          style={{
+            ...categoryItemStyles.gridContainer,
+            backgroundColor: hover
+              ? gdevelopTheme.list.hover.backgroundColor
+              : gdevelopTheme.list.itemsBackgroundColor,
+          }}
+          onPointerEnter={() => setHover(true)}
+          onPointerLeave={() => setHover(false)}
+        >
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {React.cloneElement(getBehaviorCategoryIcon(category), {
+              style: { fontSize: 136 },
+            })}
+          </div>
+          <Text
+            noMargin
+            allowBrowserAutoTranslate={false}
+            style={{
+              fontSize: '1.8rem',
+              fontWeight: 700,
+              textAlign: 'center',
+              lineHeight: '1.2',
+            }}
+          >
+            {category}
+          </Text>
+        </div>
+      </ButtonBase>
+    </div>
+  );
+};
 
 export const BehaviorStore = ({
   isInstalling,
@@ -86,8 +277,13 @@ export const BehaviorStore = ({
   deprecatedBehaviorMetadataList,
   onInstall,
   onChoose,
+  onCategoryFolderNavigationChange,
+  backToCategoryFoldersSignal,
 }: Props): React.Node => {
   const preferences = React.useContext(PreferencesContext);
+  const [viewMode, setViewMode] = React.useState<'list' | 'grid'>(
+    preferences.values.behaviorStoreViewMode || 'list'
+  );
   const [
     selectedBehaviorShortHeader,
     setSelectedBehaviorShortHeader,
@@ -105,6 +301,18 @@ export const BehaviorStore = ({
   } = React.useContext(BehaviorStoreContext);
 
   const [showDeprecated, setShowDeprecated] = React.useState(false);
+  const [
+    selectedCategoryValue,
+    setSelectedCategoryValue,
+  ] = React.useState<string>(chosenCategory || ALL_CATEGORIES_VALUE);
+
+  const handleViewModeChange = React.useCallback(
+    (newMode: 'list' | 'grid') => {
+      setViewMode(newMode);
+      preferences.setBehaviorStoreViewMode(newMode);
+    },
+    [preferences]
+  );
 
   React.useEffect(
     () => {
@@ -132,7 +340,50 @@ export const BehaviorStore = ({
     [fetchBehaviors]
   );
 
-  const filteredSearchResults = searchResults ? searchResults : null;
+  const filteredSearchResults = React.useMemo(
+    () => {
+      if (!searchResults) return null;
+      if (
+        selectedCategoryValue === NONE_CATEGORY_VALUE ||
+        selectedCategoryValue === ALL_CATEGORIES_VALUE
+      ) {
+        return searchResults;
+      }
+
+      return searchResults.filter(
+        ({ item }) => item.category === selectedCategoryValue
+      );
+    },
+    [searchResults, selectedCategoryValue]
+  );
+  const shouldShowCategoryFolders =
+    selectedCategoryValue === NONE_CATEGORY_VALUE && !searchText.trim();
+  const isInsideCategoryFolder =
+    selectedCategoryValue !== NONE_CATEGORY_VALUE &&
+    selectedCategoryValue !== ALL_CATEGORIES_VALUE;
+  const categorySearchItems = React.useMemo(
+    () => allCategories.filter(Boolean),
+    [allCategories]
+  );
+
+  React.useEffect(
+    () => {
+      if (onCategoryFolderNavigationChange) {
+        onCategoryFolderNavigationChange(isInsideCategoryFolder);
+      }
+    },
+    [isInsideCategoryFolder, onCategoryFolderNavigationChange]
+  );
+
+  React.useEffect(
+    () => {
+      if (!backToCategoryFoldersSignal) return;
+      setSelectedCategoryValue(NONE_CATEGORY_VALUE);
+      setChosenCategory('');
+      setSearchText('');
+    },
+    [backToCategoryFoldersSignal, setChosenCategory, setSearchText]
+  );
 
   const getExtensionsMatches = React.useCallback(
     (extensionShortHeader: BehaviorShortHeader): SearchMatch[] => {
@@ -235,12 +486,24 @@ export const BehaviorStore = ({
         <ColumnStackLayout noMargin>
           <ResponsiveLineStackLayout noMargin>
             <SearchBarSelectField
-              value={chosenCategory}
+              value={selectedCategoryValue}
               onChange={(e, i, value: string) => {
-                setChosenCategory(value);
+                setSelectedCategoryValue(value);
+                if (
+                  value === NONE_CATEGORY_VALUE ||
+                  value === ALL_CATEGORIES_VALUE
+                ) {
+                  setChosenCategory('');
+                } else {
+                  setChosenCategory(value);
+                }
               }}
             >
-              <SelectOption value="" label={t`All categories`} />
+              <SelectOption value={NONE_CATEGORY_VALUE} label={t`None`} />
+              <SelectOption
+                value={ALL_CATEGORIES_VALUE}
+                label={t`All categories`}
+              />
               {allCategories.map(category => (
                 <SelectOption
                   key={category}
@@ -260,6 +523,24 @@ export const BehaviorStore = ({
                   autoFocus="desktop"
                 />
               </Column>
+              <Tooltip
+                title={
+                  viewMode === 'list' ? (
+                    <Trans>Switch to grid view</Trans>
+                  ) : (
+                    <Trans>Switch to list view</Trans>
+                  )
+                }
+              >
+                <IconButton
+                  size="small"
+                  onClick={() =>
+                    handleViewModeChange(viewMode === 'list' ? 'grid' : 'list')
+                  }
+                >
+                  {viewMode === 'list' ? <ViewModule /> : <ViewList />}
+                </IconButton>
+              </Tooltip>
               <ElementWithMenu
                 key="menu"
                 element={
@@ -296,40 +577,107 @@ export const BehaviorStore = ({
           </ResponsiveLineStackLayout>
           {DismissableTutorialMessage}
         </ColumnStackLayout>
-        <ListSearchResults
-          disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
-          onRetry={fetchBehaviors}
-          error={error}
-          searchItems={
-            filteredSearchResults &&
-            filteredSearchResults.map(({ item }) => item)
-          }
-          getSearchItemUniqueId={getBehaviorType}
-          // $FlowFixMe[missing-local-annot]
-          renderSearchItem={(behaviorShortHeader, onHeightComputed) => (
-            <BehaviorListItem
-              id={
-                'behavior-item-' + behaviorShortHeader.type.replace(/:/g, '-')
-              }
-              key={behaviorShortHeader.type}
-              objectType={objectType}
-              objectBehaviorsTypes={objectBehaviorsTypes}
-              isChildObject={isChildObject}
-              onHeightComputed={onHeightComputed}
-              behaviorShortHeader={behaviorShortHeader}
-              matches={getExtensionsMatches(behaviorShortHeader)}
-              onChoose={() => {
-                installAndChoose(behaviorShortHeader);
-              }}
-              onShowDetails={() => {
-                if (behaviorShortHeader.headerUrl) {
-                  setSelectedBehaviorShortHeader(behaviorShortHeader);
-                }
-              }}
-              platform={project.getCurrentPlatform()}
-            />
-          )}
-        />
+        {viewMode === 'list' ? (
+          <ListSearchResults
+            disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
+            onRetry={fetchBehaviors}
+            error={error}
+            columnCount={2}
+            searchItems={
+              shouldShowCategoryFolders
+                ? categorySearchItems
+                : filteredSearchResults &&
+                  filteredSearchResults.map(({ item }) => item)
+            }
+            getSearchItemUniqueId={
+              shouldShowCategoryFolders ? category => category : getBehaviorType
+            }
+            // $FlowFixMe[missing-local-annot]
+            renderSearchItem={(item, onHeightComputed) =>
+              shouldShowCategoryFolders ? (
+                <BehaviorCategoryListItem
+                  key={item}
+                  category={item}
+                  onHeightComputed={onHeightComputed}
+                  onChoose={() => {
+                    setSelectedCategoryValue(item);
+                    setChosenCategory(item);
+                  }}
+                />
+              ) : (
+                <BehaviorListItem
+                  id={'behavior-item-' + item.type.replace(/:/g, '-')}
+                  key={item.type}
+                  objectType={objectType}
+                  objectBehaviorsTypes={objectBehaviorsTypes}
+                  isChildObject={isChildObject}
+                  onHeightComputed={onHeightComputed}
+                  behaviorShortHeader={item}
+                  matches={getExtensionsMatches(item)}
+                  onChoose={() => {
+                    installAndChoose(item);
+                  }}
+                  onShowDetails={() => {
+                    if (item.headerUrl) {
+                      setSelectedBehaviorShortHeader(item);
+                    }
+                  }}
+                  platform={project.getCurrentPlatform()}
+                />
+              )
+            }
+          />
+        ) : (
+          <GridSearchResults
+            disableAutoTranslate
+            onRetry={fetchBehaviors}
+            error={error}
+            searchItems={
+              shouldShowCategoryFolders
+                ? categorySearchItems
+                : filteredSearchResults &&
+                  filteredSearchResults.map(({ item }) => item)
+            }
+            getSearchItemUniqueId={
+              shouldShowCategoryFolders ? category => category : getBehaviorType
+            }
+            columnCount={3}
+            // $FlowFixMe[missing-local-annot]
+            renderSearchItem={(item, onHeightComputed) =>
+              shouldShowCategoryFolders ? (
+                <BehaviorCategoryGridItem
+                  key={item}
+                  category={item}
+                  onHeightComputed={onHeightComputed}
+                  onChoose={() => {
+                    setSelectedCategoryValue(item);
+                    setChosenCategory(item);
+                  }}
+                />
+              ) : (
+                <BehaviorGridItem
+                  id={'behavior-grid-item-' + item.type.replace(/:/g, '-')}
+                  key={item.type}
+                  objectType={objectType}
+                  objectBehaviorsTypes={objectBehaviorsTypes}
+                  isChildObject={isChildObject}
+                  onHeightComputed={onHeightComputed}
+                  behaviorShortHeader={item}
+                  matches={getExtensionsMatches(item)}
+                  onChoose={() => {
+                    installAndChoose(item);
+                  }}
+                  onShowDetails={() => {
+                    if (item.headerUrl) {
+                      setSelectedBehaviorShortHeader(item);
+                    }
+                  }}
+                  platform={project.getCurrentPlatform()}
+                />
+              )
+            }
+          />
+        )}
       </ColumnStackLayout>
       {!!selectedBehaviorShortHeader && (
         <ExtensionInstallDialog

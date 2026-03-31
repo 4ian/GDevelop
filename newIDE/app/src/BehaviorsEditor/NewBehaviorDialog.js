@@ -55,6 +55,13 @@ export default function NewBehaviorDialog({
   onExtensionInstalled,
 }: Props): null | React.Node {
   const [isInstalling, setIsInstalling] = React.useState(false);
+  const [isInsideCategoryFolder, setIsInsideCategoryFolder] = React.useState(
+    false
+  );
+  const [
+    backToCategoryFoldersSignal,
+    setBackToCategoryFoldersSignal,
+  ] = React.useState(0);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     translatedExtensionShortHeadersByName: extensionShortHeadersByName,
@@ -246,6 +253,16 @@ export default function NewBehaviorDialog({
         <Dialog
           title={<Trans>Add a new behavior to the object</Trans>}
           actions={[
+            isInsideCategoryFolder ? (
+              <FlatButton
+                key="back"
+                label={<Trans>Back</Trans>}
+                primary={false}
+                onClick={() =>
+                  setBackToCategoryFoldersSignal(previous => previous + 1)
+                }
+              />
+            ) : null,
             <FlatButton
               key="close"
               label={<Trans>Close</Trans>}
@@ -272,6 +289,8 @@ export default function NewBehaviorDialog({
             onChoose={behaviorType => chooseBehavior(i18n, behaviorType)}
             installedBehaviorMetadataList={installedBehaviorMetadataList}
             deprecatedBehaviorMetadataList={deprecatedBehaviorMetadataList}
+            onCategoryFolderNavigationChange={setIsInsideCategoryFolder}
+            backToCategoryFoldersSignal={backToCategoryFoldersSignal}
           />
         </Dialog>
       )}

@@ -57,7 +57,14 @@ let loadedOrLoadingThreeMaterials: ResourcePromise<THREE.Material> = {};
 let loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> = {};
 let spineAtlasPromises: ResourcePromise<SpineTextureAtlasOrLoadingError> = {};
 let spineDataPromises: ResourcePromise<SpineDataOrLoadingError> = {};
+
+/** Promise to serialize reloads of resources, to avoid race conditions. */
 let ongoingResourceReloads: Promise<void> | null = null;
+
+/**
+ * Ensure only one reload of a resource is being done at a time.
+ * Avoid race conditions when multiple SceneEditors are open.
+ */
 let pendingResourceReloadPromises: {
   [resourceName: string]: Promise<void>,
 } = {};

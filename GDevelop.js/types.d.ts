@@ -1140,7 +1140,7 @@ export class ResourcesContainer extends EmscriptenObject {
   getResource(name: string): Resource;
   getResourceAt(index: number): Resource;
   getResourceNameWithOrigin(originName: string, originIdentifier: string): string;
-  getResourceNameWithFile(file: string): string;
+  getResourceNamesWithFile(file: string): VectorString;
   addResource(res: Resource): boolean;
   removeResource(name: string): void;
   renameResource(oldName: string, name: string): void;

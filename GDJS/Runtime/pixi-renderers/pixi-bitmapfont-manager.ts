@@ -200,7 +200,9 @@ namespace gdjs {
           const oldestUnloadedPixiBitmapFontName =
             this._pixiBitmapFontsToUninstall.shift() as string;
 
-          PIXI.BitmapFont.uninstall(oldestUnloadedPixiBitmapFontName);
+          if (PIXI.BitmapFont.available[oldestUnloadedPixiBitmapFontName]) {
+            PIXI.BitmapFont.uninstall(oldestUnloadedPixiBitmapFontName);
+          }
           logger.log(
             'Bitmap Text',
             'Uninstalled BitmapFont "' +
@@ -375,7 +377,9 @@ namespace gdjs {
         const bitmapFontInstallKey = this._pixiBitmapFontsToUninstall[index];
 
         if (bitmapFontInstallKey.startsWith(resourceData.name + '@')) {
-          PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+          if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
+            PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+          }
           this._pixiBitmapFontsToUninstall.splice(index, 1);
           index--;
         }

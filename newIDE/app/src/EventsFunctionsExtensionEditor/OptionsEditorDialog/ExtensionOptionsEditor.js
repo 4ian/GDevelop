@@ -1,15 +1,12 @@
 //@flow
 import React from 'react';
-import axios from 'axios';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
-import TextField from '../../UI/TextField';
 import { ColumnStackLayout } from '../../UI/Layout';
-import SemiControlledTextField from '../../UI/SemiControlledTextField';
-
+import { Column } from '../../UI/Grid';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import {
   getHelpLink,
@@ -17,10 +14,15 @@ import {
   isDocumentationAbsoluteUrl,
 } from '../../Utils/HelpLink';
 import { UsersAutocomplete } from '../../Profile/UsersAutocomplete';
-import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 import { CompactIconField } from './CompactIconField';
+import CompactPropertiesEditorRowField from '../../CompactPropertiesEditor/CompactPropertiesEditorRowField';
+import CompactTextField from '../../UI/CompactTextField';
+import { CompactTextAreaField } from '../../UI/CompactTextAreaField';
+import CompactSemiControlledTextField from '../../UI/CompactSemiControlledTextField';
+import CompactSelectField from '../../UI/CompactSelectField';
+import { MarkdownText } from '../../UI/MarkdownText';
 
 type HelpPathTextFieldProps = {|
   i18n: I18nType,
@@ -42,26 +44,34 @@ const HelpPathTextField = ({
           )
         : i18n._(t`This is link to a webpage.`)) +
       ` [${i18n._(t`Click here to test the link.`)}](${getHelpLink(helpPath)})`
-    : i18n._(
-        t`This can either be a URL to a web page, or a path starting with a slash that will be opened in the GDevelop wiki. Leave empty if there is no help page, although it's recommended you eventually write one if you distribute the extension.`
-      );
+    : '';
+  const hasError = !!helpPath && !isAbsoluteUrl && !isRelativePath;
 
   return (
-    <TextField
-      floatingLabelText={<Trans>Help page URL</Trans>}
-      value={helpPath}
-      onChange={(e, text) => {
-        onChangeHelpPath(text);
-      }}
-      errorText={
-        !!helpPath && !isAbsoluteUrl && !isRelativePath ? (
-          <Trans>
-            This is not a URL starting with "http://" or "https://".
-          </Trans>
-        ) : null
+    <CompactPropertiesEditorRowField
+      label={i18n._(t`Help page URL`)}
+      markdownDescription={i18n._(
+        t`This can either be a URL to a web page, or a path starting with a slash that will be opened in the GDevelop wiki. Leave empty if there is no help page, although it's recommended you eventually write one if you distribute the extension.`
+      )}
+      field={
+        <Column noMargin expand>
+          <CompactSemiControlledTextField
+            value={helpPath}
+            onChange={text => {
+              onChangeHelpPath(text);
+            }}
+            errored={hasError}
+            errorText={
+              hasError ? (
+                <Trans>
+                  This is not a URL starting with "http://" or "https://".
+                </Trans>
+              ) : null
+            }
+          />
+          {helperText && !hasError && <MarkdownText source={helperText} />}
+        </Column>
       }
-      helperMarkdownText={helperText}
-      fullWidth
     />
   );
 };
@@ -83,11 +93,15 @@ export const ExtensionOptionsEditor = ({
     <I18n>
       {({ i18n }) => (
         <ColumnStackLayout noMargin expand>
-          <TextField
-            floatingLabelText={<Trans>Name</Trans>}
-            value={eventsFunctionsExtension.getName()}
-            disabled
-            fullWidth
+          <CompactPropertiesEditorRowField
+            label={i18n._(t`Name`)}
+            field={
+              <CompactTextField
+                value={eventsFunctionsExtension.getName()}
+                onChange={() => {}}
+                disabled
+              />
+            }
           />
           <CompactIconField
             onLoadChange={onLoadChange}
@@ -102,50 +116,98 @@ export const ExtensionOptionsEditor = ({
               eventsFunctionsExtension.setIconUrl(value);
             }}
           />
-          <TextField
-            floatingLabelText={<Trans>Name displayed in editor</Trans>}
-            value={eventsFunctionsExtension.getFullName()}
-            onChange={(e, text) => {
-              eventsFunctionsExtension.setFullName(text);
-              forceUpdate();
-            }}
-            fullWidth
+          <CompactPropertiesEditorRowField
+            label={i18n._(t`Name displayed in editor`)}
+            field={
+              <CompactTextField
+                value={eventsFunctionsExtension.getFullName()}
+                onChange={(e, text) => {
+                  eventsFunctionsExtension.setFullName(text);
+                  forceUpdate();
+                }}
+              />
+            }
           />
-          <TextField
-            floatingLabelText={<Trans>Short description</Trans>}
+          <CompactTextAreaField
+            label={i18n._(t`Short description`)}
             value={eventsFunctionsExtension.getShortDescription()}
-            onChange={(e, text) => {
+            onChange={text => {
               eventsFunctionsExtension.setShortDescription(text);
               forceUpdate();
             }}
-            multiline
-            fullWidth
             rows={2}
-            rowsMax={2}
           />
-          <TextField
-            floatingLabelText={<Trans>Description (markdown supported)</Trans>}
+          <CompactTextAreaField
+            label={i18n._(t`Description (markdown supported)`)}
             value={eventsFunctionsExtension.getDescription()}
-            onChange={(e, text) => {
+            onChange={text => {
               eventsFunctionsExtension.setDescription(text);
               forceUpdate();
             }}
-            multiline
-            fullWidth
-            rows={5}
-            rowsMax={15}
-            helperMarkdownText={i18n._(
+            placeholder={i18n._(
               t`Explain and give some examples of what can be achieved with this extension.`
             )}
+            rows={6}
           />
-          <TextField
-            floatingLabelText={<Trans>Version</Trans>}
-            value={eventsFunctionsExtension.getVersion()}
-            onChange={(e, text) => {
-              eventsFunctionsExtension.setVersion(text);
+          <CompactPropertiesEditorRowField
+            label={i18n._(t`Version`)}
+            field={
+              <CompactTextField
+                value={eventsFunctionsExtension.getVersion()}
+                onChange={(e, text) => {
+                  eventsFunctionsExtension.setVersion(text);
+                  forceUpdate();
+                }}
+              />
+            }
+          />
+          <CompactPropertiesEditorRowField
+            label={i18n._(t`Dimension`)}
+            field={
+              <CompactSelectField
+                value={eventsFunctionsExtension.getDimension()}
+                onChange={value => {
+                  eventsFunctionsExtension.setDimension(value);
+                  forceUpdate();
+                }}
+              >
+                <SelectOption value="" label={t`Not applicable`} />
+                <SelectOption value="2D" label="2D" />
+                <SelectOption value="3D" label="3D" />
+                <SelectOption value="2D/3D" label="2D/3D" />
+              </CompactSelectField>
+            }
+          />
+          <CompactPropertiesEditorRowField
+            label={i18n._(t`Tags (comma separated)`)}
+            field={
+              <CompactSemiControlledTextField
+                value={eventsFunctionsExtension
+                  .getTags()
+                  .toJSArray()
+                  .join(', ')}
+                onChange={text => {
+                  const tags = eventsFunctionsExtension.getTags();
+                  tags.clear();
+                  text
+                    .split(',')
+                    .map(tag => tag.trim())
+                    .filter(Boolean)
+                    .forEach(tag => {
+                      tags.push_back(tag);
+                    });
+                  forceUpdate();
+                }}
+              />
+            }
+          />
+          <HelpPathTextField
+            i18n={i18n}
+            helpPath={eventsFunctionsExtension.getHelpPath()}
+            onChangeHelpPath={helpPath => {
+              eventsFunctionsExtension.setHelpPath(helpPath);
               forceUpdate();
             }}
-            fullWidth
           />
           <SemiControlledAutoComplete
             floatingLabelText={<Trans>Category (shown in the editor)</Trans>}
@@ -218,48 +280,6 @@ export const ExtensionOptionsEditor = ({
                 translatableValue: 'User interface',
               },
             ]}
-          />
-          <SelectField
-            floatingLabelText={<Trans>Dimension</Trans>}
-            value={eventsFunctionsExtension.getDimension()}
-            onChange={(e, i, value) => {
-              eventsFunctionsExtension.setDimension(value);
-              forceUpdate();
-            }}
-            fullWidth
-          >
-            <SelectOption value="" label={t`Not applicable`} />
-            <SelectOption value="2D" label="2D" />
-            <SelectOption value="3D" label="3D" />
-            <SelectOption value="2D/3D" label="2D/3D" />
-          </SelectField>
-          <SemiControlledTextField
-            floatingLabelText={<Trans>Tags (comma separated)</Trans>}
-            value={eventsFunctionsExtension
-              .getTags()
-              .toJSArray()
-              .join(', ')}
-            onChange={text => {
-              const tags = eventsFunctionsExtension.getTags();
-              tags.clear();
-              text
-                .split(',')
-                .map(tag => tag.trim())
-                .filter(Boolean)
-                .forEach(tag => {
-                  tags.push_back(tag);
-                });
-              forceUpdate();
-            }}
-            fullWidth
-          />
-          <HelpPathTextField
-            i18n={i18n}
-            helpPath={eventsFunctionsExtension.getHelpPath()}
-            onChangeHelpPath={helpPath => {
-              eventsFunctionsExtension.setHelpPath(helpPath);
-              forceUpdate();
-            }}
           />
           <UsersAutocomplete
             userIds={eventsFunctionsExtension.getAuthorIds().toJSArray()}

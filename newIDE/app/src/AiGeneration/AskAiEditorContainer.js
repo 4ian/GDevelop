@@ -725,8 +725,13 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                     callId: output.call_id,
                   }) === 'initialize_project'
               );
-            if (functionCallOutputs.length > 0) {
-              // Assume changes have happened, trigger unsaved changes.
+            if (
+              editorFunctionCallResults &&
+              editorFunctionCallResults.some(
+                result =>
+                  result.status === 'finished' && result.didModifyProject
+              )
+            ) {
               triggerUnsavedChanges();
             }
 

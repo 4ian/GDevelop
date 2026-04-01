@@ -34,6 +34,7 @@ export type EditorFunctionCallResult =
       call_id: string,
       success: boolean,
       output: any,
+      didModifyProject?: true,
     |}
   | {|
       status: 'aborted',
@@ -227,11 +228,17 @@ export const processEditorFunctionCalls = async ({
       }
 
       const { success, meta, ...output } = result;
+      const editorFunctionDef = editorFunction || editorFunctionWithoutProject;
+      const didModifyProject =
+        editorFunctionDef && editorFunctionDef.modifiesProject && success
+          ? true
+          : undefined;
       results.push({
         status: 'finished',
         call_id,
         success,
         output,
+        didModifyProject,
       });
 
       if (meta && meta.newSceneNames) {

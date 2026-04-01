@@ -59,6 +59,7 @@ export type EditorFunctionCallResult =
       call_id: string,
       success: boolean,
       output: any,
+      didModifyProject?: true,
     |}
   | {|
       status: 'aborted',
@@ -286,6 +287,8 @@ export type EditorFunction = {|
   launchFunction: (
     options: LaunchFunctionOptionsWithProject
   ) => Promise<EditorFunctionGenericOutput>,
+  /** True if this function modifies the project (triggers unsaved changes tracking). */
+  modifiesProject: boolean,
 |};
 
 /**
@@ -302,6 +305,8 @@ export type EditorFunctionWithoutProject = {|
   launchFunction: (
     options: LaunchFunctionOptionsWithoutProject
   ) => Promise<EditorFunctionGenericOutput>,
+  /** True if this function modifies the project (triggers unsaved changes tracking). */
+  modifiesProject: boolean,
 |};
 
 /**
@@ -1174,6 +1179,7 @@ const createOrReplaceObject: EditorFunction = {
       return createNewObject();
     }
   },
+  modifiesProject: true,
 };
 
 /**
@@ -1288,6 +1294,7 @@ const inspectObjectProperties: EditorFunction = {
 
     return output;
   },
+  modifiesProject: false,
 };
 
 const isPropertyForChangingObjectName = (propertyName: string): boolean => {
@@ -1593,6 +1600,7 @@ const changeObjectProperty: EditorFunction = {
 
     return makeMultipleChangesOutput(changes, warnings);
   },
+  modifiesProject: true,
 };
 
 /**
@@ -1810,6 +1818,7 @@ const addBehavior: EditorFunction = {
       ].join(' ')
     );
   },
+  modifiesProject: true,
 };
 
 /**
@@ -1884,6 +1893,7 @@ const removeBehavior: EditorFunction = {
         : `Removed behavior "${behavior_name}" from object "${object_name}".`
     );
   },
+  modifiesProject: true,
 };
 
 /**
@@ -1978,6 +1988,7 @@ const inspectBehaviorProperties: EditorFunction = {
       sharedProperties,
     };
   },
+  modifiesProject: false,
 };
 
 /**
@@ -2279,6 +2290,7 @@ const changeBehaviorProperty: EditorFunction = {
     // $FlowFixMe[incompatible-type]
     return makeMultipleChangesOutput(changes, warnings);
   },
+  modifiesProject: true,
 };
 
 /**
@@ -2402,6 +2414,7 @@ const describeInstances: EditorFunction = {
       };
     }
   },
+  modifiesProject: false,
 };
 
 const iterateOnInstances = (
@@ -2990,6 +3003,7 @@ const put2dInstances: EditorFunction = {
       return put2dResult;
     }
   },
+  modifiesProject: true,
 };
 
 /**
@@ -3516,6 +3530,7 @@ const put3dInstances: EditorFunction = {
       return put3dResult;
     }
   },
+  modifiesProject: true,
 };
 
 /**
@@ -3566,6 +3581,7 @@ const readSceneEvents: EditorFunction = {
       eventsAsText,
     };
   },
+  modifiesProject: false,
 };
 
 /**
@@ -3970,6 +3986,7 @@ See attached errors that happened when some changes were applied in the project.
       );
     }
   },
+  modifiesProject: true,
 };
 
 /**
@@ -4049,6 +4066,7 @@ const createScene: EditorFunction = {
       },
     };
   },
+  modifiesProject: true,
 };
 
 /**
@@ -4079,6 +4097,7 @@ const deleteScene: EditorFunction = {
 
     return makeGenericSuccess(`Deleted scene "${scene_name}".`);
   },
+  modifiesProject: true,
 };
 
 const serializeEffectProperties = (
@@ -4186,6 +4205,7 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
       }),
     };
   },
+  modifiesProject: false,
 };
 
 const isFuzzyMatch = (string1: string, string2: string) => {
@@ -4795,6 +4815,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
       };
     }
   },
+  modifiesProject: true,
 };
 
 const addOrEditVariable: EditorFunction = {
@@ -4942,6 +4963,7 @@ const addOrEditVariable: EditorFunction = {
         : `Properly edited variable "${variable_name_or_path}".`
     );
   },
+  modifiesProject: true,
 };
 
 const createOrUpdatePlan: EditorFunction = {
@@ -4955,6 +4977,7 @@ const createOrUpdatePlan: EditorFunction = {
       `Unable to create or update plan - this is handled server-side.`
     );
   },
+  modifiesProject: false,
 };
 
 const readFullDocs: EditorFunction = {
@@ -4973,6 +4996,7 @@ const readFullDocs: EditorFunction = {
       `Unable to read full documentation - continue with your existing GDevelop knowledge.`
     );
   },
+  modifiesProject: false,
 };
 
 const initializeProject: EditorFunctionWithoutProject = {
@@ -5060,6 +5084,7 @@ const initializeProject: EditorFunctionWithoutProject = {
       );
     }
   },
+  modifiesProject: true,
 };
 
 export const editorFunctions: { [string]: EditorFunction } = {

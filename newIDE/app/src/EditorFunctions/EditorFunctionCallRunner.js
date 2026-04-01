@@ -8,6 +8,7 @@ import {
   type EditorFunctionWithoutProject,
   type EditorCallbacks,
   type EditorFunctionCall,
+  type EditorFunctionCallResult,
   type EditorFunctionGenericOutput,
   type EventsGenerationOptions,
   type AssetSearchAndInstallOptions,
@@ -24,24 +25,7 @@ import {
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 
-export type EditorFunctionCallResult =
-  | {|
-      status: 'working',
-      call_id: string,
-    |}
-  | {|
-      status: 'finished',
-      call_id: string,
-      success: boolean,
-      output: any,
-      didModifyProject?: true,
-    |}
-  | {|
-      status: 'aborted',
-      call_id: string,
-    |};
-
-export type ProcessEditorFunctionCallsOptions = {|
+type ProcessEditorFunctionCallsOptions = {|
   project: ?gdProject,
   functionCalls: Array<EditorFunctionCall>,
   i18n: I18nType,

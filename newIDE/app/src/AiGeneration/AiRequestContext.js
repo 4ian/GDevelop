@@ -9,7 +9,7 @@ import {
   getAiRequests,
 } from '../Utils/GDevelopServices/Generation';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { type EditorFunctionCallResult } from '../EditorFunctions/EditorFunctionCallRunner';
+import { type EditorFunctionCallResult } from '../EditorFunctions';
 import Window from '../Utils/Window';
 import { AI_SETTINGS_FETCH_TIMEOUT } from '../Utils/GlobalFetchTimeouts';
 import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';

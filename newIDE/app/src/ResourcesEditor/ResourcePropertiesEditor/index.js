@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
@@ -29,6 +29,7 @@ type Props = {|
   resources: Array<gdResource>,
   onResourcePathUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,
+  i18n: I18nType,
 |};
 
 export type ResourcePropertiesEditorInterface = {| forceUpdate: () => void |};
@@ -56,6 +57,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
       resources,
       onResourcePathUpdated,
       resourceManagementProps,
+      i18n,
     },
     ref
   ) => {
@@ -125,7 +127,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
     const schema: Schema = React.useMemo(
       () => [
         {
-          name: 'Resource name',
+          name: i18n._(t`Resource name`),
           valueType: 'string',
           disabled: () => true,
           getValue: (resource: gdResource) => resource.getName(),
@@ -133,7 +135,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
             resource.setName(newValue),
         },
         {
-          name: 'File',
+          name: i18n._(t`File`),
           valueType: 'string',
           getValue: (resource: gdResource) => resource.getFile(),
           setValue: (resource: gdResource, newValue: string) => {
@@ -156,7 +158,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
               : undefined,
         },
       ],
-      [resourceSources, chooseResourcePath]
+      [resourceSources, chooseResourcePath, i18n]
     );
 
     const renderResourcesProperties = React.useCallback(

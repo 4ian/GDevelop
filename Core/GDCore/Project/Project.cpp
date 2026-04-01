@@ -1158,8 +1158,6 @@ void Project::SerializeTo(SerializerElement& element) const {
 
   extensionProperties.SerializeTo(propElement.AddChild("extensionProperties"));
   
-  playableDevicesElement.AddChild("").SetStringValue("mobile");
-
   SerializerElement& platformsElement = propElement.AddChild("platforms");
   platformsElement.ConsiderAsArrayOf("platform");
   for (std::size_t i = 0; i < platforms.size(); ++i) {

@@ -16,11 +16,11 @@ import {
   updateAiRequestMessage,
 } from '../Utils/GDevelopServices/Generation';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { processEditorFunctionCalls } from '../EditorFunctions/EditorFunctionCallRunner';
 import {
-  processEditorFunctionCalls,
+  type EditorCallbacks,
   type EditorFunctionCallResult,
-} from '../EditorFunctions/EditorFunctionCallRunner';
-import { type EditorCallbacks } from '../EditorFunctions';
+} from '../EditorFunctions';
 import {
   getFunctionCallNameByCallId,
   getFunctionCallOutputsFromEditorFunctionCallResults,

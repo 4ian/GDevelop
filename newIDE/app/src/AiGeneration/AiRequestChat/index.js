@@ -28,7 +28,7 @@ import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 import Link from '../../UI/Link';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
-import { type EditorFunctionCallResult } from '../../EditorFunctions/EditorFunctionCallRunner';
+import { type EditorFunctionCallResult } from '../../EditorFunctions';
 import { type EditorCallbacks } from '../../EditorFunctions';
 import {
   getFunctionCallOutputsFromEditorFunctionCallResults,

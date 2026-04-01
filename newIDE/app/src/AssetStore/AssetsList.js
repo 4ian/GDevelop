@@ -111,17 +111,28 @@ const getPageBreakAssetLowerIndex = (pageBreakIndex: number) =>
 const getPageBreakAssetUpperIndex = (pageBreakIndex: number) =>
   ASSETS_DISPLAY_LIMIT * (pageBreakIndex + 1);
 
+export const filterAssetShortHeadersByFolders = (
+  allAssetShortHeaders: AssetShortHeader[],
+  selectedFolders: string[]
+): AssetShortHeader[] => {
+  if (!selectedFolders.length) return allAssetShortHeaders;
+  return allAssetShortHeaders.filter(assetShortHeader =>
+    // Check that the asset has all the selected folders tags.
+    selectedFolders.every(folderTag =>
+      assetShortHeader.tags.includes(folderTag)
+    )
+  );
+};
+
 export const getAssetShortHeadersToDisplay = (
   allAssetShortHeaders: AssetShortHeader[],
   selectedFolders: string[],
   pageBreakIndex: number = 0
 ): AssetShortHeader[] => {
-  let assetShortHeaders = allAssetShortHeaders.filter(assetShortHeader => {
-    if (!selectedFolders.length) return true;
-    const allAssetTags = assetShortHeader.tags;
-    // Check that the asset has all the selected folders tags.
-    return selectedFolders.every(folderTag => allAssetTags.includes(folderTag));
-  });
+  let assetShortHeaders = filterAssetShortHeadersByFolders(
+    allAssetShortHeaders,
+    selectedFolders
+  );
   // Limit the number of displayed assets to avoid performance issues
   const pageBreakAssetLowerIndex = getPageBreakAssetLowerIndex(pageBreakIndex);
   const pageBreakAssetUpperIndex = Math.min(
@@ -154,6 +165,8 @@ const styles = {
   scrollView: {
     display: 'flex',
     flexDirection: 'column',
+    // Prevent horizontal scrollbars.
+    overflowX: 'hidden',
   },
   previewImageContainer: {
     display: 'flex',
@@ -340,6 +353,25 @@ const AssetsList: React.ComponentType<{
         };
       },
       [currentPage]
+    );
+    React.useEffect(
+      () => {
+        setPageBreakIndex(0);
+        if (currentPage) currentPage.pageBreakIndex = 0;
+      },
+      // selectedFolders is a new array reference each time a folder is selected,
+      // so this resets pagination whenever the folder selection changes.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [selectedFolders]
+    );
+    const folderFilteredAssetShortHeaders = React.useMemo<
+      Array<AssetShortHeader>
+    >(
+      () =>
+        assetShortHeaders
+          ? filterAssetShortHeadersByFolders(assetShortHeaders, selectedFolders)
+          : [],
+      [assetShortHeaders, selectedFolders]
     );
     const { windowSize, isLandscape } = useResponsiveWindowSize();
     const scrollView = React.useRef<?ScrollViewInterface>(null);
@@ -973,13 +1005,13 @@ const AssetsList: React.ComponentType<{
             !isAssetPackAudioOnly(openedAssetPack)) &&
           noResultComponent}
         {currentPage &&
-          assetShortHeaders &&
-          assetShortHeaders.length > getPageBreakAssetUpperIndex(0) && (
+          folderFilteredAssetShortHeaders.length >
+            getPageBreakAssetUpperIndex(0) && (
             <PageBreakNavigation
               currentPage={currentPage}
               pageBreakIndex={pageBreakIndex}
               setPageBreakIndex={setPageBreakIndex}
-              assetShortHeaders={assetShortHeaders}
+              assetShortHeaders={folderFilteredAssetShortHeaders}
               scrollView={scrollView.current}
             />
           )}

@@ -110,6 +110,13 @@ export function serializeToJSON(
 }
 
 /**
+ * POSIX / editor convention: text files end with a newline. Use when persisting `.json`.
+ */
+export function addFinalNewline(json: string): string {
+  return json.endsWith('\n') ? json : json + '\n';
+}
+
+/**
  * Tool function to restore a serializable object from a JS object.
  * Most gd.* objects are "serializable", meaning they have a serializeTo
  * and unserializeFrom method.

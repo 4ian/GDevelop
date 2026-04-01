@@ -15,7 +15,11 @@ import {
   openBlobDownloadUrl,
 } from '../Utils/BlobDownloadUrlHolder';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import { serializeToObjectAsset } from '../Utils/Serializer';
+import {
+  serializeToObjectAsset,
+  serializeToJSObject,
+  addFinalNewline,
+} from '../Utils/Serializer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { downloadUrlsToBlobs, type ItemResult } from '../Utils/BlobDownloader';
 import { useGenericRetryableProcessWithProgress } from '../Utils/UseGenericRetryableProcessWithProgress';
@@ -27,7 +31,6 @@ import {
 } from '../Utils/BrowserArchiver';
 import ResourcesLoader from '../ResourcesLoader';
 import { type ExtensionDependency } from '../Utils/GDevelopServices/Extension';
-import { serializeToJSObject } from '../Utils/Serializer';
 import { getIDEVersion } from '../Version';
 
 const gd: libGDevelop = global.gd;
@@ -206,7 +209,9 @@ const zipAssets = async (
         }
 
         textFiles.push({
-          text: JSON.stringify(serializedObject, null, 2),
+          text: addFinalNewline(
+            JSON.stringify(serializedObject, null, 2)
+          ),
           filePath: 'objects/' + path + object.getName() + '.asset.json',
         });
       })
@@ -225,7 +230,9 @@ const zipAssets = async (
         'serializeToExternal'
       );
       textFiles.push({
-        text: JSON.stringify(serializedExtension, null, 2),
+        text: addFinalNewline(
+          JSON.stringify(serializedExtension, null, 2)
+        ),
         filePath: 'extensions/' + extensionName + '.json',
       });
     }

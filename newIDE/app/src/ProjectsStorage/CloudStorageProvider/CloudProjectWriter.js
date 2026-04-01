@@ -17,7 +17,10 @@ import {
 } from '../../Utils/GDevelopServices/Project';
 import type { $AxiosError } from 'axios';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
-import { serializeToJSON } from '../../Utils/Serializer';
+import {
+  serializeToJSON,
+  addFinalNewline,
+} from '../../Utils/Serializer';
 import { serializeToJSONInBackground } from '../../Utils/BackgroundSerializer';
 import { t } from '@lingui/macro';
 import {
@@ -55,6 +58,8 @@ const zipProject = async ({
   } else {
     projectJson = serializeToJSON(project);
   }
+
+  projectJson = addFinalNewline(projectJson);
 
   const serializeToJSONEndTime = Date.now();
 

@@ -54,12 +54,23 @@ const SemiControlledRowInput = ({
   const inputRef = React.useRef<?HTMLInputElement>(null);
 
   /**
-   * When mounting the component, select content.
+   * When mounting the component, focus and select content.
+   * We use setTimeout to ensure this runs after any deferred focus restoration
+   * from MUI Modal (used by the context menu on web), which runs in a useEffect
+   * cleanup. Without this, MUI's focus restoration steals focus from the input
+   * right after it mounts (introduced in React 18).
    */
   React.useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.select();
-    }
+    const id = setTimeout(() => {
+      const input = inputRef.current;
+      if (input) {
+        // We focus and select the text here, and not with autoFocus on the input,
+        // to avoid issues with focus restoration from MUI Modal (used by the context menu on web)
+        input.focus();
+        input.select();
+      }
+    }, 0);
+    return () => clearTimeout(id);
   }, []);
 
   /**
@@ -79,7 +90,6 @@ const SemiControlledRowInput = ({
   return (
     <div className={classes.itemNameInputContainer}>
       <input
-        autoFocus
         ref={inputRef}
         type="text"
         className={classes.itemNameInput}

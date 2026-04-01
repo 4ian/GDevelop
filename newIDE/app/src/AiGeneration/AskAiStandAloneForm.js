@@ -21,7 +21,7 @@ import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from './AiRequestUtils';
-import { type EditorFunctionCallResult } from '../EditorFunctions/EditorFunctionCallRunner';
+import { type EditorFunctionCallResult } from '../EditorFunctions';
 import { useStableUpToDateRef } from '../Utils/UseStableUpToDateCallback';
 import {
   type NewProjectSetup,

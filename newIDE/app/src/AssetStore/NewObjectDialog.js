@@ -308,9 +308,9 @@ function NewObjectDialog({
     selectedFolders,
   } = shopNavigationState.getCurrentPage();
   const [
-    isAssetPackDialogInstallOpen,
-    setIsAssetPackDialogInstallOpen,
-  ] = React.useState(false);
+    assetShortHeadersToInstall,
+    setAssetShortHeadersToInstall,
+  ] = React.useState<?Array<AssetShortHeader>>(null);
   // Avoid memoizing the result of enumerateAssetStoreIds, as it does not get updated
   // when adding assets.
   const existingAssetStoreIds = enumerateAssetStoreIds(
@@ -423,6 +423,22 @@ function NewObjectDialog({
     [assetShortHeadersSearchResults, selectedFolders]
   );
 
+  const openAssetPackInstallDialog = React.useCallback(
+    () => {
+      const currentPage = shopNavigationState.getCurrentPage();
+      setAssetShortHeadersToInstall(
+        assetShortHeadersSearchResults
+          ? getAssetShortHeadersToDisplay(
+              assetShortHeadersSearchResults,
+              currentPage.selectedFolders,
+              currentPage.pageBreakIndex || 0
+            )
+          : []
+      );
+    },
+    [shopNavigationState, assetShortHeadersSearchResults]
+  );
+
   const mainAction =
     currentTab === 'asset-store' ? (
       openedAssetPack ? (
@@ -436,7 +452,7 @@ function NewObjectDialog({
               <Trans>Add these assets to my scene</Trans>
             )
           }
-          onClick={() => setIsAssetPackDialogInstallOpen(true)}
+          onClick={openAssetPackInstallDialog}
           disabled={
             !displayedAssetShortHeaders ||
             displayedAssetShortHeaders.length === 0
@@ -543,7 +559,7 @@ function NewObjectDialog({
             onRequestClose={handleClose}
             onApply={
               openedAssetPack
-                ? () => setIsAssetPackDialogInstallOpen(true)
+                ? openAssetPackInstallDialog
                 : openedAssetShortHeader
                 ? async () => {
                     await onInstallAsset(openedAssetShortHeader);
@@ -603,16 +619,16 @@ function NewObjectDialog({
               ))}
           </Dialog>
           {isAssetBeingInstalled && <LoaderModal showImmediately />}
-          {isAssetPackDialogInstallOpen &&
-            displayedAssetShortHeaders &&
+          {assetShortHeadersToInstall &&
+            !!assetShortHeadersToInstall.length &&
             openedAssetPack && (
               <AssetPackInstallDialog
                 assetPack={openedAssetPack}
-                assetShortHeaders={displayedAssetShortHeaders}
+                assetShortHeaders={assetShortHeadersToInstall}
                 addedAssetIds={existingAssetStoreIds}
-                onClose={() => setIsAssetPackDialogInstallOpen(false)}
+                onClose={() => setAssetShortHeadersToInstall(null)}
                 onAssetsAdded={installAssetOutput => {
-                  setIsAssetPackDialogInstallOpen(false);
+                  setAssetShortHeadersToInstall(null);
                   onObjectsAddedFromAssets(installAssetOutput);
                 }}
                 project={project}

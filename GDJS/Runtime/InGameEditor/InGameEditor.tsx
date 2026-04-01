@@ -3584,14 +3584,13 @@ namespace gdjs {
 
       if (this._currentScene) {
         this._currentScene._updateObjectsForInGameEditor();
+        for (let i = 0; i < gdjs.callbacksInGameEditorPostStep.length; ++i) {
+          gdjs.callbacksInGameEditorPostStep[i](this);
+        }
         this._currentScene.render();
       }
 
       this._isFirstFrame = false;
-
-      for (let i = 0; i < gdjs.callbacksInGameEditorPostStep.length; ++i) {
-        gdjs.callbacksInGameEditorPostStep[i](this);
-      }
     }
 
     private _getEditorCamera(): EditorCamera {

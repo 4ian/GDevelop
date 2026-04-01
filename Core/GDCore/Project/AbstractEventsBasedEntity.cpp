@@ -26,6 +26,9 @@ void AbstractEventsBasedEntity::SerializeTo(SerializerElement& element) const {
   if (isPrivate) {
     element.SetBoolAttribute("private", isPrivate);
   }
+  element.SetAttribute("previewIconUrl", previewIconUrl);
+  element.SetAttribute("iconUrl", iconUrl);
+  element.SetAttribute("helpPath", helpPath);
 
   gd::SerializerElement& eventsFunctionsElement =
       element.AddChild("eventsFunctions");
@@ -45,6 +48,9 @@ void AbstractEventsBasedEntity::UnserializeFrom(
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");
   isPrivate = element.GetBoolAttribute("private");
+  previewIconUrl = element.GetStringAttribute("previewIconUrl");
+  iconUrl = element.GetStringAttribute("iconUrl");
+  helpPath = element.GetStringAttribute("helpPath");
 
   const gd::SerializerElement& eventsFunctionsElement =
       element.GetChild("eventsFunctions");

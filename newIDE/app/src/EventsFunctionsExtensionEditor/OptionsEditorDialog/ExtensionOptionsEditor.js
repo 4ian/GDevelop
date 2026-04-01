@@ -7,12 +7,8 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import TextField from '../../UI/TextField';
-import { ColumnStackLayout, TextFieldWithButtonLayout } from '../../UI/Layout';
+import { ColumnStackLayout } from '../../UI/Layout';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import RaisedButton from '../../UI/RaisedButton';
-import FlatButton from '../../UI/FlatButton';
-import { ResourceStore } from '../../AssetStore/ResourceStore';
-import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import {
@@ -20,45 +16,11 @@ import {
   isRelativePathToDocumentationRoot,
   isDocumentationAbsoluteUrl,
 } from '../../Utils/HelpLink';
-import { useIsMounted } from '../../Utils/UseIsMounted';
-import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { UsersAutocomplete } from '../../Profile/UsersAutocomplete';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
-import { ResourceStoreContext } from '../../AssetStore/ResourceStore/ResourceStoreContext';
-
-const downloadSvgAsBase64 = async (url: string): Promise<string> => {
-  try {
-    // $FlowFixMe[underconstrained-implicit-instantiation]
-    const response = await axios.get(url, { responseType: 'arraybuffer' });
-
-    const image = btoa(
-      new Uint8Array(response.data).reduce(
-        (data, byte) => data + String.fromCharCode(byte),
-        ''
-      )
-    );
-    if (image.length > 100 * 1024) {
-      throw new Error(
-        `Icon is too big (size after base64 conversion: ${image.length})`
-      );
-    }
-
-    const contentType = response.headers
-      ? response.headers['content-type'].toLowerCase()
-      : '';
-    if (contentType !== 'image/svg+xml')
-      throw new Error(
-        `Wrong content type. Got: "${contentType}", expected "image/svg+xml"`
-      );
-
-    return `data:${contentType};base64,${image}`;
-  } catch (err) {
-    console.error('Unable to import the icon.', err);
-    throw err;
-  }
-};
+import { CompactIconField } from './CompactIconField';
 
 type HelpPathTextFieldProps = {|
   i18n: I18nType,
@@ -116,57 +78,6 @@ export const ExtensionOptionsEditor = ({
   isLoading,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
-  const [resourceStoreOpen, setResourceStoreOpen] = React.useState(false);
-  const isMounted = useIsMounted();
-  const { searchResults } = React.useContext(ResourceStoreContext);
-  const [
-    selectedSvgResourceIndex,
-    setSelectedSvgResourceIndex,
-  ] = React.useState<?number>(null);
-
-  const onUseIcon = React.useCallback(
-    (i18n: I18nType) => {
-      if (typeof selectedSvgResourceIndex !== 'number') return;
-      const selectedSvgResource = searchResults
-        ? searchResults[selectedSvgResourceIndex]
-        : null;
-      if (!selectedSvgResource) return;
-      setResourceStoreOpen(false);
-      onLoadChange(true);
-      downloadSvgAsBase64(selectedSvgResource.url)
-        .then(
-          base64Svg => {
-            if (!isMounted.current) return;
-
-            eventsFunctionsExtension.setPreviewIconUrl(selectedSvgResource.url);
-            eventsFunctionsExtension.setIconUrl(base64Svg);
-          },
-          rawError => {
-            if (!isMounted.current) return;
-
-            showErrorBox({
-              message: i18n._(
-                t`Unable to download the icon. Verify your internet connection or try again later.`
-              ),
-              rawError,
-              errorId: 'icon-download-error',
-            });
-          }
-        )
-        .then(() => {
-          if (!isMounted.current) return;
-
-          onLoadChange(false);
-        });
-    },
-    [
-      selectedSvgResourceIndex,
-      searchResults,
-      eventsFunctionsExtension,
-      onLoadChange,
-      isMounted,
-    ]
-  );
 
   return (
     <I18n>
@@ -178,29 +89,18 @@ export const ExtensionOptionsEditor = ({
             disabled
             fullWidth
           />
-          <TextFieldWithButtonLayout
-            renderButton={style => (
-              <RaisedButton
-                onClick={() => {
-                  setResourceStoreOpen(true);
-                }}
-                primary
-                label={<Trans>Choose</Trans>}
-                disabled={isLoading}
-                style={style}
-              />
-            )}
-            renderTextField={() => (
-              <SemiControlledTextField
-                floatingLabelText={<Trans>Icon URL</Trans>}
-                value={eventsFunctionsExtension.getPreviewIconUrl()}
-                onChange={text => {
-                  eventsFunctionsExtension.setPreviewIconUrl(text);
-                }}
-                disabled
-                fullWidth
-              />
-            )}
+          <CompactIconField
+            onLoadChange={onLoadChange}
+            isLoading={isLoading}
+            getPreviewIconUrl={() =>
+              eventsFunctionsExtension.getPreviewIconUrl()
+            }
+            setPreviewIconUrl={value => {
+              eventsFunctionsExtension.setPreviewIconUrl(value);
+            }}
+            setIconUrl={value => {
+              eventsFunctionsExtension.setIconUrl(value);
+            }}
           />
           <TextField
             floatingLabelText={<Trans>Name displayed in editor</Trans>}
@@ -379,39 +279,6 @@ export const ExtensionOptionsEditor = ({
               </Trans>
             }
           />
-          {resourceStoreOpen && (
-            <Dialog
-              title={<Trans>Choose an icon for the extension</Trans>}
-              actions={[
-                <FlatButton
-                  key="cancel"
-                  label={<Trans>Cancel</Trans>}
-                  primary={false}
-                  onClick={() => {
-                    setResourceStoreOpen(false);
-                  }}
-                />,
-                <DialogPrimaryButton
-                  primary
-                  key="apply"
-                  label={<Trans>Use icon</Trans>}
-                  onClick={() => onUseIcon(i18n)}
-                />,
-              ]}
-              flexColumnBody
-              fullHeight
-              open
-              onRequestClose={() => {
-                setResourceStoreOpen(false);
-              }}
-            >
-              <ResourceStore
-                selectedResourceIndex={selectedSvgResourceIndex}
-                onSelectResource={setSelectedSvgResourceIndex}
-                resourceKind={'svg'}
-              />
-            </Dialog>
-          )}
         </ColumnStackLayout>
       )}
     </I18n>

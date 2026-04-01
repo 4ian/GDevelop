@@ -23,20 +23,13 @@ const operatorLabels = {
   contains: t`contains`,
 };
 
-const mapTypeToOperators: { [string]: Array<string> } = {
+export const mapTypeToRelationalOperators: { [string]: Array<string> } = {
   // $FlowFixMe[incompatible-type]
   unknown: Object.keys(operatorLabels),
   number: ['=', '<', '>', '<=', '>=', '!='],
   time: ['<', '>', '<=', '>='],
   string: ['=', '!=', 'startsWith', 'endsWith', 'contains'],
   color: ['=', '!='],
-};
-
-const defaultOperators: { [string]: string } = {
-  number: '=',
-  time: '>=',
-  string: '=',
-  color: '=',
 };
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
@@ -49,7 +42,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const { parameterMetadata } = props;
+    const { parameterMetadata, value, onChange } = props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
@@ -58,14 +51,17 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? parameterMetadata.getExtraInfo()
       : 'unknown';
     const operators =
-      mapTypeToOperators[comparedValueType] || mapTypeToOperators.unknown;
+      mapTypeToRelationalOperators[comparedValueType] ||
+      mapTypeToRelationalOperators.unknown;
 
-    if (!props.value) {
-      const defaultOperator = defaultOperators[comparedValueType];
-      if (defaultOperator) {
-        props.onChange(defaultOperator);
-      }
-    }
+    React.useEffect(
+      () => {
+        if (!value) {
+          onChange(operators[0]);
+        }
+      },
+      [value, onChange, operators]
+    );
 
     return (
       <SelectField
@@ -75,8 +71,8 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         helperMarkdownText={
           parameterMetadata ? parameterMetadata.getLongDescription() : undefined
         }
-        value={props.value}
-        onChange={(e, i, value: string) => props.onChange(value)}
+        value={value}
+        onChange={(e, i, value: string) => onChange(value)}
         ref={field}
         translatableHintText={t`Choose an operator`}
       >
@@ -111,7 +107,8 @@ export const renderInlineRelationalOperator = ({
     ? parameterMetadata.getExtraInfo()
     : 'unknown';
   const operators =
-    mapTypeToOperators[comparedValueType] || mapTypeToOperators.unknown;
+    mapTypeToRelationalOperators[comparedValueType] ||
+    mapTypeToRelationalOperators.unknown;
 
   if (!operators.includes(value)) {
     return (

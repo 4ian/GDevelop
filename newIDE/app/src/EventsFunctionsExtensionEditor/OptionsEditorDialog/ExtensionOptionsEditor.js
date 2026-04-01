@@ -6,7 +6,6 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import { ColumnStackLayout } from '../../UI/Layout';
-import { Column } from '../../UI/Grid';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import {
   getHelpLink,
@@ -54,7 +53,7 @@ const HelpPathTextField = ({
         t`This can either be a URL to a web page, or a path starting with a slash that will be opened in the GDevelop wiki. Leave empty if there is no help page, although it's recommended you eventually write one if you distribute the extension.`
       )}
       field={
-        <Column noMargin expand>
+        <ColumnStackLayout noMargin expand>
           <CompactSemiControlledTextField
             value={helpPath}
             onChange={text => {
@@ -70,7 +69,7 @@ const HelpPathTextField = ({
             }
           />
           {helperText && !hasError && <MarkdownText source={helperText} />}
-        </Column>
+        </ColumnStackLayout>
       }
     />
   );

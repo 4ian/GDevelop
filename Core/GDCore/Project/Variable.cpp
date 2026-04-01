@@ -306,6 +306,9 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
 
   if (IsPrimitive(type)) {
     if (type == Type::String) {
+      // Default to "0" for backward compatibility - projects saved before 5.6.267
+      // used "0" as the implicit default for string variables. The project flag
+      // useDeprecatedZeroAsDefaultStringVariable controls runtime behavior.
       SetString(element.GetStringAttribute("value", "0", "Value"));
     } else if (type == Type::Number) {
       SetValue(element.GetDoubleAttribute("value", 0.0, "Value"));

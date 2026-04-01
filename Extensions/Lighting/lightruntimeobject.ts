@@ -25,8 +25,11 @@ namespace gdjs {
    * @category Objects > Light
    */
   export type LightNetworkSyncDataType = {
-    rad: number;
-    col: string;
+    rad?: number;
+    radius?: number;
+
+    col?: string;
+    color?: string;
   };
 
   /**
@@ -104,10 +107,12 @@ namespace gdjs {
     override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): LightNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        rad: this.getRadius(),
-        col: this.getColor(),
+        [getKey('rad', 'radius')]: this.getRadius(),
+        [getKey('col', 'color')]: this.getColor(),
       };
     }
 

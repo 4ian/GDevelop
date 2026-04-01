@@ -1,10 +1,19 @@
 namespace gdjs {
   interface DirectionalLightFilterNetworkSyncData {
-    i: number;
-    c: number;
-    e: number;
-    r: number;
-    t: string;
+    i?: number;
+    intensity?: number;
+
+    c?: number;
+    color?: number;
+
+    e?: number;
+    elevation?: number;
+
+    r?: number;
+    rotation?: number;
+
+    t?: string;
+    top?: string;
   }
   const shadowHelper = false;
   gdjs.PixiFiltersTools.registerFilterCreator(
@@ -258,21 +267,27 @@ namespace gdjs {
               this._light.castShadow = value;
             }
           }
-          getNetworkSyncData(): DirectionalLightFilterNetworkSyncData {
+          getNetworkSyncData(
+            syncOptions: GetNetworkSyncDataOptions
+          ): DirectionalLightFilterNetworkSyncData {
+            const getKey = (abbrev: string, full: string) =>
+              syncOptions.useFullNames ? full : abbrev;
             return {
-              i: this._light.intensity,
-              c: this._light.color.getHex(),
-              e: this._elevation,
-              r: this._rotation,
-              t: this._top,
-            };
+              [getKey('i', 'intensity')]: this._light.intensity,
+              [getKey('c', 'color')]: this._light.color.getHex(),
+              [getKey('e', 'elevation')]: this._elevation,
+              [getKey('r', 'rotation')]: this._rotation,
+              [getKey('t', 'top')]: this._top,
+            } as DirectionalLightFilterNetworkSyncData;
           }
-          updateFromNetworkSyncData(syncData: any): void {
-            this._light.intensity = syncData.i;
-            this._light.color.setHex(syncData.c);
-            this._elevation = syncData.e;
-            this._rotation = syncData.r;
-            this._top = syncData.t;
+          updateFromNetworkSyncData(
+            syncData: DirectionalLightFilterNetworkSyncData
+          ): void {
+            if (syncData.i !== undefined) this._light.intensity = syncData.i;
+            if (syncData.c !== undefined) this._light.color.setHex(syncData.c);
+            if (syncData.e !== undefined) this._elevation = syncData.e;
+            if (syncData.r !== undefined) this._rotation = syncData.r;
+            if (syncData.t !== undefined) this._top = syncData.t;
           }
         })();
       }

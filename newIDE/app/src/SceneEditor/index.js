@@ -244,6 +244,7 @@ type Props = {|
   onEffectAdded: () => void,
   onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,
+  onInstancesModifiedForSimulation?: () => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -1432,6 +1433,10 @@ export default class SceneEditor extends React.Component<Props, State> {
           },
         });
       });
+
+    if (this.props.onInstancesModifiedForSimulation) {
+      this.props.onInstancesModifiedForSimulation();
+    }
   };
 
   _onObjectsModified = (objects: Array<gdObject>) => {

@@ -55,6 +55,12 @@ declare type GetNetworkSyncDataOptions = {
   syncAsyncTasks?: boolean;
   syncSceneVisualProps?: boolean;
   syncFullTileMaps?: boolean;
+  /**
+   * When true, behaviors should use full human-readable property names instead
+   * of the abbreviated network-sync keys (e.g. `currentSpeed` instead of `cs`).
+   * Use for tooling / AI inspection where readability matters.
+   */
+  useFullNames?: boolean;
 };
 
 declare type UpdateFromNetworkSyncDataOptions = {
@@ -75,26 +81,47 @@ declare type BasicObjectNetworkSyncData = {
   y: number;
   /** The position of the instance on the Z axis. Defined only for 3D games */
   z?: number;
+
   /** The width of the instance */
-  w: number;
+  w?: number;
+  width?: number;
+
   /** The height of the instance */
-  h: number;
+  h?: number;
+  height?: number;
+
   /** Z order of the instance */
-  zo: number;
+  zo?: number;
+  zOrder?: number;
+
   /** The angle of the instance. */
-  a: number;
+  a?: number;
+  angle?: number;
+
   /** If the instance is hidden */
-  hid: boolean;
-  /** The layer where the instance lives  */
-  lay: string;
+  hid?: boolean;
+  hidden?: boolean;
+
+  /** The layer where the instance lives */
+  lay?: string;
+  layer?: string;
+
   /** All the instant forces */
-  if: Array<ForceNetworkSyncData>;
+  if?: Array<ForceNetworkSyncData>;
+  instantForces?: Array<ForceNetworkSyncData>;
+
   /** Permanent force on X */
-  pfx: number;
+  pfx?: number;
+  permanentForceX?: number;
+
   /** Permanent force on Y */
-  pfy: number;
+  pfy?: number;
+  permanentForceY?: number;
+
   /** Name of the object */
   n?: string;
+  objectName?: string;
+
   /** The network ID of the instance. */
   networkId?: string;
 };
@@ -105,19 +132,33 @@ declare type BasicObjectNetworkSyncData = {
  **/
 declare interface ObjectNetworkSyncData extends BasicObjectNetworkSyncData {
   /** The behaviors of the object */
-  beh: {
+  beh?: {
     [behaviorName: string]: any;
   };
+  behaviors?: {
+    [behaviorName: string]: any;
+  };
+
   /** The variables of the object */
   var?: VariableNetworkSyncData[];
+  variables?: VariableNetworkSyncData[];
+
   /** The effects of the object */
   eff?: {
     [effectName: string]: EffectNetworkSyncData;
   };
+  effects?: {
+    [effectName: string]: EffectNetworkSyncData;
+  };
+
   /** The timers of the object */
   tim?: {
     [timerName: string]: TimerNetworkSyncData;
   };
+  timers?: {
+    [timerName: string]: TimerNetworkSyncData;
+  };
+
   /** Tweens */
   tween?: TweenManagerNetworkSyncData;
 }
@@ -125,9 +166,15 @@ declare interface ObjectNetworkSyncData extends BasicObjectNetworkSyncData {
 declare type ForceNetworkSyncData = {
   x: float;
   y: float;
-  a: float;
-  l: float;
-  m: number;
+
+  a?: float;
+  angle?: float;
+
+  l?: float;
+  length?: float;
+
+  m?: number;
+  multiplier?: number;
 };
 
 declare type TimerNetworkSyncData = {
@@ -193,7 +240,9 @@ declare type BehaviorData = {
 };
 
 declare type BehaviorNetworkSyncData = {
-  act: boolean;
+  act?: boolean;
+  activated?: boolean;
+
   props: any;
 };
 

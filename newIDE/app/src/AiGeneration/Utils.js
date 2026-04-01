@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
+import { getGlobalSimulationRunner } from './SimulationRuntimeManager';
 import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
@@ -89,7 +90,7 @@ export const useRefreshLimits = (
 
 export const AI_AGENT_TOOLS_VERSION = 'v8';
 export const AI_CHAT_TOOLS_VERSION = 'v8';
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v1';
+export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v2';
 
 export const useProcessFunctionCalls = ({
   i18n,
@@ -215,7 +216,28 @@ export const useProcessFunctionCalls = ({
           project,
           editorCallbacks,
           // $FlowFixMe[incompatible-type]
-          toolOptions: selectedAiRequest.toolOptions || null,
+          toolOptions: (() => {
+            const simulationRunner = getGlobalSimulationRunner();
+            const base = selectedAiRequest.toolOptions || {};
+            if (simulationRunner && project) {
+              const capturedProject = project;
+              return {
+                ...base,
+                testGameplay: (
+                  sceneName: string,
+                  scriptBody: string,
+                  timeoutMs: number
+                ) =>
+                  simulationRunner(
+                    capturedProject,
+                    sceneName,
+                    scriptBody,
+                    timeoutMs
+                  ),
+              };
+            }
+            return base;
+          })(),
           i18n,
           functionCalls: functionCallsToProcess.map(functionCall => ({
             name: functionCall.name,

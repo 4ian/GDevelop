@@ -82,6 +82,8 @@ export const usePreviewDebuggerServerWatcher = (
           });
         },
         onConnectionOpened: ({ id, debuggerIds }) => {
+          // The simulation frame is managed by SimulationRuntimeManager, not here.
+          if (id === 'simulation-frame') return;
           // Ask the new debugger client for its status (but don't assume anything
           // at this stage).
           previewDebuggerServer.sendMessage(id, { command: 'getStatus' });
@@ -153,7 +155,7 @@ export const usePreviewDebuggerServerWatcher = (
   );
 
   const hasNonEditionPreviewsRunning = Object.keys(debuggerStatus).some(
-    key => !debuggerStatus[key].isInGameEdition
+    key => key !== 'simulation-frame' && !debuggerStatus[key].isInGameEdition
   );
 
   return {

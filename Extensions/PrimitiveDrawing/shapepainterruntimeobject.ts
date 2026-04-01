@@ -48,18 +48,38 @@ namespace gdjs {
   export type ShapePainterObjectData = ObjectData & ShapePainterObjectDataType;
 
   type ShapePainterNetworkSyncDataType = {
-    cbf: boolean; // clearBetweenFrames
-    aa: Antialiasing; // antialiasing
-    ac: boolean; // absoluteCoordinates
-    fc: integer; // fillColor
-    oc: integer; // outlineColor
-    os: float; // outlineSize
-    fo: float; // fillOpacity
-    oo: float; // outlineOpacity
-    scaleX: number;
-    scaleY: number;
-    ifx: boolean; // isFlippedX
-    ify: boolean; // isFlippedY
+    cbf?: boolean;
+    clearBetweenFrames?: boolean;
+
+    aa?: Antialiasing;
+    antialiasing?: Antialiasing;
+
+    ac?: boolean;
+    useAbsoluteCoordinates?: boolean;
+
+    fc?: integer;
+    fillColor?: integer;
+
+    oc?: integer;
+    outlineColor?: integer;
+
+    os?: float;
+    outlineSize?: float;
+
+    fo?: float;
+    fillOpacity?: float;
+
+    oo?: float;
+    outlineOpacity?: float;
+
+    scaleX?: number;
+    scaleY?: number;
+
+    ifx?: boolean;
+    isFlippedX?: boolean;
+
+    ify?: boolean;
+    isFlippedY?: boolean;
   };
 
   /** @category Objects > Shape Painter */
@@ -225,20 +245,22 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): ShapePainterNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        cbf: this._clearBetweenFrames,
-        aa: this._antialiasing,
-        ac: this._useAbsoluteCoordinates,
-        fc: this._fillColor,
-        oc: this._outlineColor,
-        os: this._outlineSize,
-        fo: this._fillOpacity,
-        oo: this._outlineOpacity,
+        [getKey('cbf', 'clearBetweenFrames')]: this._clearBetweenFrames,
+        [getKey('aa', 'antialiasing')]: this._antialiasing,
+        [getKey('ac', 'useAbsoluteCoordinates')]: this._useAbsoluteCoordinates,
+        [getKey('fc', 'fillColor')]: this._fillColor,
+        [getKey('oc', 'outlineColor')]: this._outlineColor,
+        [getKey('os', 'outlineSize')]: this._outlineSize,
+        [getKey('fo', 'fillOpacity')]: this._fillOpacity,
+        [getKey('oo', 'outlineOpacity')]: this._outlineOpacity,
         scaleX: this.getScaleX(),
         scaleY: this.getScaleY(),
-        ifx: this._flippedX,
-        ify: this._flippedY,
+        [getKey('ifx', 'isFlippedX')]: this._flippedX,
+        [getKey('ify', 'isFlippedY')]: this._flippedY,
       };
     }
 

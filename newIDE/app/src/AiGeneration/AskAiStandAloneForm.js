@@ -187,6 +187,7 @@ export const AskAiStandAloneForm = ({
   const {
     values: { automaticallyUseCreditsForAiRequests },
   } = React.useContext(PreferencesContext);
+
   const {
     profile,
     getAuthorizationHeader,

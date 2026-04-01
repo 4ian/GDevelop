@@ -2,35 +2,92 @@
 
 namespace gdjs {
   interface PhysicsCharacter3DNetworkSyncDataType {
-    sma: float;
-    shm: float;
-    grav: float;
-    mfs: float;
-    facc: float;
-    fdec: float;
-    fsm: float;
-    sacc: float;
-    sdec: float;
-    ssm: float;
-    jumpspeed: float;
-    jumpsustime: float;
-    sbpa: boolean;
-    fwa: float;
-    fws: float;
-    sws: float;
-    cfs: float;
-    cjs: float;
-    cj: boolean;
-    lek: boolean;
-    rik: boolean;
-    upk: boolean;
-    dok: boolean;
-    juk: boolean;
-    us: boolean;
-    sa: float;
-    sf: float;
-    tscjs: float;
-    jkhsjs: boolean;
+    sma?: float;
+    slopeMaxAngle?: float;
+
+    shm?: float;
+    stairHeightMax?: float;
+
+    grav?: float;
+    gravity?: float;
+
+    mfs?: float;
+    maxFallingSpeed?: float;
+
+    facc?: float;
+    forwardAcceleration?: float;
+
+    fdec?: float;
+    forwardDeceleration?: float;
+
+    fsm?: float;
+    forwardSpeedMax?: float;
+
+    sacc?: float;
+    sidewaysAcceleration?: float;
+
+    sdec?: float;
+    sidewaysDeceleration?: float;
+
+    ssm?: float;
+    sidewaysSpeedMax?: float;
+
+    jumpspeed?: float;
+    jumpSpeed?: float;
+
+    jumpsustime?: float;
+    jumpSustainTime?: float;
+
+    sbpa?: boolean;
+    shouldBindObjectAndForwardAngle?: boolean;
+
+    fwa?: float;
+    forwardAngle?: float;
+
+    fws?: float;
+    currentForwardSpeed?: float;
+
+    sws?: float;
+    currentSidewaysSpeed?: float;
+
+    cfs?: float;
+    currentFallSpeed?: float;
+
+    cjs?: float;
+    currentJumpSpeed?: float;
+
+    cj?: boolean;
+    canJump?: boolean;
+
+    lek?: boolean;
+    wasLeftKeyPressed?: boolean;
+
+    rik?: boolean;
+    wasRightKeyPressed?: boolean;
+
+    upk?: boolean;
+    wasForwardKeyPressed?: boolean;
+
+    dok?: boolean;
+    wasBackwardKeyPressed?: boolean;
+
+    juk?: boolean;
+    wasJumpKeyPressed?: boolean;
+
+    us?: boolean;
+    wasStickUsed?: boolean;
+
+    sa?: float;
+    stickAngle?: float;
+
+    sf?: float;
+    stickForce?: float;
+
+    tscjs?: float;
+    timeSinceCurrentJumpStart?: float;
+
+    jkhsjs?: boolean;
+    jumpKeyHeldSinceJumpStart?: boolean;
   }
 
   /** @category Behaviors > Physics 3D */
@@ -312,38 +369,43 @@ namespace gdjs {
       // Let's clear the inputs between frames as we control it.
       this._clearInputsBetweenFrames = true;
 
+      const getKey = (abbrev: string, full: string) =>
+        options.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(options),
         props: {
-          sma: this._slopeMaxAngle,
-          shm: this._stairHeightMax,
-          grav: this._gravity,
-          mfs: this._maxFallingSpeed,
-          facc: this._forwardAcceleration,
-          fdec: this._forwardDeceleration,
-          fsm: this._forwardSpeedMax,
-          sacc: this._sidewaysAcceleration,
-          sdec: this._sidewaysDeceleration,
-          ssm: this._sidewaysSpeedMax,
-          jumpspeed: this._jumpSpeed,
-          jumpsustime: this._jumpSustainTime,
-          fwa: this._forwardAngle,
-          sbpa: this._shouldBindObjectAndForwardAngle,
-          fws: this._currentForwardSpeed,
-          sws: this._currentSidewaysSpeed,
-          cfs: this._currentFallSpeed,
-          cjs: this._currentJumpSpeed,
-          cj: this._canJump,
-          lek: this._wasLeftKeyPressed,
-          rik: this._wasRightKeyPressed,
-          upk: this._wasForwardKeyPressed,
-          dok: this._wasBackwardKeyPressed,
-          juk: this._wasJumpKeyPressed,
-          us: this._wasStickUsed,
-          sa: this._stickAngle,
-          sf: this._stickForce,
-          tscjs: this._timeSinceCurrentJumpStart,
-          jkhsjs: this._jumpKeyHeldSinceJumpStart,
+          [getKey('sma', 'slopeMaxAngle')]: this._slopeMaxAngle,
+          [getKey('shm', 'stairHeightMax')]: this._stairHeightMax,
+          [getKey('grav', 'gravity')]: this._gravity,
+          [getKey('mfs', 'maxFallingSpeed')]: this._maxFallingSpeed,
+          [getKey('facc', 'forwardAcceleration')]: this._forwardAcceleration,
+          [getKey('fdec', 'forwardDeceleration')]: this._forwardDeceleration,
+          [getKey('fsm', 'forwardSpeedMax')]: this._forwardSpeedMax,
+          [getKey('sacc', 'sidewaysAcceleration')]: this._sidewaysAcceleration,
+          [getKey('sdec', 'sidewaysDeceleration')]: this._sidewaysDeceleration,
+          [getKey('ssm', 'sidewaysSpeedMax')]: this._sidewaysSpeedMax,
+          [getKey('jumpspeed', 'jumpSpeed')]: this._jumpSpeed,
+          [getKey('jumpsustime', 'jumpSustainTime')]: this._jumpSustainTime,
+          [getKey('fwa', 'forwardAngle')]: this._forwardAngle,
+          [getKey('sbpa', 'shouldBindObjectAndForwardAngle')]:
+            this._shouldBindObjectAndForwardAngle,
+          [getKey('fws', 'currentForwardSpeed')]: this._currentForwardSpeed,
+          [getKey('sws', 'currentSidewaysSpeed')]: this._currentSidewaysSpeed,
+          [getKey('cfs', 'currentFallSpeed')]: this._currentFallSpeed,
+          [getKey('cjs', 'currentJumpSpeed')]: this._currentJumpSpeed,
+          [getKey('cj', 'canJump')]: this._canJump,
+          [getKey('lek', 'wasLeftKeyPressed')]: this._wasLeftKeyPressed,
+          [getKey('rik', 'wasRightKeyPressed')]: this._wasRightKeyPressed,
+          [getKey('upk', 'wasForwardKeyPressed')]: this._wasForwardKeyPressed,
+          [getKey('dok', 'wasBackwardKeyPressed')]: this._wasBackwardKeyPressed,
+          [getKey('juk', 'wasJumpKeyPressed')]: this._wasJumpKeyPressed,
+          [getKey('us', 'wasStickUsed')]: this._wasStickUsed,
+          [getKey('sa', 'stickAngle')]: this._stickAngle,
+          [getKey('sf', 'stickForce')]: this._stickForce,
+          [getKey('tscjs', 'timeSinceCurrentJumpStart')]:
+            this._timeSinceCurrentJumpStart,
+          [getKey('jkhsjs', 'jumpKeyHeldSinceJumpStart')]:
+            this._jumpKeyHeldSinceJumpStart,
         },
       };
     }
@@ -355,35 +417,64 @@ namespace gdjs {
       super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
-      this._slopeMaxAngle = behaviorSpecificProps.sma;
-      this._stairHeightMax = behaviorSpecificProps.shm;
-      this._gravity = behaviorSpecificProps.grav;
-      this._maxFallingSpeed = behaviorSpecificProps.mfs;
-      this._forwardAcceleration = behaviorSpecificProps.facc;
-      this._forwardDeceleration = behaviorSpecificProps.fdec;
-      this._forwardSpeedMax = behaviorSpecificProps.fsm;
-      this._sidewaysAcceleration = behaviorSpecificProps.sacc;
-      this._sidewaysDeceleration = behaviorSpecificProps.sdec;
-      this._sidewaysSpeedMax = behaviorSpecificProps.ssm;
-      this._jumpSpeed = behaviorSpecificProps.jumpspeed;
-      this._jumpSustainTime = behaviorSpecificProps.jumpsustime;
-      this._forwardAngle = behaviorSpecificProps.fwa;
-      this._shouldBindObjectAndForwardAngle = behaviorSpecificProps.sbpa;
-      this._currentForwardSpeed = behaviorSpecificProps.fws;
-      this._currentSidewaysSpeed = behaviorSpecificProps.sws;
-      this._currentFallSpeed = behaviorSpecificProps.cfs;
-      this._currentJumpSpeed = behaviorSpecificProps.cjs;
-      this._canJump = behaviorSpecificProps.cj;
-      this._hasPressedForwardKey = behaviorSpecificProps.upk;
-      this._hasPressedBackwardKey = behaviorSpecificProps.dok;
-      this._hasPressedLeftKey = behaviorSpecificProps.lek;
-      this._hasPressedRightKey = behaviorSpecificProps.rik;
-      this._hasPressedJumpKey = behaviorSpecificProps.juk;
-      this._hasUsedStick = behaviorSpecificProps.us;
-      this._stickAngle = behaviorSpecificProps.sa;
-      this._stickForce = behaviorSpecificProps.sf;
-      this._timeSinceCurrentJumpStart = behaviorSpecificProps.tscjs;
-      this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
+      if (behaviorSpecificProps.sma !== undefined)
+        this._slopeMaxAngle = behaviorSpecificProps.sma;
+      if (behaviorSpecificProps.shm !== undefined)
+        this._stairHeightMax = behaviorSpecificProps.shm;
+      if (behaviorSpecificProps.grav !== undefined)
+        this._gravity = behaviorSpecificProps.grav;
+      if (behaviorSpecificProps.mfs !== undefined)
+        this._maxFallingSpeed = behaviorSpecificProps.mfs;
+      if (behaviorSpecificProps.facc !== undefined)
+        this._forwardAcceleration = behaviorSpecificProps.facc;
+      if (behaviorSpecificProps.fdec !== undefined)
+        this._forwardDeceleration = behaviorSpecificProps.fdec;
+      if (behaviorSpecificProps.fsm !== undefined)
+        this._forwardSpeedMax = behaviorSpecificProps.fsm;
+      if (behaviorSpecificProps.sacc !== undefined)
+        this._sidewaysAcceleration = behaviorSpecificProps.sacc;
+      if (behaviorSpecificProps.sdec !== undefined)
+        this._sidewaysDeceleration = behaviorSpecificProps.sdec;
+      if (behaviorSpecificProps.ssm !== undefined)
+        this._sidewaysSpeedMax = behaviorSpecificProps.ssm;
+      if (behaviorSpecificProps.jumpspeed !== undefined)
+        this._jumpSpeed = behaviorSpecificProps.jumpspeed;
+      if (behaviorSpecificProps.jumpsustime !== undefined)
+        this._jumpSustainTime = behaviorSpecificProps.jumpsustime;
+      if (behaviorSpecificProps.fwa !== undefined)
+        this._forwardAngle = behaviorSpecificProps.fwa;
+      if (behaviorSpecificProps.sbpa !== undefined)
+        this._shouldBindObjectAndForwardAngle = behaviorSpecificProps.sbpa;
+      if (behaviorSpecificProps.fws !== undefined)
+        this._currentForwardSpeed = behaviorSpecificProps.fws;
+      if (behaviorSpecificProps.sws !== undefined)
+        this._currentSidewaysSpeed = behaviorSpecificProps.sws;
+      if (behaviorSpecificProps.cfs !== undefined)
+        this._currentFallSpeed = behaviorSpecificProps.cfs;
+      if (behaviorSpecificProps.cjs !== undefined)
+        this._currentJumpSpeed = behaviorSpecificProps.cjs;
+      if (behaviorSpecificProps.cj !== undefined)
+        this._canJump = behaviorSpecificProps.cj;
+      if (behaviorSpecificProps.upk !== undefined)
+        this._hasPressedForwardKey = behaviorSpecificProps.upk;
+      if (behaviorSpecificProps.dok !== undefined)
+        this._hasPressedBackwardKey = behaviorSpecificProps.dok;
+      if (behaviorSpecificProps.lek !== undefined)
+        this._hasPressedLeftKey = behaviorSpecificProps.lek;
+      if (behaviorSpecificProps.rik !== undefined)
+        this._hasPressedRightKey = behaviorSpecificProps.rik;
+      if (behaviorSpecificProps.juk !== undefined)
+        this._hasPressedJumpKey = behaviorSpecificProps.juk;
+      if (behaviorSpecificProps.us !== undefined)
+        this._hasUsedStick = behaviorSpecificProps.us;
+      if (behaviorSpecificProps.sa !== undefined)
+        this._stickAngle = behaviorSpecificProps.sa;
+      if (behaviorSpecificProps.sf !== undefined)
+        this._stickForce = behaviorSpecificProps.sf;
+      if (behaviorSpecificProps.tscjs !== undefined)
+        this._timeSinceCurrentJumpStart = behaviorSpecificProps.tscjs;
+      if (behaviorSpecificProps.jkhsjs !== undefined)
+        this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
 
       // Clear user inputs between frames only if requested.
       this._clearInputsBetweenFrames = !!options.clearInputs;

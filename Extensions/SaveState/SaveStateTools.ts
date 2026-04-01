@@ -206,8 +206,7 @@ namespace gdjs {
 
       const getNetworkSyncOptions: GetNetworkSyncDataOptions = {
         syncObjectIdentifiers: true,
-        shouldExcludeVariableFromData:
-          makeIsVariableExcludedFromSaveState(profileNames),
+        shouldExcludeVariableFromData: undefined,
         syncAllBehaviors: true,
         syncGameVariables: true,
         syncSceneTimers: true,

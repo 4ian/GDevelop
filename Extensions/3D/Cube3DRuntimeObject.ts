@@ -44,13 +44,25 @@ namespace gdjs {
   };
 
   type Cube3DObjectNetworkSyncDataType = {
-    fo: 'Y' | 'Z';
-    bfu: 'X' | 'Y';
-    vfb: integer;
-    trfb: integer;
-    frn: [string, string, string, string, string, string];
-    mt: number;
-    tint: string;
+    fo?: 'Y' | 'Z';
+    facesOrientation?: 'Y' | 'Z';
+
+    bfu?: 'X' | 'Y';
+    backFaceUpThroughWhichAxisRotation?: 'X' | 'Y';
+
+    vfb?: integer;
+    visibleFacesBitmask?: integer;
+
+    trfb?: integer;
+    textureRepeatFacesBitmask?: integer;
+
+    frn?: [string, string, string, string, string, string];
+    faceResourceNames?: [string, string, string, string, string, string];
+
+    mt?: number;
+    materialType?: number;
+
+    tint?: string;
   };
 
   type Cube3DObjectNetworkSyncData = Object3DNetworkSyncData &
@@ -460,14 +472,18 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): Cube3DObjectNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        mt: this._materialType,
-        fo: this._facesOrientation,
-        bfu: this._backFaceUpThroughWhichAxisRotation,
-        vfb: this._visibleFacesBitmask,
-        trfb: this._textureRepeatFacesBitmask,
-        frn: this._faceResourceNames,
+        [getKey('mt', 'materialType')]: this._materialType,
+        [getKey('fo', 'facesOrientation')]: this._facesOrientation,
+        [getKey('bfu', 'backFaceUpThroughWhichAxisRotation')]:
+          this._backFaceUpThroughWhichAxisRotation,
+        [getKey('vfb', 'visibleFacesBitmask')]: this._visibleFacesBitmask,
+        [getKey('trfb', 'textureRepeatFacesBitmask')]:
+          this._textureRepeatFacesBitmask,
+        [getKey('frn', 'faceResourceNames')]: this._faceResourceNames,
         tint: this._tint,
       };
     }
@@ -510,13 +526,12 @@ namespace gdjs {
         }
       }
       if (networkSyncData.frn !== undefined) {
+        const frn = networkSyncData.frn;
         // If one element is different, update all the faces.
         if (
-          !this._faceResourceNames.every(
-            (value, index) => value === networkSyncData.frn[index]
-          )
+          !this._faceResourceNames.every((value, index) => value === frn[index])
         ) {
-          this._faceResourceNames = networkSyncData.frn;
+          this._faceResourceNames = frn;
           // Update all faces. (Could optimize to only update the changed ones)
           for (let i = 0; i < this._faceResourceNames.length; i++) {
             this._renderer.updateFace(i);

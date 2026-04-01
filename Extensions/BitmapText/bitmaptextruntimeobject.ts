@@ -34,16 +34,30 @@ namespace gdjs {
    * @category Objects > Bitmap Text
    */
   export type BitmapTextObjectNetworkSyncDataType = {
-    text: string;
-    opa: float;
-    tint: number[];
-    bfrn: string;
-    tarn: string;
-    scale: number;
-    wwrap: boolean;
-    wwidth: float;
-    align: string;
-    vta: string;
+    text?: string;
+    tint?: number[];
+    scale?: number;
+
+    opa?: float;
+    opacity?: float;
+
+    bfrn?: string;
+    bitmapFontResourceName?: string;
+
+    tarn?: string;
+    textureAtlasResourceName?: string;
+
+    wwrap?: boolean;
+    wordWrap?: boolean;
+
+    wwidth?: float;
+    wrappingWidth?: float;
+
+    align?: string;
+    textAlignment?: string;
+
+    vta?: string;
+    verticalTextAlignment?: string;
   };
 
   /**
@@ -172,18 +186,22 @@ namespace gdjs {
     override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): BitmapTextObjectNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
         text: this._text,
-        opa: this._opacity,
+        [getKey('opa', 'opacity')]: this._opacity,
         tint: this._tint,
-        bfrn: this._bitmapFontResourceName,
-        tarn: this._textureAtlasResourceName,
+        [getKey('bfrn', 'bitmapFontResourceName')]:
+          this._bitmapFontResourceName,
+        [getKey('tarn', 'textureAtlasResourceName')]:
+          this._textureAtlasResourceName,
         scale: this.getScale(),
-        wwrap: this._wrapping,
-        wwidth: this._wrappingWidth,
-        align: this._textAlign,
-        vta: this._verticalTextAlignment,
+        [getKey('wwrap', 'wordWrap')]: this._wrapping,
+        [getKey('wwidth', 'wrappingWidth')]: this._wrappingWidth,
+        [getKey('align', 'textAlignment')]: this._textAlign,
+        [getKey('vta', 'verticalTextAlignment')]: this._verticalTextAlignment,
       };
     }
 
@@ -192,35 +210,35 @@ namespace gdjs {
       options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
-      if (this._text !== undefined) {
+      if (networkSyncData.text !== undefined) {
         this.setText(networkSyncData.text);
       }
-      if (this._opacity !== undefined) {
+      if (networkSyncData.opa !== undefined) {
         this.setOpacity(networkSyncData.opa);
       }
-      if (this._tint !== undefined) {
+      if (networkSyncData.tint !== undefined) {
         this._tint = networkSyncData.tint;
         this._renderer.updateTint();
       }
-      if (this._bitmapFontResourceName !== undefined) {
+      if (networkSyncData.bfrn !== undefined) {
         this.setBitmapFontResourceName(networkSyncData.bfrn);
       }
-      if (this._textureAtlasResourceName !== undefined) {
+      if (networkSyncData.tarn !== undefined) {
         this.setTextureAtlasResourceName(networkSyncData.tarn);
       }
-      if (this._scaleX !== undefined) {
+      if (networkSyncData.scale !== undefined) {
         this.setScale(networkSyncData.scale);
       }
-      if (this._wrapping !== undefined) {
+      if (networkSyncData.wwrap !== undefined) {
         this.setWrapping(networkSyncData.wwrap);
       }
-      if (this._wrappingWidth !== undefined) {
+      if (networkSyncData.wwidth !== undefined) {
         this.setWrappingWidth(networkSyncData.wwidth);
       }
-      if (this._textAlign !== undefined) {
+      if (networkSyncData.align !== undefined) {
         this.setTextAlignment(networkSyncData.align);
       }
-      if (this._verticalTextAlignment !== undefined) {
+      if (networkSyncData.vta !== undefined) {
         this.setVerticalTextAlignment(networkSyncData.vta);
       }
     }

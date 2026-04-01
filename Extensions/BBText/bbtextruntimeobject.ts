@@ -34,16 +34,33 @@ namespace gdjs {
    * @category Objects > BBText
    */
   export type BBTextObjectNetworkSyncDataType = {
-    text: string;
-    o: float;
-    c: number[];
-    ff: string;
-    fs: number;
-    wwrap: boolean;
-    wwidth: float;
-    align: string;
-    vta: string;
-    hidden: boolean;
+    text?: string;
+
+    o?: float;
+    opacity?: float;
+
+    c?: number[];
+    color?: number[];
+
+    ff?: string;
+    fontFamily?: string;
+
+    fs?: number;
+    fontSize?: number;
+
+    wwrap?: boolean;
+    wordWrap?: boolean;
+
+    wwidth?: float;
+    wrappingWidth?: float;
+
+    align?: string;
+    textAlignment?: string;
+
+    vta?: string;
+    verticalTextAlignment?: string;
+
+    hidden?: boolean;
   };
 
   /**
@@ -162,17 +179,19 @@ namespace gdjs {
     override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): BBTextObjectNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
         text: this._text,
-        o: this._opacity,
-        c: this._color,
-        ff: this._fontFamily,
-        fs: this._fontSize,
-        wwrap: this._wrapping,
-        wwidth: this._wrappingWidth,
-        align: this._textAlign,
-        vta: this._verticalTextAlignment,
+        [getKey('o', 'opacity')]: this._opacity,
+        [getKey('c', 'color')]: this._color,
+        [getKey('ff', 'fontFamily')]: this._fontFamily,
+        [getKey('fs', 'fontSize')]: this._fontSize,
+        [getKey('wwrap', 'wordWrap')]: this._wrapping,
+        [getKey('wwidth', 'wrappingWidth')]: this._wrappingWidth,
+        [getKey('align', 'textAlignment')]: this._textAlign,
+        [getKey('vta', 'verticalTextAlignment')]: this._verticalTextAlignment,
         hidden: this.hidden,
       };
     }
@@ -182,35 +201,35 @@ namespace gdjs {
       options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
-      if (this._text !== undefined) {
+      if (networkSyncData.text !== undefined) {
         this.setBBText(networkSyncData.text);
       }
-      if (this._opacity !== undefined) {
+      if (networkSyncData.o !== undefined) {
         this.setOpacity(networkSyncData.o);
       }
-      if (this._color !== undefined) {
+      if (networkSyncData.c !== undefined) {
         this._color = networkSyncData.c;
         this._renderer.updateColor();
       }
-      if (this._fontFamily !== undefined) {
+      if (networkSyncData.ff !== undefined) {
         this.setFontFamily(networkSyncData.ff);
       }
-      if (this._fontSize !== undefined) {
+      if (networkSyncData.fs !== undefined) {
         this.setFontSize(networkSyncData.fs);
       }
-      if (this._wrapping !== undefined) {
+      if (networkSyncData.wwrap !== undefined) {
         this.setWrapping(networkSyncData.wwrap);
       }
-      if (this._wrappingWidth !== undefined) {
+      if (networkSyncData.wwidth !== undefined) {
         this.setWrappingWidth(networkSyncData.wwidth);
       }
-      if (this._textAlign !== undefined) {
+      if (networkSyncData.align !== undefined) {
         this.setTextAlignment(networkSyncData.align);
       }
-      if (this._verticalTextAlignment !== undefined) {
+      if (networkSyncData.vta !== undefined) {
         this.setVerticalTextAlignment(networkSyncData.vta);
       }
-      if (this.hidden !== undefined) {
+      if (networkSyncData.hidden !== undefined) {
         this.hide(networkSyncData.hidden);
       }
     }

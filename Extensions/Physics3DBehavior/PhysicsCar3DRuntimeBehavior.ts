@@ -2,17 +2,38 @@
 
 namespace gdjs {
   interface PhysicsCar3DNetworkSyncDataType {
-    lek: boolean;
-    rik: boolean;
-    upk: boolean;
-    dok: boolean;
-    hbk: boolean;
-    asf: float;
-    ssf: float;
-    etm: float;
-    esm: float;
-    ei: float;
-    es: float;
+    lek?: boolean;
+    wasLeftKeyPressed?: boolean;
+
+    rik?: boolean;
+    wasRightKeyPressed?: boolean;
+
+    upk?: boolean;
+    wasForwardKeyPressed?: boolean;
+
+    dok?: boolean;
+    wasBackwardKeyPressed?: boolean;
+
+    hbk?: boolean;
+    wasHandBrakeKeyPressed?: boolean;
+
+    asf?: float;
+    previousAcceleratorStickForce?: float;
+
+    ssf?: float;
+    previousSteeringStickForce?: float;
+
+    etm?: float;
+    engineTorqueMax?: float;
+
+    esm?: float;
+    engineSpeedMax?: float;
+
+    ei?: float;
+    engineInertia?: float;
+
+    es?: float;
+    engineSpeed?: float;
   }
 
   /**
@@ -295,20 +316,25 @@ namespace gdjs {
       // Let's clear the inputs between frames as we control it.
       this._clearInputsBetweenFrames = true;
 
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
         props: {
-          lek: this._wasLeftKeyPressed,
-          rik: this._wasRightKeyPressed,
-          upk: this._wasForwardKeyPressed,
-          dok: this._wasBackwardKeyPressed,
-          hbk: this._wasHandBrakeKeyPressed,
-          asf: this._previousAcceleratorStickForce,
-          ssf: this._previousSteeringStickForce,
-          etm: this._engineTorqueMax,
-          esm: this._engineSpeedMax,
-          ei: this._engineInertia,
-          es: this.getEngineSpeed(),
+          [getKey('lek', 'wasLeftKeyPressed')]: this._wasLeftKeyPressed,
+          [getKey('rik', 'wasRightKeyPressed')]: this._wasRightKeyPressed,
+          [getKey('upk', 'wasForwardKeyPressed')]: this._wasForwardKeyPressed,
+          [getKey('dok', 'wasBackwardKeyPressed')]: this._wasBackwardKeyPressed,
+          [getKey('hbk', 'wasHandBrakeKeyPressed')]:
+            this._wasHandBrakeKeyPressed,
+          [getKey('asf', 'previousAcceleratorStickForce')]:
+            this._previousAcceleratorStickForce,
+          [getKey('ssf', 'previousSteeringStickForce')]:
+            this._previousSteeringStickForce,
+          [getKey('etm', 'engineTorqueMax')]: this._engineTorqueMax,
+          [getKey('esm', 'engineSpeedMax')]: this._engineSpeedMax,
+          [getKey('ei', 'engineInertia')]: this._engineInertia,
+          [getKey('es', 'engineSpeed')]: this.getEngineSpeed(),
         },
       };
     }
@@ -320,17 +346,27 @@ namespace gdjs {
       super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
-      this._hasPressedForwardKey = behaviorSpecificProps.upk;
-      this._hasPressedBackwardKey = behaviorSpecificProps.dok;
-      this._hasPressedLeftKey = behaviorSpecificProps.lek;
-      this._hasPressedRightKey = behaviorSpecificProps.rik;
-      this._hasPressedHandBrakeKey = behaviorSpecificProps.hbk;
-      this._acceleratorStickForce = behaviorSpecificProps.asf;
-      this._steeringStickForce = behaviorSpecificProps.ssf;
-      this._engineTorqueMax = behaviorSpecificProps.etm;
-      this._engineSpeedMax = behaviorSpecificProps.esm;
-      this._engineInertia = behaviorSpecificProps.ei;
-      if (this._vehicleController) {
+      if (behaviorSpecificProps.upk !== undefined)
+        this._hasPressedForwardKey = behaviorSpecificProps.upk;
+      if (behaviorSpecificProps.dok !== undefined)
+        this._hasPressedBackwardKey = behaviorSpecificProps.dok;
+      if (behaviorSpecificProps.lek !== undefined)
+        this._hasPressedLeftKey = behaviorSpecificProps.lek;
+      if (behaviorSpecificProps.rik !== undefined)
+        this._hasPressedRightKey = behaviorSpecificProps.rik;
+      if (behaviorSpecificProps.hbk !== undefined)
+        this._hasPressedHandBrakeKey = behaviorSpecificProps.hbk;
+      if (behaviorSpecificProps.asf !== undefined)
+        this._acceleratorStickForce = behaviorSpecificProps.asf;
+      if (behaviorSpecificProps.ssf !== undefined)
+        this._steeringStickForce = behaviorSpecificProps.ssf;
+      if (behaviorSpecificProps.etm !== undefined)
+        this._engineTorqueMax = behaviorSpecificProps.etm;
+      if (behaviorSpecificProps.esm !== undefined)
+        this._engineSpeedMax = behaviorSpecificProps.esm;
+      if (behaviorSpecificProps.ei !== undefined)
+        this._engineInertia = behaviorSpecificProps.ei;
+      if (this._vehicleController && behaviorSpecificProps.es !== undefined) {
         this._vehicleController
           .GetEngine()
           .SetCurrentRPM(behaviorSpecificProps.es);

@@ -1,7 +1,10 @@
 namespace gdjs {
   interface BrightnessAndContrastFilterNetworkSyncData {
-    b: number;
-    c: number;
+    b?: number;
+    brightness?: number;
+
+    c?: number;
+    contrast?: number;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::BrightnessAndContrast',
@@ -77,17 +80,25 @@ namespace gdjs {
             return 0;
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
-          getNetworkSyncData(): BrightnessAndContrastFilterNetworkSyncData {
+          getNetworkSyncData(
+            syncOptions: GetNetworkSyncDataOptions
+          ): BrightnessAndContrastFilterNetworkSyncData {
+            const getKey = (abbrev: string, full: string) =>
+              syncOptions.useFullNames ? full : abbrev;
             return {
-              b: this.shaderPass.uniforms.brightness.value,
-              c: this.shaderPass.uniforms.contrast.value,
-            };
+              [getKey('b', 'brightness')]:
+                this.shaderPass.uniforms.brightness.value,
+              [getKey('c', 'contrast')]:
+                this.shaderPass.uniforms.contrast.value,
+            } as BrightnessAndContrastFilterNetworkSyncData;
           }
           updateFromNetworkSyncData(
             data: BrightnessAndContrastFilterNetworkSyncData
           ) {
-            this.shaderPass.uniforms.brightness.value = data.b;
-            this.shaderPass.uniforms.contrast.value = data.c;
+            if (data.b !== undefined)
+              this.shaderPass.uniforms.brightness.value = data.b;
+            if (data.c !== undefined)
+              this.shaderPass.uniforms.contrast.value = data.c;
           }
         })();
       }

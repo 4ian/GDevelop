@@ -1,8 +1,13 @@
 namespace gdjs {
   interface LinearFogFilterNetworkSyncData {
-    n: number;
-    f: number;
-    c: number;
+    n?: number;
+    near?: number;
+
+    f?: number;
+    far?: number;
+
+    c?: number;
+    color?: number;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::LinearFog',
@@ -92,19 +97,23 @@ namespace gdjs {
             return 0;
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
-          getNetworkSyncData(): LinearFogFilterNetworkSyncData {
+          getNetworkSyncData(
+            syncOptions: GetNetworkSyncDataOptions
+          ): LinearFogFilterNetworkSyncData {
+            const getKey = (abbrev: string, full: string) =>
+              syncOptions.useFullNames ? full : abbrev;
             return {
-              n: this.fog.near,
-              f: this.fog.far,
-              c: this.fog.color.getHex(),
-            };
+              [getKey('n', 'near')]: this.fog.near,
+              [getKey('f', 'far')]: this.fog.far,
+              [getKey('c', 'color')]: this.fog.color.getHex(),
+            } as LinearFogFilterNetworkSyncData;
           }
           updateFromNetworkSyncData(
             data: LinearFogFilterNetworkSyncData
           ): void {
-            this.fog.near = data.n;
-            this.fog.far = data.f;
-            this.fog.color.setHex(data.c);
+            if (data.n !== undefined) this.fog.near = data.n;
+            if (data.f !== undefined) this.fog.far = data.f;
+            if (data.c !== undefined) this.fog.color.setHex(data.c);
           }
         })();
       }

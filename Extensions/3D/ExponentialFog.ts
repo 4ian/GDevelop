@@ -1,7 +1,10 @@
 namespace gdjs {
   interface ExponentialFogFilterNetworkSyncData {
-    d: number;
-    c: number;
+    d?: number;
+    density?: number;
+
+    c?: number;
+    color?: number;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::ExponentialFog',
@@ -87,17 +90,21 @@ namespace gdjs {
             return 0;
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
-          getNetworkSyncData(): ExponentialFogFilterNetworkSyncData {
+          getNetworkSyncData(
+            syncOptions: GetNetworkSyncDataOptions
+          ): ExponentialFogFilterNetworkSyncData {
+            const getKey = (abbrev: string, full: string) =>
+              syncOptions.useFullNames ? full : abbrev;
             return {
-              d: this.fog.density,
-              c: this.fog.color.getHex(),
-            };
+              [getKey('d', 'density')]: this.fog.density,
+              [getKey('c', 'color')]: this.fog.color.getHex(),
+            } as ExponentialFogFilterNetworkSyncData;
           }
           updateFromNetworkSyncData(
             syncData: ExponentialFogFilterNetworkSyncData
           ): void {
-            this.fog.density = syncData.d;
-            this.fog.color.setHex(syncData.c);
+            if (syncData.d !== undefined) this.fog.density = syncData.d;
+            if (syncData.c !== undefined) this.fog.color.setHex(syncData.c);
           }
         })();
       }

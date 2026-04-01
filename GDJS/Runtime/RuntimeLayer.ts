@@ -133,11 +133,13 @@ namespace gdjs {
       }
     }
 
-    getNetworkSyncData(): LayerNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): LayerNetworkSyncData {
       const effectsNetworkSyncData = {};
       for (const effectName in this._rendererEffects) {
         effectsNetworkSyncData[effectName] =
-          this._rendererEffects[effectName].getNetworkSyncData();
+          this._rendererEffects[effectName].getNetworkSyncData(syncOptions);
       }
 
       return {

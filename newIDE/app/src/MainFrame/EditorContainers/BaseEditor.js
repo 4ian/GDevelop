@@ -270,6 +270,7 @@ export type RenderEditorContainerProps = {|
   onEffectAdded: () => void,
   onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
   onExternalLayoutAssociationChanged: () => void,
+  onInstancesModifiedForSimulation?: () => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

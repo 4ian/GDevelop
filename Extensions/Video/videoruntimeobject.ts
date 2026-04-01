@@ -26,12 +26,20 @@ namespace gdjs {
    * @category Objects > Video
    */
   export type VideoObjectNetworkSyncDataType = {
-    op: float;
+    op?: float;
+    opacity?: float;
+
     // We don't sync volume, as it's probably a user setting?
-    pla: boolean;
-    loop: boolean;
-    ct: float;
-    ps: number;
+    pla?: boolean;
+    played?: boolean;
+
+    loop?: boolean;
+
+    ct?: float;
+    currentTime?: float;
+
+    ps?: number;
+    playbackSpeed?: number;
   };
 
   /**
@@ -116,13 +124,15 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): VideoObjectNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        op: this._opacity,
-        pla: this.isPlayed(),
+        [getKey('op', 'opacity')]: this._opacity,
+        [getKey('pla', 'played')]: this.isPlayed(),
         loop: this.isLooped(),
-        ct: this.getCurrentTime(),
-        ps: this.getPlaybackSpeed(),
+        [getKey('ct', 'currentTime')]: this.getCurrentTime(),
+        [getKey('ps', 'playbackSpeed')]: this.getPlaybackSpeed(),
       };
     }
 

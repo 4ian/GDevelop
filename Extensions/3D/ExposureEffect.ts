@@ -1,6 +1,7 @@
 namespace gdjs {
   interface ExposureFilterNetworkSyncData {
-    e: number;
+    e?: number;
+    exposure?: number;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::Exposure',
@@ -70,13 +71,21 @@ namespace gdjs {
             return 0;
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
-          getNetworkSyncData(): ExposureFilterNetworkSyncData {
-            return { e: this.shaderPass.uniforms.exposure.value };
+          getNetworkSyncData(
+            syncOptions: GetNetworkSyncDataOptions
+          ): ExposureFilterNetworkSyncData {
+            const getKey = (abbrev: string, full: string) =>
+              syncOptions.useFullNames ? full : abbrev;
+            return {
+              [getKey('e', 'exposure')]:
+                this.shaderPass.uniforms.exposure.value,
+            } as ExposureFilterNetworkSyncData;
           }
           updateFromNetworkSyncData(
             syncData: ExposureFilterNetworkSyncData
           ): void {
-            this.shaderPass.uniforms.exposure.value = syncData.e;
+            if (syncData.e !== undefined)
+              this.shaderPass.uniforms.exposure.value = syncData.e;
           }
         })();
       }

@@ -1,7 +1,10 @@
 namespace gdjs {
   interface HueAndSaturationFilterExtra {
-    h: number;
-    s: number;
+    h?: number;
+    hue?: number;
+
+    s?: number;
+    saturation?: number;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::HueAndSaturation',
@@ -77,17 +80,24 @@ namespace gdjs {
             return 0;
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
-          getNetworkSyncData(): HueAndSaturationFilterExtra {
+          getNetworkSyncData(
+            syncOptions: GetNetworkSyncDataOptions
+          ): HueAndSaturationFilterExtra {
+            const getKey = (abbrev: string, full: string) =>
+              syncOptions.useFullNames ? full : abbrev;
             return {
-              h: this.shaderPass.uniforms.hue.value,
-              s: this.shaderPass.uniforms.saturation.value,
-            };
+              [getKey('h', 'hue')]: this.shaderPass.uniforms.hue.value,
+              [getKey('s', 'saturation')]:
+                this.shaderPass.uniforms.saturation.value,
+            } as HueAndSaturationFilterExtra;
           }
           updateFromNetworkSyncData(
             syncData: HueAndSaturationFilterExtra
           ): void {
-            this.shaderPass.uniforms.hue.value = syncData.h;
-            this.shaderPass.uniforms.saturation.value = syncData.s;
+            if (syncData.h !== undefined)
+              this.shaderPass.uniforms.hue.value = syncData.h;
+            if (syncData.s !== undefined)
+              this.shaderPass.uniforms.saturation.value = syncData.s;
           }
         })();
       }

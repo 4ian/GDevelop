@@ -128,6 +128,10 @@ export type EditorFunctionGenericOutput = {|
   // Set to true when the function call was aborted mid-execution (e.g. the AI
   // request was suspended while event generation was still polling).
   aborted?: true,
+
+  // Set to true by EditorFunctionCallRunner when the function has modifiesProject: true
+  // and the call succeeded. Used to decide whether to trigger unsaved changes tracking.
+  didModifyProject?: boolean,
 |};
 
 export type EventsGenerationResult =
@@ -216,6 +220,11 @@ export type ObjectGroupsOutsideEditorChanges = {|
 
 export type ToolOptions = {
   includeEventsJson?: boolean,
+  testGameplay?: (
+    sceneName: string,
+    scriptBody: string,
+    timeoutMs: number
+  ) => Promise<any>,
 };
 
 type RenderForEditorOptions = {|
@@ -286,6 +295,8 @@ export type EditorFunction = {|
   launchFunction: (
     options: LaunchFunctionOptionsWithProject
   ) => Promise<EditorFunctionGenericOutput>,
+  /** True if this function modifies the project (triggers unsaved changes tracking). */
+  modifiesProject: boolean,
 |};
 
 /**
@@ -302,6 +313,8 @@ export type EditorFunctionWithoutProject = {|
   launchFunction: (
     options: LaunchFunctionOptionsWithoutProject
   ) => Promise<EditorFunctionGenericOutput>,
+  /** True if this function modifies the project (triggers unsaved changes tracking). */
+  modifiesProject: boolean,
 |};
 
 /**
@@ -604,6 +617,7 @@ const listLabelAndValuesFromChangedProperties = (
  * Creates a new object (in the specified scene or globally), or replaces an existing one, or duplicates an existing one.
  */
 const createOrReplaceObject: EditorFunction = {
+  modifiesProject: true,
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
@@ -1180,6 +1194,7 @@ const createOrReplaceObject: EditorFunction = {
  * Retrieves the properties of a specific object (global or in a scene)
  */
 const inspectObjectProperties: EditorFunction = {
+  modifiesProject: false,
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
@@ -1301,6 +1316,7 @@ const isPropertyForChangingObjectName = (propertyName: string): boolean => {
  * Changes a property of a specific object (global or in a scene)
  */
 const changeObjectProperty: EditorFunction = {
+  modifiesProject: true,
   renderForEditor: ({ project, shouldShowDetails, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
@@ -1599,6 +1615,7 @@ const changeObjectProperty: EditorFunction = {
  * Adds a behavior to an object in a scene
  */
 const addBehavior: EditorFunction = {
+  modifiesProject: true,
   renderForEditor: ({ project, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
@@ -1816,6 +1833,7 @@ const addBehavior: EditorFunction = {
  * Removes a behavior from an object in a scene
  */
 const removeBehavior: EditorFunction = {
+  modifiesProject: true,
   renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
@@ -1890,6 +1908,7 @@ const removeBehavior: EditorFunction = {
  * Retrieves the properties of a specific behavior attached to an object
  */
 const inspectBehaviorProperties: EditorFunction = {
+  modifiesProject: false,
   renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
@@ -1984,6 +2003,7 @@ const inspectBehaviorProperties: EditorFunction = {
  * Changes a property of a specific behavior attached to an object
  */
 const changeBehaviorProperty: EditorFunction = {
+  modifiesProject: true,
   renderForEditor: ({ project, shouldShowDetails, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
@@ -2285,6 +2305,7 @@ const changeBehaviorProperty: EditorFunction = {
  * Lists all object instances in a scene
  */
 const describeInstances: EditorFunction = {
+  modifiesProject: false,
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
@@ -2430,6 +2451,7 @@ const iterateOnInstances = (
  * Existing instances identifiers can be found by calling `describe_instances` (`id` field for each instance).
  */
 const put2dInstances: EditorFunction = {
+  modifiesProject: true,
   renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = SafeExtractor.extractStringProperty(
@@ -2999,6 +3021,7 @@ const put2dInstances: EditorFunction = {
  * Existing instances identifiers can be found by calling `describe_instances` (`id` field for each instance).
  */
 const put3dInstances: EditorFunction = {
+  modifiesProject: true,
   renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = SafeExtractor.extractStringProperty(
@@ -3522,6 +3545,7 @@ const put3dInstances: EditorFunction = {
  * Retrieves the event sheet structure for a scene
  */
 const readSceneEvents: EditorFunction = {
+  modifiesProject: false,
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
@@ -3572,6 +3596,7 @@ const readSceneEvents: EditorFunction = {
  * Adds a new event to a scene's event sheet
  */
 const addSceneEvents: EditorFunction = {
+  modifiesProject: true,
   renderForEditor: ({
     args,
     shouldShowDetails,
@@ -3976,6 +4001,7 @@ See attached errors that happened when some changes were applied in the project.
  * Creates a new, empty scene
  */
 const createScene: EditorFunction = {
+  modifiesProject: true,
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
@@ -4055,6 +4081,7 @@ const createScene: EditorFunction = {
  * Deletes an existing scene
  */
 const deleteScene: EditorFunction = {
+  modifiesProject: true,
   renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
@@ -4117,6 +4144,7 @@ const serializeEffectProperties = (
 };
 
 const inspectScenePropertiesLayersEffects: EditorFunction = {
+  modifiesProject: false,
   renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
@@ -4196,6 +4224,7 @@ const isFuzzyMatch = (string1: string, string2: string) => {
 };
 
 const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
+  modifiesProject: true,
   renderForEditor: ({ args, shouldShowDetails }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
@@ -4798,6 +4827,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
 };
 
 const addOrEditVariable: EditorFunction = {
+  modifiesProject: true,
   renderForEditor: ({ args, shouldShowDetails }) => {
     const variable_name_or_path = extractRequiredString(
       args,
@@ -4945,6 +4975,7 @@ const addOrEditVariable: EditorFunction = {
 };
 
 const createOrUpdatePlan: EditorFunction = {
+  modifiesProject: false,
   renderForEditor: ({ args }) => {
     return {
       text: <Trans>Update the plan.</Trans>,
@@ -4958,6 +4989,7 @@ const createOrUpdatePlan: EditorFunction = {
 };
 
 const readFullDocs: EditorFunction = {
+  modifiesProject: false,
   renderForEditor: ({ args }) => {
     const extension_names = SafeExtractor.extractStringProperty(
       args,
@@ -4976,6 +5008,7 @@ const readFullDocs: EditorFunction = {
 };
 
 const initializeProject: EditorFunctionWithoutProject = {
+  modifiesProject: true,
   renderForEditor: ({ args }) => {
     const project_name = extractRequiredString(args, 'project_name');
 
@@ -5062,6 +5095,105 @@ const initializeProject: EditorFunctionWithoutProject = {
   },
 };
 
+const testGameplay: EditorFunction = {
+  modifiesProject: false,
+  renderForEditor: ({ args, shouldShowDetails }) => {
+    const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
+    const gameplay_script = SafeExtractor.extractStringProperty(
+      args,
+      'gameplay_script'
+    );
+    return {
+      text: (
+        <Trans>
+          Test gameplay for scene <b>{scene_name || '?'}</b>.
+        </Trans>
+      ),
+      hasDetailsToShow: !!gameplay_script,
+      details:
+        shouldShowDetails && gameplay_script ? (
+          <pre
+            style={{
+              margin: 0,
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-all',
+              fontFamily: 'monospace',
+              fontSize: 11,
+              userSelect: 'text',
+              WebkitUserSelect: 'text',
+            }}
+          >
+            {gameplay_script}
+          </pre>
+        ) : null,
+    };
+  },
+  launchFunction: async ({
+    args,
+    toolOptions,
+    project,
+  }): Promise<EditorFunctionGenericOutput> => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+    const gameplay_script = extractRequiredString(args, 'gameplay_script');
+    const timeout_ms =
+      SafeExtractor.extractNumberProperty(args, 'timeout_ms') ?? 15000;
+
+    const testGameplayFn = toolOptions && toolOptions.testGameplay;
+    if (!testGameplayFn) {
+      return makeGenericFailure(
+        'Gameplay testing is not available in this context. The test_gameplay function requires a simulation runtime to be configured.'
+      );
+    }
+
+    if (!project.hasLayoutNamed(scene_name)) {
+      return makeGenericFailure(
+        `Scene "${scene_name}" does not exist in the project. Please use a valid scene name.`
+      );
+    }
+
+    let result;
+    try {
+      result = await testGameplayFn(scene_name, gameplay_script, timeout_ms);
+    } catch (error) {
+      return makeGenericFailure(
+        `Gameplay test failed: ${error.message || 'Unknown error'}`
+      );
+    }
+
+    const passed = result.passed;
+    const failedAssertions = (result.assertions || []).filter(a => !a.passed);
+    const errors = result.errors || [];
+
+    let message = passed
+      ? `Gameplay test passed after ${result.framesExecuted || 0} frames.`
+      : `Gameplay test failed after ${result.framesExecuted || 0} frames.`;
+
+    if (failedAssertions.length > 0) {
+      message +=
+        ' Failed assertions: ' +
+        failedAssertions.map(a => `"${a.message}"`).join(', ') +
+        '.';
+    }
+    if (errors.length > 0) {
+      message += ' Errors: ' + errors.join('; ') + '.';
+    }
+
+    return {
+      success: passed,
+      message,
+      properties: {
+        passed,
+        framesExecuted: result.framesExecuted || 0,
+        assertions: result.assertions || [],
+        errors,
+        objectStates: result.objectStates || {},
+        sceneVariables: result.sceneVariables || {},
+        eventLog: result.eventLog || [],
+      },
+    };
+  },
+};
+
 export const editorFunctions: { [string]: EditorFunction } = {
   create_object: createOrReplaceObject,
   create_or_replace_object: createOrReplaceObject,
@@ -5083,6 +5215,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   add_or_edit_variable: addOrEditVariable,
   read_full_docs: readFullDocs,
   create_or_update_plan: createOrUpdatePlan,
+  test_gameplay: testGameplay,
 };
 
 export const editorFunctionsWithoutProject: {

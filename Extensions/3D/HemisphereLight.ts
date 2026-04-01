@@ -1,11 +1,22 @@
 namespace gdjs {
   interface HemisphereLightFilterNetworkSyncData {
-    i: number;
-    sc: number;
-    gc: number;
-    e: number;
-    r: number;
-    t: string;
+    i?: number;
+    intensity?: number;
+
+    sc?: number;
+    skyColor?: number;
+
+    gc?: number;
+    groundColor?: number;
+
+    e?: number;
+    elevation?: number;
+
+    r?: number;
+    rotation?: number;
+
+    t?: string;
+    top?: string;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::HemisphereLight',
@@ -144,25 +155,31 @@ namespace gdjs {
               );
             }
           }
-          getNetworkSyncData(): HemisphereLightFilterNetworkSyncData {
+          getNetworkSyncData(
+            syncOptions: GetNetworkSyncDataOptions
+          ): HemisphereLightFilterNetworkSyncData {
+            const getKey = (abbrev: string, full: string) =>
+              syncOptions.useFullNames ? full : abbrev;
             return {
-              i: this._light.intensity,
-              sc: this._light.color.getHex(),
-              gc: this._light.groundColor.getHex(),
-              e: this._elevation,
-              r: this._rotation,
-              t: this._top,
-            };
+              [getKey('i', 'intensity')]: this._light.intensity,
+              [getKey('sc', 'skyColor')]: this._light.color.getHex(),
+              [getKey('gc', 'groundColor')]: this._light.groundColor.getHex(),
+              [getKey('e', 'elevation')]: this._elevation,
+              [getKey('r', 'rotation')]: this._rotation,
+              [getKey('t', 'top')]: this._top,
+            } as HemisphereLightFilterNetworkSyncData;
           }
           updateFromNetworkSyncData(
             syncData: HemisphereLightFilterNetworkSyncData
           ): void {
-            this._light.intensity = syncData.i;
-            this._light.color.setHex(syncData.sc);
-            this._light.groundColor.setHex(syncData.gc);
-            this._elevation = syncData.e;
-            this._rotation = syncData.r;
-            this._top = syncData.t;
+            if (syncData.i !== undefined) this._light.intensity = syncData.i;
+            if (syncData.sc !== undefined)
+              this._light.color.setHex(syncData.sc);
+            if (syncData.gc !== undefined)
+              this._light.groundColor.setHex(syncData.gc);
+            if (syncData.e !== undefined) this._elevation = syncData.e;
+            if (syncData.r !== undefined) this._rotation = syncData.r;
+            if (syncData.t !== undefined) this._top = syncData.t;
             this.updateRotation();
           }
         })();

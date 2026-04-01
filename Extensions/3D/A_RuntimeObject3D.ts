@@ -4,14 +4,21 @@ namespace gdjs {
 
   type Object3DNetworkSyncDataType = {
     // z is position on the Z axis, different from zo, which is Z order
-    z: number;
-    d: number;
-    rx: number;
-    ry: number;
+    z?: number;
+
+    d?: number;
+    depth?: number;
+
+    rx?: number;
+    rotationX?: number;
+
     // no need for rz, as it is the angle from gdjs.RuntimeObject
-    flipX: boolean;
-    flipY: boolean;
-    flipZ: boolean;
+    ry?: number;
+    rotationY?: number;
+
+    flipX?: boolean;
+    flipY?: boolean;
+    flipZ?: boolean;
   };
 
   /** @category Objects > 3D Objects */
@@ -123,12 +130,14 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): Object3DNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
         z: this.getZ(),
-        d: this.getDepth(),
-        rx: this.getRotationX(),
-        ry: this.getRotationY(),
+        [getKey('d', 'depth')]: this.getDepth(),
+        [getKey('rx', 'rotationX')]: this.getRotationX(),
+        [getKey('ry', 'rotationY')]: this.getRotationY(),
         flipX: this.isFlippedX(),
         flipY: this.isFlippedY(),
         flipZ: this.isFlippedZ(),

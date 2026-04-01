@@ -25,14 +25,29 @@ namespace gdjs {
    * @category Objects > Tile Map
    */
   export type TilemapNetworkSyncDataType = {
-    op: number;
-    tmjf: string;
-    tsjf: string;
-    tmai: string;
-    dm: string;
-    lai: number;
-    lei: number;
-    asps: number;
+    op?: number;
+    opacity?: number;
+
+    tmjf?: string;
+    tilemapJsonFile?: string;
+
+    tsjf?: string;
+    tilesetJsonFile?: string;
+
+    tmai?: string;
+    tilemapAtlasImage?: string;
+
+    dm?: string;
+    displayMode?: string;
+
+    lai?: number;
+    layerIndex?: number;
+
+    lei?: number;
+    levelIndex?: number;
+
+    asps?: number;
+    animationSpeedScale?: number;
   };
 
   /**
@@ -161,16 +176,18 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): TilemapNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        op: this._opacity,
-        tmjf: this._tilemapJsonFile,
-        tsjf: this._tilesetJsonFile,
-        tmai: this._tilemapAtlasImage,
-        dm: this._displayMode,
-        lai: this._layerIndex,
-        lei: this._levelIndex,
-        asps: this._animationSpeedScale,
+        [getKey('op', 'opacity')]: this._opacity,
+        [getKey('tmjf', 'tilemapJsonFile')]: this._tilemapJsonFile,
+        [getKey('tsjf', 'tilesetJsonFile')]: this._tilesetJsonFile,
+        [getKey('tmai', 'tilemapAtlasImage')]: this._tilemapAtlasImage,
+        [getKey('dm', 'displayMode')]: this._displayMode,
+        [getKey('lai', 'layerIndex')]: this._layerIndex,
+        [getKey('lei', 'levelIndex')]: this._levelIndex,
+        [getKey('asps', 'animationSpeedScale')]: this._animationSpeedScale,
       };
     }
 

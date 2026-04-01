@@ -1,7 +1,10 @@
 namespace gdjs {
   interface AmbientLightFilterNetworkSyncData {
-    i: number;
-    c: number;
+    i?: number;
+    intensity?: number;
+
+    c?: number;
+    color?: number;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::AmbientLight',
@@ -88,15 +91,19 @@ namespace gdjs {
             return 0;
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
-          getNetworkSyncData(): AmbientLightFilterNetworkSyncData {
+          getNetworkSyncData(
+            syncOptions: GetNetworkSyncDataOptions
+          ): AmbientLightFilterNetworkSyncData {
+            const getKey = (abbrev: string, full: string) =>
+              syncOptions.useFullNames ? full : abbrev;
             return {
-              i: this.light.intensity,
-              c: this.light.color.getHex(),
-            };
+              [getKey('i', 'intensity')]: this.light.intensity,
+              [getKey('c', 'color')]: this.light.color.getHex(),
+            } as AmbientLightFilterNetworkSyncData;
           }
           updateFromNetworkSyncData(data: AmbientLightFilterNetworkSyncData) {
-            this.light.intensity = data.i;
-            this.light.color.setHex(data.c);
+            if (data.i !== undefined) this.light.intensity = data.i;
+            if (data.c !== undefined) this.light.color.setHex(data.c);
           }
         })();
       }

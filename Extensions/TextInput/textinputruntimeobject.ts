@@ -70,21 +70,50 @@ namespace gdjs {
    * @category Objects > Text Input
    */
   export type TextInputNetworkSyncDataType = {
-    opa: float;
-    txt: string;
-    frn: string;
-    fs: number;
-    place: string;
-    it: SupportedInputType;
-    tc: string;
-    fc: string;
-    fo: float;
-    bc: string;
-    bo: float;
-    bw: float;
-    dis: boolean;
-    ro: boolean;
-    sc: boolean;
+    opa?: float;
+    opacity?: float;
+
+    txt?: string;
+    text?: string;
+
+    frn?: string;
+    fontResourceName?: string;
+
+    fs?: number;
+    fontSize?: number;
+
+    place?: string;
+    placeholder?: string;
+
+    it?: SupportedInputType;
+    inputType?: SupportedInputType;
+
+    tc?: string;
+    textColor?: string;
+
+    fc?: string;
+    fillColor?: string;
+
+    fo?: float;
+    fillOpacity?: float;
+
+    bc?: string;
+    borderColor?: string;
+
+    bo?: float;
+    borderOpacity?: float;
+
+    bw?: float;
+    borderWidth?: float;
+
+    dis?: boolean;
+    isDisabled?: boolean;
+
+    ro?: boolean;
+    isReadOnly?: boolean;
+
+    sc?: boolean;
+    isSpellCheckEnabled?: boolean;
   };
 
   /**
@@ -283,23 +312,25 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): TextInputNetworkSyncData {
+      const getKey = (abbrev: string, full: string) =>
+        syncOptions.useFullNames ? full : abbrev;
       return {
         ...super.getNetworkSyncData(syncOptions),
-        opa: this.getOpacity(),
-        txt: this.getText(),
-        frn: this.getFontResourceName(),
-        fs: this.getFontSize(),
-        place: this.getPlaceholder(),
-        it: this.getInputType(),
-        tc: this.getTextColor(),
-        fc: this.getFillColor(),
-        fo: this.getFillOpacity(),
-        bc: this.getBorderColor(),
-        bo: this.getBorderOpacity(),
-        bw: this.getBorderWidth(),
-        dis: this.isDisabled(),
-        ro: this.isReadOnly(),
-        sc: this.isSpellCheckEnabled(),
+        [getKey('opa', 'opacity')]: this.getOpacity(),
+        [getKey('txt', 'text')]: this.getText(),
+        [getKey('frn', 'fontResourceName')]: this.getFontResourceName(),
+        [getKey('fs', 'fontSize')]: this.getFontSize(),
+        [getKey('place', 'placeholder')]: this.getPlaceholder(),
+        [getKey('it', 'inputType')]: this.getInputType(),
+        [getKey('tc', 'textColor')]: this.getTextColor(),
+        [getKey('fc', 'fillColor')]: this.getFillColor(),
+        [getKey('fo', 'fillOpacity')]: this.getFillOpacity(),
+        [getKey('bc', 'borderColor')]: this.getBorderColor(),
+        [getKey('bo', 'borderOpacity')]: this.getBorderOpacity(),
+        [getKey('bw', 'borderWidth')]: this.getBorderWidth(),
+        [getKey('dis', 'isDisabled')]: this.isDisabled(),
+        [getKey('ro', 'isReadOnly')]: this.isReadOnly(),
+        [getKey('sc', 'isSpellCheckEnabled')]: this.isSpellCheckEnabled(),
       };
     }
 

@@ -99,7 +99,7 @@ namespace gdjs {
       updateColorParameter(parameterName: string, value: number): void;
       getDoubleParameter(parameterName: string): number;
       getColorParameter(parameterName: string): number;
-      getNetworkSyncData(): any;
+      getNetworkSyncData(syncOptions: GetNetworkSyncDataOptions): any;
       updateFromNetworkSyncData(syncData: any): void;
     }
 
@@ -157,7 +157,10 @@ namespace gdjs {
         filter: PIXI.Filter,
         parameterName: string
       ): number;
-      abstract getNetworkSyncData(filter: PIXI.Filter): any;
+      abstract getNetworkSyncData(
+        filter: PIXI.Filter,
+        syncOptions: GetNetworkSyncDataOptions
+      ): any;
       abstract updateFromNetworkSyncData(
         filter: PIXI.Filter,
         syncData: any
@@ -267,10 +270,13 @@ namespace gdjs {
         );
       }
 
-      getNetworkSyncData(): any {
+      getNetworkSyncData(syncOptions: GetNetworkSyncDataOptions): any {
         return {
           ena: this.pixiFilter.enabled,
-          fc: this.filterCreator.getNetworkSyncData(this.pixiFilter),
+          fc: this.filterCreator.getNetworkSyncData(
+            this.pixiFilter,
+            syncOptions
+          ),
         };
       }
 
@@ -310,7 +316,7 @@ namespace gdjs {
       getColorParameter(parameterName: string): number {
         return 0;
       }
-      getNetworkSyncData(): any {
+      getNetworkSyncData(syncOptions: GetNetworkSyncDataOptions): any {
         return {};
       }
       updateFromNetworkSyncData(syncData: any): void {}

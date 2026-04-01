@@ -2,6 +2,7 @@
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 import ResourcesList, { type ResourcesListInterface } from '../ResourcesList';
 import ResourcePropertiesEditor, {
   type ResourcePropertiesEditorInterface,
@@ -300,21 +301,26 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         type: 'secondary',
         title: t`Properties`,
         renderEditor: () => (
-          <ResourcePropertiesEditor
-            key={selectedResource ? selectedResource.ptr : undefined}
-            resources={selectedResource ? [selectedResource] : []}
-            project={project}
-            resourcesLoader={this.resourcesLoader}
-            ref={propertiesEditor =>
-              (this._propertiesEditor = propertiesEditor)
-            }
-            onResourcePathUpdated={() => {
-              if (this._resourcesList) {
-                this._resourcesList.checkMissingPaths();
-              }
-            }}
-            resourceManagementProps={resourceManagementProps}
-          />
+          <I18n>
+            {({ i18n }) => (
+              <ResourcePropertiesEditor
+                key={selectedResource ? selectedResource.ptr : undefined}
+                resources={selectedResource ? [selectedResource] : []}
+                project={project}
+                resourcesLoader={this.resourcesLoader}
+                ref={propertiesEditor =>
+                  (this._propertiesEditor = propertiesEditor)
+                }
+                onResourcePathUpdated={() => {
+                  if (this._resourcesList) {
+                    this._resourcesList.checkMissingPaths();
+                  }
+                }}
+                resourceManagementProps={resourceManagementProps}
+                i18n={i18n}
+              />
+            )}
+          </I18n>
         ),
       },
       'resources-list': {

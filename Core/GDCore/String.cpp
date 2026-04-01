@@ -433,18 +433,27 @@ String& String::Normalize(String::NormForm form)
 {
     unsigned char *newStr = nullptr;
 
-    if(form == NFD)
+    switch (form) {
+      case NFD:
         newStr = utf8proc_NFD((unsigned char*)m_string.c_str());
-    else if(form == NFC)
+        break;
+      case NFC:
         newStr = utf8proc_NFC((unsigned char*)m_string.c_str());
-    else if(form == NFKD)
+        break;
+      case NFKD:
         newStr = utf8proc_NFKD((unsigned char*)m_string.c_str());
-    else if(form == NFKC)
+        break;
+      case NFKC:
         newStr = utf8proc_NFKC((unsigned char*)m_string.c_str());
+        break;
+      default:
+        return *this;
+    }
 
-    m_string = (char*)newStr;
-
-    free(newStr);
+    if (newStr != nullptr) {
+      m_string = (char*)newStr;
+      free(newStr);
+    }
 
     return *this;
 }

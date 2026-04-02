@@ -148,8 +148,11 @@ namespace gdjs {
           ? 'use-credentials'
           : 'anonymous',
       });
-      PIXI.Assets.add({ alias: resource.name, src: url, data: { images } });
-      PIXI.Assets.load<pixi_spine.TextureAtlas | string>(resource.name).then(
+      // Use the full URL (which contains a cache buster) as alias rather than
+      // the resource name, so that after a hot-reload PIXI.Assets.add registers
+      // a fresh resolver entry instead of silently reusing the stale one.
+      PIXI.Assets.add({ alias: url, src: url, data: { images } });
+      PIXI.Assets.load<pixi_spine.TextureAtlas | string>(url).then(
         (atlas) => {
           /**
            * Ideally atlas of TextureAtlas should be passed here
@@ -222,10 +225,6 @@ namespace gdjs {
         loadingSpineAtlas.then((atl) => atl.dispose());
         this._loadingSpineAtlases.delete(resourceData);
       }
-
-      // Also unload from PIXI.Assets cache so that a subsequent
-      // loadResource properly re-fetches and re-parses the atlas.
-      PIXI.Assets.unload(resourceData.name);
     }
   }
 }

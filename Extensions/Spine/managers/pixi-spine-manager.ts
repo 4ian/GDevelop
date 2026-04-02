@@ -72,12 +72,15 @@ namespace gdjs {
             ? 'use-credentials'
             : 'anonymous',
         });
+        // Use the full URL (which contains a cache buster) as alias rather than
+        // the resource name, so that after a hot-reload PIXI.Assets.add registers
+        // a fresh resolver entry instead of silently reusing the stale one.
         PIXI.Assets.add({
-          alias: resource.name,
+          alias: url,
           src: url,
           data: { spineAtlas },
         });
-        const loadedJson = await PIXI.Assets.load(resource.name);
+        const loadedJson = await PIXI.Assets.load(url);
 
         if (loadedJson.spineData) {
           this._loadedSpines.set(resource, loadedJson.spineData);
@@ -90,7 +93,6 @@ namespace gdjs {
         logger.error(
           `Error while preloading spine resource ${resource.name}: ${error}`
         );
-        PIXI.Assets.unload(resource.name);
         throw error;
       }
     }
@@ -135,10 +137,6 @@ namespace gdjs {
       if (loadedSpine) {
         this._loadedSpines.delete(resourceData);
       }
-
-      // Also unload from PIXI.Assets cache so that a subsequent
-      // loadResource properly re-fetches and re-parses the spine data.
-      PIXI.Assets.unload(resourceData.name);
     }
   }
 }

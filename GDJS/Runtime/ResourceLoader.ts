@@ -248,6 +248,11 @@ namespace gdjs {
         // Spine extension not available.
         return;
       }
+      if (!this._imageManager) {
+        // Called too early (during constructor, before _imageManager is set).
+        // Will be called again after _imageManager is initialized.
+        return;
+      }
 
       this._spineAtlasManager = new gdjs.SpineAtlasManager(
         this,

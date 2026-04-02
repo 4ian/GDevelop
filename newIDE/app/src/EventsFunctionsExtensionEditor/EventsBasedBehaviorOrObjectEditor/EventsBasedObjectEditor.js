@@ -17,6 +17,7 @@ import CompactPropertiesEditorRowField from '../../CompactPropertiesEditor/Compa
 import { CompactTextAreaField } from '../../UI/CompactTextAreaField';
 import CompactSemiControlledTextField from '../../UI/CompactSemiControlledTextField';
 import { CompactToggleField } from '../../UI/CompactToggleField';
+import { CompactIconField } from '../OptionsEditorDialog/CompactIconField';
 
 const gd: libGDevelop = global.gd;
 
@@ -40,6 +41,7 @@ export default function EventsBasedObjectEditor({
   onEventsBasedObjectChildrenEdited,
 }: Props): React.Node {
   const forceUpdate = useForceUpdate();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const onChange = React.useCallback(
     () => {
@@ -97,6 +99,23 @@ export default function EventsBasedObjectEditor({
               eventsBasedObject.setDescription(text);
               onChange();
             }}
+          />
+          <CompactIconField
+            onLoadChange={setIsLoading}
+            isLoading={isLoading}
+            getPreviewIconUrl={() => eventsBasedObject.getPreviewIconUrl()}
+            setPreviewIconUrl={value => {
+              eventsBasedObject.setPreviewIconUrl(value);
+            }}
+            setIconUrl={value => {
+              eventsBasedObject.setIconUrl(value);
+            }}
+            disabled={!eventsFunctionsExtension.getIconUrl()}
+            placeholder={
+              eventsFunctionsExtension.getIconUrl()
+                ? ''
+                : i18n._(t`Set an icon to the extension first`)
+            }
           />
           <CompactPropertiesEditorRowField
             label={i18n._(t`Default name for created objects`)}

@@ -5,6 +5,9 @@ declare class gdEventsBasedBehavior extends gdAbstractEventsBasedEntity {
   setFullName(fullName: string): gdEventsBasedBehavior;
   setDescription(description: string): gdEventsBasedBehavior;
   setPrivate(isPrivate: boolean): gdEventsBasedBehavior;
+  setPreviewIconUrl(previewIconUrl: string): gdEventsBasedBehavior;
+  setIconUrl(iconUrl: string): gdEventsBasedBehavior;
+  setHelpPath(helpPath: string): gdEventsBasedBehavior;
   setObjectType(fullName: string): gdEventsBasedBehavior;
   getObjectType(): string;
   setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): gdEventsBasedBehavior;

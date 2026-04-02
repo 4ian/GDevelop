@@ -517,9 +517,7 @@ namespace gdjs {
       }
       // Update project data and re-load assets (sound/image/font/json managers
       // will take care of reloading only what is needed).
-      runtimeGame
-        .getResourceLoader()
-        .registerOptionalManagersForHotReload();
+      runtimeGame.getResourceLoader().registerOptionalManagersForHotReload();
       runtimeGame.setProjectData(newProjectData);
       await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
         currentScene.getName(),

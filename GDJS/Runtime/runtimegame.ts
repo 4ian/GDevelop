@@ -407,6 +407,10 @@ namespace gdjs {
         getGlobalResourceNames(projectData),
         projectData.layouts
       );
+      // During hot-reload, spine extension scripts may have been loaded
+      // after the ResourceLoader was constructed. Register spine managers
+      // if they are now available but weren't before.
+      this._resourcesLoader.registerSpineManagersIfNeeded();
     }
 
     private _updateSceneAndExtensionsData(): void {

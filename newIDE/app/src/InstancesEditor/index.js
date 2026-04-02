@@ -686,6 +686,13 @@ export default class InstancesEditor extends Component<Props, State> {
       nextProps.width !== this.props.width ||
       nextProps.height !== this.props.height
     ) {
+      // If the renderer is not initialized yet, bail out.
+      // Initialization will happen in componentDidMount/componentDidUpdate
+      // with the correct size.
+      if (!this.pixiRenderer) {
+        return;
+      }
+
       // Ensure we don't resize to 0, which is invalid for PixiJS/WebGL.
       const width = nextProps.width || 1;
       const height = nextProps.height || 1;
@@ -696,7 +703,18 @@ export default class InstancesEditor extends Component<Props, State> {
       // which will crash if Three.js's stale program is still active).
       if (this.threeRenderer) {
         this.threeRenderer.resetState();
-        this.pixiRenderer.reset();
+        // Resetting the PixiJS renderer triggers a flush of the internal batch,
+        // which can crash if sprites with destroyed textures are still in the batch
+        // (e.g., after instances renderer was recreated). Catch and ignore these
+        // errors as the batch will be cleared by the reset anyway.
+        try {
+          this.pixiRenderer.reset();
+        } catch (error) {
+          console.warn(
+            'PixiJS renderer reset failed during resize (stale batch state), continuing:',
+            error
+          );
+        }
       }
 
       this.pixiRenderer.resize(width, height);

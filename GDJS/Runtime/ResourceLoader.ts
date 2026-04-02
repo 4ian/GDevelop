@@ -202,17 +202,7 @@ namespace gdjs {
       this._model3DManager = new gdjs.Model3DManager(this);
       this._svgManager = new InternalInGameEditorOnlySvgManager();
 
-      // add spine related managers only if spine extension is used
-      if (gdjs.SpineAtlasManager && gdjs.SpineManager) {
-        this._spineAtlasManager = new gdjs.SpineAtlasManager(
-          this,
-          this._imageManager
-        );
-        this._spineManager = new gdjs.SpineManager(
-          this,
-          this._spineAtlasManager
-        );
-      }
+      this._registerSpineManagersIfNeeded();
 
       const resourceManagers: Array<ResourceManager> = [
         this._imageManager,
@@ -241,6 +231,42 @@ namespace gdjs {
      */
     getRuntimeGame(): RuntimeGame {
       return this._runtimeGame;
+    }
+
+    /**
+     * Register spine managers if the spine extension classes are available
+     * but managers haven't been created yet. This handles the case where
+     * spine extension scripts are loaded after the ResourceLoader was
+     * constructed (e.g., after a hot-reload adds a Spine object).
+     */
+    private _registerSpineManagersIfNeeded(): void {
+      if (this._spineAtlasManager && this._spineManager) {
+        // Already registered.
+        return;
+      }
+      if (!gdjs.SpineAtlasManager || !gdjs.SpineManager) {
+        // Spine extension not available.
+        return;
+      }
+
+      this._spineAtlasManager = new gdjs.SpineAtlasManager(
+        this,
+        this._imageManager
+      );
+      this._spineManager = new gdjs.SpineManager(
+        this,
+        this._spineAtlasManager
+      );
+
+      // Register the new resource kinds in the map.
+      if (this._resourceManagersMap) {
+        for (const resourceKind of this._spineAtlasManager.getResourceKinds()) {
+          this._resourceManagersMap.set(resourceKind, this._spineAtlasManager);
+        }
+        for (const resourceKind of this._spineManager.getResourceKinds()) {
+          this._resourceManagersMap.set(resourceKind, this._spineManager);
+        }
+      }
     }
 
     /**
@@ -292,6 +318,11 @@ namespace gdjs {
 
         this._resources.set(resourceData.name, resourceData);
       }
+
+      // During hot-reload, spine extension scripts may have been loaded
+      // after the ResourceLoader was constructed. Register spine managers
+      // if they are now available but weren't before.
+      this._registerSpineManagersIfNeeded();
     }
 
     async loadAllResources(

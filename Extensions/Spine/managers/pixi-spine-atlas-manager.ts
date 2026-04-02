@@ -222,6 +222,10 @@ namespace gdjs {
         loadingSpineAtlas.then((atl) => atl.dispose());
         this._loadingSpineAtlases.delete(resourceData);
       }
+
+      // Also unload from PIXI.Assets cache so that a subsequent
+      // loadResource properly re-fetches and re-parses the atlas.
+      PIXI.Assets.unload(resourceData.name);
     }
   }
 }

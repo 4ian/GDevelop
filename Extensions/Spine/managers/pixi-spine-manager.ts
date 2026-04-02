@@ -135,6 +135,10 @@ namespace gdjs {
       if (loadedSpine) {
         this._loadedSpines.delete(resourceData);
       }
+
+      // Also unload from PIXI.Assets cache so that a subsequent
+      // loadResource properly re-fetches and re-parses the spine data.
+      PIXI.Assets.unload(resourceData.name);
     }
   }
 }

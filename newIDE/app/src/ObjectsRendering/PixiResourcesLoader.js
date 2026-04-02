@@ -360,30 +360,49 @@ export default class PixiResourcesLoader {
       delete loadedBitmapFonts[resourceName];
     }
     if (loadedOrLoadingThreeTextures[resourceName]) {
-      const threeTexture = await loadedOrLoadingThreeTextures[resourceName];
-      threeTexture.dispose();
+      const threeTexturePromise = loadedOrLoadingThreeTextures[resourceName];
       delete loadedOrLoadingThreeTextures[resourceName];
+      try {
+        const threeTexture = await threeTexturePromise;
+        threeTexture.dispose();
+      } catch (e) {
+        // Ignore errors if the texture failed to load.
+      }
     }
     if (spineAtlasPromises[resourceName]) {
+      // Save the promise reference before deleting, so we can try to dispose
+      // the texture atlas if it was already loaded.
+      const atlasPromise = spineAtlasPromises[resourceName];
+      delete spineAtlasPromises[resourceName];
+
       await PIXI.Assets.unload(resourceName).catch(async () => {
         // Workaround:
         // This is an expected error due to https://github.com/pixijs/spine/issues/537 issue (read comments
         // and search the other mentions to this issue in the codebase):
         // A string, instead of a TextureAtlas, is stored as the loaded atlas resource (which is the root cause of this exception).
         // pixi-spine considers it acts on a TextureAtlas and tries to call dispose on it that causes a TypeError.
-        const { textureAtlas } = await spineAtlasPromises[resourceName];
-        if (textureAtlas) {
-          textureAtlas.dispose(); // Workaround by doing `dispose` ourselves.
+        //
+        // Use Promise.race to avoid hanging forever if the atlas is still
+        // loading (e.g., reloadResource called while the initial load is in
+        // progress — the unload may have destroyed resources the load needs).
+        const result = await Promise.race([
+          atlasPromise,
+          Promise.resolve(null),
+        ]);
+        if (result && result.textureAtlas) {
+          result.textureAtlas.dispose(); // Workaround by doing `dispose` ourselves.
         }
       });
-      delete spineAtlasPromises[resourceName];
 
       // Also reload any resource embedding this resource:
       await this._reloadEmbedderResources(project, resourceName, 'spine');
     }
     if (spineDataPromises[resourceName]) {
-      await PIXI.Assets.unload(resourceName);
       delete spineDataPromises[resourceName];
+      await PIXI.Assets.unload(resourceName).catch(() => {
+        // The spine data might not be in PIXI's cache (e.g., if the load
+        // was still in progress or already cleaned up). Ignore the error.
+      });
 
       // This line allows us to avoid issue https://github.com/pixijs/pixijs/issues/10069.
       // PIXI.Assets.resolver caches data that was passed to `PIXI.Assets.add`, even if resource was unloaded.

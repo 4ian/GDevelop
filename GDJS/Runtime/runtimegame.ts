@@ -366,23 +366,7 @@ namespace gdjs {
       this._playerId = null;
 
       this._embeddedResourcesMappings = new Map();
-      for (const resource of this._data.resources.resources) {
-        if (resource.metadata) {
-          try {
-            const metadata = JSON.parse(resource.metadata);
-            if (metadata?.embeddedResourcesMapping) {
-              this._embeddedResourcesMappings.set(
-                resource.name,
-                metadata.embeddedResourcesMapping
-              );
-            }
-          } catch {
-            logger.error(
-              'Some metadata of resources can not be successfully parsed.'
-            );
-          }
-        }
-      }
+      this._updateEmbeddedResourcesMappings();
 
       if (this.isUsingGDevelopDevelopmentEnvironment()) {
         logger.info(
@@ -402,6 +386,7 @@ namespace gdjs {
       }
       this._data = projectData;
       this._updateSceneAndExtensionsData();
+      this._updateEmbeddedResourcesMappings();
       this._resourcesLoader.setResources(
         projectData.resources.resources,
         getGlobalResourceNames(projectData),
@@ -430,6 +415,27 @@ namespace gdjs {
             this._eventsBasedObjectDatas.set(
               extension.name + '::' + eventsBasedObject.name,
               eventsBasedObject
+            );
+          }
+        }
+      }
+    }
+
+    private _updateEmbeddedResourcesMappings(): void {
+      this._embeddedResourcesMappings.clear();
+      for (const resource of this._data.resources.resources) {
+        if (resource.metadata) {
+          try {
+            const metadata = JSON.parse(resource.metadata);
+            if (metadata?.embeddedResourcesMapping) {
+              this._embeddedResourcesMappings.set(
+                resource.name,
+                metadata.embeddedResourcesMapping
+              );
+            }
+          } catch {
+            logger.error(
+              'Some metadata of resources can not be successfully parsed.'
             );
           }
         }

@@ -2441,6 +2441,9 @@ export class AbstractEventsBasedEntity extends EmscriptenObject {
   getFullName(): string;
   getDescription(): string;
   isPrivate(): boolean;
+  getPreviewIconUrl(): string;
+  getIconUrl(): string;
+  getHelpPath(): string;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
 }
@@ -2451,6 +2454,9 @@ export class EventsBasedBehavior extends AbstractEventsBasedEntity {
   setFullName(fullName: string): EventsBasedBehavior;
   setDescription(description: string): EventsBasedBehavior;
   setPrivate(isPrivate: boolean): EventsBasedBehavior;
+  setPreviewIconUrl(previewIconUrl: string): EventsBasedBehavior;
+  setIconUrl(iconUrl: string): EventsBasedBehavior;
+  setHelpPath(helpPath: string): EventsBasedBehavior;
   setObjectType(fullName: string): EventsBasedBehavior;
   getObjectType(): string;
   setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): EventsBasedBehavior;
@@ -2486,6 +2492,9 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   setFullName(fullName: string): EventsBasedObject;
   setDescription(description: string): EventsBasedObject;
   setPrivate(isPrivate: boolean): EventsBasedObject;
+  setPreviewIconUrl(previewIconUrl: string): EventsBasedObject;
+  setIconUrl(iconUrl: string): EventsBasedObject;
+  setHelpPath(helpPath: string): EventsBasedObject;
   setDefaultName(defaultName: string): EventsBasedObject;
   setAssetStoreTag(assetStoreTag: string): EventsBasedObject;
   getDefaultName(): string;

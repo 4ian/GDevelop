@@ -72,12 +72,13 @@ namespace gdjs {
             ? 'use-credentials'
             : 'anonymous',
         });
+        const alias = url;
         PIXI.Assets.add({
-          alias: resource.name,
+          alias,
           src: url,
           data: { spineAtlas },
         });
-        const loadedJson = await PIXI.Assets.load(resource.name);
+        const loadedJson = await PIXI.Assets.load(alias);
 
         if (loadedJson.spineData) {
           this._loadedSpines.set(resource, loadedJson.spineData);
@@ -90,7 +91,6 @@ namespace gdjs {
         logger.error(
           `Error while preloading spine resource ${resource.name}: ${error}`
         );
-        PIXI.Assets.unload(resource.name);
         throw error;
       }
     }

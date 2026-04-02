@@ -289,10 +289,27 @@ export default class PixiResourcesLoader {
       embeddedResourceName,
       embedderResourceKind
     );
+
+    if (embeddedResources.length === 0) {
+      return;
+    }
+
+    console.log(
+      `Reloading resources embedding ${embeddedResourceName}: ${embeddedResources
+        .map(embeddedResource => embeddedResource.getName())
+        .join(', ')}`
+    );
     await Promise.all(
-      embeddedResources.map(embeddedResource =>
-        this.reloadResource(project, embeddedResource.getName())
-      )
+      embeddedResources.map(async embeddedResource => {
+        const result = await this._doReloadResource(
+          project,
+          embeddedResource.getName()
+        );
+        return result;
+      })
+    );
+    console.log(
+      `Finished reloading resources embedding ${embeddedResourceName}.`
     );
   }
 
@@ -346,7 +363,6 @@ export default class PixiResourcesLoader {
       await this._reloadEmbedderResources(project, resourceName, 'atlas');
     }
 
-    console.info(`Now loading new texture(s) for resource "${resourceName}".`);
     await PixiResourcesLoader.loadTextures(project, [resourceName]);
 
     if (loadedOrLoading3DModelPromises[resourceName]) {
@@ -478,7 +494,17 @@ export default class PixiResourcesLoader {
       })
       .filter(Boolean);
 
-    // TODO use a PromisePool to be able to abort the previous reload of resources.
+    const allResources = [...imageResources, ...videoResources];
+    if (allResources.length === 0) {
+      return;
+    }
+
+    console.log(
+      `Loading textures for resources ${allResources
+        .map(resource => resource.getName())
+        .join(', ')}...`
+    );
+
     await Promise.all([
       ...imageResources.map(async resource => {
         const resourceName = resource.getName();

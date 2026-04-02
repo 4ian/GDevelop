@@ -696,7 +696,10 @@ export default class InstancesEditor extends Component<Props, State> {
       // which will crash if Three.js's stale program is still active).
       if (this.threeRenderer) {
         this.threeRenderer.resetState();
-        this.pixiRenderer.reset();
+
+        // Actually do not reset PixiJS renderer as we get crashes when doing it
+        // ("Cannot read properties of null (reading '_batchEnabled')").
+        // this.pixiRenderer.reset();
       }
 
       this.pixiRenderer.resize(width, height);

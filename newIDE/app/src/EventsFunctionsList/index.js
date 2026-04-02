@@ -1650,6 +1650,7 @@ const EventsFunctionsList = React.forwardRef<
         ) => {
           if (!functionFolderOrFunction) {
             setSelectedItems([]);
+            onSelectEventsFunction(null, null, null);
             return;
           }
           const functionItemId = getTreeViewItemIdFromFunctionFolderOrFunction(
@@ -1697,6 +1698,7 @@ const EventsFunctionsList = React.forwardRef<
         eventsFunctionsExtension,
         eventFunctionCommonProps,
         eventFunctionFolderCommonProps,
+        onSelectEventsFunction,
       ]
     );
 

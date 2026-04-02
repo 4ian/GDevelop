@@ -20,6 +20,7 @@ import { CompactTextAreaField } from '../../UI/CompactTextAreaField';
 import CompactSemiControlledTextField from '../../UI/CompactSemiControlledTextField';
 import CompactSelectField from '../../UI/CompactSelectField';
 import { CompactToggleField } from '../../UI/CompactToggleField';
+import { CompactIconField } from '../OptionsEditorDialog/CompactIconField';
 
 const gd: libGDevelop = global.gd;
 
@@ -41,6 +42,7 @@ export default function EventsBasedBehaviorEditor({
   onConfigurationUpdated,
 }: Props): React.Node {
   const forceUpdate = useForceUpdate();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const onChange = React.useCallback(
     () => {
@@ -112,6 +114,23 @@ export default function EventsBasedBehaviorEditor({
               eventsBasedBehavior.setDescription(text);
               onChange();
             }}
+          />
+          <CompactIconField
+            onLoadChange={setIsLoading}
+            isLoading={isLoading}
+            getPreviewIconUrl={() => eventsBasedBehavior.getPreviewIconUrl()}
+            setPreviewIconUrl={value => {
+              eventsBasedBehavior.setPreviewIconUrl(value);
+            }}
+            setIconUrl={value => {
+              eventsBasedBehavior.setIconUrl(value);
+            }}
+            disabled={!eventsFunctionsExtension.getIconUrl()}
+            placeholder={
+              eventsFunctionsExtension.getIconUrl()
+                ? ''
+                : i18n._(t`Set an icon to the extension first`)
+            }
           />
           <CompactObjectTypeSelector
             project={project}

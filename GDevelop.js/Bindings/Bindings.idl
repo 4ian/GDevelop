@@ -3372,6 +3372,9 @@ interface AbstractEventsBasedEntity {
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetDescription();
     boolean IsPrivate();
+    [Const, Ref] DOMString GetPreviewIconUrl();
+    [Const, Ref] DOMString GetIconUrl();
+    [Const, Ref] DOMString GetHelpPath();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -3384,6 +3387,9 @@ interface EventsBasedBehavior {
     [Ref] EventsBasedBehavior SetFullName([Const] DOMString fullName);
     [Ref] EventsBasedBehavior SetDescription([Const] DOMString description);
     [Ref] EventsBasedBehavior SetPrivate(boolean isPrivate);
+    [Ref] EventsBasedBehavior SetPreviewIconUrl([Const] DOMString previewIconUrl);
+    [Ref] EventsBasedBehavior SetIconUrl([Const] DOMString iconUrl);
+    [Ref] EventsBasedBehavior SetHelpPath([Const] DOMString helpPath);
 
     [Ref] EventsBasedBehavior SetObjectType([Const] DOMString fullName);
     [Const, Ref] DOMString GetObjectType();
@@ -3425,6 +3431,9 @@ interface EventsBasedObject {
     [Ref] EventsBasedObject SetFullName([Const] DOMString fullName);
     [Ref] EventsBasedObject SetDescription([Const] DOMString description);
     [Ref] EventsBasedObject SetPrivate(boolean isPrivate);
+    [Ref] EventsBasedObject SetPreviewIconUrl([Const] DOMString previewIconUrl);
+    [Ref] EventsBasedObject SetIconUrl([Const] DOMString iconUrl);
+    [Ref] EventsBasedObject SetHelpPath([Const] DOMString helpPath);
 
 
     [Ref] EventsBasedObject SetDefaultName([Const] DOMString defaultName);

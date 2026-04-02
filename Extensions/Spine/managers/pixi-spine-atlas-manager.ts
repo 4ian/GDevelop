@@ -141,6 +141,7 @@ namespace gdjs {
         callback(null, atlas);
       };
       const url = this._resourceLoader.getFullUrl(resource.file);
+      const alias = url;
 
       PIXI.Assets.setPreferences({
         preferWorkers: false,
@@ -148,8 +149,8 @@ namespace gdjs {
           ? 'use-credentials'
           : 'anonymous',
       });
-      PIXI.Assets.add({ alias: resource.name, src: url, data: { images } });
-      PIXI.Assets.load<pixi_spine.TextureAtlas | string>(resource.name).then(
+      PIXI.Assets.add({ alias, src: url, data: { images } });
+      PIXI.Assets.load<pixi_spine.TextureAtlas | string>(alias).then(
         (atlas) => {
           /**
            * Ideally atlas of TextureAtlas should be passed here

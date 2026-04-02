@@ -282,9 +282,13 @@ export default class PixiResourcesLoader {
       embeddedResourceName,
       embedderResourceKind
     );
+    // Call _doReloadResource directly instead of reloadResource to avoid a
+    // deadlock: we are already running inside the ongoingResourceReloads chain,
+    // so chaining another reloadResource would wait for the current reload to
+    // finish first — which itself is waiting for this embedder reload.
     await Promise.all(
       embeddedResources.map(embeddedResource =>
-        this.reloadResource(project, embeddedResource.getName())
+        this._doReloadResource(project, embeddedResource.getName())
       )
     );
   }

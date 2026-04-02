@@ -209,9 +209,7 @@ const zipAssets = async (
         }
 
         textFiles.push({
-          text: addFinalNewline(
-            JSON.stringify(serializedObject, null, 2)
-          ),
+          text: addFinalNewline(JSON.stringify(serializedObject, null, 2)),
           filePath: 'objects/' + path + object.getName() + '.asset.json',
         });
       })
@@ -230,9 +228,7 @@ const zipAssets = async (
         'serializeToExternal'
       );
       textFiles.push({
-        text: addFinalNewline(
-          JSON.stringify(serializedExtension, null, 2)
-        ),
+        text: addFinalNewline(JSON.stringify(serializedExtension, null, 2)),
         filePath: 'extensions/' + extensionName + '.json',
       });
     }

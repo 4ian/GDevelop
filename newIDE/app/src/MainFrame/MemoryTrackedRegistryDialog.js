@@ -30,6 +30,7 @@ const trackedClasses = [
   'ObjectGroupsContainer',
   'ObjectsContainer',
   'VariablesContainer',
+  'JsCodeEvent',
 ];
 
 type Stats = {|

@@ -384,6 +384,9 @@ interface EventsBasedObjectVariantHelper {
     void STATIC_ComplyVariantsToEventsBasedObject(
         [Ref, Const] Project project,
         [Ref] EventsBasedObject eventsBasedObject);
+    [Value] VectorString STATIC_FindAllChildrenCustomObjectType(
+        [ Ref, Const ] Project project,
+        [ Ref, Const ] EventsBasedObject eventsBasedObject);
 };
 
 interface ObjectGroupsContainer {
@@ -784,6 +787,13 @@ interface ProjectScopedContainers {
   [Const, Ref] ObjectsContainersList GetObjectsContainersList();
   [Const, Ref] VariablesContainersList GetVariablesContainersList();
   [Const, Ref] ResourcesContainersList GetResourcesContainersList();
+
+  [Const, Ref] DOMString GetScopeSceneName();
+  [Const, Ref] DOMString GetScopeExternalEventsName();
+  [Const, Ref] DOMString GetScopeExtensionName();
+  [Const, Ref] DOMString GetScopeFunctionName();
+  [Const, Ref] DOMString GetScopeBehaviorName();
+  [Const, Ref] DOMString GetScopeObjectName();
 };
 
 interface ExtensionProperties {
@@ -1344,7 +1354,7 @@ interface ResourcesContainer {
     [Const, Ref] Resource GetResource([Const] DOMString name);
     [Const, Ref] Resource GetResourceAt(unsigned long index);
     [Const, Ref] DOMString GetResourceNameWithOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
-    [Const, Ref] DOMString GetResourceNameWithFile([Const] DOMString file);
+    [Value] VectorString GetResourceNamesWithFile([Const] DOMString file);
     boolean AddResource([Const, Ref] Resource res);
     void RemoveResource([Const] DOMString name);
     void RenameResource([Const] DOMString oldName, [Const] DOMString name);
@@ -2672,7 +2682,9 @@ interface VectorUnfilledRequiredBehaviorPropertyProblem {
 
 interface ProjectBrowserHelper {
     void STATIC_ExposeProjectEvents([Ref] Project project, [Ref] ArbitraryEventsWorker worker);
+    void STATIC_ExposeProjectEventsWithoutExtensions([Ref] Project project, [Ref] ReadOnlyArbitraryEventsWorkerWithContext worker);
     void STATIC_ExposeProjectObjects([Ref] Project project, [Ref] ArbitraryObjectsWorker worker);
+    void STATIC_ExposeEventsFunctionsExtensionEvents([Ref] Project project, [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Ref] ReadOnlyArbitraryEventsWorkerWithContext worker);
 };
 
 interface ResourceExposer {
@@ -3703,11 +3715,15 @@ interface EventsContextAnalyzer {
 };
 
 interface ReadOnlyArbitraryEventsWorkerWithContext {
+    void SetSkipDisabledEvents(boolean skip);
     void Launch([Const, Ref] EventsList events, [Const, Ref] ProjectScopedContainers projectScopedContainers);
 };
 [JSImplementation=ReadOnlyArbitraryEventsWorkerWithContext]
 interface ReadOnlyArbitraryEventsWorkerWithContextJS {
     void ReadOnlyArbitraryEventsWorkerWithContextJS();
+
+    // Called at the start of each Launch, before event traversal begins
+    void DoOnLaunch([Const, Ref] EventsList events);
 
     // Called for each event visited
     void DoVisitEvent([Const, Ref] BaseEvent event);
@@ -4365,6 +4381,13 @@ interface JsCodeEvent {
     void SetDisabled(boolean disable);
     boolean IsFolded();
     void SetFolded(boolean folded);
+
+    long GetScrollTop();
+    void SetScrollTop(long value);
+    long GetCursorColumn();
+    void SetCursorColumn(long value);
+    long GetCursorLine();
+    void SetCursorLine(long value);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);

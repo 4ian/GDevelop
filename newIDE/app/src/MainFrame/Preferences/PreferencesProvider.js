@@ -82,7 +82,6 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
 };
 
 export const getInitialPreferences = (): {
-  aiState: { aiRequestId: null },
   autoDisplayChangelog: boolean,
   autoDownloadUpdates: boolean,
   autoOpenMostRecentProject: boolean,
@@ -133,6 +132,7 @@ export const getInitialPreferences = (): {
   themeName: any,
   use3DEditor: any,
   useBackgroundSerializerForSaving: boolean,
+  showJsTypeError: boolean,
   useGDJSDevelopmentWatcher: boolean,
   useShortcutToClosePreviewWindow: boolean,
   userShortcutMap: {},
@@ -390,8 +390,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ): any),
     // $FlowFixMe[method-unbinding]
-    setAiState: (this._setAiState.bind(this): any),
-    // $FlowFixMe[method-unbinding]
     setAutomaticallyUseCreditsForAiRequests: (this._setAutomaticallyUseCreditsForAiRequests.bind(
       this
     ): any),
@@ -399,6 +397,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setUseBackgroundSerializerForSaving: (this._setUseBackgroundSerializerForSaving.bind(
       this
     ): any),
+    // $FlowFixMe[method-unbinding]
+    setShowJsTypeError: (this._setShowJsTypeError.bind(this): any),
   };
 
   componentDidMount() {
@@ -1249,6 +1249,15 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setShowJsTypeError(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: { ...state.values, showJsTypeError: newValue },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _getEditorStateForProject(projectId: string): any {
     const editorState = this.state.values.editorStateByProject[projectId];
     if (!editorState) return null;
@@ -1352,21 +1361,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           showAiAskButtonInTitleBar: newValue,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
-  _setAiState(newValue: {| aiRequestId: string | null |}) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          aiState: {
-            ...state.values.aiState,
-            ...newValue,
-          },
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

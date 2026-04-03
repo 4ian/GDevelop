@@ -418,6 +418,7 @@ export class ObjectVariableHelper extends EmscriptenObject {
 
 export class EventsBasedObjectVariantHelper extends EmscriptenObject {
   static complyVariantsToEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject): void;
+  static findAllChildrenCustomObjectType(project: Project, eventsBasedObject: EventsBasedObject): VectorString;
 }
 
 export class ObjectGroupsContainer extends EmscriptenObject {
@@ -694,6 +695,12 @@ export class ProjectScopedContainers extends EmscriptenObject {
   getObjectsContainersList(): ObjectsContainersList;
   getVariablesContainersList(): VariablesContainersList;
   getResourcesContainersList(): ResourcesContainersList;
+  getScopeSceneName(): string;
+  getScopeExternalEventsName(): string;
+  getScopeExtensionName(): string;
+  getScopeFunctionName(): string;
+  getScopeBehaviorName(): string;
+  getScopeObjectName(): string;
 }
 
 export class ExtensionProperties extends EmscriptenObject {
@@ -1133,7 +1140,7 @@ export class ResourcesContainer extends EmscriptenObject {
   getResource(name: string): Resource;
   getResourceAt(index: number): Resource;
   getResourceNameWithOrigin(originName: string, originIdentifier: string): string;
-  getResourceNameWithFile(file: string): string;
+  getResourceNamesWithFile(file: string): VectorString;
   addResource(res: Resource): boolean;
   removeResource(name: string): void;
   renameResource(oldName: string, name: string): void;
@@ -2070,7 +2077,9 @@ export class VectorUnfilledRequiredBehaviorPropertyProblem extends EmscriptenObj
 
 export class ProjectBrowserHelper extends EmscriptenObject {
   static exposeProjectEvents(project: Project, worker: ArbitraryEventsWorker): void;
+  static exposeProjectEventsWithoutExtensions(project: Project, worker: ReadOnlyArbitraryEventsWorkerWithContext): void;
   static exposeProjectObjects(project: Project, worker: ArbitraryObjectsWorker): void;
+  static exposeEventsFunctionsExtensionEvents(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, worker: ReadOnlyArbitraryEventsWorkerWithContext): void;
 }
 
 export class ResourceExposer extends EmscriptenObject {
@@ -2727,11 +2736,13 @@ export class EventsContextAnalyzer extends EmscriptenObject {
 }
 
 export class ReadOnlyArbitraryEventsWorkerWithContext extends EmscriptenObject {
+  setSkipDisabledEvents(skip: boolean): void;
   launch(events: EventsList, projectScopedContainers: ProjectScopedContainers): void;
 }
 
 export class ReadOnlyArbitraryEventsWorkerWithContextJS extends ReadOnlyArbitraryEventsWorkerWithContext {
   constructor();
+  doOnLaunch(events: EventsList): void;
   doVisitEvent(event: BaseEvent): void;
   doVisitInstruction(instruction: Instruction, isCondition: boolean, projectScopedContainers: ProjectScopedContainers): void;
 }
@@ -3242,6 +3253,12 @@ export class JsCodeEvent extends EmscriptenObject {
   setDisabled(disable: boolean): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
+  getScrollTop(): number;
+  setScrollTop(value: number): void;
+  getCursorColumn(): number;
+  setCursorColumn(value: number): void;
+  getCursorLine(): number;
+  setCursorLine(value: number): void;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
 }

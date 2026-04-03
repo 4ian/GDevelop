@@ -11,6 +11,7 @@ import PoppedOutMonacoEditor from './PoppedOutMonacoEditor';
 import {
   registerThemes,
   initializeCompletions,
+  enableJsTypeDiagnostics,
   baseEditorOptions,
 } from './MonacoSetup';
 
@@ -21,6 +22,14 @@ export type State = {|
 export type Props = {|
   value: string,
   onChange: string => void,
+  initialScrollTop: number,
+  initialCursorColumn: number,
+  initialCursorLine: number,
+  saveEditorState: ({
+    scrollTop: number,
+    cursorColumn: number,
+    cursorLine: number,
+  }) => void,
   width?: number,
   height?: number,
   onEditorMounted?: () => void,
@@ -28,139 +37,179 @@ export type Props = {|
   onBlur: () => void,
 |};
 
-export class CodeEditor extends React.Component<Props, State> {
-  // $FlowFixMe[missing-local-annot]
-  state = {
-    MonacoEditor: null,
-    error: null,
-  };
+export const CodeEditor = ({
+  value,
+  onChange,
+  initialScrollTop,
+  initialCursorColumn,
+  initialCursorLine,
+  saveEditorState,
+  width,
+  height,
+  onEditorMounted,
+  onFocus,
+  onBlur,
+}: Props): React.Node => {
+  const [MonacoEditor, setMonacoEditor] = React.useState<any>(null);
+  const [error, setError] = React.useState<Error | null>(null);
 
-  setupEditorThemes = (monaco: any) => {
+  const { values: preferences } = React.useContext(PreferencesContext);
+  const portalContainer = React.useContext(PortalContainerContext);
+
+  const setupEditorThemes = React.useCallback((monaco: any) => {
     registerThemes(monaco);
-  };
+  }, []);
 
-  setupEditorCompletions = (editor: any, monaco: any) => {
-    editor.onDidFocusEditorText(this.props.onFocus);
-    editor.onDidBlurEditorText(this.props.onBlur);
-    initializeCompletions(monaco);
-    if (this.props.onEditorMounted) this.props.onEditorMounted();
-  };
+  const setUpSaveOnEditorBlur = React.useCallback(
+    (editor: any) => {
+      editor.onDidBlurEditorText(onBlur);
+    },
+    [onBlur]
+  );
+  const setUpEditorFocus = React.useCallback(
+    (editor: any) => {
+      editor.onDidFocusEditorText(onFocus);
+    },
+    [onFocus]
+  );
 
-  componentDidMount() {
-    this.loadMonacoEditor();
-  }
+  const setupEditorCompletions = React.useCallback(
+    (editor: any, monaco: any) => {
+      setUpEditorFocus(editor);
+      setUpSaveOnEditorBlur(editor);
+      initializeCompletions(monaco);
 
-  handleLoadError(error: Error) {
-    this.setState({
-      error,
-    });
-  }
+      if (preferences.showJsTypeError) {
+        enableJsTypeDiagnostics(monaco);
+      }
 
-  loadMonacoEditor() {
-    this.setState({
-      error: null,
-    });
+      editor.setScrollTop(initialScrollTop);
+      editor.setPosition({
+        column: initialCursorColumn,
+        lineNumber: initialCursorLine,
+      });
 
-    // Define the global variable used by Monaco Editor to find its worker
-    // (used, at least, for auto-completions).
-    window.MonacoEnvironment = {
-      getWorkerUrl: function(workerId, label) {
-        return 'external/monaco-editor-min/vs/base/worker/workerMain.js';
-      },
-    };
+      if (onEditorMounted) onEditorMounted();
+    },
+    [
+      initialCursorColumn,
+      initialCursorLine,
+      initialScrollTop,
+      onEditorMounted,
+      preferences.showJsTypeError,
+      setUpEditorFocus,
+      setUpSaveOnEditorBlur,
+    ]
+  );
 
-    import(/* webpackChunkName: "react-monaco-editor" */ 'react-monaco-editor')
-      .then(module =>
-        this.setState({
-          MonacoEditor: module.default,
-        })
-      )
-      // $FlowFixMe[method-unbinding]
-      .catch(this.handleLoadError);
-  }
+  const handleLoadError = React.useCallback((error: Error) => {
+    setError(error);
+  }, []);
 
-  _handleContextMenu = (event: SyntheticEvent<>) => {
+  const loadMonacoEditor = React.useCallback(
+    () => {
+      setError(null);
+
+      // Define the global variable used by Monaco Editor to find its worker
+      // (used, at least, for auto-completions).
+      window.MonacoEnvironment = {
+        getWorkerUrl: function(workerId, label) {
+          return 'external/monaco-editor-min/vs/base/worker/workerMain.js';
+        },
+      };
+
+      import(/* webpackChunkName: "react-monaco-editor" */ 'react-monaco-editor')
+        .then(module => setMonacoEditor(oldValue => module.default))
+        .catch(handleLoadError);
+    },
+    [handleLoadError]
+  );
+
+  // Load the editor on mount.
+  React.useEffect(() => {
+    loadMonacoEditor();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const _handleContextMenu = React.useCallback((event: SyntheticEvent<>) => {
     // Prevent right click to bubble up and trigger the context menu
     // of the event.
     event.preventDefault();
     event.stopPropagation();
-  };
+  }, []);
 
-  render(): any {
+  const _saveEditorState = React.useCallback(
+    (editor: any, monaco: any) => {
+      const cursorPosition = editor.getPosition();
+      saveEditorState({
+        scrollTop: editor.getScrollTop(),
+        cursorColumn: cursorPosition.column,
+        cursorLine: cursorPosition.lineNumber,
+      });
+    },
+    [saveEditorState]
+  );
+
+  // When rendered inside a popped-out window (PortalContainerContext
+  // is set), use PoppedOutMonacoEditor which loads Monaco via the
+  // AMD loader in the target window's context. This is necessary
+  // because the webpack-bundled Monaco (react-monaco-editor) has
+  // internal DOM checks that compare against the main window's
+  // document.body — elements in a different window's document are
+  // treated as detached and never rendered.
+  if (portalContainer) {
     return (
-      <PortalContainerContext.Consumer>
-        {portalContainer => {
-          // When rendered inside a popped-out window (PortalContainerContext
-          // is set), use PoppedOutMonacoEditor which loads Monaco via the
-          // AMD loader in the target window's context. This is necessary
-          // because the webpack-bundled Monaco (react-monaco-editor) has
-          // internal DOM checks that compare against the main window's
-          // document.body — elements in a different window's document are
-          // treated as detached and never rendered.
-          if (portalContainer) {
-            return (
-              <PreferencesContext.Consumer>
-                {({ values: preferences }) => (
-                  <PoppedOutMonacoEditor
-                    value={this.props.value}
-                    onChange={this.props.onChange}
-                    width={this.props.width || 600}
-                    height={this.props.height || 200}
-                    theme={preferences.codeEditorThemeName}
-                    fontSize={preferences.eventsSheetZoomLevel}
-                    onEditorMounted={this.props.onEditorMounted}
-                    onFocus={this.props.onFocus}
-                    onBlur={this.props.onBlur}
-                  />
-                )}
-              </PreferencesContext.Consumer>
-            );
-          }
-
-          const { MonacoEditor, error } = this.state;
-          if (error) {
-            return (
-              <React.Fragment>
-                <Text>
-                  <Trans>Unable to load the code editor</Trans>
-                </Text>
-                <RaisedButton
-                  label={<Trans>Retry</Trans>}
-                  // $FlowFixMe[method-unbinding]
-                  onClick={this.loadMonacoEditor}
-                />
-              </React.Fragment>
-            );
-          }
-
-          if (!MonacoEditor) {
-            return <PlaceholderLoader />;
-          }
-
-          return (
-            <div onContextMenu={this._handleContextMenu}>
-              <PreferencesContext.Consumer>
-                {({ values: preferences }) => (
-                  <MonacoEditor
-                    width={this.props.width || 600}
-                    height={this.props.height || 200}
-                    language="javascript"
-                    theme={preferences.codeEditorThemeName}
-                    value={this.props.value}
-                    onChange={this.props.onChange}
-                    editorWillMount={this.setupEditorThemes}
-                    editorDidMount={this.setupEditorCompletions}
-                    options={{
-                      ...baseEditorOptions,
-                      fontSize: preferences.eventsSheetZoomLevel,
-                    }}
-                  />
-                )}
-              </PreferencesContext.Consumer>
-            </div>
-          );
-        }}
-      </PortalContainerContext.Consumer>
+      <PoppedOutMonacoEditor
+        value={value}
+        onChange={onChange}
+        width={width || 600}
+        height={height || 200}
+        theme={preferences.codeEditorThemeName}
+        fontSize={preferences.eventsSheetZoomLevel}
+        showJsTypeError={preferences.showJsTypeError}
+        initialScrollTop={initialScrollTop}
+        initialCursorColumn={initialCursorColumn}
+        initialCursorLine={initialCursorLine}
+        saveEditorState={saveEditorState}
+        onEditorMounted={onEditorMounted}
+        onFocus={onFocus}
+        onBlur={onBlur}
+      />
     );
   }
-}
+
+  if (error) {
+    return (
+      <React.Fragment>
+        <Text>
+          <Trans>Unable to load the code editor</Trans>
+        </Text>
+        <RaisedButton label={<Trans>Retry</Trans>} onClick={loadMonacoEditor} />
+      </React.Fragment>
+    );
+  }
+
+  if (!MonacoEditor) {
+    return <PlaceholderLoader />;
+  }
+
+  return (
+    <div onContextMenu={_handleContextMenu}>
+      <MonacoEditor
+        width={width || 600}
+        height={height || 200}
+        language="javascript"
+        theme={preferences.codeEditorThemeName}
+        value={value}
+        onChange={onChange}
+        editorWillMount={setupEditorThemes}
+        editorDidMount={setupEditorCompletions}
+        editorWillUnmount={_saveEditorState}
+        options={{
+          ...baseEditorOptions,
+          fontSize: preferences.eventsSheetZoomLevel,
+        }}
+      />
+    </div>
+  );
+};

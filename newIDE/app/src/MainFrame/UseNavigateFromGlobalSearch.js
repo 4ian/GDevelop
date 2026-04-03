@@ -16,6 +16,9 @@ type Props = {|
     name: string,
     locationType: LocationType,
     eventPath: EventPath,
+    functionName?: string,
+    behaviorName?: ?string,
+    objectName?: ?string,
   |}) => void,
   openLayout: (
     name: string,
@@ -183,6 +186,9 @@ const useNavigateFromGlobalSearch = ({
         name,
         locationType,
         eventPath,
+        functionName,
+        behaviorName,
+        objectName,
       });
 
       openSearchedEditor({

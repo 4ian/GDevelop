@@ -189,7 +189,7 @@ export default class InstancesEditor extends Component<Props, State> {
   grid: Grid;
   background: Background;
   _unmounted = false;
-  _renderingPaused = false;
+  _renderingPausedReasons: Set<string> = new Set();
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
@@ -253,6 +253,10 @@ export default class InstancesEditor extends Component<Props, State> {
 
     let gameCanvas: HTMLCanvasElement;
     this._showObjectInstancesIn3D = this.props.showObjectInstancesIn3D;
+    // Ensure we don't initialize with 0 dimensions, which is invalid for PixiJS/WebGL
+    // and can cause shader creation to fail on some platforms (e.g. Windows with ANGLE).
+    const initialWidth = this.props.width || 1;
+    const initialHeight = this.props.height || 1;
     // TODO (3D): Should it handle preference changes without needing to reopen tabs?
     if (this._showObjectInstancesIn3D) {
       gameCanvas = document.createElement('canvas');
@@ -261,14 +265,14 @@ export default class InstancesEditor extends Component<Props, State> {
       });
       threeRenderer.useLegacyLights = true;
       threeRenderer.autoClear = false;
-      threeRenderer.setSize(this.props.width, this.props.height);
+      threeRenderer.setSize(initialWidth, initialHeight);
 
       // Create a PixiJS renderer that use the same GL context as Three.js
       // so that both can render to the canvas and even have PixiJS rendering
       // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
       this.pixiRenderer = new PIXI.Renderer({
-        width: this.props.width,
-        height: this.props.height,
+        width: initialWidth,
+        height: initialHeight,
         view: gameCanvas,
         context: threeRenderer.getContext(),
         clearBeforeRender: false,
@@ -285,8 +289,8 @@ export default class InstancesEditor extends Component<Props, State> {
     } else {
       // Create the renderer and setup the rendering area for scene editor.
       this.pixiRenderer = PIXI.autoDetectRenderer({
-        width: this.props.width,
-        height: this.props.height,
+        width: initialWidth,
+        height: initialHeight,
         // "preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
         preserveDrawingBuffer: true,
         // Disable anti-aliasing (default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
@@ -692,7 +696,10 @@ export default class InstancesEditor extends Component<Props, State> {
       // which will crash if Three.js's stale program is still active).
       if (this.threeRenderer) {
         this.threeRenderer.resetState();
-        this.pixiRenderer.reset();
+
+        // Actually do not reset PixiJS renderer as we get crashes when doing it
+        // ("Cannot read properties of null (reading '_batchEnabled')").
+        // this.pixiRenderer.reset();
       }
 
       this.pixiRenderer.resize(width, height);
@@ -747,10 +754,10 @@ export default class InstancesEditor extends Component<Props, State> {
     // For avoiding useless renderings, which is costly for CPU/GPU, when the editor
     // is not displayed, `pauseRendering` prop can be set to true.
     if (nextProps.pauseRendering && !this.props.pauseRendering)
-      this.pauseSceneRendering();
+      this.pauseSceneRendering('inactive');
 
     if (!nextProps.pauseRendering && this.props.pauseRendering)
-      this.restartSceneRendering();
+      this.resumeSceneRendering('inactive');
   }
 
   /**
@@ -1749,7 +1756,7 @@ export default class InstancesEditor extends Component<Props, State> {
   _renderScene = () => {
     // Protect against rendering scheduled after the component is unmounted.
     if (this._unmounted) return;
-    if (this._renderingPaused) return;
+    if (this._renderingPausedReasons.size > 0) return;
 
     // Avoid killing the CPU by limiting the rendering calls.
     try {
@@ -1797,9 +1804,9 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   };
 
-  pauseSceneRendering = () => {
+  pauseSceneRendering = (reason: string) => {
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
-    this._renderingPaused = true;
+    this._renderingPausedReasons.add(reason);
     // Deactivate interactions when the scene is paused.
     // Useful when the scene is paused to reload textures. The event system
     // might try to check if pointer is over a PIXI object using the texture
@@ -1810,8 +1817,18 @@ export default class InstancesEditor extends Component<Props, State> {
     stopPIXITicker();
   };
 
-  restartSceneRendering = () => {
-    this._renderingPaused = false;
+  resumeSceneRendering = (reason: string) => {
+    this._renderingPausedReasons.delete(reason);
+    if (this._renderingPausedReasons.size > 0) {
+      console.info(
+        `Scene rendering is still paused (reasons: ${[
+          ...this._renderingPausedReasons,
+        ].join(', ')}) after reason "${reason}" is removed.`
+      );
+      return;
+    }
+
+    console.info(`Resuming scene rendering (last reason: ${reason}).`);
     this._renderScene();
     this.instancesRenderer.getPixiContainer().eventMode = 'auto';
 

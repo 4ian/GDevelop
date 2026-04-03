@@ -18,6 +18,8 @@ import { type ParameterFieldInterface } from '../../ParameterFields/ParameterFie
 import { Trans } from '@lingui/macro';
 import ChevronArrowTop from '../../../UI/CustomSvgIcons/ChevronArrowTop';
 import ChevronArrowBottom from '../../../UI/CustomSvgIcons/ChevronArrowBottom';
+import { exceptionallyGuardAgainstDeadObject } from '../../../Utils/IsNullPtr';
+
 const gd: libGDevelop = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';
@@ -96,6 +98,26 @@ export default class JsCodeEvent extends React.Component<
   onChange = (newValue: string) => {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     jsCodeEvent.setInlineCode(newValue);
+  };
+
+  saveEditorState = ({
+    scrollTop,
+    cursorColumn,
+    cursorLine,
+  }: {
+    scrollTop: number,
+    cursorColumn: number,
+    cursorLine: number,
+  }): void => {
+    const jsCodeEvent = exceptionallyGuardAgainstDeadObject(
+      gd.asJsCodeEvent(this.props.event)
+    );
+    if (!jsCodeEvent) {
+      return;
+    }
+    jsCodeEvent.setScrollTop(scrollTop);
+    jsCodeEvent.setCursorColumn(cursorColumn);
+    jsCodeEvent.setCursorLine(cursorLine);
   };
 
   editObject = (domEvent: any) => {
@@ -270,6 +292,10 @@ export default class JsCodeEvent extends React.Component<
             <CodeEditor
               value={jsCodeEvent.getInlineCode()}
               onChange={this.onChange}
+              initialScrollTop={jsCodeEvent.getScrollTop()}
+              initialCursorColumn={jsCodeEvent.getCursorColumn()}
+              initialCursorLine={jsCodeEvent.getCursorLine()}
+              saveEditorState={this.saveEditorState}
               width={contentRect.bounds.width - 5}
               height={this._getCodeEditorHeight()}
               onEditorMounted={() => {

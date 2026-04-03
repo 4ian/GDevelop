@@ -563,15 +563,7 @@ namespace gdjs {
     }
 
     override getDrawableX(): float {
-      let minX = 0;
-      if (this._innerArea) {
-        minX = this._innerArea.min[0];
-      } else {
-        if (this._isUntransformedHitBoxesDirty) {
-          this._updateUntransformedHitBoxes();
-        }
-        minX = this._unrotatedAABB.min[0];
-      }
+      const minX = this.getUnscaledMinX();
       const absScaleX = this.getScaleX();
       if (!this._flippedX) {
         return this.x + minX * absScaleX;
@@ -584,16 +576,18 @@ namespace gdjs {
       }
     }
 
-    override getDrawableY(): float {
-      let minY = 0;
+    private getUnscaledMinX(): float {
       if (this._innerArea) {
-        minY = this._innerArea.min[1];
-      } else {
-        if (this._isUntransformedHitBoxesDirty) {
-          this._updateUntransformedHitBoxes();
-        }
-        minY = this._unrotatedAABB.min[1];
+        return this._innerArea.min[0];
       }
+      if (this._isUntransformedHitBoxesDirty) {
+        this._updateUntransformedHitBoxes();
+      }
+      return this._unrotatedAABB.min[0];
+    }
+
+    override getDrawableY(): float {
+      const minY = this.getUnscaledMinY();
       const absScaleY = this.getScaleY();
       if (!this._flippedY) {
         return this.y + minY * absScaleY;
@@ -604,6 +598,16 @@ namespace gdjs {
             absScaleY
         );
       }
+    }
+
+    private getUnscaledMinY(): float {
+      if (this._innerArea) {
+        return this._innerArea.min[1];
+      }
+      if (this._isUntransformedHitBoxesDirty) {
+        this._updateUntransformedHitBoxes();
+      }
+      return this._unrotatedAABB.min[1];
     }
 
     /**
@@ -705,13 +709,7 @@ namespace gdjs {
       if (this._customCenter) {
         return this._customCenter[0];
       }
-      if (this._innerArea) {
-        return (this._innerArea.min[0] + this._innerArea.max[0]) / 2;
-      }
-      if (this._isUntransformedHitBoxesDirty) {
-        this._updateUntransformedHitBoxes();
-      }
-      return (this._unrotatedAABB.min[0] + this._unrotatedAABB.max[0]) / 2;
+      return this.getUnscaledWidth() / 2 + this.getUnscaledMinX();
     }
 
     /**
@@ -721,13 +719,7 @@ namespace gdjs {
       if (this._customCenter) {
         return this._customCenter[1];
       }
-      if (this._innerArea) {
-        return (this._innerArea.min[1] + this._innerArea.max[1]) / 2;
-      }
-      if (this._isUntransformedHitBoxesDirty) {
-        this._updateUntransformedHitBoxes();
-      }
-      return (this._unrotatedAABB.min[1] + this._unrotatedAABB.max[1]) / 2;
+      return this.getUnscaledHeight() / 2 + this.getUnscaledMinY();
     }
 
     /**
@@ -758,15 +750,13 @@ namespace gdjs {
 
     override getCenterX(): float {
       return (
-        (this.getUnscaledCenterX() - this._unrotatedAABB.min[0]) *
-        this.getScaleX()
+        (this.getUnscaledCenterX() - this.getUnscaledMinX()) * this.getScaleX()
       );
     }
 
     override getCenterY(): float {
       return (
-        (this.getUnscaledCenterY() - this._unrotatedAABB.min[1]) *
-        this.getScaleY()
+        (this.getUnscaledCenterY() - this.getUnscaledMinY()) * this.getScaleY()
       );
     }
 

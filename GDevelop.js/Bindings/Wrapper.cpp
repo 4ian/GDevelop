@@ -408,6 +408,17 @@ class ReadOnlyArbitraryEventsWorkerWithContextJS : public ReadOnlyArbitraryEvent
         isCondition,
         (int)&GetProjectScopedContainers());
   }
+
+  virtual void DoOnLaunch(const gd::EventsList &events) {
+    EM_ASM(
+        {
+          var self = Module['getCache'](Module['ReadOnlyArbitraryEventsWorkerWithContextJS'])[$0];
+          if (self.hasOwnProperty('doOnLaunch'))
+            self.doOnLaunch(wrapPointer($1, Module['EventsList']));
+        },
+        (int)this,
+        (int)&events);
+  }
 };
 
 class InitialInstanceJSFunctorWrapper : public gd::InitialInstanceFunctor {
@@ -664,7 +675,9 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_RemoveObjectInEvents RemoveObjectInEvents
 #define STATIC_ReplaceStringInEvents ReplaceStringInEvents
 #define STATIC_ExposeProjectEvents ExposeProjectEvents
+#define STATIC_ExposeProjectEventsWithoutExtensions ExposeProjectEventsWithoutExtensions
 #define STATIC_ExposeProjectObjects ExposeProjectObjects
+#define STATIC_ExposeEventsFunctionsExtensionEvents ExposeEventsFunctionsExtensionEvents
 #define STATIC_ExposeWholeProjectResources ExposeWholeProjectResources
 #define STATIC_GetResourceTypes GetResourceTypes
 
@@ -792,6 +805,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_FillAnyVariableBetweenObjects FillAnyVariableBetweenObjects
 #define STATIC_ApplyChangesToVariants ApplyChangesToVariants
 #define STATIC_ComplyVariantsToEventsBasedObject ComplyVariantsToEventsBasedObject
+#define STATIC_FindAllChildrenCustomObjectType FindAllChildrenCustomObjectType
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
 #define STATIC_UpdateExtensionNameInEventsBasedBehavior \
   UpdateExtensionNameInEventsBasedBehavior

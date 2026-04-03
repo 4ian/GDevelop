@@ -665,10 +665,9 @@ public:
                             const gd::String &originIdentifier) const;
 
   /**
-   * \brief Return the name of the first resource with the given file, if any.
-   * If not found, an empty string is returned.
+   * \brief Return the names of the resources with the given file, if any.
    */
-  const gd::String &GetResourceNameWithFile(const gd::String &file) const;
+  std::vector<gd::String> GetResourceNamesWithFile(const gd::String &file) const;
 
   /**
    * \brief Return a list of the files, from the specified input list,

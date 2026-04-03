@@ -12,7 +12,7 @@ declare class gdResourcesContainer {
   getResource(name: string): gdResource;
   getResourceAt(index: number): gdResource;
   getResourceNameWithOrigin(originName: string, originIdentifier: string): string;
-  getResourceNameWithFile(file: string): string;
+  getResourceNamesWithFile(file: string): gdVectorString;
   addResource(res: gdResource): boolean;
   removeResource(name: string): void;
   renameResource(oldName: string, name: string): void;

@@ -192,6 +192,7 @@ type Props = {|
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   layout: gdLayout | null,
+  externalLayout?: gdExternalLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
   eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
@@ -601,27 +602,49 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   }
 
-  onResourceExternallyChanged = async (resourceInfo: {|
-    identifier: string,
-  |}) => {
-    const { project } = this.props;
+  _reloadResources = async (resourceNames: string[], reason: string) => {
+    const {
+      project,
+      layout,
+      externalLayout,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      eventsBasedObjectVariant,
+    } = this.props;
+    const { editorDisplay } = this;
 
-    const resourceName = project
-      .getResourcesManager()
-      .getResourceNameWithFile(resourceInfo.identifier);
-    if (resourceName) {
-      const { editorDisplay } = this;
-      if (!editorDisplay) return;
-      try {
-        // When reloading textures, there can be a short time during which
-        // the existing texture is removed but the InstancesEditor tries to use it
-        // through the RenderedInstance's, triggering crashes. So the scene rendering
-        // is paused during this period.
-        editorDisplay.startSceneRendering(false);
+    const name = externalLayout
+      ? externalLayout.getName()
+      : layout
+      ? layout.getName()
+      : [eventsFunctionsExtension, eventsBasedObject, eventsBasedObjectVariant]
+          .filter(Boolean)
+          .map(item => item.getName())
+          .join(' > ');
+
+    if (!editorDisplay) return;
+
+    try {
+      console.info(
+        `Reloading resources "${resourceNames.join(
+          ', '
+        )}" for scene "${name}" rendering (reason: ${reason}).`
+      );
+
+      // When reloading textures, there can be a short time during which
+      // the existing texture is removed but the InstancesEditor tries to use it
+      // through the RenderedInstance's, triggering crashes. So the scene rendering
+      // is paused during this period.
+      editorDisplay.startSceneRendering(false, 'resource-reload');
+      for (const resourceName of resourceNames) {
         await PixiResourcesLoader.reloadResource(project, resourceName);
+      }
 
-        editorDisplay.forceUpdateObjectsList();
+      editorDisplay.forceUpdateObjectsList();
 
+      // Find all the objects using the resources that were reloaded.
+      const objectNames = new Set<string>();
+      for (const resourceName of resourceNames) {
         const objectsCollector = new gd.ObjectsUsingResourceCollector(
           project.getResourcesManager(),
           resourceName
@@ -629,18 +652,55 @@ export default class SceneEditor extends React.Component<Props, State> {
         // $FlowIgnore - Flow does not know ObjectsUsingResourceCollector inherits from ArbitraryObjectsWorker
         // $FlowFixMe[incompatible-type]
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
-        const objectNames = objectsCollector.getObjectNames().toJSArray();
+        objectsCollector
+          .getObjectNames()
+          .toJSArray()
+          .forEach(objectName => {
+            objectNames.add(objectName);
+          });
         objectsCollector.delete();
-        ObjectsRenderingService.renderersCacheClearingMethods.forEach(clear =>
-          clear(project)
-        );
-        objectNames.forEach(objectName => {
-          editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
-        });
-      } finally {
-        editorDisplay.startSceneRendering(true);
       }
+      ObjectsRenderingService.renderersCacheClearingMethods.forEach(clear =>
+        clear(project)
+      );
+
+      console.info(
+        `Resetting instance renderers for objects using resources "${resourceNames.join(
+          ', '
+        )}": ${[...objectNames].join(', ')} (scene: "${name}").`
+      );
+      objectNames.forEach(objectName => {
+        editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
+      });
+    } finally {
+      console.info(
+        `Starting scene rendering again after reloading resources "${resourceNames.join(
+          ', '
+        )}": (scene: "${name}").`
+      );
+      editorDisplay.startSceneRendering(true, 'resource-reload');
     }
+  };
+
+  onResourceExternallyChanged = async (resourceInfo: {|
+    identifier: string,
+  |}) => {
+    const { project } = this.props;
+
+    const resourceNames = project
+      .getResourcesManager()
+      .getResourceNamesWithFile(resourceInfo.identifier)
+      .toJSArray();
+    if (resourceNames.length === 0) {
+      console.warn(
+        `A resource with file "${
+          resourceInfo.identifier
+        }" was changed, but no resource(s) with this file were found.`
+      );
+      return;
+    }
+
+    await this._reloadResources(resourceNames, 'resource file changed');
   };
 
   onInstancesModifiedOutsideEditor = () => {
@@ -844,7 +904,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     const selectedInstanceObjectName = this.instancesSelection
       .getSelectedInstances()[0]
       .getObjectName();
-    this.editObjectByName(selectedInstanceObjectName);
+    this.editObjectByName({
+      objectName: selectedInstanceObjectName,
+      initialTab: 'properties',
+      shouldSelectTheObject: false,
+    });
   };
 
   editLayerEffects = (layer: ?gdLayer) => {
@@ -907,15 +971,38 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  editObjectByName = (objectName: string, initialTab?: ObjectEditorTab) => {
+  editObjectByName = ({
+    objectName,
+    initialTab,
+    shouldSelectTheObject,
+  }: {
+    objectName: string,
+    initialTab: ObjectEditorTab,
+    shouldSelectTheObject: boolean,
+  }) => {
     const { globalObjectsContainer, objectsContainer } = this.props;
-    if (objectsContainer.hasObjectNamed(objectName))
-      this.editObject(objectsContainer.getObject(objectName), initialTab);
-    else if (
+    let global = false;
+    let container = null;
+    if (objectsContainer.hasObjectNamed(objectName)) {
+      container = objectsContainer;
+    } else if (
       globalObjectsContainer &&
       globalObjectsContainer.hasObjectNamed(objectName)
-    )
-      this.editObject(globalObjectsContainer.getObject(objectName), initialTab);
+    ) {
+      global = true;
+      container = globalObjectsContainer;
+    } else {
+      return;
+    }
+    this.editObject(container.getObject(objectName), initialTab);
+    if (shouldSelectTheObject) {
+      this._onObjectFolderOrObjectWithContextSelected({
+        objectFolderOrObject: container
+          .getRootFolder()
+          .getObjectNamed(objectName),
+        global,
+      });
+    }
   };
 
   editObjectInPropertiesPanel = (objectName: string) => {
@@ -1264,7 +1351,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstanceDoubleClicked = (instance: gdInitialInstance) => {
-    this.editObjectByName(instance.getObjectName());
+    this.editObjectByName({
+      objectName: instance.getObjectName(),
+      initialTab: 'properties',
+      shouldSelectTheObject: true,
+    });
   };
 
   _onInstancesMovedAndSendToEditor3D = (
@@ -2374,20 +2465,40 @@ export default class SceneEditor extends React.Component<Props, State> {
         { type: 'separator' },
         {
           label: i18n._(t`Edit object ${shortenString(objectName, 14)}`),
-          click: () => this.editObjectByName(objectName, 'properties'),
+          click: () =>
+            this.editObjectByName({
+              objectName,
+              initialTab: 'properties',
+              shouldSelectTheObject: true,
+            }),
         },
         {
           label: i18n._(t`Edit object variables`),
-          click: () => this.editObjectByName(objectName, 'variables'),
+          click: () =>
+            this.editObjectByName({
+              objectName,
+              initialTab: 'variables',
+              shouldSelectTheObject: true,
+            }),
         },
         {
           label: i18n._(t`Edit behaviors`),
-          click: () => this.editObjectByName(objectName, 'behaviors'),
+          click: () =>
+            this.editObjectByName({
+              objectName,
+              initialTab: 'behaviors',
+              shouldSelectTheObject: true,
+            }),
         },
         objectMetadata
           ? {
               label: i18n._(t`Edit effects`),
-              click: () => this.editObjectByName(objectName, 'effects'),
+              click: () =>
+                this.editObjectByName({
+                  objectName,
+                  initialTab: 'effects',
+                  shouldSelectTheObject: true,
+                }),
               enabled: objectMetadata.hasDefaultBehavior(
                 'EffectCapability::EffectBehavior'
               ),
@@ -2692,7 +2803,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay) this.editorDisplay.forceUpdatePropertiesEditor();
   };
 
-  forceUpdateCustomObjectRenderedInstances = () => {
+  forceUpdateCustomObjectRenderedInstances = async () => {
     const { project, projectScopedContainersAccessor } = this.props;
 
     const resourcesInUse = new gd.ResourcesInUseHelper(
@@ -2704,23 +2815,20 @@ export default class SceneEditor extends React.Component<Props, State> {
       }
     });
     const objectResourceNames = resourcesInUse
-      .getAllImages()
+      .getAllImages() // TODO: should probably check all resources.
       .toNewVectorString()
       .toJSArray();
     resourcesInUse.delete();
 
-    PixiResourcesLoader.loadTextures(project, objectResourceNames).then(() => {
-      // This callback is executed even if there is no image to load.
-      const { editorDisplay } = this;
-      if (editorDisplay) {
-        projectScopedContainersAccessor.forEachObject(object => {
-          editorDisplay.instancesHandlers.resetInstanceRenderersFor(
-            object.getName()
-          );
-        });
-      }
-      this.forceUpdateObjectsList();
-    });
+    await this._reloadResources(objectResourceNames, 'custom object edited');
+    const { editorDisplay } = this;
+    if (editorDisplay) {
+      projectScopedContainersAccessor.forEachObject(object => {
+        editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+          object.getName()
+        );
+      });
+    }
   };
 
   forceUpdateRenderedInstancesOfObject = (object: gdObject) => {
@@ -2731,22 +2839,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
     object.getConfiguration().exposeResources(resourcesInUse);
     const objectResourceNames = resourcesInUse
-      .getAllImages()
+      .getAllImages() // TODO: should probably check all resources.
       .toNewVectorString()
       .toJSArray();
     resourcesInUse.delete();
 
-    PixiResourcesLoader.loadTextures(project, objectResourceNames).then(() => {
-      // This callback is executed even if there is no image to load.
-      // Images need to be loaded first because instance renderers use the
-      // image dimensions to evaluate theirs. It may cause flickering otherwise.
-      if (this.editorDisplay) {
-        this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
-          object.getName()
-        );
-      }
-      this.forceUpdateObjectsList();
-    });
+    this._reloadResources(objectResourceNames, 'object edited');
   };
 
   render(): any {

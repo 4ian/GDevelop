@@ -240,10 +240,10 @@ export type PreferencesValues = {|
   gamesDashboardOrderBy: GamesDashboardOrderBy,
   takeScreenshotOnPreview: boolean,
   showAiAskButtonInTitleBar: boolean,
-  aiState: {| aiRequestId: string | null |},
   automaticallyUseCreditsForAiRequests: boolean,
   useBackgroundSerializerForSaving: boolean,
   disableNpmScriptConfirmation: boolean,
+  showJsTypeError: boolean,
 |};
 
 /**
@@ -364,11 +364,9 @@ export type Preferences = {|
   ) => void,
   setTakeScreenshotOnPreview: (enabled: boolean) => void,
   setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
-  setAiState: ({|
-    aiRequestId: string | null,
-  |}) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
   setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
+  setShowJsTypeError: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -430,10 +428,10 @@ export const initialPreferences = {
     gamesDashboardOrderBy: 'lastModifiedAt',
     takeScreenshotOnPreview: true,
     showAiAskButtonInTitleBar: true,
-    aiState: { aiRequestId: null },
     automaticallyUseCreditsForAiRequests: false,
     useBackgroundSerializerForSaving: false,
     disableNpmScriptConfirmation: false,
+    showJsTypeError: false,
   },
   setMultipleValues: () => {},
   setLanguage: () => {},
@@ -517,9 +515,9 @@ export const initialPreferences = {
   ) => {},
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
-  setAiState: ({ aiRequestId }: {| aiRequestId: string | null |}) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
+  setShowJsTypeError: (enabled: boolean) => {},
 };
 
 const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(

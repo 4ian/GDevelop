@@ -46,6 +46,9 @@ namespace gdjs {
         );
       }
 
+      const url = this._resourceLoader.getFullUrl(resource.file);
+      const alias = url;
+
       try {
         const game = this._resourceLoader.getRuntimeGame();
         const embeddedResourcesNames = game.getEmbeddedResourcesNames(
@@ -65,7 +68,7 @@ namespace gdjs {
         );
         const spineAtlas =
           await this._spineAtlasManager.getOrLoad(atlasResourceName);
-        const url = this._resourceLoader.getFullUrl(resource.file);
+
         PIXI.Assets.setPreferences({
           preferWorkers: false,
           crossOrigin: this._resourceLoader.checkIfCredentialsRequired(url)
@@ -73,11 +76,11 @@ namespace gdjs {
             : 'anonymous',
         });
         PIXI.Assets.add({
-          alias: resource.name,
+          alias,
           src: url,
           data: { spineAtlas },
         });
-        const loadedJson = await PIXI.Assets.load(resource.name);
+        const loadedJson = await PIXI.Assets.load(alias);
 
         if (loadedJson.spineData) {
           this._loadedSpines.set(resource, loadedJson.spineData);
@@ -90,7 +93,7 @@ namespace gdjs {
         logger.error(
           `Error while preloading spine resource ${resource.name}: ${error}`
         );
-        PIXI.Assets.unload(resource.name);
+        PIXI.Assets.unload(alias);
         throw error;
       }
     }

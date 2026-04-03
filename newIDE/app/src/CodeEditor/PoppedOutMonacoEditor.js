@@ -4,6 +4,7 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import {
   registerThemes,
   initializeCompletions,
+  enableJsTypeDiagnostics,
   baseEditorOptions,
 } from './MonacoSetup';
 
@@ -14,6 +15,15 @@ type Props = {|
   height: number,
   theme: string,
   fontSize: number,
+  showJsTypeError: boolean,
+  initialScrollTop: number,
+  initialCursorColumn: number,
+  initialCursorLine: number,
+  saveEditorState: ({
+    scrollTop: number,
+    cursorColumn: number,
+    cursorLine: number,
+  }) => void,
   onEditorMounted?: () => void,
   onFocus: () => void,
   onBlur: () => void,
@@ -166,6 +176,15 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
   componentWillUnmount() {
     this._unmounted = true;
     if (this._editor) {
+      // Save editor state before disposing.
+      const cursorPosition = this._editor.getPosition();
+      if (cursorPosition) {
+        this.props.saveEditorState({
+          scrollTop: this._editor.getScrollTop(),
+          cursorColumn: cursorPosition.column,
+          cursorLine: cursorPosition.lineNumber,
+        });
+      }
       this._editor.dispose();
       this._editor = null;
     }
@@ -196,6 +215,10 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
     registerThemes(monaco);
     initializeCompletions(monaco);
 
+    if (this.props.showJsTypeError) {
+      enableJsTypeDiagnostics(monaco);
+    }
+
     this._editor = monaco.editor.create(container, {
       ...baseEditorOptions,
       value: this.props.value,
@@ -217,6 +240,13 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
     this._editor.layout({
       width: this.props.width,
       height: this.props.height,
+    });
+
+    // Restore scroll position and cursor.
+    this._editor.setScrollTop(this.props.initialScrollTop);
+    this._editor.setPosition({
+      column: this.props.initialCursorColumn,
+      lineNumber: this.props.initialCursorLine,
     });
 
     this.setState({ loading: false });

@@ -188,7 +188,9 @@ import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
 import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
-import useCreateProject from '../Utils/UseCreateProject';
+import useCreateProject, {
+  type UseCreateProjectReturnType,
+} from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
@@ -1437,7 +1439,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     createProjectFromInAppTutorial,
     createProjectFromTutorial,
     createProjectFromCourseChapter,
-  } = useCreateProject({
+  }: UseCreateProjectReturnType = useCreateProject({
     beforeCreatingProject: () => {
       setIsProjectOpening(true);
     },
@@ -1463,7 +1465,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           currentFileMetadata: newFileMetadata,
         }));
       }
-      setNewProjectSetupDialogOpen(false);
+      closeNewProjectDialog();
       if (options.openQuickCustomizationDialog) {
         setQuickCustomizationDialogOpenedFromGameId(oldProjectId);
       } else {
@@ -1479,10 +1481,10 @@ const MainFrame = (props: Props): React.MixedElement => {
           })
         : openSceneOrProjectManager({
             currentProject: project,
-            editorTabs: editorTabs,
+            editorTabs,
           });
       // If Ask AI editor was opened, reposition it.
-      const openedAskAIEditor = getOpenedAskAiEditor(state.editorTabs);
+      const openedAskAIEditor = getOpenedAskAiEditor(editorTabs);
       if (openedAskAIEditor || options.forceOpenAskAiEditor) {
         openAskAi({
           paneIdentifier: 'right',
@@ -1867,8 +1869,11 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const onResourceExternallyChanged = React.useCallback(
     () => {
+      console.info(
+        'Resource externally changed: notifying changes to in-game editor.'
+      );
       notifyChangesToInGameEditor({
-        shouldReloadProjectData: false,
+        shouldReloadProjectData: true, // A resource file might have been changed.
         shouldReloadLibraries: false,
         shouldReloadResources: true,
         shouldHardReload: false,
@@ -1880,11 +1885,14 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const onResourceUsageChanged = React.useCallback(
     () => {
+      console.info(
+        'Resource usage changed: notifying changes to in-game editor.'
+      );
       if (isEditorHotReloadNeeded()) {
         notifyChangesToInGameEditor({
-          shouldReloadProjectData: false,
+          shouldReloadProjectData: true,
           shouldReloadLibraries: false,
-          shouldReloadResources: false,
+          shouldReloadResources: true,
           shouldHardReload: false,
           reasons: ['resource-usage-changed'],
         });
@@ -1892,7 +1900,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         notifyChangesToInGameEditor({
           shouldReloadProjectData: true,
           shouldReloadLibraries: false,
-          shouldReloadResources: false,
+          shouldReloadResources: true,
           shouldHardReload: false,
           reasons: ['resource-usage-changed'],
         });
@@ -4888,6 +4896,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     renderNewProjectDialog,
     fetchAndOpenNewProjectSetupDialogForExample,
     openNewProjectDialog,
+    closeNewProjectDialog,
   } = useNewProjectDialog({
     project: state.currentProject,
     fileMetadata: currentFileMetadata,
@@ -4901,7 +4910,18 @@ const MainFrame = (props: Props): React.MixedElement => {
     storageProviders: props.storageProviders,
     storageProvider: getStorageProvider(),
     resourceManagementProps,
-    onOpenLayout: (name, options) => openLayout(name, options),
+    onOpenLayout: (
+      name: string,
+      options?: {|
+        openEventsEditor: boolean,
+        openSceneEditor: boolean,
+        focusWhenOpened:
+          | 'scene-or-events-otherwise'
+          | 'scene'
+          | 'events'
+          | 'none',
+      |}
+    ) => openLayout(name, options),
     onWillInstallExtension,
     onExtensionInstalled,
   });
@@ -5489,6 +5509,28 @@ const MainFrame = (props: Props): React.MixedElement => {
               eventPath,
             });
             openExternalEvents(externalEventsName);
+          }}
+          onNavigateToExtensionEvent={({
+            extensionName,
+            functionName,
+            behaviorName,
+            objectName,
+            eventPath,
+          }) => {
+            setPendingEventNavigation({
+              name: extensionName,
+              locationType: 'extension',
+              eventPath,
+              functionName,
+              behaviorName,
+              objectName,
+            });
+            openEventsFunctionsExtension(
+              extensionName,
+              functionName,
+              behaviorName,
+              objectName
+            );
           }}
         />
       )}

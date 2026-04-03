@@ -4,7 +4,7 @@ import {
   type AiRequestMessageAssistantFunctionCall,
   type AiRequestFunctionCallOutput,
 } from '../../Utils/GDevelopServices/Generation';
-import { type EditorFunctionCallResult } from '../../EditorFunctions/EditorFunctionCallRunner';
+import { type EditorFunctionCallResult } from '../../EditorFunctions';
 import CircularProgress from '../../UI/CircularProgress';
 import { Tooltip } from '@material-ui/core';
 import Text from '../../UI/Text';

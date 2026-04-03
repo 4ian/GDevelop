@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
@@ -21,6 +21,7 @@ import { Spacer } from '../../UI/Grid';
 import ScrollView from '../../UI/ScrollView';
 import { ColumnStackLayout } from '../../UI/Layout';
 import AlertMessage from '../../UI/AlertMessage';
+import { triggerOnResourceExternallyChanged } from '../../MainFrame/ResourcesWatcher';
 
 type Props = {|
   project: gdProject,
@@ -28,6 +29,7 @@ type Props = {|
   resources: Array<gdResource>,
   onResourcePathUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,
+  i18n: I18nType,
 |};
 
 export type ResourcePropertiesEditorInterface = {| forceUpdate: () => void |};
@@ -55,6 +57,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
       resources,
       onResourcePathUpdated,
       resourceManagementProps,
+      i18n,
     },
     ref
   ) => {
@@ -96,7 +99,11 @@ const ResourcePropertiesEditor: React.ComponentType<{
         );
         if (!selectedResourceSource) return;
 
-        resource.setFile(selectedResources[0].getFile());
+        const newResourceFile = selectedResources[0].getFile();
+        resource.setFile(newResourceFile);
+        triggerOnResourceExternallyChanged({
+          identifier: newResourceFile,
+        });
 
         // Important, we are responsible for deleting the resources that were given to us.
         // Otherwise we have a memory leak.
@@ -120,7 +127,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
     const schema: Schema = React.useMemo(
       () => [
         {
-          name: 'Resource name',
+          name: i18n._(t`Resource name`),
           valueType: 'string',
           disabled: () => true,
           getValue: (resource: gdResource) => resource.getName(),
@@ -128,11 +135,15 @@ const ResourcePropertiesEditor: React.ComponentType<{
             resource.setName(newValue),
         },
         {
-          name: 'File',
+          name: i18n._(t`File`),
           valueType: 'string',
           getValue: (resource: gdResource) => resource.getFile(),
-          setValue: (resource: gdResource, newValue: string) =>
-            resource.setFile(newValue),
+          setValue: (resource: gdResource, newValue: string) => {
+            resource.setFile(newValue);
+            triggerOnResourceExternallyChanged({
+              identifier: newValue,
+            });
+          },
           onEditButtonClick: () => {
             const firstResourceSource = resourceSources[0];
             if (firstResourceSource) chooseResourcePath(firstResourceSource);
@@ -147,7 +158,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
               : undefined,
         },
       ],
-      [resourceSources, chooseResourcePath]
+      [resourceSources, chooseResourcePath, i18n]
     );
 
     const renderResourcesProperties = React.useCallback(

@@ -2058,7 +2058,16 @@ namespace gdjs {
         behaviorName
       ) as Physics3DRuntimeBehavior | null;
       if (!behavior1) return false;
-      return behavior1.collisionChecker.isColliding(object2);
+      if (behavior1.collisionChecker.isColliding(object2)) {
+        return true;
+      }
+      // We need to check both sides because collision between Physics3D and
+      // Character3D are only known by the character.
+      const behavior2 = object2.getBehavior(
+        behaviorName
+      ) as Physics3DRuntimeBehavior | null;
+      if (!behavior2) return false;
+      return behavior2.collisionChecker.isColliding(object1);
     }
 
     static hasCollisionStartedBetween(
@@ -2070,7 +2079,16 @@ namespace gdjs {
         behaviorName
       ) as Physics3DRuntimeBehavior | null;
       if (!behavior1) return false;
-      return behavior1.collisionChecker.hasCollisionStartedWith(object2);
+      if (behavior1.collisionChecker.hasCollisionStartedWith(object2)) {
+        return true;
+      }
+      // We need to check both sides because collision between Physics3D and
+      // Character3D are only known by the character.
+      const behavior2 = object2.getBehavior(
+        behaviorName
+      ) as Physics3DRuntimeBehavior | null;
+      if (!behavior2) return false;
+      return behavior2.collisionChecker.hasCollisionStartedWith(object1);
     }
 
     static hasCollisionStoppedBetween(
@@ -2082,7 +2100,16 @@ namespace gdjs {
         behaviorName
       ) as Physics3DRuntimeBehavior | null;
       if (!behavior1) return false;
-      return behavior1.collisionChecker.hasCollisionStoppedWith(object2);
+      if (behavior1.collisionChecker.hasCollisionStoppedWith(object2)) {
+        return true;
+      }
+      // We need to check both sides because collision between Physics3D and
+      // Character3D are only known by the character.
+      const behavior2 = object2.getBehavior(
+        behaviorName
+      ) as Physics3DRuntimeBehavior | null;
+      if (!behavior2) return false;
+      return behavior2.collisionChecker.hasCollisionStoppedWith(object1);
     }
   }
 

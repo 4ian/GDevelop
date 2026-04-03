@@ -375,7 +375,10 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
           if (!requestedTab) return;
 
           setActiveTab(requestedTab);
-          if (requestedTab === 'shop') {
+          if (requestedTab === 'create' && routeArguments['new-project']) {
+            onOpenNewProjectSetupDialog();
+            removeRouteArguments(['new-project']);
+          } else if (requestedTab === 'shop') {
             if (routeArguments['asset-pack']) {
               setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
             }
@@ -448,6 +451,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
           setInitialBundleCategoryForShop,
           games,
           areCoursesFetched,
+          onOpenNewProjectSetupDialog,
         ]
       );
 

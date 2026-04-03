@@ -841,10 +841,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (!droppedFile.file) return null;
         const storageProvider = resourceManagementProps.getStorageProvider();
         const resourcesManager = project.getResourcesManager();
-        const newResource =
-          droppedFile.resourceKind === 'image'
-            ? new gd.ImageResource()
-            : new gd.Model3DResource();
+        const newResource = new gd.ImageResource();
         if (storageProvider.internalName === 'Cloud') {
           if (!fileMetadata || !authenticatedUser.authenticated) {
             newResource.delete();
@@ -1968,17 +1965,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           return;
         }
         let objectTypeToCreate = null;
-        if (droppedFile.resourceKind === 'image') {
-          objectTypeToCreate = getObjectTypeForDroppedImagePosition(
-            event.clientX,
-            event.clientY
-          );
-          if (!objectTypeToCreate) {
-            resetDroppedFileState();
-            return;
-          }
-        } else {
-          objectTypeToCreate = 'Scene3D::Model3DObject';
+        objectTypeToCreate = getObjectTypeForDroppedImagePosition(
+          event.clientX,
+          event.clientY
+        );
+        if (!objectTypeToCreate) {
+          resetDroppedFileState();
+          return;
         }
         if (
           storageProvider.internalName === 'Cloud' &&

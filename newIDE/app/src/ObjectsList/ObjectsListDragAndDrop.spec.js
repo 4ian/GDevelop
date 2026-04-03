@@ -43,13 +43,13 @@ describe('ObjectsList drag and drop helpers', () => {
 
   test('detects supported resource kinds from extension', () => {
     expect(getResourceKindFromExtension('png')).toBe('image');
-    expect(getResourceKindFromExtension('glb')).toBe('model3D');
+    expect(getResourceKindFromExtension('glb')).toBe(null);
     expect(getResourceKindFromExtension('wav')).toBe(null);
   });
 
   test('detects supported resource kinds from mime type', () => {
     expect(getResourceKindFromMimeType('image/webp')).toBe('image');
-    expect(getResourceKindFromMimeType('model/gltf-binary')).toBe('model3D');
+    expect(getResourceKindFromMimeType('model/gltf-binary')).toBe(null);
     expect(getResourceKindFromMimeType('audio/wav')).toBe(null);
   });
 
@@ -94,7 +94,7 @@ describe('ObjectsList drag and drop helpers', () => {
     });
   });
 
-  test('detects a supported dropped file from mime type before the file is available', () => {
+  test('returns null for unsupported dropped mime types before the file is available', () => {
     const droppedFile = getDroppedSupportedFile({
       0: {
         kind: 'file',
@@ -104,10 +104,7 @@ describe('ObjectsList drag and drop helpers', () => {
       length: 1,
     });
 
-    expect(droppedFile).toEqual({
-      file: null,
-      resourceKind: 'model3D',
-    });
+    expect(droppedFile).toBe(null);
   });
 
   test('returns null for unsupported dropped entries', () => {

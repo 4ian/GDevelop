@@ -1,11 +1,10 @@
 // @flow
 
 const imageExtensions = ['png', 'jpg', 'jpeg', 'webp'];
-const modelExtensions = ['glb'];
 
 export type DroppedSupportedFile = {|
   file: ?File,
-  resourceKind: 'image' | 'model3D',
+  resourceKind: 'image',
 |};
 
 export const getFileExtension = (filename: string): string => {
@@ -14,27 +13,17 @@ export const getFileExtension = (filename: string): string => {
   return filename.substring(dotIndex + 1).toLowerCase();
 };
 
-export const getResourceKindFromExtension = (
-  extension: string
-): ?('image' | 'model3D') => {
+export const getResourceKindFromExtension = (extension: string): ?'image' => {
   if (imageExtensions.includes(extension)) {
     return 'image';
-  }
-  if (modelExtensions.includes(extension)) {
-    return 'model3D';
   }
   return null;
 };
 
-export const getResourceKindFromMimeType = (
-  mimeType: string
-): ?('image' | 'model3D') => {
+export const getResourceKindFromMimeType = (mimeType: string): ?'image' => {
   const normalizedMimeType = mimeType.toLowerCase();
   if (normalizedMimeType.startsWith('image/')) {
     return 'image';
-  }
-  if (normalizedMimeType === 'model/gltf-binary') {
-    return 'model3D';
   }
   return null;
 };

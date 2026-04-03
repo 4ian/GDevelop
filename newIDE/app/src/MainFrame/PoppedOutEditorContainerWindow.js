@@ -20,6 +20,8 @@ import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
 import AlertProvider from '../UI/Alert/AlertProvider';
+import ExternalWindowDragDrop from '../UI/DragAndDrop/ExternalWindowDragDrop';
+import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 
 type Props = {|
   ...EditorTabsPaneCommonProps,
@@ -55,14 +57,17 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const localCommandPaletteRef = React.useRef<?CommandPaletteInterface>(null);
 
-  // Store the external window's document for keyboard shortcuts.
+  // Store the external window and its document for keyboard shortcuts
+  // and drag-and-drop support.
   const [
     externalWindowDocument,
     setExternalWindowDocument,
   ] = React.useState<?Document>(null);
+  const [externalWindow, setExternalWindow] = React.useState<any>(null);
 
-  const onWindowReady = React.useCallback((externalWindow: any) => {
-    setExternalWindowDocument(externalWindow ? externalWindow.document : null);
+  const onWindowReady = React.useCallback((extWindow: any) => {
+    setExternalWindowDocument(extWindow ? extWindow.document : null);
+    setExternalWindow(extWindow || null);
   }, []);
 
   // Compute adaptive window size based on which pane the tab came from.
@@ -110,6 +115,10 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
           <FullThemeProvider>
             <AlertProvider>
               <PoppedOutWindowBackgroundColor />
+              {externalWindow && (
+                <ExternalWindowDragDrop externalWindow={externalWindow} />
+              )}
+              <CustomDragLayer />
               <CommandPalette ref={localCommandPaletteRef} />
               <ToolbarTitlebar
                 onPopIn={() => onPopIn(editorTab)}

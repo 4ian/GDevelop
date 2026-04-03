@@ -3,6 +3,7 @@ import { Component } from 'react';
 import TouchBackend from 'react-dnd-touch-backend';
 import MultiBackend, { TouchTransition } from 'react-dnd-multi-backend';
 import { DragDropContext } from 'react-dnd';
+import { getDropTargetElementsAtPoint } from './ExternalWindowDragDrop';
 
 // react-dnd-multi-backend/lib/HTML5toTouch is not used directly in order to
 // be able to specify the delayTouchStart parameter of the TouchBackend.
@@ -13,7 +14,15 @@ const HTML5toTouch = {
     //   backend: HTML5Backend,
     // },
     {
-      backend: TouchBackend({ delayTouchStart: 100, enableMouseEvents: true }),
+      backend: TouchBackend({
+        delayTouchStart: 100,
+        enableMouseEvents: true,
+        // Override the default elementsFromPoint which is hard-coded to the
+        // main window's document. This custom version uses the "active document"
+        // tracked by ExternalWindowDragDrop, so that drag-and-drop also works
+        // inside popped-out editor windows.
+        getDropTargetElementsAtPoint,
+      }),
       preview: true,
       transition: TouchTransition,
     },

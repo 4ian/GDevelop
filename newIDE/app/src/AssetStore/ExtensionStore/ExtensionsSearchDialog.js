@@ -160,6 +160,7 @@ const ExtensionsSearchDialog = ({
         <Dialog
           title={<Trans>Search for New Extensions</Trans>}
           id="extension-search-dialog"
+          maxWidth="md"
           fullHeight
           actions={[
             <FlatButton

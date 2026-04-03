@@ -18,7 +18,6 @@ import ChevronArrowRight from '../CustomSvgIcons/ChevronArrowRight';
 import { useScreenType } from '../Responsive/ScreenTypeMeasurer';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { itemAboveBlockingLayerZIndex } from '../../InAppTutorial/BlockingLayerWithHoles';
-import PortalContainerContext from '../PortalContainerContext';
 const electron = optionalRequire('electron');
 
 const useStyles = makeStyles({
@@ -211,8 +210,16 @@ const SubMenuItem = ({ item, buildFromTemplate, portalContainer }) => {
 export default class MaterialUIMenuImplementation
   implements ContextMenuImplementation {
   _onClose: () => void;
-  constructor({ onClose }: {| onClose: () => void |}) {
+  _portalContainer: ?HTMLElement;
+  constructor({
+    onClose,
+    portalContainer,
+  }: {|
+    onClose: () => void,
+    portalContainer?: ?HTMLElement,
+  |}) {
     this._onClose = onClose;
+    this._portalContainer = portalContainer;
   }
 
   buildFromTemplate(
@@ -222,8 +229,7 @@ export default class MaterialUIMenuImplementation
     // This is not a real hook.
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const isTouchscreen = useScreenType() === 'touch';
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const portalContainer = React.useContext(PortalContainerContext);
+    const portalContainer = this._portalContainer;
 
     return template
       .map((item, id) => {

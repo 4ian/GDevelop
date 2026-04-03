@@ -15,6 +15,19 @@ import { itemAboveBlockingLayerZIndex } from '../../InAppTutorial/BlockingLayerW
 import PortalContainerContext from '../PortalContainerContext';
 const electron = optionalRequire('electron');
 
+const getValidPortalContainer = (
+  portalContainer: ?HTMLElement
+): ?HTMLElement => {
+  if (!portalContainer) return undefined;
+
+  const ownerWindow = portalContainer.ownerDocument
+    ? portalContainer.ownerDocument.defaultView
+    : null;
+  if (ownerWindow && ownerWindow.closed) return undefined;
+
+  return portalContainer;
+};
+
 export type ContextMenuInterface = {|
   open: (x: number, y: number, options: any) => void,
 |};
@@ -39,10 +52,13 @@ const MaterialUIContextMenu = React.forwardRef<
   const [openMenu, setOpenMenu] = React.useState<boolean>(false);
   const [buildOptions, setBuildOptions] = React.useState<any>({});
   const forceUpdate = useForceUpdate();
-  const portalContainer = React.useContext(PortalContainerContext);
+  const portalContainer = getValidPortalContainer(
+    React.useContext(PortalContainerContext)
+  );
 
   const menuImplementation = new MaterialUIMenuImplementation({
     onClose: () => setOpenMenu(false),
+    portalContainer,
   });
 
   // $FlowFixMe[missing-local-annot]

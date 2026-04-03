@@ -22,6 +22,7 @@
     "axios-mock-adapter": "^1.22.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-loader": "8.1.0",
+    "babel-plugin-macros": "^3.1.0",
     "chokidar": "4.0.3",
     "concurrently": "9.2.1",
     "flow-bin": "0.299.0",
@@ -53,6 +54,7 @@
     "@material-ui/core": "4.11.0",
     "@material-ui/icons": "4.9.1",
     "@material-ui/lab": "4.0.0-alpha.56",
+    "@material-ui/styles": "4.11.5",
     "@supercharge/promise-pool": "^1.6.0",
     "axios": "^0.18.1",
     "blueimp-md5": "^2.10.0",
@@ -86,6 +88,7 @@
     "react-measure": "2.3.0",
     "react-monaco-editor": "^0.18.0",
     "react-mosaic-component": "github:4ian/react-mosaic#v3.1.0",
+    "react-refresh": "^0.11.0",
     "react-share": "^4.4.0",
     "react-sortable-hoc": "1.5.0",
     "react-test-renderer": "18.2.0",
@@ -101,8 +104,7 @@
     "url-search-params": "^1.0.2",
     "wavesurfer.js": "^7.8.6",
     "xxhashjs": "^0.2.2",
-    "yaml": "^2.8.2",
-    "@material-ui/styles": "4.11.5"
+    "yaml": "^2.8.2"
   },
   "overrides": {
     "pixi-spine": {

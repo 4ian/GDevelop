@@ -1,7 +1,11 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
-import { serializeToJSObject, serializeToJSON } from '../../Utils/Serializer';
+import {
+  serializeToJSObject,
+  serializeToJSON,
+  addFinalNewline,
+} from '../../Utils/Serializer';
 import { serializeToJSObjectInBackground } from '../../Utils/BackgroundSerializer';
 import {
   type FileMetadata,
@@ -104,7 +108,7 @@ const writeAndCheckFormattedJSONFile = async (
   object: Object,
   filePath: string
 ): Promise<void> => {
-  const content = JSON.stringify(object, null, 2);
+  const content = addFinalNewline(JSON.stringify(object, null, 2));
   await writeAndCheckFile(content, filePath);
 };
 

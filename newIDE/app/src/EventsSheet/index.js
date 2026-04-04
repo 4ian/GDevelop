@@ -2271,32 +2271,44 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
    * been scrolled out of the view and so removed from the DOM)
    */
   _ensureFocused = () => {
-    if (!this._containerDiv || !document) return;
+    if (!this._containerDiv) return;
 
     const containerDivElement = this._containerDiv.current;
-    if (document.activeElement === containerDivElement) {
+    if (!containerDivElement) return;
+
+    // Use the ownerDocument of the container element to get the correct
+    // document — important when rendered inside a WindowPortal (external
+    // browser window) where the main window's `document` is different.
+    const ownerDoc = containerDivElement.ownerDocument;
+    if (!ownerDoc) return;
+
+    if (ownerDoc.activeElement === containerDivElement) {
       // Focus is already on the container
       return;
     }
-    if (containerDivElement) {
-      if (
-        document.activeElement !== document.body &&
-        containerDivElement.contains(document.activeElement)
-      ) {
-        // Focus is already on an element of the container
-        return;
-      }
-
-      // Focus is not on an element of the container, we probably lost the focus
-      // after scrolling or removing an element. Give back the focus to the container.
-      containerDivElement.focus();
+    if (
+      ownerDoc.activeElement !== ownerDoc.body &&
+      containerDivElement.contains(ownerDoc.activeElement)
+    ) {
+      // Focus is already on an element of the container
+      return;
     }
+
+    // Focus is not on an element of the container, we probably lost the focus
+    // after scrolling or removing an element. Give back the focus to the container.
+    containerDivElement.focus();
   };
 
   _onEventsSheetBlur = (event: SyntheticFocusEvent<HTMLDivElement>) => {
     const nextFocusedElement = event.relatedTarget;
+    // Use nodeType check instead of `instanceof HTMLElement` because when the
+    // EventsSheet is rendered inside a WindowPortal (external browser window),
+    // the DOM elements belong to a different window context whose HTMLElement
+    // constructor differs from the main window's — making `instanceof` return
+    // false and incorrectly resetting modifier keys (breaking Shift-selection).
     if (
-      nextFocusedElement instanceof HTMLElement &&
+      nextFocusedElement != null &&
+      nextFocusedElement.nodeType === 1 /* ELEMENT_NODE */ &&
       // If focus is moving to an element still inside the container, do nothing.
       event.currentTarget.contains(nextFocusedElement)
     ) {

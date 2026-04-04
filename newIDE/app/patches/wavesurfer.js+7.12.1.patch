@@ -1,0 +1,14 @@
+diff --git a/node_modules/wavesurfer.js/dist/renderer.js b/node_modules/wavesurfer.js/dist/renderer.js
+index 6ecb293..80060a9 100644
+--- a/node_modules/wavesurfer.js/dist/renderer.js
++++ b/node_modules/wavesurfer.js/dist/renderer.js
+@@ -58,7 +58,8 @@ class Renderer extends EventEmitter {
+         if (typeof container === 'string') {
+             parent = document.querySelector(container);
+         }
+-        else if (container instanceof HTMLElement) {
++        else if (container instanceof HTMLElement ||
++            (container && container.nodeType === 1)) {
+             parent = container;
+         }
+         if (!parent) {

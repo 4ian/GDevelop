@@ -2318,8 +2318,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // false and incorrectly resetting modifier keys (breaking Shift-selection).
     if (
       nextFocusedElement != null &&
+      // $FlowFixMe[prop-missing]
       nextFocusedElement.nodeType === 1 /* ELEMENT_NODE */ &&
       // If focus is moving to an element still inside the container, do nothing.
+      // $FlowFixMe[incompatible-type]
       event.currentTarget.contains(nextFocusedElement)
     ) {
       return;

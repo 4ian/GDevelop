@@ -19,9 +19,7 @@ type RenderNewResourceDialogProps = {|
 
 type UseNewResourceDialogOutput = {|
   onChooseResource: ChooseResourceFunction,
-  renderNewResourceDialog: (
-    props: RenderNewResourceDialogProps
-  ) => React.Node,
+  renderNewResourceDialog: (props: RenderNewResourceDialogProps) => React.Node,
 |};
 
 /**

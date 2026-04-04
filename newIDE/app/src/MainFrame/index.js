@@ -410,10 +410,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     cloudProjectSaveChoiceOpen,
     setCloudProjectSaveChoiceOpen,
   ] = React.useState<boolean>(false);
-  const {
-    onChooseResource,
-    renderNewResourceDialog,
-  } = useNewResourceDialog();
+  const { onChooseResource, renderNewResourceDialog } = useNewResourceDialog();
   const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
   const forceUpdate = useForceUpdate();
   const [isLoadingProject, setIsLoadingProject] = React.useState<boolean>(

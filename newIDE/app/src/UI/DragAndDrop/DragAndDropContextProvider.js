@@ -10,6 +10,12 @@ const touchBackendOptions = {
 
 type Props = {|
   children: React.Node,
+  /**
+   * Optional root element for the TouchBackend to bind event listeners to.
+   * When rendering in a popped-out window, pass the external window object
+   * so that drag events are captured on the correct document.
+   */
+  rootElement?: ?EventTarget,
 |};
 
 /**
@@ -19,10 +25,23 @@ type Props = {|
  * HTML5 backend was removed because it doesn't work with the iframe
  * showing the embedded game.
  */
-const DragAndDropContextProvider = ({ children }: Props): React.Node => (
-  <DndProvider backend={TouchBackend} options={touchBackendOptions}>
-    {children}
-  </DndProvider>
-);
+const DragAndDropContextProvider = ({
+  children,
+  rootElement,
+}: Props): React.Node => {
+  const options = React.useMemo(
+    () =>
+      rootElement
+        ? { ...touchBackendOptions, rootElement }
+        : touchBackendOptions,
+    [rootElement]
+  );
+
+  return (
+    <DndProvider backend={TouchBackend} options={options}>
+      {children}
+    </DndProvider>
+  );
+};
 
 export default DragAndDropContextProvider;

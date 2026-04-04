@@ -20,6 +20,7 @@ import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
 import AlertProvider from '../UI/Alert/AlertProvider';
+import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 
 type Props = {|
   ...EditorTabsPaneCommonProps,
@@ -109,6 +110,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
         >
           <FullThemeProvider>
             <AlertProvider>
+              <PoppedOutDragAndDropProvider>
               <PoppedOutWindowBackgroundColor />
               <CommandPalette ref={localCommandPaletteRef} />
               <ToolbarTitlebar
@@ -338,11 +340,36 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                   </ErrorBoundary>
                 </CommandsContextScopedProvider>
               </div>
+              </PoppedOutDragAndDropProvider>
             </AlertProvider>
           </FullThemeProvider>
         </SpecificDimensionsWindowSizeProvider>
       )}
     />
+  );
+};
+
+/**
+ * Provides a DragAndDropContextProvider scoped to the popped-out window.
+ * The TouchBackend must bind its event listeners to the external window's
+ * root element, otherwise drag events in the popped-out window are never
+ * captured (they occur on a different document).
+ */
+const PoppedOutDragAndDropProvider = ({
+  children,
+}: {|
+  children: React.Node,
+|}): React.Node => {
+  const portalContainer = React.useContext(PortalContainerContext);
+  // Get the external window object from the portal container's document.
+  const rootElement = portalContainer
+    ? portalContainer.ownerDocument?.defaultView || undefined
+    : undefined;
+
+  return (
+    <DragAndDropContextProvider rootElement={rootElement}>
+      {children}
+    </DragAndDropContextProvider>
   );
 };
 

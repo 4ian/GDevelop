@@ -186,12 +186,16 @@ const WindowPortal = ({
     // but in the web app, React components don't unmount on tab close so the
     // cleanup in the useEffect return function never fires — leaving "dead"
     // popped-out windows open.
-    const handleMainWindowBeforeUnload = () => {
+    // We use "unload" rather than "beforeunload" because beforeunload fires
+    // before the user confirms the browser's "leave page?" dialog (triggered
+    // by CloseConfirmDialog). "unload" only fires after the user confirms,
+    // so we don't close popped-out windows when the user cancels.
+    const handleMainWindowUnload = () => {
       if (!externalWindow.closed) {
         externalWindow.close();
       }
     };
-    window.addEventListener('beforeunload', handleMainWindowBeforeUnload);
+    window.addEventListener('unload', handleMainWindowUnload);
 
     // Listen to "beforeunload" to know when a window is being closed.
     externalWindow.addEventListener('beforeunload', event => {
@@ -248,7 +252,7 @@ const WindowPortal = ({
       // Component is unmounted: deconnect listeners and clear things...
       if (styleObserver) styleObserver.disconnect();
       if (observer) observer.disconnect();
-      window.removeEventListener('beforeunload', handleMainWindowBeforeUnload);
+      window.removeEventListener('unload', handleMainWindowUnload);
       unregisterDocumentTargetId(externalWindow.document);
 
       // ...and close the window if it's not already.

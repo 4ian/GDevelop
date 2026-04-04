@@ -11,15 +11,15 @@ const touchBackendOptions = {
 type Props = {|
   children: React.Node,
   /**
-   * Optional root element for the TouchBackend to bind event listeners to.
-   * When rendering in a popped-out window, pass the external window object
-   * so that drag events are captured on the correct document.
+   * Optional context providing the window/document for the TouchBackend.
+   * When rendering in a popped-out window, pass the external window so that
+   * event listeners and element-from-point lookups are scoped to that window.
    *
    * When set, a separate react-dnd manager is created (via a unique
    * `context` passed to DndProvider) so that it doesn't conflict with the
    * main window's manager.
    */
-  rootElement?: ?EventTarget,
+  externalWindow?: ?any,
 |};
 
 /**
@@ -31,33 +31,27 @@ type Props = {|
  */
 const DragAndDropContextProvider = ({
   children,
-  rootElement,
+  externalWindow,
 }: Props): React.Node => {
-  const options = React.useMemo(
-    () =>
-      rootElement
-        ? { ...touchBackendOptions, rootElement }
-        : touchBackendOptions,
-    [rootElement]
-  );
-
-  // When a rootElement is provided (i.e. for a popped-out window), we pass
-  // a unique `context` object to DndProvider so that it creates its own
-  // DragDropManager instead of reusing the singleton stored on the global
-  // object. The context is also forwarded to the TouchBackend's
-  // OptionsReader, which reads `context.window` and `context.document`
-  // from it to scope element-from-point lookups correctly.
+  // When an externalWindow is provided (i.e. for a popped-out window), we
+  // pass a unique `context` object to DndProvider so that:
+  // 1. It creates its own DragDropManager instead of reusing the singleton.
+  // 2. The TouchBackend's OptionsReader reads context.window and
+  //    context.document, so rootElement defaults to the external Document
+  //    (matching the main window's pattern) and elementFromPoint calls
+  //    are scoped to the correct document.
   const dndContext = React.useMemo(() => {
-    if (!rootElement) return undefined;
-    // $FlowFixMe - rootElement is the external Window object here.
-    const externalWindow = rootElement;
-    return { window: externalWindow, document: externalWindow.document };
-  }, [rootElement]);
+    if (!externalWindow) return undefined;
+    return {
+      window: externalWindow,
+      document: externalWindow.document,
+    };
+  }, [externalWindow]);
 
   return (
     <DndProvider
       backend={TouchBackend}
-      options={options}
+      options={touchBackendOptions}
       context={dndContext}
     >
       {children}

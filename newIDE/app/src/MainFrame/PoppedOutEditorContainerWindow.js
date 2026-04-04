@@ -352,7 +352,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
 /**
  * Provides a DragAndDropContextProvider scoped to the popped-out window.
  * The TouchBackend must bind its event listeners to the external window's
- * root element, otherwise drag events in the popped-out window are never
+ * document, otherwise drag events in the popped-out window are never
  * captured (they occur on a different document).
  */
 const PoppedOutDragAndDropProvider = ({
@@ -362,12 +362,12 @@ const PoppedOutDragAndDropProvider = ({
 |}): React.Node => {
   const portalContainer = React.useContext(PortalContainerContext);
   // Get the external window object from the portal container's document.
-  const rootElement = portalContainer
+  const externalWindow = portalContainer
     ? portalContainer.ownerDocument?.defaultView || undefined
     : undefined;
 
   return (
-    <DragAndDropContextProvider rootElement={rootElement}>
+    <DragAndDropContextProvider externalWindow={externalWindow}>
       {children}
     </DragAndDropContextProvider>
   );

@@ -161,7 +161,7 @@ export const AskAiStandAloneForm = ({
   const {
     getEditorFunctionCallResults,
     addEditorFunctionCallResults,
-    clearEditorFunctionCallResults,
+    markEditorFunctionCallResultsAsSent,
   } = editorFunctionCallResultsStorage;
   const {
     aiRequests,
@@ -463,7 +463,7 @@ export const AskAiStandAloneForm = ({
         );
         updateAiRequest(aiRequest.id, () => aiRequest);
         setSendingAiRequest(aiRequest.id, false);
-        clearEditorFunctionCallResults(aiRequest.id);
+        markEditorFunctionCallResultsAsSent(aiRequest.id);
       } catch (error) {
         // TODO: update the label of the button to send again.
         setLastSendError(aiRequestIdForForm, error);
@@ -490,7 +490,7 @@ export const AskAiStandAloneForm = ({
       isLoading,
       setSendingAiRequest,
       updateAiRequest,
-      clearEditorFunctionCallResults,
+      markEditorFunctionCallResultsAsSent,
       getAuthorizationHeader,
       setLastSendError,
       project,

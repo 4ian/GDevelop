@@ -26,6 +26,7 @@ type EditorFunctionCallResultsStorage = {|
     editorFunctionCallResults: EditorFunctionCallResult[]
   ) => EditorFunctionCallResult[],
   clearEditorFunctionCallResults: (aiRequestId: string) => void,
+  markEditorFunctionCallResultsAsSent: (aiRequestId: string) => void,
 |};
 
 type EditorFunctionCallResultsPerRequest = {
@@ -88,6 +89,23 @@ const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage
         editorFunctionCallResultsPerRequestRef.current = {
           ...editorFunctionCallResultsPerRequestRef.current,
           [aiRequestId]: null,
+        };
+        forceUpdate();
+      },
+      [forceUpdate]
+    ),
+    markEditorFunctionCallResultsAsSent: React.useCallback(
+      (aiRequestId: string) => {
+        const existing =
+          editorFunctionCallResultsPerRequestRef.current[aiRequestId];
+        if (!existing) return;
+
+        editorFunctionCallResultsPerRequestRef.current = {
+          ...editorFunctionCallResultsPerRequestRef.current,
+          [aiRequestId]: existing.map(result => ({
+            status: 'sent',
+            call_id: result.call_id,
+          })),
         };
         forceUpdate();
       },
@@ -485,6 +503,7 @@ export const initialAiRequestContextState: AiRequestContextState = {
     getEditorFunctionCallResults: () => [],
     addEditorFunctionCallResults: () => [],
     clearEditorFunctionCallResults: () => {},
+    markEditorFunctionCallResultsAsSent: () => {},
   },
   getAiSettings: () => null,
   isFetchingSuggestions: false,
@@ -566,7 +585,18 @@ export const AiRequestProvider = ({
           })
         );
 
-        updateAiRequest(selectedAiRequestId, () => aiRequest);
+        // Use a comparison to avoid overwriting a more recent local state
+        // (e.g. from an add-message response that arrived while this poll
+        // was in flight) with stale data.
+        updateAiRequest(selectedAiRequestId, prevRequest => {
+          if (
+            prevRequest &&
+            prevRequest.output.length > aiRequest.output.length
+          ) {
+            return prevRequest;
+          }
+          return aiRequest;
+        });
         clearFetchingSuggestionsIfDone(aiRequest);
       } else {
         // Use partial request to only fetch the status between full fetches.
@@ -594,7 +624,18 @@ export const AiRequestProvider = ({
             })
           );
 
-          updateAiRequest(selectedAiRequestId, () => aiRequest);
+          // Use a comparison to avoid overwriting a more recent local state
+          // (e.g. from an add-message response that arrived while this poll
+          // was in flight) with stale data.
+          updateAiRequest(selectedAiRequestId, prevRequest => {
+            if (
+              prevRequest &&
+              prevRequest.output.length > aiRequest.output.length
+            ) {
+              return prevRequest;
+            }
+            return aiRequest;
+          });
           clearFetchingSuggestionsIfDone(aiRequest);
         }
       }

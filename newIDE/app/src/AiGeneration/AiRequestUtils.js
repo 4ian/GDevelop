@@ -225,6 +225,13 @@ export const getFunctionCallOutputsFromEditorFunctionCallResults = (
         };
       }
 
+      // 'sent' results were already sent in a previous add-message call.
+      // They are kept to prevent re-processing if polling overwrites the
+      // AI request state with stale data.  Skip them without blocking the send.
+      if (functionCallOutput.status === 'sent') {
+        return null;
+      }
+
       hasUnfinishedResult = true;
       return null;
     })

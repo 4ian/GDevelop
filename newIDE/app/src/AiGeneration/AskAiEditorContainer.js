@@ -391,6 +391,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         getEditorFunctionCallResults,
         addEditorFunctionCallResults,
         clearEditorFunctionCallResults,
+        markEditorFunctionCallResultsAsSent,
       } = editorFunctionCallResultsStorage;
       const {
         updateAiRequest,
@@ -770,7 +771,11 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             updateAiRequest(aiRequest.id, () => aiRequest);
             setSendingAiRequest(aiRequest.id, false);
             setIsSendingUserMessage(false);
-            clearEditorFunctionCallResults(aiRequest.id);
+            // Mark results as 'sent' instead of clearing them.  This keeps
+            // the call_ids in appliedFunctionCallIds so that, if a stale
+            // polling response overwrites the AI request state, the already-
+            // sent function calls won't be re-processed.
+            markEditorFunctionCallResultsAsSent(aiRequest.id);
 
             if (userMessage) {
               sendAiRequestMessageSent({
@@ -830,7 +835,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           setSendingAiRequest,
           setIsSendingUserMessage,
           updateAiRequest,
-          clearEditorFunctionCallResults,
+          markEditorFunctionCallResultsAsSent,
           getAuthorizationHeader,
           setLastSendError,
           refreshLimits,

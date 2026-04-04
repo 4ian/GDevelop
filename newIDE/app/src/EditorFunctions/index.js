@@ -62,6 +62,10 @@ export type EditorFunctionCallResult =
       didModifyProject?: true,
     |}
   | {|
+      status: 'sent',
+      call_id: string,
+    |}
+  | {|
       status: 'aborted',
       call_id: string,
     |};

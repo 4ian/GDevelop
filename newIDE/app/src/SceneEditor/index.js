@@ -551,10 +551,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         multiSelect: false,
       });
 
-      // Immediately update the properties editor to ensure they keep no reference
-      // to the deleted instances.
-      this.forceUpdatePropertiesEditor();
-
       justRemovedInstances.forEach(instance => {
         this.props.initialInstances.removeInstance(instance);
       });
@@ -2133,10 +2129,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.clearSelection();
     if (this.editorDisplay)
       this.editorDisplay.instancesHandlers.clearHighlightedInstance();
-
-    // Immediately update the properties editor to ensure they keep no reference
-    // to the deleted instances.
-    this.forceUpdatePropertiesEditor();
 
     instancesToDelete.forEach(instance => {
       this.props.initialInstances.removeInstance(instance);

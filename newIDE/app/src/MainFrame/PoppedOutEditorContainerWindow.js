@@ -367,7 +367,7 @@ const PoppedOutDragAndDropProvider = ({
     : undefined;
 
   return (
-    <DragAndDropContextProvider externalWindow={externalWindow}>
+    <DragAndDropContextProvider window={externalWindow}>
       {children}
     </DragAndDropContextProvider>
   );

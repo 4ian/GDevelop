@@ -11,15 +11,15 @@ const touchBackendOptions = {
 type Props = {|
   children: React.Node,
   /**
-   * Optional context providing the window/document for the TouchBackend.
-   * When rendering in a popped-out window, pass the external window so that
-   * event listeners and element-from-point lookups are scoped to that window.
+   * Optional external window for the TouchBackend. When provided, event
+   * listeners and element-from-point lookups are scoped to this window's
+   * document instead of the main window's document.
    *
-   * When set, a separate react-dnd manager is created (via a unique
-   * `context` passed to DndProvider) so that it doesn't conflict with the
-   * main window's manager.
+   * A separate react-dnd manager is created (via a unique `context`
+   * passed to DndProvider) so that it doesn't conflict with the main
+   * window's manager.
    */
-  externalWindow?: ?any,
+  window?: ?any,
 |};
 
 /**
@@ -31,28 +31,31 @@ type Props = {|
  */
 const DragAndDropContextProvider = ({
   children,
-  externalWindow,
+  window,
 }: Props): React.Node => {
-  // When an externalWindow is provided (i.e. for a popped-out window), we
-  // pass a unique `context` object to DndProvider so that:
-  // 1. It creates its own DragDropManager instead of reusing the singleton.
-  // 2. The TouchBackend's OptionsReader reads context.window and
-  //    context.document, so rootElement defaults to the external Document
-  //    (matching the main window's pattern) and elementFromPoint calls
-  //    are scoped to the correct document.
-  const dndContext = React.useMemo(() => {
-    if (!externalWindow) return undefined;
-    return {
-      window: externalWindow,
-      document: externalWindow.document,
-    };
-  }, [externalWindow]);
+  const backendContext = React.useMemo(
+    () => (window ? { window, document: window.document } : undefined),
+    [window]
+  );
+
+  const rootElement = React.useMemo(
+    () => (window ? window.document : undefined),
+    [window]
+  );
+
+  const backendOptions = React.useMemo(
+    () =>
+      rootElement
+        ? { ...touchBackendOptions, rootElement }
+        : touchBackendOptions,
+    [rootElement]
+  );
 
   return (
     <DndProvider
       backend={TouchBackend}
-      options={touchBackendOptions}
-      context={dndContext}
+      options={backendOptions}
+      context={backendContext}
     >
       {children}
     </DndProvider>

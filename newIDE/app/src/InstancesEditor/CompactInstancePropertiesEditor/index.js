@@ -43,6 +43,7 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
 import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
 import EmptyMessage from '../../UI/EmptyMessage';
 import CompactBehaviorsEditorService from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorsEditorService';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -158,6 +159,9 @@ export const CompactInstancePropertiesEditor = ({
    * obviously plus instance-wise variables with same name).
    */
   const shouldDisplayVariablesList = instances.length === 1;
+  const variablesContainer = shouldDisplayVariablesList
+    ? exceptionallyGuardAgainstDeadObject(instance.getVariables())
+    : null;
 
   // $FlowFixMe[missing-local-annot]
   const onScrollY = React.useCallback(deltaY => {
@@ -491,7 +495,7 @@ export const CompactInstancePropertiesEditor = ({
               )}
             />
           ) : null}
-          {object && shouldDisplayVariablesList ? (
+          {object && shouldDisplayVariablesList && variablesContainer ? (
             <>
               <Separator />
               <Column>
@@ -517,7 +521,7 @@ export const CompactInstancePropertiesEditor = ({
                 }
                 directlyStoreValueChangesWhileEditing
                 inheritedVariablesContainer={object.getVariables()}
-                variablesContainer={instance.getVariables()}
+                variablesContainer={variablesContainer}
                 areObjectVariables
                 size="compact"
                 onComputeAllVariableNames={() =>

@@ -21,6 +21,8 @@ import CommandPalette, {
 } from '../CommandPalette/CommandPalette';
 import AlertProvider from '../UI/Alert/AlertProvider';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
+import { I18n } from '@lingui/react';
+import useNewResourceDialog from '../ResourcesList/useNewResourceDialog';
 
 type Props = {|
   ...EditorTabsPaneCommonProps,
@@ -89,6 +91,19 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
       }
     }, []),
   });
+
+  const {
+    onChooseResource: poppedOutOnChooseResource,
+    renderNewResourceDialog,
+  } = useNewResourceDialog();
+
+  const poppedOutResourceManagementProps = React.useMemo(
+    () => ({
+      ...props.resourceManagementProps,
+      onChooseResource: poppedOutOnChooseResource,
+    }),
+    [props.resourceManagementProps, poppedOutOnChooseResource]
+  );
 
   const errorBoundaryProps = getEditorErrorBoundaryProps(editorTab.key);
 
@@ -220,7 +235,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                         onRestartInGameEditor: props.onRestartInGameEditor,
                         showRestartInGameEditorAfterErrorButton:
                           props.showRestartInGameEditorAfterErrorButton,
-                        resourceManagementProps: props.resourceManagementProps,
+                        resourceManagementProps: poppedOutResourceManagementProps,
                         onSave: props.saveProject,
                         onSaveProjectAsWithStorageProvider:
                           props.saveProjectAsWithStorageProvider,
@@ -352,6 +367,18 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                   </DragAndDropContextProvider>
                 </CommandsContextScopedProvider>
               </div>
+              <I18n>
+                {({ i18n }) =>
+                  renderNewResourceDialog({
+                    project: props.currentProject,
+                    fileMetadata: props.currentFileMetadata,
+                    getStorageProvider: props.getStorageProvider,
+                    i18n,
+                    resourceSources:
+                      props.resourceManagementProps.resourceSources,
+                  })
+                }
+              </I18n>
             </AlertProvider>
           </FullThemeProvider>
         </SpecificDimensionsWindowSizeProvider>

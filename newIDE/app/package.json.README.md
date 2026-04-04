@@ -20,17 +20,21 @@ GDevelop relies on some dependencies that can have special requirements.
 
 ## Drag'n'drop handling
 
-**`react-dnd`** is used by `react-mosaic-component` and `react-sortable-tree` (but not `react-sortable-hoc`). Both must be using **the same versions** of `react-dnd` and `react-dnd-html5-backend`. Otherwise, you get blanks/not rendered components.
+**`react-dnd` v14** is used for all drag-and-drop in the app (events, effects, objects, mosaic panels…). `react-mosaic-component` v5.3.0 also depends on `react-dnd` internally; npm `overrides` in `package.json` ensure a single copy of `react-dnd`, `react-dnd-touch-backend`, and `dnd-core` is resolved to avoid blank/not-rendered components.
 
-> You can check if there is only one version of a package by doing `npm ls` or `yarn why`:
+Only **`react-dnd-touch-backend`** is used (with `enableMouseEvents: true`), which handles both mouse and touch input. `react-dnd-html5-backend` and `react-dnd-multi-backend` were removed because the HTML5 backend does not work with the iframe used by the embedded game preview.
+
+The codebase uses the legacy **Decorators/HOC API** (`DragSource`, `DropTarget`, `DragLayer`) — not the Hooks API (`useDrag`, `useDrop`, …). v14 supports both, so migration to hooks can be done incrementally if desired. v14.0.3+ also includes a specific fix for drop operations in iframes & child windows.
+
+> You can check if there is only one version of a package by doing `npm ls`:
 >
-> - `yarn why react-dnd`
-> - `npm ls webpack`
+> - `npm ls react-dnd`
+> - `npm ls dnd-core`
 
 Latest versions of `react-sortable-hoc` seems to be breaking the lists. The exact version in which this occurs was not determined.
 
 ## Various fixes
 
-- `react-mosaic-component` is a custom version where `react-dnd` was simply upgraded to version `7.7.0`
+- `react-mosaic-component` is the official npm package (v5.3.0). Earlier versions used a custom fork to pin `react-dnd` 7.x; this is no longer needed.
 - `@lingui/react` is a version where Flow definitions have been fixed.
 - `pixi-simple-gesture` is a version where an extra check for `undefined` has been added to `touchStart` in `pan.js`, following traces of errors that have been inspected (though the bug could not be reproduced - but better be safe).

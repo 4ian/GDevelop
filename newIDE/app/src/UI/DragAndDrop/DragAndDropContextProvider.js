@@ -1,39 +1,28 @@
-import { Component } from 'react';
-// import HTML5Backend from 'react-dnd-html5-backend';
-import TouchBackend from 'react-dnd-touch-backend';
-import MultiBackend, { TouchTransition } from 'react-dnd-multi-backend';
-import { DragDropContext } from 'react-dnd';
+// @flow
+import * as React from 'react';
+import { DndProvider } from 'react-dnd';
+import { TouchBackend } from 'react-dnd-touch-backend';
 
-// react-dnd-multi-backend/lib/HTML5toTouch is not used directly in order to
-// be able to specify the delayTouchStart parameter of the TouchBackend.
-const HTML5toTouch = {
-  backends: [
-    // HTML5 backend is disabled as it's not working with the iframe showing the embedded game.
-    // {
-    //   backend: HTML5Backend,
-    // },
-    {
-      backend: TouchBackend({ delayTouchStart: 100, enableMouseEvents: true }),
-      preview: true,
-      transition: TouchTransition,
-    },
-  ],
+const touchBackendOptions = {
+  delayTouchStart: 100,
+  enableMouseEvents: true,
 };
 
-class DragAndDropContextProvider extends Component {
-  render() {
-    return this.props.children;
-  }
-}
+type Props = {|
+  children: React.Node,
+|};
 
 /**
- * A react-dnd provider that automatically switch to react-dnd-touch-backend
- * when a touch event is recognized (react-dnd-html5-backend won't work on
- * touch devices like phones).
+ * A react-dnd provider using react-dnd-touch-backend which supports
+ * both touch and mouse events (with enableMouseEvents: true).
  *
- * When doing the switch from HTML5 backend to Touch backend, the existing events
- * are passed to the new backend. Unsure if this is necessary in GDevelop case.
+ * HTML5 backend was removed because it doesn't work with the iframe
+ * showing the embedded game.
  */
-export default DragDropContext(MultiBackend(HTML5toTouch))(
-  DragAndDropContextProvider
+const DragAndDropContextProvider = ({ children }: Props): React.Node => (
+  <DndProvider backend={TouchBackend} options={touchBackendOptions}>
+    {children}
+  </DndProvider>
 );
+
+export default DragAndDropContextProvider;

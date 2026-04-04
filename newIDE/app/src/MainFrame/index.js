@@ -84,8 +84,6 @@ import {
 } from '../ExportAndShare/PreviewLauncher.flow';
 import {
   type ResourceSource,
-  type ChooseResourceFunction,
-  type ChooseResourceOptions,
   type ResourceManagementProps,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor';
@@ -150,7 +148,7 @@ import { delay } from '../Utils/Delay';
 import useNewProjectDialog from './UseNewProjectDialog';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
-import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
+import useNewResourceDialog from '../ResourcesList/useNewResourceDialog';
 import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_DEBUG,
@@ -412,14 +410,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     cloudProjectSaveChoiceOpen,
     setCloudProjectSaveChoiceOpen,
   ] = React.useState<boolean>(false);
-  const [
-    chooseResourceOptions,
-    setChooseResourceOptions,
-  ] = React.useState<?ChooseResourceOptions>(null);
-  const [onResourceChosen, setOnResourceChosen] = React.useState<?({|
-    selectedResources: Array<gdResource>,
-    selectedSourceName: string,
-  |}) => void>(null);
+  const {
+    onChooseResource,
+    renderNewResourceDialog,
+  } = useNewResourceDialog();
   const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
   const forceUpdate = useForceUpdate();
   const [isLoadingProject, setIsLoadingProject] = React.useState<boolean>(
@@ -4443,21 +4437,6 @@ const MainFrame = (props: Props): React.MixedElement => {
     [getStorageProvider]
   );
 
-  const onChooseResource: ChooseResourceFunction = React.useCallback(
-    (options: ChooseResourceOptions) => {
-      return new Promise(resolve => {
-        setChooseResourceOptions(options);
-        const onResourceChosenSetter: () => ({|
-          selectedResources: Array<gdResource>,
-          selectedSourceName: string,
-        |}) => void = () => resolve;
-
-        setOnResourceChosen(onResourceChosenSetter);
-      });
-    },
-    [setOnResourceChosen, setChooseResourceOptions]
-  );
-
   const setElectronUpdateStatus = (updateStatus: ElectronUpdateStatus) => {
     setState(state => ({ ...state, updateStatus }));
 
@@ -5258,29 +5237,13 @@ const MainFrame = (props: Props): React.MixedElement => {
           initialTab: shareDialogInitialTab,
           gamesList,
         })}
-      {chooseResourceOptions && onResourceChosen && !!currentProject && (
-        <NewResourceDialog
-          project={currentProject}
-          fileMetadata={currentFileMetadata}
-          getStorageProvider={getStorageProvider}
-          i18n={i18n}
-          resourceSources={resourceSources}
-          onChooseResources={resourcesOptions => {
-            setOnResourceChosen(null);
-            setChooseResourceOptions(null);
-            onResourceChosen(resourcesOptions);
-          }}
-          onClose={() => {
-            setOnResourceChosen(null);
-            setChooseResourceOptions(null);
-            onResourceChosen({
-              selectedResources: [],
-              selectedSourceName: '',
-            });
-          }}
-          options={chooseResourceOptions}
-        />
-      )}
+      {renderNewResourceDialog({
+        project: currentProject,
+        fileMetadata: currentFileMetadata,
+        getStorageProvider,
+        i18n,
+        resourceSources,
+      })}
       {profileDialogOpen && (
         // ProfileDialog is dependent on multiple contexts,
         // which are dependent of AuthenticatedUserContext.

@@ -181,6 +181,18 @@ const WindowPortal = ({
       }
     }, 250);
 
+    // Close the popped-out window when the main window/tab is closed.
+    // In Electron, child windows are automatically destroyed with the parent,
+    // but in the web app, React components don't unmount on tab close so the
+    // cleanup in the useEffect return function never fires — leaving "dead"
+    // popped-out windows open.
+    const handleMainWindowBeforeUnload = () => {
+      if (!externalWindow.closed) {
+        externalWindow.close();
+      }
+    };
+    window.addEventListener('beforeunload', handleMainWindowBeforeUnload);
+
     // Listen to "beforeunload" to know when a window is being closed.
     externalWindow.addEventListener('beforeunload', event => {
       // Disconnect as soon as possible to avoid any further interactions with the window.
@@ -236,6 +248,7 @@ const WindowPortal = ({
       // Component is unmounted: deconnect listeners and clear things...
       if (styleObserver) styleObserver.disconnect();
       if (observer) observer.disconnect();
+      window.removeEventListener('beforeunload', handleMainWindowBeforeUnload);
       unregisterDocumentTargetId(externalWindow.document);
 
       // ...and close the window if it's not already.

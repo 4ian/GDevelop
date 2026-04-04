@@ -1,0 +1,64 @@
+diff --git a/node_modules/react-dnd-touch-backend/dist/cjs/TouchBackendImpl.js b/node_modules/react-dnd-touch-backend/dist/cjs/TouchBackendImpl.js
+index 6913885..23d3623 100644
+--- a/node_modules/react-dnd-touch-backend/dist/cjs/TouchBackendImpl.js
++++ b/node_modules/react-dnd-touch-backend/dist/cjs/TouchBackendImpl.js
+@@ -364,8 +364,8 @@ var TouchBackendImpl = /*#__PURE__*/function () {
+         return;
+       }
+ 
+-      (0, _invariant.invariant)(!TouchBackendImpl.isSetUp, 'Cannot have two Touch backends at the same time.');
+-      TouchBackendImpl.isSetUp = true;
++      (0, _invariant.invariant)(!TouchBackendImpl.isSetUpRoots.has(root), 'Cannot have two Touch backends at the same time for the same root element.');
++      TouchBackendImpl.isSetUpRoots.add(root);
+       this.addEventListener(root, 'start', this.getTopMoveStartHandler());
+       this.addEventListener(root, 'start', this.handleTopMoveStartCapture, true);
+       this.addEventListener(root, 'move', this.handleTopMove);
+@@ -389,7 +389,7 @@ var TouchBackendImpl = /*#__PURE__*/function () {
+         return;
+       }
+ 
+-      TouchBackendImpl.isSetUp = false;
++      TouchBackendImpl.isSetUpRoots.delete(root);
+       this._mouseClientOffset = {};
+       this.removeEventListener(root, 'start', this.handleTopMoveStartCapture, true);
+       this.removeEventListener(root, 'start', this.handleTopMoveStart);
+@@ -588,4 +588,4 @@ var TouchBackendImpl = /*#__PURE__*/function () {
+ 
+ exports.TouchBackendImpl = TouchBackendImpl;
+ 
+-_defineProperty(TouchBackendImpl, "isSetUp", void 0);
+\ No newline at end of file
++_defineProperty(TouchBackendImpl, "isSetUpRoots", new Set());
+\ No newline at end of file
+diff --git a/node_modules/react-dnd-touch-backend/dist/esm/TouchBackendImpl.js b/node_modules/react-dnd-touch-backend/dist/esm/TouchBackendImpl.js
+index e8ff9bb..fc649fa 100644
+--- a/node_modules/react-dnd-touch-backend/dist/esm/TouchBackendImpl.js
++++ b/node_modules/react-dnd-touch-backend/dist/esm/TouchBackendImpl.js
+@@ -349,8 +349,8 @@ export var TouchBackendImpl = /*#__PURE__*/function () {
+         return;
+       }
+ 
+-      invariant(!TouchBackendImpl.isSetUp, 'Cannot have two Touch backends at the same time.');
+-      TouchBackendImpl.isSetUp = true;
++      invariant(!TouchBackendImpl.isSetUpRoots.has(root), 'Cannot have two Touch backends at the same time for the same root element.');
++      TouchBackendImpl.isSetUpRoots.add(root);
+       this.addEventListener(root, 'start', this.getTopMoveStartHandler());
+       this.addEventListener(root, 'start', this.handleTopMoveStartCapture, true);
+       this.addEventListener(root, 'move', this.handleTopMove);
+@@ -374,7 +374,7 @@ export var TouchBackendImpl = /*#__PURE__*/function () {
+         return;
+       }
+ 
+-      TouchBackendImpl.isSetUp = false;
++      TouchBackendImpl.isSetUpRoots.delete(root);
+       this._mouseClientOffset = {};
+       this.removeEventListener(root, 'start', this.handleTopMoveStartCapture, true);
+       this.removeEventListener(root, 'start', this.handleTopMoveStart);
+@@ -571,4 +571,4 @@ export var TouchBackendImpl = /*#__PURE__*/function () {
+   return TouchBackendImpl;
+ }();
+ 
+-_defineProperty(TouchBackendImpl, "isSetUp", void 0);
+\ No newline at end of file
++_defineProperty(TouchBackendImpl, "isSetUpRoots", new Set());
+\ No newline at end of file

@@ -14,6 +14,10 @@ type Props = {|
    * Optional root element for the TouchBackend to bind event listeners to.
    * When rendering in a popped-out window, pass the external window object
    * so that drag events are captured on the correct document.
+   *
+   * When set, a separate react-dnd manager is created (via a unique
+   * `context` passed to DndProvider) so that it doesn't conflict with the
+   * main window's manager.
    */
   rootElement?: ?EventTarget,
 |};
@@ -37,8 +41,25 @@ const DragAndDropContextProvider = ({
     [rootElement]
   );
 
+  // When a rootElement is provided (i.e. for a popped-out window), we pass
+  // a unique `context` object to DndProvider so that it creates its own
+  // DragDropManager instead of reusing the singleton stored on the global
+  // object. The context is also forwarded to the TouchBackend's
+  // OptionsReader, which reads `context.window` and `context.document`
+  // from it to scope element-from-point lookups correctly.
+  const dndContext = React.useMemo(() => {
+    if (!rootElement) return undefined;
+    // $FlowFixMe - rootElement is the external Window object here.
+    const externalWindow = rootElement;
+    return { window: externalWindow, document: externalWindow.document };
+  }, [rootElement]);
+
   return (
-    <DndProvider backend={TouchBackend} options={options}>
+    <DndProvider
+      backend={TouchBackend}
+      options={options}
+      context={dndContext}
+    >
       {children}
     </DndProvider>
   );

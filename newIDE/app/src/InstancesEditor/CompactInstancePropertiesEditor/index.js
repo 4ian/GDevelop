@@ -43,6 +43,7 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
 import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
 import EmptyMessage from '../../UI/EmptyMessage';
 import CompactBehaviorsEditorService from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorsEditorService';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -148,7 +149,13 @@ export const CompactInstancePropertiesEditor = ({
   canOverrideBehaviorProperties,
 }: Props): null | React.Node => {
   const forceUpdate = useForceUpdate();
-  const instance = instances[0];
+  const rawInstance = instances[0];
+
+  // Guard against destroyed C++ instances. This can happen when an instance is
+  // deleted but the properties editor re-renders before receiving updated props
+  // (e.g. forceUpdatePropertiesEditor is called before the parent re-renders
+  // with cleared selection).
+  const instance = exceptionallyGuardAgainstDeadObject(rawInstance);
 
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   /**
@@ -172,19 +179,19 @@ export const CompactInstancePropertiesEditor = ({
 
   const persistedScrollId = React.useMemo(
     () => {
-      if (!instances.length || !scrollKey) return null;
+      if (!instance || !instances.length || !scrollKey) return null;
 
       const selectedObjectForScroll = getObjectByName(
         globalObjectsContainer,
         objectsContainer,
-        instances[0].getObjectName()
+        instance.getObjectName()
       );
 
       return selectedObjectForScroll
         ? selectedObjectForScroll.getPersistentUuid()
         : null;
     },
-    [globalObjectsContainer, instances, scrollKey, objectsContainer]
+    [globalObjectsContainer, instance, instances, scrollKey, objectsContainer]
   );
 
   const onScroll = usePersistedScrollPosition({
@@ -329,7 +336,8 @@ export const CompactInstancePropertiesEditor = ({
       onSelectTileMapTile(null);
     },
     // Reset tile map tile selection if instance changes.
-    [instance.ptr, onSelectTileMapTile]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [instance ? instance.ptr : null, onSelectTileMapTile]
   );
 
   if (!object || !instance || !instanceSchema) return null;

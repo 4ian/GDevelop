@@ -743,10 +743,20 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             type === 'BuiltinCommonInstructions::Group')
         ) {
           const rowIndex = eventsTree.getEventRow(newEvent);
-          const clickableElement = document.querySelector(
-            `[data-row-index="${rowIndex}"] [data-editable-text="true"]`
-          );
-          if (clickableElement) clickableElement.click();
+
+          // Use the ownerDocument of the container element to get the correct
+          // document — important when rendered inside a WindowPortal (external
+          // browser window) where the main window's `document` is different.
+          const containerDivElement = this._containerDiv.current;
+          const ownerDoc = containerDivElement
+            ? containerDivElement.ownerDocument
+            : document;
+          if (ownerDoc) {
+            const clickableElement = ownerDoc.querySelector(
+              `[data-row-index="${rowIndex}"] [data-editable-text="true"]`
+            );
+            if (clickableElement) clickableElement.click();
+          }
         }
       });
     }

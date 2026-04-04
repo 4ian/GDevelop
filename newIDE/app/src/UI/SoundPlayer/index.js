@@ -11,6 +11,7 @@ import IconButton from '../IconButton';
 import { formatDuration } from '../../Utils/Duration';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
+import PortalContainerContext from '../PortalContainerContext';
 import SkipBack from '../CustomSvgIcons/SkipBack';
 import SkipForward from '../CustomSvgIcons/SkipForward';
 import { textEllipsisStyle } from './../TextEllipsis';
@@ -80,6 +81,12 @@ const SoundPlayer: React.ComponentType<{
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const shouldPlayAfterLoading = React.useRef<boolean>(false);
     const { isMobile } = useResponsiveWindowSize();
+    // WaveSurfer uses `instanceof HTMLElement` internally to validate its
+    // container, which fails when the component is rendered in a popped-out
+    // window (each window has its own HTMLElement constructor). In that case,
+    // fall back to native HTML5 Audio like on mobile.
+    const portalContainer = React.useContext(PortalContainerContext);
+    const isInPoppedOutWindow = !!portalContainer;
     const mobileAudioRef = React.useRef<?Audio>(null);
     const waveSurferRef = React.useRef<?any>(null);
     const [duration, setDuration] = React.useState<?number>(null);
@@ -184,9 +191,11 @@ const SoundPlayer: React.ComponentType<{
       });
     }, []);
 
+    const useNativeAudio = isMobile || isInPoppedOutWindow;
+
     React.useEffect(
       () => {
-        if (isMobile) {
+        if (useNativeAudio) {
           if (soundSrc) {
             if (mobileAudioRef.current) {
               mobileAudioRef.current.pause();
@@ -206,7 +215,7 @@ const SoundPlayer: React.ComponentType<{
         onLoad();
       },
       [
-        isMobile,
+        useNativeAudio,
         soundSrc,
         onTimeupdate,
         onFinishPlaying,
@@ -265,7 +274,7 @@ const SoundPlayer: React.ComponentType<{
                 justifyContent: !soundSrc ? 'flex-end' : 'space-between',
               }}
             >
-              {!isMobile && (
+              {!useNativeAudio && (
                 <div style={styles.waveSurferContainer}>
                   <WaveSurferPlayer
                     url={soundSrc}

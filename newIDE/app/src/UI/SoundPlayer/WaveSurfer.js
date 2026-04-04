@@ -62,10 +62,24 @@ function useWavesurferInstance(
     () => {
       if (!containerRef.current) return;
 
-      const ws = WaveSurfer.create({
-        ...options,
-        container: containerRef.current,
-      });
+      let ws;
+      try {
+        ws = WaveSurfer.create({
+          ...options,
+          container: containerRef.current,
+        });
+      } catch (error) {
+        // WaveSurfer.create can fail when the container element belongs to a
+        // different window (e.g. a popped-out editor window). In that case,
+        // `container instanceof HTMLElement` fails because each window has its
+        // own HTMLElement constructor. Gracefully degrade: the SoundPlayer will
+        // still work using native <audio> controls.
+        console.warn(
+          'WaveSurfer failed to initialize (possibly in a popped-out window):',
+          error
+        );
+        return;
+      }
 
       setWavesurfer(ws);
 

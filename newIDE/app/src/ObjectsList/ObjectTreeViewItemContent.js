@@ -222,11 +222,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     const otherParent = exceptionallyGuardAgainstDeadObject(
       objectFolderOrObject.getParent()
     );
-    return (
-      !!ownParent &&
-      !!otherParent &&
-      ownParent === otherParent
-    );
+    return !!ownParent && !!otherParent && ownParent === otherParent;
   }
 
   getIndex(): number {
@@ -261,8 +257,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
   getId(): string {
     const object = this._getAliveObject();
-    if (!object)
-      return `deleted-${this.object.ptr}`;
+    if (!object) return `deleted-${this.object.ptr}`;
     return getObjectTreeViewItemId(object);
   }
 

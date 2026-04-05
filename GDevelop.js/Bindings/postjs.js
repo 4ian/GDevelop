@@ -369,18 +369,29 @@ const callContextLabels = ['<no context set>'];
  */
 function assertAlive(obj, label, gd, className) {
   if (!obj.ptr) {
-    let message = `${label}: object was already destroyed from JavaScript (ptr is 0).`;
-
     const destructionContext = obj._jsDestructionContext;
-    throw new UseAfterFreeError({
-      message,
-      useAfterFreeContext: {
-        timeSinceDestroyedInMs: destructionContext
-          ? Math.round(performance.now() - destructionContext.time)
-          : undefined,
-        destroyedBy: destructionContext ? destructionContext.stack : 'unknown',
-      },
-    });
+    if (destructionContext) {
+      let message = `${label}: object (${className}) was already destroyed from JavaScript (ptr is 0, _jsDestructionContext is set).`;
+
+      throw new UseAfterFreeError({
+        message,
+        useAfterFreeContext: {
+          timeSinceDestroyedInMs: Math.round(
+            performance.now() - destructionContext.time
+          ),
+          destroyedBy: destructionContext.stack,
+        },
+      });
+    } else {
+      let message = `${label}: object (${className}) is a null pointer and might never have been alive (ptr is 0, _jsDestructionContext is not set).`;
+
+      throw new UseAfterFreeError({
+        message,
+        useAfterFreeContext: {
+          possiblyNeverAlive: true,
+        },
+      });
+    }
   }
   if (
     className !== null &&

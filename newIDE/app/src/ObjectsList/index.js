@@ -78,6 +78,7 @@ import {
   getDroppedSupportedFile,
   type DroppedSupportedFile,
 } from './DroppedFileObjectSelectorUtils';
+import { getDefaultObjectNameForType } from './ObjectTypeDefaultName';
 
 const gd: libGDevelop = global.gd;
 const nodePath = optionalRequire('path');
@@ -438,28 +439,6 @@ const getTreeViewItemRightButton = (i18n: I18nType) => (item: TreeViewItem) =>
 
 export const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
 
-const objectTypeToDefaultName = {
-  Sprite: 'NewSprite',
-  'TiledSpriteObject::TiledSprite': 'NewTiledSprite',
-  'ParticleSystem::ParticleEmitter': 'NewParticlesEmitter',
-  'PanelSpriteObject::PanelSprite': 'NewPanelSprite',
-  'PrimitiveDrawing::Drawer': 'NewShapePainter',
-  'TextObject::Text': 'NewText',
-  'BBText::BBText': 'NewBBText',
-  'BitmapText::BitmapTextObject': 'NewBitmapText',
-  'TextEntryObject::TextEntry': 'NewTextEntry',
-  'TileMap::SimpleTileMap': 'NewTileMap',
-  'TileMap::TileMap': 'NewExternalTileMap',
-  'TileMap::CollisionMask': 'NewExternalTileMapMask',
-  'MyDummyExtension::DummyObject': 'NewDummyObject',
-  'Lighting::LightObject': 'NewLight',
-  'TextInput::TextInputObject': 'NewTextInput',
-  'Scene3D::Model3DObject': 'New3DModel',
-  'Scene3D::Cube3DObject': 'New3DBox',
-  'SpineObject::SpineObject': 'NewSpine',
-  'Video::VideoObject': 'NewVideo',
-};
-
 export type ObjectsListInterface = {|
   forceUpdateList: () => void,
   openNewObjectDialog: () => void,
@@ -712,21 +691,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       ({
         objectType,
         resourceName,
-        sourceFileName,
       }: {|
         objectType: string,
         resourceName: string,
-        sourceFileName: string,
       |}) => {
-        const sourceBaseName = nodePath
-          ? nodePath.basename(sourceFileName, nodePath.extname(sourceFileName))
-          : sourceFileName.replace(/\.[^/.]+$/, '');
-        const fallbackName =
-          // $FlowFixMe[invalid-computed-prop]
-          objectTypeToDefaultName[objectType] || 'NewObject';
-        const defaultObjectName = sourceBaseName || fallbackName;
         const objectName = newNameGenerator(
-          defaultObjectName,
+          getDefaultObjectNameForType(objectType),
           candidateName =>
             objectsContainer.hasObjectNamed(candidateName) ||
             (!!globalObjectsContainer &&
@@ -841,10 +811,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (!droppedFile.file) return null;
         const storageProvider = resourceManagementProps.getStorageProvider();
         const resourcesManager = project.getResourcesManager();
-        const newResource =
-          droppedFile.resourceKind === 'image'
-            ? new gd.ImageResource()
-            : new gd.Model3DResource();
+        const newResource = new gd.ImageResource();
         if (storageProvider.internalName === 'Cloud') {
           if (!fileMetadata || !authenticatedUser.authenticated) {
             newResource.delete();
@@ -915,8 +882,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           ? 'New' +
             (project.getEventsBasedObject(objectType).getDefaultName() ||
               project.getEventsBasedObject(objectType).getName())
-          : // $FlowFixMe[invalid-computed-prop]
-            objectTypeToDefaultName[objectType] || 'NewObject';
+          : getDefaultObjectNameForType(objectType);
         const name = newNameGenerator(
           defaultName,
           name =>
@@ -1968,17 +1934,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           return;
         }
         let objectTypeToCreate = null;
-        if (droppedFile.resourceKind === 'image') {
-          objectTypeToCreate = getObjectTypeForDroppedImagePosition(
-            event.clientX,
-            event.clientY
-          );
-          if (!objectTypeToCreate) {
-            resetDroppedFileState();
-            return;
-          }
-        } else {
-          objectTypeToCreate = 'Scene3D::Model3DObject';
+        objectTypeToCreate = getObjectTypeForDroppedImagePosition(
+          event.clientX,
+          event.clientY
+        );
+        if (!objectTypeToCreate) {
+          resetDroppedFileState();
+          return;
         }
         if (
           storageProvider.internalName === 'Cloud' &&
@@ -2006,7 +1968,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           insertObjectFromDroppedResource({
             objectType: objectTypeToCreate,
             resourceName,
-            sourceFileName: droppedFile.file.name,
           });
         } catch (error) {
           await showAlert({

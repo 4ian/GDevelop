@@ -120,7 +120,7 @@ export const ExtensionOptionsEditor = ({
             field={
               <CompactTextField
                 value={eventsFunctionsExtension.getFullName()}
-                onChange={(e, text) => {
+                onChange={text => {
                   eventsFunctionsExtension.setFullName(text);
                   forceUpdate();
                 }}
@@ -153,7 +153,7 @@ export const ExtensionOptionsEditor = ({
             field={
               <CompactTextField
                 value={eventsFunctionsExtension.getVersion()}
-                onChange={(e, text) => {
+                onChange={text => {
                   eventsFunctionsExtension.setVersion(text);
                   forceUpdate();
                 }}

@@ -30,8 +30,9 @@ export const getFunctionCallToFunctionCallOutputMap = ({
   >();
 
   // Process messages in a single loop
-  for (let i = 0; i < aiRequest.output.length; i++) {
-    const message = aiRequest.output[i];
+  const output = aiRequest.output || [];
+  for (let i = 0; i < output.length; i++) {
+    const message = output[i];
 
     if (message.type === 'message' && message.role === 'assistant') {
       // Process function calls in this message
@@ -78,8 +79,9 @@ export const getFunctionCallsToProcess = ({
   // Process from the end and collect function calls until we hit a message with no function calls
   let foundFunctionCall = false;
 
-  for (let i = aiRequest.output.length - 1; i >= 0; i--) {
-    const message = aiRequest.output[i];
+  const output = aiRequest.output || [];
+  for (let i = output.length - 1; i >= 0; i--) {
+    const message = output[i];
 
     // Track already processed function call outputs
     if (message.type === 'function_call_output') {
@@ -124,8 +126,9 @@ export const getFunctionCallNameByCallId = ({
   aiRequest: AiRequest,
   callId: string,
 |}): string | null => {
-  for (let i = 0; i < aiRequest.output.length; i++) {
-    const message = aiRequest.output[i];
+  const output = aiRequest.output || [];
+  for (let i = 0; i < output.length; i++) {
+    const message = output[i];
     if (message.type === 'message' && message.role === 'assistant') {
       for (const content of message.content) {
         if (content.type === 'function_call' && content.call_id === callId) {
@@ -145,8 +148,9 @@ export const getLatestActivePlan = (
   aiRequest: AiRequest
 ): AiRequestPlan | null => {
   let latestPlan = null;
-  for (let i = aiRequest.output.length - 1; i >= 0; i--) {
-    const message = aiRequest.output[i];
+  const outputMessages = aiRequest.output || [];
+  for (let i = outputMessages.length - 1; i >= 0; i--) {
+    const message = outputMessages[i];
     if (message.type === 'function_call_output' && message.output) {
       try {
         const output = JSON.parse(message.output);

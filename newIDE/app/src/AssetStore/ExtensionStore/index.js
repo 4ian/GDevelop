@@ -28,6 +28,7 @@ import ExtensionDetailPanel, {
 } from './ExtensionDetailPanel';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import Text from '../../UI/Text';
+import { Divider } from '@material-ui/core';
 
 export const ExtensionDetailSidePanel = ({
   extensionShortHeader,
@@ -204,19 +205,22 @@ export const ExtensionStore = ({
         </ColumnStackLayout>
         {!isMobile ? (
           selectedExtensionShortHeader ? (
-            <Column expand noOverflowParent>
-              <ExtensionDetailSidePanel
-                project={project}
-                extensionShortHeader={selectedExtensionShortHeader}
-                isInstalling={isInstalling}
-                onInstall={async () => {
-                  sendExtensionAddedToProject(
-                    selectedExtensionShortHeader.name
-                  );
-                  await onInstall(selectedExtensionShortHeader);
-                }}
-              />
-            </Column>
+            <LineStackLayout expand noMargin>
+              <Divider orientation="vertical" />
+              <Column expand noOverflowParent>
+                <ExtensionDetailSidePanel
+                  project={project}
+                  extensionShortHeader={selectedExtensionShortHeader}
+                  isInstalling={isInstalling}
+                  onInstall={async () => {
+                    sendExtensionAddedToProject(
+                      selectedExtensionShortHeader.name
+                    );
+                    await onInstall(selectedExtensionShortHeader);
+                  }}
+                />
+              </Column>
+            </LineStackLayout>
           ) : (
             <Column
               expand

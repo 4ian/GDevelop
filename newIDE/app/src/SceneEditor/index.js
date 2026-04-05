@@ -1454,9 +1454,23 @@ export default class SceneEditor extends React.Component<Props, State> {
   }: {|
     updatedObjects: Array<gdObject>,
   |}) => {
-    const serializedObjects = updatedObjects.map(object =>
-      serializeObjectWithCleanDefaultBehaviorFlags(object)
+    const aliveObjects = updatedObjects.filter(
+      object => !!exceptionallyGuardAgainstDeadObject(object)
     );
+    if (aliveObjects.length === 0) return;
+
+    let serializedObjects;
+    try {
+      serializedObjects = aliveObjects.map(object =>
+        serializeObjectWithCleanDefaultBehaviorFlags(object)
+      );
+    } catch (error) {
+      console.error(
+        'Error while serializing objects for hot-reload, skipping.',
+        error
+      );
+      return;
+    }
     const { previewDebuggerServer } = this.props;
     if (previewDebuggerServer) {
       previewDebuggerServer

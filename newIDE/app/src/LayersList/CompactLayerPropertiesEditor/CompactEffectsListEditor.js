@@ -26,6 +26,7 @@ import {
   getEnumeratedEffectMetadata,
   useManageEffects,
 } from '../../EffectsList';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
 import { getHelpLink } from '../../Utils/HelpLink';
@@ -242,6 +243,10 @@ export const CompactEffectsListEditor = ({
 
   const filteredEffectMetadata =
     layerRenderingType === '3d' ? all3DEffectMetadata : all2DEffectMetadata;
+
+  // Guard against the effects container being destroyed (e.g. when a layer is removed)
+  // while React is still rendering this component with a stale reference.
+  if (!exceptionallyGuardAgainstDeadObject(effectsContainer)) return null;
 
   return (
     <TopLevelCollapsibleSection

@@ -783,7 +783,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 payWithCredits,
                 mode: modeForThisMessage,
                 aiRequestId: aiRequest.id,
-                outputLength: aiRequest.output.length,
+                outputLength: aiRequest.output ? aiRequest.output.length : 0,
               });
             }
           } catch (error) {
@@ -1129,7 +1129,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           if (message.type === 'message' && message.role === 'user') {
             projectVersionId = message.projectVersionIdBeforeMessage;
             // For user messages, we fork up to the previous message.
-            const messages = aiRequest.output;
+            const messages = aiRequest.output || [];
             const messageIndex = messages.findIndex(
               msg => msg.messageId === message.messageId
             );
@@ -1252,8 +1252,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           // Check if this is the last message with a save in the conversation
           // Find the last message that has a projectVersionIdAfterMessage
           let lastMessageWithSave = null;
-          for (let i = aiRequest.output.length - 1; i >= 0; i--) {
-            const msg = aiRequest.output[i];
+          const outputMessages = aiRequest.output || [];
+          for (let i = outputMessages.length - 1; i >= 0; i--) {
+            const msg = outputMessages[i];
             if (
               (msg.type === 'function_call_output' ||
                 (msg.type === 'message' && msg.role === 'assistant')) &&

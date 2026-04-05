@@ -370,6 +370,8 @@ export const useAiRequestHistory = (
           );
         })
         .forEach((request: AiRequest) => {
+          if (!request.output) return;
+
           const userMessages = request.output
             .filter(
               message => message.type === 'message' && message.role === 'user'

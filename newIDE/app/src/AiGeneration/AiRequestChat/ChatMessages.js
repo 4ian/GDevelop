@@ -602,7 +602,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
       },
       [
         shouldBeWorkingIfNotPaused,
-        aiRequest.output || [],
+        aiRequest.output,
         project,
         editorCallbacks,
         editorFunctionCallResults,
@@ -900,7 +900,9 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
               const previousMessage =
                 // $FlowFixMe[unsafe-arithmetic]
                 // $FlowFixMe[invalid-compare]
-                messageIndex > 0 ? (aiRequest.output || [])[messageIndex - 1] : null;
+                messageIndex > 0
+                  ? (aiRequest.output || [])[messageIndex - 1]
+                  : null;
               const previousMessageHasSameVersionId =
                 previousMessage &&
                 hasVersionToRestore &&

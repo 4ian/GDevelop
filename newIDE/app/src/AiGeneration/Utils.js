@@ -600,29 +600,31 @@ export const useAiRequestState = ({
           }
           return {
             ...prevRequest,
-            output: (prevRequest.output || []).map((message: AiRequestMessage) => {
-              if (
-                message.messageId === lastMessageId &&
-                message.role !== 'user'
-              ) {
-                // $FlowFixMe[incompatible-type] - Flow is not able to understand this is the right type.
-                return {
-                  ...message,
-                  projectVersionIdAfterMessage,
-                };
+            output: (prevRequest.output || []).map(
+              (message: AiRequestMessage) => {
+                if (
+                  message.messageId === lastMessageId &&
+                  message.role !== 'user'
+                ) {
+                  // $FlowFixMe[incompatible-type] - Flow is not able to understand this is the right type.
+                  return {
+                    ...message,
+                    projectVersionIdAfterMessage,
+                  };
+                }
+                if (
+                  message.messageId === lastMessageId &&
+                  message.role === 'user'
+                ) {
+                  // $FlowFixMe[incompatible-type] - Flow is not able to understand this is the right type.
+                  return {
+                    ...message,
+                    projectVersionIdBeforeMessage,
+                  };
+                }
+                return message;
               }
-              if (
-                message.messageId === lastMessageId &&
-                message.role === 'user'
-              ) {
-                // $FlowFixMe[incompatible-type] - Flow is not able to understand this is the right type.
-                return {
-                  ...message,
-                  projectVersionIdBeforeMessage,
-                };
-              }
-              return message;
-            }),
+            ),
           };
         });
       }

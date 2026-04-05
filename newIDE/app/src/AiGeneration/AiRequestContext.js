@@ -541,8 +541,7 @@ export const AiRequestProvider = ({
     const clearFetchingSuggestionsIfDone = (aiRequest: AiRequest) => {
       if (!isFetchingSuggestions) return;
       const output = aiRequest.output || [];
-      const lastMessage =
-        output.length > 0 ? output[output.length - 1] : null;
+      const lastMessage = output.length > 0 ? output[output.length - 1] : null;
       const hasSuggestions =
         lastMessage &&
         ((lastMessage.type === 'message' && lastMessage.role === 'assistant') ||

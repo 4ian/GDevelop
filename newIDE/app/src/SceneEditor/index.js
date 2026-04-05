@@ -548,9 +548,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       })
       .filter(Boolean);
 
-    justRemovedInstances.forEach(instance => {
-      this.props.initialInstances.removeInstance(instance);
-    });
     if (justRemovedInstances.length) {
       // Make sure no deleted instance stays selected.
       this.instancesSelection.selectInstances({
@@ -562,6 +559,10 @@ export default class SceneEditor extends React.Component<Props, State> {
       // Immediately update the properties editor to ensure they keep no reference
       // to the deleted instances.
       this.forceUpdatePropertiesEditor();
+
+      justRemovedInstances.forEach(instance => {
+        this.props.initialInstances.removeInstance(instance);
+      });
 
       this.setState(
         {
@@ -2167,10 +2168,9 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
-    selectedInstances.forEach(instance => {
-      if (instance.isLocked()) return;
-      this.props.initialInstances.removeInstance(instance);
-    });
+    const instancesToDelete = selectedInstances.filter(
+      instance => !instance.isLocked()
+    );
 
     this.instancesSelection.clearSelection();
     if (this.editorDisplay)
@@ -2179,6 +2179,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     // Immediately update the properties editor to ensure they keep no reference
     // to the deleted instances.
     this.forceUpdatePropertiesEditor();
+
+    instancesToDelete.forEach(instance => {
+      this.props.initialInstances.removeInstance(instance);
+    });
 
     this.setState(
       {

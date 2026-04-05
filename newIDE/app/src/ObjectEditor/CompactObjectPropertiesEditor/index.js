@@ -60,6 +60,7 @@ import { CompactEffectsListEditor } from '../../LayersList/CompactLayerPropertie
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -289,6 +290,9 @@ export const CompactObjectPropertiesEditor = ({
   const { showDeleteConfirmation } = useAlertDialog();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
   const object = objects[0];
+  const variablesContainer = exceptionallyGuardAgainstDeadObject(
+    object.getVariables()
+  );
   const objectConfiguration = object.getConfiguration();
 
   // Don't use a memo for this because metadata from custom objects are built
@@ -818,65 +822,67 @@ export const CompactObjectPropertiesEditor = ({
               </ColumnStackLayout>
             )}
           />
-          <TopLevelCollapsibleSection
-            title={<Trans>Object Variables</Trans>}
-            isFolded={isVariablesFolded}
-            toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
-            onOpenFullEditor={() => onEditObject(object, 'variables')}
-            onAdd={
-              isVariableListLocked
-                ? null
-                : () => {
-                    if (variablesListRef.current) {
-                      variablesListRef.current.addVariable();
-                    }
-                    setIsVariablesFolded(false);
-                  }
-            }
-            renderContentAsHiddenWhenFolded={
-              true /* Allows to keep a ref to the variables list for add button to work. */
-            }
-            noContentMargin
-            renderContent={() => (
-              <VariablesList
-                ref={variablesListRef}
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                directlyStoreValueChangesWhileEditing
-                variablesContainer={object.getVariables()}
-                areObjectVariables
-                size="compact"
-                onComputeAllVariableNames={() =>
-                  object && layout
-                    ? EventsRootVariablesFinder.findAllObjectVariables(
-                        project.getCurrentPlatform(),
-                        project,
-                        layout,
-                        object.getName()
-                      )
-                    : []
-                }
-                historyHandler={historyHandler}
-                toolbarIconStyle={styles.icon}
-                compactEmptyPlaceholderText={
-                  <Trans>
-                    There are no{' '}
-                    <Link
-                      href={objectVariablesHelpLink}
-                      onClick={() =>
-                        Window.openExternalURL(objectVariablesHelpLink)
+          {variablesContainer && (
+            <TopLevelCollapsibleSection
+              title={<Trans>Object Variables</Trans>}
+              isFolded={isVariablesFolded}
+              toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
+              onOpenFullEditor={() => onEditObject(object, 'variables')}
+              onAdd={
+                isVariableListLocked
+                  ? null
+                  : () => {
+                      if (variablesListRef.current) {
+                        variablesListRef.current.addVariable();
                       }
-                    >
-                      variables
-                    </Link>{' '}
-                    on this object.
-                  </Trans>
-                }
-                isListLocked={isVariableListLocked}
-              />
-            )}
-          />
+                      setIsVariablesFolded(false);
+                    }
+              }
+              renderContentAsHiddenWhenFolded={
+                true /* Allows to keep a ref to the variables list for add button to work. */
+              }
+              noContentMargin
+              renderContent={() => (
+                <VariablesList
+                  ref={variablesListRef}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
+                  directlyStoreValueChangesWhileEditing
+                  variablesContainer={variablesContainer}
+                  areObjectVariables
+                  size="compact"
+                  onComputeAllVariableNames={() =>
+                    object && layout
+                      ? EventsRootVariablesFinder.findAllObjectVariables(
+                          project.getCurrentPlatform(),
+                          project,
+                          layout,
+                          object.getName()
+                        )
+                      : []
+                  }
+                  historyHandler={historyHandler}
+                  toolbarIconStyle={styles.icon}
+                  compactEmptyPlaceholderText={
+                    <Trans>
+                      There are no{' '}
+                      <Link
+                        href={objectVariablesHelpLink}
+                        onClick={() =>
+                          Window.openExternalURL(objectVariablesHelpLink)
+                        }
+                      >
+                        variables
+                      </Link>{' '}
+                      on this object.
+                    </Trans>
+                  }
+                  isListLocked={isVariableListLocked}
+                />
+              )}
+            />
+          )}
           {objectMetadata &&
             objectMetadata.hasDefaultBehavior(
               'EffectCapability::EffectBehavior'

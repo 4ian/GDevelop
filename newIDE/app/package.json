@@ -75,10 +75,8 @@
     "qr-creator": "^1.0.0",
     "react": "18.2.0",
     "react-color": "2.13.8",
-    "react-dnd": "7.7.0",
-    "react-dnd-html5-backend": "7.7.0",
-    "react-dnd-multi-backend": "3.2.2",
-    "react-dnd-touch-backend": "0.8.3",
+    "react-dnd": "14.0.5",
+    "react-dnd-touch-backend": "14.1.1",
     "react-dom": "18.2.0",
     "react-error-boundary": "^1.2.0",
     "react-inner-image-zoom": "^3.0.2",
@@ -86,7 +84,7 @@
     "react-markdown": "^8.0.6",
     "react-measure": "2.3.0",
     "react-monaco-editor": "^0.18.0",
-    "react-mosaic-component": "github:4ian/react-mosaic#v3.1.0",
+    "react-mosaic-component": "5.3.0",
     "react-share": "^4.4.0",
     "react-sortable-hoc": "1.5.0",
     "react-test-renderer": "18.2.0",
@@ -115,7 +113,10 @@
       "@pixi/sprite": "7.4.2"
     },
     "react": "$react",
-    "react-dom": "$react-dom"
+    "react-dom": "$react-dom",
+    "react-dnd": "14.0.5",
+    "react-dnd-touch-backend": "14.1.1",
+    "dnd-core": "14.0.1"
   },
   "scripts": {
     "postinstall": "patch-package && cd ../../GDJS && npm install && cd ../newIDE/app && npm run import-resources",

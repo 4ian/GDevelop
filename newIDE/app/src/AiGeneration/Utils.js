@@ -224,7 +224,7 @@ export const useProcessFunctionCalls = ({
           })),
           relatedAiRequestId: selectedAiRequest.id,
           getRelatedAiRequestLastMessages: () =>
-            getLastMessagesFromAiRequestOutput(selectedAiRequest.output),
+            getLastMessagesFromAiRequestOutput(selectedAiRequest.output || []),
           generateEvents,
           onSceneEventsModifiedOutsideEditor,
           onInstancesModifiedOutsideEditor,
@@ -408,6 +408,7 @@ export const useAiRequestState = ({
           (selectedAiRequest.mode !== 'agent' &&
             selectedAiRequest.mode !== 'orchestrator') ||
           isSendingAiRequest(selectedAiRequest.id) ||
+          !selectedAiRequest.output ||
           selectedAiRequest.output.length === 0 ||
           selectedAiRequest.status !== 'ready' ||
           !profile ||
@@ -431,9 +432,10 @@ export const useAiRequestState = ({
         );
         if (hasUnfinishedResult) return;
 
+        const outputForSuggestions = selectedAiRequest.output || [];
         const lastMessage =
-          selectedAiRequest.output.length > 0
-            ? selectedAiRequest.output[selectedAiRequest.output.length - 1]
+          outputForSuggestions.length > 0
+            ? outputForSuggestions[outputForSuggestions.length - 1]
             : null;
         if (
           !lastMessage ||
@@ -598,7 +600,7 @@ export const useAiRequestState = ({
           }
           return {
             ...prevRequest,
-            output: prevRequest.output.map((message: AiRequestMessage) => {
+            output: (prevRequest.output || []).map((message: AiRequestMessage) => {
               if (
                 message.messageId === lastMessageId &&
                 message.role !== 'user'
@@ -638,6 +640,7 @@ export const useAiRequestState = ({
           (selectedAiRequest.mode !== 'agent' &&
             selectedAiRequest.mode !== 'orchestrator') ||
           isSendingAiRequest(selectedAiRequest.id) ||
+          !selectedAiRequest.output ||
           selectedAiRequest.output.length === 0 ||
           !profile ||
           !project ||
@@ -649,9 +652,10 @@ export const useAiRequestState = ({
           return;
         }
 
+        const outputForSave = selectedAiRequest.output || [];
         const lastMessage =
-          selectedAiRequest.output.length > 0
-            ? selectedAiRequest.output[selectedAiRequest.output.length - 1]
+          outputForSave.length > 0
+            ? outputForSave[outputForSave.length - 1]
             : null;
         const lastMessageId = lastMessage ? lastMessage.messageId : null;
         if (!lastMessage || !lastMessageId) {

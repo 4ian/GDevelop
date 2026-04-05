@@ -27,6 +27,7 @@ import {
   buildMoveToMenu,
 } from './EventsFunctionFolderTreeViewItemContent';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -247,13 +248,16 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
   }
 
   getName(): string | React.Node {
-    return this.functionFolderOrFunction.getFunction().getName();
+    const eventsFunction = this.functionFolderOrFunction.getFunction();
+    if (!exceptionallyGuardAgainstDeadObject(eventsFunction)) return '';
+    return eventsFunction.getName();
   }
 
   getId(): string {
-    return getEventsFunctionTreeViewItemId(
-      this.functionFolderOrFunction.getFunction()
-    );
+    const eventsFunction = this.functionFolderOrFunction.getFunction();
+    if (!exceptionallyGuardAgainstDeadObject(eventsFunction))
+      return `deleted-${eventsFunction.ptr}`;
+    return getEventsFunctionTreeViewItemId(eventsFunction);
   }
 
   getHtmlId(index: number): ?string {
@@ -262,6 +266,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
 
   getThumbnail(): ?string {
     const eventsFunction = this.functionFolderOrFunction.getFunction();
+    if (!exceptionallyGuardAgainstDeadObject(eventsFunction)) return null;
     return getFunctionIconUrl(
       eventsFunction.getFunctionType(),
       eventsFunction.getName()
@@ -389,6 +394,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
 
   renderRightComponent(i18n: I18nType): ?React.Node {
     const eventsFunction = this.functionFolderOrFunction.getFunction();
+    if (!exceptionallyGuardAgainstDeadObject(eventsFunction)) return null;
     const icons = [];
     if (eventsFunction.isPrivate()) {
       icons.push(

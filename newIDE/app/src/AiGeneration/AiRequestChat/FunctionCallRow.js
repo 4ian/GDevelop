@@ -27,7 +27,6 @@ import { SafeExtractor } from '../../Utils/SafeExtractor';
 import CircledAdd from '../../UI/CustomSvgIcons/CircledAdd';
 import { AiRequestContext } from '../AiRequestContext';
 import { getFunctionCallToFunctionCallOutputMap } from '../AiRequestUtils';
-import { FunctionCallsGroup } from './FunctionCallsGroup';
 
 const styles = {
   functionCallText: {
@@ -395,26 +394,24 @@ const SubAgentFunctionCallRow = ({
       </div>
       {showDetails && subAgentFunctionCallItems.length > 0 && (
         <div className={classes.detailsContent}>
-          <FunctionCallsGroup>
-            {subAgentFunctionCallItems.map(
-              ({
-                key,
-                messageContent,
-                existingFunctionCallOutput: subOutput,
-                editorFunctionCallResult,
-              }) => (
-                <EditorFunctionCallRow
-                  project={project}
-                  key={key}
-                  onProcessFunctionCalls={onProcessFunctionCalls}
-                  functionCall={messageContent}
-                  editorFunctionCallResult={editorFunctionCallResult}
-                  existingFunctionCallOutput={subOutput}
-                  editorCallbacks={editorCallbacks}
-                />
-              )
-            )}
-          </FunctionCallsGroup>
+          {subAgentFunctionCallItems.map(
+            ({
+              key,
+              messageContent,
+              existingFunctionCallOutput: subOutput,
+              editorFunctionCallResult,
+            }) => (
+              <EditorFunctionCallRow
+                project={project}
+                key={key}
+                onProcessFunctionCalls={onProcessFunctionCalls}
+                functionCall={messageContent}
+                editorFunctionCallResult={editorFunctionCallResult}
+                existingFunctionCallOutput={subOutput}
+                editorCallbacks={editorCallbacks}
+              />
+            )
+          )}
         </div>
       )}
     </div>

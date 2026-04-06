@@ -10,7 +10,6 @@ import {
 import {
   getAiRequest,
   getAiRequestSuggestions,
-  addMessageToAiRequest,
   type AiRequest,
   type AiRequestMessage,
   type AiRequestMessageAssistantFunctionCall,
@@ -35,7 +34,7 @@ import { useGenerateEvents } from './UseGenerateEvents';
 import { useSearchAndInstallAsset } from './UseSearchAndInstallAsset';
 import { useSearchAndInstallResource } from './UseSearchAndInstallResource';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import { AiRequestContext, type ActiveSubAgent } from './AiRequestContext';
+import { AiRequestContext } from './AiRequestContext';
 
 import { delay } from '../Utils/Delay';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
@@ -98,7 +97,7 @@ export const useProcessFunctionCalls = ({
   project,
   resourceManagementProps,
   editorCallbacks,
-  selectedAiRequest,
+  aiRequestsToProcess,
   onSendEditorFunctionCallResults,
   getEditorFunctionCallResults,
   addEditorFunctionCallResults,
@@ -114,8 +113,9 @@ export const useProcessFunctionCalls = ({
   project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
   editorCallbacks: EditorCallbacks,
-  selectedAiRequest: ?AiRequest,
+  aiRequestsToProcess: Array<AiRequest>,
   onSendEditorFunctionCallResults: (
+    aiRequestId: string,
     editorFunctionCallResults: Array<EditorFunctionCallResult>,
     options: {|
       createdSceneNames?: Array<string>,
@@ -144,6 +144,7 @@ export const useProcessFunctionCalls = ({
   isReadyToProcessFunctionCalls: boolean,
 |}): {
   onProcessFunctionCalls: (
+    aiRequest: AiRequest,
     functionCalls: Array<AiRequestMessageAssistantFunctionCall>
   ) => Promise<void>,
 } => {
@@ -168,22 +169,25 @@ export const useProcessFunctionCalls = ({
   // results store (see useEditorFunctionCallResultsStorage).  However,
   // React 18 can re-run an effect before a forceUpdate() re-render has
   // propagated (e.g. StrictMode double-invocations in development, or a
-  // polling update to selectedAiRequest that recreates onProcessFunctionCalls
-  // while the previous invocation is still awaiting).
+  // polling update that recreates onProcessFunctionCalls while the previous
+  // invocation is still awaiting).
   // This Set acts as an immediate, synchronous lock keyed by
   // "<requestId>:<callId>" so a call that is already being processed is
   // never started a second time.
   const inFlightFunctionCallIdsRef = React.useRef<Set<string>>(new Set());
 
   const onProcessFunctionCalls = React.useCallback(
-    async (functionCalls: Array<AiRequestMessageAssistantFunctionCall>) => {
-      if (!selectedAiRequest || !isReadyToProcessFunctionCalls) return;
-      if (selectedAiRequest.status === 'suspended') return;
+    async (
+      aiRequest: AiRequest,
+      functionCalls: Array<AiRequestMessageAssistantFunctionCall>
+    ) => {
+      if (!isReadyToProcessFunctionCalls) return;
+      if (aiRequest.status === 'suspended') return;
 
       const functionCallsToProcess = functionCalls.filter(
         functionCall =>
           !inFlightFunctionCallIdsRef.current.has(
-            `${selectedAiRequest.id}:${functionCall.call_id}`
+            `${aiRequest.id}:${functionCall.call_id}`
           )
       );
       if (functionCallsToProcess.length === 0) {
@@ -196,12 +200,12 @@ export const useProcessFunctionCalls = ({
       // Lock these call IDs so concurrent invocations skip them.
       functionCallsToProcess.forEach(functionCall => {
         inFlightFunctionCallIdsRef.current.add(
-          `${selectedAiRequest.id}:${functionCall.call_id}`
+          `${aiRequest.id}:${functionCall.call_id}`
         );
       });
 
       addEditorFunctionCallResults(
-        selectedAiRequest.id,
+        aiRequest.id,
         functionCallsToProcess.map(functionCall => ({
           status: 'working',
           call_id: functionCall.call_id,
@@ -216,16 +220,17 @@ export const useProcessFunctionCalls = ({
         } = await processEditorFunctionCalls({
           project,
           editorCallbacks,
-          toolOptions: selectedAiRequest.toolOptions || null,
+          // $FlowFixMe[incompatible-type]
+          toolOptions: aiRequest.toolOptions || null,
           i18n,
           functionCalls: functionCallsToProcess.map(functionCall => ({
             name: functionCall.name,
             arguments: functionCall.arguments,
             call_id: functionCall.call_id,
           })),
-          relatedAiRequestId: selectedAiRequest.id,
+          relatedAiRequestId: aiRequest.id,
           getRelatedAiRequestLastMessages: () =>
-            getLastMessagesFromAiRequestOutput(selectedAiRequest.output || []),
+            getLastMessagesFromAiRequestOutput(aiRequest.output || []),
           generateEvents,
           onSceneEventsModifiedOutsideEditor,
           onInstancesModifiedOutsideEditor,
@@ -248,14 +253,9 @@ export const useProcessFunctionCalls = ({
           return;
         }
 
-        const newResults = addEditorFunctionCallResults(
-          selectedAiRequest.id,
-          results
-        );
+        const newResults = addEditorFunctionCallResults(aiRequest.id, results);
 
-        // We may have processed everything, so try to send the results
-        // to the backend.
-        await onSendEditorFunctionCallResults(newResults, {
+        await onSendEditorFunctionCallResults(aiRequest.id, newResults, {
           createdSceneNames,
           createdProject,
         });
@@ -264,14 +264,13 @@ export const useProcessFunctionCalls = ({
         // (e.g. after an error or a suspension).
         functionCallsToProcess.forEach(functionCall => {
           inFlightFunctionCallIdsRef.current.delete(
-            `${selectedAiRequest.id}:${functionCall.call_id}`
+            `${aiRequest.id}:${functionCall.call_id}`
           );
         });
       }
     },
     [
       i18n,
-      selectedAiRequest,
       isReadyToProcessFunctionCalls,
       addEditorFunctionCallResults,
       project,
@@ -290,30 +289,44 @@ export const useProcessFunctionCalls = ({
     ]
   );
 
-  const allFunctionCallsToProcess = React.useMemo(
-    () =>
-      selectedAiRequest
-        ? getFunctionCallsToProcess({
-            aiRequest: selectedAiRequest,
-            editorFunctionCallResults: getEditorFunctionCallResults(
-              selectedAiRequest.id
-            ),
-          })
-        : [],
-    [selectedAiRequest, getEditorFunctionCallResults]
+  // Collect all function calls to process across all active AI requests.
+  const allFunctionCallsToProcess: Array<{|
+    aiRequest: AiRequest,
+    functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
+  |}> = React.useMemo(
+    () => {
+      const result = [];
+      for (const aiRequest of aiRequestsToProcess) {
+        const functionCalls = getFunctionCallsToProcess({
+          aiRequest,
+          editorFunctionCallResults: getEditorFunctionCallResults(aiRequest.id),
+        });
+        if (functionCalls.length > 0) {
+          result.push({ aiRequest, functionCalls });
+        }
+      }
+      return result;
+    },
+    [aiRequestsToProcess, getEditorFunctionCallResults]
   );
 
   React.useEffect(
     () => {
+      if (allFunctionCallsToProcess.length === 0) return;
+
       (async () => {
-        if (!selectedAiRequest) return;
-        if (selectedAiRequest.status === 'suspended') return;
-        if (allFunctionCallsToProcess.length === 0) return;
-        console.info('Automatically processing AI function calls...');
-        await onProcessFunctionCalls(allFunctionCallsToProcess);
+        for (const { aiRequest, functionCalls } of allFunctionCallsToProcess) {
+          if (aiRequest.status === 'suspended') continue;
+          console.info(
+            `Automatically processing AI function calls for request ${
+              aiRequest.id
+            }...`
+          );
+          await onProcessFunctionCalls(aiRequest, functionCalls);
+        }
       })();
     },
-    [selectedAiRequest, onProcessFunctionCalls, allFunctionCallsToProcess]
+    [onProcessFunctionCalls, allFunctionCallsToProcess]
   );
 
   return {
@@ -350,253 +363,6 @@ export const useActivateSubAgents = ({
       });
     },
     [selectedAiRequest, activateSubAgent]
-  );
-};
-
-/**
- * Processes editor function calls for active sub-agent AI requests,
- * sending results back via addMessageToAiRequest on the sub-agent's ID.
- */
-export const useProcessSubAgentFunctionCalls = ({
-  i18n,
-  project,
-  resourceManagementProps,
-  editorCallbacks,
-  onSceneEventsModifiedOutsideEditor,
-  onInstancesModifiedOutsideEditor,
-  onObjectsModifiedOutsideEditor,
-  onObjectGroupsModifiedOutsideEditor,
-  onWillInstallExtension,
-  onExtensionInstalled,
-  isReadyToProcessFunctionCalls,
-}: {|
-  i18n: I18nType,
-  project: ?gdProject,
-  resourceManagementProps: ResourceManagementProps,
-  editorCallbacks: EditorCallbacks,
-  onSceneEventsModifiedOutsideEditor: (
-    changes: SceneEventsOutsideEditorChanges
-  ) => void,
-  onInstancesModifiedOutsideEditor: (
-    changes: InstancesOutsideEditorChanges
-  ) => void,
-  onObjectsModifiedOutsideEditor: (
-    changes: ObjectsOutsideEditorChanges
-  ) => void,
-  onObjectGroupsModifiedOutsideEditor: (
-    changes: ObjectGroupsOutsideEditorChanges
-  ) => void,
-  onWillInstallExtension: (extensionNames: Array<string>) => void,
-  onExtensionInstalled: (extensionNames: Array<string>) => void,
-  isReadyToProcessFunctionCalls: boolean,
-|}) => {
-  const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
-    project,
-    i18n,
-  });
-  const { searchAndInstallAsset } = useSearchAndInstallAsset({
-    project,
-    resourceManagementProps,
-    onWillInstallExtension,
-    onExtensionInstalled,
-  });
-  const { searchAndInstallResources } = useSearchAndInstallResource({
-    project,
-    resourceManagementProps,
-  });
-  const { generateEvents } = useGenerateEvents({ project });
-
-  const {
-    aiRequestStorage,
-    editorFunctionCallResultsStorage,
-    activeSubAgents,
-  } = React.useContext(AiRequestContext);
-  const { aiRequests, updateAiRequest } = aiRequestStorage;
-  const {
-    getEditorFunctionCallResults,
-    addEditorFunctionCallResults,
-    clearEditorFunctionCallResults,
-  } = editorFunctionCallResultsStorage;
-  const { profile, getAuthorizationHeader } = React.useContext(
-    AuthenticatedUserContext
-  );
-  const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
-
-  const inFlightFunctionCallIdsRef = React.useRef<Set<string>>(new Set());
-
-  // Collect all function calls to process across all active sub-agents.
-  const subAgentFunctionCallsToProcess: Array<{|
-    subAgentAiRequest: AiRequest,
-    functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
-  |}> = React.useMemo(
-    () => {
-      const result = [];
-      const subAgentIds = Object.keys(activeSubAgents);
-      for (const subAgentId of subAgentIds) {
-        const subAgentAiRequest = aiRequests[subAgentId];
-        if (!subAgentAiRequest) continue;
-        if (subAgentAiRequest.status === 'suspended') continue;
-
-        const functionCalls = getFunctionCallsToProcess({
-          aiRequest: subAgentAiRequest,
-          editorFunctionCallResults: getEditorFunctionCallResults(subAgentId),
-        });
-        if (functionCalls.length > 0) {
-          result.push({ subAgentAiRequest, functionCalls });
-        }
-      }
-      return result;
-    },
-    [activeSubAgents, aiRequests, getEditorFunctionCallResults]
-  );
-
-  React.useEffect(
-    () => {
-      if (!isReadyToProcessFunctionCalls) return;
-      if (!profile) return;
-      if (subAgentFunctionCallsToProcess.length === 0) return;
-
-      (async () => {
-        for (const {
-          subAgentAiRequest,
-          functionCalls,
-        } of subAgentFunctionCallsToProcess) {
-          const subAgentId = subAgentAiRequest.id;
-
-          // Filter out already in-flight calls.
-          const callsToRun = functionCalls.filter(
-            fc =>
-              !inFlightFunctionCallIdsRef.current.has(
-                `${subAgentId}:${fc.call_id}`
-              )
-          );
-          if (callsToRun.length === 0) continue;
-
-          // Lock
-          callsToRun.forEach(fc => {
-            inFlightFunctionCallIdsRef.current.add(
-              `${subAgentId}:${fc.call_id}`
-            );
-          });
-
-          addEditorFunctionCallResults(
-            subAgentId,
-            callsToRun.map(fc => ({ status: 'working', call_id: fc.call_id }))
-          );
-
-          try {
-            const {
-              results,
-              createdSceneNames,
-            } = await processEditorFunctionCalls({
-              project,
-              editorCallbacks,
-              toolOptions: subAgentAiRequest.toolOptions || null,
-              i18n,
-              functionCalls: callsToRun.map(fc => ({
-                name: fc.name,
-                arguments: fc.arguments,
-                call_id: fc.call_id,
-              })),
-              relatedAiRequestId: subAgentId,
-              getRelatedAiRequestLastMessages: () =>
-                getLastMessagesFromAiRequestOutput(
-                  subAgentAiRequest.output || []
-                ),
-              generateEvents,
-              onSceneEventsModifiedOutsideEditor,
-              onInstancesModifiedOutsideEditor,
-              onObjectsModifiedOutsideEditor,
-              onObjectGroupsModifiedOutsideEditor,
-              ensureExtensionInstalled,
-              onWillInstallExtension,
-              onExtensionInstalled,
-              searchAndInstallAsset,
-              searchAndInstallResources,
-            });
-
-            if (results.some(r => r.status === 'aborted')) {
-              console.info(
-                `Sub-agent ${subAgentId}: some function call results were aborted, discarding.`
-              );
-              continue;
-            }
-
-            const newResults = addEditorFunctionCallResults(
-              subAgentId,
-              results
-            );
-
-            if (
-              newResults.some(
-                r => r.status === 'finished' && r.didModifyProject
-              )
-            ) {
-              triggerUnsavedChanges();
-            }
-
-            // Send results back to the sub-agent AI request.
-            const {
-              functionCallOutputs,
-              hasUnfinishedResult,
-            } = getFunctionCallOutputsFromEditorFunctionCallResults(newResults);
-
-            if (!hasUnfinishedResult && functionCallOutputs.length > 0) {
-              const gd: libGDevelop = global.gd;
-              const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
-              const simplifiedProjectJson = project
-                ? JSON.stringify(
-                    simplifiedProjectBuilder.getSimplifiedProject(project, {})
-                  )
-                : null;
-              const projectSpecificExtensionsSummaryJson = project
-                ? JSON.stringify(
-                    simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(
-                      project
-                    )
-                  )
-                : null;
-              const preparedAiUserContent = await prepareAiUserContent({
-                getAuthorizationHeader,
-                userId: profile.id,
-                simplifiedProjectJson,
-                projectSpecificExtensionsSummaryJson,
-                eventsJson: null,
-              });
-
-              const updatedSubAgentRequest = await retryIfFailed(
-                { times: 2 },
-                () =>
-                  addMessageToAiRequest(getAuthorizationHeader, {
-                    userId: profile.id,
-                    aiRequestId: subAgentId,
-                    functionCallOutputs,
-                    userMessage: '',
-                    payWithCredits: false,
-                    gameProjectJsonUserRelativeKey:
-                      preparedAiUserContent.gameProjectJsonUserRelativeKey,
-                    gameProjectJson: preparedAiUserContent.gameProjectJson,
-                    projectSpecificExtensionsSummaryJsonUserRelativeKey:
-                      preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
-                    projectSpecificExtensionsSummaryJson:
-                      preparedAiUserContent.projectSpecificExtensionsSummaryJson,
-                  })
-              );
-              updateAiRequest(subAgentId, () => updatedSubAgentRequest);
-              clearEditorFunctionCallResults(subAgentId);
-            }
-          } finally {
-            callsToRun.forEach(fc => {
-              inFlightFunctionCallIdsRef.current.delete(
-                `${subAgentId}:${fc.call_id}`
-              );
-            });
-          }
-        }
-      })();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isReadyToProcessFunctionCalls, profile, subAgentFunctionCallsToProcess]
   );
 };
 

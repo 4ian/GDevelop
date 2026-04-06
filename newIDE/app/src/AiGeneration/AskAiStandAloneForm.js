@@ -6,6 +6,7 @@ import {
   addMessageToAiRequest,
   createAiRequest,
   type AiRequest,
+  type AiRequestMessageAssistantFunctionCall,
 } from '../Utils/GDevelopServices/Generation';
 import { delay } from '../Utils/Delay';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -40,7 +41,6 @@ import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext
 import {
   useProcessFunctionCalls,
   useActivateSubAgents,
-  useProcessSubAgentFunctionCalls,
   useRefreshLimits,
   type NewAiRequestOptions,
   AI_ORCHESTRATOR_TOOLS_VERSION,
@@ -159,6 +159,7 @@ export const AskAiStandAloneForm = ({
     editorFunctionCallResultsStorage,
     getAiSettings,
     setSelectedAiRequestId,
+    activeSubAgents,
   } = React.useContext(AiRequestContext);
   const {
     getEditorFunctionCallResults,
@@ -373,18 +374,24 @@ export const AskAiStandAloneForm = ({
   // In a standalone form, the only user message is sent when starting the request.
   const onSendMessage = React.useCallback(
     async ({
+      aiRequestId,
       userMessage,
       createdSceneNames,
       createdProject,
       editorFunctionCallResults,
     }: {|
+      aiRequestId: string,
       userMessage: string,
       createdSceneNames?: Array<string>,
       createdProject?: ?gdProject,
       editorFunctionCallResults: Array<EditorFunctionCallResult>,
     |}) => {
-      if (!profile || !aiRequestIdForForm || !aiRequestForForm || isLoading)
-        return;
+      if (!profile) return;
+
+      const aiRequestForSend = aiRequests[aiRequestId];
+      if (!aiRequestForSend) return;
+
+      if (isSendingAiRequest(aiRequestId)) return;
 
       // Read the results from the editor that applied the function calls.
       // and transform them into the output that will be stored on the AI request.
@@ -397,7 +404,7 @@ export const AskAiStandAloneForm = ({
 
       const hasFunctionsCallsToProcess =
         getFunctionCallsToProcess({
-          aiRequest: aiRequestForForm,
+          aiRequest: aiRequestForSend,
           editorFunctionCallResults,
         }).length > 0;
 
@@ -412,7 +419,7 @@ export const AskAiStandAloneForm = ({
       if (functionCallOutputs.length === 0) return;
 
       try {
-        setSendingAiRequest(aiRequestIdForForm, true);
+        setSendingAiRequest(aiRequestId, true);
 
         const upToDateProject = createdProject || project;
 
@@ -441,7 +448,7 @@ export const AskAiStandAloneForm = ({
         const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
           addMessageToAiRequest(getAuthorizationHeader, {
             userId: profile.id,
-            aiRequestId: aiRequestIdForForm,
+            aiRequestId,
             functionCallOutputs,
             gameProjectJsonUserRelativeKey:
               preparedAiUserContent.gameProjectJsonUserRelativeKey,
@@ -468,15 +475,15 @@ export const AskAiStandAloneForm = ({
         clearEditorFunctionCallResults(aiRequest.id);
       } catch (error) {
         // TODO: update the label of the button to send again.
-        setLastSendError(aiRequestIdForForm, error);
+        setLastSendError(aiRequestId, error);
       }
 
-      if (aiRequestForForm) {
+      if (aiRequestId === aiRequestIdForForm) {
         // Clear the selected AI request, to be able to start a new one if needed.
         const aiRequestChatRefCurrent = aiRequestChatRef.current;
         if (aiRequestChatRefCurrent) {
           aiRequestChatRefCurrent.resetUserInput('');
-          aiRequestChatRefCurrent.resetUserInput(aiRequestIdForForm);
+          aiRequestChatRefCurrent.resetUserInput(aiRequestId);
         }
         setAiRequestIdForForm('');
       }
@@ -489,19 +496,22 @@ export const AskAiStandAloneForm = ({
     [
       profile,
       aiRequestIdForForm,
-      isLoading,
+      aiRequests,
+      isSendingAiRequest,
       setSendingAiRequest,
       updateAiRequest,
       clearEditorFunctionCallResults,
       getAuthorizationHeader,
       setLastSendError,
       project,
-      aiRequestForForm,
       refreshLimits,
     ]
   );
+  useActivateSubAgents({ selectedAiRequest: aiRequestForForm });
+
   const onSendEditorFunctionCallResults = React.useCallback(
     async (
+      aiRequestId: string,
       editorFunctionCallResults: Array<EditorFunctionCallResult>,
       options: {|
         createdSceneNames?: Array<string>,
@@ -509,6 +519,7 @@ export const AskAiStandAloneForm = ({
       |}
     ) => {
       await onSendMessage({
+        aiRequestId,
         userMessage: '',
         createdSceneNames: options.createdSceneNames,
         createdProject: options.createdProject,
@@ -517,11 +528,30 @@ export const AskAiStandAloneForm = ({
     },
     [onSendMessage]
   );
+
+  const aiRequestsToProcess = React.useMemo(
+    () => {
+      const result = [];
+      if (aiRequestForForm) {
+        result.push(aiRequestForForm);
+      }
+      const subAgentIds = Object.keys(activeSubAgents);
+      for (const subAgentId of subAgentIds) {
+        const subAgentRequest = aiRequests[subAgentId];
+        if (subAgentRequest) {
+          result.push(subAgentRequest);
+        }
+      }
+      return result;
+    },
+    [aiRequestForForm, activeSubAgents, aiRequests]
+  );
+
   const { onProcessFunctionCalls } = useProcessFunctionCalls({
     project,
     resourceManagementProps,
-    selectedAiRequest: aiRequestForForm,
     editorCallbacks,
+    aiRequestsToProcess,
     onSendEditorFunctionCallResults,
     getEditorFunctionCallResults,
     addEditorFunctionCallResults,
@@ -535,21 +565,13 @@ export const AskAiStandAloneForm = ({
     isReadyToProcessFunctionCalls: true,
   });
 
-  useActivateSubAgents({ selectedAiRequest: aiRequestForForm });
-
-  useProcessSubAgentFunctionCalls({
-    i18n,
-    project,
-    resourceManagementProps,
-    editorCallbacks,
-    onSceneEventsModifiedOutsideEditor: () => {},
-    onInstancesModifiedOutsideEditor: () => {},
-    onObjectsModifiedOutsideEditor: () => {},
-    onObjectGroupsModifiedOutsideEditor: () => {},
-    onWillInstallExtension,
-    onExtensionInstalled,
-    isReadyToProcessFunctionCalls: true,
-  });
+  const onProcessFormFunctionCalls = React.useCallback(
+    async (functionCalls: Array<AiRequestMessageAssistantFunctionCall>) => {
+      if (!aiRequestForForm) return;
+      await onProcessFunctionCalls(aiRequestForForm, functionCalls);
+    },
+    [aiRequestForForm, onProcessFunctionCalls]
+  );
 
   const { values, showAskAiStandAloneForm } = React.useContext(
     PreferencesContext
@@ -601,21 +623,23 @@ export const AskAiStandAloneForm = ({
         ref={aiRequestChatRef}
         aiRequest={aiRequestForForm}
         onStartNewAiRequest={startNewAiRequest}
-        onSendUserMessage={({
+        onSendUserMessage={async ({
           userMessage,
           mode,
         }: {|
           userMessage: string,
           mode: 'chat' | 'agent' | 'orchestrator',
-        |}) =>
-          onSendMessage({
+        |}) => {
+          if (!aiRequestIdForForm) return;
+          await onSendMessage({
+            aiRequestId: aiRequestIdForForm,
             userMessage,
             // mode, Mode is forced to agent in standalone form, no need to pass it here.
             editorFunctionCallResults: aiRequestForForm
               ? getEditorFunctionCallResults(aiRequestForForm.id) || []
               : [],
-          })
-        }
+          });
+        }}
         isSending={isLoading}
         isSendingUserMessage={isSendingUserMessage}
         lastSendError={getLastSendError(aiRequestIdForForm)}
@@ -627,7 +651,7 @@ export const AskAiStandAloneForm = ({
             ? 'upgrade'
             : 'none'
         }
-        onProcessFunctionCalls={onProcessFunctionCalls}
+        onProcessFunctionCalls={onProcessFormFunctionCalls}
         editorFunctionCallResults={
           (aiRequestForForm &&
             getEditorFunctionCallResults(aiRequestForForm.id)) ||

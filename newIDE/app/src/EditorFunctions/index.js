@@ -217,6 +217,7 @@ export type ObjectGroupsOutsideEditorChanges = {|
 
 export type ToolOptions = {
   includeEventsJson?: boolean,
+  ...
 };
 
 type RenderForEditorOptions = {|
@@ -5087,6 +5088,48 @@ const initializeProject: EditorFunctionWithoutProject = {
   modifiesProject: true,
 };
 
+const runProjectExplorerAgent: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    return {
+      text: <Trans>Explore the game.</Trans>,
+    };
+  },
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to run project explorer agent - this is handled server-side.`
+    );
+  },
+  modifiesProject: false,
+};
+
+const runProjectEditAgent: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    return {
+      text: <Trans>Edit the game.</Trans>,
+    };
+  },
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to run project edit agent - this is handled server-side.`
+    );
+  },
+  modifiesProject: true,
+};
+
+const readGameProjectJson: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    return {
+      text: <Trans>Inspect the game structure.</Trans>,
+    };
+  },
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to get game project JSON - this is handled server-side.`
+    );
+  },
+  modifiesProject: false,
+};
+
 export const editorFunctions: { [string]: EditorFunction } = {
   create_object: createOrReplaceObject,
   create_or_replace_object: createOrReplaceObject,
@@ -5107,7 +5150,12 @@ export const editorFunctions: { [string]: EditorFunction } = {
   change_scene_properties_layers_effects_groups: changeScenePropertiesLayersEffectsGroups,
   add_or_edit_variable: addOrEditVariable,
   read_full_docs: readFullDocs,
+
   create_or_update_plan: createOrUpdatePlan,
+
+  run_project_explorer_agent: runProjectExplorerAgent,
+  run_project_edit_agent: runProjectEditAgent,
+  read_game_project_json: readGameProjectJson, // TODO
 };
 
 export const editorFunctionsWithoutProject: {

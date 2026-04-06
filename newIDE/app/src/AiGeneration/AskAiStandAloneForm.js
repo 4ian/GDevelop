@@ -39,6 +39,8 @@ import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext';
 import {
   useProcessFunctionCalls,
+  useActivateSubAgents,
+  useProcessSubAgentFunctionCalls,
   useRefreshLimits,
   type NewAiRequestOptions,
   AI_ORCHESTRATOR_TOOLS_VERSION,
@@ -524,6 +526,22 @@ export const AskAiStandAloneForm = ({
     getEditorFunctionCallResults,
     addEditorFunctionCallResults,
     i18n,
+    onSceneEventsModifiedOutsideEditor: () => {},
+    onInstancesModifiedOutsideEditor: () => {},
+    onObjectsModifiedOutsideEditor: () => {},
+    onObjectGroupsModifiedOutsideEditor: () => {},
+    onWillInstallExtension,
+    onExtensionInstalled,
+    isReadyToProcessFunctionCalls: true,
+  });
+
+  useActivateSubAgents({ selectedAiRequest: aiRequestForForm });
+
+  useProcessSubAgentFunctionCalls({
+    i18n,
+    project,
+    resourceManagementProps,
+    editorCallbacks,
     onSceneEventsModifiedOutsideEditor: () => {},
     onInstancesModifiedOutsideEditor: () => {},
     onObjectsModifiedOutsideEditor: () => {},

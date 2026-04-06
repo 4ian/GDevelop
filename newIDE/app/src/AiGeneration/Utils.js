@@ -10,6 +10,7 @@ import {
 import {
   getAiRequest,
   getAiRequestSuggestions,
+  addMessageToAiRequest,
   type AiRequest,
   type AiRequestMessage,
   type AiRequestMessageAssistantFunctionCall,
@@ -25,6 +26,7 @@ import {
   getFunctionCallNameByCallId,
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
+  getSubAgentFunctionCalls,
   getLastMessagesFromAiRequestOutput,
   getLatestActivePlan,
 } from './AiRequestUtils';
@@ -33,7 +35,7 @@ import { useGenerateEvents } from './UseGenerateEvents';
 import { useSearchAndInstallAsset } from './UseSearchAndInstallAsset';
 import { useSearchAndInstallResource } from './UseSearchAndInstallResource';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import { AiRequestContext } from './AiRequestContext';
+import { AiRequestContext, type ActiveSubAgent } from './AiRequestContext';
 
 import { delay } from '../Utils/Delay';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
@@ -214,7 +216,6 @@ export const useProcessFunctionCalls = ({
         } = await processEditorFunctionCalls({
           project,
           editorCallbacks,
-          // $FlowFixMe[incompatible-type]
           toolOptions: selectedAiRequest.toolOptions || null,
           i18n,
           functionCalls: functionCallsToProcess.map(functionCall => ({
@@ -318,6 +319,285 @@ export const useProcessFunctionCalls = ({
   return {
     onProcessFunctionCalls,
   };
+};
+
+/**
+ * Detects sub-agent function calls in the selected AI request and activates
+ * them so that AiRequestContext starts polling and processing them.
+ */
+export const useActivateSubAgents = ({
+  selectedAiRequest,
+}: {|
+  selectedAiRequest: ?AiRequest,
+|}) => {
+  const { activateSubAgent } = React.useContext(AiRequestContext);
+
+  React.useEffect(
+    () => {
+      if (!selectedAiRequest) return;
+
+      const subAgentCalls = getSubAgentFunctionCalls({
+        aiRequest: selectedAiRequest,
+      });
+      subAgentCalls.forEach(call => {
+        if (call.subAgentAiRequestId) {
+          activateSubAgent(
+            call.subAgentAiRequestId,
+            selectedAiRequest.id,
+            call.call_id
+          );
+        }
+      });
+    },
+    [selectedAiRequest, activateSubAgent]
+  );
+};
+
+/**
+ * Processes editor function calls for active sub-agent AI requests,
+ * sending results back via addMessageToAiRequest on the sub-agent's ID.
+ */
+export const useProcessSubAgentFunctionCalls = ({
+  i18n,
+  project,
+  resourceManagementProps,
+  editorCallbacks,
+  onSceneEventsModifiedOutsideEditor,
+  onInstancesModifiedOutsideEditor,
+  onObjectsModifiedOutsideEditor,
+  onObjectGroupsModifiedOutsideEditor,
+  onWillInstallExtension,
+  onExtensionInstalled,
+  isReadyToProcessFunctionCalls,
+}: {|
+  i18n: I18nType,
+  project: ?gdProject,
+  resourceManagementProps: ResourceManagementProps,
+  editorCallbacks: EditorCallbacks,
+  onSceneEventsModifiedOutsideEditor: (
+    changes: SceneEventsOutsideEditorChanges
+  ) => void,
+  onInstancesModifiedOutsideEditor: (
+    changes: InstancesOutsideEditorChanges
+  ) => void,
+  onObjectsModifiedOutsideEditor: (
+    changes: ObjectsOutsideEditorChanges
+  ) => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
+  ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+  isReadyToProcessFunctionCalls: boolean,
+|}) => {
+  const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
+    project,
+    i18n,
+  });
+  const { searchAndInstallAsset } = useSearchAndInstallAsset({
+    project,
+    resourceManagementProps,
+    onWillInstallExtension,
+    onExtensionInstalled,
+  });
+  const { searchAndInstallResources } = useSearchAndInstallResource({
+    project,
+    resourceManagementProps,
+  });
+  const { generateEvents } = useGenerateEvents({ project });
+
+  const {
+    aiRequestStorage,
+    editorFunctionCallResultsStorage,
+    activeSubAgents,
+  } = React.useContext(AiRequestContext);
+  const { aiRequests, updateAiRequest } = aiRequestStorage;
+  const {
+    getEditorFunctionCallResults,
+    addEditorFunctionCallResults,
+    clearEditorFunctionCallResults,
+  } = editorFunctionCallResultsStorage;
+  const { profile, getAuthorizationHeader } = React.useContext(
+    AuthenticatedUserContext
+  );
+  const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
+
+  const inFlightFunctionCallIdsRef = React.useRef<Set<string>>(new Set());
+
+  // Collect all function calls to process across all active sub-agents.
+  const subAgentFunctionCallsToProcess: Array<{|
+    subAgentAiRequest: AiRequest,
+    functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
+  |}> = React.useMemo(
+    () => {
+      const result = [];
+      const subAgentIds = Object.keys(activeSubAgents);
+      for (const subAgentId of subAgentIds) {
+        const subAgentAiRequest = aiRequests[subAgentId];
+        if (!subAgentAiRequest) continue;
+        if (subAgentAiRequest.status === 'suspended') continue;
+
+        const functionCalls = getFunctionCallsToProcess({
+          aiRequest: subAgentAiRequest,
+          editorFunctionCallResults: getEditorFunctionCallResults(subAgentId),
+        });
+        if (functionCalls.length > 0) {
+          result.push({ subAgentAiRequest, functionCalls });
+        }
+      }
+      return result;
+    },
+    [activeSubAgents, aiRequests, getEditorFunctionCallResults]
+  );
+
+  React.useEffect(
+    () => {
+      if (!isReadyToProcessFunctionCalls) return;
+      if (!profile) return;
+      if (subAgentFunctionCallsToProcess.length === 0) return;
+
+      (async () => {
+        for (const {
+          subAgentAiRequest,
+          functionCalls,
+        } of subAgentFunctionCallsToProcess) {
+          const subAgentId = subAgentAiRequest.id;
+
+          // Filter out already in-flight calls.
+          const callsToRun = functionCalls.filter(
+            fc =>
+              !inFlightFunctionCallIdsRef.current.has(
+                `${subAgentId}:${fc.call_id}`
+              )
+          );
+          if (callsToRun.length === 0) continue;
+
+          // Lock
+          callsToRun.forEach(fc => {
+            inFlightFunctionCallIdsRef.current.add(
+              `${subAgentId}:${fc.call_id}`
+            );
+          });
+
+          addEditorFunctionCallResults(
+            subAgentId,
+            callsToRun.map(fc => ({ status: 'working', call_id: fc.call_id }))
+          );
+
+          try {
+            const {
+              results,
+              createdSceneNames,
+            } = await processEditorFunctionCalls({
+              project,
+              editorCallbacks,
+              toolOptions: subAgentAiRequest.toolOptions || null,
+              i18n,
+              functionCalls: callsToRun.map(fc => ({
+                name: fc.name,
+                arguments: fc.arguments,
+                call_id: fc.call_id,
+              })),
+              relatedAiRequestId: subAgentId,
+              getRelatedAiRequestLastMessages: () =>
+                getLastMessagesFromAiRequestOutput(
+                  subAgentAiRequest.output || []
+                ),
+              generateEvents,
+              onSceneEventsModifiedOutsideEditor,
+              onInstancesModifiedOutsideEditor,
+              onObjectsModifiedOutsideEditor,
+              onObjectGroupsModifiedOutsideEditor,
+              ensureExtensionInstalled,
+              onWillInstallExtension,
+              onExtensionInstalled,
+              searchAndInstallAsset,
+              searchAndInstallResources,
+            });
+
+            if (results.some(r => r.status === 'aborted')) {
+              console.info(
+                `Sub-agent ${subAgentId}: some function call results were aborted, discarding.`
+              );
+              continue;
+            }
+
+            const newResults = addEditorFunctionCallResults(
+              subAgentId,
+              results
+            );
+
+            if (
+              newResults.some(
+                r => r.status === 'finished' && r.didModifyProject
+              )
+            ) {
+              triggerUnsavedChanges();
+            }
+
+            // Send results back to the sub-agent AI request.
+            const {
+              functionCallOutputs,
+              hasUnfinishedResult,
+            } = getFunctionCallOutputsFromEditorFunctionCallResults(newResults);
+
+            if (!hasUnfinishedResult && functionCallOutputs.length > 0) {
+              const gd: libGDevelop = global.gd;
+              const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
+              const simplifiedProjectJson = project
+                ? JSON.stringify(
+                    simplifiedProjectBuilder.getSimplifiedProject(project, {})
+                  )
+                : null;
+              const projectSpecificExtensionsSummaryJson = project
+                ? JSON.stringify(
+                    simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(
+                      project
+                    )
+                  )
+                : null;
+              const preparedAiUserContent = await prepareAiUserContent({
+                getAuthorizationHeader,
+                userId: profile.id,
+                simplifiedProjectJson,
+                projectSpecificExtensionsSummaryJson,
+                eventsJson: null,
+              });
+
+              const updatedSubAgentRequest = await retryIfFailed(
+                { times: 2 },
+                () =>
+                  addMessageToAiRequest(getAuthorizationHeader, {
+                    userId: profile.id,
+                    aiRequestId: subAgentId,
+                    functionCallOutputs,
+                    userMessage: '',
+                    payWithCredits: false,
+                    gameProjectJsonUserRelativeKey:
+                      preparedAiUserContent.gameProjectJsonUserRelativeKey,
+                    gameProjectJson: preparedAiUserContent.gameProjectJson,
+                    projectSpecificExtensionsSummaryJsonUserRelativeKey:
+                      preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+                    projectSpecificExtensionsSummaryJson:
+                      preparedAiUserContent.projectSpecificExtensionsSummaryJson,
+                  })
+              );
+              updateAiRequest(subAgentId, () => updatedSubAgentRequest);
+              clearEditorFunctionCallResults(subAgentId);
+            }
+          } finally {
+            callsToRun.forEach(fc => {
+              inFlightFunctionCallIdsRef.current.delete(
+                `${subAgentId}:${fc.call_id}`
+              );
+            });
+          }
+        }
+      })();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isReadyToProcessFunctionCalls, profile, subAgentFunctionCallsToProcess]
+  );
 };
 
 export const useAiRequestState = ({

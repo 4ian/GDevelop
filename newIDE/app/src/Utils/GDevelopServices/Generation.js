@@ -42,7 +42,9 @@ export type AiRequestMessageAssistantFunctionCall = {|
   call_id: string,
   name: string,
   arguments: string,
+
   taskId?: string,
+  subAgentAiRequestId?: string,
 |};
 
 export type AiRequestFunctionCallOutput = {

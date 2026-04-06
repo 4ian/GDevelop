@@ -75,6 +75,8 @@ import {
   type OpenAskAiOptions,
   type NewAiRequestOptions,
   useProcessFunctionCalls,
+  useActivateSubAgents,
+  useProcessSubAgentFunctionCalls,
   useRefreshLimits,
   AI_AGENT_TOOLS_VERSION,
   AI_CHAT_TOOLS_VERSION,
@@ -871,6 +873,22 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
         i18n,
+        onWillInstallExtension,
+        onExtensionInstalled,
+        isReadyToProcessFunctionCalls,
+      });
+
+      useActivateSubAgents({ selectedAiRequest });
+
+      useProcessSubAgentFunctionCalls({
+        i18n,
+        project,
+        resourceManagementProps,
+        editorCallbacks,
+        onSceneEventsModifiedOutsideEditor,
+        onInstancesModifiedOutsideEditor,
+        onObjectsModifiedOutsideEditor,
+        onObjectGroupsModifiedOutsideEditor,
         onWillInstallExtension,
         onExtensionInstalled,
         isReadyToProcessFunctionCalls,

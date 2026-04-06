@@ -102,6 +102,9 @@ export const getFunctionCallsToProcess = ({
           const functionCall = functionCalls[j];
           if (functionCall.type !== 'function_call') continue;
 
+          // A function call which launched a sub-agent AI request is not processed by the editor.
+          if (functionCall.subAgentAiRequestId) continue;
+
           if (
             !alreadyProcessedFunctionCallIds.has(functionCall.call_id) &&
             !appliedFunctionCallIds.has(functionCall.call_id)
@@ -117,6 +120,36 @@ export const getFunctionCallsToProcess = ({
   }
 
   return functionCallsToProcess;
+};
+
+/**
+ * Returns sub-agent function calls (those with a subAgentAiRequestId)
+ * that don't yet have a corresponding function_call_output in the AI request output.
+ */
+export const getSubAgentFunctionCalls = ({
+  aiRequest,
+}: {|
+  aiRequest: AiRequest,
+|}): Array<AiRequestMessageAssistantFunctionCall> => {
+  const processedCallIds = new Set<string>();
+  const subAgentCalls: AiRequestMessageAssistantFunctionCall[] = [];
+
+  const output = aiRequest.output || [];
+  for (let i = 0; i < output.length; i++) {
+    const message = output[i];
+    if (message.type === 'function_call_output') {
+      processedCallIds.add(message.call_id);
+    }
+    if (message.type === 'message' && message.role === 'assistant') {
+      for (const content of message.content) {
+        if (content.type === 'function_call' && content.subAgentAiRequestId) {
+          subAgentCalls.push(content);
+        }
+      }
+    }
+  }
+
+  return subAgentCalls.filter(call => !processedCallIds.has(call.call_id));
 };
 
 export const getFunctionCallNameByCallId = ({

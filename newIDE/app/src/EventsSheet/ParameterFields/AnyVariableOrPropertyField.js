@@ -151,7 +151,8 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               onCancel={() => setEditorOpen(null)}
               onApply={onVariableEditorApply}
               isGlobalTabInitiallyOpen={
-                variableSourceType === gd.VariablesContainer.Global
+                variableSourceType === gd.VariablesContainer.Global ||
+                variableSourceType === gd.VariablesContainer.ExtensionGlobal
               }
               initiallySelectedVariableName={editorOpen.variableName}
               shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}

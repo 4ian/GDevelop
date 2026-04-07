@@ -77,7 +77,6 @@ export const enableJsTypeDiagnostics = (monaco: any) => {
 export const applyElectronClipboardPatch = (editor: any, monaco: any) => {
   let electronClipboard;
   try {
-    // $FlowFixMe - Electron's require
     electronClipboard = window.require('electron').clipboard;
   } catch (e) {
     // Not in Electron environment, no patch needed.
@@ -93,11 +92,8 @@ export const applyElectronClipboardPatch = (editor: any, monaco: any) => {
   pasteAction.run = (accessor: any, ed: any) => {
     const target = ed || editor;
     target.focus();
-    const domNode = target.getDomNode();
-    const doc = domNode
-      ? domNode.ownerDocument
-      : // $FlowFixMe
-        document;
+    const domNode: HTMLElement = target.getDomNode();
+    const doc = domNode ? domNode.ownerDocument : document;
     const result = doc.execCommand('paste');
     if (!result) {
       try {

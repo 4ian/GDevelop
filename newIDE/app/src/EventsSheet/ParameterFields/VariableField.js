@@ -316,12 +316,18 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
         const fieldCurrentValue = field.current
           ? field.current.getInputValue()
           : value;
+        const rootVariableName = getRootVariableName(fieldCurrentValue);
         const isRootVariableDeclared =
-          projectScopedContainersAccessor &&
-          projectScopedContainersAccessor
-            .get()
-            .getVariablesContainersList()
-            .has(getRootVariableName(fieldCurrentValue));
+          (projectScopedContainersAccessor &&
+            projectScopedContainersAccessor
+              .get()
+              .getVariablesContainersList()
+              .has(rootVariableName)) ||
+          // Also check the variable containers directly, because object
+          // variables are not in the project-scoped containers list.
+          variablesContainers.some(container =>
+            container.has(rootVariableName)
+          );
 
         onChange(fieldCurrentValue);
         onOpenDialog({
@@ -329,7 +335,13 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
           shouldCreate: !isRootVariableDeclared,
         });
       },
-      [onChange, onOpenDialog, projectScopedContainersAccessor, value]
+      [
+        onChange,
+        onOpenDialog,
+        projectScopedContainersAccessor,
+        value,
+        variablesContainers,
+      ]
     );
 
     const description = parameterMetadata

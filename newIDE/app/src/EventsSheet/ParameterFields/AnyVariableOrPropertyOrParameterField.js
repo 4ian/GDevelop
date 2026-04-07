@@ -8,6 +8,7 @@ import VariableField, {
   type VariableDialogOpeningProps,
 } from './VariableField';
 import GlobalAndSceneVariablesDialog from '../../VariablesList/GlobalAndSceneVariablesDialog';
+import LocalVariablesDialog from '../../VariablesList/LocalVariablesDialog';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
@@ -41,7 +42,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       onChange,
       value,
     } = props;
-    const { layout } = scope;
 
     const enumerateGlobalAndSceneVariables = React.useCallback(
       () =>
@@ -81,12 +81,18 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [onChange, onInstructionTypeChanged, value]
     );
 
-    const isGlobal = !!(
-      layout &&
-      project &&
-      !layout.getVariables().has(getRootVariableName(props.value)) &&
-      project.getVariables().has(getRootVariableName(props.value))
+    const variablesContainer = React.useMemo(
+      () => {
+        const variablesContainersList = projectScopedContainersAccessor
+          .get()
+          .getVariablesContainersList();
+        return variablesContainersList.getVariablesContainerFromVariableNameOnly(
+          props.value
+        );
+      },
+      [projectScopedContainersAccessor, props.value]
     );
+    const variableSourceType = variablesContainer.getSourceType();
 
     return (
       <React.Fragment>
@@ -117,19 +123,38 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onInstructionTypeChanged={onInstructionTypeChanged}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
         />
-        {editorOpen && (
-          <GlobalAndSceneVariablesDialog
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            open
-            onCancel={() => setEditorOpen(null)}
-            onApply={onVariableEditorApply}
-            isGlobalTabInitiallyOpen={isGlobal}
-            initiallySelectedVariableName={editorOpen.variableName}
-            shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
-            hotReloadPreviewButtonProps={null}
-            isListLocked={false}
-          />
-        )}
+        {editorOpen &&
+          (variableSourceType === gd.VariablesContainer.Local ? (
+            project && (
+              <LocalVariablesDialog
+                project={project}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
+                variablesContainer={variablesContainer}
+                open
+                onCancel={() => setEditorOpen(null)}
+                onApply={onVariableEditorApply}
+                initiallySelectedVariableName={editorOpen.variableName}
+                shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+                isListLocked={false}
+              />
+            )
+          ) : (
+            <GlobalAndSceneVariablesDialog
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
+              open
+              onCancel={() => setEditorOpen(null)}
+              onApply={onVariableEditorApply}
+              isGlobalTabInitiallyOpen={
+                variableSourceType === gd.VariablesContainer.Global
+              }
+              initiallySelectedVariableName={editorOpen.variableName}
+              shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+              hotReloadPreviewButtonProps={null}
+              isListLocked={false}
+            />
+          ))}
       </React.Fragment>
     );
   }

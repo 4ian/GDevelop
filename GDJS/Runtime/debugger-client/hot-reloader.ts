@@ -648,14 +648,24 @@ namespace gdjs {
               newProjectData,
               newLayoutData ? newLayoutData.objects : []
             );
+          const oldGlobalObjectDataList =
+            HotReloader.resolveCustomObjectConfigurations(
+              oldProjectData,
+              oldProjectData.objects
+            );
+          const newGlobalObjectDataList =
+            HotReloader.resolveCustomObjectConfigurations(
+              newProjectData,
+              newProjectData.objects
+            );
 
           sceneStack._stack.forEach((runtimeScene) => {
             this._hotReloadRuntimeSceneInstances(
               oldProjectData,
               newProjectData,
               changedRuntimeBehaviors,
-              oldObjectDataList,
-              newObjectDataList,
+              [...oldObjectDataList, ...oldGlobalObjectDataList],
+              [...newObjectDataList, ...newGlobalObjectDataList],
               oldExternalLayoutData.instances,
               newExternalLayoutData.instances,
               runtimeScene
@@ -956,6 +966,27 @@ namespace gdjs {
         newLayoutData.objects
       );
 
+      // Also include global objects so that instances of global objects
+      // can be hot-reloaded (their positions, angles, etc. updated).
+      const oldGlobalObjectDataList =
+        HotReloader.resolveCustomObjectConfigurations(
+          oldProjectData,
+          oldProjectData.objects
+        );
+      const newGlobalObjectDataList =
+        HotReloader.resolveCustomObjectConfigurations(
+          newProjectData,
+          newProjectData.objects
+        );
+      const oldAllObjectDataList = [
+        ...oldObjectDataList,
+        ...oldGlobalObjectDataList,
+      ];
+      const newAllObjectDataList = [
+        ...newObjectDataList,
+        ...newGlobalObjectDataList,
+      ];
+
       // Re-instantiate any gdjs.RuntimeBehavior that was changed.
       this._reinstantiateRuntimeSceneRuntimeBehaviors(
         changedRuntimeBehaviors,
@@ -971,8 +1002,8 @@ namespace gdjs {
         oldProjectData,
         newProjectData,
         changedRuntimeBehaviors,
-        oldObjectDataList,
-        newObjectDataList,
+        oldAllObjectDataList,
+        newAllObjectDataList,
         oldLayoutData.instances,
         newLayoutData.instances,
         runtimeInstanceContainer

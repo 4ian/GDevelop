@@ -228,6 +228,9 @@ export const aiRequestHasWorkInProgress = (
     )
   )
     return true;
+  // TODO: Also check for pending sub-agent calls (getSubAgentFunctionCalls).
+  // Currently, a request with in-progress sub-agents but no pending editor
+  // function calls is not considered as having work in progress.
   if (aiRequest.status === 'ready') {
     return (
       getFunctionCallsToProcess({

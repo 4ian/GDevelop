@@ -363,6 +363,58 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     expect(instances[2].getY()).to.be(600);
   });
 
+  it('can move instances of both scene and global objects at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      globalObjects: [createSpriteData({ name: 'MyGlobalObject' })],
+      layouts: [
+        createSceneData({
+          instances: [
+            { persistentUuid: '1', name: 'MyObject', x: 100, y: 200 },
+            { persistentUuid: '2', name: 'MyGlobalObject', x: 300, y: 400 },
+          ],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const newProjectData = createProjectData({
+      globalObjects: [createSpriteData({ name: 'MyGlobalObject' })],
+      layouts: [
+        createSceneData({
+          instances: [
+            { persistentUuid: '1', name: 'MyObject', x: 150, y: 250 },
+            { persistentUuid: '2', name: 'MyGlobalObject', x: 350, y: 450 },
+          ],
+        }),
+      ],
+    });
+
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      newProjectData,
+      [],
+      runtimeGame
+    );
+
+    const sceneInstances = scene.getInstancesOf('MyObject');
+    expect(sceneInstances.length).to.be(1);
+    expect(sceneInstances[0].getX()).to.be(150);
+    expect(sceneInstances[0].getY()).to.be(250);
+
+    const globalInstances = scene.getInstancesOf('MyGlobalObject');
+    expect(globalInstances.length).to.be(1);
+    expect(globalInstances[0].getX()).to.be(350);
+    expect(globalInstances[0].getY()).to.be(450);
+  });
+
   it('can change the image of a sprite object of a scene at hot-reload', async () => {
     const oldProjectData = createProjectData({
       layouts: [

@@ -355,7 +355,7 @@ export function ClosableTab({
             ? [
                 { type: 'separator' },
                 {
-                  label: i18n._(t`Pop out in a separate window`),
+                  label: i18n._(t`Pop out in a separate window (beta)`),
                   click: onPopOut,
                   enabled: closable && popOutEnabled,
                 },

@@ -8,7 +8,7 @@ import type {
 } from '../../Utils/GDevelopServices/Extension';
 
 type UpdateType = 'patch' | 'minor' | 'major';
-type UpdateMetadata = {|
+export type UpdateMetadata = {|
   type: UpdateType,
   currentVersion: string,
   newestVersion: string,

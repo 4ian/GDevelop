@@ -28,3 +28,12 @@ diff --git a/node_modules/monaco-editor/esm/vs/editor/contrib/clipboard/clipboar
      };
      return ExecCommandAction;
  }(EditorAction));
+
+diff --git a/node_modules/monaco-editor/min/vs/editor/editor.main.js b/node_modules/monaco-editor/min/vs/editor/editor.main.js
+--- a/node_modules/monaco-editor/min/vs/editor/editor.main.js
++++ b/node_modules/monaco-editor/min/vs/editor/editor.main.js
+@@ -1193,7 +1193,7 @@
+ ;i.push(new u.ReplaceCommand(v,m+g))}}}i.length>0&&(t.pushUndoStop(),t.executeCommands(this.id,i),t.pushUndoStop())},t}(l.EditorAction);l.registerEditorAction(d)}),define(t[449],n([1,0,306,30,18,32,11,165,20,44,367]),function(e,t,n,i,r,s,a,l,u,d){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var c="9_cutcopypaste",h=r.isNative||document.queryCommandSupported("cut"),p=r.isNative||document.queryCommandSupported("copy"),f=p&&!i.isEdgeOrIE,g=r.isNative||!i.isChrome&&document.queryCommandSupported("paste"),m=function(e){function t(t,n){var i=e.call(this,n)||this;return i.browserCommand=t,i}return o(t,e),t.prototype.runCommand=function(e,t){var n=e.get(s.ICodeEditorService).getFocusedCodeEditor();n&&n.hasTextFocus()?n.trigger("keyboard",this.id,t):document.execCommand(this.browserCommand)},
+-t.prototype.run=function(e,t){t.focus(),document.execCommand(this.browserCommand)},t}(a.EditorAction),v=function(e){function t(){var t={kbExpr:u.EditorContextKeys.textInputFocus,primary:2102,win:{primary:2102,
++t.prototype.run=function(e,t){t.focus();var n=document.execCommand(this.browserCommand);if(!n&&"paste"===this.browserCommand)try{var i=window.require("electron").clipboard.readText();if(i){var r=t.getSelection();t.executeEdits("paste",[{range:r,text:i,forceMoveMarkers:!0}])}}catch(e){}},t}(a.EditorAction),v=function(e){function t(){var t={kbExpr:u.EditorContextKeys.textInputFocus,primary:2102,win:{primary:2102,
+ secondary:[1044]},weight:100};return r.isNative||(t=null),e.call(this,"cut",{id:"editor.action.clipboardCutAction",label:n.localize(0,null),

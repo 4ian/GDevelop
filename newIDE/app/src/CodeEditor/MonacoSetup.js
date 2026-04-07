@@ -62,10 +62,14 @@ export const enableJsTypeDiagnostics = (monaco: any) => {
 
 /**
  * In Electron, `document.execCommand('paste')` fails in newer Chromium
- * versions. This runtime patch overrides the paste keybindings so that
- * when the native paste command fails, we fall back to Electron's clipboard
- * API. This replaces the old patch-package patch for the ESM clipboard
- * module and also covers the AMD-loaded Monaco used in popped-out windows.
+ * versions. This runtime patch wraps the clipboard paste action's `run`
+ * method so that when the native paste command fails, we fall back to
+ * Electron's clipboard API. Because we patch the action itself (not just
+ * keybindings), this covers keyboard shortcuts, the context menu "Paste"
+ * item, and any programmatic trigger.
+ *
+ * This replaces the old patch-package patch for the ESM clipboard module
+ * and also covers the AMD-loaded Monaco used in popped-out windows.
  *
  * Call this once per editor instance after creation.
  * See https://github.com/microsoft/monaco-editor/issues/4855
@@ -80,9 +84,18 @@ export const applyElectronClipboardPatch = (editor: any, monaco: any) => {
     return;
   }
 
-  const pasteFromElectronClipboard = (ed: any) => {
-    const doc = ed.getDomNode()
-      ? ed.getDomNode().ownerDocument
+  const pasteAction = editor.getAction('editor.action.clipboardPasteAction');
+  if (!pasteAction) return;
+
+  // Replace the run method entirely. The original just does:
+  //   editor.focus(); document.execCommand('paste');
+  // We add the Electron clipboard fallback when execCommand fails.
+  pasteAction.run = (accessor: any, ed: any) => {
+    const target = ed || editor;
+    target.focus();
+    const domNode = target.getDomNode();
+    const doc = domNode
+      ? domNode.ownerDocument
       : // $FlowFixMe
         document;
     const result = doc.execCommand('paste');
@@ -90,8 +103,8 @@ export const applyElectronClipboardPatch = (editor: any, monaco: any) => {
       try {
         const text = electronClipboard.readText();
         if (text) {
-          const selection = ed.getSelection();
-          ed.executeEdits('paste', [
+          const selection = target.getSelection();
+          target.executeEdits('paste', [
             {
               range: selection,
               text: text,
@@ -100,23 +113,10 @@ export const applyElectronClipboardPatch = (editor: any, monaco: any) => {
           ]);
         }
       } catch (e) {
-        // Ignore — clipboard read failed.
+        // Clipboard read failed — ignore.
       }
     }
   };
-
-  // Override Ctrl/Cmd+V.
-  editor.addCommand(
-    // $FlowFixMe
-    monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_V,
-    () => pasteFromElectronClipboard(editor)
-  );
-  // Override Shift+Insert (another common paste keybinding).
-  editor.addCommand(
-    // $FlowFixMe
-    monaco.KeyMod.Shift | monaco.KeyCode.Insert,
-    () => pasteFromElectronClipboard(editor)
-  );
 };
 
 /** Base editor options shared by all code editors. */

@@ -286,59 +286,50 @@ const ExtensionDetailPanel = ({
 
   return (
     <ColumnStackLayout expand noMargin>
-      <Line alignItems="flex-start" noMargin>
+      <Line alignItems="center" noMargin>
         <IconContainer
           alt={extensionShortHeader.fullName}
           src={extensionShortHeader.previewIconUrl}
           size={64}
         />
-        <Line expand alignItems="center" noMargin>
-          <Column expand>
-            <Text noMargin size="body2">
-              {extensionUpdate &&
-              installedExtension &&
-              extensionShortHeader.version !==
-                installedExtension.getVersion() ? (
-                <Trans>{`Version ${installedExtension.getVersion()} (${
-                  extensionShortHeader.version
-                } available)`}</Trans>
-              ) : (
-                <Trans>{`Version ${extensionShortHeader.version}`}</Trans>
-              )}
-            </Text>
-            <Line>
-              <div style={{ flexWrap: 'wrap' }}>
-                {extensionShortHeader.authors &&
-                  extensionShortHeader.authors.map(author => (
-                    <UserPublicProfileChip
-                      user={author}
-                      key={author.id}
-                      isClickable
-                    />
-                  ))}
-              </div>
-            </Line>
+        <Column expand>
+          <Text noMargin size="body2">
+            {extensionUpdate &&
+            installedExtension &&
+            extensionShortHeader.version !== installedExtension.getVersion() ? (
+              <Trans>{`Version ${installedExtension.getVersion()} (${
+                extensionShortHeader.version
+              } available)`}</Trans>
+            ) : (
+              <Trans>{`Version ${extensionShortHeader.version}`}</Trans>
+            )}
+          </Text>
+          <Line>
+            <div style={{ flexWrap: 'wrap' }}>
+              {extensionShortHeader.authors &&
+                extensionShortHeader.authors.map(author => (
+                  <UserPublicProfileChip
+                    user={author}
+                    key={author.id}
+                    isClickable
+                  />
+                ))}
+            </div>
+          </Line>
+        </Column>
+        {shouldDisplayButtons && onInstall && (
+          <Column noMargin noOverflowParent justifyContent="center">
+            <LeftLoader isLoading={isInstalling} key="install">
+              <RaisedButton
+                id="install-extension-button"
+                label={renderInstallButtonLabel()}
+                primary
+                onClick={onInstallExtension}
+                disabled={!canInstallExtension}
+              />
+            </LeftLoader>
           </Column>
-          {shouldDisplayButtons && onInstall && (
-            <Column
-              expand
-              noMargin
-              noOverflowParent
-              alignItems="center"
-              justifyContent="center"
-            >
-              <LeftLoader isLoading={isInstalling} key="install">
-                <RaisedButton
-                  id="install-extension-button"
-                  label={renderInstallButtonLabel()}
-                  primary
-                  onClick={onInstallExtension}
-                  disabled={!canInstallExtension}
-                />
-              </LeftLoader>
-            </Column>
-          )}
-        </Line>
+        )}
       </Line>
       <Text noMargin>
         {extensionHeader

@@ -204,9 +204,9 @@ export const ExtensionStore = ({
           />
         </ColumnStackLayout>
         {!isMobile ? (
-          selectedExtensionShortHeader ? (
-            <LineStackLayout expand noMargin>
-              <Divider orientation="vertical" />
+          <LineStackLayout expand noMargin>
+            <Divider orientation="vertical" />
+            {selectedExtensionShortHeader ? (
               <Column expand noOverflowParent>
                 <ExtensionDetailSidePanel
                   project={project}
@@ -220,20 +220,20 @@ export const ExtensionStore = ({
                   }}
                 />
               </Column>
-            </LineStackLayout>
-          ) : (
-            <Column
-              expand
-              noMargin
-              noOverflowParent
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Text color="secondary">
-                <Trans>Select an extension</Trans>
-              </Text>
-            </Column>
-          )
+            ) : (
+              <Column
+                expand
+                noMargin
+                noOverflowParent
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Text color="secondary">
+                  <Trans>Select an extension</Trans>
+                </Text>
+              </Column>
+            )}
+          </LineStackLayout>
         ) : null}
       </LineStackLayout>
       {isMobile && !!selectedExtensionShortHeader && (

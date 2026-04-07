@@ -165,6 +165,11 @@ const ElectronMainMenu = ({
         : isFocusedOnMainWindow,
   });
   useIPCEventListener({
+    ipcEvent: 'main-menu-reload',
+    callback: callbacks.onReloadProject,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
     ipcEvent: 'main-menu-close-app',
     callback: callbacks.onCloseApp,
     shouldApply: isFocusedOnMainWindow,

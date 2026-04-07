@@ -17,6 +17,7 @@ export type CommandName =
   | 'SAVE_PROJECT'
   | 'SAVE_PROJECT_AS'
   | 'CLOSE_PROJECT'
+  | 'RELOAD_PROJECT'
   | 'EXPORT_GAME'
   | 'INVITE_COLLABORATORS'
   | 'OPEN_RECENT_PROJECT'
@@ -149,6 +150,11 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   CLOSE_PROJECT: {
     area: 'GENERAL',
     displayText: t`Close project`,
+    handledByElectron: true,
+  },
+  RELOAD_PROJECT: {
+    area: 'GENERAL',
+    displayText: t`Reload project`,
     handledByElectron: true,
   },
   EXPORT_GAME: {

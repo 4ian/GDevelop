@@ -90,7 +90,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         const variablesContainersList = projectScopedContainersAccessor
           .get()
           .getVariablesContainersList();
-        return variablesContainersList.getVariablesContainerFromVariableNameOnly(
+        return variablesContainersList.getVariablesContainerFromVariableOrPropertyName(
           props.value
         );
       },

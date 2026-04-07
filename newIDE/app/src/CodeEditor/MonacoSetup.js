@@ -60,6 +60,65 @@ export const enableJsTypeDiagnostics = (monaco: any) => {
   });
 };
 
+/**
+ * In Electron, `document.execCommand('paste')` fails in newer Chromium
+ * versions. This runtime patch overrides the paste keybindings so that
+ * when the native paste command fails, we fall back to Electron's clipboard
+ * API. This replaces the old patch-package patch for the ESM clipboard
+ * module and also covers the AMD-loaded Monaco used in popped-out windows.
+ *
+ * Call this once per editor instance after creation.
+ * See https://github.com/microsoft/monaco-editor/issues/4855
+ */
+export const applyElectronClipboardPatch = (editor: any, monaco: any) => {
+  let electronClipboard;
+  try {
+    // $FlowFixMe - Electron's require
+    electronClipboard = window.require('electron').clipboard;
+  } catch (e) {
+    // Not in Electron environment, no patch needed.
+    return;
+  }
+
+  const pasteFromElectronClipboard = (ed: any) => {
+    const doc = ed.getDomNode()
+      ? ed.getDomNode().ownerDocument
+      : // $FlowFixMe
+        document;
+    const result = doc.execCommand('paste');
+    if (!result) {
+      try {
+        const text = electronClipboard.readText();
+        if (text) {
+          const selection = ed.getSelection();
+          ed.executeEdits('paste', [
+            {
+              range: selection,
+              text: text,
+              forceMoveMarkers: true,
+            },
+          ]);
+        }
+      } catch (e) {
+        // Ignore — clipboard read failed.
+      }
+    }
+  };
+
+  // Override Ctrl/Cmd+V.
+  editor.addCommand(
+    // $FlowFixMe
+    monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_V,
+    () => pasteFromElectronClipboard(editor)
+  );
+  // Override Shift+Insert (another common paste keybinding).
+  editor.addCommand(
+    // $FlowFixMe
+    monaco.KeyMod.Shift | monaco.KeyCode.Insert,
+    () => pasteFromElectronClipboard(editor)
+  );
+};
+
 /** Base editor options shared by all code editors. */
 export const baseEditorOptions = {
   scrollBeyondLastLine: false,

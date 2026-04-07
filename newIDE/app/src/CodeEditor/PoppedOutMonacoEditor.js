@@ -5,6 +5,7 @@ import {
   registerThemes,
   initializeCompletions,
   enableJsTypeDiagnostics,
+  applyElectronClipboardPatch,
   baseEditorOptions,
 } from './MonacoSetup';
 
@@ -226,6 +227,8 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
       theme: this.props.theme,
       fontSize: this.props.fontSize,
     });
+
+    applyElectronClipboardPatch(this._editor, monaco);
 
     this._editor.onDidChangeModelContent(() => {
       if (!this._editor) return;

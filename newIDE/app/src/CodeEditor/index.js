@@ -12,6 +12,7 @@ import {
   registerThemes,
   initializeCompletions,
   enableJsTypeDiagnostics,
+  applyElectronClipboardPatch,
   baseEditorOptions,
 } from './MonacoSetup';
 
@@ -78,6 +79,7 @@ export const CodeEditor = ({
       setUpEditorFocus(editor);
       setUpSaveOnEditorBlur(editor);
       initializeCompletions(monaco);
+      applyElectronClipboardPatch(editor, monaco);
 
       if (preferences.showJsTypeError) {
         enableJsTypeDiagnostics(monaco);

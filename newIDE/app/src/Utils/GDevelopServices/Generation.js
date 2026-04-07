@@ -128,7 +128,7 @@ export type AiRequest = {
     message: string,
   } | null,
 
-  output: Array<AiRequestMessage>,
+  output?: Array<AiRequestMessage>,
 
   lastUserMessagePriceInCredits?: number | null,
   totalPriceInCredits?: number | null,

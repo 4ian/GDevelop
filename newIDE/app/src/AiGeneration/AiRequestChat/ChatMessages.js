@@ -349,8 +349,9 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
           }
         };
 
-        aiRequest.output.forEach((message, messageIndex) => {
-          const isLastMessage = messageIndex === aiRequest.output.length - 1;
+        const output = aiRequest.output || [];
+        output.forEach((message, messageIndex) => {
+          const isLastMessage = messageIndex === output.length - 1;
 
           if (message.type === 'message' && message.role === 'user') {
             flushFunctionCallGroup();
@@ -555,7 +556,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
         // Iterate all assistant messages directly so we capture function calls
         // that have a taskId (which are excluded from renderItems but still
         // need to appear in the status bar when running).
-        for (const message of aiRequest.output) {
+        for (const message of aiRequest.output || []) {
           if (message.type !== 'message' || message.role !== 'assistant')
             continue;
           for (const messageContent of message.content) {
@@ -717,7 +718,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     > = React.useMemo(
       () => {
         const map: Map<string, Array<FunctionCallItem>> = new Map();
-        aiRequest.output.forEach(message => {
+        (aiRequest.output || []).forEach(message => {
           if (message.type === 'message' && message.role === 'assistant') {
             message.content.forEach(messageContent => {
               if (
@@ -899,7 +900,9 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
               const previousMessage =
                 // $FlowFixMe[unsafe-arithmetic]
                 // $FlowFixMe[invalid-compare]
-                messageIndex > 0 ? aiRequest.output[messageIndex - 1] : null;
+                messageIndex > 0
+                  ? (aiRequest.output || [])[messageIndex - 1]
+                  : null;
               const previousMessageHasSameVersionId =
                 previousMessage &&
                 hasVersionToRestore &&

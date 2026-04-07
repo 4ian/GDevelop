@@ -761,45 +761,45 @@
     "instruction-parameter": {
       "base": {
         "color": {
-          "value": "rgb(78, 78, 78)"
+          "value": "#687085"
         }
       },
       "number": {
         "color": {
-          "value": "rgb(27, 143, 1)"
+          "value": "#006DEE"
         }
       },
       "object": {
         "color": {
-          "value": "#3c4698"
+          "value": "#7046EC"
         }
       },
       "behavior": {
         "color": {
-          "value": "rgb(119, 119, 119)"
+          "value": "#00AB6A"
         }
       },
       "operator": {
         "color": {
-          "value": "rgb(55, 131, 211)"
+          "value": "#FF1ADD"
         }
       },
       "var": {
         "color": {
-          "value": "rgb(131, 55, 162)"
+          "value": "#CC9200"
         }
       },
       "error": {
         "color": {
-          "value": "#E06C75"
+          "value": "#FF8569"
         },
         "background-color": {
-          "value": "#E06C7544"
+          "value": "#FF856944"
         }
       },
       "warning": {
         "color": {
-          "value": "#E5C07B"
+          "value": "#FFBC57"
         }
       }
     },

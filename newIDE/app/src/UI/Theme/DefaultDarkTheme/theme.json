@@ -763,45 +763,45 @@
     "instruction-parameter": {
       "base": {
         "color": {
-          "value": "#98C379"
+          "value": "#B2BCD7"
         }
       },
       "number": {
         "color": {
-          "value": "#E5C07B"
+          "value": "#95C6FF"
         }
       },
       "object": {
         "color": {
-          "value": "#C678DD"
+          "value": "#C9B6FC"
         }
       },
       "behavior": {
         "color": {
-          "value": "#E09563"
+          "value": "#42F0AE"
         }
       },
       "operator": {
         "color": {
-          "value": "#B77CFF"
+          "value": "#FF85ED"
         }
       },
       "var": {
         "color": {
-          "value": "#56B6C2"
+          "value": "#CBE500"
         }
       },
       "error": {
         "color": {
-          "value": "#E06C75"
+          "value": "#FF8569"
         },
         "background-color": {
-          "value": "#E06C7544"
+          "value": "#FF856944"
         }
       },
       "warning": {
         "color": {
-          "value": "#E5C07B"
+          "value": "#FFBC57"
         }
       }
     },

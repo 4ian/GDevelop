@@ -35,9 +35,7 @@ export const initializeCompletions = (monaco: any) => {
 
   // Enable type checking of JavaScript files
   monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-    // TODO: Uncomment to activate type checking of JS files, once autocompletions are all handled properly.
-    // ...monaco.languages.typescript.javascriptDefaults.getCompilerOptions()
-    target: monaco.languages.typescript.ScriptTarget.ES6,
+    ...monaco.languages.typescript.javascriptDefaults.getCompilerOptions(),
     allowNonTsExtensions: true,
     allowJs: true,
     checkJs: true,

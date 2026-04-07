@@ -641,12 +641,16 @@ namespace gdjs {
           const oldObjectDataList =
             HotReloader.resolveCustomObjectConfigurations(
               oldProjectData,
-              oldLayoutData ? oldLayoutData.objects : []
+              oldLayoutData
+                ? [...oldProjectData.objects, ...oldLayoutData.objects]
+                : oldProjectData.objects
             );
           const newObjectDataList =
             HotReloader.resolveCustomObjectConfigurations(
               newProjectData,
-              newLayoutData ? newLayoutData.objects : []
+              newLayoutData
+                ? [...newProjectData.objects, ...newLayoutData.objects]
+                : newProjectData.objects
             );
 
           sceneStack._stack.forEach((runtimeScene) => {
@@ -949,11 +953,11 @@ namespace gdjs {
       }
       const oldObjectDataList = HotReloader.resolveCustomObjectConfigurations(
         oldProjectData,
-        oldLayoutData.objects
+        [...oldProjectData.objects, ...oldLayoutData.objects]
       );
       const newObjectDataList = HotReloader.resolveCustomObjectConfigurations(
         newProjectData,
-        newLayoutData.objects
+        [...newProjectData.objects, ...newLayoutData.objects]
       );
 
       // Re-instantiate any gdjs.RuntimeBehavior that was changed.

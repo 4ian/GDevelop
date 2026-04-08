@@ -269,6 +269,36 @@ namespace gdjs {
         }
       );
 
+      gdjs.registerRuntimeSceneGetSyncDataCallback(
+        function (runtimeScene, currentLayoutSyncData, syncOptions) {
+          if (!syncOptions.syncLinkedObjects) return;
+
+          currentLayoutSyncData.linkedObjects =
+            LinksManager.getManager(runtimeScene).getNetworkSyncData();
+        }
+      );
+
+      gdjs.registerRuntimeSceneUpdateFromSyncDataCallback(
+        function (runtimeScene, receivedSyncData, _syncOptions) {
+          if (!receivedSyncData.linkedObjects) return;
+
+          const linksManager = LinksManager.getManager(runtimeScene);
+
+          // Clear links only for objects with a networkId (managed by save state).
+          // DoNotSave objects don't have networkIds, so their links are preserved.
+          for (const object of runtimeScene.getAdhocListOfAllInstances()) {
+            if (object.networkId) {
+              linksManager.removeAllLinksOf(object);
+            }
+          }
+
+          linksManager.updateFromNetworkSyncData(
+            receivedSyncData.linkedObjects,
+            runtimeScene
+          );
+        }
+      );
+
       export const linkObjects = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         objA: gdjs.RuntimeObject | null,

@@ -218,6 +218,7 @@ namespace gdjs {
         syncAsyncTasks: true,
         syncSceneVisualProps: true,
         syncFullTileMaps: true,
+        syncLinkedObjects: true,
       };
 
       const shouldPersistGameData = checkIfIsPersistedInProfiles(
@@ -282,13 +283,6 @@ namespace gdjs {
               objectSyncData;
           }
         }
-
-        // Collect linked object links after the objects
-        // (so that networkIds are assigned).
-        const linksManager =
-          gdjs.LinksManager.getManager(runtimeScene);
-        gameSaveState.layoutNetworkSyncDatas[index].linkedObjectLinks =
-          linksManager.getNetworkSyncData();
 
         // Collect scene data after the objects:
         const shouldPersistSceneData = checkIfIsPersistedInProfiles(
@@ -575,27 +569,6 @@ namespace gdjs {
               object.deleteFromScene();
             }
           }
-        }
-
-        // Restore linked object links after objects are created and updated.
-        // First, clear links only for objects managed by the save state
-        // (those with a networkId in the save state), so that links between
-        // non-saved objects are preserved.
-        const linksManager =
-          gdjs.LinksManager.getManager(runtimeScene);
-        for (const object of runtimeScene.getAdhocListOfAllInstances()) {
-          if (
-            object.networkId &&
-            allLoadedNetworkIds.has(object.networkId)
-          ) {
-            linksManager.removeAllLinksOf(object);
-          }
-        }
-        if (layoutSyncData.linkedObjectLinks) {
-          linksManager.updateFromNetworkSyncData(
-            layoutSyncData.linkedObjectLinks,
-            runtimeScene
-          );
         }
 
         // Update the rest of the scene last.

@@ -1366,11 +1366,11 @@ describe('SaveState', () => {
       });
 
       // Verify links are in the save state.
-      expect(saveState.layoutNetworkSyncDatas[0].linkedObjectLinks).not.to.be(
+      expect(saveState.layoutNetworkSyncDatas[0].sceneData.linkedObjects).not.to.be(
         undefined
       );
       expect(
-        saveState.layoutNetworkSyncDatas[0].linkedObjectLinks.length
+        saveState.layoutNetworkSyncDatas[0].sceneData.linkedObjects.length
       ).to.be(3);
 
       // Start a new game and restore.
@@ -1522,7 +1522,7 @@ describe('SaveState', () => {
 
       // The save state should only contain the link between the two saved objects.
       expect(
-        saveState.layoutNetworkSyncDatas[0].linkedObjectLinks.length
+        saveState.layoutNetworkSyncDatas[0].sceneData.linkedObjects.length
       ).to.be(1);
 
       // Restore into the same game (clearSceneStack: false).

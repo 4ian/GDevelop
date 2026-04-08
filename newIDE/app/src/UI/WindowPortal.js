@@ -10,6 +10,7 @@ import {
 } from '../Utils/Window';
 import useAlertDialog from './Alert/useAlertDialog';
 import { getThemeWindowBackgroundColor } from './Theme';
+import { silenceBenignResizeObserverError } from '../Utils/SilenceBenignResizeObserverError';
 
 // There is a high chance of FS operations running while an Electron window is closing.
 // We run into "Uncaught illegal access" errors from V8/Chrome/Electron on Electron when these
@@ -164,29 +165,9 @@ const WindowPortal = ({
     // and pre-existing global styles.
     const styleObserver = copyDocumentStyles(document, externalWindow.document);
 
-    // Suppress the benign "ResizeObserver loop completed with undelivered
-    // notifications" browser error in the external window so that it doesn't
-    // propagate to the main window's error handler. Per the W3C spec this is
-    // a non-fatal warning: undelivered observations are simply deferred to
-    // the next frame and do not affect correctness.
-    let lastResizeObserverErrorLogTime = 0;
-    externalWindow.addEventListener('error', event => {
-      if (
-        event.message ===
-        'ResizeObserver loop completed with undelivered notifications.'
-      ) {
-        const now = Date.now();
-        if (now - lastResizeObserverErrorLogTime > 1000) {
-          lastResizeObserverErrorLogTime = now;
-          console.log(
-            'Silenced benign "ResizeObserver loop completed with undelivered notifications" error ' +
-              'in popped-out window. This is a non-fatal browser warning (W3C spec): ' +
-              'undelivered observations are deferred to the next frame.'
-          );
-        }
-        event.stopImmediatePropagation();
-      }
-    });
+    // Suppress the benign "ResizeObserver loop" error in the external window
+    // so that it doesn't propagate to the main window's error handler.
+    silenceBenignResizeObserverError(externalWindow);
 
     // Set up context menu in the new window (works for both Electron and web).
     Window.setUpContextMenu(externalWindow);

@@ -64,17 +64,11 @@
     <script>
       window["GD_STARTUP_TIMES"] = [["indexHtmlFirstScriptStarted", performance.now()]];
 
-      // Suppress the benign "ResizeObserver loop completed with undelivered
-      // notifications" browser error. Per the W3C spec this is a non-fatal
-      // warning: undelivered observations are simply deferred to the next
-      // animation frame and do not affect correctness.
-      //
+      // Suppress benign errors.
       // This MUST be registered here (before any webpack bundle runs) so that
-      // stopImmediatePropagation prevents react-error-overlay's handler —
-      // injected as a webpack entry point — from showing a red error overlay.
+      // stopImmediatePropagation prevents react-error-overlay's handler.
       //
-      // See also: Utils/SilenceBenignResizeObserverError.js (used for
-      // popped-out windows created by WindowPortal).
+      // See also: Utils/SilenceBenignResizeObserverError.js.
       (function() {
         var lastLogTime = 0;
         window.addEventListener('error', function(event) {

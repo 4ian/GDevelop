@@ -36,7 +36,7 @@ export function silenceBenignResizeObserverError(
             'This is a non-fatal browser warning (W3C spec): undelivered observations are deferred to the next frame.'
         );
       }
-      // $FlowFixMe - stopImmediatePropagation exists on ErrorEvent.
+      // $FlowFixMe[prop-missing] - stopImmediatePropagation exists on ErrorEvent.
       event.stopImmediatePropagation();
     }
   });

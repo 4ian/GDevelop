@@ -41,7 +41,7 @@ namespace gdjs {
       objA: gdjs.RuntimeObject
     ): Map<string, gdjs.RuntimeObject[]> {
       if (!this._links.has(objA.id)) {
-        this._links.set(objA.id, new IterableLinkedObjects());
+        this._links.set(objA.id, new IterableLinkedObjects(objA));
       }
       return this._links.get(objA.id)!.linkedObjectMap;
     }
@@ -55,7 +55,7 @@ namespace gdjs {
       objA: gdjs.RuntimeObject
     ): Iterable<gdjs.RuntimeObject> {
       if (!this._links.has(objA.id)) {
-        this._links.set(objA.id, new IterableLinkedObjects());
+        this._links.set(objA.id, new IterableLinkedObjects(objA));
       }
       return this._links.get(objA.id)!;
     }
@@ -160,105 +160,80 @@ namespace gdjs {
       }
     }
 
+    clearAllLinks() {
+      this._links.clear();
+    }
+
     /**
      * Serialize all links between objects that have a networkId,
      * so they can be persisted and restored later.
      * Each link is stored once as a pair of networkIds.
      */
-    getSerializedLinks(): Array<{ a: string; b: string }> {
-      const serializedLinks: Array<{ a: string; b: string }> = [];
-      const processedPairs = new Set<string>();
+    getNetworkSyncData(): Array<[string, string]> {
+      const linkedObjects: Array<[string, string]> = [];
+      const serializedLinks = new Set<string>();
 
-      for (const [objectId, iterableLinkedObjects] of this._links) {
-        for (const linkedObjects of iterableLinkedObjects.linkedObjectMap.values()) {
-          for (const linkedObject of linkedObjects) {
-            // Find the source object: look it up via the linked object's back-links
-            // to get the source object reference.
-            // Actually, we need the source object. We can find it by iterating
-            // through the linked object's links back to us.
-            // A simpler approach: we have the objectId key, we need the object reference.
-            // We can get it from any of the reverse links.
-            const sourceNetworkId = this._getNetworkIdForObjectId(
-              objectId,
-              linkedObject
-            );
-            const targetNetworkId = linkedObject.networkId;
+      for (const iterableLinkedObjects of this._links.values()) {
+        const objectA = iterableLinkedObjects.ownerObject;
+        if (!objectA || !objectA.networkId) {
+          continue;
+        }
 
-            if (!sourceNetworkId || !targetNetworkId) continue;
+        for (const objectB of iterableLinkedObjects) {
+          if (!objectB.networkId) continue;
+          const pairKey =
+            objectA.networkId < objectB.networkId
+              ? `${objectA.networkId}|${objectB.networkId}`
+              : `${objectB.networkId}|${objectA.networkId}`;
+          if (serializedLinks.has(pairKey)) continue;
+          serializedLinks.add(pairKey);
 
-            // Create a canonical key to avoid duplicates (bidirectional links).
-            const pairKey =
-              sourceNetworkId < targetNetworkId
-                ? `${sourceNetworkId}:${targetNetworkId}`
-                : `${targetNetworkId}:${sourceNetworkId}`;
-
-            if (!processedPairs.has(pairKey)) {
-              processedPairs.add(pairKey);
-              serializedLinks.push({ a: sourceNetworkId, b: targetNetworkId });
-            }
-          }
+          linkedObjects.push([objectA.networkId, objectB.networkId]);
         }
       }
 
-      return serializedLinks;
-    }
-
-    /**
-     * Find the networkId for an object identified by its runtime id,
-     * by looking at the reverse links from a linked object.
-     */
-    private _getNetworkIdForObjectId(
-      objectId: integer,
-      anyLinkedObject: gdjs.RuntimeObject
-    ): string | null {
-      // Look through the reverse links of the linked object to find
-      // the source object with the matching id.
-      const reverseLinks = this._links.get(anyLinkedObject.id);
-      if (reverseLinks) {
-        for (const objects of reverseLinks.linkedObjectMap.values()) {
-          for (const obj of objects) {
-            if (obj.id === objectId) {
-              return obj.networkId;
-            }
-          }
-        }
-      }
-      return null;
+      return linkedObjects;
     }
 
     /**
      * Restore links from serialized data. Objects must already exist
      * in the scene with their networkId set.
      */
-    restoreSerializedLinks(
-      links: Array<{ a: string; b: string }>,
+    updateFromNetworkSyncData(
+      linksNetworkSyncData: Array<[string, string]>,
       runtimeScene: gdjs.RuntimeScene
     ): void {
+      this.clearAllLinks();
+
+      if (!linksNetworkSyncData) return;
+
       // Build a map from networkId to object instance for quick lookup.
-      const networkIdToObject = new Map<string, gdjs.RuntimeObject>();
+      const objectsByNetworkId = new Map<string, gdjs.RuntimeObject>();
       for (const object of runtimeScene.getAdhocListOfAllInstances()) {
         if (object.networkId) {
-          networkIdToObject.set(object.networkId, object);
+          objectsByNetworkId.set(object.networkId, object);
         }
       }
 
-      for (const link of links) {
-        const objA = networkIdToObject.get(link.a);
-        const objB = networkIdToObject.get(link.b);
-        if (objA && objB) {
-          this.linkObjects(objA, objB);
-        }
+      for (const [networkIdA, networkIdB] of linksNetworkSyncData) {
+        const objectA = objectsByNetworkId.get(networkIdA);
+        const objectB = objectsByNetworkId.get(networkIdB);
+        if (!objectA || !objectB) continue;
+
+        this.linkObjects(objectA, objectB);
       }
     }
   }
 
   class IterableLinkedObjects implements Iterable<gdjs.RuntimeObject> {
+    ownerObject: gdjs.RuntimeObject;
     linkedObjectMap: Map<string, gdjs.RuntimeObject[]>;
     static emptyItr: Iterator<gdjs.RuntimeObject> = {
       next: () => ({ value: undefined, done: true }),
     };
 
-    constructor() {
+    constructor(ownerObject: gdjs.RuntimeObject) {
+      this.ownerObject = ownerObject;
       this.linkedObjectMap = new Map<string, gdjs.RuntimeObject[]>();
     }
 

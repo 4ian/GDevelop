@@ -1234,7 +1234,76 @@ describe('SaveState', () => {
   });
 
   describe('Save State with linked objects', () => {
-    it('saves and restores linked objects connections', async () => {
+    it('saves and restores linked objects relations (same type)', async () => {
+      // Start a game.
+      const runtimeGame1 = gdjs.getPixiRuntimeGame({
+        layouts: [getFakeSceneData({ name: 'Scene1' })],
+      });
+      await runtimeGame1._resourcesLoader.loadAllResources(() => {});
+
+      const runtimeScene1 = runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene1',
+      });
+      if (!runtimeScene1) throw new Error('No current scene was created.');
+
+      const object1 = runtimeScene1.createObject('MySpriteObject');
+      const object2 = runtimeScene1.createObject('MySpriteObject');
+      if (!object1 || !object2) {
+        throw new Error('Objects were not created');
+      }
+
+      object1.setPosition(100, 200);
+      object2.setPosition(300, 400);
+      gdjs.evtTools.linkedObjects.linkObjects(runtimeScene1, object1, object2);
+
+      // Save the game state.
+      const saveState = gdjs.saveState.createGameSaveState(runtimeGame1, {
+        profileNames: ['default'],
+      });
+
+      // Start a new game.
+      const runtimeGame2 = gdjs.getPixiRuntimeGame({
+        layouts: [getFakeSceneData({ name: 'Scene1' })],
+      });
+      await runtimeGame2._resourcesLoader.loadAllResources(() => {});
+
+      // Load the saved state.
+      gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
+        profileNames: ['default'],
+        clearSceneStack: false,
+      });
+
+      const runtimeScene2 = runtimeGame2.getSceneStack().getCurrentScene();
+      if (!runtimeScene2) throw new Error('No current scene was restored.');
+
+      const restoredObjects = runtimeScene2.getObjects('MySpriteObject');
+      expect(restoredObjects.length).to.be(2);
+
+      const restoredObject1 = restoredObjects.find(
+        (obj) => obj.getX() === 100 && obj.getY() === 200
+      );
+      const restoredObject2 = restoredObjects.find(
+        (obj) => obj.getX() === 300 && obj.getY() === 400
+      );
+      if (!restoredObject1 || !restoredObject2) {
+        throw new Error(
+          'Objects not found at the proper positions after restore.'
+        );
+      }
+
+      const linksManager = gdjs.LinksManager.getManager(runtimeScene2);
+      const object1Links = Array.from(
+        linksManager.getObjectsLinkedWith(restoredObject1)
+      );
+      const object2Links = Array.from(
+        linksManager.getObjectsLinkedWith(restoredObject2)
+      );
+
+      expect(object1Links).to.eql([restoredObject2]);
+      expect(object2Links).to.eql([restoredObject1]);
+    });
+
+    it('saves and restores multiple linked objects across types', async () => {
       const sceneData = getFakeSceneData({
         name: 'Scene1',
         objects: [
@@ -1281,21 +1350,15 @@ describe('SaveState', () => {
         throw new Error('Objects were not created');
       }
 
-      objectA1.setX(10);
-      objectA1.setY(20);
-      objectA2.setX(30);
-      objectA2.setY(40);
-      objectB1.setX(50);
-      objectB1.setY(60);
-      objectB2.setX(70);
-      objectB2.setY(80);
+      objectA1.setPosition(10, 20);
+      objectA2.setPosition(30, 40);
+      objectB1.setPosition(50, 60);
+      objectB2.setPosition(70, 80);
 
-      // Link objectA1 <-> objectB1 and objectA1 <-> objectB2.
-      const manager1 = gdjs.LinksManager.getManager(runtimeScene1);
-      manager1.linkObjects(objectA1, objectB1);
-      manager1.linkObjects(objectA1, objectB2);
-      // Link objectA2 <-> objectB2.
-      manager1.linkObjects(objectA2, objectB2);
+      // Link objectA1 <-> objectB1, objectA1 <-> objectB2, objectA2 <-> objectB2.
+      gdjs.evtTools.linkedObjects.linkObjects(runtimeScene1, objectA1, objectB1);
+      gdjs.evtTools.linkedObjects.linkObjects(runtimeScene1, objectA1, objectB2);
+      gdjs.evtTools.linkedObjects.linkObjects(runtimeScene1, objectA2, objectB2);
 
       // Save the game state.
       const saveState = gdjs.saveState.createGameSaveState(runtimeGame1, {
@@ -1349,32 +1412,28 @@ describe('SaveState', () => {
         );
       }
 
-      // Verify links are restored: objectA1 should be linked to objectB1 and objectB2.
+      // Verify links via the public API.
       const manager2 = gdjs.LinksManager.getManager(runtimeScene2);
-      const a1LinkedMap = manager2._getMapOfObjectsLinkedWith(restoredA1);
-      expect(a1LinkedMap.has('ObjectB')).to.be(true);
-      expect(a1LinkedMap.get('ObjectB').length).to.be(2);
-      expect(a1LinkedMap.get('ObjectB')).to.contain(restoredB1);
-      expect(a1LinkedMap.get('ObjectB')).to.contain(restoredB2);
 
-      // Verify objectA2 is linked to objectB2 only.
-      const a2LinkedMap = manager2._getMapOfObjectsLinkedWith(restoredA2);
-      expect(a2LinkedMap.has('ObjectB')).to.be(true);
-      expect(a2LinkedMap.get('ObjectB').length).to.be(1);
-      expect(a2LinkedMap.get('ObjectB')[0]).to.be(restoredB2);
+      // objectA1 should be linked to objectB1 and objectB2.
+      const a1Links = Array.from(manager2.getObjectsLinkedWith(restoredA1));
+      expect(a1Links.length).to.be(2);
+      expect(a1Links).to.contain(restoredB1);
+      expect(a1Links).to.contain(restoredB2);
+
+      // objectA2 should be linked to objectB2 only.
+      const a2Links = Array.from(manager2.getObjectsLinkedWith(restoredA2));
+      expect(a2Links).to.eql([restoredB2]);
 
       // Verify bidirectional: objectB1 linked to objectA1.
-      const b1LinkedMap = manager2._getMapOfObjectsLinkedWith(restoredB1);
-      expect(b1LinkedMap.has('ObjectA')).to.be(true);
-      expect(b1LinkedMap.get('ObjectA').length).to.be(1);
-      expect(b1LinkedMap.get('ObjectA')[0]).to.be(restoredA1);
+      const b1Links = Array.from(manager2.getObjectsLinkedWith(restoredB1));
+      expect(b1Links).to.eql([restoredA1]);
 
-      // Verify objectB2 linked to both objectA1 and objectA2.
-      const b2LinkedMap = manager2._getMapOfObjectsLinkedWith(restoredB2);
-      expect(b2LinkedMap.has('ObjectA')).to.be(true);
-      expect(b2LinkedMap.get('ObjectA').length).to.be(2);
-      expect(b2LinkedMap.get('ObjectA')).to.contain(restoredA1);
-      expect(b2LinkedMap.get('ObjectA')).to.contain(restoredA2);
+      // objectB2 linked to both objectA1 and objectA2.
+      const b2Links = Array.from(manager2.getObjectsLinkedWith(restoredB2));
+      expect(b2Links.length).to.be(2);
+      expect(b2Links).to.contain(restoredA1);
+      expect(b2Links).to.contain(restoredA2);
     });
   });
 });

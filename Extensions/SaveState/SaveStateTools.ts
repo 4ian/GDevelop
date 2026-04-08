@@ -288,7 +288,7 @@ namespace gdjs {
         const linksManager =
           gdjs.LinksManager.getManager(runtimeScene);
         gameSaveState.layoutNetworkSyncDatas[index].linkedObjectLinks =
-          linksManager.getSerializedLinks();
+          linksManager.getNetworkSyncData();
 
         // Collect scene data after the objects:
         const shouldPersistSceneData = checkIfIsPersistedInProfiles(
@@ -581,7 +581,7 @@ namespace gdjs {
         if (layoutSyncData.linkedObjectLinks) {
           const linksManager =
             gdjs.LinksManager.getManager(runtimeScene);
-          linksManager.restoreSerializedLinks(
+          linksManager.updateFromNetworkSyncData(
             layoutSyncData.linkedObjectLinks,
             runtimeScene
           );

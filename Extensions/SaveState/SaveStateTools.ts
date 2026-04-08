@@ -578,9 +578,20 @@ namespace gdjs {
         }
 
         // Restore linked object links after objects are created and updated.
+        // First, clear links only for objects managed by the save state
+        // (those with a networkId in the save state), so that links between
+        // non-saved objects are preserved.
+        const linksManager =
+          gdjs.LinksManager.getManager(runtimeScene);
+        for (const object of runtimeScene.getAdhocListOfAllInstances()) {
+          if (
+            object.networkId &&
+            allLoadedNetworkIds.has(object.networkId)
+          ) {
+            linksManager.removeAllLinksOf(object);
+          }
+        }
         if (layoutSyncData.linkedObjectLinks) {
-          const linksManager =
-            gdjs.LinksManager.getManager(runtimeScene);
           linksManager.updateFromNetworkSyncData(
             layoutSyncData.linkedObjectLinks,
             runtimeScene

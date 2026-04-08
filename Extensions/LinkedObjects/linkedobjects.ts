@@ -198,13 +198,15 @@ namespace gdjs {
     /**
      * Restore links from serialized data. Objects must already exist
      * in the scene with their networkId set.
+     *
+     * Links for objects managed by the save state should be cleared
+     * before calling this method, so that stale links are removed.
+     * This method only adds the saved links back.
      */
     updateFromNetworkSyncData(
       linksNetworkSyncData: Array<[string, string]>,
       runtimeScene: gdjs.RuntimeScene
     ): void {
-      this.clearAllLinks();
-
       if (!linksNetworkSyncData) return;
 
       // Build a map from networkId to object instance for quick lookup.

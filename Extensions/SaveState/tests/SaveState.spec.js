@@ -1435,5 +1435,119 @@ describe('SaveState', () => {
       expect(b2Links).to.contain(restoredA1);
       expect(b2Links).to.contain(restoredA2);
     });
+
+    it('preserves links between non-saved objects when restoring', async () => {
+      const sceneData = getFakeSceneData({
+        name: 'Scene1',
+        objects: [
+          // @ts-ignore - SavedObject is persisted in the default profile.
+          {
+            type: 'Sprite',
+            name: 'SavedObject',
+            behaviors: [
+              {
+                name: 'SaveConfiguration',
+                type: 'SaveState::SaveConfiguration',
+                defaultProfilePersistence: 'Persisted',
+              },
+            ],
+            effects: [],
+            variables: [],
+            animations: [],
+            updateIfNotVisible: false,
+          },
+          // @ts-ignore - NotSavedObject is excluded from save.
+          {
+            type: 'Sprite',
+            name: 'NotSavedObject',
+            behaviors: [
+              {
+                name: 'SaveConfiguration',
+                type: 'SaveState::SaveConfiguration',
+                defaultProfilePersistence: 'DoNotSave',
+              },
+            ],
+            effects: [],
+            variables: [],
+            animations: [],
+            updateIfNotVisible: false,
+          },
+        ],
+      });
+
+      const runtimeGame1 = gdjs.getPixiRuntimeGame({
+        layouts: [sceneData],
+      });
+      await runtimeGame1._resourcesLoader.loadAllResources(() => {});
+
+      const runtimeScene1 = runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene1',
+      });
+      if (!runtimeScene1) throw new Error('No current scene was created.');
+
+      const saved1 = runtimeScene1.createObject('SavedObject');
+      const saved2 = runtimeScene1.createObject('SavedObject');
+      const notSaved1 = runtimeScene1.createObject('NotSavedObject');
+      const notSaved2 = runtimeScene1.createObject('NotSavedObject');
+
+      if (!saved1 || !saved2 || !notSaved1 || !notSaved2) {
+        throw new Error('Objects were not created');
+      }
+
+      saved1.setPosition(10, 20);
+      saved2.setPosition(30, 40);
+      notSaved1.setPosition(50, 60);
+      notSaved2.setPosition(70, 80);
+
+      // Create links:
+      // saved1 <-> saved2 (both saved — should be preserved)
+      // saved1 <-> notSaved1 (mixed — link is lost because notSaved1 has no networkId)
+      // notSaved1 <-> notSaved2 (both not saved — should be preserved)
+      gdjs.evtTools.linkedObjects.linkObjects(runtimeScene1, saved1, saved2);
+      gdjs.evtTools.linkedObjects.linkObjects(
+        runtimeScene1,
+        saved1,
+        notSaved1
+      );
+      gdjs.evtTools.linkedObjects.linkObjects(
+        runtimeScene1,
+        notSaved1,
+        notSaved2
+      );
+
+      // Save — only SavedObject instances are included.
+      const saveState = gdjs.saveState.createGameSaveState(runtimeGame1, {
+        profileNames: ['default'],
+      });
+
+      // The save state should only contain the link between the two saved objects.
+      expect(
+        saveState.layoutNetworkSyncDatas[0].linkedObjectLinks.length
+      ).to.be(1);
+
+      // Restore into the same game (clearSceneStack: false).
+      gdjs.saveState.restoreGameSaveState(runtimeGame1, saveState, {
+        profileNames: ['default'],
+        clearSceneStack: false,
+      });
+
+      const linksManager = gdjs.LinksManager.getManager(runtimeScene1);
+
+      // saved1 <-> saved2 link should be restored.
+      const saved1Links = Array.from(
+        linksManager.getObjectsLinkedWith(saved1)
+      );
+      expect(saved1Links).to.contain(saved2);
+      // saved1 <-> notSaved1 link is lost (notSaved1 had no networkId during save).
+      expect(saved1Links).not.to.contain(notSaved1);
+
+      // notSaved1 <-> notSaved2 link should be preserved (neither is managed by save state).
+      const notSaved1Links = Array.from(
+        linksManager.getObjectsLinkedWith(notSaved1)
+      );
+      expect(notSaved1Links).to.contain(notSaved2);
+      // notSaved1 <-> saved1 was cleared from both sides.
+      expect(notSaved1Links).not.to.contain(saved1);
+    });
   });
 });

@@ -38,7 +38,6 @@ export type MainMenuCallbacks = {|
   onSaveProjectAs: () => void,
   onShowVersionHistory: () => void,
   onCloseProject: () => Promise<boolean>,
-  onReloadProject: () => Promise<void>,
   onCloseApp: () => void,
   onExportProject: () => void,
   onInviteCollaborators: () => void,
@@ -66,7 +65,6 @@ export type MainMenuEvent =
   | 'main-menu-save-as'
   | 'main-menu-show-version-history'
   | 'main-menu-close'
-  | 'main-menu-reload'
   | 'main-menu-close-app'
   | 'main-menu-export'
   | 'main-menu-invite-collaborators'
@@ -94,7 +92,6 @@ const getMainMenuEventCallback = (
     'main-menu-save-as': callbacks.onSaveProjectAs,
     'main-menu-show-version-history': callbacks.onShowVersionHistory,
     'main-menu-close': callbacks.onCloseProject,
-    'main-menu-reload': callbacks.onReloadProject,
     'main-menu-close-app': callbacks.onCloseApp,
     'main-menu-export': callbacks.onExportProject,
     'main-menu-invite-collaborators': callbacks.onInviteCollaborators,
@@ -192,12 +189,6 @@ export const buildMainMenuDeclarativeTemplate = ({
         label: i18n._(t`Close Project`),
         accelerator: getElectronAccelerator(shortcutMap['CLOSE_PROJECT']),
         onClickSendEvent: 'main-menu-close',
-        enabled: !!project,
-      },
-      {
-        label: i18n._(t`Reload Project`),
-        accelerator: getElectronAccelerator(shortcutMap['RELOAD_PROJECT']),
-        onClickSendEvent: 'main-menu-reload',
         enabled: !!project,
       },
       ...(!isMacLike() || !isApplicationTopLevelMenu

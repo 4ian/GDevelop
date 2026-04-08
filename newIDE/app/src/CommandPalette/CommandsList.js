@@ -154,8 +154,7 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   },
   RELOAD_PROJECT: {
     area: 'GENERAL',
-    displayText: t`Reload project`,
-    handledByElectron: true,
+    displayText: t`Reload project from disk/cloud (lose all changes)`,
   },
   EXPORT_GAME: {
     area: 'PROJECT',

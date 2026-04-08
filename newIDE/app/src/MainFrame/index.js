@@ -1181,6 +1181,16 @@ const MainFrame = (props: Props): React.MixedElement => {
           );
           if (rawSettings) {
             applyProjectPreferences(rawSettings.preferences, preferences);
+            if (rawSettings.shortcuts) {
+              const shortcuts = rawSettings.shortcuts;
+              for (const commandName of Object.keys(shortcuts)) {
+                // $FlowFixMe[incompatible-type] - command names are validated at runtime
+                preferences.setShortcutForCommand(
+                  commandName,
+                  shortcuts[commandName]
+                );
+              }
+            }
             setState(currentState => ({
               ...currentState,
               toolbarButtons: rawSettings.toolbarButtons || [],
@@ -4960,7 +4970,6 @@ const MainFrame = (props: Props): React.MixedElement => {
     onSaveProjectAs: saveProjectAs,
     onShowVersionHistory: openVersionHistoryPanel,
     onCloseProject: askToCloseProject,
-    onReloadProject: reloadProject,
     onCloseApp: closeApp,
     onExportProject: () => {
       openShareDialog('publish');

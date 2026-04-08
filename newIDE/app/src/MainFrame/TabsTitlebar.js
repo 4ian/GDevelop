@@ -241,7 +241,7 @@ export default function TabsTitlebar({
         </div>
       ) : null}
       {isRightMostPane && <TitleBarRightSafeMargins />}
-      {tooltipData && (
+      {tooltipData && tooltipData.element.isConnected && (
         <TabsTitlebarTooltip
           anchorElement={tooltipData.element}
           editorTab={tooltipData.editorTab}

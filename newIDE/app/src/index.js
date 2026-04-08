@@ -1,4 +1,22 @@
 // @flow
+
+// Suppress the benign "ResizeObserver loop completed with undelivered
+// notifications" error. This browser warning (non-fatal per the W3C spec)
+// is triggered when a ResizeObserver callback causes layout changes that
+// produce additional observations that can't be delivered in the same frame.
+// It surfaces as a red overlay in development because react-error-overlay
+// treats all unhandled errors as fatal. Registering this listener before
+// react-error-overlay ensures stopImmediatePropagation prevents it from
+// reaching the overlay handler.
+window.addEventListener('error', event => {
+  if (
+    event.message ===
+    'ResizeObserver loop completed with undelivered notifications.'
+  ) {
+    event.stopImmediatePropagation();
+  }
+});
+
 import 'element-closest';
 // $FlowFixMe[missing-export]
 import React, { Component, type Element } from 'react';

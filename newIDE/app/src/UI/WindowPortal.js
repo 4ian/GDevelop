@@ -164,6 +164,17 @@ const WindowPortal = ({
     // and pre-existing global styles.
     const styleObserver = copyDocumentStyles(document, externalWindow.document);
 
+    // Suppress the benign "ResizeObserver loop" error in the external window
+    // so that it doesn't propagate to the main window's error handler.
+    externalWindow.addEventListener('error', event => {
+      if (
+        event.message ===
+        'ResizeObserver loop completed with undelivered notifications.'
+      ) {
+        event.stopImmediatePropagation();
+      }
+    });
+
     // Set up context menu in the new window (works for both Electron and web).
     Window.setUpContextMenu(externalWindow);
 

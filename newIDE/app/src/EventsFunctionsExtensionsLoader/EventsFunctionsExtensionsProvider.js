@@ -117,8 +117,7 @@ export const EventsFunctionsExtensionsProvider = ({
             ).toFixed(2)}ms.`
           );
           // Only clear the ref if no newer load has been queued since.
-          // Without this check, chained loads (A then B) would have A's
-          // cleanup clear B's reference, leading to stuck state.
+          // In theory we don't do concurrent loads, but it's better to be safe.
           if (lastLoadPromise.current === currentPromise) {
             lastLoadPromise.current = null;
           }

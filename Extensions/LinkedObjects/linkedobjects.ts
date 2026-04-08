@@ -41,7 +41,7 @@ namespace gdjs {
       objA: gdjs.RuntimeObject
     ): Map<string, gdjs.RuntimeObject[]> {
       if (!this._links.has(objA.id)) {
-        this._links.set(objA.id, new IterableLinkedObjects());
+        this._links.set(objA.id, new IterableLinkedObjects(objA));
       }
       return this._links.get(objA.id)!.linkedObjectMap;
     }
@@ -55,7 +55,7 @@ namespace gdjs {
       objA: gdjs.RuntimeObject
     ): Iterable<gdjs.RuntimeObject> {
       if (!this._links.has(objA.id)) {
-        this._links.set(objA.id, new IterableLinkedObjects());
+        this._links.set(objA.id, new IterableLinkedObjects(objA));
       }
       return this._links.get(objA.id)!;
     }
@@ -159,15 +159,83 @@ namespace gdjs {
         }
       }
     }
+
+    clearAllLinks() {
+      this._links.clear();
+    }
+
+    /**
+     * Serialize all links between objects that have a networkId,
+     * so they can be persisted and restored later.
+     * Each link is stored once as a pair of networkIds.
+     */
+    getNetworkSyncData(): Array<[string, string]> {
+      const linkedObjects: Array<[string, string]> = [];
+      const serializedLinks = new Set<string>();
+
+      for (const iterableLinkedObjects of this._links.values()) {
+        const objectA = iterableLinkedObjects.ownerObject;
+        if (!objectA || !objectA.networkId) {
+          continue;
+        }
+
+        for (const objectB of iterableLinkedObjects) {
+          if (!objectB.networkId) continue;
+          const pairKey =
+            objectA.networkId < objectB.networkId
+              ? `${objectA.networkId}|${objectB.networkId}`
+              : `${objectB.networkId}|${objectA.networkId}`;
+          if (serializedLinks.has(pairKey)) continue;
+          serializedLinks.add(pairKey);
+
+          linkedObjects.push([objectA.networkId, objectB.networkId]);
+        }
+      }
+
+      return linkedObjects;
+    }
+
+    /**
+     * Restore links from serialized data. Objects must already exist
+     * in the scene with their networkId set.
+     *
+     * Links for objects managed by the save state should be cleared
+     * before calling this method, so that stale links are removed.
+     * This method only adds the saved links back.
+     */
+    updateFromNetworkSyncData(
+      linksNetworkSyncData: Array<[string, string]>,
+      runtimeScene: gdjs.RuntimeScene
+    ): void {
+      if (!linksNetworkSyncData) return;
+
+      // Build a map from networkId to object instance for quick lookup.
+      const objectsByNetworkId = new Map<string, gdjs.RuntimeObject>();
+      for (const object of runtimeScene.getAdhocListOfAllInstances()) {
+        if (object.networkId) {
+          objectsByNetworkId.set(object.networkId, object);
+        }
+      }
+
+      for (const [networkIdA, networkIdB] of linksNetworkSyncData) {
+        const objectA = objectsByNetworkId.get(networkIdA);
+        const objectB = objectsByNetworkId.get(networkIdB);
+        if (!objectA || !objectB) continue;
+
+        this.linkObjects(objectA, objectB);
+      }
+    }
   }
 
   class IterableLinkedObjects implements Iterable<gdjs.RuntimeObject> {
+    ownerObject: gdjs.RuntimeObject;
     linkedObjectMap: Map<string, gdjs.RuntimeObject[]>;
     static emptyItr: Iterator<gdjs.RuntimeObject> = {
       next: () => ({ value: undefined, done: true }),
     };
 
-    constructor() {
+    constructor(ownerObject: gdjs.RuntimeObject) {
+      this.ownerObject = ownerObject;
       this.linkedObjectMap = new Map<string, gdjs.RuntimeObject[]>();
     }
 
@@ -198,6 +266,36 @@ namespace gdjs {
       gdjs.registerObjectDeletedFromSceneCallback(
         function (instanceContainer, obj) {
           LinksManager.getManager(instanceContainer).removeAllLinksOf(obj);
+        }
+      );
+
+      gdjs.registerRuntimeSceneGetSyncDataCallback(
+        function (runtimeScene, currentLayoutSyncData, syncOptions) {
+          if (!syncOptions.syncLinkedObjects) return;
+
+          currentLayoutSyncData.linkedObjects =
+            LinksManager.getManager(runtimeScene).getNetworkSyncData();
+        }
+      );
+
+      gdjs.registerRuntimeSceneUpdateFromSyncDataCallback(
+        function (runtimeScene, receivedSyncData, _syncOptions) {
+          if (!receivedSyncData.linkedObjects) return;
+
+          const linksManager = LinksManager.getManager(runtimeScene);
+
+          // Clear links only for objects with a networkId (managed by save state).
+          // DoNotSave objects don't have networkIds, so their links are preserved.
+          for (const object of runtimeScene.getAdhocListOfAllInstances()) {
+            if (object.networkId) {
+              linksManager.removeAllLinksOf(object);
+            }
+          }
+
+          linksManager.updateFromNetworkSyncData(
+            receivedSyncData.linkedObjects,
+            runtimeScene
+          );
         }
       );
 

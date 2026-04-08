@@ -1,18 +1,30 @@
 // @flow
 
 // Suppress the benign "ResizeObserver loop completed with undelivered
-// notifications" error. This browser warning (non-fatal per the W3C spec)
-// is triggered when a ResizeObserver callback causes layout changes that
-// produce additional observations that can't be delivered in the same frame.
-// It surfaces as a red overlay in development because react-error-overlay
-// treats all unhandled errors as fatal. Registering this listener before
-// react-error-overlay ensures stopImmediatePropagation prevents it from
-// reaching the overlay handler.
+// notifications" browser error. Per the W3C spec this is a non-fatal warning:
+// undelivered observations are simply deferred to the next frame and do not
+// affect correctness. It is triggered when a ResizeObserver callback causes
+// layout changes that produce additional observations that cannot all be
+// delivered in the same animation frame.
+//
+// In development, react-error-overlay treats every unhandled error event as
+// fatal and shows a red overlay. Registering this listener *before*
+// react-error-overlay ensures stopImmediatePropagation prevents the error
+// from reaching the overlay handler.
+let lastResizeObserverErrorLogTime = 0;
 window.addEventListener('error', event => {
   if (
     event.message ===
     'ResizeObserver loop completed with undelivered notifications.'
   ) {
+    const now = Date.now();
+    if (now - lastResizeObserverErrorLogTime > 1000) {
+      lastResizeObserverErrorLogTime = now;
+      console.log(
+        'Silenced benign "ResizeObserver loop completed with undelivered notifications" error. ' +
+          'This is a non-fatal browser warning (W3C spec): undelivered observations are deferred to the next frame.'
+      );
+    }
     event.stopImmediatePropagation();
   }
 });

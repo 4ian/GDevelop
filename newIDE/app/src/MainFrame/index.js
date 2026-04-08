@@ -1181,6 +1181,16 @@ const MainFrame = (props: Props): React.MixedElement => {
           );
           if (rawSettings) {
             applyProjectPreferences(rawSettings.preferences, preferences);
+            if (rawSettings.shortcuts) {
+              const shortcuts = rawSettings.shortcuts;
+              for (const commandName of Object.keys(shortcuts)) {
+                // $FlowFixMe[incompatible-type] - command names are validated at runtime
+                preferences.setShortcutForCommand(
+                  commandName,
+                  shortcuts[commandName]
+                );
+              }
+            }
             setState(currentState => ({
               ...currentState,
               toolbarButtons: rawSettings.toolbarButtons || [],
@@ -4311,6 +4321,41 @@ const MainFrame = (props: Props): React.MixedElement => {
     [currentProject, hasUnsavedChanges, i18n, closeProject]
   );
 
+  const reloadProject = React.useCallback(
+    async (): Promise<void> => {
+      if (!currentProject || !currentFileMetadata) return;
+
+      if (hasUnsavedChanges) {
+        const answer = Window.showConfirmDialog(
+          i18n._(
+            t`Reload the project? Any changes that have not been saved will be lost.`
+          )
+        );
+        if (!answer) return;
+      }
+
+      const storageProviderName = getStorageProvider().internalName;
+      await openFromFileMetadataWithStorageProvider(
+        {
+          fileMetadata: currentFileMetadata,
+          storageProviderName,
+        },
+        {
+          ignoreUnsavedChanges: true,
+          ignoreAutoSave: true,
+        }
+      );
+    },
+    [
+      currentProject,
+      currentFileMetadata,
+      hasUnsavedChanges,
+      i18n,
+      getStorageProvider,
+      openFromFileMetadataWithStorageProvider,
+    ]
+  );
+
   const endTutorial = React.useCallback(
     async (shouldCloseProject?: boolean) => {
       if (shouldCloseProject) {
@@ -4805,6 +4850,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onCloseProject: async () => {
       askToCloseProject();
     },
+    onReloadProject: reloadProject,
     onExportGame: () => {
       openShareDialog('publish');
     },

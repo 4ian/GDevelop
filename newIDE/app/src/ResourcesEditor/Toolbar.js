@@ -11,7 +11,7 @@ import IconButton from '../UI/IconButton';
 type Props = {|
   onOpenProjectFolder: () => void,
   canOpenProjectFolder: boolean,
-  onDeleteSelection: () => void,
+  onDeleteSelection: () => Promise<void>,
   canDelete: boolean,
   onToggleProperties: () => void,
   isPropertiesShown: boolean,

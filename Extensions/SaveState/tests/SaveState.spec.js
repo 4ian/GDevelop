@@ -1356,9 +1356,21 @@ describe('SaveState', () => {
       objectB2.setPosition(70, 80);
 
       // Link objectA1 <-> objectB1, objectA1 <-> objectB2, objectA2 <-> objectB2.
-      gdjs.evtTools.linkedObjects.linkObjects(runtimeScene1, objectA1, objectB1);
-      gdjs.evtTools.linkedObjects.linkObjects(runtimeScene1, objectA1, objectB2);
-      gdjs.evtTools.linkedObjects.linkObjects(runtimeScene1, objectA2, objectB2);
+      gdjs.evtTools.linkedObjects.linkObjects(
+        runtimeScene1,
+        objectA1,
+        objectB1
+      );
+      gdjs.evtTools.linkedObjects.linkObjects(
+        runtimeScene1,
+        objectA1,
+        objectB2
+      );
+      gdjs.evtTools.linkedObjects.linkObjects(
+        runtimeScene1,
+        objectA2,
+        objectB2
+      );
 
       // Save the game state.
       const saveState = gdjs.saveState.createGameSaveState(runtimeGame1, {
@@ -1366,12 +1378,12 @@ describe('SaveState', () => {
       });
 
       // Verify links are in the save state.
-      expect(saveState.layoutNetworkSyncDatas[0].sceneData.linkedObjects).not.to.be(
-        undefined
-      );
-      expect(
-        saveState.layoutNetworkSyncDatas[0].sceneData.linkedObjects.length
-      ).to.be(3);
+      const linkedObjects =
+        saveState.layoutNetworkSyncDatas[0].sceneData.linkedObjects;
+      if (!linkedObjects) {
+        throw new Error('Linked objects not found in save state.');
+      }
+      expect(linkedObjects.length).to.be(3);
 
       // Start a new game and restore.
       const runtimeGame2 = gdjs.getPixiRuntimeGame({
@@ -1504,11 +1516,7 @@ describe('SaveState', () => {
       // saved1 <-> notSaved1 (mixed — link is lost because notSaved1 has no networkId)
       // notSaved1 <-> notSaved2 (both not saved — should be preserved)
       gdjs.evtTools.linkedObjects.linkObjects(runtimeScene1, saved1, saved2);
-      gdjs.evtTools.linkedObjects.linkObjects(
-        runtimeScene1,
-        saved1,
-        notSaved1
-      );
+      gdjs.evtTools.linkedObjects.linkObjects(runtimeScene1, saved1, notSaved1);
       gdjs.evtTools.linkedObjects.linkObjects(
         runtimeScene1,
         notSaved1,
@@ -1521,9 +1529,12 @@ describe('SaveState', () => {
       });
 
       // The save state should only contain the link between the two saved objects.
-      expect(
-        saveState.layoutNetworkSyncDatas[0].sceneData.linkedObjects.length
-      ).to.be(1);
+      const linkedObjects =
+        saveState.layoutNetworkSyncDatas[0].sceneData.linkedObjects;
+      if (!linkedObjects) {
+        throw new Error('Linked objects not found in save state.');
+      }
+      expect(linkedObjects.length).to.be(1);
 
       // Restore into the same game (clearSceneStack: false).
       gdjs.saveState.restoreGameSaveState(runtimeGame1, saveState, {
@@ -1534,9 +1545,7 @@ describe('SaveState', () => {
       const linksManager = gdjs.LinksManager.getManager(runtimeScene1);
 
       // saved1 <-> saved2 link should be restored.
-      const saved1Links = Array.from(
-        linksManager.getObjectsLinkedWith(saved1)
-      );
+      const saved1Links = Array.from(linksManager.getObjectsLinkedWith(saved1));
       expect(saved1Links).to.contain(saved2);
       // saved1 <-> notSaved1 link is lost (notSaved1 had no networkId during save).
       expect(saved1Links).not.to.contain(notSaved1);

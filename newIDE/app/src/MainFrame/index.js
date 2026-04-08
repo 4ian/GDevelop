@@ -134,6 +134,7 @@ import useMainFrameCommands from './MainFrameCommands';
 import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
+import { type CommandName } from '../CommandPalette/CommandsList';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
 import {
   type PreviewState,
@@ -1183,12 +1184,10 @@ const MainFrame = (props: Props): React.MixedElement => {
             applyProjectPreferences(rawSettings.preferences, preferences);
             if (rawSettings.shortcuts) {
               const shortcuts = rawSettings.shortcuts;
-              for (const commandName of Object.keys(shortcuts)) {
-                // $FlowFixMe[incompatible-type] - command names are validated at runtime
-                preferences.setShortcutForCommand(
-                  commandName,
-                  shortcuts[commandName]
-                );
+              for (const key of Object.keys(shortcuts)) {
+                // $FlowFixMe[incompatible-call]
+                const commandName: CommandName = (key: any);
+                preferences.setShortcutForCommand(commandName, shortcuts[key]);
               }
             }
             setState(currentState => ({

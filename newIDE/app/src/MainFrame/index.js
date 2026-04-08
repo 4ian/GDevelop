@@ -134,6 +134,7 @@ import useMainFrameCommands from './MainFrameCommands';
 import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
+import { type CommandName } from '../CommandPalette/CommandsList';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
 import {
   type PreviewState,
@@ -1181,6 +1182,14 @@ const MainFrame = (props: Props): React.MixedElement => {
           );
           if (rawSettings) {
             applyProjectPreferences(rawSettings.preferences, preferences);
+            if (rawSettings.shortcuts) {
+              const shortcuts = rawSettings.shortcuts;
+              for (const key of Object.keys(shortcuts)) {
+                // $FlowFixMe[incompatible-call]
+                const commandName: CommandName = (key: any);
+                preferences.setShortcutForCommand(commandName, shortcuts[key]);
+              }
+            }
             setState(currentState => ({
               ...currentState,
               toolbarButtons: rawSettings.toolbarButtons || [],
@@ -4311,6 +4320,41 @@ const MainFrame = (props: Props): React.MixedElement => {
     [currentProject, hasUnsavedChanges, i18n, closeProject]
   );
 
+  const reloadProject = React.useCallback(
+    async (): Promise<void> => {
+      if (!currentProject || !currentFileMetadata) return;
+
+      if (hasUnsavedChanges) {
+        const answer = Window.showConfirmDialog(
+          i18n._(
+            t`Reload the project? Any changes that have not been saved will be lost.`
+          )
+        );
+        if (!answer) return;
+      }
+
+      const storageProviderName = getStorageProvider().internalName;
+      await openFromFileMetadataWithStorageProvider(
+        {
+          fileMetadata: currentFileMetadata,
+          storageProviderName,
+        },
+        {
+          ignoreUnsavedChanges: true,
+          ignoreAutoSave: true,
+        }
+      );
+    },
+    [
+      currentProject,
+      currentFileMetadata,
+      hasUnsavedChanges,
+      i18n,
+      getStorageProvider,
+      openFromFileMetadataWithStorageProvider,
+    ]
+  );
+
   const endTutorial = React.useCallback(
     async (shouldCloseProject?: boolean) => {
       if (shouldCloseProject) {
@@ -4805,6 +4849,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onCloseProject: async () => {
       askToCloseProject();
     },
+    onReloadProject: reloadProject,
     onExportGame: () => {
       openShareDialog('publish');
     },

@@ -69,7 +69,7 @@ const initialMosaicEditorNodes = {
 };
 
 export default class ResourcesEditor extends React.Component<Props, State> {
-  static contextType: React$Context<ConfirmState> = AlertContext;
+  static contextType: React.Context<ConfirmState> = AlertContext;
   // $FlowFixMe[missing-local-annot]
   static defaultProps = {
     setToolbar: () => {},

@@ -283,6 +283,13 @@ namespace gdjs {
           }
         }
 
+        // Collect linked object links after the objects
+        // (so that networkIds are assigned).
+        const linksManager =
+          gdjs.LinksManager.getManager(runtimeScene);
+        gameSaveState.layoutNetworkSyncDatas[index].linkedObjectLinks =
+          linksManager.getSerializedLinks();
+
         // Collect scene data after the objects:
         const shouldPersistSceneData = checkIfIsPersistedInProfiles(
           options.profileNames,
@@ -568,6 +575,16 @@ namespace gdjs {
               object.deleteFromScene();
             }
           }
+        }
+
+        // Restore linked object links after objects are created and updated.
+        if (layoutSyncData.linkedObjectLinks) {
+          const linksManager =
+            gdjs.LinksManager.getManager(runtimeScene);
+          linksManager.restoreSerializedLinks(
+            layoutSyncData.linkedObjectLinks,
+            runtimeScene
+          );
         }
 
         // Update the rest of the scene last.

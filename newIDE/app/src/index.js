@@ -1,6 +1,5 @@
 // @flow
 
-import { silenceBenignResizeObserverError } from './Utils/SilenceBenignResizeObserverError';
 import 'element-closest';
 // $FlowFixMe[missing-export]
 import React, { Component, type Element } from 'react';
@@ -18,11 +17,6 @@ import { loadScript } from './Utils/LoadScript';
 import { showErrorBox } from './UI/Messages/MessageBox';
 import VersionMetadata from './Version/VersionMetadata';
 import { getThemeWindowBackgroundColor } from './UI/Theme';
-
-// Silence the benign ResizeObserver loop error on the main window before any
-// other code runs (ES module hoisting guarantees the import above is resolved
-// first, so the listener is registered before react-error-overlay's handler).
-silenceBenignResizeObserverError(window);
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 

@@ -1,4 +1,5 @@
 // @flow
+
 import 'element-closest';
 // $FlowFixMe[missing-export]
 import React, { Component, type Element } from 'react';

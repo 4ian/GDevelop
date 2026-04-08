@@ -55,6 +55,7 @@ declare type GetNetworkSyncDataOptions = {
   syncAsyncTasks?: boolean;
   syncSceneVisualProps?: boolean;
   syncFullTileMaps?: boolean;
+  syncLinkedObjects?: boolean;
 };
 
 declare type UpdateFromNetworkSyncDataOptions = {
@@ -322,6 +323,7 @@ declare interface LayoutNetworkSyncData {
   };
   async?: AsyncTasksManagerNetworkSyncData;
   color?: integer;
+  linkedObjects?: Array<[string, string]>;
 }
 
 declare interface SceneStackSceneNetworkSyncData {

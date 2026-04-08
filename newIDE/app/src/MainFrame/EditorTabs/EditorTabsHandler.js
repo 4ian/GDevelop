@@ -248,6 +248,7 @@ export const popOutTab = (
 ): EditorTabsState => {
   let sourcePaneIdentifier: string | null = null;
   let editorTab: EditorTab | null = null;
+  let sourceTabIndex: number = -1;
 
   for (const paneIdentifier in state.panes) {
     if (paneIdentifier === 'external') continue;
@@ -256,6 +257,7 @@ export const popOutTab = (
     if (tabIndex !== -1) {
       sourcePaneIdentifier = paneIdentifier;
       editorTab = pane.editors[tabIndex];
+      sourceTabIndex = tabIndex;
       break;
     }
   }
@@ -289,7 +291,10 @@ export const popOutTab = (
   newPanes[sourcePaneIdentifier] = {
     ...sourcePane,
     editors: remainingEditors,
-    currentTab: newCurrentTabIndex === -1 ? 0 : newCurrentTabIndex,
+    currentTab:
+      newCurrentTabIndex === -1
+        ? Math.max(0, sourceTabIndex - 1)
+        : newCurrentTabIndex,
   };
 
   return {

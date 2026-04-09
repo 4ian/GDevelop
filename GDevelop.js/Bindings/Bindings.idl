@@ -912,6 +912,8 @@ interface gdObject {
     [Const, Ref] DOMString GetAssetStoreId();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
+    void SetResourcesPreloading([Const] DOMString value);
+    [Const, Ref] DOMString GetResourcesPreloading();
 
     [Ref] ObjectConfiguration GetConfiguration();
 

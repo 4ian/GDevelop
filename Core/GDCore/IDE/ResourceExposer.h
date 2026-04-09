@@ -5,6 +5,8 @@
  */
 #pragma once
 
+#include <functional>
+
 namespace gd {
 class Platform;
 class Project;
@@ -13,6 +15,7 @@ class EventsBasedObjectVariant;
 class EventsFunctionsExtension;
 class Effect;
 class Layout;
+class Object;
 } // namespace gd
 
 namespace gd {
@@ -47,9 +50,18 @@ public:
    *
    * It doesn't include resources used globally.
    */
-  static void ExposeLayoutResources(gd::Project &project,
-                                    gd::Layout &layout,
+  static void ExposeLayoutResources(gd::Project &project, gd::Layout &layout,
                                     gd::ArbitraryResourceWorker &worker);
+
+  /**
+   * @brief Expose the resources used in a given layout.
+   *
+   * It doesn't include resources used globally.
+   */
+  static void ExposeLayoutResources(
+      gd::Project &project, gd::Layout &layout,
+      gd::ArbitraryResourceWorker &worker,
+      std::function<bool(const gd::Object &)> &shouldCheckObject);
 
   /**
    * @brief Expose the resources used in a given events-based object variant.

@@ -578,7 +578,8 @@ void ExporterHelper::StripAndSerializeProjectData(
        layoutIndex++) {
     auto &layout = project.GetLayout(layoutIndex);
     auto sceneUsedResources = gd::SceneResourcesFinder::FindSceneResources(
-        project, layout);
+        project, layout,
+        /* ignoreObjectResourcePreloading= */ isInGameEdition);
     for (auto &&resourceName : projectUsedResources) {
       sceneUsedResources.erase(resourceName);
     }
@@ -619,7 +620,7 @@ void ExporterHelper::StripAndSerializeProjectData(
   gd::ProjectStripper::StripProjectForExport(project);
 
   project.SerializeTo(rootElement);
-  SerializeUsedResources(rootElement, projectUsedResources, scenesUsedResources,
+  SerializeUsedResources(project, rootElement, projectUsedResources, scenesUsedResources,
                          eventsBasedObjectVariantsUsedResources);
   if (isInGameEdition) {
     auto &behaviorsElement = rootElement.AddChild("activatedByDefaultInEditorBehaviors");
@@ -638,6 +639,7 @@ void ExporterHelper::StripAndSerializeProjectData(
 }
 
 void ExporterHelper::SerializeUsedResources(
+    gd::Project &project,
     gd::SerializerElement &rootElement,
     std::set<gd::String> &projectUsedResources,
     std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources,
@@ -663,8 +665,29 @@ void ExporterHelper::SerializeUsedResources(
     auto &layoutElement = layoutsElement.GetChild(layoutIndex);
     const auto layoutName = layoutElement.GetStringAttribute("name");
 
-    auto &layoutUsedResources = scenesUsedResources[layoutName];
-    serializeUsedResources(layoutElement, layoutUsedResources);
+    auto &sceneUsedResources = scenesUsedResources[layoutName];
+    serializeUsedResources(layoutElement, sceneUsedResources);
+
+    auto &scene = project.GetLayout(layoutName);
+    auto &objectsElement = layoutElement.GetChild("objects");
+    for (std::size_t objectIndex = 0;
+         objectIndex < objectsElement.GetChildrenCount(); objectIndex++) {
+      auto &objectElement = objectsElement.GetChild(objectIndex);
+      const auto objectName = objectElement.GetStringAttribute("name");
+
+      auto &object = scene.GetObjects().GetObject(objectName);
+      if (object.GetResourcesPreloading() == "manually") {
+        auto objectUsedResources =
+            gd::SceneResourcesFinder::FindObjectResources(project, object);
+        for (auto &&resourceName : projectUsedResources) {
+          objectUsedResources.erase(resourceName);
+        }
+        for (auto &&resourceName : sceneUsedResources) {
+          objectUsedResources.erase(resourceName);
+        }
+        serializeUsedResources(objectElement, objectUsedResources);
+      }
+    }
   }
 
   auto &extensionsElement = rootElement.GetChild("eventsFunctionsExtensions");

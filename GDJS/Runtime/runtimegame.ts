@@ -913,6 +913,39 @@ namespace gdjs {
     }
 
     /**
+     * Preload an object assets in background.
+     */
+    loadObjectAssets(objectName: string): void {
+      const currentScene = this._sceneStack.getCurrentScene();
+      if (!currentScene) {
+        return;
+      }
+      const objectData = currentScene._objects.get(objectName);
+      if (!objectData) {
+        return;
+      }
+      const usedResources = objectData.usedResources;
+      if (!usedResources) {
+        return;
+      }
+      this._resourcesLoader.loadObjectResources(objectName, usedResources);
+    }
+
+    /**
+     * @returns true when all the resources of the given object are loaded.
+     */
+    areObjectAssetsLoaded(objectName: string): boolean {
+      return this._resourcesLoader.areObjectAssetsReady(objectName);
+    }
+
+    /**
+     * Unload an object assets.
+     */
+    unloadObjectAssets(objectName: string): void {
+      this._resourcesLoader.unloadObjectResources(objectName);
+    }
+
+    /**
      * Preload a scene assets as soon as possible in background.
      */
     prioritizeLoadingOfScene(sceneName: string) {

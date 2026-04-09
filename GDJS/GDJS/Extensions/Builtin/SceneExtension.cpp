@@ -51,6 +51,12 @@ SceneExtension::SceneExtension() {
       "gdjs.evtTools.runtimeScene.getSceneLoadingProgress");
   GetAllExpressions()["SceneLoadingProgress"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.getSceneLoadingProgress");
+  GetAllActions()["LoadObjectAssets"].SetFunctionName(
+      "gdjs.evtTools.runtimeScene.loadObjectAssets");
+  GetAllActions()["UnloadObjectAssets"].SetFunctionName(
+      "gdjs.evtTools.runtimeScene.unloadObjectAssets");
+  GetAllConditions()["AreObjectAssetsLoaded"].SetFunctionName(
+      "gdjs.evtTools.runtimeScene.areObjectAssetsLoaded");
 
   StripUnimplementedInstructionsAndExpressions();
 }

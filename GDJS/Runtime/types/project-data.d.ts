@@ -38,6 +38,12 @@ declare type ObjectData = {
   behaviors: Array<BehaviorData & any>;
   /** The list of effects. */
   effects: Array<EffectData>;
+  /**
+   * The resources used by this object excluding the one already used by the
+   * scene and/or the project.
+   * This attribute is only set for objects that are preloaded manually.
+   */
+  usedResources?: ResourceReference[];
 };
 
 declare type GetNetworkSyncDataOptions = {

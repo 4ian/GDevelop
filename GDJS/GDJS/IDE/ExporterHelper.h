@@ -752,7 +752,8 @@ class ExporterHelper {
 
  private:
    static void
-   SerializeUsedResources(gd::SerializerElement &rootElement,
+   SerializeUsedResources(gd::Project &project,
+                          gd::SerializerElement &rootElement,
                           std::set<gd::String> &projectUsedResources,
                           std::unordered_map<gd::String, std::set<gd::String>>
                               &layersUsedResources,

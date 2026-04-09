@@ -5,7 +5,8 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('ResourceLoader');
-  const debugLogger = new gdjs.Logger('ResourceLoader - debug').enable(false);
+  // TODO add a condition before each log to avoid building the message for nothing.
+  const debugLogger = new gdjs.Logger('ResourceLoader - debug').enable(true);
 
   const addSearchParameterToUrl = (
     url: string,
@@ -107,6 +108,16 @@ namespace gdjs {
     errors: Array<PromiseError<T>>;
   };
 
+  type LoadingState = {
+    resourceNames: Array<string>;
+    /**
+     * - `'not-loaded'` Resources are not loaded.
+     * - `'loaded'` Resources are loaded but not parsed.
+     * - `'ready'` Resources are loaded and parsed.
+     */
+    status: 'not-loaded' | 'loaded' | 'ready';
+  };
+
   /**
    * Pre-load resources of any kind needed for a game or a scene.
    * @category Resources
@@ -129,17 +140,21 @@ namespace gdjs {
     /**
      * Resources and the loading state of each scene, indexed by scene name.
      */
-    private _sceneLoadingStates: Map<
-      string,
-      {
-        resourceNames: Array<string>;
-        status: 'not-loaded' | 'loaded' | 'ready';
-      }
-    > = new Map();
+    private _sceneLoadingStates = new Map<string, LoadingState>();
+    /**
+     * Resources and the loading state of each manually loaded object,
+     * indexed by object name.
+     */
+    private _objectLoadingStates = new Map<string, LoadingState>();
     /**
      * A queue of scenes whose resources are still to be pre-loaded.
      */
     private _sceneToLoadQueue: Array<SceneLoadingTask> =
+      new Array<SceneLoadingTask>();
+    /**
+     * A queue of objects whose resources are still to be pre-loaded.
+     */
+    private _objectToLoadQueue: Array<SceneLoadingTask> =
       new Array<SceneLoadingTask>();
     /**
      * The resource managers that actually download and remember downloaded
@@ -160,6 +175,7 @@ namespace gdjs {
      * The name of the scene for which resources are currently being loaded.
      */
     private currentLoadingSceneName: string = '';
+    private currentLoadingObjectName: string = '';
     /**
      * The progress, between 0 and 1, of the loading of the resource, for the
      * scene that is being loaded (see `currentLoadingSceneName`).
@@ -388,10 +404,19 @@ namespace gdjs {
           debugLogger.log(
             `Loading (but not processing) resources for scene ${task.sceneName}.`
           );
-          await this._doLoadSceneResources(
-            task.sceneName,
-            async (count, total) => task.onProgress(count, total)
-          );
+          const sceneState = this._sceneLoadingStates.get(task.sceneName);
+          if (sceneState) {
+            await this._doLoadResources(sceneState, async (count, total) =>
+              task.onProgress(count, total)
+            );
+          } else {
+            logger.warn(
+              'Can\'t load resource for unknown scene: "' +
+                task.sceneName +
+                '".'
+            );
+            return;
+          }
           debugLogger.log(
             `Done loading (but not processing) resources for scene ${task.sceneName}.`
           );
@@ -411,21 +436,13 @@ namespace gdjs {
       this.currentLoadingSceneName = '';
     }
 
-    private async _doLoadSceneResources(
-      sceneName: string,
+    private async _doLoadResources(
+      loadingState: LoadingState,
       onProgress?: (count: number, total: number) => Promise<void>
     ): Promise<void> {
-      const sceneState = this._sceneLoadingStates.get(sceneName);
-      if (!sceneState) {
-        logger.warn(
-          'Can\'t load resource for unknown scene: "' + sceneName + '".'
-        );
-        return;
-      }
-
       let loadedCount = 0;
       await ResourceLoader.processAndRetryIfNeededWithPromisePool(
-        sceneState.resourceNames,
+        loadingState.resourceNames,
         this._isLoadingInForeground
           ? ResourceLoader.maxForegroundConcurrency
           : ResourceLoader.maxBackgroundConcurrency,
@@ -439,12 +456,12 @@ namespace gdjs {
           await this._loadResource(resource);
           loadedCount++;
           this.currentSceneLoadingProgress =
-            loadedCount / sceneState.resourceNames.length;
+            loadedCount / loadingState.resourceNames.length;
           onProgress &&
-            (await onProgress(loadedCount, sceneState.resourceNames.length));
+            (await onProgress(loadedCount, loadingState.resourceNames.length));
         }
       );
-      sceneState.status = 'loaded';
+      loadingState.status = 'loaded';
     }
 
     private async _loadResource(resource: ResourceData): Promise<void> {
@@ -536,6 +553,103 @@ namespace gdjs {
     }
 
     /**
+     * Preload an object assets in background.
+     */
+    async loadObjectResources(
+      objectName: string,
+      usedResources: Array<ResourceReference>
+    ): Promise<void> {
+      debugLogger.log(
+        `Loading of resources for object ${objectName} was requested.`
+      );
+      const objectLoadingState = this._objectLoadingStates.get(objectName);
+      if (objectLoadingState) {
+        debugLogger.log(`Object ${objectName} is already loading or loaded.`);
+        return;
+      }
+      this._objectLoadingStates.set(objectName, {
+        resourceNames: usedResources.map((resource) => resource.name),
+        status: 'not-loaded',
+      });
+      const task = new SceneLoadingTask(objectName);
+      this._objectToLoadQueue.push(task);
+      this.loadAllObjectsInBackground();
+
+      return new Promise<void>((resolve, reject) => {
+        if (!task) {
+          this._isLoadingInForeground = false;
+          debugLogger.log(
+            `Loading of resources for object ${objectName} was immediately resolved.`
+          );
+          resolve();
+          return;
+        }
+        task.registerCallback(() => {
+          debugLogger.log(
+            `Loading of resources for object ${objectName} just finished.`
+          );
+          this._isLoadingInForeground = false;
+          resolve();
+        });
+      });
+    }
+
+    // TODO Extract a class to factorize scene and object loading.
+    async loadAllObjectsInBackground(): Promise<void> {
+      if (this.currentLoadingObjectName) {
+        return;
+      }
+
+      debugLogger.log('Loading all object resources, in background.');
+      while (this._objectToLoadQueue.length > 0) {
+        debugLogger.log(
+          `Still resources of ${this._objectToLoadQueue.length} object(s) to load: ${this._objectToLoadQueue.map((task) => task.sceneName).join(', ')}`
+        );
+        const task =
+          this._objectToLoadQueue[this._objectToLoadQueue.length - 1];
+        if (task === undefined) {
+          continue;
+        }
+        this.currentLoadingObjectName = task.sceneName;
+        if (!this.areObjectAssetsReady(task.sceneName)) {
+          debugLogger.log(
+            `Loading (but not processing) resources for object ${task.sceneName}.`
+          );
+          const loadingState = this._objectLoadingStates.get(task.sceneName);
+          if (loadingState) {
+            await this._doLoadResources(loadingState, async (count, total) =>
+              task.onProgress(count, total)
+            );
+            // TODO Parse the resources
+            loadingState.status = 'ready';
+          } else {
+            logger.warn(
+              'Can\'t load resource for unknown object: "' +
+                task.sceneName +
+                '".'
+            );
+            return;
+          }
+          debugLogger.log(
+            `Done loading (but not processing) resources for scene ${task.sceneName}.`
+          );
+
+          // A scene may have been moved last while awaiting resources to be
+          // downloaded (see _prioritizeScene).
+          this._objectToLoadQueue.splice(
+            this._objectToLoadQueue.findIndex((element) => element === task),
+            1
+          );
+          task.onFinish();
+        } else {
+          this._objectToLoadQueue.pop();
+        }
+      }
+      debugLogger.log(`Object resources loading finished.`);
+      this.currentLoadingObjectName = '';
+    }
+
+    /**
      * To be called when the game is disposed.
      * Dispose all the resource managers.
      */
@@ -560,36 +674,84 @@ namespace gdjs {
         `Unloading of resources for scene ${unloadedSceneName} was requested.`
       );
 
-      const sceneUniqueResourcesByKindMap =
-        this._getResourcesByKindOnlyUsedInUnloadedScene({
-          unloadedSceneName,
-          newSceneName,
-        });
-
-      for (const [kindResourceManager, resourceManager] of this
-        ._resourceManagersMap) {
-        const resources =
-          sceneUniqueResourcesByKindMap.get(kindResourceManager);
-        if (resources) {
-          debugLogger.log(
-            `Unloading of resources of kind ${kindResourceManager} for scene ${unloadedSceneName}: `,
-            resources.map((resource) => resource.name).join(', ')
-          );
-          for (const resource of resources) {
-            resourceManager.unloadResource(resource);
-          }
-        }
+      for (const resourceName of this._getResourcesOnlyUsedInUnloadedScene({
+        unloadedSceneName,
+        newSceneName,
+      })) {
+        this._unloadResource(resourceName);
       }
 
       debugLogger.log(
         `Unloading of resources for scene ${unloadedSceneName} finished.`
       );
 
+      this._objectLoadingStates.clear();
       const sceneState = this._sceneLoadingStates.get(unloadedSceneName);
       if (sceneState) {
         sceneState.status = 'not-loaded';
       }
       // TODO: mark the scene as unloaded so it's not automatically loaded again eagerly.
+    }
+
+    private _unloadResource(resourceName: string): void {
+      const resourceData = this._resources.get(resourceName);
+      if (resourceData) {
+        const resourceManager = this._resourceManagersMap.get(
+          resourceData.kind
+        );
+        if (resourceManager) {
+          debugLogger.log(
+            `Unloading of resources of kind ${resourceData.kind} : ${resourceName}`
+          );
+          resourceManager.unloadResource(resourceData);
+        }
+      }
+    }
+
+    /**
+     * Unload an object assets in background.
+     */
+    unloadObjectResources(objectName: string): void {
+      console.log(this._objectLoadingStates);
+      const objectLoadingState = this._objectLoadingStates.get(objectName);
+      if (!objectLoadingState || objectLoadingState.status !== 'ready') {
+        debugLogger.log(
+          `Can't unload of resources for object ${objectName} as it is not loaded.`
+        );
+        return;
+      }
+      const scene = this._runtimeGame._sceneStack.getCurrentScene();
+      if (!scene) {
+        return;
+      }
+      if (scene.getObjects(objectName).length > 0) {
+        // TOD Should all instances be automatically removed from the scene?
+        debugLogger.log(
+          `Can't unload of resources for object ${objectName} as it still have instances living in the scene.`
+        );
+        return;
+      }
+      debugLogger.log(
+        `Unloading of resources for object ${objectName} was requested.`
+      );
+      this._objectLoadingStates.delete(objectName);
+      for (const resourceName of objectLoadingState.resourceNames) {
+        let otherObjectNeedResource = false;
+        for (const otherObjectLoadingState of this._objectLoadingStates.values()) {
+          if (
+            otherObjectLoadingState.resourceNames.indexOf(resourceName) >= 0
+          ) {
+            otherObjectNeedResource = true;
+            break;
+          }
+        }
+        if (!otherObjectNeedResource) {
+          this._unloadResource(resourceName);
+        }
+      }
+      debugLogger.log(
+        `Unloading of resources for object ${objectName} finished.`
+      );
     }
 
     /**
@@ -598,14 +760,12 @@ namespace gdjs {
     unloadAllResources(): void {
       debugLogger.log(`Unloading of all resources was requested.`);
       for (const resource of this._resources.values()) {
-        const resourceManager = this._resourceManagersMap.get(resource.kind);
-        if (resourceManager) {
-          resourceManager.unloadResource(resource);
-        }
+        this._unloadResource(resource.name);
       }
       for (const sceneLoadingState of this._sceneLoadingStates.values()) {
         sceneLoadingState.status = 'not-loaded';
       }
+      this._objectLoadingStates.clear();
       debugLogger.log(`Unloading of all resources finished.`);
     }
 
@@ -694,6 +854,17 @@ namespace gdjs {
      */
     areSceneAssetsReady(sceneName: string): boolean {
       const sceneState = this._sceneLoadingStates.get(sceneName);
+      if (!sceneState) return false;
+
+      return sceneState.status === 'ready';
+    }
+
+    /**
+     * @returns true when all the resources of the given object are loaded and
+     * parsed.
+     */
+    areObjectAssetsReady(objectName: string): boolean {
+      const sceneState = this._objectLoadingStates.get(objectName);
       if (!sceneState) return false;
 
       return sceneState.status === 'ready';
@@ -852,17 +1023,17 @@ namespace gdjs {
      * Get the map of resources that are only used in the scene that is being unloaded,
      * and that are not used in any other loaded scene (or the scene that is coming next).
      */
-    private _getResourcesByKindOnlyUsedInUnloadedScene({
+    private _getResourcesOnlyUsedInUnloadedScene({
       unloadedSceneName,
       newSceneName,
     }: {
       unloadedSceneName: string;
       newSceneName: string | null;
-    }): Map<ResourceKind, ResourceData[]> {
+    }): Set<string> {
       const unloadedSceneState =
         this._sceneLoadingStates.get(unloadedSceneName);
       if (!unloadedSceneState) {
-        return new Map<ResourceKind, ResourceData[]>();
+        return new Set<string>();
       }
 
       // Construct the set of all resources to unload. These are the resources
@@ -871,6 +1042,11 @@ namespace gdjs {
       const resourceNamesToUnload = new Set<string>(
         unloadedSceneState.resourceNames
       );
+      for (const objectLoadingState of this._objectLoadingStates.values()) {
+        for (const resourceName of objectLoadingState.resourceNames) {
+          resourceNamesToUnload.add(resourceName);
+        }
+      }
       for (const [
         sceneName,
         sceneState,
@@ -882,27 +1058,12 @@ namespace gdjs {
           sceneState.status === 'loaded' ||
           sceneState.status === 'ready'
         ) {
-          sceneState.resourceNames.forEach((resourceName) => {
+          for (const resourceName of sceneState.resourceNames) {
             resourceNamesToUnload.delete(resourceName);
-          });
+          }
         }
       }
-
-      const result = new Map<ResourceKind, ResourceData[]>();
-      resourceNamesToUnload.forEach((resourceName) => {
-        const resourceData = this._resources.get(resourceName);
-        if (!resourceData) return;
-
-        const kind = resourceData.kind;
-        const resources = result.get(kind);
-        if (resources) {
-          resources.push(resourceData);
-        } else {
-          result.set(kind, [resourceData]);
-        }
-      });
-
-      return result;
+      return resourceNamesToUnload;
     }
 
     static processWithPromisePool<T, U>(

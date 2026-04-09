@@ -363,6 +363,36 @@ namespace gdjs {
       ): boolean => {
         return runtimeScene.getGame().areSceneAssetsLoaded(sceneName);
       };
+
+      /**
+       * Preload an object assets in background.
+       */
+      export const loadObjectAssets = (
+        runtimeScene: gdjs.RuntimeScene,
+        objectName: string
+      ): void => {
+        runtimeScene.getGame().loadObjectAssets(objectName);
+      };
+
+      /**
+       * Unload an object assets.
+       */
+      export const unloadObjectAssets = (
+        runtimeScene: gdjs.RuntimeScene,
+        objectName: string
+      ): void => {
+        runtimeScene.getGame().unloadObjectAssets(objectName);
+      };
+
+      /**
+       * Check if object assets have finished to load in background.
+       */
+      export const areObjectAssetsLoaded = (
+        runtimeScene: gdjs.RuntimeScene,
+        objectName: string
+      ): boolean => {
+        return runtimeScene.getGame().areObjectAssetsLoaded(objectName);
+      };
     }
   }
 }

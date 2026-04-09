@@ -134,7 +134,6 @@ import useMainFrameCommands from './MainFrameCommands';
 import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
-import { type CommandName } from '../CommandPalette/CommandsList';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
 import {
   type PreviewState,
@@ -1177,22 +1176,14 @@ const MainFrame = (props: Props): React.MixedElement => {
 
         // Read and apply project settings from gdevelop-settings.yaml if it exists
         try {
-          const rawSettings = await readProjectSettings(
+          const parsedProjectSettings = await readProjectSettings(
             updatedFileMetadata.fileIdentifier
           );
-          if (rawSettings) {
-            applyProjectPreferences(rawSettings.preferences, preferences);
-            if (rawSettings.shortcuts) {
-              const shortcuts = rawSettings.shortcuts;
-              for (const key of Object.keys(shortcuts)) {
-                // $FlowFixMe[incompatible-call]
-                const commandName: CommandName = (key: any);
-                preferences.setShortcutForCommand(commandName, shortcuts[key]);
-              }
-            }
+          if (parsedProjectSettings) {
+            applyProjectPreferences(parsedProjectSettings, preferences);
             setState(currentState => ({
               ...currentState,
-              toolbarButtons: rawSettings.toolbarButtons || [],
+              toolbarButtons: parsedProjectSettings.toolbarButtons || [],
             }));
           }
         } catch (error) {

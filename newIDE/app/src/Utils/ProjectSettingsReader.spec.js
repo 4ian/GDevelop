@@ -76,14 +76,17 @@ preferences:
       // Step 4: Apply to preferences via setMultipleValues
       // $FlowFixMe[underconstrained-implicit-instantiation]
       const mockSetMultipleValues = jest.fn();
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const mockSetShortcutForCommand = jest.fn();
       // $FlowFixMe[incompatible-type] - partial mock
       const mockPreferences: Preferences = {
         // $FlowFixMe[incompatible-type] - partial mock
         values: {},
         setMultipleValues: mockSetMultipleValues,
+        setShortcutForCommand: mockSetShortcutForCommand,
       };
 
-      applyProjectPreferences(rawPreferences, mockPreferences);
+      applyProjectPreferences({ preferences: rawPreferences }, mockPreferences);
 
       expect(mockSetMultipleValues).toHaveBeenCalledWith({
         autosaveOnPreview: true,
@@ -97,6 +100,41 @@ preferences:
         eventsSheetZoomLevel: 1.5,
         eventsSheetIndentScale: 2,
       });
+    });
+
+    test('shortcuts from gdevelop-settings.yaml are properly applied to preferences', () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const mockSetMultipleValues = jest.fn();
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const mockSetShortcutForCommand = jest.fn();
+      // $FlowFixMe[incompatible-type] - partial mock
+      const mockPreferences: Preferences = {
+        // $FlowFixMe[incompatible-type] - partial mock
+        values: {},
+        setMultipleValues: mockSetMultipleValues,
+        setShortcutForCommand: mockSetShortcutForCommand,
+      };
+
+      applyProjectPreferences(
+        {
+          shortcuts: {
+            RELOAD_PROJECT: 'CmdOrCtrl+Shift+R',
+            OPEN_PROJECT_PROPERTIES: 'CmdOrCtrl+Shift+P',
+          },
+        },
+        mockPreferences
+      );
+
+      expect(mockSetShortcutForCommand).toHaveBeenCalledTimes(2);
+      expect(mockSetShortcutForCommand).toHaveBeenCalledWith(
+        'RELOAD_PROJECT',
+        'CmdOrCtrl+Shift+R'
+      );
+      expect(mockSetShortcutForCommand).toHaveBeenCalledWith(
+        'OPEN_PROJECT_PROPERTIES',
+        'CmdOrCtrl+Shift+P'
+      );
+      expect(mockSetMultipleValues).not.toHaveBeenCalled();
     });
 
     test('readProjectSettings would return null when preferences section is missing', () => {

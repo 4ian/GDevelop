@@ -1176,14 +1176,14 @@ const MainFrame = (props: Props): React.MixedElement => {
 
         // Read and apply project settings from gdevelop-settings.yaml if it exists
         try {
-          const rawSettings = await readProjectSettings(
+          const parsedProjectSettings = await readProjectSettings(
             updatedFileMetadata.fileIdentifier
           );
-          if (rawSettings) {
-            applyProjectPreferences(rawSettings.preferences, preferences);
+          if (parsedProjectSettings) {
+            applyProjectPreferences(parsedProjectSettings, preferences);
             setState(currentState => ({
               ...currentState,
-              toolbarButtons: rawSettings.toolbarButtons || [],
+              toolbarButtons: parsedProjectSettings.toolbarButtons || [],
             }));
           }
         } catch (error) {
@@ -4311,6 +4311,41 @@ const MainFrame = (props: Props): React.MixedElement => {
     [currentProject, hasUnsavedChanges, i18n, closeProject]
   );
 
+  const reloadProject = React.useCallback(
+    async (): Promise<void> => {
+      if (!currentProject || !currentFileMetadata) return;
+
+      if (hasUnsavedChanges) {
+        const answer = Window.showConfirmDialog(
+          i18n._(
+            t`Reload the project? Any changes that have not been saved will be lost.`
+          )
+        );
+        if (!answer) return;
+      }
+
+      const storageProviderName = getStorageProvider().internalName;
+      await openFromFileMetadataWithStorageProvider(
+        {
+          fileMetadata: currentFileMetadata,
+          storageProviderName,
+        },
+        {
+          ignoreUnsavedChanges: true,
+          ignoreAutoSave: true,
+        }
+      );
+    },
+    [
+      currentProject,
+      currentFileMetadata,
+      hasUnsavedChanges,
+      i18n,
+      getStorageProvider,
+      openFromFileMetadataWithStorageProvider,
+    ]
+  );
+
   const endTutorial = React.useCallback(
     async (shouldCloseProject?: boolean) => {
       if (shouldCloseProject) {
@@ -4805,6 +4840,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onCloseProject: async () => {
       askToCloseProject();
     },
+    onReloadProject: reloadProject,
     onExportGame: () => {
       openShareDialog('publish');
     },

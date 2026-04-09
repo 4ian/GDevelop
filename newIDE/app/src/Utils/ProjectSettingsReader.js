@@ -11,6 +11,7 @@ const path = optionalRequire('path');
 export type ParsedProjectSettings = {
   preferences?: { [string]: boolean | string | number },
   toolbarButtons?: Array<ToolbarButtonConfig>,
+  shortcuts?: { [string]: string },
 };
 
 const SETTINGS_FILE_NAME = 'gdevelop-settings.yaml';
@@ -126,10 +127,27 @@ export const readProjectSettings = async (
       }
     }
 
+    // Parse shortcuts section
+    const rawShortcuts = SafeExtractor.extractObjectProperty(
+      parsed,
+      'shortcuts'
+    );
+    const shortcuts: { [string]: string } = {};
+    if (rawShortcuts) {
+      for (const key of Object.keys(rawShortcuts)) {
+        const value = SafeExtractor.extractStringProperty(rawShortcuts, key);
+        if (value !== null) {
+          shortcuts[key] = value;
+        }
+      }
+    }
+
     console.info(
       `[ProjectSettingsReader] Loaded: ${
         Object.keys(preferences).length
-      } preferences, ${toolbarButtons.length} buttons`
+      } preferences, ${toolbarButtons.length} buttons, ${
+        Object.keys(shortcuts).length
+      } shortcuts`
     );
 
     const result: ParsedProjectSettings = {};
@@ -138,6 +156,9 @@ export const readProjectSettings = async (
     }
     if (toolbarButtons.length > 0) {
       result.toolbarButtons = toolbarButtons;
+    }
+    if (Object.keys(shortcuts).length > 0) {
+      result.shortcuts = shortcuts;
     }
     return result;
   } catch (error) {

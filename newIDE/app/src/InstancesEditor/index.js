@@ -694,17 +694,27 @@ export default class InstancesEditor extends Component<Props, State> {
       // to ensure the WebGL state is clean and avoid crashes when resizing renderers
       // (PixiJS's resize triggers internal shader uniform syncing,
       // which will crash if Three.js's stale program is still active).
-      if (this.threeRenderer) {
-        this.threeRenderer.resetState();
+      // Wrap in try/catch: resize can run while resources are being reloaded
+      // (textures disposed), and interacting with PixiJS/Three.js state in that
+      // window could crash. A failed resize is recoverable on the next frame.
+      try {
+        if (this.threeRenderer) {
+          this.threeRenderer.resetState();
 
-        // Actually do not reset PixiJS renderer as we get crashes when doing it
-        // ("Cannot read properties of null (reading '_batchEnabled')").
-        // this.pixiRenderer.reset();
-      }
+          // Actually do not reset PixiJS renderer as we get crashes when doing it
+          // ("Cannot read properties of null (reading '_batchEnabled')").
+          // this.pixiRenderer.reset();
+        }
 
-      this.pixiRenderer.resize(width, height);
-      if (this.threeRenderer) {
-        this.threeRenderer.setSize(width, height);
+        this.pixiRenderer.resize(width, height);
+        if (this.threeRenderer) {
+          this.threeRenderer.setSize(width, height);
+        }
+      } catch (error) {
+        console.error(
+          'Error while resizing the renderers, will be retried on next frame:',
+          error
+        );
       }
       this.viewPosition.resize(width, height);
       this.statusBar.resize(width, height);

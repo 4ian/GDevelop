@@ -763,22 +763,22 @@
     "instruction-parameter": {
       "base": {
         "color": {
-          "value": "#B2BCD7"
+          "value": "#9AA5CE"
         }
       },
       "number": {
         "color": {
-          "value": "#95C6FF"
+          "value": "#8AD6FF"
         }
       },
       "object": {
         "color": {
-          "value": "#C9B6FC"
+          "value": "#A483FF"
         }
       },
       "behavior": {
         "color": {
-          "value": "#42F0AE"
+          "value": "#8BED1C"
         }
       },
       "operator": {
@@ -788,7 +788,7 @@
       },
       "var": {
         "color": {
-          "value": "#CBE500"
+          "value": "#E2E225"
         }
       },
       "error": {

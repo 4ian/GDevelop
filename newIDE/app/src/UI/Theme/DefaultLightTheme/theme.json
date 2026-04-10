@@ -761,32 +761,32 @@
     "instruction-parameter": {
       "base": {
         "color": {
-          "value": "#687085"
+          "value": "#5D689B"
         }
       },
       "number": {
         "color": {
-          "value": "#006DEE"
+          "value": "#046ACA"
         }
       },
       "object": {
         "color": {
-          "value": "#7046EC"
+          "value": "#7742F8"
         }
       },
       "behavior": {
         "color": {
-          "value": "#00AB6A"
+          "value": "#027C2A"
         }
       },
       "operator": {
         "color": {
-          "value": "#FF1ADD"
+          "value": "#C112A8"
         }
       },
       "var": {
         "color": {
-          "value": "#CC9200"
+          "value": "#7D6925"
         }
       },
       "error": {

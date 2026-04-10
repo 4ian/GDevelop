@@ -708,7 +708,7 @@
     },
     "conditions": {
       "background-color": {
-        "value": "#f1f2f2"
+        "value": "#EBEBED"
       },
       "border-color": {
         "value": "#e2e2e2"
@@ -738,7 +738,7 @@
     },
     "actions": {
       "background-color": {
-        "value": "#FFFFFF"
+        "value": "#FAFAFA"
       },
       "color": {
         "value": "black"

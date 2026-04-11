@@ -78,9 +78,7 @@ import {
   useProcessFunctionCalls,
   useActivateSubAgents,
   useRefreshLimits,
-  AI_AGENT_TOOLS_VERSION,
-  AI_CHAT_TOOLS_VERSION,
-  AI_ORCHESTRATOR_TOOLS_VERSION,
+  getToolsVersionForAiRequestMode,
 } from './Utils';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
@@ -533,12 +531,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 fileMetadata,
                 storageProviderName,
                 mode,
-                toolsVersion:
-                  mode === 'agent'
-                    ? AI_AGENT_TOOLS_VERSION
-                    : mode === 'orchestrator'
-                    ? AI_ORCHESTRATOR_TOOLS_VERSION
-                    : AI_CHAT_TOOLS_VERSION,
+                toolsVersion: getToolsVersionForAiRequestMode(mode),
                 aiConfiguration: {
                   presetId: aiConfigurationPresetId,
                 },
@@ -765,15 +758,11 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 userMessage,
                 paused:
                   hasJustInitializedProject && modeForThisMessage === 'agent',
+                //  These are defined only if there is a mode change:
                 mode,
-                toolsVersion:
-                  mode === 'agent'
-                    ? AI_AGENT_TOOLS_VERSION
-                    : mode === 'orchestrator'
-                    ? AI_ORCHESTRATOR_TOOLS_VERSION
-                    : mode === 'chat'
-                    ? AI_CHAT_TOOLS_VERSION
-                    : undefined,
+                toolsVersion: mode
+                  ? getToolsVersionForAiRequestMode(mode)
+                  : undefined,
               })
             );
             updateAiRequest(aiRequest.id, () => aiRequest);

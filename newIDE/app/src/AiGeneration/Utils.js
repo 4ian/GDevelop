@@ -90,7 +90,28 @@ export const useRefreshLimits = (
 
 export const AI_AGENT_TOOLS_VERSION = 'v8';
 export const AI_CHAT_TOOLS_VERSION = 'v8';
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v1';
+export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v3';
+export const AI_AGENT_EXPLORER_TOOLS_VERSION = 'v3'; // TODO: useless?
+export const AI_AGENT_EDIT_TOOLS_VERSION = 'v3';
+
+export const getToolsVersionForAiRequestMode = (mode: string): string => {
+  switch (mode) {
+    case 'agent':
+      return AI_AGENT_TOOLS_VERSION;
+    case 'chat':
+      return AI_CHAT_TOOLS_VERSION;
+    case 'orchestrator':
+      return AI_ORCHESTRATOR_TOOLS_VERSION;
+    case 'agent-explorer':
+      return AI_AGENT_EXPLORER_TOOLS_VERSION;
+    case 'agent-edit':
+      return AI_AGENT_EDIT_TOOLS_VERSION;
+    default:
+      throw new Error(
+        `Unknown AI request mode: ${mode} - unable to get tools version.`
+      );
+  }
+};
 
 export const useProcessFunctionCalls = ({
   i18n,

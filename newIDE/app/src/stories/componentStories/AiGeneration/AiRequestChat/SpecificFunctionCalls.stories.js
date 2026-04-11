@@ -209,6 +209,73 @@ const fakeSubAgentAiRequest = {
   ],
 };
 
+const fakeSubAgentAiRequestWithText = {
+  id: 'fake-sub-agent-request-id',
+  createdAt: '',
+  updatedAt: '',
+  userId: 'fake-user-id',
+  mode: 'agent',
+  status: 'ready',
+  gameProjectJson: null,
+  error: null,
+  output: [
+    {
+      type: 'message',
+      status: 'completed',
+      role: 'assistant',
+      content: [
+        {
+          type: 'output_text',
+          status: 'completed',
+          text:
+            "I'll start by creating the Enemy object and then add the necessary events to handle its behavior.",
+          annotations: [],
+        },
+        {
+          type: 'function_call',
+          status: 'completed',
+          call_id: 'sub_tool_0_create_object',
+          name: 'create_or_replace_object',
+          arguments:
+            '{"object_name":"Enemy","object_type":"Sprite","scene_name":"Level1"}',
+        },
+      ],
+    },
+    {
+      type: 'function_call_output',
+      call_id: 'sub_tool_0_create_object',
+      output: '{"success":true}',
+    },
+    {
+      type: 'message',
+      status: 'completed',
+      role: 'assistant',
+      content: [
+        {
+          type: 'output_text',
+          status: 'completed',
+          text:
+            "The Enemy object has been created. Now I'll add the events to delete it when it falls off screen. This will use the Y position check to determine when the enemy has gone below the visible area.",
+          annotations: [],
+        },
+        {
+          type: 'function_call',
+          status: 'completed',
+          call_id: 'sub_tool_1_add_scene_events',
+          name: 'add_scene_events',
+          arguments:
+            '{"objects_list":"Enemy","events_description":"When Enemy falls off screen, delete it","extension_names_list":"Sprite","scene_name":"Level1"}',
+        },
+      ],
+    },
+    {
+      type: 'function_call_output',
+      call_id: 'sub_tool_1_add_scene_events',
+      output: '{"success":true}',
+    },
+  ],
+};
+
 const subAgentFunctionCallMessage = {
   type: 'message',
   status: 'completed',
@@ -307,6 +374,80 @@ export const subAgentFunctionCallFinished = (): React.Node => (
           output: '{"success":true}',
         },
       ],
+      error: null,
+    }}
+  />
+);
+
+export const subAgentFunctionCallWithTextFinished = (): React.Node => (
+  <WrappedChatComponentWithSubAgent
+    subAgentAiRequest={fakeSubAgentAiRequestWithText}
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-orchestrator-request',
+      mode: 'orchestrator',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: [
+        userRequestMessage,
+        subAgentFunctionCallMessage,
+        {
+          type: 'function_call_output',
+          call_id: 'tool_0_run_project_edit_agent',
+          output: '{"success":true}',
+        },
+      ],
+      error: null,
+    }}
+  />
+);
+
+export const subAgentFunctionCallWithTextWorking = (): React.Node => (
+  <WrappedChatComponentWithSubAgent
+    subAgentAiRequest={{
+      ...fakeSubAgentAiRequestWithText,
+      status: 'working',
+      output: [
+        {
+          type: 'message',
+          status: 'completed',
+          role: 'assistant',
+          content: [
+            {
+              type: 'output_text',
+              status: 'completed',
+              text:
+                "I'll start by creating the Enemy object and then add the necessary events to handle its behavior.",
+              annotations: [],
+            },
+            {
+              type: 'function_call',
+              status: 'completed',
+              call_id: 'sub_tool_0_create_object',
+              name: 'create_or_replace_object',
+              arguments:
+                '{"object_name":"Enemy","object_type":"Sprite","scene_name":"Level1"}',
+            },
+          ],
+        },
+        {
+          type: 'function_call_output',
+          call_id: 'sub_tool_0_create_object',
+          output: '{"success":true}',
+        },
+      ],
+    }}
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-orchestrator-request',
+      mode: 'orchestrator',
+      status: 'working',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: [userRequestMessage, subAgentFunctionCallMessage],
       error: null,
     }}
   />

@@ -610,14 +610,14 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           createdSceneNames,
           createdProject,
           editorFunctionCallResults,
-          mode,
+          newMode,
         }: {|
           aiRequestId: string,
           userMessage: string,
           createdSceneNames?: Array<string>,
           createdProject?: ?gdProject,
           editorFunctionCallResults: Array<EditorFunctionCallResult>,
-          mode?: 'chat' | 'agent' | 'orchestrator',
+          newMode?: 'chat' | 'agent' | 'orchestrator',
         |}) => {
           if (!profile) return;
 
@@ -737,7 +737,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             }
 
             const modeForThisMessage =
-              mode || aiRequestForMessage.mode || 'chat';
+              newMode || aiRequestForMessage.mode || 'chat';
 
             const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
               addMessageToAiRequest(getAuthorizationHeader, {
@@ -759,9 +759,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 paused:
                   hasJustInitializedProject && modeForThisMessage === 'agent',
                 //  These are defined only if there is a mode change:
-                mode,
-                toolsVersion: mode
-                  ? getToolsVersionForAiRequestMode(mode)
+                mode: newMode,
+                toolsVersion: newMode
+                  ? getToolsVersionForAiRequestMode(newMode)
                   : undefined,
               })
             );
@@ -1400,7 +1400,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                   await onSendMessage({
                     aiRequestId: selectedAiRequestId,
                     userMessage,
-                    mode,
+                    newMode: mode,
                     editorFunctionCallResults: selectedAiRequest
                       ? getEditorFunctionCallResults(selectedAiRequest.id) || []
                       : [],

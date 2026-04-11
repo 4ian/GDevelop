@@ -507,7 +507,6 @@ export const AskAiStandAloneForm = ({
       refreshLimits,
     ]
   );
-  useActivateSubAgents({ selectedAiRequest: aiRequestForForm });
 
   const onSendEditorFunctionCallResults = React.useCallback(
     async (
@@ -530,21 +529,8 @@ export const AskAiStandAloneForm = ({
   );
 
   const aiRequestsToProcess = React.useMemo(
-    () => {
-      const result = [];
-      if (aiRequestForForm) {
-        result.push(aiRequestForForm);
-      }
-      const subAgentIds = Object.keys(activeSubAgents);
-      for (const subAgentId of subAgentIds) {
-        const subAgentRequest = aiRequests[subAgentId];
-        if (subAgentRequest) {
-          result.push(subAgentRequest);
-        }
-      }
-      return result;
-    },
-    [aiRequestForForm, activeSubAgents, aiRequests]
+    () => (aiRequestForForm ? [aiRequestForForm] : []),
+    [aiRequestForForm]
   );
 
   const { onProcessFunctionCalls } = useProcessFunctionCalls({

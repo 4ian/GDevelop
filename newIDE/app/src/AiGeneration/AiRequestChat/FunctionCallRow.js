@@ -251,6 +251,20 @@ const EditorFunctionCallRow = ({
   );
 };
 
+type SubAgentItem =
+  | {|
+      type: 'function_call',
+      key: string,
+      messageContent: AiRequestMessageAssistantFunctionCall,
+      existingFunctionCallOutput: AiRequestFunctionCallOutput | null,
+      editorFunctionCallResult: EditorFunctionCallResult | null,
+    |}
+  | {|
+      type: 'text',
+      key: string,
+      text: string,
+    |};
+
 const SubAgentFunctionCallRow = ({
   project,
   functionCall,
@@ -311,32 +325,56 @@ const SubAgentFunctionCallRow = ({
     }
   }
 
-  // Build function call items for the sub-agent's own function calls.
-  const subAgentFunctionCallItems = React.useMemo(
+  // Build items (function calls and text) for the sub-agent's output, in order.
+  const subAgentItems: Array<SubAgentItem> = React.useMemo(
     () => {
-      if (!subAgentRequest) return ([]: Array<any>);
+      if (!subAgentRequest) return ([]: Array<SubAgentItem>);
 
       const functionCallOutputMap = getFunctionCallToFunctionCallOutputMap({
         aiRequest: subAgentRequest,
       });
       const subAgentResults = getEditorFunctionCallResults(subAgentAiRequestId);
 
-      const items = [];
-      for (const [fc, output] of functionCallOutputMap) {
-        // Skip sub-agent-within-sub-agent or plan function calls.
-        if (fc.subAgentAiRequestId || fc.name === 'create_or_update_plan')
-          continue;
+      const items: Array<SubAgentItem> = [];
+      const output = subAgentRequest.output || [];
+      let itemIndex = 0;
+      for (let i = 0; i < output.length; i++) {
+        const message = output[i];
+        if (message.type === 'message' && message.role === 'assistant') {
+          for (const content of message.content) {
+            if (content.type === 'function_call') {
+              // Skip sub-agent-within-sub-agent or plan function calls.
+              if (
+                content.subAgentAiRequestId ||
+                content.name === 'create_or_update_plan'
+              )
+                continue;
 
-        const editorResult =
-          (subAgentResults &&
-            subAgentResults.find(r => r.call_id === fc.call_id)) ||
-          null;
-        items.push({
-          key: `sub-${subAgentAiRequestId}-${fc.call_id}`,
-          messageContent: fc,
-          existingFunctionCallOutput: output,
-          editorFunctionCallResult: editorResult,
-        });
+              const fcOutput = functionCallOutputMap.get(content) || null;
+              const editorResult =
+                (subAgentResults &&
+                  subAgentResults.find(r => r.call_id === content.call_id)) ||
+                null;
+              items.push({
+                type: 'function_call',
+                key: `sub-${subAgentAiRequestId}-${content.call_id}`,
+                messageContent: content,
+                existingFunctionCallOutput: fcOutput,
+                editorFunctionCallResult: editorResult,
+              });
+            } else if (content.type === 'output_text') {
+              const trimmedText = content.text.trim();
+              if (trimmedText) {
+                items.push({
+                  type: 'text',
+                  key: `sub-${subAgentAiRequestId}-text-${itemIndex}`,
+                  text: trimmedText,
+                });
+              }
+            }
+            itemIndex++;
+          }
+        }
       }
       return items;
     },
@@ -392,28 +430,73 @@ const SubAgentFunctionCallRow = ({
           </div>
         </div>
       </div>
-      {showDetails && subAgentFunctionCallItems.length > 0 && (
+      {showDetails && subAgentItems.length > 0 && (
         <div className={classes.detailsContent}>
-          {subAgentFunctionCallItems.map(
-            ({
-              key,
-              messageContent,
-              existingFunctionCallOutput: subOutput,
-              editorFunctionCallResult,
-            }) => (
+          {subAgentItems.map(item =>
+            item.type === 'function_call' ? (
               <EditorFunctionCallRow
                 project={project}
-                key={key}
+                key={item.key}
                 onProcessFunctionCalls={onProcessFunctionCalls}
-                functionCall={messageContent}
-                editorFunctionCallResult={editorFunctionCallResult}
-                existingFunctionCallOutput={subOutput}
+                functionCall={item.messageContent}
+                editorFunctionCallResult={item.editorFunctionCallResult}
+                existingFunctionCallOutput={item.existingFunctionCallOutput}
                 editorCallbacks={editorCallbacks}
               />
+            ) : (
+              <SubAgentTextRow key={item.key} text={item.text} />
             )
           )}
         </div>
       )}
+    </div>
+  );
+};
+
+const SubAgentTextRow = ({ text }: {| text: string |}) => {
+  const [showDetails, setShowDetails] = React.useState(false);
+
+  const firstLine = text.split('\n')[0];
+  const truncatedLabel =
+    firstLine.length > 80 ? firstLine.substring(0, 80) + '...' : firstLine;
+
+  const toggle = () => setShowDetails(v => !v);
+
+  return (
+    <div className={classes.functionCallContainer}>
+      <div className={classes.functionCallRow}>
+        <span className={classes.statusIconContainer} />
+        <div
+          className={`${classes.functionCallTextArea} ${
+            classes.functionCallTextAreaClickable
+          }`}
+          onClick={toggle}
+          role="button"
+          tabIndex={0}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              toggle();
+            }
+          }}
+        >
+          <Text
+            size="body-small"
+            color="secondary"
+            // $FlowFixMe[incompatible-type]
+            style={styles.functionCallText}
+          >
+            {showDetails ? text : truncatedLabel}
+          </Text>
+          <div className={classes.chevron}>
+            {showDetails ? (
+              <ChevronArrowBottom fontSize="small" />
+            ) : (
+              <ChevronArrowRight fontSize="small" />
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

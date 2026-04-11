@@ -155,20 +155,8 @@ export const openEditorTab = (
       editor => editor.key === key
     );
     if (existingEditorId !== -1) {
-      // If the tab is in the external pane, pop it back in first.
-      if (statePaneIdentifier === 'external') {
-        const editorTab = pane.editors[existingEditorId];
-        const returnState = popInTab(state, editorTab.key);
-        const originalPane = editorTab.originalPaneIdentifier || paneIdentifier;
-        const returnPaneEditors = returnState.panes[originalPane].editors;
-        const returnedTabIndex = findIndex(
-          returnPaneEditors,
-          editor => editor.key === key
-        );
-        return dontFocusTab
-          ? returnState
-          : changeCurrentTab(returnState, originalPane, returnedTabIndex);
-      }
+      // If the tab is already open (including in an external/popped-out window),
+      // don't re-open or move it — just focus it in its current pane.
       return dontFocusTab
         ? { ...state }
         : changeCurrentTab(state, statePaneIdentifier, existingEditorId);

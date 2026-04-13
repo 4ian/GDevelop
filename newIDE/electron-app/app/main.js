@@ -127,6 +127,10 @@ app.on('window-all-closed', function() {
   app.quit();
 });
 
+// Maps target (from window.open) to BrowserWindow ID for child windows.
+// This is used to target the correct BrowserWindow for IPC messages.
+const windowTargetIdToBrowserWindowIds = new Map();
+
 // Function to create a new GDevelop window
 function createNewWindow(windowArgs = args) {
   const isIntegrated = windowArgs.mode === 'integrated';
@@ -261,11 +265,85 @@ function createNewWindow(windowArgs = args) {
     }
   });
 
-  // Prevent opening any website or url inside Electron
+  // Allow blank-URL pop-out windows (used by WindowPortal for editor pop-outs),
+  // but open all other URLs in the external browser.
   newWindow.webContents.setWindowOpenHandler(details => {
+    if (details.frameName.startsWith('GDevelopWindowPortal')) {
+      // Extract the theme background color passed via the features string
+      // by WindowPortal (e.g. "...,themeBackgroundColor=%23282828").
+      let backgroundColor = '#000';
+      const match = details.features.match(
+        /themeBackgroundColor=([^,]*)/
+      );
+      if (match) {
+        try {
+          backgroundColor = decodeURIComponent(match[1]);
+        } catch (e) {}
+      }
+
+      return {
+        action: 'allow',
+        overrideBrowserWindowOptions: {
+          // Use hidden title bar with overlay controls, like the main window,
+          // so that ToolbarTitlebar can provide safe margins for window controls.
+          titleBarStyle: 'hidden',
+          titleBarOverlay: {
+            color: '#000000',
+            symbolColor: '#ffffff',
+          },
+          trafficLightPosition: { x: 12, y: 12 },
+          backgroundColor,
+          webPreferences: {
+            // No need for Node.js integration or disabled context isolation, because
+            // popped-out windows are driven by React portals and don't do any Node operations.
+            // Still keep webSecurity enabled to allow local file access.
+            // nodeIntegration: true,
+            // contextIsolation: false,
+            webSecurity: false,
+          },
+        },
+      };
+    }
+
     console.info('Opening in browser (because of new window): ', details.url);
     electron.shell.openExternal(details.url);
     return { action: 'deny' };
+  });
+
+  // When a child window is created (e.g. a popped-out editor), set up security
+  // policies and enable @electron/remote on it.
+  newWindow.webContents.on('did-create-window', (childWindow, details) => {
+    require('@electron/remote/main').enable(childWindow.webContents);
+
+    if (!details.frameName || !details.frameName.startsWith('GDevelopWindowPortal')) {
+      console.warn(`Unexpected frameName for child window: ${details.frameName} - verify handling on Electron side.`);
+    }
+
+    // Track child window by frameName so the renderer can look up its
+    // BrowserWindow ID (needed for titlebar overlay IPC targeting).
+    if (details.frameName) {
+      windowTargetIdToBrowserWindowIds.set(details.frameName, childWindow.id);
+      childWindow.on('closed', () => {
+        windowTargetIdToBrowserWindowIds.delete(details.frameName);
+      });
+    }
+
+    // Remove the menu bar from popped-out editor windows.
+    childWindow.setMenu(null);
+
+    // Prevent navigation inside child windows.
+    childWindow.webContents.on('will-navigate', (e, url) => {
+      if (url !== childWindow.webContents.getURL()) {
+        e.preventDefault();
+        electron.shell.openExternal(url);
+      }
+    });
+
+    // Block further nesting of new windows from pop-outs.
+    childWindow.webContents.setWindowOpenHandler(childDetails => {
+      electron.shell.openExternal(childDetails.url);
+      return { action: 'deny' };
+    });
   });
 
   return newWindow;
@@ -403,8 +481,17 @@ app.on('ready', function() {
   // Titlebar handling:
   ipcMain.handle(
     'titlebar-set-overlay-options',
-    async (event, overlayOptions) => {
-      const window = BrowserWindow.fromWebContents(event.sender);
+    async (event, overlayOptions, optionalTargetId) => {
+      // When a optionalTargetId is provided, resolve it to the child BrowserWindow
+      // (needed for popped-out editor windows, where event.sender is always
+      // the main window's webContents). Otherwise, use event.sender.
+      let window;
+      if (optionalTargetId) {
+        const windowId = windowTargetIdToBrowserWindowIds.get(optionalTargetId);
+        window = windowId != null ? BrowserWindow.fromId(windowId) : null;
+      } else {
+        window = BrowserWindow.fromWebContents(event.sender);
+      }
       if (!window) return;
 
       // setTitleBarOverlay seems not defined on macOS.

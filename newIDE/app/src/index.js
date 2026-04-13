@@ -1,4 +1,5 @@
 // @flow
+
 import 'element-closest';
 // $FlowFixMe[missing-export]
 import React, { Component, type Element } from 'react';
@@ -15,8 +16,7 @@ import optionalRequire from './Utils/OptionalRequire';
 import { loadScript } from './Utils/LoadScript';
 import { showErrorBox } from './UI/Messages/MessageBox';
 import VersionMetadata from './Version/VersionMetadata';
-import { loadPreferencesFromLocalStorage } from './MainFrame/Preferences/PreferencesProvider';
-import { getFullTheme } from './UI/Theme';
+import { getThemeWindowBackgroundColor } from './UI/Theme';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -32,22 +32,8 @@ global.process = global.process || {
 };
 
 // Use the user preferred theme to define the loading screen color.
-
-let color = 'f0f0f0';
-
-try {
-  const values = loadPreferencesFromLocalStorage();
-  if (values && values.themeName) {
-    const theme = getFullTheme({
-      themeName: values.themeName,
-      language: 'en', // language is not important here as we only look for a color.
-      isMobile: true, // window size is not important as we only look for a color.
-    });
-    color = theme.gdevelopTheme.surface.window.backgroundColor;
-  }
-} catch {}
-
-document.getElementsByTagName('body')[0].style.backgroundColor = color;
+document.getElementsByTagName('body')[0].style.backgroundColor =
+  getThemeWindowBackgroundColor();
 
 const styles = {
   loadingMessage: {

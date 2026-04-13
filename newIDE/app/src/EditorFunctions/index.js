@@ -170,6 +170,7 @@ export type AssetSearchAndInstallOptions = {|
   searchTerms: string,
   description: string,
   twoDimensionalViewKind: string,
+  exactAssetId?: string | null,
   relatedAiRequestId?: string | null,
   lastUserMessage?: string | null,
   lastAssistantMessages?: string[],
@@ -716,6 +717,10 @@ const createOrReplaceObject: EditorFunction = {
       args,
       'search_terms'
     );
+    const exact_asset_id = SafeExtractor.extractStringProperty(
+      args,
+      'exact_asset_id'
+    );
     const two_dimensional_view_kind = SafeExtractor.extractStringProperty(
       args,
       'two_dimensional_view_kind'
@@ -817,6 +822,7 @@ const createOrReplaceObject: EditorFunction = {
           searchTerms: search_terms || '',
           description: description || '',
           twoDimensionalViewKind: two_dimensional_view_kind || '',
+          exactAssetId: exact_asset_id || null,
           relatedAiRequestId,
           ...getRelatedAiRequestLastMessages(),
         });
@@ -954,7 +960,12 @@ const createOrReplaceObject: EditorFunction = {
         );
       }
 
-      if (!search_terms && !description && !two_dimensional_view_kind) {
+      if (
+        !search_terms &&
+        !description &&
+        !two_dimensional_view_kind &&
+        !exact_asset_id
+      ) {
         return makeGenericFailure(
           `No search terms, description or information were provided to replace the object "${existingTargetObject.getName()}". This object was not changed/replaced.`
         );
@@ -986,6 +997,7 @@ const createOrReplaceObject: EditorFunction = {
           searchTerms: search_terms || '',
           description: description || '',
           twoDimensionalViewKind: two_dimensional_view_kind || '',
+          exactAssetId: exact_asset_id || null,
           relatedAiRequestId,
           ...getRelatedAiRequestLastMessages(),
         });

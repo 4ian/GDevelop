@@ -12,6 +12,7 @@ import {
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInstallAsset } from '../AssetStore/NewObjectDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import { AssetStoreContext } from '../AssetStore/AssetStoreContext';
 
 type _FuncReturnType = {
   searchAndInstallAsset: AssetSearchAndInstallOptions => Promise<AssetSearchAndInstallResult>,
@@ -31,6 +32,7 @@ export const useSearchAndInstallAsset = ({
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
+  const { getAssetShortHeaderFromId } = React.useContext(AssetStoreContext);
   const installAsset = useInstallAsset({
     project,
     resourceManagementProps,
@@ -43,32 +45,64 @@ export const useSearchAndInstallAsset = ({
       async ({
         objectsContainer,
         objectName,
+        objectType,
+        exactAssetId,
         ...assetSearchOptions
       }: AssetSearchAndInstallOptions): Promise<AssetSearchAndInstallResult> => {
         if (!profile) throw new Error('User should be authenticated.');
 
-        const assetSearch: AssetSearch = await retryIfFailed(
-          { times: 3, backoff: { initialDelay: 300, factor: 2 } },
-          () =>
-            createAssetSearch(getAuthorizationHeader, {
-              userId: profile.id,
-              ...assetSearchOptions,
-            })
-        );
-        if (!assetSearch.results || assetSearch.results.length === 0) {
-          return {
-            status: 'nothing-found',
-            message: 'No assets found.',
-            createdObjects: [],
-            assetShortHeader: null,
-          };
-        }
+        let assetShortHeader;
+        if (exactAssetId) {
+          // If an exact asset id is provided, fetch the asset directly
+          // instead of searching for it.
+          const foundAssetShortHeader = getAssetShortHeaderFromId(exactAssetId);
+          if (!foundAssetShortHeader) {
+            return {
+              status: 'nothing-found',
+              message: `No asset found with id "${exactAssetId}".`,
+              createdObjects: [],
+              assetShortHeader: null,
+            };
+          }
+          if (
+            objectType &&
+            foundAssetShortHeader.objectType !== objectType
+          ) {
+            return {
+              status: 'nothing-found',
+              message: `Asset with id "${exactAssetId}" has type "${
+                foundAssetShortHeader.objectType
+              }", which does not match the requested type "${objectType}".`,
+              createdObjects: [],
+              assetShortHeader: null,
+            };
+          }
+          assetShortHeader = foundAssetShortHeader;
+        } else {
+          const assetSearch: AssetSearch = await retryIfFailed(
+            { times: 3, backoff: { initialDelay: 300, factor: 2 } },
+            () =>
+              createAssetSearch(getAuthorizationHeader, {
+                userId: profile.id,
+                objectType,
+                ...assetSearchOptions,
+              })
+          );
+          if (!assetSearch.results || assetSearch.results.length === 0) {
+            return {
+              status: 'nothing-found',
+              message: 'No assets found.',
+              createdObjects: [],
+              assetShortHeader: null,
+            };
+          }
 
-        // In the future, we could ask the user to select the asset they want to use.
-        // For now, we just return the first asset.
-        const chosenResult = assetSearch.results[0];
-        if (!chosenResult) throw new Error('No asset found.');
-        const assetShortHeader = chosenResult.asset;
+          // In the future, we could ask the user to select the asset they want to use.
+          // For now, we just return the first asset.
+          const chosenResult = assetSearch.results[0];
+          if (!chosenResult) throw new Error('No asset found.');
+          assetShortHeader = chosenResult.asset;
+        }
 
         const installOutput = await installAsset({
           assetShortHeader,
@@ -93,7 +127,12 @@ export const useSearchAndInstallAsset = ({
           assetShortHeader,
         };
       },
-      [installAsset, profile, getAuthorizationHeader]
+      [
+        installAsset,
+        profile,
+        getAuthorizationHeader,
+        getAssetShortHeaderFromId,
+      ]
     ),
   };
 };

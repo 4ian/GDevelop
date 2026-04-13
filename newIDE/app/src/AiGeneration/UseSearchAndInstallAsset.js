@@ -62,6 +62,7 @@ export const useSearchAndInstallAsset = ({
               message: `No asset found with id "${exactAssetId}".`,
               createdObjects: [],
               assetShortHeader: null,
+              isTheFirstOfItsTypeInProject: false,
             };
           }
           if (
@@ -75,6 +76,7 @@ export const useSearchAndInstallAsset = ({
               }", which does not match the requested type "${objectType}".`,
               createdObjects: [],
               assetShortHeader: null,
+              isTheFirstOfItsTypeInProject: false,
             };
           }
           assetShortHeader = foundAssetShortHeader;
@@ -86,6 +88,7 @@ export const useSearchAndInstallAsset = ({
                 'Cannot search for an asset without an object type. Specify either `object_type` or `exact_asset_id`.',
               createdObjects: [],
               assetShortHeader: null,
+              isTheFirstOfItsTypeInProject: false,
             };
           }
           const assetSearch: AssetSearch = await retryIfFailed(
@@ -103,6 +106,7 @@ export const useSearchAndInstallAsset = ({
               message: 'No assets found.',
               createdObjects: [],
               assetShortHeader: null,
+              isTheFirstOfItsTypeInProject: false,
             };
           }
 
@@ -113,6 +117,9 @@ export const useSearchAndInstallAsset = ({
           assetShortHeader = chosenResult.asset;
         }
 
+        // `installAsset` computes `isTheFirstOfItsTypeInProject` before
+        // actually inserting the objects into the project, so it reflects
+        // the state right before installation.
         const installOutput = await installAsset({
           assetShortHeader,
           objectsContainer,
@@ -126,6 +133,7 @@ export const useSearchAndInstallAsset = ({
             message: 'Asset found but failed to install asset.',
             createdObjects: [],
             assetShortHeader: null,
+            isTheFirstOfItsTypeInProject: false,
           };
         }
 
@@ -134,6 +142,8 @@ export const useSearchAndInstallAsset = ({
           message: 'Asset installed successfully.',
           createdObjects: installOutput.createdObjects,
           assetShortHeader,
+          isTheFirstOfItsTypeInProject:
+            installOutput.isTheFirstOfItsTypeInProject,
         };
       },
       [

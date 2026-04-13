@@ -46,6 +46,10 @@ describe('editorFunctions', () => {
       objectName,
       objectType,
     }) => {
+      const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+        project,
+        objectType
+      );
       const object = objectsContainer.insertNewObject(
         project,
         objectType,
@@ -58,6 +62,7 @@ describe('editorFunctions', () => {
         message: 'Object installed',
         createdObjects: [object],
         assetShortHeader: fakeAssetShortHeader1,
+        isTheFirstOfItsTypeInProject,
       });
     },
     searchAndInstallResources: async () => {
@@ -150,6 +155,7 @@ describe('editorFunctions', () => {
               message: 'Object not found',
               createdObjects: [],
               assetShortHeader: null,
+              isTheFirstOfItsTypeInProject: false,
             });
           },
           args: {
@@ -533,6 +539,7 @@ describe('editorFunctions', () => {
               message: 'Object installed',
               createdObjects: [object],
               assetShortHeader: fakeAssetShortHeader1,
+              isTheFirstOfItsTypeInProject: false,
             });
           },
           args: {

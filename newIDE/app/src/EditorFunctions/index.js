@@ -161,6 +161,7 @@ export type AssetSearchAndInstallResult = {|
   message: string,
   createdObjects: Array<gdObject>,
   assetShortHeader: AssetShortHeader | null,
+  isTheFirstOfItsTypeInProject: boolean,
 |};
 
 export type AssetSearchAndInstallOptions = {|
@@ -825,6 +826,7 @@ const createOrReplaceObject: EditorFunction = {
           message,
           createdObjects,
           assetShortHeader,
+          isTheFirstOfItsTypeInProject,
         } = await searchAndInstallAsset({
           objectsContainer: targetObjectsContainer,
           objectName: targetObjectName,
@@ -842,13 +844,6 @@ const createOrReplaceObject: EditorFunction = {
             `Unable to search and install object (${message}).`
           );
         } else if (status === 'asset-installed') {
-          const installedType = assetShortHeader
-            ? assetShortHeader.objectType
-            : candidateType;
-          const isTheFirstOfItsTypeInProject = installedType
-            ? !gd.UsedObjectTypeFinder.scanProject(project, installedType)
-            : false;
-
           // Update behaviors shared data for the scene where the object was created.
           // Assets from the store can come with behaviors that have shared data.
           if (target_object_scope === 'global') {

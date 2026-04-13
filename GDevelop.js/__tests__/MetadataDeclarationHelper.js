@@ -976,8 +976,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(action.getSentence()).toBe(
       'Change the property value for Value of _PARAM0_: _PARAM2_ _PARAM3_'
     );
-    // Shared properties can't be used in variable instructions yet.
-    expect(action.isHidden()).toBe(false);
+    expect(action.isHidden()).toBe(true);
     expect(action.isPrivate()).toBe(true);
 
     expect(action.getParametersCount()).toBe(4);
@@ -1001,8 +1000,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getSentence()).toBe(
       'The property value for Value of _PARAM0_ _PARAM2_ _PARAM3_'
     );
-    // Shared properties can't be used in variable instructions yet.
-    expect(condition.isHidden()).toBe(false);
+    expect(condition.isHidden()).toBe(true);
     expect(condition.isPrivate()).toBe(true);
 
     expect(condition.getParametersCount()).toBe(4);
@@ -1077,8 +1075,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(action.getSentence()).toBe(
       'Set property value for Value of _PARAM0_ to _PARAM2_'
     );
-    // Shared properties can't be used in variable instructions yet.
-    expect(action.isHidden()).toBe(false);
+    expect(action.isHidden()).toBe(true);
     expect(action.isPrivate()).toBe(true);
 
     expect(action.getParametersCount()).toBe(3);
@@ -1100,8 +1097,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getSentence()).toBe(
       'Property Value of _PARAM0_ is true'
     );
-    // Shared properties can't be used in variable instructions yet.
-    expect(condition.isHidden()).toBe(false);
+    expect(condition.isHidden()).toBe(true);
     expect(condition.isPrivate()).toBe(true);
 
     expect(condition.getParametersCount()).toBe(2);

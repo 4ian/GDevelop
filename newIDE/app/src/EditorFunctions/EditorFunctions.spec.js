@@ -46,9 +46,14 @@ describe('editorFunctions', () => {
       objectName,
       objectType,
     }) => {
+      const fakeFoundObjectType = objectType || 'Sprite';
+      const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+        project,
+        fakeFoundObjectType
+      );
       const object = objectsContainer.insertNewObject(
         project,
-        objectType,
+        fakeFoundObjectType,
         objectName,
         objectsContainer.getObjectsCount()
       );
@@ -58,6 +63,7 @@ describe('editorFunctions', () => {
         message: 'Object installed',
         createdObjects: [object],
         assetShortHeader: fakeAssetShortHeader1,
+        isTheFirstOfItsTypeInProject,
       });
     },
     searchAndInstallResources: async () => {
@@ -150,6 +156,7 @@ describe('editorFunctions', () => {
               message: 'Object not found',
               createdObjects: [],
               assetShortHeader: null,
+              isTheFirstOfItsTypeInProject: false,
             });
           },
           args: {
@@ -506,6 +513,104 @@ describe('editorFunctions', () => {
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(
         `"Scene not found: \\"NonExistentScene\\"."`
+      );
+    });
+
+    it('creates a new object via exact_asset_id without object_type', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async ({
+            objectsContainer,
+            objectName,
+            objectType,
+          }) => {
+            // The helper derives the type from the asset itself.
+            const object = objectsContainer.insertNewObject(
+              project,
+              'Sprite',
+              objectName,
+              objectsContainer.getObjectsCount()
+            );
+            return Promise.resolve({
+              status: 'asset-installed',
+              message: 'Object installed',
+              createdObjects: [object],
+              assetShortHeader: fakeAssetShortHeader1,
+              isTheFirstOfItsTypeInProject: false,
+            });
+          },
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyAssetObject',
+            exact_asset_id: fakeAssetShortHeader1.id,
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(testScene.getObjects().hasObjectNamed('MyAssetObject')).toBe(true);
+    });
+
+    it('fails when creating a new object without object_type nor exact_asset_id', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyAssetObject',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Cannot create object \\"MyAssetObject\\": specify either \\"object_type\\" or \\"exact_asset_id\\"."`
+      );
+    });
+
+    it('replaces an existing object without specifying object_type', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Player',
+            replace_existing_object: true,
+            search_terms: 'Spaceship, Blue',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Replaced object \\"Player\\" by an object from the asset store fitting the search, with the same type (\\"Sprite\\")."`
+      );
+    });
+
+    it('fails when object_type conflicts with an existing object type', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'TextObject::Text',
+            object_name: 'Player',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Object with name \\"Player\\" already exists in scene \\"TestScene\\" with type \\"Sprite\\". It cannot be (re)created or replaced as type \\"TextObject::Text\\"."`
       );
     });
   });

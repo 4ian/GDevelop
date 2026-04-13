@@ -456,6 +456,23 @@
           "value": "rgba(255, 178, 102, 0.30)"
         }
       }
+    },
+    "premium": {
+      "teal": {
+        "value": "#3BF7F4"
+      },
+      "teal-dark": {
+        "value": "#09F0EC"
+      },
+      "orange": {
+        "value": "#FFBC57"
+      },
+      "orange-dark": {
+        "value": "#FFA929"
+      },
+      "text-contrast-color": {
+        "value": "#1D1D26"
+      }
     }
   },
   "input": {

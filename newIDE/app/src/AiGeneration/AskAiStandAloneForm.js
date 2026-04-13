@@ -40,7 +40,6 @@ import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext';
 import {
   useProcessFunctionCalls,
-  useActivateSubAgents,
   useRefreshLimits,
   type NewAiRequestOptions,
   AI_ORCHESTRATOR_TOOLS_VERSION,
@@ -159,7 +158,6 @@ export const AskAiStandAloneForm = ({
     editorFunctionCallResultsStorage,
     getAiSettings,
     setSelectedAiRequestId,
-    activeSubAgents,
   } = React.useContext(AiRequestContext);
   const {
     getEditorFunctionCallResults,

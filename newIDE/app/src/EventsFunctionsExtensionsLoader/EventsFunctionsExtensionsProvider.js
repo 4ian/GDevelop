@@ -65,19 +65,19 @@ export const EventsFunctionsExtensionsProvider = ({
   );
 
   const ensureLoadFinished = React.useCallback((): Promise<void> => {
-    if (lastLoadPromise.current) {
+    const currentLastLoadPromise = lastLoadPromise.current;
+    if (currentLastLoadPromise) {
       console.info(
         'Waiting on the events functions extensions to finish loading...'
       );
     } else {
       console.info('Events functions extensions are ready.');
+      return Promise.resolve();
     }
 
-    return lastLoadPromise.current
-      ? lastLoadPromise.current.then(() => {
-          console.info('Events functions extensions finished loading.');
-        })
-      : Promise.resolve();
+    return currentLastLoadPromise.then(() => {
+      console.info('Events functions extensions finished loading.');
+    });
   }, []);
 
   const _loadProjectEventsFunctionsExtensions = React.useCallback(
@@ -87,14 +87,18 @@ export const EventsFunctionsExtensionsProvider = ({
       const previousLastLoadPromise =
         lastLoadPromise.current || Promise.resolve();
 
-      lastLoadPromise.current = previousLastLoadPromise
-        .then(() =>
-          loadProjectEventsFunctionsExtensions(
+      let startTime;
+
+      const currentPromise: Promise<void> = previousLastLoadPromise
+        .then(() => {
+          console.info('Loading project extensions...');
+          startTime = Date.now();
+          return loadProjectEventsFunctionsExtensions(
             project,
             eventsFunctionCodeWriter,
             i18n
-          )
-        )
+          );
+        })
         .then(() => setEventsFunctionsExtensionsError(null))
         .catch((eventsFunctionsExtensionsError: Error) => {
           setEventsFunctionsExtensionsError(eventsFunctionsExtensionsError);
@@ -107,10 +111,20 @@ export const EventsFunctionsExtensionsProvider = ({
           });
         })
         .then(() => {
-          lastLoadPromise.current = null;
+          console.info(
+            `Finished loading project extensions in ${(
+              Date.now() - startTime
+            ).toFixed(2)}ms.`
+          );
+          // Only clear the ref if no newer load has been queued since.
+          // In theory we don't do concurrent loads, but it's better to be safe.
+          if (lastLoadPromise.current === currentPromise) {
+            lastLoadPromise.current = null;
+          }
         });
 
-      return lastLoadPromise.current;
+      lastLoadPromise.current = currentPromise;
+      return currentPromise;
     },
     [eventsFunctionCodeWriter, i18n]
   );

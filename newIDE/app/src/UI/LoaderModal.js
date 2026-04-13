@@ -9,6 +9,7 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import Text from './Text';
 import CircularProgress from './CircularProgress';
 import { Column, Spacer } from './Grid';
+import PortalContainerContext from './PortalContainerContext';
 
 const loaderSize = 50;
 const dialogWithMessageWidth = 250;
@@ -68,6 +69,7 @@ const LoaderModal = ({
 }: Props): React.Node => {
   const delayedShow = useDelayedBoolean(!!showAfterDelay, 150);
   const isInfinite = progress === null || progress === undefined;
+  const portalContainer = React.useContext(PortalContainerContext);
 
   return (
     <I18n>
@@ -75,6 +77,7 @@ const LoaderModal = ({
         <Dialog
           open={showImmediately || delayedShow}
           transitionDuration={transitionDuration}
+          container={portalContainer}
         >
           <DialogContent style={styles.dialogContent}>
             <div

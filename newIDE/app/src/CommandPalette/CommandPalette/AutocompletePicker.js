@@ -19,6 +19,8 @@ import commandsList, { commandAreas } from '../CommandsList';
 import { getShortcutDisplayName } from '../../KeyboardShortcuts';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
+import PortalContainerContext from '../../UI/PortalContainerContext';
+import { Popper } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   listItemContainer: {
@@ -54,6 +56,7 @@ const AutocompletePicker = (
   const [open, setOpen] = React.useState(true);
   const shortcutMap = useShortcutMap();
   const classes = useStyles();
+  const portalContainer = React.useContext(PortalContainerContext);
 
   // $FlowFixMe[missing-local-annot]
   const handleClose = (_, reason) => {
@@ -134,6 +137,13 @@ const AutocompletePicker = (
   return (
     <Autocomplete
       open={open}
+      PopperComponent={
+        portalContainer
+          ? popperProps => (
+              <Popper {...popperProps} container={portalContainer} />
+            )
+          : undefined
+      }
       onClose={handleClose}
       onOpen={() => setOpen(true)}
       options={props.items}

@@ -21,6 +21,7 @@ import TextButton from '../../UI/TextButton';
 import Paste from '../../UI/CustomSvgIcons/Paste';
 import { Column, Line } from '../../UI/Grid';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import PortalContainerContext from '../../UI/PortalContainerContext';
 
 const styles = {
   fullHeightSelector: {
@@ -83,6 +84,7 @@ const InstructionEditorMenu = ({
   i18n,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
+  const portalContainer = React.useContext(PortalContainerContext);
   const [
     instructionEditorState,
     instructionEditorSetters,
@@ -203,6 +205,7 @@ const InstructionEditorMenu = ({
       open={open}
       onClose={onCancel}
       anchorEl={anchorEl}
+      container={portalContainer}
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'left',

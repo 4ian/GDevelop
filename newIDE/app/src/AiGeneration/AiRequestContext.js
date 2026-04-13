@@ -16,6 +16,7 @@ import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInterval } from '../Utils/UseInterval';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import { aiRequestShouldBeWatched } from './AiRequestUtils';
 
 type EditorFunctionCallResultsStorage = {|
   getEditorFunctionCallResults: (
@@ -543,13 +544,13 @@ export const AiRequestProvider = ({
   const lastFullFetchTimeRef = React.useRef<number>(0);
   const fullFetchIntervalInMs = 5000;
 
-  // If the selected AI request is in a "working" state, watch it until it's finished.
-  // Every ~1.4s we do a partial (status-only) fetch; every 5s we do a full fetch to
-  // pick up new messages from the orchestrator/agent while it is still running.
-  const status = selectedAiRequest ? selectedAiRequest.status : null;
+  // Watch the selected AI request while it needs polling (backend is working,
+  // or sub-agents are running). Every ~1.4s we do a partial (status-only) fetch;
+  // every 5s we do a full fetch to pick up new messages.
   const onWatch = async () => {
     if (!profile) return;
-    if (!selectedAiRequestId || !status || status !== 'working') return;
+    if (!selectedAiRequestId || !selectedAiRequest) return;
+    if (!aiRequestShouldBeWatched(selectedAiRequest)) return;
 
     const clearFetchingSuggestionsIfDone = (aiRequest: AiRequest) => {
       if (!isFetchingSuggestions) return;
@@ -592,7 +593,8 @@ export const AiRequestProvider = ({
           }
         );
 
-        if (partialAiRequest.status === 'working') {
+        if (partialAiRequest.status === selectedAiRequest.status) {
+          // No status change — just merge the partial data.
           updateAiRequest(selectedAiRequestId, prevRequest => ({
             ...(prevRequest || {}),
             ...partialAiRequest,
@@ -636,14 +638,13 @@ export const AiRequestProvider = ({
       if (
         selectedAiRequestId &&
         selectedAiRequest &&
-        selectedAiRequest.status === 'working'
+        aiRequestShouldBeWatched(selectedAiRequest)
       ) {
         setShouldWatchRequest(true);
       } else {
         setShouldWatchRequest(false);
       }
 
-      // Ensure we stop watching when the request is no longer working.
       return () => {
         setShouldWatchRequest(false);
       };
@@ -664,6 +665,10 @@ export const AiRequestProvider = ({
       parentAiRequestId: string,
       callId: string
     ) => {
+      console.info('Activating sub-agent:', subAgentAiRequestId, {
+        parentAiRequestId,
+        callId,
+      });
       if (activeSubAgentsRef.current[subAgentAiRequestId]) return;
       activeSubAgentsRef.current = {
         ...activeSubAgentsRef.current,
@@ -676,6 +681,7 @@ export const AiRequestProvider = ({
 
   const removeSubAgent = React.useCallback(
     (subAgentAiRequestId: string) => {
+      console.info('Removing sub-agent:', subAgentAiRequestId);
       const { [subAgentAiRequestId]: _, ...rest } = activeSubAgentsRef.current;
       activeSubAgentsRef.current = rest;
       forceUpdateForSubAgents();
@@ -689,6 +695,36 @@ export const AiRequestProvider = ({
   }>({});
 
   const hasActiveSubAgents = Object.keys(activeSubAgentsRef.current).length > 0;
+
+  /**
+   * Remove a sub-agent only when the parent AI request has received a
+   * function_call_output for the sub-agent's call. Until that point the
+   * sub-agent must stay active so it remains in `aiRequestsToProcess` and
+   * its own function calls can be processed by the editor.
+   */
+  const removeSubAgentIfDone = React.useCallback(
+    (subAgentId: string) => {
+      const subAgentInfo = activeSubAgentsRef.current[subAgentId];
+      if (!subAgentInfo) return;
+
+      const parentRequest = aiRequests[subAgentInfo.parentAiRequestId];
+      if (!parentRequest) return;
+
+      const parentOutput = parentRequest.output || [];
+      const hasOutputForSubAgent = parentOutput.some(
+        message =>
+          message.type === 'function_call_output' &&
+          message.call_id === subAgentInfo.callId
+      );
+
+      if (hasOutputForSubAgent) {
+        console.info('Removing sub-agent as done:', subAgentId);
+        delete subAgentLastFullFetchTimeRef.current[subAgentId];
+        removeSubAgent(subAgentId);
+      }
+    },
+    [aiRequests, removeSubAgent]
+  );
 
   useInterval(
     () => {
@@ -715,9 +751,7 @@ export const AiRequestProvider = ({
             updateAiRequest(subAgentId, () => aiRequest);
 
             if (aiRequest.status === 'ready' || aiRequest.status === 'error') {
-              // Sub-agent is done. The backend will wake up the parent request.
-              delete subAgentLastFullFetchTimeRef.current[subAgentId];
-              removeSubAgent(subAgentId);
+              removeSubAgentIfDone(subAgentId);
             }
           } else {
             const partialAiRequest = await getPartialAiRequest(
@@ -744,8 +778,7 @@ export const AiRequestProvider = ({
                 aiRequest.status === 'ready' ||
                 aiRequest.status === 'error'
               ) {
-                delete subAgentLastFullFetchTimeRef.current[subAgentId];
-                removeSubAgent(subAgentId);
+                removeSubAgentIfDone(subAgentId);
               }
             } else {
               updateAiRequest(subAgentId, prevRequest => ({

@@ -209,8 +209,26 @@ export const getLatestActivePlan = (
 };
 
 /**
+ * Returns true if the AI request needs to be polled for updates:
+ * - The server is actively processing (status === 'working')
+ * - OR the request is 'ready' but has sub-agent calls without a
+ *   function_call_output yet (sub-agents are still running and the backend
+ *   will add output to the parent when they complete)
+ */
+export const aiRequestShouldBeWatched = (aiRequest: AiRequest): boolean => {
+  if (aiRequest.status === 'working') return true;
+  if (aiRequest.status === 'ready') {
+    return getSubAgentFunctionCalls({ aiRequest }).length > 0;
+  }
+  return false;
+};
+
+// TODO: can we merge these two functions?
+
+/**
  * Returns true if the AI request has work in progress that should be suspended:
  * - The server is actively processing (status === 'working')
+ * - OR the request has sub-agent calls still running
  * - OR the request is ready with function calls that still need to be processed and sent back
  */
 export const aiRequestHasWorkInProgress = (
@@ -218,7 +236,7 @@ export const aiRequestHasWorkInProgress = (
   editorFunctionCallResults: Array<EditorFunctionCallResult> | null
 ): boolean => {
   if (aiRequest.status === 'working') return true;
-  // A function call is either either being processed or has been processed by the editor but not yet sent back
+  // A function call is either being processed or has been processed by the editor but not yet sent back
   // (e.g. generateEvents that finished execution but the output hasn't been sent back to the AI with the follow-up request).
   // This means there's still work in progress from the AI perspective, even if the editor is not actively working on a function call.
   if (
@@ -228,10 +246,8 @@ export const aiRequestHasWorkInProgress = (
     )
   )
     return true;
-  // TODO: Also check for pending sub-agent calls (getSubAgentFunctionCalls).
-  // Currently, a request with in-progress sub-agents but no pending editor
-  // function calls is not considered as having work in progress.
   if (aiRequest.status === 'ready') {
+    if (getSubAgentFunctionCalls({ aiRequest }).length > 0) return true;
     return (
       getFunctionCallsToProcess({
         aiRequest,

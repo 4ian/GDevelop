@@ -483,6 +483,7 @@ export const useAiRequestState = ({
         )
           return;
 
+        // Check if there are tools being run. If so, no suggestions at this time.
         const hasFunctionsCallsToProcess =
           getFunctionCallsToProcess({
             aiRequest: selectedAiRequest,
@@ -491,6 +492,14 @@ export const useAiRequestState = ({
             ),
           }).length > 0;
         if (hasFunctionsCallsToProcess) return;
+
+        // If there are sub-agents running, it means the request is still running,
+        // so no suggestions at this time.
+        const hasPendingSubAgentCalls =
+          getSubAgentFunctionCalls({
+            aiRequest: selectedAiRequest,
+          }).length > 0;
+        if (hasPendingSubAgentCalls) return;
 
         const {
           hasUnfinishedResult,

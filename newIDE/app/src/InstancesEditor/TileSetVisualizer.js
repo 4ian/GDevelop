@@ -788,7 +788,7 @@ const TileSetVisualizer = ({
           <Line justifyContent="space-between" noMargin>
             <LineStackLayout alignItems="left" noMargin>
               <IconButton
-                id="freehandBrush"
+                id="paintBrush"
                 size="small"
                 tooltip={t`Freehand brush`}
                 selected={

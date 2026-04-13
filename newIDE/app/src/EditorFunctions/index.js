@@ -692,7 +692,10 @@ const createOrReplaceObject: EditorFunction = {
     PixiResourcesLoader,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
-    const object_type = SafeExtractor.extractStringProperty(args, 'object_type');
+    const object_type = SafeExtractor.extractStringProperty(
+      args,
+      'object_type'
+    );
     const targetObjectName = extractRequiredString(args, 'object_name');
     const target_object_scope = SafeExtractor.extractStringProperty(
       args,

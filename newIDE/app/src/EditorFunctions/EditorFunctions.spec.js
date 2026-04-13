@@ -46,13 +46,14 @@ describe('editorFunctions', () => {
       objectName,
       objectType,
     }) => {
+      const fakeFoundObjectType = objectType || 'Sprite';
       const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
         project,
-        objectType
+        fakeFoundObjectType
       );
       const object = objectsContainer.insertNewObject(
         project,
-        objectType,
+        fakeFoundObjectType,
         objectName,
         objectsContainer.getObjectsCount()
       );

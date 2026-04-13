@@ -65,10 +65,7 @@ export const useSearchAndInstallAsset = ({
               isTheFirstOfItsTypeInProject: false,
             };
           }
-          if (
-            objectType &&
-            foundAssetShortHeader.objectType !== objectType
-          ) {
+          if (objectType && foundAssetShortHeader.objectType !== objectType) {
             return {
               status: 'nothing-found',
               message: `Asset with id "${exactAssetId}" has type "${
@@ -146,12 +143,7 @@ export const useSearchAndInstallAsset = ({
             installOutput.isTheFirstOfItsTypeInProject,
         };
       },
-      [
-        installAsset,
-        profile,
-        getAuthorizationHeader,
-        getAssetShortHeaderFromId,
-      ]
+      [installAsset, profile, getAuthorizationHeader, getAssetShortHeaderFromId]
     ),
   };
 };

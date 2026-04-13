@@ -375,22 +375,26 @@ jobs:
           # setuptools will make distutils available again (but we should migrate our packages probably).
           command: |
             pip install setuptools
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
             cd newIDE\app
 
             npm -v
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
             Remove-Item package-lock.json
 
             $Env:REQUIRES_EXACT_LIBGD_JS_VERSION = "true"
 
             npm install
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
             cd ..\electron-app
 
             Remove-Item package-lock.json
 
             npm install
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
             cd ..\..
 

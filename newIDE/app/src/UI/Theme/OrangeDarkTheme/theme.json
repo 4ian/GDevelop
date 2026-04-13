@@ -381,7 +381,7 @@
           "comment": "Palette/Grey/00"
         },
         "borderColor": {
-          "value": "#7F7F85",
+          "value": "#D05300",
           "comment": "Palette/Grey/50"
         }
       }
@@ -501,7 +501,7 @@
     },
     "tabs": {
       "text-color": {
-        "value": "#7F7F85",
+        "value": "#D05300",
         "comment": "Palette/Grey/50"
       },
       "background-color": {

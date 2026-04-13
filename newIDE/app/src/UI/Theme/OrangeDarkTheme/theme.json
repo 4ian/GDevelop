@@ -6,7 +6,8 @@
         "comment": "Palette/Orange/60"
       },
       "color": {
-        "value": "#C75000"
+        "value": "#C75000",
+        "comment": "Palette/Orange/50"
       },
       "light": {
         "value": "#FF8B3D",
@@ -20,11 +21,11 @@
     "secondary": {
       "dark": {
         "value": "#FFD0B8",
-        "comment": "Palette/Purple/10"
+        "comment": "Palette/Orange/10"
       },
       "color": {
         "value": "#FFE6D9",
-        "comment": "Palette/Purple/05"
+        "comment": "Palette/Orange/05"
       },
       "light": {
         "value": "#FFF5F0",
@@ -143,33 +144,28 @@
       },
       "window": {
         "background-color": {
-          "value": "#111418",
-          "comment": "Palette/Grey/100"
+          "value": "#111418"
         }
       },
       "canvas": {
         "background-color": {
-          "value": "#22272E",
-          "comment": "Palette/Grey/100"
+          "value": "#22272E"
         }
       },
       "alternate-canvas": {
         "background-color": {
-          "value": "#2C323C",
-          "comment": "Palette/Grey/90"
+          "value": "#2C323C"
         }
       },
       "alternate-canvas-light": {
         "background-color": {
-          "value": "#4B5563",
-          "comment": "Palette/Grey/80"
+          "value": "#4B5563"
         }
       }
     },
     "dialog": {
       "background-color": {
-        "value": "#22272E",
-        "comment": "Palette/Grey/90"
+        "value": "#22272E"
       },
       "separator": {
         "color": {
@@ -268,8 +264,7 @@
       },
       "disabled": {
         "background-color": {
-          "value": "#22272E",
-          "comment": "Palette/Grey/80"
+          "value": "#22272E"
         },
         "text-color": {
           "value": "#4B5563",
@@ -279,10 +274,12 @@
     },
     "selection": {
       "background-color": {
-        "value": "#CC5500"
+        "value": "#CC5500",
+        "comment": "Palette/Purple/10"
       },
       "color": {
-        "value": "#FFFFFF"
+        "value": "#FFFFFF",
+        "comment": "Text/Primary"
       }
     },
     "text": {
@@ -392,7 +389,8 @@
     "list-item": {
       "hover": {
         "background-color": {
-          "value": "#2C323C"
+          "value": "#2C323C",
+          "comment": "Palette/Purple/00"
         }
       },
       "group": {
@@ -427,11 +425,12 @@
     },
     "right-icon": {
       "color": {
-        "value": "#fff"
+        "value": "#FF9752"
       }
     },
     "palette": {
       "black": {
+        "pvalue": "rgb(110, 42, 42)",
         "value": "rgba(110, 42, 42, 1)"
       },
       "white": {
@@ -827,7 +826,7 @@
       },
       "selectable-link": {
         "color": {
-          "value": "#b77cff"
+          "value": "#FF9752"
         }
       }
     }
@@ -842,7 +841,8 @@
     },
     "link": {
       "color": {
-        "value": "rgb(221, 221, 221)"
+        "value": "rgb(221, 221, 221)",
+        "comment": "Palette/Purple/30"
       }
     }
   },

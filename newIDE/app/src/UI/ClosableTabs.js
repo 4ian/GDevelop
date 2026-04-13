@@ -141,6 +141,8 @@ export type ClosableTabProps = {|
   onClose: () => void,
   onCloseOthers: () => void,
   onCloseAll: () => void,
+  onPopOut?: ?() => void,
+  popOutEnabled?: boolean,
   onClick: () => void,
   onActivated: () => void,
   onHover: (boolean, options: {| isLabelTruncated: boolean |}) => void,
@@ -154,6 +156,8 @@ export function ClosableTab({
   onClose,
   onCloseOthers,
   onCloseAll,
+  onPopOut,
+  popOutEnabled = true,
   label,
   icon,
   renderCustomIcon,
@@ -347,6 +351,16 @@ export function ClosableTab({
             label: i18n._(t`Close all`),
             click: onCloseAll,
           },
+          ...(onPopOut
+            ? [
+                { type: 'separator' },
+                {
+                  label: i18n._(t`Pop out in a separate window (beta)`),
+                  click: onPopOut,
+                  enabled: closable && popOutEnabled,
+                },
+              ]
+            : []),
         ]}
       />
     </React.Fragment>

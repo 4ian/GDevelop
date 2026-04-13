@@ -26,6 +26,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import EditorTabsPane, {
   type EditorTabsPaneCommonProps,
 } from './EditorTabsPane';
+import PoppedOutWindows from './PoppedOutWindows';
 import {
   getEditorTabsInitialState,
   openEditorTab,
@@ -37,6 +38,7 @@ import {
   closeCustomObjectTab,
   closeEventsBasedObjectVariantTab,
   saveUiSettings,
+  type EditorTab,
   type EditorTabsState,
   type EditorKind,
   getEventsFunctionsExtensionEditor,
@@ -49,6 +51,8 @@ import {
   getAllEditorTabs,
   hasEditorsInPane,
   closeEditorTab,
+  popOutTab,
+  popInTab,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -80,8 +84,6 @@ import {
 } from '../ExportAndShare/PreviewLauncher.flow';
 import {
   type ResourceSource,
-  type ChooseResourceFunction,
-  type ChooseResourceOptions,
   type ResourceManagementProps,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor';
@@ -146,7 +148,7 @@ import { delay } from '../Utils/Delay';
 import useNewProjectDialog from './UseNewProjectDialog';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
-import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
+import useNewResourceDialog from '../ResourcesList/useNewResourceDialog';
 import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_DEBUG,
@@ -239,7 +241,6 @@ import StandaloneDialog from './StandAloneDialog';
 import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
-import type { EditorTab } from './EditorTabs/EditorTabsHandler';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -409,14 +410,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     cloudProjectSaveChoiceOpen,
     setCloudProjectSaveChoiceOpen,
   ] = React.useState<boolean>(false);
-  const [
-    chooseResourceOptions,
-    setChooseResourceOptions,
-  ] = React.useState<?ChooseResourceOptions>(null);
-  const [onResourceChosen, setOnResourceChosen] = React.useState<?({|
-    selectedResources: Array<gdResource>,
-    selectedSourceName: string,
-  |}) => void>(null);
+  const { onChooseResource, renderNewResourceDialog } = useNewResourceDialog();
   const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
   const forceUpdate = useForceUpdate();
   const [isLoadingProject, setIsLoadingProject] = React.useState<boolean>(
@@ -815,6 +809,36 @@ const MainFrame = (props: Props): React.MixedElement => {
     [setState]
   );
 
+  const onPopOutTab = React.useCallback(
+    (editorTab: EditorTab) => {
+      setState(prevState => ({
+        ...prevState,
+        editorTabs: popOutTab(prevState.editorTabs, editorTab.key),
+      }));
+    },
+    [setState]
+  );
+
+  const onPopInTab = React.useCallback(
+    (editorTab: EditorTab) => {
+      setState(prevState => ({
+        ...prevState,
+        editorTabs: popInTab(prevState.editorTabs, editorTab.key),
+      }));
+    },
+    [setState]
+  );
+
+  const onExternalWindowClose = React.useCallback(
+    (editorTab: EditorTab) => {
+      setState(prevState => ({
+        ...prevState,
+        editorTabs: closeEditorTab(prevState.editorTabs, editorTab),
+      }));
+    },
+    [setState]
+  );
+
   const {
     hasAPreviousSaveForEditorTabsState,
     openEditorTabsFromPersistedState,
@@ -1176,14 +1200,14 @@ const MainFrame = (props: Props): React.MixedElement => {
 
         // Read and apply project settings from gdevelop-settings.yaml if it exists
         try {
-          const rawSettings = await readProjectSettings(
+          const parsedProjectSettings = await readProjectSettings(
             updatedFileMetadata.fileIdentifier
           );
-          if (rawSettings) {
-            applyProjectPreferences(rawSettings.preferences, preferences);
+          if (parsedProjectSettings) {
+            applyProjectPreferences(parsedProjectSettings, preferences);
             setState(currentState => ({
               ...currentState,
-              toolbarButtons: rawSettings.toolbarButtons || [],
+              toolbarButtons: parsedProjectSettings.toolbarButtons || [],
             }));
           }
         } catch (error) {
@@ -4311,6 +4335,41 @@ const MainFrame = (props: Props): React.MixedElement => {
     [currentProject, hasUnsavedChanges, i18n, closeProject]
   );
 
+  const reloadProject = React.useCallback(
+    async (): Promise<void> => {
+      if (!currentProject || !currentFileMetadata) return;
+
+      if (hasUnsavedChanges) {
+        const answer = Window.showConfirmDialog(
+          i18n._(
+            t`Reload the project? Any changes that have not been saved will be lost.`
+          )
+        );
+        if (!answer) return;
+      }
+
+      const storageProviderName = getStorageProvider().internalName;
+      await openFromFileMetadataWithStorageProvider(
+        {
+          fileMetadata: currentFileMetadata,
+          storageProviderName,
+        },
+        {
+          ignoreUnsavedChanges: true,
+          ignoreAutoSave: true,
+        }
+      );
+    },
+    [
+      currentProject,
+      currentFileMetadata,
+      hasUnsavedChanges,
+      i18n,
+      getStorageProvider,
+      openFromFileMetadataWithStorageProvider,
+    ]
+  );
+
   const endTutorial = React.useCallback(
     async (shouldCloseProject?: boolean) => {
       if (shouldCloseProject) {
@@ -4408,21 +4467,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       );
     },
     [getStorageProvider]
-  );
-
-  const onChooseResource: ChooseResourceFunction = React.useCallback(
-    (options: ChooseResourceOptions) => {
-      return new Promise(resolve => {
-        setChooseResourceOptions(options);
-        const onResourceChosenSetter: () => ({|
-          selectedResources: Array<gdResource>,
-          selectedSourceName: string,
-        |}) => void = () => resolve;
-
-        setOnResourceChosen(onResourceChosenSetter);
-      });
-    },
-    [setOnResourceChosen, setChooseResourceOptions]
   );
 
   const setElectronUpdateStatus = (updateStatus: ElectronUpdateStatus) => {
@@ -4805,6 +4849,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onCloseProject: async () => {
       askToCloseProject();
     },
+    onReloadProject: reloadProject,
     onExportGame: () => {
       openShareDialog('publish');
     },
@@ -5183,10 +5228,16 @@ const MainFrame = (props: Props): React.MixedElement => {
               areSidePanesDrawers={areSidePanesDrawers}
               onSetPointerEventsNone={onSetPointerEventsNone}
               onSetPaneDrawerState={onSetPaneDrawerState}
+              onPopOutTab={onPopOutTab}
             />
           )}
         />
       </LeaderboardProvider>
+      <PoppedOutWindows
+        {...editorTabsPaneProps}
+        onClose={onExternalWindowClose}
+        onPopIn={onPopInTab}
+      />
       <CommandPalette ref={commandPaletteRef} />
       <LoaderModal
         showImmediately={showLoaderImmediately}
@@ -5219,29 +5270,13 @@ const MainFrame = (props: Props): React.MixedElement => {
           initialTab: shareDialogInitialTab,
           gamesList,
         })}
-      {chooseResourceOptions && onResourceChosen && !!currentProject && (
-        <NewResourceDialog
-          project={currentProject}
-          fileMetadata={currentFileMetadata}
-          getStorageProvider={getStorageProvider}
-          i18n={i18n}
-          resourceSources={resourceSources}
-          onChooseResources={resourcesOptions => {
-            setOnResourceChosen(null);
-            setChooseResourceOptions(null);
-            onResourceChosen(resourcesOptions);
-          }}
-          onClose={() => {
-            setOnResourceChosen(null);
-            setChooseResourceOptions(null);
-            onResourceChosen({
-              selectedResources: [],
-              selectedSourceName: '',
-            });
-          }}
-          options={chooseResourceOptions}
-        />
-      )}
+      {renderNewResourceDialog({
+        project: currentProject,
+        fileMetadata: currentFileMetadata,
+        getStorageProvider,
+        i18n,
+        resourceSources,
+      })}
       {profileDialogOpen && (
         // ProfileDialog is dependent on multiple contexts,
         // which are dependent of AuthenticatedUserContext.

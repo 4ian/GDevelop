@@ -58,6 +58,7 @@ type CommandHandlers = {|
   onSaveProjectAs: () => void,
   onCloseApp: () => void,
   onCloseProject: () => Promise<void>,
+  onReloadProject: () => Promise<void>,
   onExportGame: () => void,
   onInviteCollaborators: () => void,
   onOpenLayout: string => void,
@@ -148,6 +149,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('CLOSE_PROJECT', !!handlers.project, {
     handler: handlers.onCloseProject,
+  });
+
+  useCommand('RELOAD_PROJECT', !!handlers.project, {
+    handler: handlers.onReloadProject,
   });
 
   useCommand('EXPORT_GAME', !!handlers.project, {

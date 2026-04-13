@@ -761,7 +761,7 @@
     "instruction-parameter": {
       "base": {
         "color": {
-          "value": "#5D689B"
+          "value": "#027C2A"
         }
       },
       "number": {
@@ -776,7 +776,7 @@
       },
       "behavior": {
         "color": {
-          "value": "#027C2A"
+          "value": "#5D689B"
         }
       },
       "operator": {
@@ -791,7 +791,7 @@
       },
       "error": {
         "color": {
-          "value": "#281603"
+          "value": "#F03F18"
         },
         "background-color": {
           "value": "#F03F18"

@@ -352,7 +352,7 @@
         "value": "#111418"
       },
       "indicator-color": {
-        "value": "#9CA3AF"
+        "value": "#FF6500"
       },
       "separator-color": {
         "value": "#22272E"
@@ -664,32 +664,32 @@
     "instruction-parameter": {
       "base": {
         "color": {
-          "value": "#93e500"
+          "value": "#4ADE80"
         }
       },
       "number": {
         "color": {
-          "value": "#e8dc59"
+          "value": "#FFD166"
         }
       },
       "object": {
         "color": {
-          "value": "#b77cff"
+          "value": "#FF6500"
         }
       },
       "behavior": {
         "color": {
-          "value": "#ff9200"
+          "value": "#FF79C6"
         }
       },
       "operator": {
         "color": {
-          "value": "#b77cff"
+          "value": "#FFB266"
         }
       },
       "var": {
         "color": {
-          "value": "#18dcf2"
+          "value": "#38BDF8"
         }
       },
       "error": {

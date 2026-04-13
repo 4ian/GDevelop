@@ -26,5 +26,8 @@
 .content {
   display: flex;
   flex-direction: column;
+}
+
+.contentIndented {
   padding-left: 20px;
 }

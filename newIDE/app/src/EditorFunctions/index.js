@@ -892,6 +892,12 @@ const createOrReplaceObject: EditorFunction = {
               .join(', ')} in scene "${scene_name}".`
           );
         } else {
+          if (exact_asset_id) {
+            return makeGenericFailure(
+              `No asset found with id "${exact_asset_id}". The object was not created.`
+            );
+          }
+
           // No asset found - we'll create an object from scratch.
         }
       } catch (error) {
@@ -5121,10 +5127,10 @@ const initializeProject: EditorFunctionWithoutProject = {
   modifiesProject: true,
 };
 
-const runProjectExplorerAgent: EditorFunction = {
+const runExplorerAgent: EditorFunction = {
   renderForEditor: ({ args }) => {
     return {
-      text: <Trans>Explore the game.</Trans>,
+      text: <Trans>Exploring the game.</Trans>,
     };
   },
   launchFunction: async ({ args }) => {
@@ -5135,10 +5141,10 @@ const runProjectExplorerAgent: EditorFunction = {
   modifiesProject: false,
 };
 
-const runProjectEditAgent: EditorFunction = {
+const runEditAgent: EditorFunction = {
   renderForEditor: ({ args }) => {
     return {
-      text: <Trans>Edit the game.</Trans>,
+      text: <Trans>Editing the game.</Trans>,
     };
   },
   launchFunction: async ({ args }) => {
@@ -5158,6 +5164,20 @@ const readGameProjectJson: EditorFunction = {
   launchFunction: async ({ args }) => {
     return makeGenericFailure(
       `Unable to get game project JSON - this is handled server-side.`
+    );
+  },
+  modifiesProject: false,
+};
+
+const searchObjectAssetStore: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    return {
+      text: <Trans>Searching the asset store.</Trans>,
+    };
+  },
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to search the asset store - this is handled server-side.`
     );
   },
   modifiesProject: false,
@@ -5186,9 +5206,10 @@ export const editorFunctions: { [string]: EditorFunction } = {
 
   create_or_update_plan: createOrUpdatePlan,
 
-  run_project_explorer_agent: runProjectExplorerAgent,
-  run_project_edit_agent: runProjectEditAgent,
-  read_game_project_json: readGameProjectJson, // TODO
+  run_explorer_agent: runExplorerAgent,
+  run_edit_agent: runEditAgent,
+  read_game_project_json: readGameProjectJson,
+  search_object_asset_store: searchObjectAssetStore,
 };
 
 export const editorFunctionsWithoutProject: {

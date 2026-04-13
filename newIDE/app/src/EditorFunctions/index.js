@@ -166,7 +166,7 @@ export type AssetSearchAndInstallResult = {|
 export type AssetSearchAndInstallOptions = {|
   objectsContainer: gdObjectsContainer,
   objectName: string,
-  objectType: string,
+  objectType: string | null,
   searchTerms: string,
   description: string,
   twoDimensionalViewKind: string,
@@ -691,7 +691,7 @@ const createOrReplaceObject: EditorFunction = {
     PixiResourcesLoader,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
-    const object_type = extractRequiredString(args, 'object_type');
+    const object_type = SafeExtractor.extractStringProperty(args, 'object_type');
     const targetObjectName = extractRequiredString(args, 'object_name');
     const target_object_scope = SafeExtractor.extractStringProperty(
       args,
@@ -775,25 +775,29 @@ const createOrReplaceObject: EditorFunction = {
       }
     }
 
-    const createNewObject = async () => {
-      const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
-        project,
-        object_type
+    // Compute the effective object type from the explicit argument or, as a
+    // fallback, the type of any object that already exists with the target
+    // name. Both sources (when provided) must agree - otherwise the request
+    // is inconsistent and we reject it before touching the project.
+    const existingTargetObjectType = existingTargetObject
+      ? existingTargetObject.getType()
+      : null;
+    if (
+      object_type &&
+      existingTargetObjectType &&
+      existingTargetObjectType !== object_type
+    ) {
+      return makeGenericFailure(
+        `Object with name "${targetObjectName}" already exists ${
+          isTargetObjectGlobal ? 'globally' : `in scene "${scene_name}"`
+        } with type "${existingTargetObjectType}". It cannot be (re)created or replaced as type "${object_type}".`
       );
+    }
+    const candidateType = object_type || existingTargetObjectType || null;
 
+    const createNewObject = async () => {
       if (existingTargetObject) {
-        if (existingTargetObject.getType() !== object_type) {
-          if (isTargetObjectGlobal) {
-            return makeGenericFailure(
-              `Object with name "${targetObjectName}" already exists globally but with a different type ("${object_type}").`
-            );
-          }
-
-          return makeGenericFailure(
-            `Object with name "${targetObjectName}" already exists in scene "${scene_name}" but with a different type ("${object_type}").`
-          );
-        }
-
+        // Type mismatch was already rejected above.
         // /!\ Tell the editor that some objects have potentially been modified (and even removed).
         // This will force the objects panel to refresh.
         onObjectsModifiedOutsideEditor({
@@ -802,6 +806,12 @@ const createOrReplaceObject: EditorFunction = {
         });
         return makeGenericSuccess(
           `Object with name "${targetObjectName}" already exists, no need to re-create it.`
+        );
+      }
+
+      if (!candidateType && !exact_asset_id) {
+        return makeGenericFailure(
+          `Cannot create object "${targetObjectName}": specify either "object_type" or "exact_asset_id".`
         );
       }
 
@@ -818,7 +828,7 @@ const createOrReplaceObject: EditorFunction = {
         } = await searchAndInstallAsset({
           objectsContainer: targetObjectsContainer,
           objectName: targetObjectName,
-          objectType: object_type,
+          objectType: candidateType,
           searchTerms: search_terms || '',
           description: description || '',
           twoDimensionalViewKind: two_dimensional_view_kind || '',
@@ -832,6 +842,13 @@ const createOrReplaceObject: EditorFunction = {
             `Unable to search and install object (${message}).`
           );
         } else if (status === 'asset-installed') {
+          const installedType = assetShortHeader
+            ? assetShortHeader.objectType
+            : candidateType;
+          const isTheFirstOfItsTypeInProject = installedType
+            ? !gd.UsedObjectTypeFinder.scanProject(project, installedType)
+            : false;
+
           // Update behaviors shared data for the scene where the object was created.
           // Assets from the store can come with behaviors that have shared data.
           if (target_object_scope === 'global') {
@@ -886,10 +903,15 @@ const createOrReplaceObject: EditorFunction = {
         );
       }
 
-      // Create an object from scratch:
+      // Create an object from scratch: this requires a known object type.
+      if (!candidateType) {
+        return makeGenericFailure(
+          `Could not install an object for "${targetObjectName}" from the asset store, and no "object_type" was provided to create one from scratch.`
+        );
+      }
       // Ensure the extension for this object type is installed.
-      if (object_type.includes('::')) {
-        const extensionName = object_type.split('::')[0];
+      if (candidateType.includes('::')) {
+        const extensionName = candidateType.split('::')[0];
         try {
           await ensureExtensionInstalled({
             extensionName,
@@ -910,17 +932,21 @@ const createOrReplaceObject: EditorFunction = {
       // Ensure the object type is valid.
       const objectMetadata = gd.MetadataProvider.getObjectMetadata(
         project.getCurrentPlatform(),
-        object_type
+        candidateType
       );
       if (gd.MetadataProvider.isBadObjectMetadata(objectMetadata)) {
         return makeGenericFailure(
-          `Type "${object_type}" does not exist for objects.`
+          `Type "${candidateType}" does not exist for objects.`
         );
       }
 
+      const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+        project,
+        candidateType
+      );
       const object = targetObjectsContainer.insertNewObject(
         project,
-        object_type,
+        candidateType,
         targetObjectName,
         targetObjectsContainer.getObjectsCount()
       );
@@ -934,7 +960,7 @@ const createOrReplaceObject: EditorFunction = {
       const scratchResult: EditorFunctionGenericOutput = {
         success: true,
         message: [
-          `Created a new object (from scratch) called "${targetObjectName}" of type "${object_type}" in scene "${scene_name}".`,
+          `Created a new object (from scratch) called "${targetObjectName}" of type "${candidateType}" in scene "${scene_name}".`,
           getPropertiesText(object),
         ].join(' '),
       };
@@ -954,11 +980,8 @@ const createOrReplaceObject: EditorFunction = {
         return createNewObject();
       }
 
-      if (existingTargetObject.getType() !== object_type) {
-        return makeGenericFailure(
-          `Existing object "${existingTargetObject.getName()}" is of type "${existingTargetObject.getType()}". It can't be replaced by an object of type "${object_type}". This object was not changed/replaced.`
-        );
-      }
+      // Type mismatch between `object_type` and the existing object's type was
+      // already rejected above - here `candidateType` is the existing type.
 
       if (
         !search_terms &&
@@ -993,7 +1016,7 @@ const createOrReplaceObject: EditorFunction = {
         } = await searchAndInstallAsset({
           objectsContainer: targetObjectsContainer,
           objectName: replacementObjectName,
-          objectType: object_type,
+          objectType: existingTargetObject.getType(),
           searchTerms: search_terms || '',
           description: description || '',
           twoDimensionalViewKind: two_dimensional_view_kind || '',

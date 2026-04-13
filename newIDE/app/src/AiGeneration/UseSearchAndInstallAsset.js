@@ -79,6 +79,15 @@ export const useSearchAndInstallAsset = ({
           }
           assetShortHeader = foundAssetShortHeader;
         } else {
+          if (!objectType) {
+            return {
+              status: 'error',
+              message:
+                'Cannot search for an asset without an object type. Specify either `object_type` or `exact_asset_id`.',
+              createdObjects: [],
+              assetShortHeader: null,
+            };
+          }
           const assetSearch: AssetSearch = await retryIfFailed(
             { times: 3, backoff: { initialDelay: 300, factor: 2 } },
             () =>

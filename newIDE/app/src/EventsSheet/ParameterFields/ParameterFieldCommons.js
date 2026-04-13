@@ -4,6 +4,7 @@ import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
+import { type VariableDialogOpeningProps } from './VariableField';
 
 export type ParameterRenderingServiceType = {
   components: any,
@@ -56,6 +57,7 @@ export type ParameterFieldProps = {|
   // The index of the parameter in the instruction or expression.
   parameterIndex?: number,
   onInstructionTypeChanged?: () => void,
+  editEventsFunctionParameter?: VariableDialogOpeningProps => void,
 |};
 
 export type FieldFocusFunction = (

@@ -134,6 +134,7 @@ import { findEventByPath } from '../Utils/EventsValidationScanner';
 import type { SearchFilterParams } from '../Utils/Search';
 import type { InitialSearchFilterParams } from './SearchPanel';
 import { isNullPtr } from '../Utils/IsNullPtr';
+import { type VariableDialogOpeningProps } from './ParameterFields/VariableField';
 
 const gd: libGDevelop = global.gd;
 
@@ -193,6 +194,7 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  editEventsFunctionParameter: VariableDialogOpeningProps => void,
 |};
 
 type ComponentProps = {|
@@ -2596,6 +2598,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       windowSize,
       screenType,
       highlightedAiGeneratedEventIds,
+      editEventsFunctionParameter,
     } = this.props;
     if (!project) return null;
 
@@ -2929,6 +2932,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       this._searchPanel.markSearchResultsDirty();
                   }}
                   resourceManagementProps={resourceManagementProps}
+                  editEventsFunctionParameter={editEventsFunctionParameter}
                 />
                 <ContextMenu
                   ref={eventContextMenu =>

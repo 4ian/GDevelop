@@ -41,6 +41,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       projectScopedContainersAccessor,
       onChange,
       value,
+      editEventsFunctionParameter,
     } = props;
 
     const enumerateGlobalAndSceneVariables = React.useCallback(
@@ -94,6 +95,19 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     );
     const variableSourceType = variablesContainer.getSourceType();
 
+    const onOpenDialog = React.useCallback(
+      (props: VariableDialogOpeningProps) => {
+        if (variableSourceType === gd.VariablesContainer.Parameters) {
+          if (editEventsFunctionParameter) {
+            editEventsFunctionParameter(props);
+          }
+        } else {
+          setEditorOpen(props);
+        }
+      },
+      [editEventsFunctionParameter, variableSourceType]
+    );
+
     return (
       <React.Fragment>
         <VariableField
@@ -110,7 +124,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onRequestClose={props.onRequestClose}
           onApply={props.onApply}
           ref={field}
-          onOpenDialog={setEditorOpen}
+          onOpenDialog={onOpenDialog}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}

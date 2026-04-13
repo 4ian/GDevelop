@@ -793,15 +793,15 @@
       },
       "error": {
         "color": {
-          "value": "#FF8569"
+          "value": "#281603"
         },
         "background-color": {
-          "value": "#FF856944"
+          "value": "#FF8569"
         }
       },
       "warning": {
         "color": {
-          "value": "#FFBC57"
+          "value": "#FB9600"
         }
       }
     },

@@ -2,7 +2,7 @@
   "theme": {
     "primary": {
       "color": {
-        "value": "#FF6500"
+        "value": "#C75000"
       },
       "text-contrast-color": {
         "value": "#fff"
@@ -298,7 +298,7 @@
     "drop-indicator": {
       "can-drop": {
         "color": {
-          "value": "#FF6500"
+          "value": "#C75000"
         }
       },
       "cannot-drop": {
@@ -352,7 +352,7 @@
         "value": "#111418"
       },
       "indicator-color": {
-        "value": "#FF6500"
+        "value": "#C75000"
       },
       "separator-color": {
         "value": "#22272E"
@@ -606,7 +606,7 @@
         "value": "1PX #22272E SOLID"
       },
       "selected-border": {
-        "value": "1px #FF6500 dashed"
+        "value": "1px #C75000 dashed"
       }
     },
     "conditions": {
@@ -664,7 +664,7 @@
     "instruction-parameter": {
       "base": {
         "color": {
-          "value": "#4ADE80"
+          "value": "#D1D5DB"
         }
       },
       "number": {
@@ -674,7 +674,7 @@
       },
       "object": {
         "color": {
-          "value": "#FF6500"
+          "value": "#C75000"
         }
       },
       "behavior": {
@@ -684,7 +684,7 @@
       },
       "operator": {
         "color": {
-          "value": "#FFB266"
+          "value": "#9CA3AF"
         }
       },
       "var": {
@@ -704,7 +704,7 @@
     "drop-indicator": {
       "can-drop": {
         "border-top-color": {
-          "value": "#FF6500"
+          "value": "#C75000"
         }
       },
       "cannot-drop": {
@@ -788,7 +788,7 @@
       "value": "#FF8C00"
     },
     "progress-color": {
-      "value": "#FF6500"
+      "value": "#C75000"
     }
   },
   "mosaic": {
@@ -811,7 +811,7 @@
         "value": "#22272E"
       },
       "border-color-hover": {
-        "value": "#FF6500"
+        "value": "#C75000"
       }
     }
   },

@@ -10,16 +10,16 @@
     },
     "secondary": {
       "dark": {
-        "value": "#4A433E"
+        "value": "#FFD0B8"
       },
       "color": {
-        "value": "#665E58"
+        "value": "#FFE6D9"
       },
       "light": {
-        "value": "#8C847E"
+        "value": "#FFF5F0"
       },
       "text-contrast-color": {
-        "value": "#FAFAFA"
+        "value": "#181B21"
       }
     },
     "surface": {
@@ -157,17 +157,17 @@
     "text": {
       "default": {
         "color": {
-          "value": "#DDD"
+          "value": "#FAFAFA"
         }
       },
       "secondary": {
         "color": {
-          "value": "#CCC"
+          "value": "#C5C5C9"
         }
       },
       "disabled": {
         "color": {
-          "value": "#888888"
+          "value": "#9AA1AD"
         }
       },
       "contrast": {

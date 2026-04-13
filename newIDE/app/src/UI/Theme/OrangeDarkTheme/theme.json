@@ -383,6 +383,18 @@
         "value": "#FF5E3B"
       }
     },
+    "tooltip": {
+      "background": {
+        "color": {
+          "value": "#4B5563"
+        }
+      },
+      "text": {
+        "color": {
+          "value": "#FAFAFA"
+        }
+      }
+    },
     "text-field": {
       "active": {
         "error": {

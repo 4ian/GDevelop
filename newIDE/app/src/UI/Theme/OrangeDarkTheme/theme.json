@@ -611,10 +611,10 @@
     },
     "conditions": {
       "background-color": {
-        "value": "#22272E"
+        "value": "#2C323D"
       },
       "border-color": {
-        "value": "#22272E"
+        "value": "#2C323D"
       },
       "border": {
         "value": "1px solid {event-sheet.conditions.border-color.value}"
@@ -623,7 +623,7 @@
         "value": "rgb(209, 209, 209)"
       },
       "border-right-color": {
-        "value": "#22272E"
+        "value": "#2C323D"
       },
       "border-bottom-color": {
         "value": "black"
@@ -664,7 +664,7 @@
     "instruction-parameter": {
       "base": {
         "color": {
-          "value": "#D1D5DB"
+          "value": "#22D3EE"
         }
       },
       "number": {
@@ -674,7 +674,7 @@
       },
       "object": {
         "color": {
-          "value": "#C75000"
+          "value": "#FF9752"
         }
       },
       "behavior": {
@@ -684,7 +684,7 @@
       },
       "operator": {
         "color": {
-          "value": "#9CA3AF"
+          "value": "#BD93F9"
         }
       },
       "var": {

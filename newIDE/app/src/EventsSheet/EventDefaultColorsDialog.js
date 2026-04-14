@@ -14,6 +14,7 @@ import {
   isLightRgbColor,
 } from '../Utils/ColorTransformer';
 import { MiniToolbarText } from '../UI/MiniToolbar';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 const EXTENSION_NAME = 'EventDefaultColors';
 const PROP_GROUP_BG = 'groupBg';
@@ -29,9 +30,7 @@ const styles = {
     marginTop: 20,
     padding: 10,
     borderRadius: 8,
-    border: '1px solid #ccc',
-    backgroundColor: '#fff',
-    color: '#000',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
   },
   previewEvent: {
     padding: 10,
@@ -58,7 +57,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const EventDefaultColorsDialog = ({ project, onClose }: Props) => {
+const EventDefaultColorsDialog = ({ project, onClose }: Props): React.Node => {
   const extensionProperties = project.getExtensionProperties();
 
   const [groupColor, setGroupColor] = React.useState<RGBColor>(
@@ -96,6 +95,8 @@ const EventDefaultColorsDialog = ({ project, onClose }: Props) => {
     onClose();
   };
 
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
   const groupTextColorHex = isLightRgbColor(groupColor) ? '#000000' : '#ffffff';
   const groupBgColorHex = `#${rgbToHex(
     groupColor.r,
@@ -131,6 +132,7 @@ const EventDefaultColorsDialog = ({ project, onClose }: Props) => {
         />,
       ]}
       onRequestClose={onClose}
+      onApply={onApply}
     >
       <Column noMargin>
         <Line alignItems="center">
@@ -164,35 +166,42 @@ const EventDefaultColorsDialog = ({ project, onClose }: Props) => {
             disableAlpha
           />
         </Line>
-        <Column noMargin style={styles.previewContainer}>
-          <MiniToolbarText>
-            <Trans>Preview (newly created events):</Trans>
-          </MiniToolbarText>
-          <div
-            style={{
-              ...styles.previewEvent,
-              backgroundColor: groupBgColorHex,
-              color: groupTextColorHex,
-            }}
-          >
-            <span style={styles.groupTitle}>
-              <Trans>Example Group</Trans>
-            </span>
-          </div>
-          <div
-            style={{
-              ...styles.previewEvent,
-              backgroundColor: commentBgColorHex,
-              color: commentTextColorHex,
-            }}
-          >
-            <span style={styles.commentText}>
-              <Trans>
-                This is a comment event with your chosen default colors.
-              </Trans>
-            </span>
-          </div>
-        </Column>
+        <div
+          style={{
+            ...styles.previewContainer,
+            backgroundColor: gdevelopTheme.dialog.backgroundColor,
+          }}
+        >
+          <Column noMargin>
+            <MiniToolbarText>
+              <Trans>Preview (newly created events):</Trans>
+            </MiniToolbarText>
+            <div
+              style={{
+                ...styles.previewEvent,
+                backgroundColor: groupBgColorHex,
+                color: groupTextColorHex,
+              }}
+            >
+              <span style={styles.groupTitle}>
+                <Trans>Example Group</Trans>
+              </span>
+            </div>
+            <div
+              style={{
+                ...styles.previewEvent,
+                backgroundColor: commentBgColorHex,
+                color: commentTextColorHex,
+              }}
+            >
+              <span style={styles.commentText}>
+                <Trans>
+                  This is a comment event with your chosen default colors.
+                </Trans>
+              </span>
+            </div>
+          </Column>
+        </div>
       </Column>
     </Dialog>
   );

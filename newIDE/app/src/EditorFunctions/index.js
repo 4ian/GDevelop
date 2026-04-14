@@ -889,9 +889,9 @@ const createOrReplaceObject: EditorFunction = {
               .join(', ')} in scene "${scene_name}".`
           );
         } else {
-          if (exact_asset_id) {
+          if (asset_id) {
             return makeGenericFailure(
-              `No asset found with id "${exact_asset_id}". The object was not created.`
+              `No asset found with id "${asset_id}". The object was not created.`
             );
           }
 

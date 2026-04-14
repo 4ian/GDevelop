@@ -3,6 +3,7 @@ import * as React from 'react';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { mapFor } from '../../Utils/MapFor';
 import getObjectByName from '../../Utils/GetObjectByName';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 
 export interface TreeViewItemContent {
@@ -400,13 +401,20 @@ export class ObjectFolderTreeViewItem implements TreeViewItem {
     }
     return mapFor(0, this.objectFolderOrObject.getChildrenCount(), i => {
       const child = this.objectFolderOrObject.getChildAt(i);
+      // Skip non-folder children whose object is dead or missing.
+      if (
+        !child.isFolder() &&
+        !exceptionallyGuardAgainstDeadObject(child.getObject())
+      ) {
+        return null;
+      }
       return createTreeViewItem({
         objectFolderOrObject: child,
         isGlobal: this.global,
         objectFolderTreeViewItemProps: this.objectFolderTreeViewItemProps,
         objectTreeViewItemProps: this.objectTreeViewItemProps,
       });
-    });
+    }).filter(Boolean);
   }
 }
 
@@ -424,15 +432,26 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     return this.object;
   }
 
+  _getAliveObject(): ?gdObject {
+    if (!exceptionallyGuardAgainstDeadObject(this.object)) return null;
+    const object = this.object.getObject();
+    if (!exceptionallyGuardAgainstDeadObject(object)) return null;
+    return object;
+  }
+
   getName(): string | React.Node {
-    return this.object.getObject().getName();
+    const object = this._getAliveObject();
+    if (!object) return '';
+    return object.getName();
   }
   getDescription(): string | null {
     return null;
   }
 
   getId(): string {
-    return getObjectTreeViewItemId(this.object.getObject());
+    const object = this._getAliveObject();
+    if (!object) return `deleted-${this.object.ptr}`;
+    return getObjectTreeViewItemId(object);
   }
 
   getHtmlId(index: number): ?string {
@@ -440,15 +459,19 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   getDataSet(): ?HTMLDataset {
+    const object = this._getAliveObject();
+    if (!object) return null;
     return {
-      objectName: this.object.getObject().getName(),
+      objectName: object.getName(),
     };
   }
 
   getThumbnail(): ?string {
+    const object = this._getAliveObject();
+    if (!object) return null;
     return this.props.getThumbnail(
       this.props.project,
-      this.object.getObject().getConfiguration()
+      object.getConfiguration()
     );
   }
 }

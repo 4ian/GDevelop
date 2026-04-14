@@ -254,13 +254,20 @@ class ObjectFolderTreeViewItem implements TreeViewItem {
     }
     return mapFor(0, this.objectFolderOrObject.getChildrenCount(), i => {
       const child = this.objectFolderOrObject.getChildAt(i);
+      // Skip non-folder children whose object is dead or missing.
+      if (
+        !child.isFolder() &&
+        !exceptionallyGuardAgainstDeadObject(child.getObject())
+      ) {
+        return null;
+      }
       return createTreeViewItem({
         objectFolderOrObject: child,
         isGlobal: this.global,
         objectFolderTreeViewItemProps: this.objectFolderTreeViewItemProps,
         objectTreeViewItemProps: this.objectTreeViewItemProps,
       });
-    });
+    }).filter(Boolean);
   }
 }
 

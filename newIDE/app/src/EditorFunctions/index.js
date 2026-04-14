@@ -171,7 +171,7 @@ export type AssetSearchAndInstallOptions = {|
   searchTerms: string,
   description: string,
   twoDimensionalViewKind: string,
-  exactAssetId?: string | null,
+  exactOrPartialAssetId?: string | null,
   relatedAiRequestId?: string | null,
   lastUserMessage?: string | null,
   lastAssistantMessages?: string[],
@@ -721,9 +721,9 @@ const createOrReplaceObject: EditorFunction = {
       args,
       'search_terms'
     );
-    const exact_asset_id = SafeExtractor.extractStringProperty(
+    const exact_or_partial_asset_id = SafeExtractor.extractStringProperty(
       args,
-      'exact_asset_id'
+      'exact_or_partial_asset_id'
     );
     const two_dimensional_view_kind = SafeExtractor.extractStringProperty(
       args,
@@ -813,9 +813,9 @@ const createOrReplaceObject: EditorFunction = {
         );
       }
 
-      if (!candidateType && !exact_asset_id) {
+      if (!candidateType && !exact_or_partial_asset_id) {
         return makeGenericFailure(
-          `Cannot create object "${targetObjectName}": specify either "object_type" or "exact_asset_id".`
+          `Cannot create object "${targetObjectName}": specify either "object_type" or "exact_or_partial_asset_id".`
         );
       }
 
@@ -837,7 +837,7 @@ const createOrReplaceObject: EditorFunction = {
           searchTerms: search_terms || '',
           description: description || '',
           twoDimensionalViewKind: two_dimensional_view_kind || '',
-          exactAssetId: exact_asset_id || null,
+          exactOrPartialAssetId: exact_or_partial_asset_id || null,
           relatedAiRequestId,
           ...getRelatedAiRequestLastMessages(),
         });
@@ -985,7 +985,7 @@ const createOrReplaceObject: EditorFunction = {
         !search_terms &&
         !description &&
         !two_dimensional_view_kind &&
-        !exact_asset_id
+        !exact_or_partial_asset_id
       ) {
         return makeGenericFailure(
           `No search terms, description or information were provided to replace the object "${existingTargetObject.getName()}". This object was not changed/replaced.`
@@ -1018,7 +1018,7 @@ const createOrReplaceObject: EditorFunction = {
           searchTerms: search_terms || '',
           description: description || '',
           twoDimensionalViewKind: two_dimensional_view_kind || '',
-          exactAssetId: exact_asset_id || null,
+          exactOrPartialAssetId: exact_or_partial_asset_id || null,
           relatedAiRequestId,
           ...getRelatedAiRequestLastMessages(),
         });

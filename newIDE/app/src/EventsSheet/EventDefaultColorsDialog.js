@@ -6,21 +6,19 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { Line, Column } from '../UI/Grid';
 import ColorPicker from '../UI/ColorField/ColorPicker';
-import { type RGBColor, rgbToHex } from '../Utils/ColorTransformer';
+import {
+  type RGBColor,
+  rgbToHex,
+  rgbColorToRGBString,
+  rgbStringAndAlphaToRGBColor,
+  isLightRgbColor,
+} from '../Utils/ColorTransformer';
 import { MiniToolbarText } from '../UI/MiniToolbar';
 
 const EXTENSION_NAME = 'EventDefaultColors';
 const PROP_GROUP_BG = 'groupBg';
 const PROP_COMMENT_BG = 'commentBg';
 const PROP_COMMENT_TEXT = 'commentText';
-
-const rgbToString = (color: RGBColor) => `${color.r};${color.g};${color.b}`;
-const stringToRgb = (str: string, defaultColor: RGBColor): RGBColor => {
-  if (!str) return defaultColor;
-  const parts = str.split(';').map(Number);
-  if (parts.length !== 3 || parts.some(isNaN)) return defaultColor;
-  return { r: parts[0], g: parts[1], b: parts[2] };
-};
 
 const styles = {
   colorPicker: {
@@ -64,53 +62,41 @@ const EventDefaultColorsDialog = ({ project, onClose }: Props) => {
   const extensionProperties = project.getExtensionProperties();
 
   const [groupColor, setGroupColor] = React.useState<RGBColor>(
-    stringToRgb(extensionProperties.getValue(EXTENSION_NAME, PROP_GROUP_BG), {
-      r: 74,
-      g: 176,
-      b: 228,
-    })
+    rgbStringAndAlphaToRGBColor(
+      extensionProperties.getValue(EXTENSION_NAME, PROP_GROUP_BG)
+    ) || { r: 74, g: 176, b: 228 }
   );
   const [commentBgColor, setCommentBgColor] = React.useState<RGBColor>(
-    stringToRgb(extensionProperties.getValue(EXTENSION_NAME, PROP_COMMENT_BG), {
-      r: 255,
-      g: 230,
-      b: 109,
-    })
+    rgbStringAndAlphaToRGBColor(
+      extensionProperties.getValue(EXTENSION_NAME, PROP_COMMENT_BG)
+    ) || { r: 255, g: 230, b: 109 }
   );
   const [commentTextColor, setCommentTextColor] = React.useState<RGBColor>(
-    stringToRgb(
-      extensionProperties.getValue(EXTENSION_NAME, PROP_COMMENT_TEXT),
-      {
-        r: 0,
-        g: 0,
-        b: 0,
-      }
-    )
+    rgbStringAndAlphaToRGBColor(
+      extensionProperties.getValue(EXTENSION_NAME, PROP_COMMENT_TEXT)
+    ) || { r: 0, g: 0, b: 0 }
   );
 
   const onApply = () => {
     extensionProperties.setValue(
       EXTENSION_NAME,
       PROP_GROUP_BG,
-      rgbToString(groupColor)
+      rgbColorToRGBString(groupColor)
     );
     extensionProperties.setValue(
       EXTENSION_NAME,
       PROP_COMMENT_BG,
-      rgbToString(commentBgColor)
+      rgbColorToRGBString(commentBgColor)
     );
     extensionProperties.setValue(
       EXTENSION_NAME,
       PROP_COMMENT_TEXT,
-      rgbToString(commentTextColor)
+      rgbColorToRGBString(commentTextColor)
     );
     onClose();
   };
 
-  const groupTextColorHex =
-    (groupColor.r + groupColor.g + groupColor.b) / 3 > 200
-      ? '#000000'
-      : '#ffffff';
+  const groupTextColorHex = isLightRgbColor(groupColor) ? '#000000' : '#ffffff';
   const groupBgColorHex = `#${rgbToHex(
     groupColor.r,
     groupColor.g,

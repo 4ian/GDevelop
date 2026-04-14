@@ -390,7 +390,11 @@ const SortableEventsTree = ({
     [flatData, searchMethod, searchQuery]
   );
 
-  React.useEffect(
+  // Use useLayoutEffect (not useEffect) so that the ref proxy is available
+  // before the parent's useLayoutEffect fires to call recomputeRowHeights.
+  // With useEffect, the proxy wouldn't be set until after paint, causing
+  // the first render to display rows at incorrect (estimated) heights.
+  React.useLayoutEffect(
     () => {
       if (!reactVirtualizedListProps || !reactVirtualizedListProps.ref) return;
       reactVirtualizedListProps.ref({

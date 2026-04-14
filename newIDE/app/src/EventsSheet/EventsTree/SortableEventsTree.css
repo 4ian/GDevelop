@@ -124,6 +124,11 @@
   white-space: nowrap;
   position: relative;
   text-align: left;
+  /* Clip content so that if the virtual list temporarily assigns
+     a smaller height than the actual content (before measurements
+     complete), the overflow is hidden rather than overlapping
+     adjacent rows. */
+  overflow: hidden;
 }
 
 .rst__nodeContent {

@@ -177,6 +177,29 @@ const EventContainer = (props: EventsContainerProps) => {
     eventsHeightsCache.setEventHeight(event, height);
   });
 
+  // Use a ResizeObserver to detect height changes that happen outside of
+  // React render cycles (e.g. images loading, fonts loading, CSS transitions).
+  // When a change is detected, the cache is updated and its debounced callback
+  // will trigger a list recomputation.
+  React.useEffect(
+    () => {
+      const container = containerRef.current;
+      if (!container) return;
+
+      const observer = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          const height = entry.contentRect.height;
+          if (height > 0) {
+            eventsHeightsCache.setEventHeight(event, height);
+          }
+        }
+      });
+      observer.observe(container);
+      return () => observer.disconnect();
+    },
+    [event, eventsHeightsCache]
+  );
+
   const _onUpdate = React.useCallback(
     () => {
       forceUpdate();
@@ -404,6 +427,17 @@ const EventsTree: React.ComponentType<{
 
   const _list = React.useRef<?any>(null);
   const eventsHeightsCache = React.useMemo(() => new EventHeightsCache(), []);
+
+  // Register a callback so that when the height cache is updated
+  // (e.g. from a ResizeObserver), the virtual list recomputes row positions.
+  React.useEffect(() => {
+    eventsHeightsCache.setOnHeightsChanged(() => {
+      if (_list.current) {
+        _list.current.recomputeRowHeights();
+      }
+    });
+    return () => eventsHeightsCache.setOnHeightsChanged(null);
+  }, [eventsHeightsCache]);
 
   const DragSourceAndDropTarget = React.useMemo(
     () =>

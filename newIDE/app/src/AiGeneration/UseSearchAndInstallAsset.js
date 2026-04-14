@@ -83,7 +83,7 @@ export const useSearchAndInstallAsset = ({
             return {
               status: 'error',
               message:
-                'Cannot search for an asset without an object type. Specify either `object_type` or `exact_or_partial_asset_id`.',
+                'Cannot search for an asset without an object type. Specify either `object_type` or `asset_id`.',
               createdObjects: [],
               assetShortHeader: null,
               isTheFirstOfItsTypeInProject: false,

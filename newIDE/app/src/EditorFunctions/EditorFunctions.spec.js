@@ -516,7 +516,7 @@ describe('editorFunctions', () => {
       );
     });
 
-    it('creates a new object via exact_or_partial_asset_id without object_type', async () => {
+    it('creates a new object via asset_id without object_type', async () => {
       // $FlowFixMe[underconstrained-implicit-instantiation]
       const onObjectsModifiedOutsideEditor = jest.fn();
 
@@ -546,7 +546,7 @@ describe('editorFunctions', () => {
           args: {
             scene_name: 'TestScene',
             object_name: 'MyAssetObject',
-            exact_or_partial_asset_id: fakeAssetShortHeader1.id,
+            asset_id: fakeAssetShortHeader1.id,
           },
           onObjectsModifiedOutsideEditor,
         }
@@ -556,7 +556,7 @@ describe('editorFunctions', () => {
       expect(testScene.getObjects().hasObjectNamed('MyAssetObject')).toBe(true);
     });
 
-    it('fails when creating a new object without object_type nor exact_or_partial_asset_id', async () => {
+    it('fails when creating a new object without object_type nor asset_id', async () => {
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
           ...makeFakeLaunchFunctionOptionsWithProject(project),
@@ -569,7 +569,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(
-        `"Cannot create object \\"MyAssetObject\\": specify either \\"object_type\\" or \\"exact_or_partial_asset_id\\"."`
+        `"Cannot create object \\"MyAssetObject\\": specify either \\"object_type\\" or \\"asset_id\\"."`
       );
     });
 

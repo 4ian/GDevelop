@@ -15,6 +15,9 @@ import {
 } from '../Utils/ColorTransformer';
 import { MiniToolbarText } from '../UI/MiniToolbar';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
+import Paper from '../UI/Paper';
+import Text from '../UI/Text';
 
 const EXTENSION_NAME = 'EventDefaultColors';
 const PROP_GROUP_BG = 'groupBg';
@@ -30,7 +33,6 @@ const styles = {
     marginTop: 20,
     padding: 10,
     borderRadius: 8,
-    border: '1px solid rgba(255, 255, 255, 0.1)',
   },
   previewEvent: {
     padding: 10,
@@ -134,8 +136,8 @@ const EventDefaultColorsDialog = ({ project, onClose }: Props): React.Node => {
       onRequestClose={onClose}
       onApply={onApply}
     >
-      <Column noMargin>
-        <Line alignItems="center">
+      <ColumnStackLayout noMargin>
+        <LineStackLayout alignItems="center">
           <MiniToolbarText>
             <Trans>Group background:</Trans>
           </MiniToolbarText>
@@ -145,8 +147,8 @@ const EventDefaultColorsDialog = ({ project, onClose }: Props): React.Node => {
             onChangeComplete={color => setGroupColor(color.rgb)}
             disableAlpha
           />
-        </Line>
-        <Line alignItems="center">
+        </LineStackLayout>
+        <LineStackLayout alignItems="center">
           <MiniToolbarText>
             <Trans>Comment background:</Trans>
           </MiniToolbarText>
@@ -165,17 +167,16 @@ const EventDefaultColorsDialog = ({ project, onClose }: Props): React.Node => {
             onChangeComplete={color => setCommentTextColor(color.rgb)}
             disableAlpha
           />
-        </Line>
-        <div
-          style={{
-            ...styles.previewContainer,
-            backgroundColor: gdevelopTheme.dialog.backgroundColor,
-          }}
+        </LineStackLayout>
+        <Paper
+          background="dark"
+          variant="outlined"
+          style={styles.previewContainer}
         >
-          <Column noMargin>
-            <MiniToolbarText>
+          <ColumnStackLayout noMargin>
+            <Text size="block-title">
               <Trans>Preview (newly created events):</Trans>
-            </MiniToolbarText>
+            </Text>
             <div
               style={{
                 ...styles.previewEvent,
@@ -200,9 +201,9 @@ const EventDefaultColorsDialog = ({ project, onClose }: Props): React.Node => {
                 </Trans>
               </span>
             </div>
-          </Column>
-        </div>
-      </Column>
+          </ColumnStackLayout>
+        </Paper>
+      </ColumnStackLayout>
     </Dialog>
   );
 };

@@ -241,6 +241,7 @@ import StandaloneDialog from './StandAloneDialog';
 import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
+import EventDefaultColorsDialog from '../EventsSheet/EventDefaultColorsDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -466,6 +467,10 @@ const MainFrame = (props: Props): React.MixedElement => {
   const [
     memoryTrackerRegistryDialogOpen,
     setMemoryTrackedRegistryDialogOpen,
+  ] = React.useState<boolean>(false);
+  const [
+    eventDefaultColorsDialogOpen,
+    setEventDefaultColorsDialogOpen,
   ] = React.useState<boolean>(false);
 
   /**
@@ -4867,6 +4872,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onRestartInGameEditor,
     onOpenGlobalSearch: openGlobalSearch,
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
+    onOpenEventDefaultColorsDialog: () => setEventDefaultColorsDialogOpen(true),
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -5605,6 +5611,12 @@ const MainFrame = (props: Props): React.MixedElement => {
       {memoryTrackerRegistryDialogOpen && (
         <MemoryTrackedRegistryDialog
           onClose={() => setMemoryTrackedRegistryDialogOpen(false)}
+        />
+      )}
+      {eventDefaultColorsDialogOpen && currentProject && (
+        <EventDefaultColorsDialog
+          project={currentProject}
+          onClose={() => setEventDefaultColorsDialogOpen(false)}
         />
       )}
       <CustomDragLayer />

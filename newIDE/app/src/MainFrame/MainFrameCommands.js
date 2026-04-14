@@ -70,6 +70,7 @@ type CommandHandlers = {|
   onRestartInGameEditor: (reason: string) => void,
   onOpenGlobalSearch: () => void,
   onOpenMemoryTrackerRegistry: () => void,
+  onOpenEventDefaultColorsDialog: () => void,
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
@@ -181,6 +182,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('OPEN_MEMORY_TRACKER_REGISTRY', true, {
     handler: handlers.onOpenMemoryTrackerRegistry,
+  });
+
+  useCommand('OPEN_EVENT_DEFAULT_COLORS_DIALOG', !!handlers.project, {
+    handler: handlers.onOpenEventDefaultColorsDialog,
   });
 
   useCommandWithOptions('OPEN_LAYOUT', !!handlers.project, {

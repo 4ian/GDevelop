@@ -69,7 +69,8 @@ export type CommandName =
   | 'SEARCH_EVENTS'
   | 'OPEN_EXTENSION_SETTINGS'
   | 'OPEN_PROFILE'
-  | 'OPEN_MEMORY_TRACKER_REGISTRY';
+  | 'OPEN_MEMORY_TRACKER_REGISTRY'
+  | 'OPEN_EVENT_DEFAULT_COLORS_DIALOG';
 
 export const commandAreas = {
   GENERAL: (t`General`: any),
@@ -184,6 +185,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_PROJECT_PROPERTIES: {
     area: 'PROJECT',
     displayText: t`Open project properties`,
+  },
+  OPEN_EVENT_DEFAULT_COLORS_DIALOG: {
+    area: 'PROJECT',
+    displayText: t`Group and Comment default colors`,
   },
   OPEN_PROJECT_LOADING_SCREEN: {
     area: 'PROJECT',

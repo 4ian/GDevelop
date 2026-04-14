@@ -46,43 +46,41 @@ export const useSearchAndInstallAsset = ({
         objectsContainer,
         objectName,
         objectType,
-        exactAssetId,
+        exactOrPartialAssetId,
         ...assetSearchOptions
       }: AssetSearchAndInstallOptions): Promise<AssetSearchAndInstallResult> => {
         if (!profile) throw new Error('User should be authenticated.');
 
         let assetShortHeader;
-        if (exactAssetId) {
-          // If an exact asset id is provided, fetch the asset directly
-          // instead of searching for it.
-          const foundAssetShortHeader = getAssetShortHeaderFromId(exactAssetId);
-          if (!foundAssetShortHeader) {
-            return {
-              status: 'nothing-found',
-              message: `No asset found with id "${exactAssetId}".`,
-              createdObjects: [],
-              assetShortHeader: null,
-              isTheFirstOfItsTypeInProject: false,
-            };
+        if (exactOrPartialAssetId) {
+          // If an exact or partial asset id is provided, first try to
+          // fetch the asset directly by its id.
+          const foundAssetShortHeader = getAssetShortHeaderFromId(
+            exactOrPartialAssetId
+          );
+          if (foundAssetShortHeader) {
+            if (objectType && foundAssetShortHeader.objectType !== objectType) {
+              return {
+                status: 'nothing-found',
+                message: `Asset with id "${exactOrPartialAssetId}" has type "${
+                  foundAssetShortHeader.objectType
+                }", which does not match the requested type "${objectType}".`,
+                createdObjects: [],
+                assetShortHeader: null,
+                isTheFirstOfItsTypeInProject: false,
+              };
+            }
+            assetShortHeader = foundAssetShortHeader;
           }
-          if (objectType && foundAssetShortHeader.objectType !== objectType) {
-            return {
-              status: 'nothing-found',
-              message: `Asset with id "${exactAssetId}" has type "${
-                foundAssetShortHeader.objectType
-              }", which does not match the requested type "${objectType}".`,
-              createdObjects: [],
-              assetShortHeader: null,
-              isTheFirstOfItsTypeInProject: false,
-            };
-          }
-          assetShortHeader = foundAssetShortHeader;
-        } else {
-          if (!objectType) {
+          // If not found by id, fall through to the search below.
+        }
+
+        if (!assetShortHeader) {
+          if (!objectType && !exactOrPartialAssetId) {
             return {
               status: 'error',
               message:
-                'Cannot search for an asset without an object type. Specify either `object_type` or `exact_asset_id`.',
+                'Cannot search for an asset without an object type. Specify either `object_type` or `asset_id`.',
               createdObjects: [],
               assetShortHeader: null,
               isTheFirstOfItsTypeInProject: false,
@@ -94,6 +92,7 @@ export const useSearchAndInstallAsset = ({
               createAssetSearch(getAuthorizationHeader, {
                 userId: profile.id,
                 objectType,
+                exactOrPartialAssetId,
                 ...assetSearchOptions,
               })
           );

@@ -138,7 +138,7 @@
     "surface": {
       "toolbar": {
         "background-color": {
-          "value": "#25252E",
+          "value": "#151D24",
           "comment": "Palette/Grey/90"
         }
       },
@@ -501,7 +501,7 @@
     },
     "tabs": {
       "text-color": {
-        "value": "#D05300",
+        "value": "#7F7F85",
         "comment": "Palette/Grey/50"
       },
       "background-color": {
@@ -761,7 +761,7 @@
     "instruction-parameter": {
       "base": {
         "color": {
-          "value": "#22D3EE"
+          "value": "#4ADE80"
         }
       },
       "number": {

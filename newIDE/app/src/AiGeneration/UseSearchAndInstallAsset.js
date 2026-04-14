@@ -12,6 +12,7 @@ import {
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInstallAsset } from '../AssetStore/NewObjectDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import { AssetStoreContext } from '../AssetStore/AssetStoreContext';
 
 type _FuncReturnType = {
   searchAndInstallAsset: AssetSearchAndInstallOptions => Promise<AssetSearchAndInstallResult>,
@@ -31,6 +32,7 @@ export const useSearchAndInstallAsset = ({
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
+  const { getAssetShortHeaderFromId } = React.useContext(AssetStoreContext);
   const installAsset = useInstallAsset({
     project,
     resourceManagementProps,
@@ -43,33 +45,78 @@ export const useSearchAndInstallAsset = ({
       async ({
         objectsContainer,
         objectName,
+        objectType,
+        exactAssetId,
         ...assetSearchOptions
       }: AssetSearchAndInstallOptions): Promise<AssetSearchAndInstallResult> => {
         if (!profile) throw new Error('User should be authenticated.');
 
-        const assetSearch: AssetSearch = await retryIfFailed(
-          { times: 3, backoff: { initialDelay: 300, factor: 2 } },
-          () =>
-            createAssetSearch(getAuthorizationHeader, {
-              userId: profile.id,
-              ...assetSearchOptions,
-            })
-        );
-        if (!assetSearch.results || assetSearch.results.length === 0) {
-          return {
-            status: 'nothing-found',
-            message: 'No assets found.',
-            createdObjects: [],
-            assetShortHeader: null,
-          };
+        let assetShortHeader;
+        if (exactAssetId) {
+          // If an exact asset id is provided, fetch the asset directly
+          // instead of searching for it.
+          const foundAssetShortHeader = getAssetShortHeaderFromId(exactAssetId);
+          if (!foundAssetShortHeader) {
+            return {
+              status: 'nothing-found',
+              message: `No asset found with id "${exactAssetId}".`,
+              createdObjects: [],
+              assetShortHeader: null,
+              isTheFirstOfItsTypeInProject: false,
+            };
+          }
+          if (objectType && foundAssetShortHeader.objectType !== objectType) {
+            return {
+              status: 'nothing-found',
+              message: `Asset with id "${exactAssetId}" has type "${
+                foundAssetShortHeader.objectType
+              }", which does not match the requested type "${objectType}".`,
+              createdObjects: [],
+              assetShortHeader: null,
+              isTheFirstOfItsTypeInProject: false,
+            };
+          }
+          assetShortHeader = foundAssetShortHeader;
+        } else {
+          if (!objectType) {
+            return {
+              status: 'error',
+              message:
+                'Cannot search for an asset without an object type. Specify either `object_type` or `exact_asset_id`.',
+              createdObjects: [],
+              assetShortHeader: null,
+              isTheFirstOfItsTypeInProject: false,
+            };
+          }
+          const assetSearch: AssetSearch = await retryIfFailed(
+            { times: 3, backoff: { initialDelay: 300, factor: 2 } },
+            () =>
+              createAssetSearch(getAuthorizationHeader, {
+                userId: profile.id,
+                objectType,
+                ...assetSearchOptions,
+              })
+          );
+          if (!assetSearch.results || assetSearch.results.length === 0) {
+            return {
+              status: 'nothing-found',
+              message: 'No assets found.',
+              createdObjects: [],
+              assetShortHeader: null,
+              isTheFirstOfItsTypeInProject: false,
+            };
+          }
+
+          // In the future, we could ask the user to select the asset they want to use.
+          // For now, we just return the first asset.
+          const chosenResult = assetSearch.results[0];
+          if (!chosenResult) throw new Error('No asset found.');
+          assetShortHeader = chosenResult.asset;
         }
 
-        // In the future, we could ask the user to select the asset they want to use.
-        // For now, we just return the first asset.
-        const chosenResult = assetSearch.results[0];
-        if (!chosenResult) throw new Error('No asset found.');
-        const assetShortHeader = chosenResult.asset;
-
+        // `installAsset` computes `isTheFirstOfItsTypeInProject` before
+        // actually inserting the objects into the project, so it reflects
+        // the state right before installation.
         const installOutput = await installAsset({
           assetShortHeader,
           objectsContainer,
@@ -83,6 +130,7 @@ export const useSearchAndInstallAsset = ({
             message: 'Asset found but failed to install asset.',
             createdObjects: [],
             assetShortHeader: null,
+            isTheFirstOfItsTypeInProject: false,
           };
         }
 
@@ -91,9 +139,11 @@ export const useSearchAndInstallAsset = ({
           message: 'Asset installed successfully.',
           createdObjects: installOutput.createdObjects,
           assetShortHeader,
+          isTheFirstOfItsTypeInProject:
+            installOutput.isTheFirstOfItsTypeInProject,
         };
       },
-      [installAsset, profile, getAuthorizationHeader]
+      [installAsset, profile, getAuthorizationHeader, getAssetShortHeaderFromId]
     ),
   };
 };

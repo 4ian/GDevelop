@@ -286,6 +286,8 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   onClick(): void {
     const objectFolderOrObject = this._getAliveObjectFolderOrObject();
     if (!objectFolderOrObject) return;
+    if (!objectFolderOrObject.isFolder() && !this._getAliveObject()) return;
+
     this.props.selectObjectFolderOrObjectWithContext({
       objectFolderOrObject,
       global: this._isGlobal,

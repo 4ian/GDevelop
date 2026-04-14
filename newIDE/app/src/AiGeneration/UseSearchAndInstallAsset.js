@@ -59,10 +59,7 @@ export const useSearchAndInstallAsset = ({
             exactOrPartialAssetId
           );
           if (foundAssetShortHeader) {
-            if (
-              objectType &&
-              foundAssetShortHeader.objectType !== objectType
-            ) {
+            if (objectType && foundAssetShortHeader.objectType !== objectType) {
               return {
                 status: 'nothing-found',
                 message: `Asset with id "${exactOrPartialAssetId}" has type "${

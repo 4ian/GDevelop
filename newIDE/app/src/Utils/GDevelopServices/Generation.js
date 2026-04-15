@@ -124,6 +124,7 @@ export type AiRequest = {
   forkedFromAiRequestId?: string | null,
   forkedAfterOriginalMessageId?: string | null,
   forkedAfterNewMessageId?: string | null,
+  parentAiRequestId?: string | null,
 
   error: {
     code: string,

@@ -94,13 +94,16 @@ export const AskAiHistoryContent = ({
       error,
     },
   } = React.useContext(AiRequestContext);
-  // $FlowFixMe[incompatible-type] - Flow loses type with Object.values
-  const aiRequestsArray: AiRequest[] = Object.values(aiRequests).sort(
-    // $FlowFixMe[incompatible-type] - Object.values() loses the type of aiRequests.
-    (a: AiRequest, b: AiRequest) => {
+  // Sub-agent requests live in the same `aiRequests` map as top-level
+  // conversations (they are fetched on demand for display within their parent
+  // request). They carry a `parentAiRequestId` and must not appear as
+  // independent entries in the history.
+  const aiRequestsArray: AiRequest[] = Object.values(aiRequests)
+    // $FlowFixMe[incompatible-type] - Object.values loses the value type.
+    .filter((aiRequest: AiRequest) => !aiRequest.parentAiRequestId)
+    .sort((a: AiRequest, b: AiRequest) => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    }
-  );
+    });
   if (!aiRequestsArray.length && isLoading) {
     return (
       <Column

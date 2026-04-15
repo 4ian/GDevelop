@@ -27,6 +27,8 @@ import { SafeExtractor } from '../../Utils/SafeExtractor';
 import CircledAdd from '../../UI/CustomSvgIcons/CircledAdd';
 import { AiRequestContext } from '../AiRequestContext';
 import { getFunctionCallToFunctionCallOutputMap } from '../AiRequestUtils';
+import CheckCircleFilled from '../../UI/CustomSvgIcons/CheckCircleFilled';
+import CircledInfo from '../../UI/CustomSvgIcons/CircledInfo';
 
 const styles = {
   functionCallText: {
@@ -325,6 +327,27 @@ const SubAgentFunctionCallRow = ({
     }
   }
 
+  // Extract the prompt given to the sub-agent from the function call arguments.
+  const subAgentPrompt: string | null = React.useMemo(
+    () => {
+      try {
+        const parsedArguments = JSON.parse(functionCall.arguments);
+        const prompt = SafeExtractor.extractStringProperty(
+          parsedArguments,
+          'prompt'
+        );
+        if (prompt) {
+          const trimmed = prompt.trim();
+          return trimmed || null;
+        }
+        return null;
+      } catch (error) {
+        return null;
+      }
+    },
+    [functionCall.arguments]
+  );
+
   // Build items (function calls and text) for the sub-agent's output, in order.
   const subAgentItems: Array<SubAgentItem> = React.useMemo(
     () => {
@@ -430,8 +453,15 @@ const SubAgentFunctionCallRow = ({
           </div>
         </div>
       </div>
-      {showDetails && subAgentItems.length > 0 && (
+      {showDetails && (subAgentPrompt || subAgentItems.length > 0) && (
         <div className={classes.detailsContent}>
+          {subAgentPrompt && (
+            <SubAgentTextRow
+              key={`sub-${subAgentAiRequestId}-prompt`}
+              text={subAgentPrompt}
+              textType="prompt"
+            />
+          )}
           {subAgentItems.map(item =>
             item.type === 'function_call' ? (
               <EditorFunctionCallRow
@@ -444,7 +474,11 @@ const SubAgentFunctionCallRow = ({
                 editorCallbacks={editorCallbacks}
               />
             ) : (
-              <SubAgentTextRow key={item.key} text={item.text} />
+              <SubAgentTextRow
+                key={item.key}
+                text={item.text}
+                textType="output"
+              />
             )
           )}
         </div>
@@ -453,7 +487,14 @@ const SubAgentFunctionCallRow = ({
   );
 };
 
-const SubAgentTextRow = ({ text }: {| text: string |}) => {
+const SubAgentTextRow = ({
+  text,
+  textType,
+}: {|
+  text: string,
+  textType: 'output' | 'prompt',
+|}) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [showDetails, setShowDetails] = React.useState(false);
 
   const firstLine = text.split('\n')[0];
@@ -465,7 +506,19 @@ const SubAgentTextRow = ({ text }: {| text: string |}) => {
   return (
     <div className={classes.functionCallContainer}>
       <div className={classes.functionCallRow}>
-        <span className={classes.statusIconContainer} />
+        <span className={classes.statusIconContainer}>
+          {textType === 'output' ? (
+            <CheckCircleFilled
+              htmlColor={gdevelopTheme.text.color.disabled}
+              fontSize="small"
+            />
+          ) : textType === 'prompt' ? (
+            <CircledInfo
+              htmlColor={gdevelopTheme.text.color.disabled}
+              fontSize="small"
+            />
+          ) : null}
+        </span>
         <div
           className={`${classes.functionCallTextArea} ${
             classes.functionCallTextAreaClickable

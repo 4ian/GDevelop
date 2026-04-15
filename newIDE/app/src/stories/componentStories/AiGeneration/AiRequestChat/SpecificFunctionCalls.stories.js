@@ -286,7 +286,8 @@ const subAgentFunctionCallMessage = {
       status: 'completed',
       call_id: 'tool_0_run_project_edit_agent',
       name: 'run_project_edit_agent',
-      arguments: '{"task":"Add an enemy to the game"}',
+      arguments:
+        '{"prompt":"Add an enemy to the game. The enemy should be a Sprite object placed in Level1, and should be deleted automatically when it falls off the bottom of the screen."}',
       subAgentAiRequestId: 'fake-sub-agent-request-id',
     },
   ],

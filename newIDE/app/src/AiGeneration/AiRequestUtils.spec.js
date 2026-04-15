@@ -1,10 +1,12 @@
 // @flow
 import {
+  getAllSubAgentFunctionCalls,
   getFunctionCallsToProcess,
-  getSubAgentFunctionCalls,
+  getPendingSubAgentFunctionCalls,
 } from './AiRequestUtils';
+import { type AiRequest } from '../Utils/GDevelopServices/Generation';
 
-const makeAiRequest = (output: Array<any>) => ({
+const makeAiRequest = (output: Array<any>): AiRequest => ({
   id: 'request-1',
   createdAt: '',
   updatedAt: '',
@@ -71,7 +73,7 @@ describe('getFunctionCallsToProcess', () => {
   });
 });
 
-describe('getSubAgentFunctionCalls', () => {
+describe('getPendingSubAgentFunctionCalls', () => {
   it('returns pending sub-agent function calls', () => {
     const aiRequest = makeAiRequest([
       makeAssistantMessage([
@@ -85,7 +87,7 @@ describe('getSubAgentFunctionCalls', () => {
       makeFunctionCallOutput('call-1'),
     ]);
 
-    const result = getSubAgentFunctionCalls({ aiRequest });
+    const result = getPendingSubAgentFunctionCalls({ aiRequest });
 
     expect(result).toHaveLength(1);
     expect(result[0].call_id).toBe('call-2');
@@ -104,8 +106,65 @@ describe('getSubAgentFunctionCalls', () => {
       makeFunctionCallOutput('call-1'),
     ]);
 
-    const result = getSubAgentFunctionCalls({ aiRequest });
+    const result = getPendingSubAgentFunctionCalls({ aiRequest });
 
     expect(result).toHaveLength(0);
+  });
+});
+
+describe('getAllSubAgentFunctionCalls', () => {
+  it('returns both pending and completed sub-agent function calls', () => {
+    const aiRequest = makeAiRequest([
+      makeAssistantMessage([
+        makeSubAgentFunctionCall(
+          'call-1',
+          'run_project_edit_agent',
+          'sub-agent-1'
+        ),
+        makeSubAgentFunctionCall(
+          'call-2',
+          'run_project_edit_agent',
+          'sub-agent-2'
+        ),
+      ]),
+      makeFunctionCallOutput('call-1'),
+    ]);
+
+    const result = getAllSubAgentFunctionCalls({ aiRequest });
+
+    expect(result.map(fc => fc.call_id)).toEqual(['call-1', 'call-2']);
+    expect(result.map(fc => fc.subAgentAiRequestId)).toEqual([
+      'sub-agent-1',
+      'sub-agent-2',
+    ]);
+  });
+
+  it('excludes non-sub-agent function calls', () => {
+    const aiRequest = makeAiRequest([
+      makeAssistantMessage([
+        makeFunctionCall('call-1', 'create_object'),
+        makeSubAgentFunctionCall(
+          'call-2',
+          'run_project_edit_agent',
+          'sub-agent-1'
+        ),
+        makeFunctionCall('call-3', 'add_scene_events'),
+      ]),
+    ]);
+
+    const result = getAllSubAgentFunctionCalls({ aiRequest });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].call_id).toBe('call-2');
+  });
+
+  it('returns an empty array when there are no sub-agent function calls', () => {
+    const aiRequest = makeAiRequest([
+      makeAssistantMessage([makeFunctionCall('call-1', 'create_object')]),
+    ]);
+
+    const result = getAllSubAgentFunctionCalls({ aiRequest });
+
+    expect(result).toEqual([]);
   });
 });

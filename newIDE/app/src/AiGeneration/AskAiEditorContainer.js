@@ -76,7 +76,8 @@ import {
   type OpenAskAiOptions,
   type NewAiRequestOptions,
   useProcessFunctionCalls,
-  useActivateSubAgents,
+  useActivatePendingSubAgents,
+  useLoadSubAgentRequests,
   useRefreshLimits,
   getToolsVersionForAiRequestMode,
 } from './Utils';
@@ -835,7 +836,8 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           triggerUnsavedChanges,
         ]
       );
-      useActivateSubAgents({ selectedAiRequest });
+      useActivatePendingSubAgents({ selectedAiRequest });
+      useLoadSubAgentRequests({ selectedAiRequest });
 
       const onSendEditorFunctionCallResults = React.useCallback(
         async (

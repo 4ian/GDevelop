@@ -123,23 +123,19 @@ export const getFunctionCallsToProcess = ({
 };
 
 /**
- * Returns sub-agent function calls (those with a subAgentAiRequestId)
- * that don't yet have a corresponding function_call_output in the AI request output.
+ * Returns all sub-agent function calls (those with a subAgentAiRequestId) in
+ * the AI request output, regardless of whether their sub-agent has completed.
  */
-export const getSubAgentFunctionCalls = ({
+export const getAllSubAgentFunctionCalls = ({
   aiRequest,
 }: {|
   aiRequest: AiRequest,
 |}): Array<AiRequestMessageAssistantFunctionCall> => {
-  const processedCallIds = new Set<string>();
   const subAgentCalls: AiRequestMessageAssistantFunctionCall[] = [];
 
   const output = aiRequest.output || [];
   for (let i = 0; i < output.length; i++) {
     const message = output[i];
-    if (message.type === 'function_call_output') {
-      processedCallIds.add(message.call_id);
-    }
     if (message.type === 'message' && message.role === 'assistant') {
       for (const content of message.content) {
         if (content.type === 'function_call' && content.subAgentAiRequestId) {
@@ -149,7 +145,30 @@ export const getSubAgentFunctionCalls = ({
     }
   }
 
-  return subAgentCalls.filter(call => !processedCallIds.has(call.call_id));
+  return subAgentCalls;
+};
+
+/**
+ * Returns sub-agent function calls (those with a subAgentAiRequestId)
+ * that don't yet have a corresponding function_call_output in the AI request output.
+ */
+export const getPendingSubAgentFunctionCalls = ({
+  aiRequest,
+}: {|
+  aiRequest: AiRequest,
+|}): Array<AiRequestMessageAssistantFunctionCall> => {
+  const processedCallIds = new Set<string>();
+  const output = aiRequest.output || [];
+  for (let i = 0; i < output.length; i++) {
+    const message = output[i];
+    if (message.type === 'function_call_output') {
+      processedCallIds.add(message.call_id);
+    }
+  }
+
+  return getAllSubAgentFunctionCalls({ aiRequest }).filter(
+    call => !processedCallIds.has(call.call_id)
+  );
 };
 
 export const getFunctionCallNameByCallId = ({
@@ -218,7 +237,7 @@ export const getLatestActivePlan = (
 export const aiRequestShouldBeWatched = (aiRequest: AiRequest): boolean => {
   if (aiRequest.status === 'working') return true;
   if (aiRequest.status === 'ready') {
-    return getSubAgentFunctionCalls({ aiRequest }).length > 0;
+    return getPendingSubAgentFunctionCalls({ aiRequest }).length > 0;
   }
   return false;
 };
@@ -247,7 +266,7 @@ export const aiRequestHasWorkInProgress = (
   )
     return true;
   if (aiRequest.status === 'ready') {
-    if (getSubAgentFunctionCalls({ aiRequest }).length > 0) return true;
+    if (getPendingSubAgentFunctionCalls({ aiRequest }).length > 0) return true;
     return (
       getFunctionCallsToProcess({
         aiRequest,

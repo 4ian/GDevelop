@@ -665,10 +665,6 @@ export const AiRequestProvider = ({
       parentAiRequestId: string,
       callId: string
     ) => {
-      console.info('Activating sub-agent:', subAgentAiRequestId, {
-        parentAiRequestId,
-        callId,
-      });
       if (activeSubAgentsRef.current[subAgentAiRequestId]) return;
       activeSubAgentsRef.current = {
         ...activeSubAgentsRef.current,
@@ -681,7 +677,6 @@ export const AiRequestProvider = ({
 
   const removeSubAgent = React.useCallback(
     (subAgentAiRequestId: string) => {
-      console.info('Removing sub-agent:', subAgentAiRequestId);
       const { [subAgentAiRequestId]: _, ...rest } = activeSubAgentsRef.current;
       activeSubAgentsRef.current = rest;
       forceUpdateForSubAgents();

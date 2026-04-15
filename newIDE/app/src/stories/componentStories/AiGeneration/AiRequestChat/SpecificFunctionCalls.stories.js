@@ -453,3 +453,33 @@ export const subAgentFunctionCallWithTextWorking = (): React.Node => (
     }}
   />
 );
+
+// Reproduces a parent AI request reopened from history whose sub-agent's
+// AiRequest data has not (yet) been loaded into aiRequests storage.
+// Before the load, only the prompt extracted from the function call arguments
+// is shown. Once the sub-agent data is loaded (see useLoadSubAgentRequests),
+// the nested function calls and output text appear.
+export const subAgentFunctionCallFromHistoryNotYetLoaded = (): React.Node => (
+  <WrappedChatComponentWithSubAgent
+    subAgentAiRequest={null}
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-orchestrator-request',
+      mode: 'orchestrator',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: [
+        userRequestMessage,
+        subAgentFunctionCallMessage,
+        {
+          type: 'function_call_output',
+          call_id: 'tool_0_run_project_edit_agent',
+          output: '{"success":true}',
+        },
+      ],
+      error: null,
+    }}
+  />
+);

@@ -22,10 +22,11 @@ import {
   type EditorFunctionCallResult,
 } from '../EditorFunctions';
 import {
+  getAllSubAgentFunctionCalls,
   getFunctionCallNameByCallId,
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
-  getSubAgentFunctionCalls,
+  getPendingSubAgentFunctionCalls,
   getLastMessagesFromAiRequestOutput,
   getLatestActivePlan,
 } from './AiRequestUtils';
@@ -359,7 +360,7 @@ export const useProcessFunctionCalls = ({
  * Detects sub-agent function calls in the selected AI request and activates
  * them so that AiRequestContext starts polling and processing them.
  */
-export const useActivateSubAgents = ({
+export const useActivatePendingSubAgents = ({
   selectedAiRequest,
 }: {|
   selectedAiRequest: ?AiRequest,
@@ -370,7 +371,7 @@ export const useActivateSubAgents = ({
     () => {
       if (!selectedAiRequest) return;
 
-      const subAgentCalls = getSubAgentFunctionCalls({
+      const subAgentCalls = getPendingSubAgentFunctionCalls({
         aiRequest: selectedAiRequest,
       });
       subAgentCalls.forEach(call => {
@@ -384,6 +385,44 @@ export const useActivateSubAgents = ({
       });
     },
     [selectedAiRequest, activateSubAgent]
+  );
+};
+
+/**
+ * For every sub-agent function call in the selected AI request, ensures that
+ * its AiRequest is loaded into the shared `aiRequests` storage so its details
+ * can be displayed (e.g. for historical or suspended parents whose sub-agents
+ * are no longer being polled by `useActivatePendingSubAgents`).
+ *
+ * One-shot fetch only — the polling/activation pipeline remains responsible
+ * for live updates of still-running sub-agents.
+ */
+export const useLoadSubAgentRequests = ({
+  selectedAiRequest,
+}: {|
+  selectedAiRequest: ?AiRequest,
+|}) => {
+  const { aiRequestStorage } = React.useContext(AiRequestContext);
+  const { aiRequests, refreshAiRequest } = aiRequestStorage;
+  const attemptedFetchRef = React.useRef<Set<string>>(new Set());
+
+  React.useEffect(
+    () => {
+      if (!selectedAiRequest) return;
+
+      const subAgentCalls = getAllSubAgentFunctionCalls({
+        aiRequest: selectedAiRequest,
+      });
+      for (const call of subAgentCalls) {
+        const subAgentAiRequestId = call.subAgentAiRequestId;
+        if (!subAgentAiRequestId) continue;
+        if (aiRequests[subAgentAiRequestId]) continue;
+        if (attemptedFetchRef.current.has(subAgentAiRequestId)) continue;
+        attemptedFetchRef.current.add(subAgentAiRequestId);
+        refreshAiRequest(subAgentAiRequestId);
+      }
+    },
+    [selectedAiRequest, aiRequests, refreshAiRequest]
   );
 };
 
@@ -496,7 +535,7 @@ export const useAiRequestState = ({
         // If there are sub-agents running, it means the request is still running,
         // so no suggestions at this time.
         const hasPendingSubAgentCalls =
-          getSubAgentFunctionCalls({
+          getPendingSubAgentFunctionCalls({
             aiRequest: selectedAiRequest,
           }).length > 0;
         if (hasPendingSubAgentCalls) return;

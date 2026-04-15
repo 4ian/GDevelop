@@ -811,98 +811,103 @@ const createOrReplaceObject: EditorFunction = {
         );
       }
 
-      if (!candidateType && !asset_id) {
-        return makeGenericFailure(
-          `Cannot create object "${targetObjectName}": specify either "object_type" or "asset_id".`
-        );
-      }
-
       const targetObjectsContainer =
         target_object_scope === 'global' ? globalObjects : layoutObjects;
 
-      // First try to search and install an object from the asset store.
-      try {
-        const {
-          status,
-          message,
-          createdObjects,
-          assetShortHeader,
-          isTheFirstOfItsTypeInProject,
-        } = await searchAndInstallAsset({
-          objectsContainer: targetObjectsContainer,
-          objectName: targetObjectName,
-          objectType: candidateType,
-          searchTerms: search_terms || '',
-          description: description || '',
-          twoDimensionalViewKind: two_dimensional_view_kind || '',
-          exactOrPartialAssetId: asset_id || null,
-          relatedAiRequestId,
-          ...getRelatedAiRequestLastMessages(),
-        });
-
-        if (status === 'error') {
+      if (candidateType && !search_terms && !asset_id) {
+        // Do nothing: there is nothing given apart from an object type,
+        // which we can still use to fallback to create from scratch.
+      } else {
+        if (!search_terms && !asset_id) {
           return makeGenericFailure(
-            `Unable to search and install object (${message}).`
+            `No search_terms or asset_id were provided to create the object "${targetObjectName}". This object was not created.`
           );
-        } else if (status === 'asset-installed') {
-          // Update behaviors shared data for the scene where the object was created.
-          // Assets from the store can come with behaviors that have shared data.
-          if (target_object_scope === 'global') {
-            gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
-          } else {
-            layout.updateBehaviorsSharedData(project);
-          }
+        }
 
-          // /!\ Tell the editor that some objects have potentially been modified (and even removed).
-          // This will force the objects panel to refresh.
-          onObjectsModifiedOutsideEditor({
-            scene: layout,
-            isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
+        // First try to search and install an object from the asset store.
+        try {
+          const {
+            status,
+            message,
+            createdObjects,
+            assetShortHeader,
+            isTheFirstOfItsTypeInProject,
+          } = await searchAndInstallAsset({
+            objectsContainer: targetObjectsContainer,
+            objectName: targetObjectName,
+            objectType: candidateType,
+            searchTerms: search_terms || '',
+            description: description || '',
+            twoDimensionalViewKind: two_dimensional_view_kind || '',
+            exactOrPartialAssetId: asset_id || null,
+            relatedAiRequestId,
+            ...getRelatedAiRequestLastMessages(),
           });
 
-          if (createdObjects.length === 1) {
-            const object = createdObjects[0];
-            const result: EditorFunctionGenericOutput = {
-              success: true,
-              message: [
-                `Created (from the asset store) object "${object.getName()}" of type "${object.getType()}" in scene "${scene_name}".`,
-                getPropertiesText(object),
-              ].join(' '),
-              objectSizeInfo: {
-                [object.getName()]: getObjectSizeInfo(
-                  object,
-                  project,
-                  PixiResourcesLoader,
-                  assetShortHeader
-                ),
-              },
-            };
-            return result;
-          }
-
-          return makeGenericSuccess(
-            `Created (from the asset store) ${createdObjects
-              .map(
-                object =>
-                  `object "${object.getName()}" of type "${object.getType()}"`
-              )
-              .join(', ')} in scene "${scene_name}".`
-          );
-        } else {
-          if (asset_id) {
+          if (status === 'error') {
             return makeGenericFailure(
-              `No asset found with id "${asset_id}". The object was not created.`
+              `Unable to search and install object (${message}).`
             );
-          }
+          } else if (status === 'asset-installed') {
+            // Update behaviors shared data for the scene where the object was created.
+            // Assets from the store can come with behaviors that have shared data.
+            if (target_object_scope === 'global') {
+              gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
+            } else {
+              layout.updateBehaviorsSharedData(project);
+            }
 
-          // No asset found - we'll create an object from scratch.
+            // /!\ Tell the editor that some objects have potentially been modified (and even removed).
+            // This will force the objects panel to refresh.
+            onObjectsModifiedOutsideEditor({
+              scene: layout,
+              isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
+            });
+
+            if (createdObjects.length === 1) {
+              const object = createdObjects[0];
+              const result: EditorFunctionGenericOutput = {
+                success: true,
+                message: [
+                  `Created (from the asset store) object "${object.getName()}" of type "${object.getType()}" in scene "${scene_name}".`,
+                  getPropertiesText(object),
+                ].join(' '),
+                objectSizeInfo: {
+                  [object.getName()]: getObjectSizeInfo(
+                    object,
+                    project,
+                    PixiResourcesLoader,
+                    assetShortHeader
+                  ),
+                },
+              };
+              return result;
+            }
+
+            return makeGenericSuccess(
+              `Created (from the asset store) ${createdObjects
+                .map(
+                  object =>
+                    `object "${object.getName()}" of type "${object.getType()}"`
+                )
+                .join(', ')} in scene "${scene_name}".`
+            );
+          } else {
+            if (asset_id) {
+              return makeGenericFailure(
+                `No asset found with id "${asset_id}". The object was not created.`
+              );
+            }
+
+            // No asset found - we'll create an object from scratch.
+          }
+        } catch (error) {
+          return makeGenericFailure(
+            `An unexpected error happened while search and installing objects (${
+              error.message
+            }).`
+          );
         }
-      } catch (error) {
-        return makeGenericFailure(
-          `An unexpected error happened while search and installing objects (${
-            error.message
-          }).`
-        );
       }
 
       // Create an object from scratch: this requires a known object type.

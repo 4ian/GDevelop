@@ -113,7 +113,7 @@ describe('editorFunctions', () => {
       project.delete();
     });
 
-    it('creates a new object (from the asset store)', async () => {
+    it('creates a new object (from scratch, because only object_type was provided)', async () => {
       // $FlowFixMe[underconstrained-implicit-instantiation]
       const onObjectsModifiedOutsideEditor = jest.fn();
 
@@ -130,6 +130,33 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
+        `"Created a new object (from scratch) called \\"MyNewTextObject\\" of type \\"TextObject::Text\\" in scene \\"TestScene\\". It has the following properties: bold: false (boolean), characterSize: 20 (Pixel), color: 0;0;0 (color), font:  (resource), isOutlineEnabled: false (boolean), isShadowEnabled: false (boolean), italic: false (boolean), lineHeight: 0 (Pixel), outlineColor: 255;255;255 (color), outlineThickness: 2 (Pixel), shadowAngle: 90 (DegreeAngle), shadowBlurRadius: 2 (Pixel), shadowColor: 0;0;0 (color), shadowDistance: 4 (Pixel), shadowOpacity: 127 (Pixel), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"])."`
+      );
+      expect(result.success).toBe(true);
+      expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        isNewObjectTypeUsed: true,
+      });
+    });
+
+    it('creates a new object (from the asset store, with search_terms and object_type provided)', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'TextObject::Text',
+            object_name: 'MyNewTextObject',
+            search_terms: 'Very cool text object',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.message).toMatchInlineSnapshot(
         `"Created (from the asset store) object \\"MyNewTextObject\\" of type \\"TextObject::Text\\" in scene \\"TestScene\\". It has the following properties: bold: false (boolean), characterSize: 20 (Pixel), color: 0;0;0 (color), font:  (resource), isOutlineEnabled: false (boolean), isShadowEnabled: false (boolean), italic: false (boolean), lineHeight: 0 (Pixel), outlineColor: 255;255;255 (color), outlineThickness: 2 (Pixel), shadowAngle: 90 (DegreeAngle), shadowBlurRadius: 2 (Pixel), shadowColor: 0;0;0 (color), shadowDistance: 4 (Pixel), shadowOpacity: 127 (Pixel), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"])."`
       );
       expect(result.success).toBe(true);
@@ -139,7 +166,33 @@ describe('editorFunctions', () => {
       });
     });
 
-    it('creates a new object (from scratch if not found in the asset store)', async () => {
+    it('creates a new object (from the asset store, with search_terms but without any specified object type)', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'SomeNewObject',
+            search_terms: 'A very cool sprite for my player in my game',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.message).toMatchInlineSnapshot(
+        `"Created (from the asset store) object \\"SomeNewObject\\" of type \\"Sprite\\" in scene \\"TestScene\\". It has the following properties: ."`
+      );
+      expect(result.success).toBe(true);
+      expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        isNewObjectTypeUsed: false,
+      });
+    });
+
+    it('creates a new object (from scratch, fallback if not found in the asset store)', async () => {
       // $FlowFixMe[underconstrained-implicit-instantiation]
       const onObjectsModifiedOutsideEditor = jest.fn();
 
@@ -556,7 +609,7 @@ describe('editorFunctions', () => {
       expect(testScene.getObjects().hasObjectNamed('MyAssetObject')).toBe(true);
     });
 
-    it('fails when creating a new object without object_type nor asset_id', async () => {
+    it('fails when creating a new object without object_type, search_terms nor asset_id', async () => {
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
           ...makeFakeLaunchFunctionOptionsWithProject(project),
@@ -569,7 +622,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(
-        `"Cannot create object \\"MyAssetObject\\": specify either \\"object_type\\" or \\"asset_id\\"."`
+        `"No search_terms or asset_id were provided to create the object \\"MyAssetObject\\". This object was not created."`
       );
     });
 

@@ -214,7 +214,7 @@ import {
   readProjectSettings,
   getProjectDirectory,
 } from '../Utils/ProjectSettingsReader';
-import EditorLifecycleContextProvider from './EditorLifecycleContextProvider';
+import NpmScriptRunnerProvider from './NpmScriptRunnerProvider';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
   EmbeddedGameFrame,
@@ -5219,9 +5219,11 @@ const MainFrame = (props: Props): React.MixedElement => {
       <LeaderboardProvider
         gameId={currentProject ? currentProject.getProjectUuid() : ''}
       >
-        <EditorLifecycleContextProvider
+        <NpmScriptRunnerProvider
           hasPreviewsRunning={hasNonEditionPreviewsRunning}
           isEditorReady={isEditorReady}
+          toolbarButtons={state.toolbarButtons}
+          projectPath={projectPath}
         >
           <PanesContainer
             hasEditorsInLeftPane={hasEditorsInLeftPane}
@@ -5248,7 +5250,7 @@ const MainFrame = (props: Props): React.MixedElement => {
               />
             )}
           />
-        </EditorLifecycleContextProvider>
+        </NpmScriptRunnerProvider>
       </LeaderboardProvider>
       <PoppedOutWindows
         {...editorTabsPaneProps}

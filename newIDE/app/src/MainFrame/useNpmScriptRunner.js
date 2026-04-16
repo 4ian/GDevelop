@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import PreferencesContext from './Preferences/PreferencesContext';
-import { useEditorLifecycleContext } from './EditorLifecycleContextProvider';
 import { runNpmScript } from '../Utils/NpmScriptExecutor';
 import type {
   ToolbarButtonConfig,
@@ -11,10 +10,14 @@ import type {
 type Props = {|
   toolbarButtons: Array<ToolbarButtonConfig>,
   projectPath: ?string,
+  isEditorReady: boolean,
+  hasPreviewsRunning: boolean,
 |};
 
+export type HandleCustomButtonClick = (npmScript: string) => void;
+
 type ReturnType = {|
-  handleCustomButtonClick: (npmScript: string) => void,
+  handleCustomButtonClick: HandleCustomButtonClick,
   confirmDialogOpen: boolean,
   scriptNames: string,
   callingHookName?: ToolbarButtonHooksNames,
@@ -41,13 +44,13 @@ const getScriptsByHookName = (
 const useNpmScriptRunner = ({
   toolbarButtons,
   projectPath,
+  isEditorReady,
+  hasPreviewsRunning,
 }: Props): ReturnType => {
   const {
     values: { disableNpmScriptConfirmation },
     setDisableNpmScriptConfirmation,
   } = React.useContext(PreferencesContext);
-
-  const { isEditorReady, hasPreviewsRunning } = useEditorLifecycleContext();
 
   const prevHasPreviewsRunningRef = React.useRef(false);
 

@@ -17,8 +17,7 @@ import CustomToolbarButton, {
   type ToolbarButtonConfig,
 } from '../CustomToolbarButton';
 import { type FileMetadata } from '../../ProjectsStorage';
-import useNpmScriptRunner from '../useNpmScriptRunner';
-import NpmScriptConfirmDialog from './NpmScriptConfirmDialog';
+import { useNpmScriptButtonHandler } from '../NpmScriptRunnerProvider';
 
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
@@ -58,30 +57,10 @@ type LeftButtonsToolbarGroupProps = {|
 const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
   function LeftButtonsToolbarGroup(props) {
     const toolbarButtons = props.toolbarButtons;
-    const projectPath = props.projectPath;
-    const {
-      handleCustomButtonClick,
-      handleDismiss,
-      handleConfirm,
-      confirmDialogOpen,
-      scriptNames,
-      callingHookName,
-      isAutoRun,
-    } = useNpmScriptRunner({
-      toolbarButtons: toolbarButtons,
-      projectPath: projectPath,
-    });
+    const handleCustomButtonClick = useNpmScriptButtonHandler();
 
     return (
       <>
-        <NpmScriptConfirmDialog
-          open={confirmDialogOpen}
-          scriptNames={scriptNames}
-          hookName={callingHookName}
-          onConfirm={handleConfirm}
-          onDismiss={handleDismiss}
-          isAutoRun={isAutoRun}
-        />
         <ToolbarGroup firstChild>
           <IconButton
             size="small"

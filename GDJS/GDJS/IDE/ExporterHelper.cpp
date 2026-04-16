@@ -620,9 +620,11 @@ void ExporterHelper::StripAndSerializeProjectData(
   gd::ProjectStripper::StripProjectForExport(project);
 
   project.SerializeTo(rootElement);
-  SerializeUsedResources(project, rootElement, projectUsedResources, scenesUsedResources,
-                         eventsBasedObjectVariantsUsedResources);
+  SerializeUsedResourcesForRuntime(project, rootElement, projectUsedResources,
+                         scenesUsedResources);
   if (isInGameEdition) {
+    SerializeUsedResourcesForInGameEditor(
+        project, rootElement, eventsBasedObjectVariantsUsedResources);
     auto &behaviorsElement = rootElement.AddChild("activatedByDefaultInEditorBehaviors");
     behaviorsElement.ConsiderAsArrayOf("resourceReference");
     auto &platform = project.GetCurrentPlatform();
@@ -639,24 +641,22 @@ void ExporterHelper::StripAndSerializeProjectData(
 }
 
 void ExporterHelper::SerializeUsedResources(
+    gd::SerializerElement &element, std::set<gd::String> &usedResources) {
+  auto &resourcesElement = element.AddChild("usedResources");
+  resourcesElement.ConsiderAsArrayOf("resourceReference");
+  for (auto &resourceName : usedResources) {
+    auto &resourceElement = resourcesElement.AddChild("resourceReference");
+    resourceElement.SetAttribute("name", resourceName);
+  }
+}
+
+void ExporterHelper::SerializeUsedResourcesForRuntime(
     gd::Project &project,
     gd::SerializerElement &rootElement,
     std::set<gd::String> &projectUsedResources,
-    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources,
-    std::unordered_map<gd::String, std::set<gd::String>>
-        &eventsBasedObjectVariantsUsedResources) {
-  auto serializeUsedResources =
-      [](gd::SerializerElement &element,
-         std::set<gd::String> &usedResources) -> void {
-    auto &resourcesElement = element.AddChild("usedResources");
-    resourcesElement.ConsiderAsArrayOf("resourceReference");
-    for (auto &resourceName : usedResources) {
-      auto &resourceElement = resourcesElement.AddChild("resourceReference");
-      resourceElement.SetAttribute("name", resourceName);
-    }
-  };
+    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources) {
 
-  serializeUsedResources(rootElement, projectUsedResources);
+  SerializeUsedResources(rootElement, projectUsedResources);
 
   auto &layoutsElement = rootElement.GetChild("layouts");
   for (std::size_t layoutIndex = 0;
@@ -666,7 +666,7 @@ void ExporterHelper::SerializeUsedResources(
     const auto layoutName = layoutElement.GetStringAttribute("name");
 
     auto &sceneUsedResources = scenesUsedResources[layoutName];
-    serializeUsedResources(layoutElement, sceneUsedResources);
+    SerializeUsedResources(layoutElement, sceneUsedResources);
 
     auto &scene = project.GetLayout(layoutName);
     auto &objectsElement = layoutElement.GetChild("objects");
@@ -685,11 +685,16 @@ void ExporterHelper::SerializeUsedResources(
         for (auto &&resourceName : sceneUsedResources) {
           objectUsedResources.erase(resourceName);
         }
-        serializeUsedResources(objectElement, objectUsedResources);
+        SerializeUsedResources(objectElement, objectUsedResources);
       }
     }
   }
+}
 
+void ExporterHelper::SerializeUsedResourcesForInGameEditor(
+    gd::Project &project, gd::SerializerElement &rootElement,
+    std::unordered_map<gd::String, std::set<gd::String>>
+        &eventsBasedObjectVariantsUsedResources) {
   auto &extensionsElement = rootElement.GetChild("eventsFunctionsExtensions");
   for (std::size_t extensionIndex = 0;
        extensionIndex < extensionsElement.GetChildrenCount();
@@ -708,7 +713,7 @@ void ExporterHelper::SerializeUsedResources(
           gd::PlatformExtension::GetObjectFullType(extensionName, objectName);
       auto &objectUsedResources =
           eventsBasedObjectVariantsUsedResources[eventsBasedObjectType];
-      serializeUsedResources(objectElement, objectUsedResources);
+      SerializeUsedResources(objectElement, objectUsedResources);
 
       auto &variantsElement = objectElement.GetChild("variants");
       for (std::size_t variantIndex = 0;
@@ -720,7 +725,7 @@ void ExporterHelper::SerializeUsedResources(
             extensionName, objectName, variantName);
         auto &variantUsedResources =
             eventsBasedObjectVariantsUsedResources[variantType];
-        serializeUsedResources(variantElement, variantUsedResources);
+        SerializeUsedResources(variantElement, variantUsedResources);
       }
     }
   }

@@ -214,6 +214,7 @@ import {
   readProjectSettings,
   getProjectDirectory,
 } from '../Utils/ProjectSettingsReader';
+import NpmScriptRunnerProvider from './NpmScriptRunnerProvider';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
   EmbeddedGameFrame,
@@ -612,6 +613,17 @@ const MainFrame = (props: Props): React.MixedElement => {
   const currentProject = exceptionallyGuardAgainstDeadObject(
     state.currentProject
   );
+
+  const [isEditorReady, setIsEditorReady] = React.useState<boolean>(false);
+
+  const projectPath = React.useMemo(
+    () =>
+      currentFileMetadata
+        ? getProjectDirectory(currentFileMetadata.fileIdentifier)
+        : null,
+    [currentFileMetadata]
+  );
+
   const {
     renderShareDialog,
     resourceSources,
@@ -1064,6 +1076,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const closeProject = React.useCallback(
     async (): Promise<void> => {
       setHasProjectOpened(false);
+      setIsEditorReady(false);
       setPreviewState(initialPreviewState);
 
       console.info('Closing project...');
@@ -1209,6 +1222,7 @@ const MainFrame = (props: Props): React.MixedElement => {
               ...currentState,
               toolbarButtons: parsedProjectSettings.toolbarButtons || [],
             }));
+            setIsEditorReady(true);
           }
         } catch (error) {
           console.warn(
@@ -5097,9 +5111,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onRestartInGameEditor,
     showRestartInGameEditorAfterErrorButton,
     toolbarButtons: state.toolbarButtons,
-    projectPath: currentFileMetadata
-      ? getProjectDirectory(currentFileMetadata.fileIdentifier)
-      : null,
+    projectPath,
   };
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');
@@ -5207,31 +5219,38 @@ const MainFrame = (props: Props): React.MixedElement => {
       <LeaderboardProvider
         gameId={currentProject ? currentProject.getProjectUuid() : ''}
       >
-        <PanesContainer
-          hasEditorsInLeftPane={hasEditorsInLeftPane}
-          hasEditorsInRightPane={hasEditorsInRightPane}
-          renderPane={({
-            paneIdentifier,
-            isLeftMostPane,
-            isRightMostPane,
-            isDrawer,
-            areSidePanesDrawers,
-            onSetPointerEventsNone,
-            onSetPaneDrawerState,
-          }) => (
-            <EditorTabsPane
-              {...editorTabsPaneProps}
-              paneIdentifier={paneIdentifier}
-              isLeftMostPane={isLeftMostPane}
-              isRightMostPane={isRightMostPane}
-              isDrawer={isDrawer}
-              areSidePanesDrawers={areSidePanesDrawers}
-              onSetPointerEventsNone={onSetPointerEventsNone}
-              onSetPaneDrawerState={onSetPaneDrawerState}
-              onPopOutTab={onPopOutTab}
-            />
-          )}
-        />
+        <NpmScriptRunnerProvider
+          hasPreviewsRunning={hasNonEditionPreviewsRunning}
+          isEditorReady={isEditorReady}
+          toolbarButtons={state.toolbarButtons}
+          projectPath={projectPath}
+        >
+          <PanesContainer
+            hasEditorsInLeftPane={hasEditorsInLeftPane}
+            hasEditorsInRightPane={hasEditorsInRightPane}
+            renderPane={({
+              paneIdentifier,
+              isLeftMostPane,
+              isRightMostPane,
+              isDrawer,
+              areSidePanesDrawers,
+              onSetPointerEventsNone,
+              onSetPaneDrawerState,
+            }) => (
+              <EditorTabsPane
+                {...editorTabsPaneProps}
+                paneIdentifier={paneIdentifier}
+                isLeftMostPane={isLeftMostPane}
+                isRightMostPane={isRightMostPane}
+                isDrawer={isDrawer}
+                areSidePanesDrawers={areSidePanesDrawers}
+                onSetPointerEventsNone={onSetPointerEventsNone}
+                onSetPaneDrawerState={onSetPaneDrawerState}
+                onPopOutTab={onPopOutTab}
+              />
+            )}
+          />
+        </NpmScriptRunnerProvider>
       </LeaderboardProvider>
       <PoppedOutWindows
         {...editorTabsPaneProps}

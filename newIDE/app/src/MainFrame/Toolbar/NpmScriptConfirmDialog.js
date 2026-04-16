@@ -6,12 +6,15 @@ import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import Text from '../../UI/Text';
 import InlineCheckbox from '../../UI/InlineCheckbox';
+import type { ToolbarButtonHooksNames } from '../CustomToolbarButton';
 
 type Props = {|
   open: boolean,
   scriptNames: string,
   onConfirm: (dontShowAgain: boolean) => void,
   onDismiss: () => void,
+  isAutoRun?: boolean,
+  hookName?: ToolbarButtonHooksNames,
 |};
 
 function NpmScriptConfirmDialog({
@@ -19,6 +22,8 @@ function NpmScriptConfirmDialog({
   scriptNames,
   onConfirm,
   onDismiss,
+  isAutoRun,
+  hookName,
 }: Props): React.Node {
   const [dontShowAgain, setDontShowAgain] = React.useState(false);
 
@@ -64,12 +69,22 @@ function NpmScriptConfirmDialog({
       ]}
     >
       <Text>
-        <Trans>
-          This project contains toolbar buttons that want to run npm scripts on
-          your computer ({scriptNames}). Only allow this if you created
-          package.json yourself or got it from a source you trust. Malicious
-          scripts could harm your computer or steal your data.
-        </Trans>
+        {isAutoRun ? (
+          <Trans>
+            This project has configured npm scripts ({scriptNames}) to run
+            automatically when the &quot;{hookName}&quot; editor lifecycle hook
+            fires. Only allow this if you created package.json yourself or got
+            it from a source you trust. Malicious scripts could harm your
+            computer or steal your data.
+          </Trans>
+        ) : (
+          <Trans>
+            This project contains toolbar buttons that want to run npm scripts
+            on your computer ({scriptNames}). Only allow this if you created
+            package.json yourself or got it from a source you trust. Malicious
+            scripts could harm your computer or steal your data.
+          </Trans>
+        )}
       </Text>
       <InlineCheckbox
         label={<Trans>Don't show this warning again</Trans>}

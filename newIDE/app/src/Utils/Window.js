@@ -20,32 +20,49 @@ type YesNoCancelDialogChoice = 'yes' | 'no' | 'cancel';
  */
 export const POSITIONAL_ARGUMENTS_KEY = '_';
 
-let currentWindowBackgroundColor: ?string = null;
+const documentBackgroundColors: WeakMap<Document, string> = new WeakMap();
+const documentToTargetId: WeakMap<Document, string> = new WeakMap();
 
-const onChangeCallbacks = new Set<() => void>();
-let debouncedGeometryChange = null;
+/**
+ * Register a mapping from a window Document to the target
+ * used in window.open().
+ */
+export const registerDocumentTargetId = (doc: Document, frameName: string) => {
+  documentToTargetId.set(doc, frameName);
+};
 
-const setupWindowControlsOverlayWatcher = () => {
-  if (debouncedGeometryChange) {
-    // Already set up.
-    return;
-  }
+export const unregisterDocumentTargetId = (doc: Document) => {
+  documentToTargetId.delete(doc);
+};
 
-  // $FlowFixMe[incompatible-type] - this API is not handled by Flow.
-  // $FlowFixMe[prop-missing]
-  const { windowControlsOverlay } = navigator;
+// Per-navigator watcher state: each window's windowControlsOverlay gets its
+// own debounced listener and set of callbacks.
+type OverlayWatcherState = {|
+  callbacks: Set<() => void>,
+  debouncedHandler: () => void,
+|};
+const overlayWatchers: WeakMap<Object, OverlayWatcherState> = new WeakMap();
 
-  if (windowControlsOverlay) {
-    debouncedGeometryChange = debounce(() => {
-      for (const callback of onChangeCallbacks) {
+const getOrCreateOverlayWatcher = (
+  windowControlsOverlay: Object
+): OverlayWatcherState => {
+  const existing = overlayWatchers.get(windowControlsOverlay);
+  if (existing) return existing;
+
+  const state: OverlayWatcherState = {
+    callbacks: new Set<() => void>(),
+    debouncedHandler: debounce(() => {
+      for (const callback of state.callbacks) {
         callback();
       }
-    }, 20);
-    windowControlsOverlay.addEventListener(
-      'geometrychange',
-      debouncedGeometryChange
-    );
-  }
+    }, 20),
+  };
+  windowControlsOverlay.addEventListener(
+    'geometrychange',
+    state.debouncedHandler
+  );
+  overlayWatchers.set(windowControlsOverlay, state);
+  return state;
 };
 
 /**
@@ -54,22 +71,32 @@ const setupWindowControlsOverlayWatcher = () => {
  * - An installed PWA can have window controls displayed as overlay. If supported,
  * we set up a listener to detect any change and notify the caller.
  * - On Electron, the window controls are always integrated in the app - so this does nothing.
+ *
+ * Accepts an optional `targetWindow` parameter so that popped-out windows
+ * (which have their own navigator) can watch their own overlay.
  */
 export const useWindowControlsOverlayWatcher = ({
   onChanged,
+  targetWindow,
 }: {|
   onChanged: () => void,
+  targetWindow?: typeof window,
 |}) => {
-  setupWindowControlsOverlayWatcher();
-
   React.useEffect(
     () => {
-      onChangeCallbacks.add(onChanged);
+      const win = targetWindow || window;
+      // $FlowFixMe[incompatible-type] - this API is not handled by Flow.
+      // $FlowFixMe[prop-missing]
+      const { windowControlsOverlay } = win.navigator;
+      if (!windowControlsOverlay) return;
+
+      const state = getOrCreateOverlayWatcher(windowControlsOverlay);
+      state.callbacks.add(onChanged);
       return () => {
-        onChangeCallbacks.delete(onChanged);
+        state.callbacks.delete(onChanged);
       };
     },
-    [onChanged]
+    [onChanged, targetWindow]
   );
 };
 
@@ -95,40 +122,51 @@ export default class Window {
     }
   }
 
-  static setWindowBackgroundColor(newColor: string) {
-    if (currentWindowBackgroundColor === newColor) {
+  static setWindowBackgroundColor(newColor: string, targetDocument?: Document) {
+    const doc = targetDocument || document;
+
+    if (documentBackgroundColors.get(doc) === newColor) {
       // Avoid potentially expensive DOM query/modification if no changes needed.
       return;
     }
 
     if (ipcRenderer) {
-      // Update the window controls colors on Windows.
-      ipcRenderer.invoke('titlebar-set-overlay-options', {
-        color: newColor,
-        // $FlowFixMe[incompatible-type]
-        symbolColor: isLightRgbColor(hexToRGBColor(newColor))
-          ? '#000000'
-          : '#ffffff',
-      });
+      // Update the window controls and background colors on Windows/Linux.
+      // For the main window, the main process resolves via event.sender.
+      // For popped-out editor windows (opened via window.open and rendered
+      // into via React portals), event.sender is always the main window's
+      // webContents, so we pass the frameName and let the main process
+      // resolve it to the correct BrowserWindow.
+      ipcRenderer.invoke(
+        'titlebar-set-overlay-options',
+        {
+          color: newColor,
+          // $FlowFixMe[incompatible-type]
+          symbolColor: isLightRgbColor(hexToRGBColor(newColor))
+            ? '#000000'
+            : '#ffffff',
+        },
+        documentToTargetId.get(doc)
+      );
     }
 
     // Update the PWA titlebar/controls color (if it's an installed PWA).
-    const metaElement = document.querySelector('meta[name="theme-color"]');
+    const metaElement = doc.querySelector('meta[name="theme-color"]');
     if (metaElement) {
       metaElement.setAttribute('content', newColor);
     }
 
     // Update the window background color. Update both `body` and `html` elements
     // to ensure the background color is visible when resized.
-    const body = document.body;
+    const body = doc.body;
     if (body) {
       body.style.backgroundColor = newColor;
     }
-    if (document.documentElement) {
-      document.documentElement.style.backgroundColor = newColor;
+    if (doc.documentElement) {
+      doc.documentElement.style.backgroundColor = newColor;
     }
 
-    currentWindowBackgroundColor = newColor;
+    documentBackgroundColors.set(doc, newColor);
   }
 
   static setBounds(x: number, y: number, width: number, height: number) {
@@ -319,7 +357,9 @@ export default class Window {
     return answer === 0;
   }
 
-  static setUpContextMenu() {
+  static setUpContextMenu(targetWindow?: any) {
+    const win = targetWindow || window;
+    const doc = win.document;
     const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
 
     if (electron) {
@@ -328,7 +368,7 @@ export default class Window {
         'electron-editor-context-menu'
       );
 
-      window.addEventListener('contextmenu', function(e) {
+      win.addEventListener('contextmenu', function(e) {
         // Only show the context menu in text editors.
         if (!e.target.closest(textEditorSelectors)) return;
 
@@ -338,11 +378,15 @@ export default class Window {
         // visible selection has changed. Try to wait to show the menu until after that, otherwise the
         // visible selection will update after the menu dismisses and look weird.
         setTimeout(function() {
-          menu.popup({ window: remote.getCurrentWindow() });
+          const { BrowserWindow } = remote;
+          menu.popup({
+            window:
+              BrowserWindow.getFocusedWindow() || remote.getCurrentWindow(),
+          });
         }, 30);
       });
-    } else if (document) {
-      document.addEventListener('contextmenu', function(e: any) {
+    } else if (doc) {
+      doc.addEventListener('contextmenu', function(e: any) {
         // Only show the context menu in text editors.
         if (!e.target.closest(textEditorSelectors)) {
           e.preventDefault();

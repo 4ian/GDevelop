@@ -305,6 +305,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   resourceExternallyChangedCallbackId: ?string;
   unregisterDebuggerCallback: (() => void) | null = null;
   editorViewPosition2D: EditorViewPosition2D = { viewX: null, viewY: null };
+  _reloadResourcesCounter: number = 0;
 
   constructor(props: Props) {
     super(props);
@@ -626,6 +627,9 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     if (!editorDisplay) return;
 
+    // Use a unique reason for each reload to avoid concurrent calls resuming rendering too early.
+    const pauseReason = `resource-reload-${++this._reloadResourcesCounter}`;
+
     try {
       console.info(
         `Reloading resources "${resourceNames.join(
@@ -637,7 +641,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       // the existing texture is removed but the InstancesEditor tries to use it
       // through the RenderedInstance's, triggering crashes. So the scene rendering
       // is paused during this period.
-      editorDisplay.startSceneRendering(false, 'resource-reload');
+      editorDisplay.startSceneRendering(false, pauseReason);
       for (const resourceName of resourceNames) {
         await PixiResourcesLoader.reloadResource(project, resourceName);
       }
@@ -680,7 +684,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           ', '
         )}": (scene: "${name}").`
       );
-      editorDisplay.startSceneRendering(true, 'resource-reload');
+      editorDisplay.startSceneRendering(true, pauseReason);
     }
   };
 

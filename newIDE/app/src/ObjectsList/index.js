@@ -110,9 +110,14 @@ export const getLabelsForObjectsAndGroupsLists = (
 export const getTreeViewItemIdFromObjectFolderOrObject = (
   objectFolderOrObject: gdObjectFolderOrObject
 ): string => {
-  return objectFolderOrObject.isFolder()
-    ? getObjectFolderTreeViewItemId(objectFolderOrObject)
-    : getObjectTreeViewItemId(objectFolderOrObject.getObject());
+  if (objectFolderOrObject.isFolder()) {
+    return getObjectFolderTreeViewItemId(objectFolderOrObject);
+  }
+  const object = exceptionallyGuardAgainstDeadObject(
+    objectFolderOrObject.getObject()
+  );
+  if (!object) return `deleted-${objectFolderOrObject.ptr}`;
+  return getObjectTreeViewItemId(object);
 };
 
 export interface TreeViewItemContent {

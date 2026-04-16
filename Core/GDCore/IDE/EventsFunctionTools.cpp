@@ -140,14 +140,34 @@ void EventsFunctionTools::ParametersToVariablesContainer(
 void EventsFunctionTools::PropertiesToVariablesContainer(
     const PropertiesContainer &properties,
     gd::VariablesContainer &outputVariablesContainer) {
+  outputVariablesContainer.Clear();
+  AddPropertiesToVariablesContainer(
+    properties,
+    outputVariablesContainer);
+}
+
+void EventsFunctionTools::PropertiesToVariablesContainer(
+    const PropertiesContainer &properties,
+    const PropertiesContainer &sharedProperties,
+    gd::VariablesContainer &outputVariablesContainer) {
+  outputVariablesContainer.Clear();
+  AddPropertiesToVariablesContainer(
+    properties,
+    outputVariablesContainer);
+  AddPropertiesToVariablesContainer(
+    sharedProperties,
+    outputVariablesContainer);
+}
+
+void EventsFunctionTools::AddPropertiesToVariablesContainer(
+    const PropertiesContainer &properties,
+    gd::VariablesContainer &outputVariablesContainer) {
   if (outputVariablesContainer.GetSourceType() !=
       gd::VariablesContainer::SourceType::Properties) {
     throw std::logic_error("Tried to generate a variables container from "
                            "properties with the wrong source type.");
   }
-  outputVariablesContainer.Clear();
 
-  gd::String lastObjectName;
   for (std::size_t i = 0; i < properties.GetCount(); ++i) {
     const auto &property = properties.Get(i);
     if (property.GetName().empty())

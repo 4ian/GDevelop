@@ -188,7 +188,14 @@ const TaskRow = ({
               </div>
             ) : task.description ? (
               <div className={classes.descriptionContainer}>
-                <Text size="body-small" color="secondary">
+                <Text
+                  size="body-small"
+                  color="secondary"
+                  style={{
+                    whiteSpace: 'pre-wrap',
+                    overflowWrap: 'anywhere',
+                  }}
+                >
                   {task.description}
                 </Text>
               </div>

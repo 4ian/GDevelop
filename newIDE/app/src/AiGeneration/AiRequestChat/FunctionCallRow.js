@@ -27,13 +27,14 @@ import { SafeExtractor } from '../../Utils/SafeExtractor';
 import CircledAdd from '../../UI/CustomSvgIcons/CircledAdd';
 import { AiRequestContext } from '../AiRequestContext';
 import { getFunctionCallToFunctionCallOutputMap } from '../AiRequestUtils';
-import CheckCircleFilled from '../../UI/CustomSvgIcons/CheckCircleFilled';
-import CircledInfo from '../../UI/CustomSvgIcons/CircledInfo';
+import SubAgentInput from '../../UI/CustomSvgIcons/SubAgentInput';
+import SubAgentOutput from '../../UI/CustomSvgIcons/SubAgentOutput';
 
 const styles = {
   functionCallText: {
     // Anywhere because behavior names can be long and have no spaces.
     overflowWrap: 'anywhere',
+    whiteSpace: 'pre-wrap',
   },
 };
 
@@ -494,7 +495,6 @@ const SubAgentTextRow = ({
   text: string,
   textType: 'output' | 'prompt',
 |}) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [showDetails, setShowDetails] = React.useState(false);
 
   const firstLine = text.split('\n')[0];
@@ -508,15 +508,9 @@ const SubAgentTextRow = ({
       <div className={classes.functionCallRow}>
         <span className={classes.statusIconContainer}>
           {textType === 'output' ? (
-            <CheckCircleFilled
-              htmlColor={gdevelopTheme.text.color.disabled}
-              fontSize="small"
-            />
+            <SubAgentOutput fontSize="small" />
           ) : textType === 'prompt' ? (
-            <CircledInfo
-              htmlColor={gdevelopTheme.text.color.disabled}
-              fontSize="small"
-            />
+            <SubAgentInput fontSize="small" />
           ) : null}
         </span>
         <div

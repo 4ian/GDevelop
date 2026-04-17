@@ -128,6 +128,7 @@ import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent
 import { findEventByPath } from '../Utils/EventsValidationScanner';
 import type { SearchFilterParams } from '../Utils/Search';
 import type { InitialSearchFilterParams } from './SearchPanel';
+import { rgbStringAndAlphaToRGBColor } from '../Utils/ColorTransformer';
 
 const gd: libGDevelop = global.gd;
 
@@ -719,6 +720,26 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       type,
       insertion.indexInList + 1
     );
+
+    const extensionProperties = project.getExtensionProperties();
+
+    if (type === 'BuiltinCommonInstructions::Group') {
+      const groupEvent = gd.asGroupEvent(newEvent);
+      const color = rgbStringAndAlphaToRGBColor(
+        extensionProperties.getValue('EventDefaultColors', 'groupBg')
+      ) || { r: 74, g: 176, b: 228 };
+      groupEvent.setBackgroundColor(color.r, color.g, color.b);
+    } else if (type === 'BuiltinCommonInstructions::Comment') {
+      const commentEvent = gd.asCommentEvent(newEvent);
+      const bgColor = rgbStringAndAlphaToRGBColor(
+        extensionProperties.getValue('EventDefaultColors', 'commentBg')
+      ) || { r: 255, g: 230, b: 109 };
+      const textColor = rgbStringAndAlphaToRGBColor(
+        extensionProperties.getValue('EventDefaultColors', 'commentText')
+      ) || { r: 0, g: 0, b: 0 };
+      commentEvent.setBackgroundColor(bgColor.r, bgColor.g, bgColor.b);
+      commentEvent.setTextColor(textColor.r, textColor.g, textColor.b);
+    }
 
     const eventsTree = this._eventsTree;
     if (eventsTree) {

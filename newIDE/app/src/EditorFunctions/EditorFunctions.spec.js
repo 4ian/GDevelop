@@ -1073,6 +1073,17 @@ describe('editorFunctions', () => {
       expect(result).toMatchInlineSnapshot(`
         Object {
           "aiGeneratedEventId": "test-ai-event-id",
+          "eventsDiffAsText": "=== Changes to events of scene \\"TestScene\\" ===
+
+        [+] Added event-0:
+          <event-0>
+           Conditions:
+           (no conditions)
+           Actions:
+           (no actions)
+          </event-0>
+
+        (0 events unchanged)",
           "message": "Successfully added explosion events.",
           "newlyAddedResources": Array [
             Object {

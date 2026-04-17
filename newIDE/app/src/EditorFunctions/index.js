@@ -16,6 +16,10 @@ import {
   addUndeclaredVariables,
   applyEventsChanges,
 } from './ApplyEventsChanges';
+import {
+  computeEventsDiff,
+  renderEventsDiffAsText,
+} from './ComputeEventsDiff';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
@@ -106,6 +110,9 @@ export type EditorFunctionGenericOutput = {|
   animationNames?: string,
   generatedEventsErrorDiagnostics?: string,
   aiGeneratedEventId?: string,
+  // Objective text diff of events after applying changes — used by the
+  // orchestrator instead of the sub-agent's self-reported summary.
+  eventsDiffAsText?: string,
   warnings?: string,
   errors?: Array<string>,
 
@@ -3800,6 +3807,11 @@ const addSceneEvents: EditorFunction = {
       toolOptions && toolOptions.includeEventsJson
         ? serializeToJSON(currentSceneEvents)
         : null;
+    // Unconditional before-snapshot so we can compute an objective text diff
+    // of what actually changed after applyEventsChanges. This is independent
+    // from `existingEventsJson` (which is sent to the events-generation
+    // sub-agent as prompt context and gated by `toolOptions`).
+    const beforeEventsJson = serializeToJSObject(currentSceneEvents);
 
     try {
       const eventsGenerationResult: EventsGenerationResult = await generateEvents(
@@ -3983,10 +3995,23 @@ ${aiGeneratedEvent.resultMessage || '(no generation output was given)'}].
 See attached errors that happened when some changes were applied in the project. Verify the content of events if necessary to be sure what was done.`
             : aiGeneratedEvent.resultMessage ||
               'Properly modified or added new event(s).';
+
+        // Surface an objective text diff of events for the orchestrator, so
+        // it doesn't rely solely on the sub-agent's self-reported summary.
+        const eventsDiff = computeEventsDiff({
+          beforeEventsJson,
+          afterEventsJson: serializeToJSObject(currentSceneEvents),
+        });
+        const eventsDiffAsText = renderEventsDiffAsText(eventsDiff, {
+          project,
+          sceneName,
+        });
+
         return {
           success: true,
           message: resultMessage,
           aiGeneratedEventId: aiGeneratedEvent.id,
+          eventsDiffAsText,
           newlyAddedResources,
           ...(errors.length > 0 ? { errors } : undefined),
         };

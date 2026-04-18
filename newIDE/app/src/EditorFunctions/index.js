@@ -88,6 +88,256 @@ export type ResourceSearchAndInstallResult = {|
   results: Array<SingleResourceSearchAndInstallResult>,
 |};
 
+export type EditorFunctionStructuredChange =
+  | {|
+      kind: 'object-created',
+      scene: string,
+      object: string,
+      objectType: string,
+      source: 'asset-store' | 'from-scratch',
+    |}
+  | {|
+      kind: 'object-duplicated',
+      scene: string,
+      object: string,
+      objectType: string,
+      fromObject: string,
+      fromScene: string,
+      fromGlobal: boolean,
+      toGlobal: boolean,
+    |}
+  | {|
+      kind: 'object-moved-to-global',
+      scene: string,
+      object: string,
+    |}
+  | {|
+      kind: 'object-replaced',
+      scene: string,
+      object: string,
+      objectType: string,
+    |}
+  | {|
+      kind: 'object-renamed',
+      scene: string,
+      fromName: string,
+      toName: string,
+    |}
+  | {|
+      kind: 'object-property-changed',
+      scene: string,
+      object: string,
+      property: string,
+      value: string,
+    |}
+  | {|
+      kind: 'behavior-added',
+      scene: string,
+      object: string,
+      behavior: string,
+      behaviorType: string,
+    |}
+  | {|
+      kind: 'behavior-removed',
+      scene: string,
+      object: string,
+      behavior: string,
+      dependentsRemoved?: Array<string>,
+    |}
+  | {|
+      kind: 'behavior-property-changed',
+      scene: string,
+      object: string,
+      behavior: string,
+      property: string,
+      value: string,
+      shared?: true,
+    |}
+  | {|
+      kind: 'instances-created',
+      scene: string,
+      layer: string,
+      object: string,
+      count: number,
+    |}
+  | {|
+      kind: 'instances-erased',
+      scene: string,
+      count: number,
+    |}
+  | {|
+      kind: 'instances-moved-to-layer',
+      scene: string,
+      layer: string,
+      count: number,
+    |}
+  | {|
+      kind: 'instances-repositioned',
+      scene: string,
+      count: number,
+      brushKind: string,
+    |}
+  | {|
+      kind: 'instances-resized',
+      scene: string,
+      count: number,
+      size: Array<number>,
+    |}
+  | {|
+      kind: 'instances-rotated',
+      scene: string,
+      count: number,
+      rotation: number | Array<number>,
+    |}
+  | {|
+      kind: 'instances-opacity-changed',
+      scene: string,
+      count: number,
+      opacity: number,
+    |}
+  | {|
+      kind: 'instances-z-order-changed',
+      scene: string,
+      count: number,
+      zOrder: number,
+    |}
+  | {|
+      kind: 'scene-events-added',
+      scene: string,
+      aiGeneratedEventId: string,
+    |}
+  | {|
+      kind: 'scene-created',
+      scene: string,
+      withUiLayer: boolean,
+    |}
+  | {|
+      kind: 'scene-deleted',
+      scene: string,
+    |}
+  | {|
+      kind: 'scene-property-changed',
+      scene: string,
+      property: string,
+    |}
+  | {|
+      kind: 'project-property-changed',
+      property: string,
+    |}
+  | {|
+      kind: 'layer-created',
+      scene: string,
+      layer: string,
+      position: number,
+    |}
+  | {|
+      kind: 'layer-renamed',
+      scene: string,
+      fromName: string,
+      toName: string,
+    |}
+  | {|
+      kind: 'layer-deleted',
+      scene: string,
+      layer: string,
+      instancesMovedToLayer?: string,
+    |}
+  | {|
+      kind: 'layer-moved',
+      scene: string,
+      layer: string,
+      position: number,
+    |}
+  | {|
+      kind: 'effect-created',
+      scene: string,
+      layer: string,
+      effect: string,
+      effectType: string,
+    |}
+  | {|
+      kind: 'effect-renamed',
+      scene: string,
+      layer: string,
+      fromName: string,
+      toName: string,
+    |}
+  | {|
+      kind: 'effect-deleted',
+      scene: string,
+      layer: string,
+      effect: string,
+    |}
+  | {|
+      kind: 'effect-moved',
+      scene: string,
+      layer: string,
+      effect: string,
+      position: number,
+    |}
+  | {|
+      kind: 'effect-property-changed',
+      scene: string,
+      layer: string,
+      effect: string,
+      property: string,
+      value: string,
+    |}
+  | {|
+      kind: 'group-renamed',
+      scene: string,
+      fromName: string,
+      toName: string,
+    |}
+  | {|
+      kind: 'group-deleted',
+      scene: string,
+      group: string,
+    |}
+  | {|
+      kind: 'group-objects-modified',
+      scene: string,
+      group: string,
+      objects: Array<string>,
+    |}
+  | {|
+      kind: 'variable-added',
+      scope: 'global' | 'scene' | 'object',
+      scene?: string,
+      object?: string,
+      path: string,
+      variableType: string,
+    |}
+  | {|
+      kind: 'variable-edited',
+      scope: 'global' | 'scene' | 'object',
+      scene?: string,
+      object?: string,
+      path: string,
+    |}
+  | {|
+      kind: 'project-initialized',
+      projectName: string,
+      templateSlug?: string,
+    |}
+  | {|
+      kind: 'resource-installed',
+      resourceName: string,
+      resourceKind: string,
+    |};
+
+/**
+ * A listing of every atomic change made by a mutating function call. This is
+ * meant to be consumed by an orchestrator that runs sub-agents: the backend
+ * can simply concatenate the `changes` (and `warnings`) of every structured
+ * output in a batch to produce an accurate, de-duplicated wrap-up for the
+ * parent agent. Only set on functions that modify the project.
+ */
+export type EditorFunctionStructuredOutput = {|
+  changes: Array<EditorFunctionStructuredChange>,
+  warnings?: Array<string>,
+|};
+
 export type EditorFunctionGenericOutput = {|
   success: boolean,
   meta?: {
@@ -129,6 +379,11 @@ export type EditorFunctionGenericOutput = {|
   // Set to true when the function call was aborted mid-execution (e.g. the AI
   // request was suspended while event generation was still polling).
   aborted?: true,
+
+  // Exhaustive, mergeable listing of every atomic change made by a function
+  // call, for sub-agent -> orchestrator handoffs. Only set on mutating
+  // functions (those with `modifiesProject: true`).
+  structuredOutput?: EditorFunctionStructuredOutput,
 |};
 
 export type EventsGenerationResult =
@@ -336,8 +591,16 @@ const makeGenericSuccess = (message: string): EditorFunctionGenericOutput => ({
 
 const makeMultipleChangesOutput = (
   changes: Array<string>,
-  warnings: Array<string>
+  warnings: Array<string>,
+  structuredChanges?: Array<EditorFunctionStructuredChange>
 ): EditorFunctionGenericOutput => {
+  const structuredOutput: EditorFunctionStructuredOutput | void = structuredChanges
+    ? {
+        changes: structuredChanges,
+        ...(warnings.length > 0 ? { warnings } : undefined),
+      }
+    : undefined;
+
   if (changes.length === 0 && warnings.length === 0) {
     return {
       success: false,
@@ -355,6 +618,7 @@ const makeMultipleChangesOutput = (
     return {
       success: true,
       message: ['Successfully done the changes.', ...changes].join('\n'),
+      ...(structuredOutput ? { structuredOutput } : undefined),
     };
   }
 
@@ -366,6 +630,7 @@ const makeMultipleChangesOutput = (
       'Warnings:',
       ...warnings,
     ].join('\n'),
+    ...(structuredOutput ? { structuredOutput } : undefined),
   };
 };
 
@@ -875,18 +1140,39 @@ const createOrReplaceObject: EditorFunction = {
                   assetShortHeader
                 ),
               },
+              structuredOutput: {
+                changes: [
+                  {
+                    kind: 'object-created',
+                    scene: scene_name,
+                    object: object.getName(),
+                    objectType: object.getType(),
+                    source: 'asset-store',
+                  },
+                ],
+              },
             };
             return result;
           }
 
-          return makeGenericSuccess(
-            `Created (from the asset store) ${createdObjects
+          return {
+            success: true,
+            message: `Created (from the asset store) ${createdObjects
               .map(
                 object =>
                   `object "${object.getName()}" of type "${object.getType()}"`
               )
-              .join(', ')} in scene "${scene_name}".`
-          );
+              .join(', ')} in scene "${scene_name}".`,
+            structuredOutput: {
+              changes: createdObjects.map(object => ({
+                kind: 'object-created',
+                scene: scene_name,
+                object: object.getName(),
+                objectType: object.getType(),
+                source: 'asset-store',
+              })),
+            },
+          };
         } else {
           // No asset found - we'll create an object from scratch.
         }
@@ -958,6 +1244,17 @@ const createOrReplaceObject: EditorFunction = {
           `Created a new object (from scratch) called "${targetObjectName}" of type "${candidateType}" in scene "${scene_name}".`,
           getPropertiesText(object),
         ].join(' '),
+        structuredOutput: {
+          changes: [
+            {
+              kind: 'object-created',
+              scene: scene_name,
+              object: targetObjectName,
+              objectType: candidateType,
+              source: 'from-scratch',
+            },
+          ],
+        },
       };
       scratchResult.objectSizeInfo = {
         [targetObjectName]: getObjectSizeInfo(
@@ -1048,9 +1345,20 @@ const createOrReplaceObject: EditorFunction = {
             scene: layout,
             isNewObjectTypeUsed: false, // The object type was not changed.
           });
-          return makeGenericSuccess(
-            `Replaced object "${existingTargetObject.getName()}" by an object from the asset store fitting the search, with the same type ("${existingTargetObject.getType()}").`
-          );
+          return {
+            success: true,
+            message: `Replaced object "${existingTargetObject.getName()}" by an object from the asset store fitting the search, with the same type ("${existingTargetObject.getType()}").`,
+            structuredOutput: {
+              changes: [
+                {
+                  kind: 'object-replaced',
+                  scene: scene_name,
+                  object: existingTargetObject.getName(),
+                  objectType: existingTargetObject.getType(),
+                },
+              ],
+            },
+          };
         } else {
           // No asset found.
         }
@@ -1142,9 +1450,24 @@ const createOrReplaceObject: EditorFunction = {
         target_object_scope === 'global'
           ? 'the global objects'
           : `scene "${scene_name}"`;
-      return makeGenericSuccess(
-        `Duplicated object "${duplicatedObjectName}" (from ${fromText}) as "${newObject.getName()}" (to ${toText}). The new object "${newObject.getName()}" has the same type, behaviors, properties and effects as the one it was duplicated from.`
-      );
+      return {
+        success: true,
+        message: `Duplicated object "${duplicatedObjectName}" (from ${fromText}) as "${newObject.getName()}" (to ${toText}). The new object "${newObject.getName()}" has the same type, behaviors, properties and effects as the one it was duplicated from.`,
+        structuredOutput: {
+          changes: [
+            {
+              kind: 'object-duplicated',
+              scene: scene_name,
+              object: newObject.getName(),
+              objectType: newObject.getType(),
+              fromObject: duplicatedObjectName,
+              fromScene: duplicatedObjectScene.getName(),
+              fromGlobal: isDuplicatedObjectGlobal,
+              toGlobal: target_object_scope === 'global',
+            },
+          ],
+        },
+      };
     };
 
     const moveExistingObject = () => {
@@ -1182,9 +1505,19 @@ const createOrReplaceObject: EditorFunction = {
           isNewObjectTypeUsed: false, // The object type was not changed.
         });
 
-        return makeGenericSuccess(
-          `Moved object "${existingTargetObject.getName()}" to the global objects. Its type, behaviors, properties and effects are unchanged.`
-        );
+        return {
+          success: true,
+          message: `Moved object "${existingTargetObject.getName()}" to the global objects. Its type, behaviors, properties and effects are unchanged.`,
+          structuredOutput: {
+            changes: [
+              {
+                kind: 'object-moved-to-global',
+                scene: scene_name,
+                object: existingTargetObject.getName(),
+              },
+            ],
+          },
+        };
       } else if (target_object_scope === 'scene' && isTargetObjectGlobal) {
         return makeGenericFailure(
           `Object "${existingTargetObject.getName()}" is a global object. Global objects can't be moved, so it cannot be moved to the scene "${scene_name}".`
@@ -1490,6 +1823,7 @@ const changeObjectProperty: EditorFunction = {
 
     const warnings = [];
     const changes = [];
+    const structuredChanges: Array<EditorFunctionStructuredChange> = [];
 
     changed_properties.forEach(changed_property => {
       if (!object) return;
@@ -1557,6 +1891,12 @@ const changeObjectProperty: EditorFunction = {
         changes.push(
           `Renamed object "${object_name}" to "${newName}". Events and everything else refering to this object having been also updated. Continue assuming the object has now the name "${newName}" and the whole project has been updated for it.`
         );
+        structuredChanges.push({
+          kind: 'object-renamed',
+          scene: scene_name,
+          fromName: object_name,
+          toName: newName,
+        });
         return;
       }
 
@@ -1626,9 +1966,19 @@ const changeObjectProperty: EditorFunction = {
       });
       warnings.push(...propertyWarnings);
       changes.push(...propertyChanges);
+      structuredChanges.push({
+        kind: 'object-property-changed',
+        scene: scene_name,
+        object: object.getName(),
+        property: foundPropertyName,
+        value: objectConfiguration
+          .getProperties()
+          .get(foundPropertyName)
+          .getValue(),
+      });
     });
 
-    return makeMultipleChangesOutput(changes, warnings);
+    return makeMultipleChangesOutput(changes, warnings, structuredChanges);
   },
   modifiesProject: true,
 };
@@ -1841,12 +2191,24 @@ const addBehavior: EditorFunction = {
       ', '
     )}.`;
 
-    return makeGenericSuccess(
-      [
+    return {
+      success: true,
+      message: [
         `Added behavior called "${behaviorName}" with type "${behavior_type}" to object "${object_name}".`,
         propertiesText,
-      ].join(' ')
-    );
+      ].join(' '),
+      structuredOutput: {
+        changes: [
+          {
+            kind: 'behavior-added',
+            scene: scene_name,
+            object: object_name,
+            behavior: behaviorName,
+            behaviorType: behavior_type,
+          },
+        ],
+      },
+    };
   },
   modifiesProject: true,
 };
@@ -1915,13 +2277,28 @@ const removeBehavior: EditorFunction = {
       object.removeBehavior(name);
     });
 
-    return makeGenericSuccess(
-      dependentBehaviors.length > 0
-        ? `Removed behavior "${behavior_name}" from object "${object_name}". Dependent behaviors were also removed as they were based on this behavior: ${dependentBehaviors.join(
-            ', '
-          )}.`
-        : `Removed behavior "${behavior_name}" from object "${object_name}".`
-    );
+    return {
+      success: true,
+      message:
+        dependentBehaviors.length > 0
+          ? `Removed behavior "${behavior_name}" from object "${object_name}". Dependent behaviors were also removed as they were based on this behavior: ${dependentBehaviors.join(
+              ', '
+            )}.`
+          : `Removed behavior "${behavior_name}" from object "${object_name}".`,
+      structuredOutput: {
+        changes: [
+          {
+            kind: 'behavior-removed',
+            scene: scene_name,
+            object: object_name,
+            behavior: behavior_name,
+            ...(dependentBehaviors.length > 0
+              ? { dependentsRemoved: dependentBehaviors }
+              : undefined),
+          },
+        ],
+      },
+    };
   },
   modifiesProject: true,
 };
@@ -2226,6 +2603,7 @@ const changeBehaviorProperty: EditorFunction = {
     const warnings = [];
     // $FlowFixMe[missing-empty-array-annot]
     const changes = [];
+    const structuredChanges: Array<EditorFunctionStructuredChange> = [];
 
     changedProperties.forEach(changed_property => {
       const propertyName = SafeExtractor.extractStringProperty(
@@ -2277,6 +2655,17 @@ const changeBehaviorProperty: EditorFunction = {
         warnings.push(...propertyWarnings);
         // $FlowFixMe[incompatible-type]
         changes.push(...propertyChanges);
+        structuredChanges.push({
+          kind: 'behavior-property-changed',
+          scene: scene_name,
+          object: object_name,
+          behavior: behavior_name,
+          property: foundPropertyName,
+          value: behavior
+            .getProperties()
+            .get(foundPropertyName)
+            .getValue(),
+        });
       } else if (
         behaviorSharedData &&
         behaviorSharedDataPropertySearch.foundPropertyName
@@ -2310,6 +2699,18 @@ const changeBehaviorProperty: EditorFunction = {
         warnings.push(...propertyWarnings);
         // $FlowFixMe[incompatible-type]
         changes.push(...propertyChanges);
+        structuredChanges.push({
+          kind: 'behavior-property-changed',
+          scene: scene_name,
+          object: object_name,
+          behavior: behavior_name,
+          property: foundPropertyName,
+          value: behaviorSharedData
+            .getProperties()
+            .get(foundPropertyName)
+            .getValue(),
+          shared: true,
+        });
       } else {
         warnings.push(
           `Property "${propertyName}" not found on behavior "${behavior_name}" of object "${object_name}".`
@@ -2318,7 +2719,7 @@ const changeBehaviorProperty: EditorFunction = {
     });
 
     // $FlowFixMe[incompatible-type]
-    return makeMultipleChangesOutput(changes, warnings);
+    return makeMultipleChangesOutput(changes, warnings, structuredChanges);
   },
   modifiesProject: true,
 };
@@ -2705,6 +3106,18 @@ const put2dInstances: EditorFunction = {
         ]
           .filter(Boolean)
           .join(' '),
+        structuredOutput: {
+          changes:
+            instancesToDelete.size > 0
+              ? [
+                  {
+                    kind: 'instances-erased',
+                    scene: scene_name,
+                    count: instancesToDelete.size,
+                  },
+                ]
+              : [],
+        },
       };
       if (object_name && objectSizeInfo)
         eraseResult.objectSizeInfo = { [object_name]: objectSizeInfo };
@@ -2737,6 +3150,7 @@ const put2dInstances: EditorFunction = {
 
       // Track changes for detailed success message
       const changes = [];
+      const structuredChanges: Array<EditorFunctionStructuredChange> = [];
 
       if (newInstancesCount > 0 && !object_name) {
         changes.push(
@@ -2908,6 +3322,15 @@ const put2dInstances: EditorFunction = {
             ', '
           )} on layer "${layer_name || 'base'}".`
         );
+        if (object_name) {
+          structuredChanges.push({
+            kind: 'instances-created',
+            scene: scene_name,
+            layer: layer_name,
+            object: object_name,
+            count: newInstancesCount,
+          });
+        }
       }
 
       // Check what changed for existing instances
@@ -2961,6 +3384,12 @@ const put2dInstances: EditorFunction = {
             movedToLayerCount > 1 ? 's' : ''
           } to layer "${layer_name || 'base'}".`
         );
+        structuredChanges.push({
+          kind: 'instances-moved-to-layer',
+          scene: scene_name,
+          layer: layer_name,
+          count: movedToLayerCount,
+        });
       }
 
       if (movedPositionCount > 0) {
@@ -2969,6 +3398,12 @@ const put2dInstances: EditorFunction = {
             movedPositionCount > 1 ? 's' : ''
           } using ${brush_kind} brush.`
         );
+        structuredChanges.push({
+          kind: 'instances-repositioned',
+          scene: scene_name,
+          count: movedPositionCount,
+          brushKind: brush_kind,
+        });
       }
 
       if (resizedCount > 0 && instancesSize) {
@@ -2977,6 +3412,12 @@ const put2dInstances: EditorFunction = {
             instancesSize[0]
           }x${instancesSize[1]}.`
         );
+        structuredChanges.push({
+          kind: 'instances-resized',
+          scene: scene_name,
+          count: resizedCount,
+          size: instancesSize,
+        });
       }
 
       if (rotatedCount > 0 && instancesRotation !== null) {
@@ -2985,6 +3426,12 @@ const put2dInstances: EditorFunction = {
             rotatedCount > 1 ? 's' : ''
           } to ${instancesRotation}°.`
         );
+        structuredChanges.push({
+          kind: 'instances-rotated',
+          scene: scene_name,
+          count: rotatedCount,
+          rotation: instancesRotation,
+        });
       }
 
       if (opacityChangedCount > 0 && instancesOpacity !== null) {
@@ -2993,6 +3440,12 @@ const put2dInstances: EditorFunction = {
             opacityChangedCount > 1 ? 's' : ''
           } to ${instancesOpacity}.`
         );
+        structuredChanges.push({
+          kind: 'instances-opacity-changed',
+          scene: scene_name,
+          count: opacityChangedCount,
+          opacity: instancesOpacity,
+        });
       }
 
       if (zOrderChangedCount > 0 && instances_z_order !== null) {
@@ -3001,6 +3454,12 @@ const put2dInstances: EditorFunction = {
             zOrderChangedCount > 1 ? 's' : ''
           } to ${instances_z_order}.`
         );
+        structuredChanges.push({
+          kind: 'instances-z-order-changed',
+          scene: scene_name,
+          count: zOrderChangedCount,
+          zOrder: instances_z_order,
+        });
       }
 
       if (notFoundExistingInstanceIds.size > 0) {
@@ -3027,6 +3486,9 @@ const put2dInstances: EditorFunction = {
       const put2dResult: EditorFunctionGenericOutput = {
         success: true,
         message: changes.join(' '),
+        structuredOutput: {
+          changes: structuredChanges,
+        },
       };
       if (object_name && objectSizeInfo)
         put2dResult.objectSizeInfo = { [object_name]: objectSizeInfo };
@@ -3277,6 +3739,18 @@ const put3dInstances: EditorFunction = {
         ]
           .filter(Boolean)
           .join(' '),
+        structuredOutput: {
+          changes:
+            instancesToDelete.size > 0
+              ? [
+                  {
+                    kind: 'instances-erased',
+                    scene: scene_name,
+                    count: instancesToDelete.size,
+                  },
+                ]
+              : [],
+        },
       };
       if (object_name && objectSizeInfo)
         eraseResult.objectSizeInfo = { [object_name]: objectSizeInfo };
@@ -3302,6 +3776,7 @@ const put3dInstances: EditorFunction = {
 
       // Track changes for detailed success message
       const changes = [];
+      const structuredChanges: Array<EditorFunctionStructuredChange> = [];
 
       if (newInstancesCount > 0 && !object_name) {
         changes.push(
@@ -3461,6 +3936,15 @@ const put3dInstances: EditorFunction = {
             ', '
           )} on layer "${layer_name || 'base'}".`
         );
+        if (object_name) {
+          structuredChanges.push({
+            kind: 'instances-created',
+            scene: scene_name,
+            layer: layer_name,
+            object: object_name,
+            count: newInstancesCount,
+          });
+        }
       }
 
       // Check what changed for existing instances
@@ -3506,6 +3990,12 @@ const put3dInstances: EditorFunction = {
             movedToLayerCount > 1 ? 's' : ''
           } to layer "${layer_name || 'base'}".`
         );
+        structuredChanges.push({
+          kind: 'instances-moved-to-layer',
+          scene: scene_name,
+          layer: layer_name,
+          count: movedToLayerCount,
+        });
       }
 
       if (movedPositionCount > 0) {
@@ -3514,6 +4004,12 @@ const put3dInstances: EditorFunction = {
             movedPositionCount > 1 ? 's' : ''
           } using ${brush_kind} brush.`
         );
+        structuredChanges.push({
+          kind: 'instances-repositioned',
+          scene: scene_name,
+          count: movedPositionCount,
+          brushKind: brush_kind,
+        });
       }
 
       if (resizedCount > 0 && instancesSizeArray) {
@@ -3522,6 +4018,12 @@ const put3dInstances: EditorFunction = {
             instancesSizeArray[0]
           }x${instancesSizeArray[1]}x${instancesSizeArray[2]}.`
         );
+        structuredChanges.push({
+          kind: 'instances-resized',
+          scene: scene_name,
+          count: resizedCount,
+          size: instancesSizeArray,
+        });
       }
 
       if (rotatedCount > 0 && instancesRotationArray) {
@@ -3530,6 +4032,12 @@ const put3dInstances: EditorFunction = {
             instancesRotationArray[0]
           }°, ${instancesRotationArray[1]}°, ${instancesRotationArray[2]}°).`
         );
+        structuredChanges.push({
+          kind: 'instances-rotated',
+          scene: scene_name,
+          count: rotatedCount,
+          rotation: instancesRotationArray,
+        });
       }
 
       if (notFoundExistingInstanceIds.size > 0) {
@@ -3554,6 +4062,9 @@ const put3dInstances: EditorFunction = {
       const put3dResult: EditorFunctionGenericOutput = {
         success: true,
         message: changes.join(' '),
+        structuredOutput: {
+          changes: structuredChanges,
+        },
       };
       if (object_name && objectSizeInfo)
         put3dResult.objectSizeInfo = { [object_name]: objectSizeInfo };
@@ -3983,12 +4494,32 @@ ${aiGeneratedEvent.resultMessage || '(no generation output was given)'}].
 See attached errors that happened when some changes were applied in the project. Verify the content of events if necessary to be sure what was done.`
             : aiGeneratedEvent.resultMessage ||
               'Properly modified or added new event(s).';
+        const structuredChanges: Array<EditorFunctionStructuredChange> = [
+          {
+            kind: 'scene-events-added',
+            scene: sceneName,
+            aiGeneratedEventId: aiGeneratedEvent.id,
+          },
+        ];
+        for (const result of newlyAddedResources) {
+          if (result.status === 'resource-installed') {
+            structuredChanges.push({
+              kind: 'resource-installed',
+              resourceName: result.resourceName,
+              resourceKind: result.resourceKind,
+            });
+          }
+        }
         return {
           success: true,
           message: resultMessage,
           aiGeneratedEventId: aiGeneratedEvent.id,
           newlyAddedResources,
           ...(errors.length > 0 ? { errors } : undefined),
+          structuredOutput: {
+            changes: structuredChanges,
+            ...(errors.length > 0 ? { warnings: errors } : undefined),
+          },
         };
       } catch (error) {
         console.error(
@@ -4063,9 +4594,20 @@ const createScene: EditorFunction = {
       if (include_ui_layer && !scene.hasLayerNamed('UI')) {
         scene.insertNewLayer('UI', scene.getLayersCount());
         addDefaultLightToLayer(scene.getLayer('UI'));
-        return makeGenericSuccess(
-          `Scene with name "${scene_name}" already exists, no need to re-create it. A layer called "UI" was added to it.`
-        );
+        return {
+          success: true,
+          message: `Scene with name "${scene_name}" already exists, no need to re-create it. A layer called "UI" was added to it.`,
+          structuredOutput: {
+            changes: [
+              {
+                kind: 'layer-created',
+                scene: scene_name,
+                layer: 'UI',
+                position: scene.getLayersCount() - 1,
+              },
+            ],
+          },
+        };
       }
 
       return makeGenericSuccess(
@@ -4093,6 +4635,15 @@ const createScene: EditorFunction = {
         : `Created new scene "${scene_name}".`,
       meta: {
         newSceneNames: [scene_name],
+      },
+      structuredOutput: {
+        changes: [
+          {
+            kind: 'scene-created',
+            scene: scene_name,
+            withUiLayer: !!include_ui_layer,
+          },
+        ],
       },
     };
   },
@@ -4125,7 +4676,18 @@ const deleteScene: EditorFunction = {
 
     project.removeLayout(scene_name);
 
-    return makeGenericSuccess(`Deleted scene "${scene_name}".`);
+    return {
+      success: true,
+      message: `Deleted scene "${scene_name}".`,
+      structuredOutput: {
+        changes: [
+          {
+            kind: 'scene-deleted',
+            scene: scene_name,
+          },
+        ],
+      },
+    };
   },
   modifiesProject: true,
 };
@@ -4355,6 +4917,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
 
     const changes = [];
     const warnings = [];
+    const structuredChanges: Array<EditorFunctionStructuredChange> = [];
 
     const changed_properties = SafeExtractor.extractArrayProperty(
       args,
@@ -4396,32 +4959,62 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           const colorAsRgb = hexNumberToRGBArray(rgbOrHexToHexNumber(newValue));
           scene.setBackgroundColor(colorAsRgb[0], colorAsRgb[1], colorAsRgb[2]);
           changes.push('Modified the scene background color.');
+          structuredChanges.push({
+            kind: 'scene-property-changed',
+            scene: scene_name,
+            property: 'backgroundColor',
+          });
         } else if (isFuzzyMatch(propertyName, 'gameResolutionWidth')) {
           project.setGameResolutionSize(
             parseInt(newValue),
             project.getGameResolutionHeight()
           );
           changes.push('Modified the game resolution width.');
+          structuredChanges.push({
+            kind: 'project-property-changed',
+            property: 'gameResolutionWidth',
+          });
         } else if (isFuzzyMatch(propertyName, 'stopSoundsOnStartup')) {
           scene.setStopSoundsOnStartup(newValue.toLowerCase() === 'true');
           changes.push(
             'Modified whether sounds should be stopped on scene startup.'
           );
+          structuredChanges.push({
+            kind: 'scene-property-changed',
+            scene: scene_name,
+            property: 'stopSoundsOnStartup',
+          });
         } else if (isFuzzyMatch(propertyName, 'gameResolutionHeight')) {
           project.setGameResolutionSize(
             project.getGameResolutionWidth(),
             parseInt(newValue)
           );
           changes.push('Modified the game resolution height.');
+          structuredChanges.push({
+            kind: 'project-property-changed',
+            property: 'gameResolutionHeight',
+          });
         } else if (isFuzzyMatch(propertyName, 'gameOrientation')) {
           project.setOrientation(newValue);
           changes.push('Modified the game orientation.');
+          structuredChanges.push({
+            kind: 'project-property-changed',
+            property: 'gameOrientation',
+          });
         } else if (isFuzzyMatch(propertyName, 'gameScaleMode')) {
           project.setScaleMode(newValue);
           changes.push('Modified the game scale mode.');
+          structuredChanges.push({
+            kind: 'project-property-changed',
+            property: 'gameScaleMode',
+          });
         } else if (isFuzzyMatch(propertyName, 'gameName')) {
           project.setName(newValue);
           changes.push('Modified the game name.');
+          structuredChanges.push({
+            kind: 'project-property-changed',
+            property: 'gameName',
+          });
         } else {
           warnings.push(
             `Unknown property for the scene: "${propertyName}". It was ignored and not changed.`
@@ -4480,6 +5073,14 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             changes.push(
               `Removed layer "${layerName}" for scene "${scene.getName()}".`
             );
+            structuredChanges.push({
+              kind: 'layer-deleted',
+              scene: scene_name,
+              layer: layerName,
+              ...(move_instances_to_layer
+                ? { instancesMovedToLayer: move_instances_to_layer }
+                : undefined),
+            });
           } else {
             if (new_layer_name) {
               gd.WholeProjectRefactorer.renameLayerInScene(
@@ -4491,6 +5092,12 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               changes.push(
                 `Renamed layer "${layerName}" to "${new_layer_name}" for scene "${scene.getName()}".`
               );
+              structuredChanges.push({
+                kind: 'layer-renamed',
+                scene: scene_name,
+                fromName: layerName,
+                toName: new_layer_name,
+              });
             }
           }
           if (new_layer_position !== null) {
@@ -4503,6 +5110,12 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             changes.push(
               `Moved layer "${layerName}" to position ${new_layer_position} for scene "${scene.getName()}".`
             );
+            structuredChanges.push({
+              kind: 'layer-moved',
+              scene: scene_name,
+              layer: new_layer_name || layerName,
+              position: new_layer_position,
+            });
           }
 
           // /!\ Tell the editor that some instances have potentially been modified (and even removed).
@@ -4512,19 +5125,24 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             scene,
           });
         } else {
+          const createdLayerName = new_layer_name || layerName;
+          const createdLayerPosition =
+            new_layer_position === null
+              ? scene.getLayersCount()
+              : new_layer_position;
           scene
             .getLayers()
-            .insertNewLayer(
-              new_layer_name || layerName,
-              new_layer_position === null
-                ? scene.getLayersCount()
-                : new_layer_position
-            );
+            .insertNewLayer(createdLayerName, createdLayerPosition);
           changes.push(
-            `Created new layer "${new_layer_name ||
-              layerName}" for scene "${scene.getName()}" at position ${new_layer_position ||
+            `Created new layer "${createdLayerName}" for scene "${scene.getName()}" at position ${createdLayerPosition ||
               0}.`
           );
+          structuredChanges.push({
+            kind: 'layer-created',
+            scene: scene_name,
+            layer: createdLayerName,
+            position: createdLayerPosition,
+          });
         }
       });
     }
@@ -4585,12 +5203,25 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             changes.push(
               `Removed "${effectName}" effect on layer "${layerName}".`
             );
+            structuredChanges.push({
+              kind: 'effect-deleted',
+              scene: scene_name,
+              layer: layerName,
+              effect: effectName,
+            });
           } else {
             if (new_effect_name) {
               effect.setName(new_effect_name);
               changes.push(
                 `Renamed the "${effectName}" effect on layer "${layerName}" to "${new_effect_name}".`
               );
+              structuredChanges.push({
+                kind: 'effect-renamed',
+                scene: scene_name,
+                layer: layerName,
+                fromName: effectName,
+                toName: new_effect_name,
+              });
             }
             if (new_effect_position !== null) {
               effectsContainer.moveEffect(
@@ -4600,6 +5231,13 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               changes.push(
                 `Moved the "${effectName}" effect on layer "${layerName}" to position ${new_effect_position}.`
               );
+              structuredChanges.push({
+                kind: 'effect-moved',
+                scene: scene_name,
+                layer: layerName,
+                effect: new_effect_name || effectName,
+                position: new_effect_position,
+              });
             }
           }
         } else {
@@ -4694,6 +5332,14 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             changes.push(
               `Modified "${propertyName}" property of the "${effectName}" effect to "${newValue}".`
             );
+            structuredChanges.push({
+              kind: 'effect-property-changed',
+              scene: scene_name,
+              layer: layerName,
+              effect: effectName,
+              property: propertyName,
+              value: newValue,
+            });
           });
         }
 
@@ -4715,6 +5361,13 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
                 .map(serializedProperty => JSON.stringify(serializedProperty))
                 .join(', ')}.`
             );
+            structuredChanges.push({
+              kind: 'effect-created',
+              scene: scene_name,
+              layer: layerName,
+              effect: newlyCreatedEffect.getName(),
+              effectType: newlyCreatedEffect.getEffectType(),
+            });
           }
         }
       });
@@ -4759,6 +5412,11 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           changes.push(
             `Deleted group "${groupName}" from scene "${scene_name}".`
           );
+          structuredChanges.push({
+            kind: 'group-deleted',
+            scene: scene_name,
+            group: groupName,
+          });
         } else {
           if (newGroupName) {
             gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
@@ -4772,6 +5430,12 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             changes.push(
               `Renamed group "${groupName}" to "${newGroupName}" in scene "${scene_name}".`
             );
+            structuredChanges.push({
+              kind: 'group-renamed',
+              scene: scene_name,
+              fromName: groupName,
+              toName: newGroupName,
+            });
           }
           if (objects) {
             const newObjectNames = objects
@@ -4807,6 +5471,12 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             changes.push(
               `Modified objects of group "${groupName}" in scene "${scene_name}".`
             );
+            structuredChanges.push({
+              kind: 'group-objects-modified',
+              scene: scene_name,
+              group: newGroupName || groupName,
+              objects: foundGroup.getAllObjectsNames().toJSArray(),
+            });
           }
         }
       });
@@ -4833,6 +5503,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
       return {
         success: true,
         message: ['Successfully done the changes.', ...changes].join('\n'),
+        structuredOutput: { changes: structuredChanges },
       };
     } else {
       return {
@@ -4842,6 +5513,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           ...changes,
         ].join('\n'),
         warnings: warnings.join('\n'),
+        structuredOutput: { changes: structuredChanges, warnings },
       };
     }
   },
@@ -4987,11 +5659,33 @@ const addOrEditVariable: EditorFunction = {
       value,
     });
 
-    return makeGenericSuccess(
-      addedNewVariable
+    const scope: 'global' | 'scene' | 'object' = (variable_scope: any);
+    const structuredChange: EditorFunctionStructuredChange = addedNewVariable
+      ? {
+          kind: 'variable-added',
+          scope,
+          ...(scene_name ? { scene: scene_name } : undefined),
+          ...(object_name ? { object: object_name } : undefined),
+          path: variable_name_or_path,
+          variableType,
+        }
+      : {
+          kind: 'variable-edited',
+          scope,
+          ...(scene_name ? { scene: scene_name } : undefined),
+          ...(object_name ? { object: object_name } : undefined),
+          path: variable_name_or_path,
+        };
+
+    return {
+      success: true,
+      message: addedNewVariable
         ? `Properly added variable "${variable_name_or_path}" of type "${variableType}".`
-        : `Properly edited variable "${variable_name_or_path}".`
-    );
+        : `Properly edited variable "${variable_name_or_path}".`,
+      structuredOutput: {
+        changes: [structuredChange],
+      },
+    };
   },
   modifiesProject: true,
 };
@@ -5105,6 +5799,15 @@ const initializeProject: EditorFunctionWithoutProject = {
         // Do not include the scene names, as the project will automatically
         // open the scenes.
         createdProject,
+      };
+      output.structuredOutput = {
+        changes: [
+          {
+            kind: 'project-initialized',
+            projectName: project_name,
+            ...(exampleSlug ? { templateSlug: exampleSlug } : undefined),
+          },
+        ],
       };
 
       return output;

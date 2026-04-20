@@ -263,7 +263,7 @@ module.exports = [
     "languageCode": "sk_SK",
     "languageName": "Slovak",
     "languageNativeName": "Slovenčina",
-    "translationRatio": 0.9773333333333334
+    "translationRatio": 0.978051282051282
   },
   {
     "languageCode": "sl_SI",

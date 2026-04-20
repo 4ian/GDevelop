@@ -161,13 +161,13 @@
  * Links to add a condition or an action
  */
 .gd-events-sheet .add-link {
-    background:none!important;
-    color:inherit;
-    border:none;
-    padding:0!important;
+    background: none !important;
+    color: inherit;
+    border: none;
+    padding: 2px 6px !important;
     font: inherit;
     cursor: pointer;
-    opacity: 0.6;
+    opacity: 0.65;
 
     /** Ensure the links are not growing outside of their parents on small screens. */
     text-align: left;
@@ -175,7 +175,7 @@
     overflow-wrap: break-word;
 }
 .gd-events-sheet .add-link:hover {
-    opacity: 0.9;
+    opacity: 1;
 }
 
 /**

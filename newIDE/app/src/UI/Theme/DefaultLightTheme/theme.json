@@ -708,7 +708,7 @@
     },
     "conditions": {
       "background-color": {
-        "value": "#f1f2f2"
+        "value": "#EBEBED"
       },
       "border-color": {
         "value": "#e2e2e2"
@@ -738,7 +738,7 @@
     },
     "actions": {
       "background-color": {
-        "value": "#FFFFFF"
+        "value": "#FAFAFA"
       },
       "color": {
         "value": "black"
@@ -761,45 +761,45 @@
     "instruction-parameter": {
       "base": {
         "color": {
-          "value": "rgb(78, 78, 78)"
+          "value": "#027C2A"
         }
       },
       "number": {
         "color": {
-          "value": "rgb(27, 143, 1)"
+          "value": "#046ACA"
         }
       },
       "object": {
         "color": {
-          "value": "#3c4698"
+          "value": "#7742F8"
         }
       },
       "behavior": {
         "color": {
-          "value": "rgb(119, 119, 119)"
+          "value": "#5D689B"
         }
       },
       "operator": {
         "color": {
-          "value": "rgb(55, 131, 211)"
+          "value": "#C112A8"
         }
       },
       "var": {
         "color": {
-          "value": "rgb(131, 55, 162)"
+          "value": "#7D6925"
         }
       },
       "error": {
         "color": {
-          "value": "#E06C75"
+          "value": "#C92906"
         },
         "background-color": {
-          "value": "#E06C7544"
+          "value": "#F03F18"
         }
       },
       "warning": {
         "color": {
-          "value": "#E5C07B"
+          "value": "#D24700"
         }
       }
     },

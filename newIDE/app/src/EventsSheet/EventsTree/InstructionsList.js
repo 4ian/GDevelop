@@ -278,7 +278,7 @@ export default function InstructionsList({
                     }
                     title={i18n._(addButtonTooltipLabel)}
                   >
-                    {addButtonLabel || addButtonDefaultLabel}
+                    + {addButtonLabel || addButtonDefaultLabel}
                   </button>
                   {canPaste && (
                     <span style={styles.pasteButtonContainer}>

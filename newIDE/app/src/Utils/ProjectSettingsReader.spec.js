@@ -3,6 +3,7 @@ import {
   filterAllowedPreferences,
   applyProjectPreferences,
 } from './ApplyProjectPreferences';
+import { parseToolbarButtons } from './ProjectSettingsReader';
 import YAML from 'yaml';
 import { type Preferences } from '../MainFrame/Preferences/PreferencesContext';
 
@@ -156,6 +157,111 @@ preferences:
       const parsed = YAML.parse(yamlContent);
       // readProjectSettings checks for preferences and returns null if empty/null
       expect(parsed.preferences).toBeNull();
+    });
+  });
+
+  describe('parseToolbarButtons', () => {
+    const availableScripts = {
+      lint: 'eslint src',
+      build: 'webpack',
+      test: 'jest',
+    };
+
+    test('parses a button without a hook (backward-compatible)', () => {
+      // $FlowFixMe[incompatible-call] - test array is a subtype of Array<mixed>
+      const raw = ([{ name: 'Lint', icon: '🔍', npmScript: 'lint' }]: any);
+      const result = parseToolbarButtons(raw, availableScripts);
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual({
+        name: 'Lint',
+        icon: '🔍',
+        npmScript: 'lint',
+      });
+      expect(result[0].hook).toBeUndefined();
+    });
+
+    test('parses a button with a valid hook', () => {
+      // $FlowFixMe[incompatible-call]
+      const raw = ([
+        { name: 'Lint', icon: '🔍', npmScript: 'lint', hook: 'onPreviewStart' },
+      ]: any);
+      const result = parseToolbarButtons(raw, availableScripts);
+      expect(result).toHaveLength(1);
+      expect(result[0].hook).toBe('onPreviewStart');
+    });
+
+    test('parses all supported hook names', () => {
+      // $FlowFixMe[incompatible-call]
+      const raw = ([
+        { name: 'A', icon: '1', npmScript: 'lint', hook: 'onEditorReady' },
+        { name: 'B', icon: '2', npmScript: 'build', hook: 'onPreviewStart' },
+        { name: 'C', icon: '3', npmScript: 'test', hook: 'onPreviewEnd' },
+      ]: any);
+      const result = parseToolbarButtons(raw, availableScripts);
+      expect(result).toHaveLength(3);
+      expect(result[0].hook).toBe('onEditorReady');
+      expect(result[1].hook).toBe('onPreviewStart');
+      expect(result[2].hook).toBe('onPreviewEnd');
+    });
+
+    test('ignores an invalid hook name (logs warning, no hook field set)', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      // $FlowFixMe[incompatible-call]
+      const raw = ([
+        { name: 'Lint', icon: '🔍', npmScript: 'lint', hook: 'onInvalidHook' },
+      ]: any);
+      const result = parseToolbarButtons(raw, availableScripts);
+      expect(result).toHaveLength(1);
+      expect(result[0].hook).toBeUndefined();
+      warnSpy.mockRestore();
+    });
+
+    test('skips a button whose npmScript is not in package.json', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      // $FlowFixMe[incompatible-call]
+      const raw = ([
+        { name: 'Missing', icon: '❌', npmScript: 'nonexistent' },
+      ]: any);
+      const result = parseToolbarButtons(raw, availableScripts);
+      expect(result).toHaveLength(0);
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'script "nonexistent" not found in package.json'
+        )
+      );
+      warnSpy.mockRestore();
+    });
+
+    test('skips a button with an unsafe script name', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      // $FlowFixMe[incompatible-call]
+      const raw = ([
+        { name: 'Dangerous', icon: '⚠️', npmScript: 'rm -rf /' },
+      ]: any);
+      const result = parseToolbarButtons(raw, {});
+      expect(result).toHaveLength(0);
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('invalid script name "rm -rf /"')
+      );
+      warnSpy.mockRestore();
+    });
+
+    test('skips buttons with missing required fields', () => {
+      // $FlowFixMe[incompatible-call]
+      const raw = ([
+        { icon: '🔍', npmScript: 'lint' },
+        { name: 'No Icon', npmScript: 'lint' },
+        { name: 'No Script', icon: '🔍' },
+      ]: any);
+      const result = parseToolbarButtons(raw, availableScripts);
+      expect(result).toHaveLength(0);
+    });
+
+    test('returns empty array when no scripts available (no package.json)', () => {
+      // $FlowFixMe[incompatible-call]
+      const raw = ([{ name: 'Lint', icon: '🔍', npmScript: 'lint' }]: any);
+      const result = parseToolbarButtons(raw, {});
+      expect(result).toHaveLength(0);
     });
   });
 });

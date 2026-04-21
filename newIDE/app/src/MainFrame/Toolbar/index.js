@@ -17,7 +17,7 @@ import CustomToolbarButton, {
   type ToolbarButtonConfig,
 } from '../CustomToolbarButton';
 import { type FileMetadata } from '../../ProjectsStorage';
-import { useNpmScriptButtonHandler } from '../NpmScriptRunnerProvider';
+import { useNpmScriptButtonHandler } from '../NpmScriptRunner/NpmScriptRunnerProvider';
 
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,

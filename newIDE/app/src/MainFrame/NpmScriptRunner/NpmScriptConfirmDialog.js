@@ -2,11 +2,11 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 
-import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
-import FlatButton from '../UI/FlatButton';
-import Text from '../UI/Text';
-import InlineCheckbox from '../UI/InlineCheckbox';
-import type { ToolbarButtonHooksNames } from './CustomToolbarButton';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
+import FlatButton from '../../UI/FlatButton';
+import Text from '../../UI/Text';
+import InlineCheckbox from '../../UI/InlineCheckbox';
+import type { ToolbarButtonHooksNames } from '../CustomToolbarButton';
 
 type Props = {|
   open: boolean,

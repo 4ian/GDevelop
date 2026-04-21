@@ -1,5 +1,5 @@
 // @flow
-import type { ToolbarButtonConfig } from './CustomToolbarButton';
+import type { ToolbarButtonConfig } from '../CustomToolbarButton';
 import type { HandleCustomButtonClick } from './useNpmScriptRunner';
 
 import NpmScriptConfirmDialog from './NpmScriptConfirmDialog';

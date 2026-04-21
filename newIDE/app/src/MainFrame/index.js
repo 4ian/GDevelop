@@ -214,7 +214,7 @@ import {
   readProjectSettings,
   getProjectDirectory,
 } from '../Utils/ProjectSettingsReader';
-import NpmScriptRunnerProvider from './NpmScriptRunnerProvider';
+import NpmScriptRunnerProvider from './NpmScriptRunner/NpmScriptRunnerProvider';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
   EmbeddedGameFrame,

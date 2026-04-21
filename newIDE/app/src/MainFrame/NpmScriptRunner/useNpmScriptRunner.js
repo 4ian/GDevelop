@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react';
-import PreferencesContext from './Preferences/PreferencesContext';
-import { runNpmScript } from '../Utils/NpmScriptExecutor';
+import PreferencesContext from '../Preferences/PreferencesContext';
+import { runNpmScript } from '../../Utils/NpmScriptExecutor';
 import type {
   ToolbarButtonConfig,
   ToolbarButtonHooksNames,
-} from './CustomToolbarButton';
+} from '../CustomToolbarButton';
 
 type Props = {|
   toolbarButtons: Array<ToolbarButtonConfig>,

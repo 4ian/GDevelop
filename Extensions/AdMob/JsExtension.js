@@ -61,7 +61,7 @@ module.exports = {
       .setName('AdMob Cordova plugin')
       .setDependencyType('cordova')
       .setExportName('gdevelop-cordova-admob-plus')
-      .setVersion('2.0.0-alpha.20')
+      .setVersion('2.0.0-alpha.21')
       .setExtraSetting(
         'APP_ID_ANDROID',
         new gd.PropertyDescriptor('AdMobAppIdAndroid').setType(

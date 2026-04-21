@@ -10,7 +10,12 @@ import type {
 type Props = {|
   toolbarButtons: Array<ToolbarButtonConfig>,
   projectPath: ?string,
-  hasPreviewsRunning: boolean,
+  /**
+   * Number of currently active non-edition preview windows, derived from
+   * debugger connections. Note: hook callbacks fire *after* the preview window
+   * connects (post-launch), not before the launch begins.
+   */
+  previewCount: number,
 |};
 
 export type TriggerNpmScript = (npmScript: string) => void;
@@ -43,7 +48,7 @@ const getScriptsByHookName = (
 const useNpmScriptRunner = ({
   toolbarButtons,
   projectPath,
-  hasPreviewsRunning,
+  previewCount,
 }: Props): ReturnType => {
   const isEditorReady = !!projectPath && toolbarButtons.length > 0;
   const {
@@ -51,7 +56,7 @@ const useNpmScriptRunner = ({
     setDisableNpmScriptConfirmation,
   } = React.useContext(PreferencesContext);
 
-  const prevHasPreviewsRunningRef = React.useRef(false);
+  const prevPreviewCountRef = React.useRef(0);
 
   const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
   const [pending, setPending] = React.useState<{|
@@ -126,19 +131,18 @@ const useNpmScriptRunner = ({
 
   React.useEffect(
     () => {
-      if (prevHasPreviewsRunningRef.current && !hasPreviewsRunning) {
+      const prev = prevPreviewCountRef.current;
+      if (previewCount > prev) {
+        callHook('onPreviewStart');
+      } else if (previewCount < prev) {
         callHook('onPreviewEnd');
       }
-      if (!prevHasPreviewsRunningRef.current && hasPreviewsRunning) {
-        callHook('onPreviewStart');
-      }
-      prevHasPreviewsRunningRef.current = hasPreviewsRunning;
+      prevPreviewCountRef.current = previewCount;
     },
-    // Same reasoning as above: `callHook` is omitted so the effect only runs
-    // when `hasPreviewsRunning` actually changes (start/stop edge), not on every
-    // re-render caused by unrelated toolbar config updates.
+    // `callHook` is intentionally omitted: we only want to react to changes in
+    // `previewCount` (each window open/close), not to toolbar config updates.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hasPreviewsRunning]
+    [previewCount]
   );
 
   const isAutoRun = !!(pending && pending.hookName);

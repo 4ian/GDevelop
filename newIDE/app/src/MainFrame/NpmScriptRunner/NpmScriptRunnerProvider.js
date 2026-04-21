@@ -23,7 +23,7 @@ export const useNpmScriptRunnerContext = (): NpmScriptRunnerContextValue =>
   React.useContext(NpmScriptRunnerContext);
 
 type NpmScriptRunnerProviderProps = {|
-  hasPreviewsRunning: boolean,
+  previewCount: number,
   children: React.Node,
   toolbarButtons: Array<ToolbarButtonConfig>,
   projectPath: ?string,
@@ -31,7 +31,7 @@ type NpmScriptRunnerProviderProps = {|
 
 const NpmScriptRunnerProvider: React.ComponentType<NpmScriptRunnerProviderProps> = React.memo(
   ({
-    hasPreviewsRunning,
+    previewCount,
     children,
     toolbarButtons,
     projectPath,
@@ -47,7 +47,7 @@ const NpmScriptRunnerProvider: React.ComponentType<NpmScriptRunnerProviderProps>
     } = useNpmScriptRunner({
       toolbarButtons,
       projectPath,
-      hasPreviewsRunning,
+      previewCount,
     });
 
     const npmScriptRunnerContextValue = React.useMemo(

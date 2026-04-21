@@ -532,6 +532,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     _previewLauncher.current.getPreviewDebuggerServer();
   const {
     hasNonEditionPreviewsRunning,
+    nonEditionPreviewsCount,
     gameHotReloadLogs,
     editorHotReloadLogs,
     editorUncaughtError,
@@ -5216,7 +5217,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         gameId={currentProject ? currentProject.getProjectUuid() : ''}
       >
         <NpmScriptRunnerProvider
-          hasPreviewsRunning={hasNonEditionPreviewsRunning}
+          previewCount={nonEditionPreviewsCount}
           toolbarButtons={state.toolbarButtons}
           projectPath={projectPath}
         >

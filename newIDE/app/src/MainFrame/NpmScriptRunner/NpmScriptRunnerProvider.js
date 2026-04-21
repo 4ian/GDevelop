@@ -1,19 +1,25 @@
 // @flow
 import type { ToolbarButtonConfig } from '../CustomToolbarButton';
-import type { HandleCustomButtonClick } from './useNpmScriptRunner';
+import type { TriggerNpmScript } from './useNpmScriptRunner';
 
 import NpmScriptConfirmDialog from './NpmScriptConfirmDialog';
 import useNpmScriptRunner from './useNpmScriptRunner';
 
 import * as React from 'react';
 
-const defaultNpmScriptButtonHandler: HandleCustomButtonClick = () => {};
+type NpmScriptRunnerContextValue = {|
+  triggerNpmScript: TriggerNpmScript,
+|};
 
-const NpmScriptRunnerContext = React.createContext<HandleCustomButtonClick>(
-  defaultNpmScriptButtonHandler
+const defaultNpmScriptRunnerContextValue: NpmScriptRunnerContextValue = {
+  triggerNpmScript: () => {},
+};
+
+const NpmScriptRunnerContext = React.createContext<NpmScriptRunnerContextValue>(
+  defaultNpmScriptRunnerContextValue
 );
 
-export const useNpmScriptButtonHandler = (): HandleCustomButtonClick =>
+export const useNpmScriptButtonHandler = (): NpmScriptRunnerContextValue =>
   React.useContext(NpmScriptRunnerContext);
 
 type NpmScriptRunnerProviderProps = {|
@@ -31,7 +37,7 @@ const NpmScriptRunnerProvider: React.ComponentType<NpmScriptRunnerProviderProps>
     projectPath,
   }: NpmScriptRunnerProviderProps): React.Node => {
     const {
-      handleCustomButtonClick,
+      triggerNpmScript,
       handleDismiss,
       handleConfirm,
       confirmDialogOpen,
@@ -44,8 +50,13 @@ const NpmScriptRunnerProvider: React.ComponentType<NpmScriptRunnerProviderProps>
       hasPreviewsRunning,
     });
 
+    const npmScriptRunnerContextValue = React.useMemo(
+      () => ({ triggerNpmScript }),
+      [triggerNpmScript]
+    );
+
     return (
-      <NpmScriptRunnerContext.Provider value={handleCustomButtonClick}>
+      <NpmScriptRunnerContext.Provider value={npmScriptRunnerContextValue}>
         <NpmScriptConfirmDialog
           open={confirmDialogOpen}
           scriptNames={scriptNames}

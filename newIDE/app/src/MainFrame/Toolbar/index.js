@@ -57,7 +57,7 @@ type LeftButtonsToolbarGroupProps = {|
 const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
   function LeftButtonsToolbarGroup(props) {
     const toolbarButtons = props.toolbarButtons;
-    const handleCustomButtonClick = useNpmScriptButtonHandler();
+    const { triggerNpmScript } = useNpmScriptButtonHandler();
 
     return (
       <>
@@ -81,7 +81,7 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
               key={index}
               name={button.name}
               icon={button.icon}
-              onClick={() => handleCustomButtonClick(button.npmScript)}
+              onClick={() => triggerNpmScript(button.npmScript)}
             />
           ))}
           {props.checkedOutVersionStatus && (

@@ -13,10 +13,10 @@ type Props = {|
   hasPreviewsRunning: boolean,
 |};
 
-export type HandleCustomButtonClick = (npmScript: string) => void;
+export type TriggerNpmScript = (npmScript: string) => void;
 
 type ReturnType = {|
-  handleCustomButtonClick: HandleCustomButtonClick,
+  triggerNpmScript: TriggerNpmScript,
   confirmDialogOpen: boolean,
   scriptNames: string,
   callingHookName?: ToolbarButtonHooksNames,
@@ -86,7 +86,7 @@ const useNpmScriptRunner = ({
     [toolbarButtons, projectPath, scheduleOrRun]
   );
 
-  const handleCustomButtonClick = React.useCallback(
+  const triggerNpmScript = React.useCallback(
     (npmScript: string) => {
       if (!projectPath) return;
       scheduleOrRun([npmScript], projectPath);
@@ -149,7 +149,7 @@ const useNpmScriptRunner = ({
     pending && pending.hookName ? pending.hookName : undefined;
 
   return {
-    handleCustomButtonClick,
+    triggerNpmScript,
     confirmDialogOpen,
     scriptNames,
     callingHookName,

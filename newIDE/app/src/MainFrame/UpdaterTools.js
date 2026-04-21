@@ -1,7 +1,8 @@
 // @flow
 // See ElectronEventsBridge, AboutDialog and electron-app/main.js for handling the updates.
 
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
+import { type I18n } from '@lingui/core';
 import React from 'react';
 
 export type ElectronUpdateStatus = {
@@ -14,22 +15,40 @@ export type ElectronUpdateStatus = {
     | 'download-progress'
     | 'update-downloaded'
     | 'unknown',
+  info?: {| version?: string |},
 };
 
 export const getElectronUpdateNotificationTitle = (
-  updateStatus: ElectronUpdateStatus
+  updateStatus: ElectronUpdateStatus,
+  i18n: I18n
 ): string => {
   if (updateStatus.status === 'update-available')
-    return 'A new update is available!';
+    return i18n._(t`A new update is available!`);
 
   return '';
 };
 
 export const getElectronUpdateNotificationBody = (
-  updateStatus: ElectronUpdateStatus
+  updateStatus: ElectronUpdateStatus,
+  i18n: I18n,
+  autoDownloadUpdates: boolean
 ): string => {
-  if (updateStatus.status === 'update-available')
-    return 'It will be downloaded and installed automatically (unless you deactivated this in preferences)';
+  if (updateStatus.status === 'update-available') {
+    const version = updateStatus.info && updateStatus.info.version;
+    if (autoDownloadUpdates) {
+      return version
+        ? i18n._(
+            t`Version ${version} is available and will be downloaded and installed automatically.`
+          )
+        : i18n._(t`It will be downloaded and installed automatically.`);
+    } else {
+      return version
+        ? i18n._(
+            t`Version ${version} is available. Open About to download and install it.`
+          )
+        : i18n._(t`Open About to download and install it.`);
+    }
+  }
 
   return '';
 };

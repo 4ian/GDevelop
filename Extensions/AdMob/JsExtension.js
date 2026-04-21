@@ -41,7 +41,7 @@ module.exports = {
       .setName('Consent Cordova plugin')
       .setDependencyType('cordova')
       .setExportName('gdevelop-cordova-plugin-consent')
-      .setVersion('3.0.0-alpha.9')
+      .setVersion('3.0.0-alpha.9.patch.1')
       .onlyIfOtherDependencyIsExported('AdMob Cordova plugin');
 
     extension
@@ -61,7 +61,7 @@ module.exports = {
       .setName('AdMob Cordova plugin')
       .setDependencyType('cordova')
       .setExportName('gdevelop-cordova-admob-plus')
-      .setVersion('2.0.0-alpha.24')
+      .setVersion('2.0.0-alpha.19.patch.1')
       .setExtraSetting(
         'APP_ID_ANDROID',
         new gd.PropertyDescriptor('AdMobAppIdAndroid').setType(

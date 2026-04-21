@@ -19,7 +19,7 @@ const NpmScriptRunnerContext = React.createContext<NpmScriptRunnerContextValue>(
   defaultNpmScriptRunnerContextValue
 );
 
-export const useNpmScriptButtonHandler = (): NpmScriptRunnerContextValue =>
+export const useNpmScriptRunnerContext = (): NpmScriptRunnerContextValue =>
   React.useContext(NpmScriptRunnerContext);
 
 type NpmScriptRunnerProviderProps = {|

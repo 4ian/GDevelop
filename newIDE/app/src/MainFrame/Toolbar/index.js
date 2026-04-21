@@ -17,7 +17,7 @@ import CustomToolbarButton, {
   type ToolbarButtonConfig,
 } from '../CustomToolbarButton';
 import { type FileMetadata } from '../../ProjectsStorage';
-import { useNpmScriptButtonHandler } from '../NpmScriptRunner/NpmScriptRunnerProvider';
+import { useNpmScriptRunnerContext } from '../NpmScriptRunner/NpmScriptRunnerProvider';
 
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
@@ -57,7 +57,7 @@ type LeftButtonsToolbarGroupProps = {|
 const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
   function LeftButtonsToolbarGroup(props) {
     const toolbarButtons = props.toolbarButtons;
-    const { triggerNpmScript } = useNpmScriptButtonHandler();
+    const { triggerNpmScript } = useNpmScriptRunnerContext();
 
     return (
       <>

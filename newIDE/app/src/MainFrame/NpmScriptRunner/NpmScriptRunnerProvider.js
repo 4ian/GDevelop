@@ -7,11 +7,6 @@ import useNpmScriptRunner from './useNpmScriptRunner';
 
 import * as React from 'react';
 
-export type EditorLifecycleState = {|
-  isEditorReady: boolean,
-  hasPreviewsRunning: boolean,
-|};
-
 const defaultNpmScriptButtonHandler: HandleCustomButtonClick = () => {};
 
 const NpmScriptRunnerContext = React.createContext<HandleCustomButtonClick>(
@@ -22,7 +17,6 @@ export const useNpmScriptButtonHandler = (): HandleCustomButtonClick =>
   React.useContext(NpmScriptRunnerContext);
 
 type NpmScriptRunnerProviderProps = {|
-  isEditorReady: boolean,
   hasPreviewsRunning: boolean,
   children: React.Node,
   toolbarButtons: Array<ToolbarButtonConfig>,
@@ -31,7 +25,6 @@ type NpmScriptRunnerProviderProps = {|
 
 const NpmScriptRunnerProvider: React.ComponentType<NpmScriptRunnerProviderProps> = React.memo(
   ({
-    isEditorReady,
     hasPreviewsRunning,
     children,
     toolbarButtons,
@@ -48,7 +41,6 @@ const NpmScriptRunnerProvider: React.ComponentType<NpmScriptRunnerProviderProps>
     } = useNpmScriptRunner({
       toolbarButtons,
       projectPath,
-      isEditorReady,
       hasPreviewsRunning,
     });
 

@@ -614,8 +614,6 @@ const MainFrame = (props: Props): React.MixedElement => {
     state.currentProject
   );
 
-  const [isEditorReady, setIsEditorReady] = React.useState<boolean>(false);
-
   const projectPath = React.useMemo(
     () =>
       currentFileMetadata
@@ -1076,7 +1074,6 @@ const MainFrame = (props: Props): React.MixedElement => {
   const closeProject = React.useCallback(
     async (): Promise<void> => {
       setHasProjectOpened(false);
-      setIsEditorReady(false);
       setPreviewState(initialPreviewState);
 
       console.info('Closing project...');
@@ -1222,7 +1219,6 @@ const MainFrame = (props: Props): React.MixedElement => {
               ...currentState,
               toolbarButtons: parsedProjectSettings.toolbarButtons || [],
             }));
-            setIsEditorReady(true);
           }
         } catch (error) {
           console.warn(
@@ -5221,7 +5217,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       >
         <NpmScriptRunnerProvider
           hasPreviewsRunning={hasNonEditionPreviewsRunning}
-          isEditorReady={isEditorReady}
           toolbarButtons={state.toolbarButtons}
           projectPath={projectPath}
         >

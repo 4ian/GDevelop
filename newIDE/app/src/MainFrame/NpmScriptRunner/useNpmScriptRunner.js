@@ -10,7 +10,6 @@ import type {
 type Props = {|
   toolbarButtons: Array<ToolbarButtonConfig>,
   projectPath: ?string,
-  isEditorReady: boolean,
   hasPreviewsRunning: boolean,
 |};
 
@@ -44,9 +43,9 @@ const getScriptsByHookName = (
 const useNpmScriptRunner = ({
   toolbarButtons,
   projectPath,
-  isEditorReady,
   hasPreviewsRunning,
 }: Props): ReturnType => {
+  const isEditorReady = !!projectPath && toolbarButtons.length > 0;
   const {
     values: { disableNpmScriptConfirmation },
     setDisableNpmScriptConfirmation,

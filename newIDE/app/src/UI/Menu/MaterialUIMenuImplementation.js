@@ -46,6 +46,19 @@ const styles = {
   },
 };
 
+// MenuItem whose `dense` prop adapts to the current screen type.
+// Defined as a function component so useScreenType() can be called properly.
+const DenseMenuItem = React.forwardRef<any, any>((props, ref) => {
+  const screenType = useScreenType();
+  return (
+    <MenuItem
+      dense={!!electron || screenType !== 'touch'}
+      ref={ref}
+      {...props}
+    />
+  );
+});
+
 // $FlowFixMe[missing-local-annot]
 const SubMenuItem = ({ item, buildFromTemplate, portalContainer }) => {
   // The invisible backdrop behind the submenu is either:
@@ -132,8 +145,6 @@ const SubMenuItem = ({ item, buildFromTemplate, portalContainer }) => {
     }, 75);
   }
 
-  // This is not a real hook.
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const isTouchscreen = useScreenType() === 'touch';
 
   return (
@@ -226,9 +237,6 @@ export default class MaterialUIMenuImplementation
     template: Array<MenuItemTemplate>,
     forceUpdate?: () => void
   ): any {
-    // This is not a real hook.
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const isTouchscreen = useScreenType() === 'touch';
     const portalContainer = this._portalContainer;
 
     return template
@@ -243,8 +251,7 @@ export default class MaterialUIMenuImplementation
           return <Divider key={'separator' + id} style={styles.divider} />;
         } else if (item.type === 'checkbox') {
           return (
-            <MenuItem
-              dense={!!electron || !isTouchscreen}
+            <DenseMenuItem
               key={'checkbox' + item.label}
               checked={
                 // $FlowFixMe[incompatible-type] - existence should be inferred by Flow.
@@ -282,7 +289,7 @@ export default class MaterialUIMenuImplementation
                 )}
               </ListItemIcon>
               <ListItemText primary={item.label} />
-            </MenuItem>
+            </DenseMenuItem>
           );
         } else if (item.submenu) {
           return (
@@ -297,8 +304,7 @@ export default class MaterialUIMenuImplementation
           );
         } else {
           return (
-            <MenuItem
-              dense={!!electron || !isTouchscreen}
+            <DenseMenuItem
               key={'item' + item.label}
               disabled={item.enabled === false}
               onClick={e => {
@@ -322,7 +328,7 @@ export default class MaterialUIMenuImplementation
                   <span style={styles.accelerator}>{accelerator}</span>
                 </div>
               )}
-            </MenuItem>
+            </DenseMenuItem>
           );
         }
       })

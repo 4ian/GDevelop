@@ -95,7 +95,10 @@ import {
   hasClipboardConditions,
   pasteInstructionsFromClipboardInInstructionsList,
 } from './ClipboardKind';
-import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
+import {
+  useScreenType,
+  type ScreenType,
+} from '../UI/Responsive/ScreenTypeMeasurer';
 import {
   type WindowSizeType,
   useResponsiveWindowSize,
@@ -176,6 +179,7 @@ type Props = {|
 type ComponentProps = {|
   ...Props,
   windowSize: WindowSizeType,
+  screenType: ScreenType,
   authenticatedUser: AuthenticatedUser,
   preferences: Preferences,
   tutorials: ?Array<Tutorial>,
@@ -734,9 +738,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           }
         );
 
-        // This is not a real hook.
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const screenType = useScreenType();
+        const screenType = this.props.screenType;
         if (
           screenType !== 'touch' &&
           (type === 'BuiltinCommonInstructions::Comment' ||
@@ -2347,12 +2349,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       tutorials,
       hotReloadPreviewButtonProps,
       windowSize,
+      screenType,
       highlightedAiGeneratedEventIds,
     } = this.props;
     if (!project) return null;
-
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const screenType = useScreenType();
 
     const isFunctionOnlyCallingItself =
       scope.eventsFunctionsExtension &&
@@ -2884,6 +2884,7 @@ const EventsSheet = (props, ref) => {
   const leaderboardsManager = React.useContext(LeaderboardContext);
   const { windowSize } = useResponsiveWindowSize();
   const shortcutMap = useShortcutMap();
+  const screenType = useScreenType();
   return (
     <EventsSheetComponentWithoutHandle
       ref={component}
@@ -2893,6 +2894,7 @@ const EventsSheet = (props, ref) => {
       leaderboardsManager={leaderboardsManager}
       shortcutMap={shortcutMap}
       windowSize={windowSize}
+      screenType={screenType}
       highlightedAiGeneratedEventIds={highlightedAiGeneratedEventIds}
       {...props}
     />

@@ -272,6 +272,7 @@ export default class ExportLauncher extends Component<Props, State> {
         project,
         updateStepProgress: this._updateStepProgress,
         exportState: this.state.exportState,
+        i18n,
       };
 
       if (
@@ -443,7 +444,7 @@ export default class ExportLauncher extends Component<Props, State> {
       return exportPipeline.canLaunchBuild(exportState, errored, exportStep);
     };
 
-    const isExporting = !!exportStep && exportStep !== 'done';
+    const isExporting = !!exportStep && exportStep !== 'done' && !errored;
     const isBuildRunning = !!build && build.status === 'pending';
     const isExportingOrWaitingForBuild = isExporting || isBuildRunning;
     const isExportAndBuildCompleteOrErrored =

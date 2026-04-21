@@ -1103,10 +1103,12 @@ const MainFrame = (props: Props): React.MixedElement => {
       // Delete the project from memory. All references to it have been dropped previously
       // by the setState.
       console.info('Deleting project from memory...');
+      // Wait for any in-progress load to complete before unloading, otherwise the
+      // pending load would re-add the old project's extensions after we remove them.
+      await eventsFunctionsExtensionsState.ensureLoadFinished();
       eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
         currentProject
       );
-      await eventsFunctionsExtensionsState.ensureLoadFinished();
       currentProject.delete();
       sealUnsavedChanges();
       console.info('Project closed.');

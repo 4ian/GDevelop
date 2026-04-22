@@ -78,6 +78,16 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
   idToCallbackMapCode +=
       codeGenerator.GetCodeNamespace() + ".idToCallbackMap = new Map();\n";
 
+  gd::String bpPushCode;
+  gd::String bpTryCode;
+  gd::String bpFinallyCode;
+  if (!codeGenerator.GenerateCodeForRuntime()) {
+    gd::String ns = codeGenerator.ConvertToStringExplicit(codeGenerator.GetCodeNamespace());
+    bpPushCode = "if (runtimeScene) runtimeScene.__pushBpFunction(" + ns + ");\n";
+    bpTryCode = "try {\n";
+    bpFinallyCode = "} finally { if (runtimeScene) runtimeScene.__popBpFunction(); }\n";
+  }
+
   gd::String output =
       // clang-format off
       codeGenerator.GetCodeNamespace() + " = {};\n" +
@@ -89,12 +99,20 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
       fullyQualifiedFunctionName + " = function(" +
         functionArgumentsCode +
       ") {\n" +
+        // Prelude runs BEFORE __pushBpFunction because object methods declare
+        // `var runtimeScene = this._instanceContainer;` in the prelude.
+        // If bpPushCode ran earlier, `runtimeScene` would be undefined (var-hoisted)
+        // and the push would silently no-op, leaving custom-object method calls
+        // at the wrong bp depth (breaks stepping's depth-based "don't step into" guard).
         functionPreEventsCode + "\n" +
+        bpPushCode +
+        bpTryCode +
         globalObjectListsReset + "\n" +
         wholeEventsCode + "\n" +
         globalObjectListsReset + "\n" +
         functionPostEventsCode + "\n" +
         functionReturnCode + "\n" +
+        bpFinallyCode +
       "}\n";
   // clang-format on
 
@@ -1554,7 +1572,7 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionBegin(
     const gd::String& section) {
   if (GenerateCodeForRuntime()) return "";
 
-  return "if (runtimeScene.getProfiler()) { runtimeScene.getProfiler().begin(" +
+  return "if (runtimeScene && runtimeScene.getProfiler()) { runtimeScene.getProfiler().begin(" +
          ConvertToStringExplicit(section) + "); }";
 }
 
@@ -1562,8 +1580,22 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
     const gd::String& section) {
   if (GenerateCodeForRuntime()) return "";
 
-  return "if (runtimeScene.getProfiler()) { runtimeScene.getProfiler().end(" +
+  return "if (runtimeScene && runtimeScene.getProfiler()) { runtimeScene.getProfiler().end(" +
          ConvertToStringExplicit(section) + "); }";
+}
+
+gd::String EventsCodeGenerator::GenerateBreakpointCode(size_t eventIndex) {
+  if (GenerateCodeForRuntime()) return "";
+
+  // Breakpoints are only supported in Electron preview where the Chrome
+  // DevTools Protocol is attached from the main process. `__checkBreakpoint`
+  // returns `false` in any other preview mode (web / remote browser), so
+  // the `debugger;` statement never fires there and is effectively dead
+  // code — no V8 debugger is attached to pause on it anyway.
+  return "if (runtimeScene && runtimeScene.__checkBreakpoint(" +
+         ConvertToStringExplicit(GetCodeNamespace()) + ", " +
+         gd::String::From(eventIndex) +
+         ")) debugger;\n";
 }
 
 gd::String EventsCodeGenerator::GeneratePropertySetterWithoutCasting(

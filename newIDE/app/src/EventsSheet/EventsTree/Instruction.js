@@ -25,6 +25,7 @@ import InvalidParameterValue from './InvalidParameterValue';
 import DeprecatedParameterValue from './DeprecatedParameterValue';
 import MissingParameterValue from './MissingParameterValue';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
+import RuntimeVariablesContext from '../RuntimeVariablesContext';
 import {
   type ScreenType,
   useScreenType,
@@ -225,6 +226,7 @@ const Instruction = (props: Props): React.Node => {
     []
   );
   const preferences = React.useContext(PreferencesContext);
+  const runtimeVariables = React.useContext(RuntimeVariablesContext);
   const theme = React.useContext(GDevelopThemeContext);
   const type = theme.palette.type;
   const warningColor = theme.message.warning;
@@ -256,6 +258,23 @@ const Instruction = (props: Props): React.Node => {
       metadata
     );
     const parametersCount = metadata.getParametersCount();
+
+    // For each parameter, remember the most recent `object`-typed
+    // parameter value that precedes it in the same instruction. This is
+    // what `objectvar` tooltips need to resolve `<object>.<variable>`
+    // values at pause time — the `objectvar` parameter on its own only
+    // carries the variable path.
+    const lastObjectNamePerParameter: Array<?string> = new Array(
+      parametersCount
+    ).fill(null);
+    let trackedLastObjectName: ?string = null;
+    for (let p = 0; p < parametersCount; p++) {
+      lastObjectNamePerParameter[p] = trackedLastObjectName;
+      const paramType = metadata.getParameter(p).getType();
+      if (gd.ParameterMetadata.isObject(paramType)) {
+        trackedLastObjectName = instruction.getParameter(p).getPlainString();
+      }
+    }
 
     return (
       <span
@@ -415,6 +434,8 @@ const Instruction = (props: Props): React.Node => {
                   props.projectScopedContainersAccessor,
                 highlightedSearchText: props.highlightedSearchText,
                 highlightedSearchMatchCase: props.highlightedSearchMatchCase,
+                runtimeVariables,
+                lastObjectName: lastObjectNamePerParameter[parameterIndex],
               })}
             </span>
           );

@@ -6,6 +6,7 @@
 #include "MetadataDeclarationHelper.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
+#include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
@@ -1572,6 +1573,12 @@ void MetadataDeclarationHelper::DeclareEventsFunctionParameters(
   multipleInstructionMetadata.AddCodeOnlyParameter("eventsFunctionContext", "");
 }
 
+gd::String MetadataDeclarationHelper::GetSceneCodeNamespace(
+    const gd::String &sceneName) {
+  return "gdjs." +
+         gd::SceneNameMangler::Get()->GetMangledSceneName(sceneName) + "Code";
+}
+
 gd::String MetadataDeclarationHelper::GetExtensionCodeNamespacePrefix(
     const gd::EventsFunctionsExtension &eventsFunctionsExtension) {
   return "gdjs.evtsExt__" + EventsCodeNameMangler::GetMangledName(
@@ -1609,6 +1616,24 @@ gd::String MetadataDeclarationHelper::GetObjectFunctionCodeNamespace(
     const gd::String &codeNamespacePrefix) {
   return codeNamespacePrefix + "__" +
          EventsCodeNameMangler::GetMangledName(eventsBasedObject.GetName());
+}
+
+/**
+ * Build the fully qualified context namespace used as `functionId` at runtime
+ * for a method of an events-based object. Must stay in sync with the layout
+ * produced in ObjectCodeGenerator (`<objectCodeNamespace>.<objectName>.`
+ * `prototype.<mangledFunctionName>Context`).
+ */
+gd::String
+MetadataDeclarationHelper::GetObjectEventsFunctionFullyQualifiedContextName(
+    const gd::EventsBasedObject &eventsBasedObject,
+    const gd::EventsFunction &eventsFunction,
+    const gd::String &codeNamespacePrefix) {
+  return GetObjectFunctionCodeNamespace(eventsBasedObject,
+                                        codeNamespacePrefix) +
+         "." + eventsBasedObject.GetName() + ".prototype." +
+         EventsCodeNameMangler::GetMangledName(eventsFunction.GetName()) +
+         "Context";
 }
 
 gd::AbstractFunctionMetadata &

@@ -4430,6 +4430,9 @@ interface MetadataDeclarationHelper {
         [Const, Ref] EventsBasedObject eventsBasedObject,
         [Ref] MapStringString objectMethodMangledNames);
 
+    [Const, Value] DOMString STATIC_GetSceneCodeNamespace(
+        [Const] DOMString sceneName);
+
     [Const, Value] DOMString STATIC_GetExtensionCodeNamespacePrefix(
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension);
 
@@ -4447,6 +4450,11 @@ interface MetadataDeclarationHelper {
 
     [Const, Value] DOMString STATIC_GetObjectFunctionCodeNamespace(
         [Const, Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString codeNamespacePrefix);
+
+    [Const, Value] DOMString STATIC_GetObjectEventsFunctionFullyQualifiedContextName(
+        [Const, Ref] EventsBasedObject eventsBasedObject,
+        [Const, Ref] EventsFunction eventsFunction,
         [Const] DOMString codeNamespacePrefix);
 
     boolean STATIC_IsBehaviorLifecycleEventsFunction([Const] DOMString functionName);

@@ -9,11 +9,11 @@
 // flat-index payload for *every* sheet that has breakpoints — not just the
 // currently mounted one.
 
-type EventsListLike = {
-  +ptr: number,
-  getEventsCount(): number,
-  getEventAt(index: number): any,
-};
+interface EventsListLike {
+  +ptr: number;
+  getEventsCount(): number;
+  getEventAt(index: number): any;
+}
 
 type Entry = {|
   events: EventsListLike,

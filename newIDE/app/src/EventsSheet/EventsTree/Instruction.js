@@ -264,7 +264,7 @@ const Instruction = (props: Props): React.Node => {
     // what `objectvar` tooltips need to resolve `<object>.<variable>`
     // values at pause time — the `objectvar` parameter on its own only
     // carries the variable path.
-    const lastObjectNamePerParameter: Array<?string> = new Array(
+    const lastObjectNamePerParameter: Array<?string> = new Array<?string>(
       parametersCount
     ).fill(null);
     let trackedLastObjectName: ?string = null;

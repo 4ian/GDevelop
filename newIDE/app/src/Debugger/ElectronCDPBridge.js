@@ -113,7 +113,7 @@ export const onPreviewDebuggerPauseChange = (
   callback: (isPaused: boolean, payload: ?CDPPausePayload) => void
 ): (() => void) => {
   if (!ipcRenderer) return () => {};
-  const onPaused = (_event, payload) =>
+  const onPaused = (_event: mixed, payload: ?CDPPausePayload) =>
     callback(true, {
       breakpoint: payload && payload.breakpoint ? payload.breakpoint : null,
       dumpJson: (payload && payload.dumpJson) || '',

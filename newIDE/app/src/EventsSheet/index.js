@@ -173,16 +173,17 @@ const isBreakpointableEvent = (event: gdBaseEvent): boolean =>
   event.isExecutable() && !NON_BREAKPOINTABLE_TYPES.includes(event.getType());
 
 const getFunctionIdFromScope = (scope: EventsScope): string => {
-  if (scope.eventsFunctionsExtension && scope.eventsFunction) {
+  const { eventsFunctionsExtension, eventsFunction } = scope;
+  if (eventsFunctionsExtension && eventsFunction) {
     const prefix = gd.MetadataDeclarationHelper.getExtensionCodeNamespacePrefix(
-      scope.eventsFunctionsExtension
+      eventsFunctionsExtension
     );
     // Method of a custom (events-based) object: the runtime uses a fully
     // qualified namespace `<prefix>__<Obj>.<Obj>.prototype.<Func>Context`.
     if (scope.eventsBasedObject) {
       return gd.MetadataDeclarationHelper.getObjectEventsFunctionFullyQualifiedContextName(
         scope.eventsBasedObject,
-        scope.eventsFunction,
+        eventsFunction,
         prefix
       );
     }
@@ -193,7 +194,7 @@ const getFunctionIdFromScope = (scope: EventsScope): string => {
       return '';
     }
     return gd.MetadataDeclarationHelper.getFreeFunctionCodeNamespace(
-      scope.eventsFunction,
+      eventsFunction,
       prefix
     );
   }
@@ -1834,10 +1835,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // unfolded sub-event on a slow machine).
     const MAX_ATTEMPTS = 5;
     const tryScroll = (attempt: number) => {
-      if (!this._eventsTree) return;
-      const row = this._eventsTree.getEventRow(event);
+      const eventsTree = this._eventsTree;
+      if (!eventsTree) return;
+      const row = eventsTree.getEventRow(event);
       if (row !== -1) {
-        this._eventsTree.scrollToRow(row);
+        eventsTree.scrollToRow(row);
         return;
       }
       if (attempt < MAX_ATTEMPTS) {

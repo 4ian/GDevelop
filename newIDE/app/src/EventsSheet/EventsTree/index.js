@@ -582,7 +582,8 @@ const EventsTree: React.ComponentType<{
       // would be swallowed by a `|| -1` fallback.
       const key = '' + searchedEvent.ptr;
       const map = eventPtrToRowIndex.current;
-      return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : -1;
+      const value = map[key];
+      return value === undefined ? -1 : value;
     },
     [eventPtrToRowIndex]
   );

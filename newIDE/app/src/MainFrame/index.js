@@ -2895,7 +2895,12 @@ const MainFrame = (props: Props): React.MixedElement => {
   // Navigate to the events tab when a breakpoint is hit; track paused
   // state. Pause / step is CDP-driven — see `ElectronCDPBridge.js` and
   // `PreviewWindow.js`.
-  const handleBreakpointHitRef = React.useRef(null);
+  type BreakpointHitHandler = (
+    functionId: string,
+    eventIndex: number,
+    sceneName: string
+  ) => void;
+  const handleBreakpointHitRef = React.useRef<?BreakpointHitHandler>(null);
   React.useEffect(
     () => {
       const handleBreakpointHit = (

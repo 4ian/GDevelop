@@ -763,7 +763,9 @@ namespace gdjs {
           // to JSON. Convert them to plain objects for the debugger dump.
           if (value instanceof Map) {
             const obj: Record<string, any> = {};
-            value.forEach((v, k) => { obj[k] = v; });
+            value.forEach((v, k) => {
+              obj[k] = v;
+            });
             return obj;
           }
           return value;

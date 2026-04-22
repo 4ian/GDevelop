@@ -66,8 +66,9 @@ namespace gdjs {
           ) &&
           (entry as ExtensionFunctionFrame).localVariables.length > 0
         ) {
-          activeLocalVariables['gdjs.' + key] = (entry as ExtensionFunctionFrame)
-            .localVariables;
+          activeLocalVariables['gdjs.' + key] = (
+            entry as ExtensionFunctionFrame
+          ).localVariables;
         }
       }
 
@@ -123,19 +124,19 @@ namespace gdjs {
         message.activeLocalVariables = activeLocalVariables;
       }
 
-      return JSON.stringify(message, function (
-        _key: string,
-        value: unknown
-      ): unknown {
-        if (value instanceof Map) {
-          const obj: { [key: string]: unknown } = {};
-          value.forEach((v: unknown, k: unknown) => {
-            obj[String(k)] = v;
-          });
-          return obj;
+      return JSON.stringify(
+        message,
+        function (_key: string, value: unknown): unknown {
+          if (value instanceof Map) {
+            const obj: { [key: string]: unknown } = {};
+            value.forEach((v: unknown, k: unknown) => {
+              obj[String(k)] = v;
+            });
+            return obj;
+          }
+          return value;
         }
-        return value;
-      });
+      );
     };
 
     if (typeof window === 'undefined') return;

@@ -462,7 +462,10 @@ namespace gdjs {
       return false;
     }
 
-    private _triggerBreakpoint(functionId: string, eventIndex: number): boolean {
+    private _triggerBreakpoint(
+      functionId: string,
+      eventIndex: number
+    ): boolean {
       // A pause can end the frame before "Trigger once" events re-evaluate.
       // Preserve last-frame state so Once doesn't refire on resume/step.
       this._onceTriggers.preserveLastFrameOnNextCycle();

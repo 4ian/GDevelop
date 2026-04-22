@@ -30,8 +30,18 @@ export default class BrowserEventsFunctionsExtensionOpener {
         adhocInput.type = 'file';
         adhocInput.multiple = true;
         adhocInput.accept = 'application/json,.json';
+        adhocInput.style.display = 'none';
+
+        const removeInput = () => {
+          const body = document.body;
+          if (body && body.contains(adhocInput)) {
+            body.removeChild(adhocInput);
+          }
+        };
+
         adhocInput.onchange = e => {
-          return resolve(e.target.files);
+          removeInput();
+          return resolve(Array.from(e.target.files));
         };
 
         // There is no built-in way to know if the user closed the file picking dialog
@@ -58,12 +68,14 @@ export default class BrowserEventsFunctionsExtensionOpener {
               onFilePickingDialogFinishedClosing
             );
           }
+          removeInput();
           if (!adhocInput.files.length) {
             resolve([]);
           }
         };
 
         window.addEventListener('focus', onFocusBackWindow);
+        if (document.body) document.body.appendChild(adhocInput);
         adhocInput.click();
       }
     });
@@ -118,7 +130,17 @@ export default class BrowserEventsFunctionsExtensionOpener {
         adhocInput.type = 'file';
         adhocInput.multiple = false;
         adhocInput.accept = 'application/gdo,.gdo';
+        adhocInput.style.display = 'none';
+
+        const removeInput = () => {
+          const body = document.body;
+          if (body && body.contains(adhocInput)) {
+            body.removeChild(adhocInput);
+          }
+        };
+
         adhocInput.onchange = e => {
+          removeInput();
           return resolve(e.target.files[0]);
         };
 
@@ -146,12 +168,14 @@ export default class BrowserEventsFunctionsExtensionOpener {
               onFilePickingDialogFinishedClosing
             );
           }
+          removeInput();
           if (!adhocInput.files.length) {
             resolve('');
           }
         };
 
         window.addEventListener('focus', onFocusBackWindow);
+        if (document.body) document.body.appendChild(adhocInput);
         adhocInput.click();
       }
     });

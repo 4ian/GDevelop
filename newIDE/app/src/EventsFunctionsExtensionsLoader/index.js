@@ -338,10 +338,9 @@ const generateFreeFunction = (
       eventsFunction,
       codeNamespace,
       includeFiles,
-      // For now, always generate functions for runtime (this disables
-      // generation of profiling for groups (see EventsCodeGenerator))
-      // as extensions generated can be used either for preview or export.
-      true
+      // Generate in preview mode so breakpoint checks are injected.
+      // In production the calls are no-ops (_breakpointIndices is null).
+      false
     );
 
     // Add any include file required by the function to the list
@@ -554,11 +553,10 @@ function generateObject(
         codeNamespace,
         objectMethodMangledNames,
         includeFiles,
-
-        // For now, always generate functions for runtime (this disables
-        // generation of profiling for groups (see EventsCodeGenerator))
-        // as extensions generated can be used either for preview or export.
-        true
+        // Preview mode so breakpoint checks are injected.
+        // The generated code guards runtimeScene with a null check
+        // since _instanceContainer may be undefined during construction.
+        false
       );
       objectCodeGenerator.delete();
       objectMethodMangledNames.delete();

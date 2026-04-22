@@ -23,6 +23,13 @@ import ProfileDialog from '../Profile/ProfileDialog';
 import PurchaseClaimDialog from '../Profile/PurchaseClaimDialog';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import {
+  resumePausedPreview,
+  stepPausedPreview,
+  schedulePauseAtNextEvent,
+  onPreviewDebuggerPauseChange,
+  isElectronCDPBridgeAvailable,
+} from '../Debugger/ElectronCDPBridge';
 import EditorTabsPane, {
   type EditorTabsPaneCommonProps,
 } from './EditorTabsPane';
@@ -2853,6 +2860,272 @@ const MainFrame = (props: Props): React.MixedElement => {
     openEventsFunctionsExtension,
   });
 
+  const previewPausedRef = React.useRef<boolean>(false);
+  const lastHitEventIndexRef = React.useRef<number>(-1);
+  const lastHitFunctionIdRef = React.useRef<string>('');
+  // Kept in sync with `state.editorTabs` so the breakpoint-hit handler can
+  // focus an already-open extension editor without re-subscribing to the
+  // debugger whenever tabs change.
+  const editorTabsRef = React.useRef(state.editorTabs);
+  React.useEffect(
+    () => {
+      editorTabsRef.current = state.editorTabs;
+    },
+    [state.editorTabs]
+  );
+
+  // Focus an extension editor on a specific function (free, behavior, or
+  // object method). If the tab is already open, we cannot rely on
+  // `initiallyFocused*` props (they are only consumed on mount), so we
+  // call `selectEventsFunctionByName` on the live editor ref directly.
+  const focusOnExtensionFunction = React.useCallback(
+    (
+      extensionName: string,
+      functionName: string,
+      behaviorName: ?string,
+      objectName: ?string
+    ) => {
+      if (!currentProject) return;
+      if (!currentProject.hasEventsFunctionsExtensionNamed(extensionName))
+        return;
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        extensionName
+      );
+      const foundTab = getEventsFunctionsExtensionEditor(
+        editorTabsRef.current,
+        eventsFunctionsExtension
+      );
+      if (foundTab) {
+        foundTab.editor.selectEventsFunctionByName(
+          functionName,
+          behaviorName,
+          objectName
+        );
+        setState(state => ({
+          ...state,
+          editorTabs: changeCurrentTab(
+            state.editorTabs,
+            foundTab.paneIdentifier,
+            foundTab.tabIndex
+          ),
+        }));
+      } else {
+        openEventsFunctionsExtension(
+          extensionName,
+          functionName,
+          behaviorName,
+          objectName
+        );
+      }
+    },
+    [currentProject, setState, openEventsFunctionsExtension]
+  );
+
+  // Navigate to the events tab when a breakpoint is hit; track paused
+  // state. Pause / step is CDP-driven — see `ElectronCDPBridge.js` and
+  // `PreviewWindow.js`.
+  type BreakpointHitHandler = (
+    functionId: string,
+    eventIndex: number,
+    sceneName: string
+  ) => void;
+  const handleBreakpointHitRef = React.useRef<?BreakpointHitHandler>(null);
+  React.useEffect(
+    () => {
+      const handleBreakpointHit = (
+        functionId: string,
+        eventIndex: number,
+        sceneName: string
+      ) => {
+        previewPausedRef.current = true;
+        lastHitEventIndexRef.current = eventIndex;
+        lastHitFunctionIdRef.current = functionId;
+
+        // If the hit is inside a local extension function, open its editor.
+        // We try free functions first, then methods of custom objects.
+        // Behavior methods are compiled with `compilationForRuntime: true`
+        // so they never emit breakpoint checks — we don't look for them.
+        if (functionId.startsWith('gdjs.evtsExt__') && currentProject) {
+          try {
+            const count = currentProject.getEventsFunctionsExtensionsCount();
+            for (let i = 0; i < count; i++) {
+              const ext = currentProject.getEventsFunctionsExtensionAt(i);
+              const prefix = gd.MetadataDeclarationHelper.getExtensionCodeNamespacePrefix(
+                ext
+              );
+              if (!functionId.startsWith(prefix)) continue;
+              if (ext.getOriginName() !== '') break;
+
+              const freeFuncs = ext.getEventsFunctions();
+              let resolved = false;
+              for (let j = 0; j < freeFuncs.getEventsFunctionsCount(); j++) {
+                const func = freeFuncs.getEventsFunctionAt(j);
+                const ns = gd.MetadataDeclarationHelper.getFreeFunctionCodeNamespace(
+                  func,
+                  prefix
+                );
+                if (ns === functionId) {
+                  focusOnExtensionFunction(
+                    ext.getName(),
+                    func.getName(),
+                    null,
+                    null
+                  );
+                  resolved = true;
+                  break;
+                }
+              }
+              if (resolved) return;
+
+              const ebos = ext.getEventsBasedObjects();
+              for (let k = 0; k < ebos.getCount(); k++) {
+                const ebo = ebos.getAt(k);
+                const objFuncs = ebo.getEventsFunctions();
+                for (let m = 0; m < objFuncs.getEventsFunctionsCount(); m++) {
+                  const func = objFuncs.getEventsFunctionAt(m);
+                  const ns = gd.MetadataDeclarationHelper.getObjectEventsFunctionFullyQualifiedContextName(
+                    ebo,
+                    func,
+                    prefix
+                  );
+                  if (ns === functionId) {
+                    focusOnExtensionFunction(
+                      ext.getName(),
+                      func.getName(),
+                      null,
+                      ebo.getName()
+                    );
+                    resolved = true;
+                    break;
+                  }
+                }
+                if (resolved) break;
+              }
+              if (resolved) return;
+              break;
+            }
+          } catch (_) {}
+        }
+
+        const layoutName = sceneName || previewState.previewLayoutName;
+        if (!layoutName) return;
+        openLayout(layoutName, {
+          openEventsEditor: true,
+          openSceneEditor: false,
+          focusWhenOpened: 'events',
+        });
+      };
+      handleBreakpointHitRef.current = handleBreakpointHit;
+
+      if (!previewDebuggerServer) return;
+      // `previewPausedRef` is driven authoritatively by
+      // `onPreviewDebuggerPauseChange`. The preview server connection
+      // lifecycle is used here only as a safety net: when the preview
+      // window closes, CDP detach does not emit a synthetic
+      // `Debugger.resumed`, so the refs would otherwise stay set to the
+      // last pause snapshot.
+      const resetPauseRefs = () => {
+        previewPausedRef.current = false;
+        lastHitEventIndexRef.current = -1;
+        lastHitFunctionIdRef.current = '';
+      };
+      const unregister = previewDebuggerServer.registerCallbacks({
+        onErrorReceived: () => {},
+        onServerStateChanged: () => {},
+        onConnectionClosed: resetPauseRefs,
+        onConnectionOpened: resetPauseRefs,
+        onConnectionErrored: () => {},
+        onHandleParsedMessage: () => {},
+      });
+      return unregister;
+    },
+    [
+      previewDebuggerServer,
+      previewState.previewLayoutName,
+      openLayout,
+      focusOnExtensionFunction,
+      currentProject,
+    ]
+  );
+
+  // CDP pause / resume forwarded from Electron main — fires reliably
+  // even while V8 is frozen on a `debugger;` statement and carries the
+  // current breakpoint snapshot for UI navigation.
+  React.useEffect(() => {
+    const unregister = onPreviewDebuggerPauseChange((isPaused, payload) => {
+      const breakpoint = payload && payload.breakpoint;
+      if (
+        isPaused &&
+        breakpoint &&
+        typeof breakpoint.eventIndex === 'number' &&
+        typeof breakpoint.functionId === 'string' &&
+        handleBreakpointHitRef.current
+      ) {
+        handleBreakpointHitRef.current(
+          breakpoint.functionId,
+          breakpoint.eventIndex,
+          breakpoint.sceneName || ''
+        );
+      } else if (!isPaused) {
+        previewPausedRef.current = false;
+        lastHitEventIndexRef.current = -1;
+        lastHitFunctionIdRef.current = '';
+      }
+    });
+    return unregister;
+  }, []);
+
+  // Breakpoints, Pause / Next Event all require V8 to truly freeze on
+  // `debugger;` — that is only possible when Electron's main process is
+  // attached via CDP. In web / remote previews we surface a one-shot
+  // notification instead (suggested by the user: "notify that the feature
+  // isn't supported and ask to use local preview").
+  const notifyBreakpointsUnsupported = React.useCallback(
+    () => {
+      showAlert({
+        title: t`Debugger not available here`,
+        message: t`Pausing, stepping and breakpoints only work in the local Electron preview. Please use "Preview" (F5) on this computer to debug your events.`,
+      });
+    },
+    [showAlert]
+  );
+
+  const togglePauseExecution = React.useCallback(
+    () => {
+      if (!previewDebuggerServer) return;
+      if (!isElectronCDPBridgeAvailable()) {
+        notifyBreakpointsUnsupported();
+        return;
+      }
+      if (previewPausedRef.current) {
+        resumePausedPreview();
+        previewPausedRef.current = false;
+      } else {
+        // Scheduling "pause at next event" via CDP Runtime.evaluate. The
+        // preview is running, so V8 processes the write immediately and the
+        // actual pause happens inside the next `__checkBreakpoint` call.
+        schedulePauseAtNextEvent();
+      }
+    },
+    [previewDebuggerServer, notifyBreakpointsUnsupported]
+  );
+
+  const stepNextEvent = React.useCallback(
+    () => {
+      if (!previewDebuggerServer) return;
+      if (!isElectronCDPBridgeAvailable()) {
+        notifyBreakpointsUnsupported();
+        return;
+      }
+      if (!previewPausedRef.current) return;
+      stepPausedPreview({
+        currentEventIndex: lastHitEventIndexRef.current,
+        currentFunctionId: lastHitFunctionIdRef.current,
+      });
+    },
+    [previewDebuggerServer, notifyBreakpointsUnsupported]
+  );
+
   const onEditorTabClosing = React.useCallback(
     (editorTab: EditorTab) => {
       if (editorTab.kind === 'global-search') {
@@ -4892,6 +5165,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     onRestartInGameEditor,
     onOpenGlobalSearch: openGlobalSearch,
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
+    onTogglePauseExecution: togglePauseExecution,
+    onStepNextEvent: stepNextEvent,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(

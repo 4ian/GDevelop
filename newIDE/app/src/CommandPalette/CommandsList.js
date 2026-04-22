@@ -61,6 +61,9 @@ export type CommandName =
   | 'ADD_COMMENT_EVENT'
   | 'TOGGLE_EVENT_DISABLED'
   | 'TOGGLE_CONDITION_INVERTED'
+  | 'TOGGLE_BREAKPOINT'
+  | 'TOGGLE_PAUSE_EXECUTION'
+  | 'STEP_NEXT_EVENT'
   | 'CHOOSE_AND_ADD_EVENT'
   | 'MOVE_EVENTS_IN_NEW_GROUP'
   | 'EVENTS_EDITOR_UNDO'
@@ -317,6 +320,18 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   TOGGLE_EVENT_DISABLED: {
     area: 'EVENTS',
     displayText: t`Toggle disabled event`,
+  },
+  TOGGLE_BREAKPOINT: {
+    area: 'EVENTS',
+    displayText: t`Toggle breakpoint`,
+  },
+  TOGGLE_PAUSE_EXECUTION: {
+    area: 'PROJECT',
+    displayText: t`Pause/resume execution`,
+  },
+  STEP_NEXT_EVENT: {
+    area: 'PROJECT',
+    displayText: t`Step to next event`,
   },
   TOGGLE_CONDITION_INVERTED: {
     area: 'EVENTS',

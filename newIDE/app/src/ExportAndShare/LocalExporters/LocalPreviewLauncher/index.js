@@ -22,6 +22,7 @@ import {
 import Window from '../../../Utils/Window';
 import { getIDEVersionWithHash } from '../../../Version';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import { buildAllBreakpointsPayload } from '../../../EventsSheet/BreakpointsSessionStore';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -114,6 +115,15 @@ export default class LocalPreviewLauncher extends React.Component<
 
     if (!ipcRenderer) return;
 
+    // Snapshot session breakpoints once, at launch time, so the Electron
+    // main process can inject them into the preview via CDP's
+    // Page.addScriptToEvaluateOnNewDocument. Without this injection the
+    // only path for breakpoint delivery is the WebSocket `setBreakpoints`
+    // frame which arrives *after* the first renderAndStep, making any
+    // breakpoint on a frame-0 event (e.g. events gated by TriggerOnce or
+    // "At beginning of scene") silently un-hittable on first launch.
+    const initialBreakpoints = buildAllBreakpointsPayload();
+
     ipcRenderer.invoke('preview-open', {
       previewBrowserWindowOptions,
       previewGameIndexHtmlPath: `file://${previewGamePath}/index.html`,
@@ -121,6 +131,7 @@ export default class LocalPreviewLauncher extends React.Component<
       hideMenuBar,
       numberOfWindows,
       captureOptions,
+      initialBreakpoints,
     });
 
     ipcRenderer.removeAllListeners('preview-window-closed');

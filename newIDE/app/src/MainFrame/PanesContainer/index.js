@@ -30,6 +30,9 @@ type Props = {|
       paneIdentifier: string,
       newState: FloatingPaneState
     ) => void,
+    onRequestPaneClose?: (onClosed: () => void) => void,
+    drawerState?: FloatingPaneState,
+    rightPaneDrawerOpen?: boolean,
   }) => React.Node,
   hasEditorsInLeftPane: boolean,
   hasEditorsInRightPane: boolean,
@@ -142,6 +145,8 @@ const useSwipeableDrawer = ({
   );
 };
 
+const PANE_ANIMATION_DURATION_MS = 250;
+
 export const PanesContainer = ({
   renderPane,
   hasEditorsInLeftPane,
@@ -159,6 +164,132 @@ export const PanesContainer = ({
   const rightResizerRef = React.useRef<HTMLDivElement | null>(null);
 
   const areSidePanesDrawers = isMobile;
+
+  const [rightPaneRendered, setRightPaneRendered] = React.useState(
+    hasEditorsInRightPane
+  );
+  const [rightPaneClosing, setRightPaneClosing] = React.useState(false);
+  const rightPaneCloseTimeoutRef = React.useRef<?TimeoutID>(null);
+  const rightPaneRequestedCloseRef = React.useRef(false);
+  const rightPaneCloseCallbackRef = React.useRef<null | (() => void)>(null);
+
+  const startRightPaneCloseAnimation = React.useCallback(() => {
+    const pane = rightPaneRef.current;
+    if (pane) {
+      pane.style.setProperty('--pane-close-width', `${pane.offsetWidth}px`);
+    }
+    setRightPaneClosing(true);
+    rightPaneCloseTimeoutRef.current = setTimeout(() => {
+      rightPaneCloseTimeoutRef.current = null;
+      // React 18 batches all state updates in a setTimeout callback into one
+      // render, so the callback (onCloseEditorTab) and the pane hide land
+      // in the same frame — no flash between tab disappearing and button appearing.
+      const callback = rightPaneCloseCallbackRef.current;
+      rightPaneCloseCallbackRef.current = null;
+      if (callback) callback();
+      setRightPaneRendered(false);
+      setRightPaneClosing(false);
+    }, PANE_ANIMATION_DURATION_MS);
+  }, []);
+
+  const cancelRightPaneCloseAnimation = React.useCallback(() => {
+    if (rightPaneCloseTimeoutRef.current) {
+      clearTimeout(rightPaneCloseTimeoutRef.current);
+      rightPaneCloseTimeoutRef.current = null;
+    }
+    rightPaneCloseCallbackRef.current = null;
+  }, []);
+
+  const requestRightPaneClose = React.useCallback(
+    (onClosed: () => void) => {
+      if (areSidePanesDrawers) {
+        onClosed();
+        return;
+      }
+      rightPaneRequestedCloseRef.current = true;
+      rightPaneCloseCallbackRef.current = onClosed;
+      startRightPaneCloseAnimation();
+    },
+    [areSidePanesDrawers, startRightPaneCloseAnimation]
+  );
+
+  React.useEffect(
+    () => {
+      if (hasEditorsInRightPane) {
+        cancelRightPaneCloseAnimation();
+        rightPaneRequestedCloseRef.current = false;
+        const pane = rightPaneRef.current;
+        if (pane) {
+          pane.style.setProperty(
+            '--pane-close-width',
+            pane.style.flexBasis || '300px'
+          );
+        }
+        setRightPaneRendered(true);
+        setRightPaneClosing(false);
+      } else {
+        // If requestRightPaneClose already started the animation, don't restart it.
+        if (rightPaneRequestedCloseRef.current) {
+          rightPaneRequestedCloseRef.current = false;
+          return;
+        }
+        startRightPaneCloseAnimation();
+      }
+    },
+    [
+      hasEditorsInRightPane,
+      startRightPaneCloseAnimation,
+      cancelRightPaneCloseAnimation,
+    ]
+  );
+
+  // Unmount-only cleanup for the right pane close animation.
+  React.useEffect(() => cancelRightPaneCloseAnimation, [
+    cancelRightPaneCloseAnimation,
+  ]);
+
+  const [leftPaneRendered, setLeftPaneRendered] = React.useState(
+    hasEditorsInLeftPane
+  );
+  const [leftPaneClosing, setLeftPaneClosing] = React.useState(false);
+  const leftPaneCloseTimeoutRef = React.useRef<?TimeoutID>(null);
+
+  React.useEffect(
+    () => {
+      if (hasEditorsInLeftPane) {
+        if (leftPaneCloseTimeoutRef.current) {
+          clearTimeout(leftPaneCloseTimeoutRef.current);
+          leftPaneCloseTimeoutRef.current = null;
+        }
+        const pane = leftPaneRef.current;
+        if (pane) {
+          pane.style.setProperty(
+            '--pane-close-width',
+            pane.style.flexBasis || '300px'
+          );
+        }
+        setLeftPaneRendered(true);
+        setLeftPaneClosing(false);
+      } else {
+        const pane = leftPaneRef.current;
+        if (pane) {
+          pane.style.setProperty('--pane-close-width', `${pane.offsetWidth}px`);
+        }
+        setLeftPaneClosing(true);
+        leftPaneCloseTimeoutRef.current = setTimeout(() => {
+          setLeftPaneRendered(false);
+          setLeftPaneClosing(false);
+          leftPaneCloseTimeoutRef.current = null;
+        }, PANE_ANIMATION_DURATION_MS);
+      }
+      return () => {
+        if (leftPaneCloseTimeoutRef.current) {
+          clearTimeout(leftPaneCloseTimeoutRef.current);
+        }
+      };
+    },
+    [hasEditorsInLeftPane]
+  );
 
   const [panesDrawerState, setPanesDrawerState] = React.useState<{
     [string]: FloatingPaneState,
@@ -378,7 +509,8 @@ export const PanesContainer = ({
           [classes.drawer]: areSidePanesDrawers,
           [classes.closedDrawer]:
             areSidePanesDrawers && panesDrawerState['left'] === 'closed',
-          [classes.hidden]: !hasEditorsInLeftPane,
+          [classes.hidden]: !leftPaneRendered,
+          [classes.closing]: leftPaneClosing && !areSidePanesDrawers,
         })}
         style={
           leftPanePointerEventsNone && !isDragging
@@ -387,21 +519,25 @@ export const PanesContainer = ({
         }
         id="pane-left"
       >
-        {renderPane({
-          paneIdentifier: 'left',
-          isLeftMostPane: true,
-          isRightMostPane: false,
-          isDrawer: areSidePanesDrawers,
-          areSidePanesDrawers,
-          onSetPaneDrawerState: setPaneDrawerState,
-          onSetPointerEventsNone: setLeftPanePointerEventsNone,
-        })}
+        <div className={classes.paneContent}>
+          {renderPane({
+            paneIdentifier: 'left',
+            isLeftMostPane: true,
+            isRightMostPane: false,
+            isDrawer: areSidePanesDrawers,
+            areSidePanesDrawers,
+            onSetPaneDrawerState: setPaneDrawerState,
+            onSetPointerEventsNone: setLeftPanePointerEventsNone,
+            drawerState: panesDrawerState['left'],
+          })}
+        </div>
       </div>
       <div
         className={classNames({
           [classes.resizer]: true,
           [classes.leftResizer]: true,
-          [classes.hidden]: !hasEditorsInLeftPane || areSidePanesDrawers,
+          [classes.hidden]: !leftPaneRendered || areSidePanesDrawers,
+          [classes.resizerClosing]: leftPaneClosing && !areSidePanesDrawers,
         })}
         role="separator"
         aria-orientation="vertical"
@@ -424,19 +560,21 @@ export const PanesContainer = ({
       >
         {renderPane({
           paneIdentifier: 'center',
-          isLeftMostPane: areSidePanesDrawers || !hasEditorsInLeftPane,
-          isRightMostPane: areSidePanesDrawers || !hasEditorsInRightPane,
+          isLeftMostPane: areSidePanesDrawers || !leftPaneRendered,
+          isRightMostPane: areSidePanesDrawers || !rightPaneRendered,
           isDrawer: false,
           areSidePanesDrawers,
           onSetPaneDrawerState: setPaneDrawerState,
           onSetPointerEventsNone: setCenterPanePointerEventsNone,
+          rightPaneDrawerOpen: panesDrawerState['right'] === 'open',
         })}
       </div>
       <div
         className={classNames({
           [classes.resizer]: true,
           [classes.rightResizer]: true,
-          [classes.hidden]: !hasEditorsInRightPane || areSidePanesDrawers,
+          [classes.hidden]: !rightPaneRendered || areSidePanesDrawers,
+          [classes.resizerClosing]: rightPaneClosing && !areSidePanesDrawers,
         })}
         role="separator"
         aria-orientation="vertical"
@@ -452,7 +590,8 @@ export const PanesContainer = ({
           [classes.drawer]: areSidePanesDrawers,
           [classes.closedDrawer]:
             areSidePanesDrawers && panesDrawerState['right'] === 'closed',
-          [classes.hidden]: !hasEditorsInRightPane,
+          [classes.hidden]: !rightPaneRendered,
+          [classes.closing]: rightPaneClosing && !areSidePanesDrawers,
         })}
         style={
           rightPanePointerEventsNone && !isDragging
@@ -461,15 +600,19 @@ export const PanesContainer = ({
         }
         id="pane-right"
       >
-        {renderPane({
-          paneIdentifier: 'right',
-          isLeftMostPane: false,
-          isRightMostPane: true,
-          isDrawer: areSidePanesDrawers,
-          areSidePanesDrawers,
-          onSetPaneDrawerState: setPaneDrawerState,
-          onSetPointerEventsNone: setRightPanePointerEventsNone,
-        })}
+        <div className={classes.paneContent}>
+          {renderPane({
+            paneIdentifier: 'right',
+            isLeftMostPane: false,
+            isRightMostPane: true,
+            isDrawer: areSidePanesDrawers,
+            areSidePanesDrawers,
+            onSetPaneDrawerState: setPaneDrawerState,
+            onSetPointerEventsNone: setRightPanePointerEventsNone,
+            onRequestPaneClose: requestRightPaneClose,
+            drawerState: panesDrawerState['right'],
+          })}
+        </div>
       </div>
     </div>
   );

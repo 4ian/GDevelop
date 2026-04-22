@@ -3,6 +3,8 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
+  contain: layout; /* Prevent max-width animation from forcing full-page reflow */
+  position: relative; /* Containing block for absolutely-positioned panes during close */
 }
 
 .pane {
@@ -11,6 +13,15 @@
   overflow: hidden;
   position: relative;
   pointer-events: all;
+}
+
+.paneContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: var(--pane-close-width, 300px);
+  min-height: 0;
 }
 
 .leftPane {
@@ -25,39 +36,83 @@
   z-index: 1; /* Create a new stacking context. */
 }
 
-@keyframes slide-in-right {
+@keyframes slide-in-pane {
   from {
-    transform: translateX(40px);
+    max-width: 0;
   }
   to {
-    transform: translateX(0);
+    max-width: var(--pane-close-width, 300px);
   }
 }
 
-@keyframes slide-in-left {
+
+/* GPU-composited close animations — no layout recalculation per frame. */
+@keyframes slide-out-right-pane {
+  from { transform: translateX(0); }
+  to   { transform: translateX(100%); }
+}
+
+@keyframes slide-out-left-pane {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+
+@keyframes slide-in-resizer {
   from {
-    transform: translateX(-40px);
+    max-width: 0;
   }
   to {
-    transform: translateX(0);
+    max-width: 3px;
   }
 }
 
 /* Pane opening (drawer or not) */
-.rightPane:not(.hidden) {
-  animation: slide-in-right 0.15s ease-out;
+/* backwards fill-mode: applies the `from` keyframe immediately, preventing a
+   one-frame flash at the pane's natural flex-basis width before the animation starts. */
+.rightPane:not(.hidden):not(.closing) {
+  animation: slide-in-pane 0.25s ease-out backwards;
 }
 
-.leftPane:not(.hidden) {
-  animation: slide-in-left 0.15s ease-out;
+.leftPane:not(.hidden):not(.closing) {
+  animation: slide-in-pane 0.25s ease-out backwards;
 }
 
-.rightResizer:not(.hidden) {
-  animation: slide-in-right 0.15s ease-out;
+.rightResizer:not(.hidden):not(.resizerClosing) {
+  animation: slide-in-resizer 0.25s ease-out backwards;
 }
 
-.leftResizer:not(.hidden) {
-  animation: slide-in-left 0.15s ease-out;
+.leftResizer:not(.hidden):not(.resizerClosing) {
+  animation: slide-in-resizer 0.25s ease-out backwards;
+}
+
+/* Right pane closing: leaves flex flow immediately (center expands at once),
+   then slides out to the right as a GPU-composited overlay. */
+.rightPane.closing {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--pane-close-width, 300px);
+  animation: slide-out-right-pane 0.25s ease forwards;
+  z-index: 2;
+}
+
+/* Left pane closing: same approach as right — leaves flex flow immediately,
+   slides out to the left as a GPU-composited overlay. */
+.leftPane.closing {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--pane-close-width, 300px);
+  animation: slide-out-left-pane 0.25s ease forwards;
+  z-index: 2;
+}
+
+/* Resizer disappears immediately when a pane starts closing. */
+.resizerClosing {
+  opacity: 0;
+  width: 0;
 }
 
 /* Pane as drawer */

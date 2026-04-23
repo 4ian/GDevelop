@@ -1151,6 +1151,21 @@ namespace gdjs {
       return this.bodyType === 'Kinematic';
     }
 
+    setBodyType(bodyType: string): void {
+      switch (bodyType) {
+        case 'Static':
+          this.setStatic();
+          break;
+        case 'Kinematic':
+          this.setKinematic();
+          break;
+        case 'Dynamic':
+        default:
+          this.setDynamic();
+          break;
+      }
+    }
+
     setKinematic(): void {
       // Check if there is no modification
       if (this.bodyType === 'Kinematic') {

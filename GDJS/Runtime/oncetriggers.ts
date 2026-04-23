@@ -20,16 +20,34 @@ namespace gdjs {
   export class OnceTriggers {
     _onceTriggers: Record<integer, boolean> = {};
     _lastFrameOnceTrigger: Record<integer, boolean> = {};
+    // Debugger-only: when true, the NEXT startNewFrame() call keeps
+    // `_lastFrameOnceTrigger` intact instead of clearing it. Used to
+    // stabilize "Trigger once" across debugger pauses (breakpoint hits and
+    // Shift+F10 stepping), where a frame can terminate before the event
+    // holding the Once condition is evaluated, which would otherwise make
+    // Once erroneously re-fire on subsequent resumed/stepped frames.
+    _preserveLastFrameOnNextCycle: boolean = false;
+
+    /**
+     * Debugger-only: request that the next `startNewFrame()` preserves
+     * `_lastFrameOnceTrigger` instead of clearing it.
+     */
+    preserveLastFrameOnNextCycle(): void {
+      this._preserveLastFrameOnNextCycle = true;
+    }
 
     /**
      * To be called when events begin so that "Trigger once" conditions
      * are properly handled.
      */
     startNewFrame(): void {
-      // Clear triggers from 2 frames ago
-      for (const k in this._lastFrameOnceTrigger)
-        if (this._lastFrameOnceTrigger.hasOwnProperty(k))
-          delete this._lastFrameOnceTrigger[k];
+      if (!this._preserveLastFrameOnNextCycle) {
+        // Clear triggers from 2 frames ago
+        for (const k in this._lastFrameOnceTrigger)
+          if (this._lastFrameOnceTrigger.hasOwnProperty(k))
+            delete this._lastFrameOnceTrigger[k];
+      }
+      this._preserveLastFrameOnNextCycle = false;
 
       // Move triggers from this frame to last frame
       for (const k in this._onceTriggers) {

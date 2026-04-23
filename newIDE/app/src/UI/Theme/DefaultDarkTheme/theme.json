@@ -763,12 +763,12 @@
     "instruction-parameter": {
       "base": {
         "color": {
-          "value": "#67D411"
+          "value": "#16EF91"
         }
       },
       "number": {
         "color": {
-          "value": "#16EF91"
+          "value": "#E0D01F"
         }
       },
       "object": {

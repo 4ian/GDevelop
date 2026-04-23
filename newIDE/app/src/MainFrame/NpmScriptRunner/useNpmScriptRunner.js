@@ -6,6 +6,7 @@ import type {
   ToolbarButtonConfig,
   ToolbarButtonHooksNames,
 } from '../CustomToolbarButton';
+import NpmScriptConfirmDialog from './NpmScriptConfirmDialog';
 
 type Props = {|
   toolbarButtons: Array<ToolbarButtonConfig>,
@@ -22,12 +23,7 @@ export type TriggerNpmScript = (npmScript: string) => void;
 
 type ReturnType = {|
   triggerNpmScript: TriggerNpmScript,
-  confirmDialogOpen: boolean,
-  scriptNames: string,
-  callingHookName?: ToolbarButtonHooksNames,
-  isAutoRun: boolean,
-  handleDismiss: () => void,
-  handleConfirm: (dontShowAgain: boolean) => void,
+  renderNpmScriptConfirmDialog: () => React.Node,
 |};
 
 const getScriptsByHookName = (
@@ -152,14 +148,30 @@ const useNpmScriptRunner = ({
   const callingHookName =
     pending && pending.hookName ? pending.hookName : undefined;
 
+  const renderNpmScriptConfirmDialog = React.useCallback(
+    () => (
+      <NpmScriptConfirmDialog
+        open={confirmDialogOpen}
+        scriptNames={scriptNames}
+        hookName={callingHookName}
+        onConfirm={handleConfirm}
+        onDismiss={handleDismiss}
+        isAutoRun={isAutoRun}
+      />
+    ),
+    [
+      confirmDialogOpen,
+      scriptNames,
+      callingHookName,
+      handleConfirm,
+      handleDismiss,
+      isAutoRun,
+    ]
+  );
+
   return {
     triggerNpmScript,
-    confirmDialogOpen,
-    scriptNames,
-    callingHookName,
-    isAutoRun,
-    handleDismiss,
-    handleConfirm,
+    renderNpmScriptConfirmDialog,
   };
 };
 

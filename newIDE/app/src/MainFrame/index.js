@@ -214,7 +214,7 @@ import {
   readProjectSettings,
   getProjectDirectory,
 } from '../Utils/ProjectSettingsReader';
-import NpmScriptRunnerProvider from './NpmScriptRunner/NpmScriptRunnerProvider';
+import useNpmScriptRunner from './NpmScriptRunner/useNpmScriptRunner';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
   EmbeddedGameFrame,
@@ -621,6 +621,14 @@ const MainFrame = (props: Props): React.MixedElement => {
         ? getProjectDirectory(currentFileMetadata.fileIdentifier)
         : null,
     [currentFileMetadata]
+  );
+
+  const { triggerNpmScript, renderNpmScriptConfirmDialog } = useNpmScriptRunner(
+    {
+      toolbarButtons: state.toolbarButtons,
+      projectPath,
+      previewCount: nonEditionPreviewsCount,
+    }
   );
 
   const {
@@ -5109,6 +5117,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     showRestartInGameEditorAfterErrorButton,
     toolbarButtons: state.toolbarButtons,
     projectPath,
+    triggerNpmScript,
   };
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');
@@ -5216,37 +5225,32 @@ const MainFrame = (props: Props): React.MixedElement => {
       <LeaderboardProvider
         gameId={currentProject ? currentProject.getProjectUuid() : ''}
       >
-        <NpmScriptRunnerProvider
-          previewCount={nonEditionPreviewsCount}
-          toolbarButtons={state.toolbarButtons}
-          projectPath={projectPath}
-        >
-          <PanesContainer
-            hasEditorsInLeftPane={hasEditorsInLeftPane}
-            hasEditorsInRightPane={hasEditorsInRightPane}
-            renderPane={({
-              paneIdentifier,
-              isLeftMostPane,
-              isRightMostPane,
-              isDrawer,
-              areSidePanesDrawers,
-              onSetPointerEventsNone,
-              onSetPaneDrawerState,
-            }) => (
-              <EditorTabsPane
-                {...editorTabsPaneProps}
-                paneIdentifier={paneIdentifier}
-                isLeftMostPane={isLeftMostPane}
-                isRightMostPane={isRightMostPane}
-                isDrawer={isDrawer}
-                areSidePanesDrawers={areSidePanesDrawers}
-                onSetPointerEventsNone={onSetPointerEventsNone}
-                onSetPaneDrawerState={onSetPaneDrawerState}
-                onPopOutTab={onPopOutTab}
-              />
-            )}
-          />
-        </NpmScriptRunnerProvider>
+        {renderNpmScriptConfirmDialog()}
+        <PanesContainer
+          hasEditorsInLeftPane={hasEditorsInLeftPane}
+          hasEditorsInRightPane={hasEditorsInRightPane}
+          renderPane={({
+            paneIdentifier,
+            isLeftMostPane,
+            isRightMostPane,
+            isDrawer,
+            areSidePanesDrawers,
+            onSetPointerEventsNone,
+            onSetPaneDrawerState,
+          }) => (
+            <EditorTabsPane
+              {...editorTabsPaneProps}
+              paneIdentifier={paneIdentifier}
+              isLeftMostPane={isLeftMostPane}
+              isRightMostPane={isRightMostPane}
+              isDrawer={isDrawer}
+              areSidePanesDrawers={areSidePanesDrawers}
+              onSetPointerEventsNone={onSetPointerEventsNone}
+              onSetPaneDrawerState={onSetPaneDrawerState}
+              onPopOutTab={onPopOutTab}
+            />
+          )}
+        />
       </LeaderboardProvider>
       <PoppedOutWindows
         {...editorTabsPaneProps}

@@ -17,7 +17,7 @@ import CustomToolbarButton, {
   type ToolbarButtonConfig,
 } from '../CustomToolbarButton';
 import { type FileMetadata } from '../../ProjectsStorage';
-import { useNpmScriptRunnerContext } from '../NpmScriptRunner/NpmScriptRunnerProvider';
+import { type TriggerNpmScript } from '../NpmScriptRunner/useNpmScriptRunner';
 
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
@@ -33,6 +33,7 @@ export type MainFrameToolbarProps = {|
   hidden: boolean,
   toolbarButtons: Array<ToolbarButtonConfig>,
   projectPath: ?string,
+  triggerNpmScript: TriggerNpmScript,
 
   ...PreviewAndShareButtonsProps,
 |};
@@ -52,12 +53,13 @@ type LeftButtonsToolbarGroupProps = {|
   canSave: boolean,
   toolbarButtons: Array<ToolbarButtonConfig>,
   projectPath: ?string,
+  triggerNpmScript: TriggerNpmScript,
 |};
 
 const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
   function LeftButtonsToolbarGroup(props) {
     const toolbarButtons = props.toolbarButtons;
-    const { triggerNpmScript } = useNpmScriptRunnerContext();
+    const triggerNpmScript = props.triggerNpmScript;
 
     return (
       <>
@@ -140,6 +142,7 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               canQuitVersionHistory={props.canQuitVersionHistory}
               toolbarButtons={props.toolbarButtons}
               projectPath={props.projectPath}
+              triggerNpmScript={props.triggerNpmScript}
             />
             <ToolbarGroup>
               <Spacer />

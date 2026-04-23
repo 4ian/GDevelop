@@ -108,7 +108,10 @@ import {
   hasClipboardConditions,
   pasteInstructionsFromClipboardInInstructionsList,
 } from './ClipboardKind';
-import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
+import {
+  useScreenType,
+  type ScreenType,
+} from '../UI/Responsive/ScreenTypeMeasurer';
 import {
   type WindowSizeType,
   useResponsiveWindowSize,
@@ -251,6 +254,7 @@ type Props = {|
 type ComponentProps = {|
   ...Props,
   windowSize: WindowSizeType,
+  screenType: ScreenType,
   authenticatedUser: AuthenticatedUser,
   preferences: Preferences,
   tutorials: ?Array<Tutorial>,
@@ -902,19 +906,27 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           }
         );
 
-        // This is not a real hook.
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const screenType = useScreenType();
+        const screenType = this.props.screenType;
         if (
           screenType !== 'touch' &&
           (type === 'BuiltinCommonInstructions::Comment' ||
             type === 'BuiltinCommonInstructions::Group')
         ) {
           const rowIndex = eventsTree.getEventRow(newEvent);
-          const clickableElement = document.querySelector(
-            `[data-row-index="${rowIndex}"] [data-editable-text="true"]`
-          );
-          if (clickableElement) clickableElement.click();
+
+          // Use the ownerDocument of the container element to get the correct
+          // document — important when rendered inside a WindowPortal (external
+          // browser window) where the main window's `document` is different.
+          const containerDivElement = this._containerDiv.current;
+          const ownerDoc = containerDivElement
+            ? containerDivElement.ownerDocument
+            : document;
+          if (ownerDoc) {
+            const clickableElement = ownerDoc.querySelector(
+              `[data-row-index="${rowIndex}"] [data-editable-text="true"]`
+            );
+            if (clickableElement) clickableElement.click();
+          }
         }
       });
     }
@@ -2633,33 +2645,47 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
    * been scrolled out of the view and so removed from the DOM)
    */
   _ensureFocused = () => {
-    if (!this._containerDiv || !document) return;
+    if (!this._containerDiv) return;
 
     const containerDivElement = this._containerDiv.current;
-    if (document.activeElement === containerDivElement) {
+    if (!containerDivElement) return;
+
+    // Use the ownerDocument of the container element to get the correct
+    // document — important when rendered inside a WindowPortal (external
+    // browser window) where the main window's `document` is different.
+    const ownerDoc = containerDivElement.ownerDocument;
+    if (!ownerDoc) return;
+
+    if (ownerDoc.activeElement === containerDivElement) {
       // Focus is already on the container
       return;
     }
-    if (containerDivElement) {
-      if (
-        document.activeElement !== document.body &&
-        containerDivElement.contains(document.activeElement)
-      ) {
-        // Focus is already on an element of the container
-        return;
-      }
-
-      // Focus is not on an element of the container, we probably lost the focus
-      // after scrolling or removing an element. Give back the focus to the container.
-      containerDivElement.focus();
+    if (
+      ownerDoc.activeElement !== ownerDoc.body &&
+      containerDivElement.contains(ownerDoc.activeElement)
+    ) {
+      // Focus is already on an element of the container
+      return;
     }
+
+    // Focus is not on an element of the container, we probably lost the focus
+    // after scrolling or removing an element. Give back the focus to the container.
+    containerDivElement.focus();
   };
 
   _onEventsSheetBlur = (event: SyntheticFocusEvent<HTMLDivElement>) => {
     const nextFocusedElement = event.relatedTarget;
+    // Use nodeType check instead of `instanceof HTMLElement` because when the
+    // EventsSheet is rendered inside a WindowPortal (external browser window),
+    // the DOM elements belong to a different window context whose HTMLElement
+    // constructor differs from the main window's — making `instanceof` return
+    // false and incorrectly resetting modifier keys (breaking Shift-selection).
     if (
-      nextFocusedElement instanceof HTMLElement &&
+      nextFocusedElement != null &&
+      // $FlowFixMe[prop-missing]
+      nextFocusedElement.nodeType === 1 /* ELEMENT_NODE */ &&
       // If focus is moving to an element still inside the container, do nothing.
+      // $FlowFixMe[incompatible-type]
       event.currentTarget.contains(nextFocusedElement)
     ) {
       return;
@@ -2685,12 +2711,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       tutorials,
       hotReloadPreviewButtonProps,
       windowSize,
+      screenType,
       highlightedAiGeneratedEventIds,
     } = this.props;
     if (!project) return null;
-
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const screenType = useScreenType();
 
     const isFunctionOnlyCallingItself =
       scope.eventsFunctionsExtension &&
@@ -3279,6 +3303,7 @@ const EventsSheet = (props, ref) => {
   const leaderboardsManager = React.useContext(LeaderboardContext);
   const { windowSize } = useResponsiveWindowSize();
   const shortcutMap = useShortcutMap();
+  const screenType = useScreenType();
   return (
     <EventsSheetComponentWithoutHandle
       ref={component}
@@ -3288,6 +3313,7 @@ const EventsSheet = (props, ref) => {
       leaderboardsManager={leaderboardsManager}
       shortcutMap={shortcutMap}
       windowSize={windowSize}
+      screenType={screenType}
       highlightedAiGeneratedEventIds={highlightedAiGeneratedEventIds}
       {...props}
     />

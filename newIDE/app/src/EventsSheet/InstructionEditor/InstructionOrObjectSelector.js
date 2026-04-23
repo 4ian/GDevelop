@@ -63,6 +63,7 @@ import {
   getInstructionGroupId,
 } from './InstructionOrExpressionTreeViewItems';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -411,11 +412,16 @@ const InstructionOrObjectSelector: React.ComponentType<{
               }
             }
             if (item.content instanceof ObjectTreeViewItemContent) {
-              const objectFolderOrObject = item.content.getObjectFolderOrObject();
-              if (!objectFolderOrObject) return;
-              if (
-                objectFolderOrObject.getObject().getName() === objectOrGroupName
-              ) {
+              const objectFolderOrObject = exceptionallyGuardAgainstDeadObject(
+                item.content.getObjectFolderOrObject()
+              );
+              if (!objectFolderOrObject || objectFolderOrObject.isFolder())
+                return;
+
+              const object = exceptionallyGuardAgainstDeadObject(
+                objectFolderOrObject.getObject()
+              );
+              if (object && object.getName() === objectOrGroupName) {
                 itemToSelect = item;
                 break;
               }
@@ -502,7 +508,13 @@ const InstructionOrObjectSelector: React.ComponentType<{
         if (item.content instanceof ObjectTreeViewItemContent) {
           const objectFolderOrObject = item.content.getObjectFolderOrObject();
           if (!objectFolderOrObject) return;
-          onChooseObject(objectFolderOrObject.getObject().getName());
+
+          const object = exceptionallyGuardAgainstDeadObject(
+            objectFolderOrObject.getObject()
+          );
+          if (!object) return;
+
+          onChooseObject(object.getName());
           break;
         }
         if (item.content instanceof ObjectGroupObjectTreeViewItemContent) {
@@ -811,16 +823,21 @@ const InstructionOrObjectSelector: React.ComponentType<{
                   if (
                     itemContentToSelect instanceof ObjectTreeViewItemContent
                   ) {
-                    const objectFolderOrObjectToSelect = itemContentToSelect.getObjectFolderOrObject();
+                    const objectFolderOrObjectToSelect = exceptionallyGuardAgainstDeadObject(
+                      itemContentToSelect.getObjectFolderOrObject()
+                    );
                     if (
                       !objectFolderOrObjectToSelect ||
                       objectFolderOrObjectToSelect.isFolder()
                     ) {
                       return;
                     }
-                    onChooseObject(
-                      objectFolderOrObjectToSelect.getObject().getName()
+                    const object = exceptionallyGuardAgainstDeadObject(
+                      objectFolderOrObjectToSelect.getObject()
                     );
+                    if (!object) return;
+
+                    onChooseObject(object.getName());
                     setSelectedItem(item);
                   } else if (
                     itemContentToSelect instanceof
@@ -834,7 +851,9 @@ const InstructionOrObjectSelector: React.ComponentType<{
                     itemContentToSelect instanceof
                     ObjectGroupObjectTreeViewItemContent
                   ) {
-                    const object = itemContentToSelect.getObject();
+                    const object = exceptionallyGuardAgainstDeadObject(
+                      itemContentToSelect.getObject()
+                    );
                     if (!object) return;
                     onChooseObject(object.getName());
                     setSelectedItem(item);

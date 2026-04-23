@@ -24,7 +24,7 @@ const styles = {
 type Props = {|
   kind?: 'info' | 'warning' | 'error' | 'valid',
   children: React.Node,
-  onHide?: ?() => void,
+  onHide?: ?() => void | Promise<void>,
   hideButtonSize?: 'small',
   renderLeftIcon?: () => React.Node,
   renderRightButton?: ?() => React.Node,

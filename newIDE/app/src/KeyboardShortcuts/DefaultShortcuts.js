@@ -17,6 +17,7 @@ const defaultShortcuts: ShortcutMap = {
   SAVE_PROJECT: 'CmdOrCtrl+KeyS',
   SAVE_PROJECT_AS: 'CmdOrCtrl+Shift+KeyS',
   CLOSE_PROJECT: 'CmdOrCtrl+KeyW',
+  RELOAD_PROJECT: '',
   EXPORT_GAME: 'CmdOrCtrl+Shift+KeyE',
   INVITE_COLLABORATORS: 'CmdOrCtrl+Shift+KeyI',
   OPEN_RECENT_PROJECT: '',

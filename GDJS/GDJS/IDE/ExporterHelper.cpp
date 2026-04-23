@@ -574,11 +574,15 @@ void ExporterHelper::StripAndSerializeProjectData(
   }
 
   std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
-  for (std::size_t layoutIndex = 0;
-       layoutIndex < project.GetLayoutsCount(); layoutIndex++) {
+  for (std::size_t layoutIndex = 0; layoutIndex < project.GetLayoutsCount();
+       layoutIndex++) {
     auto &layout = project.GetLayout(layoutIndex);
-    scenesUsedResources[layout.GetName()] =
-        gd::SceneResourcesFinder::FindSceneResources(project, layout);
+    auto sceneUsedResources = gd::SceneResourcesFinder::FindSceneResources(
+        project, layout);
+    for (auto &&resourceName : projectUsedResources) {
+      sceneUsedResources.erase(resourceName);
+    }
+    scenesUsedResources[layout.GetName()] = sceneUsedResources;
   }
 
   std::unordered_map<gd::String, std::set<gd::String>>

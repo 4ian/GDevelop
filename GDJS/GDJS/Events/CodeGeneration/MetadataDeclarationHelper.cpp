@@ -1133,9 +1133,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
         iconURL, iconURL);
     addObjectAndBehaviorParameters(conditionMetadata);
     conditionMetadata.SetFunctionName(getterName);
-    if (!isSharedProperty) {
-      conditionMetadata.SetHidden();
-    }
+    conditionMetadata.SetHidden();
 
     auto &setterActionMetadata = entityMetadata.AddScopedAction(
         actionName, propertyLabel,
@@ -1153,9 +1151,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
     setterActionMetadata
         .AddParameter("yesorno", _("New value to set"), "", false)
         .SetFunctionName(setterName);
-    if (!isSharedProperty) {
-      setterActionMetadata.SetHidden();
-    }
+    setterActionMetadata.SetHidden();
 
     auto &toggleActionMetadata = entityMetadata.AddScopedAction(
         toggleActionName, _("Toggle") + " " + propertyLabel,
@@ -1169,9 +1165,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
         iconURL, iconURL);
     addObjectAndBehaviorParameters(toggleActionMetadata);
     toggleActionMetadata.SetFunctionName(toggleFunctionName);
-    if (!isSharedProperty) {
-      toggleActionMetadata.SetHidden();
-    }
+    toggleActionMetadata.SetHidden();
   } else {
     auto typeExtraInfo = GetStringifiedExtraInfo(property);
     auto parameterOptions = gd::ParameterOptions::MakeNewOptions();
@@ -1195,9 +1189,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
             parameterOptions)
         .SetFunctionName(setterName)
         .SetGetter(getterName);
-    if (!isSharedProperty) {
-      propertyInstructionMetadata.SetHidden();
-    }
+    propertyInstructionMetadata.SetHidden();
   }
 }
 

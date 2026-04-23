@@ -32,6 +32,7 @@ import {
   TitleBarLeftSafeMargins,
   TitleBarRightSafeMargins,
 } from './TitleBarSafeMargins';
+import PortalContainerContext from './PortalContainerContext';
 
 let openedDialogsCount = 0;
 
@@ -389,6 +390,7 @@ const DialogWithoutWindowSizeProvider = ({
     [onCloseDialog, onApply]
   );
 
+  const portalContainer = React.useContext(PortalContainerContext);
   const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
 
   const paperMinHeight = fullHeight
@@ -448,6 +450,7 @@ const DialogWithoutWindowSizeProvider = ({
       }
       disableBackdropClick={false}
       onKeyDown={handleKeyDown}
+      container={portalContainer}
     >
       {topBackgroundSrc && (
         <div

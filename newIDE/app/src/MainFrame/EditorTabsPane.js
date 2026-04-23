@@ -306,6 +306,7 @@ type Props = {|
     paneIdentifier: string,
     newState: FloatingPaneState
   ) => void,
+  onPopOutTab?: ?(editorTab: EditorTab) => void,
 |};
 
 const EditorTabsPane: React.ComponentType<{
@@ -612,6 +613,7 @@ const EditorTabsPane: React.ComponentType<{
                 });
                 onCloseAllEditorTabs();
               }}
+              onPopOutTab={props.onPopOutTab}
               onTabActivated={onEditorTabActivated}
               onDropTab={onDropEditorTab}
               onHoverTab={onEditorTabHovered}
@@ -673,6 +675,149 @@ const EditorTabsPane: React.ComponentType<{
               editorTab.key
             );
 
+            const editorContent = (
+              <CommandsContextScopedProvider active={isCurrentTab}>
+                <ErrorBoundary
+                  componentTitle={errorBoundaryProps.componentTitle}
+                  scope={errorBoundaryProps.scope}
+                >
+                  {editorTab.renderEditorContainer({
+                    editorId: editorTab.key,
+                    gameEditorMode,
+                    setGameEditorMode,
+                    isActive: isCurrentTab,
+                    extraEditorProps: editorTab.extraEditorProps,
+                    project: currentProject,
+                    fileMetadata: currentFileMetadata,
+                    storageProvider: getStorageProvider(),
+                    ref: editorRef => (editorTab.editorRef = editorRef),
+                    setToolbar: editorToolbar => {
+                      setEditorToolbar(editorToolbar, isCurrentTab);
+                    },
+                    setGamesPlatformFrameShown: onSetGamesPlatformFrameShown,
+                    projectItemName: editorTab.projectItemName,
+                    setPreviewedLayout,
+                    onOpenAskAi,
+                    onCloseAskAi,
+                    onOpenExternalEvents: openExternalEvents,
+                    onOpenEvents: (sceneName: string) => {
+                      openLayout(sceneName, {
+                        openEventsEditor: true,
+                        openSceneEditor: false,
+                        focusWhenOpened: 'events',
+                      });
+                    },
+                    onOpenLayout: openLayout,
+                    onOpenTemplateFromTutorial: openTemplateFromTutorial,
+                    onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
+                    previewDebuggerServer,
+                    hotReloadPreviewButtonProps,
+                    onRestartInGameEditor,
+                    showRestartInGameEditorAfterErrorButton,
+                    resourceManagementProps,
+                    onSave: saveProject,
+                    onSaveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
+                    canSave,
+                    onCheckoutVersion,
+                    getOrLoadProjectVersion,
+                    onCreateEventsFunction,
+                    openInstructionOrExpression,
+                    onOpenCustomObjectEditor: onOpenCustomObjectEditor,
+                    onOpenEventsFunctionsExtension,
+                    onRenamedEventsBasedObject: onRenamedEventsBasedObject,
+                    onDeletedEventsBasedObject: onDeletedEventsBasedObject,
+                    openObjectEvents,
+                    onNavigateToEventFromGlobalSearch,
+                    unsavedChanges: unsavedChanges,
+                    canOpen,
+                    onChooseProject: () => openOpenFromStorageProviderDialog(),
+                    onOpenRecentFile: openFromFileMetadataWithStorageProvider,
+                    onOpenNewProjectSetupDialog: openNewProjectDialog,
+                    onOpenProjectManager: () => openProjectManager(true),
+                    onOpenVersionHistory: openVersionHistoryPanel,
+                    askToCloseProject,
+                    closeProject,
+                    onSelectExampleShortHeader: exampleShortHeader => {
+                      onSelectExampleShortHeader({
+                        exampleShortHeader,
+                        preventBackHome: true,
+                      });
+                    },
+                    onSelectPrivateGameTemplateListingData: privateGameTemplateListingData => {
+                      onSelectPrivateGameTemplateListingData({
+                        privateGameTemplateListingData,
+                        preventBackHome: true,
+                      });
+                    },
+                    onOpenPrivateGameTemplateListingData: privateGameTemplateListingData => {
+                      onSelectPrivateGameTemplateListingData({
+                        privateGameTemplateListingData,
+                        preventBackHome: true,
+                      });
+                    },
+                    onCreateEmptyProject: createEmptyProject,
+                    onCreateProjectFromExample: createProjectFromExample,
+                    onOpenProfile: onOpenProfileDialog,
+                    onOpenLanguageDialog: () => openLanguageDialog(true),
+                    onOpenPreferences: () => openPreferencesDialog(true),
+                    onOpenAbout: () => openAboutDialog(true),
+                    selectInAppTutorial: selectInAppTutorial,
+                    onLoadEventsFunctionsExtensions: onLoadEventsFunctionsExtensions,
+                    onReloadEventsFunctionsExtensionMetadata: extension => {
+                      if (isProjectClosedSoAvoidReloadingExtensions) {
+                        return;
+                      }
+                      eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(
+                        currentProject,
+                        extension
+                      );
+                    },
+                    onDeleteResource: (
+                      resource: gdResource,
+                      cb: boolean => void
+                    ) => {
+                      // TODO: Project wide refactoring of objects/events using the resource
+                      cb(true);
+                    },
+                    onRenameResource: (
+                      resource: gdResource,
+                      newName: string,
+                      cb: boolean => void
+                    ) => {
+                      if (currentProject)
+                        renameResourcesInProject(currentProject, {
+                          [resource.getName()]: newName,
+                        });
+
+                      cb(true);
+                    },
+                    openBehaviorEvents: openBehaviorEvents,
+                    onExtractAsExternalLayout: onExtractAsExternalLayout,
+                    onExtractAsEventBasedObject: onExtractAsEventBasedObject,
+                    onEventBasedObjectTypeChanged: onEventBasedObjectTypeChanged,
+                    onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
+                    onOpenEventBasedObjectVariantEditor: onOpenEventBasedObjectVariantEditor,
+                    onDeleteEventsBasedObjectVariant: deleteEventsBasedObjectVariant,
+                    onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
+                    onSceneObjectEdited: onSceneObjectEdited,
+                    onSceneObjectsDeleted: onSceneObjectsDeleted,
+                    onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
+                    onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
+                    onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
+                    onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
+                    onWillInstallExtension: onWillInstallExtension,
+                    onExtensionInstalled: onExtensionInstalled,
+                    onEffectAdded: onEffectAdded,
+                    onObjectListsModified: onObjectListsModified,
+                    onExternalLayoutAssociationChanged,
+                    triggerHotReloadInGameEditorIfNeeded: triggerHotReloadInGameEditorIfNeeded,
+                    gamesList,
+                    gamesPlatformFrameTools,
+                  })}
+                </ErrorBoundary>
+              </CommandsContextScopedProvider>
+            );
+
             return (
               <TabContentContainer
                 key={editorTab.key}
@@ -684,146 +829,7 @@ const EditorTabsPane: React.ComponentType<{
                   shouldRemovePointerEvents(editorTab.kind, gameEditorMode)
                 }
               >
-                <CommandsContextScopedProvider active={isCurrentTab}>
-                  <ErrorBoundary
-                    componentTitle={errorBoundaryProps.componentTitle}
-                    scope={errorBoundaryProps.scope}
-                  >
-                    {editorTab.renderEditorContainer({
-                      editorId: editorTab.key,
-                      gameEditorMode,
-                      setGameEditorMode,
-                      isActive: isCurrentTab,
-                      extraEditorProps: editorTab.extraEditorProps,
-                      project: currentProject,
-                      fileMetadata: currentFileMetadata,
-                      storageProvider: getStorageProvider(),
-                      ref: editorRef => (editorTab.editorRef = editorRef),
-                      setToolbar: editorToolbar =>
-                        setEditorToolbar(editorToolbar, isCurrentTab),
-                      setGamesPlatformFrameShown: onSetGamesPlatformFrameShown,
-                      projectItemName: editorTab.projectItemName,
-                      setPreviewedLayout,
-                      onOpenAskAi,
-                      onCloseAskAi,
-                      onOpenExternalEvents: openExternalEvents,
-                      onOpenEvents: (sceneName: string) => {
-                        openLayout(sceneName, {
-                          openEventsEditor: true,
-                          openSceneEditor: false,
-                          focusWhenOpened: 'events',
-                        });
-                      },
-                      onOpenLayout: openLayout,
-                      onOpenTemplateFromTutorial: openTemplateFromTutorial,
-                      onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
-                      previewDebuggerServer,
-                      hotReloadPreviewButtonProps,
-                      onRestartInGameEditor,
-                      showRestartInGameEditorAfterErrorButton,
-                      resourceManagementProps,
-                      onSave: saveProject,
-                      onSaveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
-                      canSave,
-                      onCheckoutVersion,
-                      getOrLoadProjectVersion,
-                      onCreateEventsFunction,
-                      openInstructionOrExpression,
-                      onOpenCustomObjectEditor: onOpenCustomObjectEditor,
-                      onOpenEventsFunctionsExtension,
-                      onRenamedEventsBasedObject: onRenamedEventsBasedObject,
-                      onDeletedEventsBasedObject: onDeletedEventsBasedObject,
-                      openObjectEvents,
-                      onNavigateToEventFromGlobalSearch,
-                      unsavedChanges: unsavedChanges,
-                      canOpen,
-                      onChooseProject: () =>
-                        openOpenFromStorageProviderDialog(),
-                      onOpenRecentFile: openFromFileMetadataWithStorageProvider,
-                      onOpenNewProjectSetupDialog: openNewProjectDialog,
-                      onOpenProjectManager: () => openProjectManager(true),
-                      onOpenVersionHistory: openVersionHistoryPanel,
-                      askToCloseProject,
-                      closeProject,
-                      onSelectExampleShortHeader: exampleShortHeader => {
-                        onSelectExampleShortHeader({
-                          exampleShortHeader,
-                          preventBackHome: true,
-                        });
-                      },
-                      onSelectPrivateGameTemplateListingData: privateGameTemplateListingData => {
-                        onSelectPrivateGameTemplateListingData({
-                          privateGameTemplateListingData,
-                          preventBackHome: true,
-                        });
-                      },
-                      onOpenPrivateGameTemplateListingData: privateGameTemplateListingData => {
-                        onSelectPrivateGameTemplateListingData({
-                          privateGameTemplateListingData,
-                          preventBackHome: true,
-                        });
-                      },
-                      onCreateEmptyProject: createEmptyProject,
-                      onCreateProjectFromExample: createProjectFromExample,
-                      onOpenProfile: onOpenProfileDialog,
-                      onOpenLanguageDialog: () => openLanguageDialog(true),
-                      onOpenPreferences: () => openPreferencesDialog(true),
-                      onOpenAbout: () => openAboutDialog(true),
-                      selectInAppTutorial: selectInAppTutorial,
-                      onLoadEventsFunctionsExtensions: onLoadEventsFunctionsExtensions,
-                      onReloadEventsFunctionsExtensionMetadata: extension => {
-                        if (isProjectClosedSoAvoidReloadingExtensions) {
-                          return;
-                        }
-                        eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(
-                          currentProject,
-                          extension
-                        );
-                      },
-                      onDeleteResource: (
-                        resource: gdResource,
-                        cb: boolean => void
-                      ) => {
-                        // TODO: Project wide refactoring of objects/events using the resource
-                        cb(true);
-                      },
-                      onRenameResource: (
-                        resource: gdResource,
-                        newName: string,
-                        cb: boolean => void
-                      ) => {
-                        if (currentProject)
-                          renameResourcesInProject(currentProject, {
-                            [resource.getName()]: newName,
-                          });
-
-                        cb(true);
-                      },
-                      openBehaviorEvents: openBehaviorEvents,
-                      onExtractAsExternalLayout: onExtractAsExternalLayout,
-                      onExtractAsEventBasedObject: onExtractAsEventBasedObject,
-                      onEventBasedObjectTypeChanged: onEventBasedObjectTypeChanged,
-                      onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
-                      onOpenEventBasedObjectVariantEditor: onOpenEventBasedObjectVariantEditor,
-                      onDeleteEventsBasedObjectVariant: deleteEventsBasedObjectVariant,
-                      onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
-                      onSceneObjectEdited: onSceneObjectEdited,
-                      onSceneObjectsDeleted: onSceneObjectsDeleted,
-                      onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
-                      onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
-                      onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
-                      onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
-                      onWillInstallExtension: onWillInstallExtension,
-                      onExtensionInstalled: onExtensionInstalled,
-                      onEffectAdded: onEffectAdded,
-                      onObjectListsModified: onObjectListsModified,
-                      onExternalLayoutAssociationChanged,
-                      triggerHotReloadInGameEditorIfNeeded: triggerHotReloadInGameEditorIfNeeded,
-                      gamesList,
-                      gamesPlatformFrameTools,
-                    })}
-                  </ErrorBoundary>
-                </CommandsContextScopedProvider>
+                {editorContent}
               </TabContentContainer>
             );
           })}

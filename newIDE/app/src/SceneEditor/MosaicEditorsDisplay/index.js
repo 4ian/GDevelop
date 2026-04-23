@@ -34,6 +34,7 @@ import {
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
 import { preventGameFramePointerEvents } from '../../EmbeddedGame/EmbeddedGameFrame';
 import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 
 const initialMosaicEditorNodes = {
   direction: 'row',
@@ -272,7 +273,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
         const { objectFolderOrObject } = objectFolderOrObjectWithContext;
         if (!objectFolderOrObject) return null; // Protect ourselves from an unexpected null value.
         if (objectFolderOrObject.isFolder()) return null;
-        return objectFolderOrObject.getObject();
+        return exceptionallyGuardAgainstDeadObject(
+          objectFolderOrObject.getObject()
+        );
       })
       .filter(Boolean);
 

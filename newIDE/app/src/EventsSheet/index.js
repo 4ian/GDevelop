@@ -545,7 +545,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         onToggleSearchPanel={this._toggleSearchPanel}
         canMoveEventsIntoNewGroup={hasSomethingSelected(this.state.selection)}
         moveEventsIntoNewGroup={this.moveEventsIntoNewGroup}
-        onOpenSceneVariables={this.editLayoutVariables}
+        onOpenSceneVariables={this.openSceneVariables}
       />
     );
   }
@@ -868,7 +868,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  editLayoutVariables = (open: boolean = true) => {
+  openSceneVariables = (open: boolean = true) => {
     this.setState({ layoutVariablesDialogOpen: open });
   };
 
@@ -2789,8 +2789,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           <GlobalAndSceneVariablesDialog
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             open
-            onCancel={() => this.editLayoutVariables(false)}
-            onApply={() => this.editLayoutVariables(false)}
+            onCancel={() => this.openSceneVariables(false)}
+            onApply={() => this.openSceneVariables(false)}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             isListLocked={false}
           />

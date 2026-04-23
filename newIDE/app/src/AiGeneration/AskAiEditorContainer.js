@@ -973,6 +973,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           skipSuspendOnCloseRef.current = true;
         },
         suspendOnDrawerClose: () => {
+          if (skipSuspendOnCloseRef.current) return;
           upToDateOnStop.current().catch(err => {
             console.error('Failed to suspend AI request on drawer close:', err);
           });

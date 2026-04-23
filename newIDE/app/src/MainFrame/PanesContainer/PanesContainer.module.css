@@ -15,6 +15,9 @@
   pointer-events: all;
 }
 
+/* Prevents content from collapsing to zero while the outer pane is clipped
+   by the max-width open animation. The pane clips via overflow:hidden; this
+   inner div maintains the minimum content width so layout doesn't reflow. */
 .paneContent {
   flex: 1;
   display: flex;

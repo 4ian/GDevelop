@@ -147,6 +147,111 @@ const useSwipeableDrawer = ({
 
 const PANE_ANIMATION_DURATION_MS = 250;
 
+/**
+ * Manages the open/close animation state for a side pane.
+ *
+ * When requestPaneClose(callback) is called, the pane plays its slide-out
+ * animation for PANE_ANIMATION_DURATION_MS, then fires the callback and hides
+ * the pane — all batched into one React render so there's no visible flash.
+ *
+ * requestedCloseRef prevents a double-animation: when requestPaneClose has
+ * already started the slide-out (setting requestedCloseRef = true), the
+ * hasEditors=false effect skips re-starting it.
+ */
+const usePaneCloseAnimation = ({
+  hasEditors,
+  paneRef,
+  areSidePanesDrawers,
+}: {|
+  hasEditors: boolean,
+  paneRef: {| current: HTMLDivElement | null |},
+  areSidePanesDrawers: boolean,
+|}): {|
+  paneRendered: boolean,
+  paneClosing: boolean,
+  requestPaneClose: (onClosed: () => void) => void,
+|} => {
+  const [paneRendered, setPaneRendered] = React.useState(hasEditors);
+  const [paneClosing, setPaneClosing] = React.useState(false);
+  const closeTimeoutRef = React.useRef<?TimeoutID>(null);
+  const requestedCloseRef = React.useRef(false);
+  const closeCallbackRef = React.useRef<null | (() => void)>(null);
+
+  const startCloseAnimation = React.useCallback(
+    () => {
+      const pane = paneRef.current;
+      if (pane) {
+        pane.style.setProperty('--pane-close-width', `${pane.offsetWidth}px`);
+      }
+      setPaneClosing(true);
+      closeTimeoutRef.current = setTimeout(() => {
+        closeTimeoutRef.current = null;
+        // React 18 batches all state updates in a setTimeout callback into one
+        // render, so the callback (onCloseEditorTab) and the pane hide land
+        // in the same frame — no flash between tab disappearing and button appearing.
+        const callback = closeCallbackRef.current;
+        closeCallbackRef.current = null;
+        if (callback) callback();
+        setPaneRendered(false);
+        setPaneClosing(false);
+      }, PANE_ANIMATION_DURATION_MS);
+    },
+    [paneRef]
+  );
+
+  const cancelCloseAnimation = React.useCallback(() => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    closeCallbackRef.current = null;
+  }, []);
+
+  const requestPaneClose = React.useCallback(
+    (onClosed: () => void) => {
+      if (areSidePanesDrawers) {
+        // On mobile, panes are drawers — no slide-out animation, close immediately.
+        onClosed();
+        return;
+      }
+      requestedCloseRef.current = true;
+      closeCallbackRef.current = onClosed;
+      startCloseAnimation();
+    },
+    [areSidePanesDrawers, startCloseAnimation]
+  );
+
+  React.useEffect(
+    () => {
+      if (hasEditors) {
+        cancelCloseAnimation();
+        requestedCloseRef.current = false;
+        const pane = paneRef.current;
+        if (pane) {
+          pane.style.setProperty(
+            '--pane-close-width',
+            pane.style.flexBasis || '300px'
+          );
+        }
+        setPaneRendered(true);
+        setPaneClosing(false);
+      } else {
+        if (requestedCloseRef.current) {
+          requestedCloseRef.current = false;
+          return;
+        }
+        startCloseAnimation();
+      }
+    },
+    [hasEditors, paneRef, startCloseAnimation, cancelCloseAnimation]
+  );
+
+  // Unmount-only cleanup.
+  React.useEffect(() => cancelCloseAnimation, [cancelCloseAnimation]);
+
+  return { paneRendered, paneClosing, requestPaneClose };
+};
+
 export const PanesContainer = ({
   renderPane,
   hasEditorsInLeftPane,
@@ -165,131 +270,25 @@ export const PanesContainer = ({
 
   const areSidePanesDrawers = isMobile;
 
-  const [rightPaneRendered, setRightPaneRendered] = React.useState(
-    hasEditorsInRightPane
-  );
-  const [rightPaneClosing, setRightPaneClosing] = React.useState(false);
-  const rightPaneCloseTimeoutRef = React.useRef<?TimeoutID>(null);
-  const rightPaneRequestedCloseRef = React.useRef(false);
-  const rightPaneCloseCallbackRef = React.useRef<null | (() => void)>(null);
+  const {
+    paneRendered: leftPaneRendered,
+    paneClosing: leftPaneClosing,
+    requestPaneClose: requestLeftPaneClose,
+  } = usePaneCloseAnimation({
+    hasEditors: hasEditorsInLeftPane,
+    paneRef: leftPaneRef,
+    areSidePanesDrawers,
+  });
 
-  const startRightPaneCloseAnimation = React.useCallback(() => {
-    const pane = rightPaneRef.current;
-    if (pane) {
-      pane.style.setProperty('--pane-close-width', `${pane.offsetWidth}px`);
-    }
-    setRightPaneClosing(true);
-    rightPaneCloseTimeoutRef.current = setTimeout(() => {
-      rightPaneCloseTimeoutRef.current = null;
-      // React 18 batches all state updates in a setTimeout callback into one
-      // render, so the callback (onCloseEditorTab) and the pane hide land
-      // in the same frame — no flash between tab disappearing and button appearing.
-      const callback = rightPaneCloseCallbackRef.current;
-      rightPaneCloseCallbackRef.current = null;
-      if (callback) callback();
-      setRightPaneRendered(false);
-      setRightPaneClosing(false);
-    }, PANE_ANIMATION_DURATION_MS);
-  }, []);
-
-  const cancelRightPaneCloseAnimation = React.useCallback(() => {
-    if (rightPaneCloseTimeoutRef.current) {
-      clearTimeout(rightPaneCloseTimeoutRef.current);
-      rightPaneCloseTimeoutRef.current = null;
-    }
-    rightPaneCloseCallbackRef.current = null;
-  }, []);
-
-  const requestRightPaneClose = React.useCallback(
-    (onClosed: () => void) => {
-      if (areSidePanesDrawers) {
-        onClosed();
-        return;
-      }
-      rightPaneRequestedCloseRef.current = true;
-      rightPaneCloseCallbackRef.current = onClosed;
-      startRightPaneCloseAnimation();
-    },
-    [areSidePanesDrawers, startRightPaneCloseAnimation]
-  );
-
-  React.useEffect(
-    () => {
-      if (hasEditorsInRightPane) {
-        cancelRightPaneCloseAnimation();
-        rightPaneRequestedCloseRef.current = false;
-        const pane = rightPaneRef.current;
-        if (pane) {
-          pane.style.setProperty(
-            '--pane-close-width',
-            pane.style.flexBasis || '300px'
-          );
-        }
-        setRightPaneRendered(true);
-        setRightPaneClosing(false);
-      } else {
-        // If requestRightPaneClose already started the animation, don't restart it.
-        if (rightPaneRequestedCloseRef.current) {
-          rightPaneRequestedCloseRef.current = false;
-          return;
-        }
-        startRightPaneCloseAnimation();
-      }
-    },
-    [
-      hasEditorsInRightPane,
-      startRightPaneCloseAnimation,
-      cancelRightPaneCloseAnimation,
-    ]
-  );
-
-  // Unmount-only cleanup for the right pane close animation.
-  React.useEffect(() => cancelRightPaneCloseAnimation, [
-    cancelRightPaneCloseAnimation,
-  ]);
-
-  const [leftPaneRendered, setLeftPaneRendered] = React.useState(
-    hasEditorsInLeftPane
-  );
-  const [leftPaneClosing, setLeftPaneClosing] = React.useState(false);
-  const leftPaneCloseTimeoutRef = React.useRef<?TimeoutID>(null);
-
-  React.useEffect(
-    () => {
-      if (hasEditorsInLeftPane) {
-        if (leftPaneCloseTimeoutRef.current) {
-          clearTimeout(leftPaneCloseTimeoutRef.current);
-          leftPaneCloseTimeoutRef.current = null;
-        }
-        const pane = leftPaneRef.current;
-        if (pane) {
-          pane.style.setProperty(
-            '--pane-close-width',
-            pane.style.flexBasis || '300px'
-          );
-        }
-        setLeftPaneRendered(true);
-        setLeftPaneClosing(false);
-      } else {
-        const pane = leftPaneRef.current;
-        if (pane) {
-          pane.style.setProperty('--pane-close-width', `${pane.offsetWidth}px`);
-        }
-        setLeftPaneClosing(true);
-        leftPaneCloseTimeoutRef.current = setTimeout(() => {
-          setLeftPaneRendered(false);
-          setLeftPaneClosing(false);
-          leftPaneCloseTimeoutRef.current = null;
-        }, PANE_ANIMATION_DURATION_MS);
-      }
-      return () => {
-        if (leftPaneCloseTimeoutRef.current) {
-          clearTimeout(leftPaneCloseTimeoutRef.current);
-        }
-      };
-    },
-    [hasEditorsInLeftPane]
-  );
+  const {
+    paneRendered: rightPaneRendered,
+    paneClosing: rightPaneClosing,
+    requestPaneClose: requestRightPaneClose,
+  } = usePaneCloseAnimation({
+    hasEditors: hasEditorsInRightPane,
+    paneRef: rightPaneRef,
+    areSidePanesDrawers,
+  });
 
   const [panesDrawerState, setPanesDrawerState] = React.useState<{
     [string]: FloatingPaneState,
@@ -528,6 +527,7 @@ export const PanesContainer = ({
             areSidePanesDrawers,
             onSetPaneDrawerState: setPaneDrawerState,
             onSetPointerEventsNone: setLeftPanePointerEventsNone,
+            onRequestPaneClose: requestLeftPaneClose,
             drawerState: panesDrawerState['left'],
           })}
         </div>

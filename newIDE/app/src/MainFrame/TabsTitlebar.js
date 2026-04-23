@@ -204,6 +204,13 @@ export default function TabsTitlebar({
     }, 1000);
   }, []);
 
+  React.useEffect(
+    () => () => {
+      if (glowTimeoutRef.current) clearTimeout(glowTimeoutRef.current);
+    },
+    []
+  );
+
   // Desktop: glow when the Ask AI panel is closed (button re-appears).
   const prevShouldDisplayAskAiRef = React.useRef(shouldDisplayAskAi);
   React.useEffect(

@@ -16,10 +16,8 @@ import SaveProjectIcon from '../SaveProjectIcon';
 import CustomToolbarButton, {
   type ToolbarButtonConfig,
 } from '../CustomToolbarButton';
-import { runNpmScript } from '../../Utils/NpmScriptExecutor';
 import { type FileMetadata } from '../../ProjectsStorage';
-import PreferencesContext from '../Preferences/PreferencesContext';
-import NpmScriptConfirmDialog from './NpmScriptConfirmDialog';
+import { type TriggerNpmScript } from '../NpmScriptRunner/useNpmScriptRunner';
 
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
@@ -35,6 +33,7 @@ export type MainFrameToolbarProps = {|
   hidden: boolean,
   toolbarButtons: Array<ToolbarButtonConfig>,
   projectPath: ?string,
+  triggerNpmScript: TriggerNpmScript,
 
   ...PreviewAndShareButtonsProps,
 |};
@@ -54,65 +53,16 @@ type LeftButtonsToolbarGroupProps = {|
   canSave: boolean,
   toolbarButtons: Array<ToolbarButtonConfig>,
   projectPath: ?string,
+  triggerNpmScript: TriggerNpmScript,
 |};
 
 const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
   function LeftButtonsToolbarGroup(props) {
-    const {
-      values: { disableNpmScriptConfirmation },
-      setDisableNpmScriptConfirmation,
-    } = React.useContext(PreferencesContext);
-
-    const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
-    const [pendingNpmScript, setPendingNpmScript] = React.useState<?string>(
-      null
-    );
-
-    const handleCustomButtonClick = React.useCallback(
-      (npmScript: string) => {
-        if (!props.projectPath) return;
-
-        // Check if confirmation is needed (stored in user preferences)
-        if (!disableNpmScriptConfirmation) {
-          setPendingNpmScript(npmScript);
-          setConfirmDialogOpen(true);
-          return;
-        }
-
-        runNpmScript(props.projectPath, npmScript);
-      },
-      [props.projectPath, disableNpmScriptConfirmation]
-    );
-
-    const handleConfirm = React.useCallback(
-      (dontShowAgain: boolean) => {
-        setConfirmDialogOpen(false);
-        if (dontShowAgain) {
-          setDisableNpmScriptConfirmation(true);
-        }
-        if (pendingNpmScript && props.projectPath) {
-          runNpmScript(props.projectPath, pendingNpmScript);
-        }
-        setPendingNpmScript(null);
-      },
-      [pendingNpmScript, props.projectPath, setDisableNpmScriptConfirmation]
-    );
-
-    const handleDismiss = React.useCallback(() => {
-      setConfirmDialogOpen(false);
-      setPendingNpmScript(null);
-    }, []);
-
-    const scriptNames = props.toolbarButtons.map(b => b.npmScript).join(', ');
+    const toolbarButtons = props.toolbarButtons;
+    const triggerNpmScript = props.triggerNpmScript;
 
     return (
       <>
-        <NpmScriptConfirmDialog
-          open={confirmDialogOpen}
-          scriptNames={scriptNames}
-          onConfirm={handleConfirm}
-          onDismiss={handleDismiss}
-        />
         <ToolbarGroup firstChild>
           <IconButton
             size="small"
@@ -128,12 +78,12 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
             onSave={props.onSave}
             canSave={props.canSave}
           />
-          {props.toolbarButtons.map((button, index) => (
+          {toolbarButtons.map((button, index) => (
             <CustomToolbarButton
               key={index}
               name={button.name}
               icon={button.icon}
-              onClick={() => handleCustomButtonClick(button.npmScript)}
+              onClick={() => triggerNpmScript(button.npmScript)}
             />
           ))}
           {props.checkedOutVersionStatus && (
@@ -192,6 +142,7 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               canQuitVersionHistory={props.canQuitVersionHistory}
               toolbarButtons={props.toolbarButtons}
               projectPath={props.projectPath}
+              triggerNpmScript={props.triggerNpmScript}
             />
             <ToolbarGroup>
               <Spacer />

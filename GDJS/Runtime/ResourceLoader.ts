@@ -37,7 +37,7 @@ namespace gdjs {
    * and make impossible to finely tune in which order scenes are actually
    * downloaded.
    */
-  class loadingTask {
+  class LoadingTask {
     identifier: string;
     private onProgressCallbacks: Array<(count: number, total: number) => void>;
     private onFinishCallbacks: Array<() => void>;
@@ -712,7 +712,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the map of resources that are only used in the scene that is being unloaded,
+     * Get the resources that are only used in the scene that is being unloaded,
      * and that are not used in any other loaded scene (or the scene that is coming next).
      */
     private _getResourcesOnlyUsedInUnloadedScene(
@@ -725,6 +725,7 @@ namespace gdjs {
       const resourceNamesToUnload = new Set<string>(
         unloadedSceneState.resourceNames
       );
+      // Also add the resources manually loaded for objects during the current scene.
       for (const objectLoadingState of this.objectResourceLoadingQueue.loadingStates.values()) {
         for (const resourceName of objectLoadingState.resourceNames) {
           resourceNamesToUnload.add(resourceName);
@@ -750,6 +751,9 @@ namespace gdjs {
         objectLoadingState.resourceNames
       );
       for (const otherObjectLoadingState of this.objectResourceLoadingQueue.loadingStates.values()) {
+        if (otherObjectLoadingState === objectLoadingState) {
+          continue;
+        }
         for (const resourceName of otherObjectLoadingState.resourceNames) {
           resourceNamesToUnload.delete(resourceName);
         }
@@ -916,7 +920,7 @@ namespace gdjs {
     /**
      * A queue of loading task whose resources are still to be pre-loaded.
      */
-    private loadingTaskQueue: Array<loadingTask> = new Array<loadingTask>();
+    private loadingTaskQueue: Array<LoadingTask> = new Array<LoadingTask>();
 
     /**
      * It's set to `true` during intermediary loading screen to use a greater
@@ -1066,7 +1070,7 @@ namespace gdjs {
      * When the scene that is currently loading in background is done,
      * this scene will be the next to be loaded.
      */
-    prioritize(taskIdentifier: string): loadingTask | null {
+    prioritize(taskIdentifier: string): LoadingTask | null {
       const loadingState = this.loadingStates.get(taskIdentifier);
       if (!loadingState) return null;
       if (loadingState.status === 'loaded' || loadingState.status === 'ready') {
@@ -1082,7 +1086,7 @@ namespace gdjs {
       const taskIndex = this.loadingTaskQueue.findIndex(
         (task) => task.identifier === taskIdentifier
       );
-      let task: loadingTask;
+      let task: LoadingTask;
       if (taskIndex !== -1) {
         // There is already a task for this scene in the queue.
         // Move it so that it's loaded first.
@@ -1093,7 +1097,7 @@ namespace gdjs {
         // There is no task for this scene in the queue.
         // It might be because the scene was unloaded or never loaded.
         // In this case, we need to add a new task to the queue.
-        task = new loadingTask(taskIdentifier);
+        task = new LoadingTask(taskIdentifier);
         this.loadingTaskQueue.push(task);
       }
 
@@ -1129,7 +1133,7 @@ namespace gdjs {
     /**
      * Preload an object assets in background.
      */
-    enqueue(taskIdentifier: string): loadingTask | null {
+    enqueue(taskIdentifier: string): LoadingTask | null {
       const objectLoadingState = this.loadingStates.get(taskIdentifier);
       if (!objectLoadingState) {
         debugLogger.log(
@@ -1146,7 +1150,7 @@ namespace gdjs {
       debugLogger.log(
         `Loading of resources for ${this.name} ${taskIdentifier} was requested.`
       );
-      const task = new loadingTask(taskIdentifier);
+      const task = new LoadingTask(taskIdentifier);
       this.loadingTaskQueue.push(task);
       this.loadAllTasksInBackground();
       return task;

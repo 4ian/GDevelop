@@ -38,6 +38,10 @@ const {
   closePreviewWindow,
   closePreviewWindowsForParent,
   closeAllPreviewWindows,
+  resumePreviewDebugger,
+  stepPreviewDebugger,
+  setBreakpointsPreviewDebugger,
+  schedulePauseAtNextEventInPreviewDebugger,
 } = require('./PreviewWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
@@ -410,6 +414,7 @@ app.on('ready', function() {
       numberOfWindows: options.numberOfWindows,
       captureOptions: options.captureOptions,
       openEvent: event,
+      initialBreakpoints: options.initialBreakpoints,
     });
   });
   ipcMain.handle('preview-close', async (event, options) => {
@@ -419,6 +424,39 @@ app.on('ready', function() {
   ipcMain.handle('preview-close-all', async () => {
     return closeAllPreviewWindows();
   });
+
+  // Resume V8 that has been paused on a `debugger;` statement emitted by
+  // the breakpoints codegen. `windowId` is the BrowserWindow id of the
+  // preview that is currently paused.
+  ipcMain.handle('preview-debugger-resume', async (event, { windowId }) => {
+    return resumePreviewDebugger(windowId);
+  });
+
+  // Write stepping state into the paused runtime via CDP Runtime.evaluate,
+  // then resume V8 so the next `__checkBreakpoint` trips on the target event.
+  ipcMain.handle('preview-debugger-step', async (event, { windowId, payload }) => {
+    return stepPreviewDebugger(windowId, payload);
+  });
+
+  // Push the full session breakpoint payload into the runtime via CDP.
+  // `Runtime.evaluate` applies atomically and works even while V8 is paused
+  // on a `debugger;` statement.
+  ipcMain.handle(
+    'preview-debugger-set-breakpoints',
+    async (event, { windowId, breakpoints }) => {
+      return setBreakpointsPreviewDebugger(windowId, breakpoints);
+    }
+  );
+
+  // Schedule "pause at next event" in a *running* preview (F10 while not
+  // paused). Writes the stepping FSM via CDP Runtime.evaluate; no
+  // Debugger.resume is issued because V8 is not paused.
+  ipcMain.handle(
+    'preview-debugger-schedule-pause',
+    async (event, { windowId }) => {
+      return schedulePauseAtNextEventInPreviewDebugger(windowId);
+    }
+  );
 
   // Piskel image editor
   ipcMain.handle('piskel-load', (event, externalEditorInput) => {

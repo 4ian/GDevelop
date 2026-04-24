@@ -249,8 +249,10 @@ namespace gdjs {
       try {
         if (data.command === 'play') {
           runtimeGame.pause(false);
+          that.sendRuntimeGameStatus();
         } else if (data.command === 'pause') {
           runtimeGame.pause(true);
+          that.sendRuntimeGameStatus();
           that.sendRuntimeGameDump();
         } else if (data.command === 'refresh') {
           that.sendRuntimeGameDump();
@@ -684,7 +686,30 @@ namespace gdjs {
      */
     sendRuntimeGameDump(): void {
       const that = this;
-      const message = { command: 'dump', payload: this._runtimegame };
+
+      // Collect scene-level local variable stacks. Each generated scene code
+      // namespace (`gdjs.<mangled>Code`) holds a `localVariables` array that
+      // is pushed/popped as events enter and leave "Declare local" scopes.
+      // Extension function locals live on the per-call `eventsFunctionContext`
+      // and are not reachable from globals — the IDE tooltip falls back to
+      // the generic "variable" label for them.
+      const activeLocalVariables: { [key: string]: any[] } = {};
+      for (const key in gdjs) {
+        if (!Object.prototype.hasOwnProperty.call(gdjs, key)) continue;
+        const entry = (gdjs as any)[key];
+        if (
+          entry &&
+          typeof entry === 'object' &&
+          Array.isArray(entry.localVariables) &&
+          entry.localVariables.length > 0
+        ) {
+          activeLocalVariables['gdjs.' + key] = entry.localVariables;
+        }
+      }
+      const message: any = { command: 'dump', payload: this._runtimegame };
+      if (Object.keys(activeLocalVariables).length > 0) {
+        message.activeLocalVariables = activeLocalVariables;
+      }
       const serializationStartTime = Date.now();
 
       // Stringify the message, excluding some known data that are big and/or not
@@ -733,6 +758,15 @@ namespace gdjs {
             excludedKeys.indexOf(key) !== -1
           ) {
             return '[Removed from the debugger]';
+          }
+          // Map instances (e.g. _variablesByExtensionName) don't serialize
+          // to JSON. Convert them to plain objects for the debugger dump.
+          if (value instanceof Map) {
+            const obj: Record<string, any> = {};
+            value.forEach((v, k) => {
+              obj[k] = v;
+            });
+            return obj;
           }
           return value;
         },

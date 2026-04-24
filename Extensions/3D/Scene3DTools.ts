@@ -45,11 +45,7 @@ namespace gdjs {
         cameraIndex: integer
       ): float => {
         const layer = runtimeScene.getLayer(layerName);
-        const layerRenderer = layer.getRenderer();
-
-        const threeCamera = layerRenderer.getThreeCamera();
-        if (!threeCamera) return 0;
-        return gdjs.toDegrees(threeCamera.rotation.x);
+        return layer.getCameraRotationX(cameraIndex);
       };
 
       export const setCameraRotationX = (
@@ -59,12 +55,7 @@ namespace gdjs {
         cameraIndex: integer
       ) => {
         const layer = runtimeScene.getLayer(layerName);
-        const layerRenderer = layer.getRenderer();
-
-        const threeCamera = layerRenderer.getThreeCamera();
-        if (!threeCamera) return;
-
-        threeCamera.rotation.x = gdjs.toRad(angle);
+        layer.setCameraRotationX(angle, cameraIndex);
       };
 
       export const getCameraRotationY = (
@@ -73,11 +64,7 @@ namespace gdjs {
         cameraIndex: integer
       ): float => {
         const layer = runtimeScene.getLayer(layerName);
-        const layerRenderer = layer.getRenderer();
-
-        const threeCamera = layerRenderer.getThreeCamera();
-        if (!threeCamera) return 0;
-        return gdjs.toDegrees(threeCamera.rotation.y);
+        return layer.getCameraRotationY(cameraIndex);
       };
 
       export const setCameraRotationY = (
@@ -87,12 +74,88 @@ namespace gdjs {
         cameraIndex: integer
       ) => {
         const layer = runtimeScene.getLayer(layerName);
-        const layerRenderer = layer.getRenderer();
+        layer.setCameraRotationY(angle, cameraIndex);
+      };
 
-        const threeCamera = layerRenderer.getThreeCamera();
-        if (!threeCamera) return;
+      export const getCameraForwardX = (
+        runtimeScene: RuntimeScene,
+        layerName: string,
+        cameraIndex: integer
+      ): float => {
+        const layer = runtimeScene.getLayer(layerName);
+        return layer.getCameraForwardX(cameraIndex);
+      };
 
-        threeCamera.rotation.y = gdjs.toRad(angle);
+      export const getCameraForwardY = (
+        runtimeScene: RuntimeScene,
+        layerName: string,
+        cameraIndex: integer
+      ): float => {
+        const layer = runtimeScene.getLayer(layerName);
+        return layer.getCameraForwardY(cameraIndex);
+      };
+
+      export const getCameraForwardZ = (
+        runtimeScene: RuntimeScene,
+        layerName: string,
+        cameraIndex: integer
+      ): float => {
+        const layer = runtimeScene.getLayer(layerName);
+        return layer.getCameraForwardZ(cameraIndex);
+      };
+
+      export const getCameraUpX = (
+        runtimeScene: RuntimeScene,
+        layerName: string,
+        cameraIndex: integer
+      ): float => {
+        const layer = runtimeScene.getLayer(layerName);
+        return layer.getCameraUpX(cameraIndex);
+      };
+
+      export const getCameraUpY = (
+        runtimeScene: RuntimeScene,
+        layerName: string,
+        cameraIndex: integer
+      ): float => {
+        const layer = runtimeScene.getLayer(layerName);
+        return layer.getCameraUpY(cameraIndex);
+      };
+
+      export const getCameraUpZ = (
+        runtimeScene: RuntimeScene,
+        layerName: string,
+        cameraIndex: integer
+      ): float => {
+        const layer = runtimeScene.getLayer(layerName);
+        return layer.getCameraUpZ(cameraIndex);
+      };
+
+      export const getCameraRightX = (
+        runtimeScene: RuntimeScene,
+        layerName: string,
+        cameraIndex: integer
+      ): float => {
+        const layer = runtimeScene.getLayer(layerName);
+        return layer.getCameraRightX(cameraIndex);
+      };
+
+      export const getCameraRightY = (
+        runtimeScene: RuntimeScene,
+        layerName: string,
+        cameraIndex: integer
+      ): float => {
+        const layer = runtimeScene.getLayer(layerName);
+        return layer.getCameraRightY(cameraIndex);
+      };
+
+      export const getCameraRightZ = (
+        runtimeScene: RuntimeScene,
+        layerName: string,
+        cameraIndex: integer
+      ): float => {
+        const layer = runtimeScene.getLayer(layerName);
+        return layer.getCameraRightZ(cameraIndex);
       };
 
       export const turnCameraTowardObject = (

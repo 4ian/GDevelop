@@ -1764,6 +1764,150 @@ module.exports = {
       .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
     extension
+      .addExpression(
+        'CameraForwardX',
+        _('Camera forward X'),
+        _('Return the camera forward X.'),
+        _('Camera local basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraForwardX')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraForwardY',
+        _('Camera forward Y'),
+        _('Return the camera forward Y.'),
+        _('Camera local basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraForwardY')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraForwardZ',
+        _('Camera forward Z'),
+        _('Return the camera forward Z.'),
+        _('Camera local basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraForwardZ')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraUpX',
+        _('Camera up X'),
+        _('Return the camera up X.'),
+        _('Camera local basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraUpX')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraUpY',
+        _('Camera up Y'),
+        _('Return the camera up Y.'),
+        _('Camera local basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraUpY')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraUpZ',
+        _('Camera up Z'),
+        _('Return the camera up Z.'),
+        _('Camera local basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraUpZ')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraRightX',
+        _('Camera right X'),
+        _('Return the camera right X.'),
+        _('Camera local basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraRightX')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraRightY',
+        _('Camera right Y'),
+        _('Return the camera right Y.'),
+        _('Camera local basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraRightY')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraRightZ',
+        _('Camera right Z'),
+        _('Return the camera right Z.'),
+        _('Camera local basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraRightZ')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
       .addAction(
         'TurnCameraTowardObject',
         _('Look at an object'),

@@ -656,6 +656,11 @@
   "event-sheet": {
     "event-tree": {
       "background-color": {
+        "value": "#f0f0f2"
+      }
+    },
+    "executable-event-container": {
+      "border-color": {
         "value": "#D9D9DE"
       }
     },

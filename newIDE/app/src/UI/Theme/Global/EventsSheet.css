@@ -73,10 +73,12 @@
  */
 .gd-events-sheet .large-selectable {
   border: var(--event-sheet-selectable-border) !important;
+  border-radius: 0 2px 2px 0;
 }
 
 .gd-events-sheet .large-selectable.large-selected {
   border: var(--event-sheet-selectable-selected-border) !important;
+  border-radius: 0 2px 2px 0;
 }
 
 /**
@@ -113,6 +115,7 @@
   color: var(--event-sheet-actions-color);
   padding-left: 5px;
   padding-right: 5px;
+  border-radius: 0 2px 2px 0;
   /* Prevent container to growing outside its parent. We don't have a way to prevent an infinitely
      * small action column, but responsive design should avoid the problem on small screens. */
   min-width: 0;
@@ -339,4 +342,11 @@
   padding-right: 3px;
   width: 24px;
   height: 24px;
+}
+
+@media only screen and (max-width: 750px) {
+  .gd-events-sheet .large-selectable,
+  .gd-events-sheet .large-selectable.large-selected {
+    border-radius: 0 1px 1px 0;
+  }
 }

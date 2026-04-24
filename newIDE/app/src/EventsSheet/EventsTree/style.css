@@ -77,6 +77,13 @@
     padding: 0;
 }
 
+/**
+ * Container wrapping the conditions and actions columns of an event
+ */
+.gd-events-sheet .executable-event-container {
+    border: 1px solid var(--event-sheet-executable-event-container-border-color);
+}
+
 .gd-events-sheet .rst__rowLabel {
     padding: 0;
     flex: 1;

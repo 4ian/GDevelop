@@ -658,7 +658,7 @@
   "event-sheet": {
     "event-tree": {
       "background-color": {
-        "value": "#282C34"
+        "value": "#32323B"
       }
     },
     "rst": {
@@ -694,6 +694,10 @@
         },
         "color": {
           "value": "#D6DEEC"
+        },
+        "border-color": {
+          "value": "#494952",
+          "comment": "Palette/Grey/60"
         }
       }
     },
@@ -716,7 +720,7 @@
         "value": "#3E4452"
       },
       "border": {
-        "value": "1px #3E4452 solid"
+        "value": "0px #3E4452 solid"
       },
       "color": {
         "value": "rgb(209, 209, 209)"

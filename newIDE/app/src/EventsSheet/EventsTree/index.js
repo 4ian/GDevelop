@@ -205,6 +205,25 @@ const EventContainer = (props: EventsContainerProps) => {
 
   const EventComponent = EventsRenderingService.getEventComponent(event);
 
+  const eventType = event.getType();
+  const coloredHandleStyle = (() => {
+    if (eventType === 'BuiltinCommonInstructions::Comment') {
+      const commentEvent = gd.asCommentEvent(event);
+      return {
+        backgroundColor: `rgb(${commentEvent.getBackgroundColorRed()}, ${commentEvent.getBackgroundColorGreen()}, ${commentEvent.getBackgroundColorBlue()})`,
+        filter: 'brightness(0.8)',
+      };
+    }
+    if (eventType === 'BuiltinCommonInstructions::Group') {
+      const groupEvent = gd.asGroupEvent(event);
+      return {
+        backgroundColor: `rgb(${groupEvent.getBackgroundColorR()}, ${groupEvent.getBackgroundColorG()}, ${groupEvent.getBackgroundColorB()})`,
+        filter: 'brightness(0.8)',
+      };
+    }
+    return undefined;
+  })();
+
   return (
     <div
       ref={containerRef}
@@ -222,6 +241,7 @@ const EventContainer = (props: EventsContainerProps) => {
                   event.getAiGeneratedEventId()
                 ),
               })}
+              style={coloredHandleStyle}
             />
           )}
           <div style={styles.container}>

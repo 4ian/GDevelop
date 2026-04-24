@@ -718,9 +718,6 @@
       "border-color": {
         "value": "#e2e2e2"
       },
-      "border": {
-        "value": "1px solid {event-sheet.conditions.border-color.value}"
-      },
       "color": {
         "value": "black"
       },

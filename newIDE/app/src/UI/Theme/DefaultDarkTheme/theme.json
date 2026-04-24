@@ -699,10 +699,6 @@
         },
         "color": {
           "value": "#D6DEEC"
-        },
-        "border-color": {
-          "value": "#494952",
-          "comment": "Palette/Grey/60"
         }
       }
     },
@@ -723,9 +719,6 @@
       },
       "border-color": {
         "value": "#3E4452"
-      },
-      "border": {
-        "value": "0px #3E4452 solid"
       },
       "color": {
         "value": "rgb(209, 209, 209)"

@@ -980,7 +980,7 @@ class GD_CORE_API Project {
   ResourcesContainer& GetResourcesManager() { return resourcesContainer; }
 
   /**
-   * Get when the scenes must preload their resources: `at-startup` (default),
+   * Set when the scenes must preload their resources: `at-startup` (default),
    * `never.
    */
   void SetSceneResourcesPreloading(gd::String sceneResourcesPreloading_) {

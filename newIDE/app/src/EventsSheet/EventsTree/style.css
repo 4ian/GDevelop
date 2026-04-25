@@ -27,7 +27,7 @@
         width: 4px;
         border-radius: 1px 0 0 1px;
     }
-    .gd-events-sheet .executable-event-container {
+    .gd-events-sheet .conditions-actions-container {
         border-radius: 0 1px 1px 0;
     }
     .gd-events-sheet .rst__rowContents {
@@ -88,8 +88,8 @@
 /**
  * Container wrapping the conditions and actions columns of an event
  */
-.gd-events-sheet .executable-event-container {
-    border: 1px solid var(--event-sheet-executable-event-container-border-color);
+.gd-events-sheet .conditions-actions-container {
+    border: 1px solid var(--event-sheet-conditions-actions-container-border-color);
     border-radius: 0 2px 2px 0;
 }
 

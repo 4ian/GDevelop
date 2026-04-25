@@ -661,7 +661,7 @@
         "value": "#282C34"
       }
     },
-    "executable-event-container": {
+    "conditions-actions-container": {
       "border-color": {
         "value": "#32323B"
       }

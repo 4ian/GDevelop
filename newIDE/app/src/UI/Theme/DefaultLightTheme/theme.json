@@ -659,6 +659,11 @@
         "value": "#f0f0f2"
       }
     },
+    "conditions-actions-container": {
+      "border-color": {
+        "value": "#D9D9DE"
+      }
+    },
     "rst": {
       "ai-generated-event-move-handle": {
         "gradient-color-1": {
@@ -712,9 +717,6 @@
       },
       "border-color": {
         "value": "#e2e2e2"
-      },
-      "border": {
-        "value": "1px solid {event-sheet.conditions.border-color.value}"
       },
       "color": {
         "value": "black"

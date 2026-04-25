@@ -231,7 +231,12 @@
   );
   border-bottom: 1px dashed var(--event-sheet-instruction-parameter-error-color);
   min-width: var(--instruction-missing-parameter-min-width);
-  min-height: var(--instruction-missing-parameter-min-height);
+}
+
+.gd-events-sheet .instruction-parameter .instruction-missing-parameter::before {
+  content: "";
+  display: inline-block;
+  height: 1em;
 }
 
 .gd-events-sheet .else-text-container {

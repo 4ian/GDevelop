@@ -4963,6 +4963,7 @@ const addOrEditVariable: EditorFunction = {
     const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
 
     let variablesContainer;
+    let scopeDescription;
     if (variable_scope === 'scene') {
       if (!scene_name) {
         return makeGenericFailure(
@@ -4973,6 +4974,7 @@ const addOrEditVariable: EditorFunction = {
         return makeGenericFailure(`Scene not found: "${scene_name}".`);
       }
       variablesContainer = project.getLayout(scene_name).getVariables();
+      scopeDescription = `scene "${scene_name}"`;
     } else if (variable_scope === 'object') {
       if (!object_name) {
         return makeGenericFailure(
@@ -4991,6 +4993,7 @@ const addOrEditVariable: EditorFunction = {
             `Object "${object_name}" not in scene "${scene_name}". For a global object, omit scene_name.`
           );
         }
+        scopeDescription = `scene "${scene_name}" object "${object_name}"`;
       } else {
         objectsContainer = project.getObjects();
         if (!objectsContainer.hasObjectNamed(object_name)) {
@@ -4998,6 +5001,7 @@ const addOrEditVariable: EditorFunction = {
             `Object "${object_name}" not found globally. Did you forget to specify scene_name?`
           );
         }
+        scopeDescription = `global object "${object_name}"`;
       }
 
       variablesContainer = objectsContainer
@@ -5005,6 +5009,7 @@ const addOrEditVariable: EditorFunction = {
         .getVariables();
     } else if (variable_scope === 'global') {
       variablesContainer = project.getVariables();
+      scopeDescription = 'global';
     } else {
       return makeGenericFailure(
         `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\` or \`global\`.`
@@ -5021,8 +5026,8 @@ const addOrEditVariable: EditorFunction = {
     const truncatedValue = truncateValue(value);
     return makeGenericSuccess(
       addedNewVariable
-        ? `Added variable "${variable_name_or_path}" (${variableType}) = ${truncatedValue}`
-        : `Edited variable "${variable_name_or_path}" = ${truncatedValue}`
+        ? `Added ${scopeDescription} variable "${variable_name_or_path}" (${variableType}) = ${truncatedValue}`
+        : `Edited ${scopeDescription} variable "${variable_name_or_path}" = ${truncatedValue}`
     );
   },
   modifiesProject: true,

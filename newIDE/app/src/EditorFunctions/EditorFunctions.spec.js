@@ -1152,18 +1152,26 @@ describe('editorFunctions', () => {
 
   describe('add_or_edit_variable', () => {
     let project: gdProject;
+    let testScene: gdLayout;
 
     beforeEach(() => {
       // $FlowFixMe[invalid-constructor]
       project = new gd.ProjectHelper.createNewGDJSProject();
-      project.insertNewLayout('TestScene', 0);
+      testScene = project.insertNewLayout('TestScene', 0);
+
+      // A scene-scoped sprite and a global sprite, to exercise the two
+      // object-variable scope branches.
+      testScene
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'Player', 0);
+      project.getObjects().insertNewObject(project, 'Sprite', 'GlobalEnemy', 0);
     });
 
     afterEach(() => {
       project.delete();
     });
 
-    it('reports the new value in the success message (short value)', async () => {
+    it('reports scope and new value for a global variable (added)', async () => {
       const result = await editorFunctions.add_or_edit_variable.launchFunction({
         ...makeFakeLaunchFunctionOptionsWithProject(project),
         args: {
@@ -1175,7 +1183,59 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Added variable \\"score\\" (Number) = 42"`
+        `"Added global variable \\"score\\" (Number) = 42"`
+      );
+    });
+
+    it('reports scope and new value for a scene variable (added)', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'lives',
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          value: '3',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added scene \\"TestScene\\" variable \\"lives\\" (Number) = 3"`
+      );
+    });
+
+    it('reports scope and new value for a scene-object variable (added)', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'health',
+          variable_scope: 'object',
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          value: '100',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added scene \\"TestScene\\" object \\"Player\\" variable \\"health\\" (Number) = 100"`
+      );
+    });
+
+    it('reports scope and new value for a global-object variable (added)', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'speed',
+          variable_scope: 'object',
+          object_name: 'GlobalEnemy',
+          value: '50',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added global object \\"GlobalEnemy\\" variable \\"speed\\" (Number) = 50"`
       );
     });
 
@@ -1193,7 +1253,7 @@ describe('editorFunctions', () => {
       expect(result.success).toBe(true);
       // 200 'x' kept, then the truncation tag mentioning the remaining 250 chars.
       expect(result.message).toBe(
-        `Added variable "longText" (String) = ${'x'.repeat(
+        `Added global variable "longText" (String) = ${'x'.repeat(
           200
         )}[...truncated - 250 more characters]`
       );
@@ -1212,7 +1272,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toBe(
-        `Added variable "edgeCase" (String) = ${value}`
+        `Added global variable "edgeCase" (String) = ${value}`
       );
     });
 
@@ -1231,8 +1291,121 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Edited variable \\"greeting\\" = hello world"`
+        `"Edited global variable \\"greeting\\" = hello world"`
       );
+    });
+
+    it('creates a structure variable from a JSON object value', async () => {
+      const value = '{"hp": 10, "name": "Hero", "alive": true}';
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'stats',
+          variable_scope: 'global',
+          value,
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toBe(
+        `Added global variable "stats" (Structure) = ${value}`
+      );
+
+      // The variable is actually persisted as a structure with each child set.
+      const variable = project.getVariables().get('stats');
+      expect(variable.getType()).toBe(gd.Variable.Structure);
+      expect(variable.getChild('hp').getValue()).toBe(10);
+      expect(variable.getChild('name').getString()).toBe('Hero');
+      expect(variable.getChild('alive').getBool()).toBe(true);
+    });
+
+    it('sets a nested field inside an existing structure', async () => {
+      // Pre-populate a structure with a child field.
+      const variables = project.getVariables();
+      const struct = variables.insertNew('player', 0);
+      struct.castTo('Structure');
+      struct.getChild('hp').setValue(10);
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'player.hp',
+          variable_scope: 'global',
+          value: '42',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Edited global variable \\"player.hp\\" = 42"`
+      );
+      expect(struct.getChild('hp').getValue()).toBe(42);
+    });
+
+    it('adds a deeply nested structure path (path-based creation)', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'config.audio.volume',
+          variable_scope: 'global',
+          value: '0.8',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added global variable \\"config.audio.volume\\" (Number) = 0.8"`
+      );
+      const config = project.getVariables().get('config');
+      expect(config.getType()).toBe(gd.Variable.Structure);
+      expect(
+        config
+          .getChild('audio')
+          .getChild('volume')
+          .getValue()
+      ).toBeCloseTo(0.8);
+    });
+
+    it('sets an element of an array variable', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'inventory[2]',
+          variable_scope: 'global',
+          value: 'Magic Sword',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added global variable \\"inventory[2]\\" (String) = Magic Sword"`
+      );
+      const inventory = project.getVariables().get('inventory');
+      expect(inventory.getType()).toBe(gd.Variable.Array);
+      expect(inventory.getChildrenCount()).toBe(3);
+      expect(inventory.getAtIndex(2).getString()).toBe('Magic Sword');
+    });
+
+    it('sets a structure field inside an array element', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'players[0].name',
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          value: 'Alice',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added scene \\"TestScene\\" variable \\"players[0].name\\" (String) = Alice"`
+      );
+      const players = testScene.getVariables().get('players');
+      expect(players.getType()).toBe(gd.Variable.Array);
+      const player0 = players.getAtIndex(0);
+      expect(player0.getType()).toBe(gd.Variable.Structure);
+      expect(player0.getChild('name').getString()).toBe('Alice');
     });
   });
 

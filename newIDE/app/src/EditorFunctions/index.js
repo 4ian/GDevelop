@@ -863,6 +863,8 @@ const createOrReplaceObject: EditorFunction = {
 
       const targetObjectsContainer =
         target_object_scope === 'global' ? globalObjects : layoutObjects;
+      const targetScopeText =
+        target_object_scope === 'global' ? 'global' : `scene "${scene_name}"`;
 
       if (candidateType && !search_terms && !asset_id) {
         // Do nothing: there is nothing given apart from an object type,
@@ -919,7 +921,7 @@ const createOrReplaceObject: EditorFunction = {
               const result: EditorFunctionGenericOutput = {
                 success: true,
                 message: [
-                  `Created object "${object.getName()}" (type "${object.getType()}", scene "${scene_name}") from asset store.`,
+                  `Created object "${object.getName()}" (type "${object.getType()}", ${targetScopeText}) from asset store.`,
                   getPropertiesText(object),
                 ].join(' '),
                 objectSizeInfo: {
@@ -935,7 +937,7 @@ const createOrReplaceObject: EditorFunction = {
             }
 
             return makeGenericSuccess(
-              `Created from asset store in scene "${scene_name}": ${createdObjects
+              `Created from asset store in ${targetScopeText}: ${createdObjects
                 .map(
                   object =>
                     `"${object.getName()}" (type "${object.getType()}")`
@@ -1017,7 +1019,7 @@ const createOrReplaceObject: EditorFunction = {
       const scratchResult: EditorFunctionGenericOutput = {
         success: true,
         message: [
-          `Created object "${targetObjectName}" (type "${candidateType}", scene "${scene_name}") from scratch.`,
+          `Created object "${targetObjectName}" (type "${candidateType}", ${targetScopeText}) from scratch.`,
           getPropertiesText(object),
         ].join(' '),
       };
@@ -1111,7 +1113,9 @@ const createOrReplaceObject: EditorFunction = {
             isNewObjectTypeUsed: false, // The object type was not changed.
           });
           return makeGenericSuccess(
-            `Replaced "${existingTargetObject.getName()}" with asset store object (same type "${existingTargetObject.getType()}").`
+            `Replaced ${
+              isTargetObjectGlobal ? 'global' : `scene "${scene_name}"`
+            } object "${existingTargetObject.getName()}" with asset store object (same type "${existingTargetObject.getType()}").`
           );
         } else {
           // No asset found.
@@ -4458,31 +4462,40 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         if (isFuzzyMatch(propertyName, 'backgroundColor')) {
           const colorAsRgb = hexNumberToRGBArray(rgbOrHexToHexNumber(newValue));
           scene.setBackgroundColor(colorAsRgb[0], colorAsRgb[1], colorAsRgb[2]);
-          changes.push('Set scene background color.');
+          changes.push(
+            `Set scene background color to ${rgbColorToHex(
+              colorAsRgb[0],
+              colorAsRgb[1],
+              colorAsRgb[2]
+            )}.`
+          );
         } else if (isFuzzyMatch(propertyName, 'gameResolutionWidth')) {
+          const newWidth = parseInt(newValue);
           project.setGameResolutionSize(
-            parseInt(newValue),
+            newWidth,
             project.getGameResolutionHeight()
           );
-          changes.push('Set game resolution width.');
+          changes.push(`Set game resolution width to ${newWidth}.`);
         } else if (isFuzzyMatch(propertyName, 'stopSoundsOnStartup')) {
-          scene.setStopSoundsOnStartup(newValue.toLowerCase() === 'true');
-          changes.push('Set stopSoundsOnStartup.');
+          const newStop = newValue.toLowerCase() === 'true';
+          scene.setStopSoundsOnStartup(newStop);
+          changes.push(`Set stopSoundsOnStartup to ${newStop}.`);
         } else if (isFuzzyMatch(propertyName, 'gameResolutionHeight')) {
+          const newHeight = parseInt(newValue);
           project.setGameResolutionSize(
             project.getGameResolutionWidth(),
-            parseInt(newValue)
+            newHeight
           );
-          changes.push('Set game resolution height.');
+          changes.push(`Set game resolution height to ${newHeight}.`);
         } else if (isFuzzyMatch(propertyName, 'gameOrientation')) {
           project.setOrientation(newValue);
-          changes.push('Set game orientation.');
+          changes.push(`Set game orientation to ${newValue}.`);
         } else if (isFuzzyMatch(propertyName, 'gameScaleMode')) {
           project.setScaleMode(newValue);
-          changes.push('Set game scale mode.');
+          changes.push(`Set game scale mode to ${newValue}.`);
         } else if (isFuzzyMatch(propertyName, 'gameName')) {
           project.setName(newValue);
-          changes.push('Set game name.');
+          changes.push(`Set game name to "${newValue}".`);
         } else {
           warnings.push(
             `Unknown scene property: "${propertyName}". Skipped.`

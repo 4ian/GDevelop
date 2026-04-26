@@ -438,7 +438,7 @@ describe('editorFunctions', () => {
       );
       expect(testScene.getObjects().hasObjectNamed('Player')).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Replaced \\"Player\\" with asset store object (same type \\"Sprite\\")."`
+        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\")."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -645,7 +645,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Replaced \\"Player\\" with asset store object (same type \\"Sprite\\")."`
+        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\")."`
       );
     });
 
@@ -664,6 +664,60 @@ describe('editorFunctions', () => {
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(
         `"Object \\"Player\\" already exists in scene \\"TestScene\\" with type \\"Sprite\\". Cannot (re)create as type \\"TextObject::Text\\"."`
+      );
+    });
+
+    it('reports global scope when creating a global object from scratch', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async () =>
+            Promise.resolve({
+              status: 'nothing-found',
+              message: '',
+              createdObjects: [],
+              assetShortHeader: null,
+              isTheFirstOfItsTypeInProject: false,
+            }),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'TextObject::Text',
+            object_name: 'GlobalText',
+            target_object_scope: 'global',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getObjects().hasObjectNamed('GlobalText')).toBe(true);
+      expect(testScene.getObjects().hasObjectNamed('GlobalText')).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Created object "GlobalText" (type "TextObject::Text", global) from scratch.'
+        )
+      );
+    });
+
+    it('reports global scope when creating a global object from the asset store', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'Sprite',
+            object_name: 'GlobalSprite',
+            target_object_scope: 'global',
+            search_terms: 'cool sprite',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getObjects().hasObjectNamed('GlobalSprite')).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Created object "GlobalSprite" (type "Sprite", global) from asset store.'
+        )
       );
     });
   });
@@ -922,6 +976,44 @@ describe('editorFunctions', () => {
       expect(properties.get('bold').getValue()).toBe('true');
       expect(properties.get('italic').getValue()).toBe('false');
       expect(properties.get('shadowAngle').getValue()).toBe('20');
+    });
+
+    it('reports the FINAL renamed name when a collision forces a suffix', async () => {
+      // The scene already has another object named "Foo": renaming
+      // MyTextObject -> Foo must collide and end up as "Foo2".
+      testScene.getObjects().insertNewObject(
+        project,
+        'Sprite',
+        'Foo',
+        testScene.getObjects().getObjectsCount()
+      );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyTextObject',
+            changed_properties: [
+              {
+                property_name: 'name',
+                new_value: 'Foo',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      // Final name reported is "Foo2", not the requested "Foo".
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Renamed object \\"MyTextObject\\" to \\"Foo2\\" (events and references updated)."
+      `);
+      // Original "Foo" still exists; the renamed one is "Foo2".
+      expect(testScene.getObjects().hasObjectNamed('Foo')).toBe(true);
+      expect(testScene.getObjects().hasObjectNamed('Foo2')).toBe(true);
+      expect(testScene.getObjects().hasObjectNamed('MyTextObject')).toBe(false);
     });
   });
 
@@ -1573,6 +1665,61 @@ describe('editorFunctions', () => {
           'Created 1 new instance of object "Player" using point brush at 10, 20, 30 on layer "base" (size 8x16x24, rotation (15°, 30°, 45°)).'
         )
       );
+    });
+  });
+
+  describe('change_scene_properties_layers_effects_groups (echo new values)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('echoes the new values for background color and game resolution', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_properties: [
+              { property_name: 'backgroundColor', new_value: '#ff0080' },
+              { property_name: 'gameResolutionWidth', new_value: '1920' },
+              { property_name: 'gameResolutionHeight', new_value: '1080' },
+              { property_name: 'stopSoundsOnStartup', new_value: 'true' },
+              { property_name: 'gameOrientation', new_value: 'landscape' },
+              { property_name: 'gameScaleMode', new_value: 'nearest' },
+              { property_name: 'gameName', new_value: 'My Game' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Set scene background color to #ff0080.
+        Set game resolution width to 1920.
+        Set game resolution height to 1080.
+        Set stopSoundsOnStartup to true.
+        Set game orientation to landscape.
+        Set game scale mode to nearest.
+        Set game name to \\"My Game\\"."
+      `);
+
+      // The properties are also actually applied to the project.
+      expect(project.getGameResolutionWidth()).toBe(1920);
+      expect(project.getGameResolutionHeight()).toBe(1080);
+      expect(testScene.stopSoundsOnStartup()).toBe(true);
+      expect(project.getOrientation()).toBe('landscape');
+      expect(project.getScaleMode()).toBe('nearest');
+      expect(project.getName()).toBe('My Game');
     });
   });
 });

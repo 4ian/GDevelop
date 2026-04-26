@@ -1474,4 +1474,105 @@ describe('editorFunctions', () => {
       );
     });
   });
+
+  describe('put_2d_instances (new-instance attributes in message)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('omits the attributes parenthetical when none of size/rotation/opacity/z-order are specified', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'point',
+          brush_position: '100,200',
+          new_instances_count: 1,
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Created 1 new instance of object "Player" using point brush at 100, 200 on layer "base".'
+        )
+      );
+    });
+
+    it('includes size/rotation/opacity/z-order in the new-instance message', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'point',
+          brush_position: '50,60',
+          new_instances_count: 2,
+          instances_size: '64,64',
+          instances_rotation: 45,
+          instances_opacity: 128,
+          instances_z_order: 5,
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Created 2 new instances of object "Player" using point brush at 50, 60 on layer "base" (size 64x64, rotation 45°, opacity 128, z-order 5).'
+        )
+      );
+    });
+  });
+
+  describe('put_3d_instances (new-instance attributes in message)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('includes size and rotation in the new-instance message', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'point',
+          brush_position: '10,20,30',
+          new_instances_count: 1,
+          instances_size: '8,16,24',
+          instances_rotation: '15,30,45',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Created 1 new instance of object "Player" using point brush at 10, 20, 30 on layer "base" (size 8x16x24, rotation (15°, 30°, 45°)).'
+        )
+      );
+    });
+  });
 });

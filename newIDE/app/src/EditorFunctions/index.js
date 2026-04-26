@@ -2946,13 +2946,24 @@ const put2dInstances: EditorFunction = {
 
       // Track specific changes that were made
       if (newInstancesCount > 0) {
+        const attrs = [];
+        if (instancesSize)
+          attrs.push(`size ${instancesSize[0]}x${instancesSize[1]}`);
+        if (instancesRotation !== null)
+          attrs.push(`rotation ${instancesRotation}°`);
+        if (instancesOpacity !== null)
+          attrs.push(`opacity ${instancesOpacity}`);
+        if (instances_z_order !== null)
+          attrs.push(`z-order ${instances_z_order}`);
         changes.push(
           `Created ${newInstancesCount} new instance${
             newInstancesCount > 1 ? 's' : ''
           } of object "${object_name ||
             ''}" using ${brush_kind} brush at ${brushPosition.join(
             ', '
-          )} on layer "${layer_name || 'base'}".`
+          )} on layer "${layer_name || 'base'}"${
+            attrs.length > 0 ? ` (${attrs.join(', ')})` : ''
+          }.`
         );
       }
 
@@ -3497,13 +3508,28 @@ const put3dInstances: EditorFunction = {
 
       // Track specific changes that were made
       if (newInstancesCount > 0) {
+        const attrs = [];
+        if (instancesSizeArray && instancesSizeArray.length >= 3)
+          attrs.push(
+            `size ${instancesSizeArray[0]}x${instancesSizeArray[1]}x${
+              instancesSizeArray[2]
+            }`
+          );
+        if (instancesRotationArray && instancesRotationArray.length >= 3)
+          attrs.push(
+            `rotation (${instancesRotationArray[0]}°, ${
+              instancesRotationArray[1]
+            }°, ${instancesRotationArray[2]}°)`
+          );
         changes.push(
           `Created ${newInstancesCount} new instance${
             newInstancesCount > 1 ? 's' : ''
           } of object "${object_name ||
             ''}" using ${brush_kind} brush at ${brushPosition.join(
             ', '
-          )} on layer "${layer_name || 'base'}".`
+          )} on layer "${layer_name || 'base'}"${
+            attrs.length > 0 ? ` (${attrs.join(', ')})` : ''
+          }.`
         );
       }
 

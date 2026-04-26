@@ -9,7 +9,13 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import { highlightSearchText } from '../../Utils/HighlightSearchText';
+import {
+  highlightSearchText,
+  renderStylizedText,
+  type TextStyle,
+  mergeStylizedText,
+  getHighlightSearchTextParts,
+} from '../../Utils/HighlightSearchText';
 import { mapVector } from '../../Utils/MapFor';
 import classNames from 'classnames';
 import { instructionParameter } from '../EventsTree/ClassNames';
@@ -85,7 +91,7 @@ export const applySyntaxColoring = ({
   projectScopedContainers: gdProjectScopedContainers,
   rootType: string,
   expression: gdExpression,
-}): React.Node => {
+}): Array<TextStyle> => {
   const colorationDescriptions = gd.ExpressionSyntaxColoringHelper.getColorationDescriptionsFor(
     platform,
     projectScopedContainers,
@@ -93,40 +99,40 @@ export const applySyntaxColoring = ({
     expression.getRootNode()
   );
   let nextCharacterIndex = 0;
-  const coloredTextParts = [];
-  let partIndex = 0;
+  const coloredTextParts: Array<TextStyle> = [];
   mapVector(colorationDescriptions, colorationDescription => {
     const startPosition = colorationDescription.getStartPosition();
     if (startPosition > nextCharacterIndex) {
-      coloredTextParts.push(
-        <span key={`color-part-${partIndex}`}>
-          {text.substring(nextCharacterIndex, startPosition)}
-        </span>
-      );
-      partIndex++;
+      coloredTextParts.push({
+        startIndex: nextCharacterIndex,
+        endIndex: startPosition,
+        props: {},
+        key: `color-part--${coloredTextParts.length}`,
+      });
       nextCharacterIndex = startPosition;
     }
     const endPosition = colorationDescription.getEndPosition();
-    coloredTextParts.push(
-      <span
-        key={`color-part-${partIndex}`}
-        className={classNames({
+    coloredTextParts.push({
+      startIndex: startPosition,
+      endIndex: endPosition,
+      props: {
+        className: classNames({
           [instructionParameter]: true,
+          //$FlowFixMe[invalid-computed-prop]
           [getColorationName(colorationDescription.getColorationKind())]: true,
-        })}
-      >
-        {text.substring(nextCharacterIndex, endPosition)}
-      </span>
-    );
-    partIndex++;
+        }),
+      },
+      key: `color-part--${coloredTextParts.length}`,
+    });
     nextCharacterIndex = endPosition;
   });
   if (nextCharacterIndex < text.length) {
-    coloredTextParts.push(
-      <span key={`color-part-${partIndex}`}>
-        {text.substring(nextCharacterIndex)}
-      </span>
-    );
+    coloredTextParts.push({
+      startIndex: nextCharacterIndex,
+      endIndex: text.length,
+      props: {},
+      key: `color-part--${coloredTextParts.length}`,
+    });
   }
   return coloredTextParts;
 };
@@ -166,17 +172,19 @@ export const renderInlineDefaultField = ({
       </DeprecatedParameterValue>
     );
   }
-  return applySyntaxColoring({
-    text: value,
-    expression,
-    rootType: parameterMetadata.getValueTypeMetadata().getName(),
-    platform: scope.project.getCurrentPlatform(),
-    projectScopedContainers: projectScopedContainersAccessor.get(),
-  });
-
-  // TODO Merge coloration and search highlighting.
-
-  // return highlightSearchText(value, highlightedSearchText, {
-  //   matchCase: highlightedSearchMatchCase,
-  // });
+  return renderStylizedText(
+    value,
+    mergeStylizedText(
+      getHighlightSearchTextParts(value, highlightedSearchText, {
+        matchCase: highlightedSearchMatchCase,
+      }),
+      applySyntaxColoring({
+        text: value,
+        expression,
+        rootType: parameterMetadata.getValueTypeMetadata().getName(),
+        platform: scope.project.getCurrentPlatform(),
+        projectScopedContainers: projectScopedContainersAccessor.get(),
+      })
+    )
+  );
 };

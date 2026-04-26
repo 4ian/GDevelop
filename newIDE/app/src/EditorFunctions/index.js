@@ -342,32 +342,36 @@ const makeMultipleChangesOutput = (
   if (changes.length === 0 && warnings.length === 0) {
     return {
       success: false,
-      message: 'No changes were made.',
+      message: 'No changes.',
     };
   } else if (changes.length === 0 && warnings.length > 0) {
     return {
       success: false,
-      message: [
-        'No changes were made because of these issues:',
-        ...warnings,
-      ].join('\n'),
+      message: ['No changes. Issues:', ...warnings].join('\n'),
     };
   } else if (changes.length > 0 && warnings.length === 0) {
     return {
       success: true,
-      message: ['Successfully done the changes.', ...changes].join('\n'),
+      message: ['Done.', ...changes].join('\n'),
     };
   }
 
   return {
     success: true,
     message: [
-      'Successfully done some changes but some issues were found - see the warnings.',
+      'Done with warnings.',
       ...changes,
       'Warnings:',
       ...warnings,
     ].join('\n'),
   };
+};
+
+const TRUNCATION_LIMIT = 200;
+const truncateValue = (value: string, limit: number = TRUNCATION_LIMIT) => {
+  if (value.length <= limit) return value;
+  return `${value.slice(0, limit)}[...truncated - ${value.length -
+    limit} more characters]`;
 };
 
 const shouldHideProperty = (property: gdPropertyDescriptor): boolean => {
@@ -461,11 +465,6 @@ export const getPropertyValue = ({
   return foundProperty.getValue();
 };
 
-const capitalizeFirstLetter = (str: string) => {
-  if (!str) return str;
-  return str[0].toUpperCase() + str.slice(1);
-};
-
 const verifyPropertyChange = ({
   propertyNameWithLocation,
   newProperties,
@@ -489,7 +488,7 @@ const verifyPropertyChange = ({
     return {
       propertyWarnings: [],
       propertyChanges: [
-        `Changed property "${propertyName}" but it was then not found in the new properties - double check if necessary the value of all properties.`,
+        `Set ${propertyNameWithLocation} but property not found afterwards - double-check the values.`,
       ],
     };
   }
@@ -509,9 +508,7 @@ const verifyPropertyChange = ({
         : requestedNewValue;
     if (requestedNewValueAsBooleanString !== actualNewValue) {
       propertyWarnings.push(
-        capitalizeFirstLetter(
-          `${propertyNameWithLocation} was changed - but the new value (${actualNewValue}) is different from the requested value (${requestedNewValueAsBooleanString}).`
-        )
+        `${propertyNameWithLocation}: actual "${actualNewValue}" ≠ requested "${requestedNewValueAsBooleanString}".`
       );
     }
   } else {
@@ -523,23 +520,19 @@ const verifyPropertyChange = ({
         const sizeLikeRegex = /^\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)\s*([,;xX*×])\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(?:\2\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)\s*)?$/;
         if (sizeLikeRegex.test(requestedNewValue)) {
           propertyWarnings.push(
-            capitalizeFirstLetter(
-              `${propertyNameWithLocation} was changed to ${actualNewValue} - but the original requested value (${requestedNewValue}) looks like a size with multiple dimensions. This is not supported, only a number is allowed here.`
-            )
+            `${propertyNameWithLocation} = "${actualNewValue}", but requested "${requestedNewValue}" looks multi-dimensional; only a single number is allowed.`
           );
         }
       } else {
         propertyWarnings.push(
-          capitalizeFirstLetter(
-            `${propertyNameWithLocation} was changed - but the new value (${actualNewValue}) is different from the requested value (${requestedNewValue}).`
-          )
+          `${propertyNameWithLocation}: actual "${actualNewValue}" ≠ requested "${requestedNewValue}".`
         );
       }
     }
   }
 
   propertyChanges.push(
-    `Changed ${propertyNameWithLocation} to "${actualNewValue}".`
+    `Set ${propertyNameWithLocation} = "${actualNewValue}".`
   );
 
   return {
@@ -548,40 +541,113 @@ const verifyPropertyChange = ({
   };
 };
 
-const makeShortTextForNamedProperty = (
-  name: string,
-  property: gdPropertyDescriptor
-): string => {
-  const type = property.getType();
-  const measurementUnit = property.getMeasurementUnit();
-  const measurementUnitText = measurementUnit.isUndefined()
-    ? null
-    : measurementUnit.getName();
-  const value = property.getValue();
+// Compact unit string: prefer the short symbol (e.g. "px", "deg") if it's
+// shorter than the full unit name (e.g. "Pixel", "DegreeAngle"). Returns null
+// if the property has no unit.
+const getShortMeasurementUnit = (
+  measurementUnit: gdMeasurementUnit
+): string | null => {
+  if (measurementUnit.isUndefined()) return null;
+  const name = measurementUnit.getName();
+  let shortLabel = '';
+  try {
+    const elementsCount = measurementUnit.getElementsCount();
+    for (let i = 0; i < elementsCount; i++) {
+      const baseUnit = measurementUnit.getElementBaseUnit(i);
+      const power = measurementUnit.getElementPower(i);
+      const symbol = baseUnit.getSymbol();
+      if (!symbol) continue;
+      shortLabel +=
+        (shortLabel ? '·' : '') +
+        symbol +
+        (power === 1 ? '' : `^${power}`);
+    }
+  } catch (_) {
+    // Defensive: if anything goes wrong, fall back to the name.
+    return name;
+  }
+  if (!shortLabel) return name;
+  return shortLabel.length < name.length ? shortLabel : name;
+};
 
-  if (type.toLowerCase() === 'number') {
-    return `${name}: ${value} ${
-      measurementUnitText ? `(${measurementUnitText})` : ''
-    }`;
+const getPropertyChoices = (
+  property: gdPropertyDescriptor
+): Array<string> | null => {
+  if (property.getType().toLowerCase() !== 'choice') return null;
+  return [
+    ...mapVector(property.getChoices(), choice => choice.getValue()),
+    // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
+    ...property.getExtraInfo().toJSArray(),
+  ];
+};
+
+// Builds a compact textual listing of properties optimized for LLM consumption:
+// - Boolean values omit the type tag (the value already implies it).
+// - Empty-valued properties are grouped at the end ("Empty: a, b (resource), c (string)").
+// - Number units use a short symbol ("px") when shorter than the full name ("Pixel").
+const formatPropertiesList = (
+  properties: gdMapStringPropertyDescriptor
+): string => {
+  const propertyNames = properties.keys().toJSArray();
+
+  const nonEmptyParts: Array<string> = [];
+  const emptyByType: Map<string, Array<string>> = new Map();
+
+  for (const name of propertyNames) {
+    const property = properties.get(name);
+    if (shouldHideProperty(property)) continue;
+
+    const rawType = property.getType();
+    const type = rawType.toLowerCase();
+    const value = property.getValue();
+    const unit = getShortMeasurementUnit(property.getMeasurementUnit());
+    const choices = getPropertyChoices(property);
+
+    // Booleans are always "true"/"false" - never grouped as empty.
+    if (type === 'boolean') {
+      nonEmptyParts.push(`${name}: ${value || 'false'}`);
+      continue;
+    }
+
+    if (value === '' || value === null || value === undefined) {
+      // Group empty properties by their descriptor (type + optional unit/choices).
+      const choicesText = choices
+        ? `one of: [${choices.map(c => `"${c}"`).join(', ')}]`
+        : null;
+      const tag = [type, choicesText, unit].filter(Boolean).join(', ');
+      const list = emptyByType.get(tag) || [];
+      list.push(name);
+      emptyByType.set(tag, list);
+      continue;
+    }
+
+    if (type === 'number') {
+      nonEmptyParts.push(unit ? `${name}: ${value} (${unit})` : `${name}: ${value}`);
+      continue;
+    }
+
+    const information = [
+      type,
+      choices ? `one of: [${choices.map(c => `"${c}"`).join(', ')}]` : null,
+      unit,
+    ]
+      .filter(Boolean)
+      .join(', ');
+    nonEmptyParts.push(
+      information ? `${name}: ${value} (${information})` : `${name}: ${value}`
+    );
   }
 
-  const choices =
-    type.toLowerCase() === 'choice'
-      ? [
-          ...mapVector(property.getChoices(), choice => choice.getValue()),
-          // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
-          ...property.getExtraInfo().toJSArray(),
-        ]
-      : null;
-  const information = [
-    type,
-    choices
-      ? `one of: [${choices.map(choice => `"${choice}"`).join(', ')}]`
-      : null,
-    measurementUnitText,
-  ].filter(Boolean);
+  const emptyParts: Array<string> = [];
+  for (const [tag, names] of emptyByType.entries()) {
+    emptyParts.push(tag ? `${names.join(', ')} (${tag})` : names.join(', '));
+  }
 
-  return `${name}: ${value} (${information.join(', ')})`;
+  const segments = [];
+  if (nonEmptyParts.length > 0) segments.push(nonEmptyParts.join(', '));
+  if (emptyParts.length > 0) segments.push(`Empty: ${emptyParts.join(', ')}`);
+
+  return segments.join('. ');
 };
 
 const listLabelAndValuesFromChangedProperties = (
@@ -737,24 +803,8 @@ const createOrReplaceObject: EditorFunction = {
     const globalObjects = project.getObjects();
 
     const getPropertiesText = (object: gdObject): string => {
-      const objectConfiguration = object.getConfiguration();
-      const properties = objectConfiguration.getProperties();
-      const propertyShortTexts = properties
-        .keys()
-        .toJSArray()
-        .map(
-          (name: string): string | null => {
-            const propertyDescriptor = properties.get(name);
-            if (shouldHideProperty(propertyDescriptor)) return null;
-
-            return makeShortTextForNamedProperty(name, propertyDescriptor);
-          }
-        )
-        .filter(Boolean);
-
-      return `It has the following properties: ${propertyShortTexts.join(
-        ', '
-      )}.`;
+      const properties = object.getConfiguration().getProperties();
+      return `Properties: ${formatPropertiesList(properties)}.`;
     };
 
     // Check if target object already exists.
@@ -790,9 +840,9 @@ const createOrReplaceObject: EditorFunction = {
       existingTargetObjectType !== object_type
     ) {
       return makeGenericFailure(
-        `Object with name "${targetObjectName}" already exists ${
+        `Object "${targetObjectName}" already exists ${
           isTargetObjectGlobal ? 'globally' : `in scene "${scene_name}"`
-        } with type "${existingTargetObjectType}". It cannot be (re)created or replaced as type "${object_type}".`
+        } with type "${existingTargetObjectType}". Cannot (re)create as type "${object_type}".`
       );
     }
     const candidateType = object_type || existingTargetObjectType || null;
@@ -807,7 +857,7 @@ const createOrReplaceObject: EditorFunction = {
           isNewObjectTypeUsed: false, // No object was actually added.
         });
         return makeGenericSuccess(
-          `Object with name "${targetObjectName}" already exists, no need to re-create it.`
+          `Object "${targetObjectName}" already exists.`
         );
       }
 
@@ -820,7 +870,7 @@ const createOrReplaceObject: EditorFunction = {
       } else {
         if (!search_terms && !asset_id) {
           return makeGenericFailure(
-            `No search_terms or asset_id were provided to create the object "${targetObjectName}". This object was not created.`
+            `No search_terms or asset_id provided for "${targetObjectName}". Not created.`
           );
         }
 
@@ -846,7 +896,7 @@ const createOrReplaceObject: EditorFunction = {
 
           if (status === 'error') {
             return makeGenericFailure(
-              `Unable to search and install object (${message}).`
+              `Unable to search/install object (${message}).`
             );
           } else if (status === 'asset-installed') {
             // Update behaviors shared data for the scene where the object was created.
@@ -869,7 +919,7 @@ const createOrReplaceObject: EditorFunction = {
               const result: EditorFunctionGenericOutput = {
                 success: true,
                 message: [
-                  `Created (from the asset store) object "${object.getName()}" of type "${object.getType()}" in scene "${scene_name}".`,
+                  `Created object "${object.getName()}" (type "${object.getType()}", scene "${scene_name}") from asset store.`,
                   getPropertiesText(object),
                 ].join(' '),
                 objectSizeInfo: {
@@ -885,17 +935,17 @@ const createOrReplaceObject: EditorFunction = {
             }
 
             return makeGenericSuccess(
-              `Created (from the asset store) ${createdObjects
+              `Created from asset store in scene "${scene_name}": ${createdObjects
                 .map(
                   object =>
-                    `object "${object.getName()}" of type "${object.getType()}"`
+                    `"${object.getName()}" (type "${object.getType()}")`
                 )
-                .join(', ')} in scene "${scene_name}".`
+                .join(', ')}.`
             );
           } else {
             if (asset_id) {
               return makeGenericFailure(
-                `No asset found with id "${asset_id}". The object was not created.`
+                `No asset found with id "${asset_id}". Object not created.`
               );
             }
 
@@ -903,7 +953,7 @@ const createOrReplaceObject: EditorFunction = {
           }
         } catch (error) {
           return makeGenericFailure(
-            `An unexpected error happened while search and installing objects (${
+            `Unexpected error while searching/installing object (${
               error.message
             }).`
           );
@@ -913,7 +963,7 @@ const createOrReplaceObject: EditorFunction = {
       // Create an object from scratch: this requires a known object type.
       if (!candidateType) {
         return makeGenericFailure(
-          `Could not install an object for "${targetObjectName}" from the asset store, and no "object_type" was provided to create one from scratch.`
+          `Could not install asset for "${targetObjectName}", and no "object_type" provided to create from scratch.`
         );
       }
       // Ensure the extension for this object type is installed.
@@ -931,7 +981,7 @@ const createOrReplaceObject: EditorFunction = {
             error
           );
           return makeGenericFailure(
-            `Could not install extension "${extensionName}" - should you consider trying with another object type?`
+            `Could not install extension "${extensionName}" - try a different object type?`
           );
         }
       }
@@ -943,7 +993,7 @@ const createOrReplaceObject: EditorFunction = {
       );
       if (gd.MetadataProvider.isBadObjectMetadata(objectMetadata)) {
         return makeGenericFailure(
-          `Type "${candidateType}" does not exist for objects.`
+          `Object type "${candidateType}" does not exist.`
         );
       }
 
@@ -967,7 +1017,7 @@ const createOrReplaceObject: EditorFunction = {
       const scratchResult: EditorFunctionGenericOutput = {
         success: true,
         message: [
-          `Created a new object (from scratch) called "${targetObjectName}" of type "${candidateType}" in scene "${scene_name}".`,
+          `Created object "${targetObjectName}" (type "${candidateType}", scene "${scene_name}") from scratch.`,
           getPropertiesText(object),
         ].join(' '),
       };
@@ -997,7 +1047,7 @@ const createOrReplaceObject: EditorFunction = {
         !asset_id
       ) {
         return makeGenericFailure(
-          `No search terms, description or information were provided to replace the object "${existingTargetObject.getName()}". This object was not changed/replaced.`
+          `No search_terms/description/asset_id provided for "${existingTargetObject.getName()}". Not replaced.`
         );
       }
 
@@ -1035,7 +1085,7 @@ const createOrReplaceObject: EditorFunction = {
         if (status === 'error') {
           // TODO
           return makeGenericFailure(
-            `Unable to search and install object (${message}).`
+            `Unable to search/install object (${message}).`
           );
         } else if (
           status === 'asset-installed' &&
@@ -1061,21 +1111,21 @@ const createOrReplaceObject: EditorFunction = {
             isNewObjectTypeUsed: false, // The object type was not changed.
           });
           return makeGenericSuccess(
-            `Replaced object "${existingTargetObject.getName()}" by an object from the asset store fitting the search, with the same type ("${existingTargetObject.getType()}").`
+            `Replaced "${existingTargetObject.getName()}" with asset store object (same type "${existingTargetObject.getType()}").`
           );
         } else {
           // No asset found.
         }
       } catch (error) {
         return makeGenericFailure(
-          `An unexpected error happened while search and installing objects (${
+          `Unexpected error while searching/installing object (${
             error.message
           }).`
         );
       }
 
       return makeGenericFailure(
-        `Could not find an object in the asset store to replace "${targetObjectName}" in scene "${scene_name}". Instead, inspect properties of the object and modify it until it matches what you want it to be.`
+        `No asset store match for "${targetObjectName}" in scene "${scene_name}". Instead, inspect and modify the object's properties to match what you need.`
       );
     };
 
@@ -1088,7 +1138,7 @@ const createOrReplaceObject: EditorFunction = {
         !project.hasLayoutNamed(duplicatedObjectSceneName)
       ) {
         return makeGenericFailure(
-          `Scene not found: "${duplicatedObjectSceneName}". Nothing was duplicated.`
+          `Scene not found: "${duplicatedObjectSceneName}". Not duplicated.`
         );
       }
 
@@ -1110,7 +1160,7 @@ const createOrReplaceObject: EditorFunction = {
 
       if (!duplicatedObject) {
         return makeGenericFailure(
-          `Object not found: "${duplicatedObjectName}" in scene "${duplicatedObjectScene.getName()}" or as a global object. Nothing was duplicated.`
+          `Object "${duplicatedObjectName}" not found in scene "${duplicatedObjectScene.getName()}" nor globally. Not duplicated.`
         );
       }
 
@@ -1148,14 +1198,14 @@ const createOrReplaceObject: EditorFunction = {
       });
 
       const fromText = isDuplicatedObjectGlobal
-        ? 'the global objects'
+        ? 'global objects'
         : `scene "${duplicatedObjectScene.getName()}"`;
       const toText =
         target_object_scope === 'global'
-          ? 'the global objects'
+          ? 'global objects'
           : `scene "${scene_name}"`;
       return makeGenericSuccess(
-        `Duplicated object "${duplicatedObjectName}" (from ${fromText}) as "${newObject.getName()}" (to ${toText}). The new object "${newObject.getName()}" has the same type, behaviors, properties and effects as the one it was duplicated from.`
+        `Duplicated "${duplicatedObjectName}" (${fromText}) as "${newObject.getName()}" (${toText}); same type/behaviors/properties/effects.`
       );
     };
 
@@ -1174,7 +1224,7 @@ const createOrReplaceObject: EditorFunction = {
       if (target_object_scope === 'global' && !isTargetObjectGlobal) {
         if (globalObjects.hasObjectNamed(existingTargetObject.getName())) {
           return makeGenericFailure(
-            `Object "${existingTargetObject.getName()}" already exists in the global objects. Nothing was changed.`
+            `Object "${existingTargetObject.getName()}" already exists globally. No change.`
           );
         }
 
@@ -1195,16 +1245,16 @@ const createOrReplaceObject: EditorFunction = {
         });
 
         return makeGenericSuccess(
-          `Moved object "${existingTargetObject.getName()}" to the global objects. Its type, behaviors, properties and effects are unchanged.`
+          `Moved "${existingTargetObject.getName()}" to global objects; type/behaviors/properties/effects unchanged.`
         );
       } else if (target_object_scope === 'scene' && isTargetObjectGlobal) {
         return makeGenericFailure(
-          `Object "${existingTargetObject.getName()}" is a global object. Global objects can't be moved, so it cannot be moved to the scene "${scene_name}".`
+          `"${existingTargetObject.getName()}" is global; global objects cannot be moved to scene "${scene_name}".`
         );
       }
 
       return makeGenericFailure(
-        `Unrecognized move requested - the object "${existingTargetObject.getName()}" was not changed and nothing was done.`
+        `Unrecognized move for "${existingTargetObject.getName()}". No change.`
       );
     };
 
@@ -1275,7 +1325,7 @@ const inspectObjectProperties: EditorFunction = {
 
     if (!object) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}", nor in the global objects.`
+        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
       );
     }
 
@@ -1496,7 +1546,7 @@ const changeObjectProperty: EditorFunction = {
 
     if (!object) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}", nor in the global objects.`
+        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
       );
     }
 
@@ -1516,9 +1566,9 @@ const changeObjectProperty: EditorFunction = {
       );
       if (propertyName === null || newValue === null) {
         warnings.push(
-          `Missing "property_name" or "new_value" in an item of \`changed_properties\`: ${JSON.stringify(
+          `Missing "property_name" or "new_value" in changed_properties item: ${JSON.stringify(
             changed_property
-          )}. It was ignored and not changed.`
+          )}. Skipped.`
         );
         return;
       }
@@ -1527,7 +1577,7 @@ const changeObjectProperty: EditorFunction = {
       if (isPropertyForChangingObjectName(propertyName)) {
         if (object.getName() === newValue) {
           changes.push(
-            `Object "${object_name}" already has the name "${newValue}", no need to rename it. Continue assuming this name is correct and valid.`
+            `Object "${object_name}" already named "${newValue}".`
           );
           return;
         }
@@ -1567,7 +1617,7 @@ const changeObjectProperty: EditorFunction = {
         object.setName(newName);
 
         changes.push(
-          `Renamed object "${object_name}" to "${newName}". Events and everything else refering to this object having been also updated. Continue assuming the object has now the name "${newName}" and the whole project has been updated for it.`
+          `Renamed object "${object_name}" to "${newName}" (events and references updated).`
         );
         return;
       }
@@ -1583,7 +1633,7 @@ const changeObjectProperty: EditorFunction = {
 
       if (!foundPropertyName || !foundProperty) {
         warnings.push(
-          `Property not found: ${propertyName} on object ${object_name}.`
+          `Property "${propertyName}" not found on object "${object_name}".`
         );
         return;
       }
@@ -1596,7 +1646,7 @@ const changeObjectProperty: EditorFunction = {
       if (foundProperty.getType() === 'resource') {
         if (!project.getResourcesManager().hasResource(sanitizedNewValue)) {
           warnings.push(
-            `Could not change property "${foundPropertyName}" of object "${object_name}" to "${newValue}" because the resource "${sanitizedNewValue}" does not exist in the project. New resources can't be added just by setting a new name that does not exist. Instead, use \`create_or_replace_object\` to replace the assets of an existing object by new one(s) that will be searched and imported from the asset store (this will keep the object properties, behaviors, events, etc. unchanged).`
+            `"${foundPropertyName}" on "${object_name}" -> "${newValue}": resource "${sanitizedNewValue}" does not exist. New resources cannot be added just by name; use \`create_or_replace_object\` to import assets from the asset store (preserving properties/behaviors/events).`
           );
           return;
         }
@@ -1612,7 +1662,7 @@ const changeObjectProperty: EditorFunction = {
           resource.getKind().toLowerCase() !== expectedResourceKind
         ) {
           warnings.push(
-            `Could not change property "${foundPropertyName}" of object "${object_name}" to "${newValue}" because the resource "${sanitizedNewValue}" exists in project but has type "${resource.getKind()}", which is not the expected type "${expectedResourceKind}".`
+            `"${foundPropertyName}" on "${object_name}" -> "${newValue}": resource "${sanitizedNewValue}" has kind "${resource.getKind()}" but expected "${expectedResourceKind}".`
           );
           return;
         }
@@ -1625,13 +1675,13 @@ const changeObjectProperty: EditorFunction = {
         )
       ) {
         warnings.push(
-          `Could not change property "${foundPropertyName}" of object "${object_name}". The value might be invalid, of the wrong type or not allowed.`
+          `Could not set "${foundPropertyName}" on "${object_name}": invalid value or type.`
         );
         return;
       }
 
       const { propertyWarnings, propertyChanges } = verifyPropertyChange({
-        propertyNameWithLocation: `property "${foundPropertyName}" of object "${object_name}"`,
+        propertyNameWithLocation: `"${foundPropertyName}" on "${object_name}"`,
         newProperties: objectConfiguration.getProperties(),
         propertyName: foundPropertyName,
         requestedNewValue: sanitizedNewValue,
@@ -1737,7 +1787,7 @@ const addBehavior: EditorFunction = {
 
     if (!object) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}", nor in the global objects.`
+        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
       );
     }
 
@@ -1756,7 +1806,7 @@ const addBehavior: EditorFunction = {
           error
         );
         return makeGenericFailure(
-          `Could not install extension "${extensionName}" - should you consider trying with another behavior type?`
+          `Could not install extension "${extensionName}" - try a different behavior type?`
         );
       }
     }
@@ -1767,7 +1817,7 @@ const addBehavior: EditorFunction = {
     );
     if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
       return makeGenericFailure(
-        `Type "${behavior_type}" does not exist for behaviors.`
+        `Behavior type "${behavior_type}" does not exist.`
       );
     }
 
@@ -1781,12 +1831,12 @@ const addBehavior: EditorFunction = {
       const behavior = object.getBehavior(behaviorName);
       if (behavior.getTypeName() !== behavior_type) {
         return makeGenericFailure(
-          `Behavior with name "${behaviorName}" already exists on object "${object_name}" but with a different type ("${behavior_type}").`
+          `Behavior "${behaviorName}" already on "${object_name}" with different type ("${behavior_type}").`
         );
       }
 
       return makeGenericSuccess(
-        `Behavior with name "${behaviorName}" already exists on object "${object_name}", no need to re-create it.`
+        `Behavior "${behaviorName}" already on "${object_name}".`
       );
     }
 
@@ -1801,12 +1851,12 @@ const addBehavior: EditorFunction = {
         });
       if (alreadyHasDefaultCapability) {
         return makeGenericSuccess(
-          `Behavior "${behaviorName}" of type "${behavior_type}" is a default capability and is already available on object "${object_name}". There is no need to add it (and it can't be removed).`
+          `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability already on "${object_name}".`
         );
       }
 
       return makeGenericFailure(
-        `Behavior "${behaviorName}" of type "${behavior_type}" is a default capability and cannot be added to object "${object_name}".`
+        `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability; cannot be added to "${object_name}".`
       );
     }
 
@@ -1815,7 +1865,7 @@ const addBehavior: EditorFunction = {
       behaviorMetadata.getObjectType() !== object.getType()
     ) {
       return makeGenericFailure(
-        `Behavior "${behaviorName}" of type "${behavior_type}" cannot be added to object "${object_name}" because the object is not of type "${behaviorMetadata.getObjectType()}".`
+        `Behavior "${behaviorName}" (type "${behavior_type}") requires object type "${behaviorMetadata.getObjectType()}"; "${object_name}" is not.`
       );
     }
 
@@ -1828,34 +1878,19 @@ const addBehavior: EditorFunction = {
     );
     if (!object.hasBehaviorNamed(behaviorName)) {
       return makeGenericFailure(
-        `Unexpected error: behavior "${behaviorName}" was not added to object "${object_name}" despite a valid type and name.`
+        `Unexpected error: behavior "${behaviorName}" not added to "${object_name}".`
       );
     }
     layout.updateBehaviorsSharedData(project);
 
     const behavior = object.getBehavior(behaviorName);
-
-    const behaviorProperties = behavior.getProperties();
-    const propertyShortTexts = behaviorProperties
-      .keys()
-      .toJSArray()
-      .map(
-        (name: string): string | null => {
-          const propertyDescriptor = behaviorProperties.get(name);
-          if (shouldHideProperty(propertyDescriptor)) return null;
-
-          return makeShortTextForNamedProperty(name, propertyDescriptor);
-        }
-      )
-      .filter(Boolean);
-
-    const propertiesText = `It has the following properties: ${propertyShortTexts.join(
-      ', '
+    const propertiesText = `Properties: ${formatPropertiesList(
+      behavior.getProperties()
     )}.`;
 
     return makeGenericSuccess(
       [
-        `Added behavior called "${behaviorName}" with type "${behavior_type}" to object "${object_name}".`,
+        `Added behavior "${behaviorName}" (type "${behavior_type}") to "${object_name}".`,
         propertiesText,
       ].join(' ')
     );
@@ -1904,13 +1939,13 @@ const removeBehavior: EditorFunction = {
 
     if (!object) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}", nor in the global objects.`
+        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
       );
     }
 
     if (!object.hasBehaviorNamed(behavior_name)) {
       return makeGenericFailure(
-        `Behavior not found: "${behavior_name}" on object "${object_name}". So it was not removed.`
+        `Behavior "${behavior_name}" not on "${object_name}". Not removed.`
       );
     }
 
@@ -1929,10 +1964,10 @@ const removeBehavior: EditorFunction = {
 
     return makeGenericSuccess(
       dependentBehaviors.length > 0
-        ? `Removed behavior "${behavior_name}" from object "${object_name}". Dependent behaviors were also removed as they were based on this behavior: ${dependentBehaviors.join(
+        ? `Removed behavior "${behavior_name}" from "${object_name}" (also removed dependents: ${dependentBehaviors.join(
             ', '
-          )}.`
-        : `Removed behavior "${behavior_name}" from object "${object_name}".`
+          )}).`
+        : `Removed behavior "${behavior_name}" from "${object_name}".`
     );
   },
   modifiesProject: true,
@@ -1979,13 +2014,13 @@ const inspectBehaviorProperties: EditorFunction = {
 
     if (!object) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}", nor in the global objects.`
+        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
       );
     }
 
     if (!object.hasBehaviorNamed(behavior_name)) {
       return makeGenericFailure(
-        `Behavior not found: "${behavior_name}" on object "${object_name}".`
+        `Behavior "${behavior_name}" not on "${object_name}".`
       );
     }
 
@@ -2211,13 +2246,13 @@ const changeBehaviorProperty: EditorFunction = {
 
     if (!object) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}", nor in the global objects.`
+        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
       );
     }
 
     if (!object.hasBehaviorNamed(behavior_name)) {
       return makeGenericFailure(
-        `Behavior not found: "${behavior_name}" on object "${object_name}".`
+        `Behavior "${behavior_name}" not on "${object_name}".`
       );
     }
 
@@ -2250,9 +2285,9 @@ const changeBehaviorProperty: EditorFunction = {
       );
       if (propertyName === null || newValue === null) {
         warnings.push(
-          `Missing "property_name" or "new_value" in an item of \`changed_properties\`: ${JSON.stringify(
+          `Missing "property_name" or "new_value" in changed_properties item: ${JSON.stringify(
             changed_property
-          )}. It was ignored and not changed.`
+          )}. Skipped.`
         );
         return;
       }
@@ -2275,13 +2310,13 @@ const changeBehaviorProperty: EditorFunction = {
         );
         if (!behavior.updateProperty(foundPropertyName, sanitizedNewValue)) {
           warnings.push(
-            `Could not change property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+            `Could not set "${foundPropertyName}" on behavior "${behavior_name}": invalid value or type.`
           );
           return;
         }
 
         const { propertyWarnings, propertyChanges } = verifyPropertyChange({
-          propertyNameWithLocation: `property "${foundPropertyName}" of behavior "${behavior_name}"`,
+          propertyNameWithLocation: `"${foundPropertyName}" on behavior "${behavior_name}"`,
           newProperties: behavior.getProperties(),
           propertyName: foundPropertyName,
           requestedNewValue: sanitizedNewValue,
@@ -2308,13 +2343,13 @@ const changeBehaviorProperty: EditorFunction = {
           )
         ) {
           warnings.push(
-            `Could not change shared property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+            `Could not set shared "${foundPropertyName}" on behavior "${behavior_name}": invalid value or type.`
           );
           return;
         }
 
         const { propertyWarnings, propertyChanges } = verifyPropertyChange({
-          propertyNameWithLocation: `property "${foundPropertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior)`,
+          propertyNameWithLocation: `"${foundPropertyName}" on shared behavior "${behavior_name}"`,
           newProperties: behavior.getProperties(),
           propertyName: foundPropertyName,
           requestedNewValue: sanitizedNewValue,
@@ -2324,7 +2359,7 @@ const changeBehaviorProperty: EditorFunction = {
         changes.push(...propertyChanges);
       } else {
         warnings.push(
-          `Property "${propertyName}" not found on behavior "${behavior_name}" of object "${object_name}".`
+          `Property "${propertyName}" not on behavior "${behavior_name}" of "${object_name}".`
         );
       }
     });
@@ -2709,10 +2744,9 @@ const put2dInstances: EditorFunction = {
             instancesToDelete.size > 1 ? 's' : ''
           }.`,
           notFoundExistingInstanceIds.size > 0
-            ? `Could not find these instances to erase:
-        ${Array.from(notFoundExistingInstanceIds).join(
-          ', '
-        )}. Verify the ids and layer names are ALWAYS exact and correct.`
+            ? `Instance ids not found: ${Array.from(
+                notFoundExistingInstanceIds
+              ).join(', ')}. Verify ids and layer names.`
             : '',
         ]
           .filter(Boolean)
@@ -2752,7 +2786,7 @@ const put2dInstances: EditorFunction = {
 
       if (newInstancesCount > 0 && !object_name) {
         changes.push(
-          `You've specified to create ${newInstancesCount} instances, but you didn't specify the object name. Please specify the object name.`
+          `Specified ${newInstancesCount} instances but no object_name. Specify object_name.`
         );
       }
 
@@ -2762,7 +2796,7 @@ const put2dInstances: EditorFunction = {
         !project.getObjects().hasObjectNamed(object_name)
       ) {
         return makeGenericFailure(
-          `Object not found: "${object_name}" in scene "${scene_name}". Please only specify the object name of an object existing in the scene (or create if before if necessary).`
+          `Object "${object_name}" not in scene "${scene_name}". Use only existing objects (create them first if needed).`
         );
       }
 
@@ -3017,16 +3051,15 @@ const put2dInstances: EditorFunction = {
 
       if (notFoundExistingInstanceIds.size > 0) {
         changes.push(
-          `Could not find these existing instance ids to modify:
-          ${Array.from(notFoundExistingInstanceIds).join(
-            ', '
-          )}. Verify the ids and layer names are ALWAYS exact and correct.`
+          `Instance ids not found: ${Array.from(
+            notFoundExistingInstanceIds
+          ).join(', ')}. Verify ids and layer names.`
         );
       }
 
       if (changes.length === 0) {
         return makeGenericSuccess(
-          'No changes were made to instances. Please specify a brush kind, position and number of instances to create, or specify the exact ids of the instances to manipulate.'
+          'No instance changes. Specify brush kind/position/count, or exact instance ids to manipulate.'
         );
       }
 
@@ -3281,10 +3314,9 @@ const put3dInstances: EditorFunction = {
             instancesToDelete.size > 1 ? 's' : ''
           }.`,
           notFoundExistingInstanceIds.size > 0
-            ? `Could not find these instances to erase:
-        ${Array.from(notFoundExistingInstanceIds).join(
-          ', '
-        )}. Verify the ids and layer names are ALWAYS exact and correct.`
+            ? `Instance ids not found: ${Array.from(
+                notFoundExistingInstanceIds
+              ).join(', ')}. Verify ids and layer names.`
             : '',
         ]
           .filter(Boolean)
@@ -3317,7 +3349,7 @@ const put3dInstances: EditorFunction = {
 
       if (newInstancesCount > 0 && !object_name) {
         changes.push(
-          `You've specified to create ${newInstancesCount} instances, but you didn't specify the object name. Please specify the object name.`
+          `Specified ${newInstancesCount} instances but no object_name. Specify object_name.`
         );
       }
 
@@ -3327,7 +3359,7 @@ const put3dInstances: EditorFunction = {
         !project.getObjects().hasObjectNamed(object_name)
       ) {
         return makeGenericFailure(
-          `Object not found: "${object_name}" in scene "${scene_name}". Please only specify the object name of an object existing in the scene (or create if before if necessary).`
+          `Object "${object_name}" not in scene "${scene_name}". Use only existing objects (create them first if needed).`
         );
       }
 
@@ -3546,15 +3578,14 @@ const put3dInstances: EditorFunction = {
 
       if (notFoundExistingInstanceIds.size > 0) {
         changes.push(
-          `Could not find these existing instance ids to modify:
-          ${Array.from(notFoundExistingInstanceIds).join(
-            ', '
-          )}. Verify the ids and layer names are ALWAYS exact and correct.`
+          `Instance ids not found: ${Array.from(
+            notFoundExistingInstanceIds
+          ).join(', ')}. Verify ids and layer names.`
         );
       }
 
       if (changes.length === 0) {
-        return makeGenericSuccess('No changes were made to instances.');
+        return makeGenericSuccess('No instance changes.');
       }
 
       // /!\ Tell the editor that some instances have potentially been modified (and even removed).
@@ -3834,9 +3865,9 @@ const addSceneEvents: EditorFunction = {
 
       if (!eventsGenerationResult.generationCompleted) {
         return makeGenericFailure(
-          `Infrastructure error when launching or completing events generation (${
+          `Infrastructure error during events generation (${
             eventsGenerationResult.errorMessage
-          }). Consider trying again or a different approach.`
+          }). Try again or a different approach.`
         );
       }
 
@@ -3859,9 +3890,9 @@ const addSceneEvents: EditorFunction = {
       if (aiGeneratedEvent.error) {
         // $FlowFixMe[incompatible-type]
         return makeAiGeneratedEventFailure(
-          `Infrastructure error when generating events (${
+          `Infrastructure error generating events (${
             aiGeneratedEvent.error.message
-          }). Consider trying again or a different approach.`
+          }). Try again or a different approach.`
         );
       }
 
@@ -3869,10 +3900,10 @@ const addSceneEvents: EditorFunction = {
       if (!changes || changes.length === 0) {
         const resultMessage =
           aiGeneratedEvent.resultMessage ||
-          'No generated events found and no other information was given.';
+          'No generated events and no other info given.';
         // $FlowFixMe[incompatible-type]
         return makeAiGeneratedEventFailure(
-          `Error when generating events: ${resultMessage}\nConsider trying again or a different approach.`
+          `Error generating events: ${resultMessage}\nTry again or a different approach.`
         );
       }
 
@@ -3882,10 +3913,10 @@ const addSceneEvents: EditorFunction = {
       ) {
         const resultMessage =
           aiGeneratedEvent.resultMessage ||
-          'This probably means what you asked for is not possible or does not work like this.';
+          'Likely the request is not possible.';
         // $FlowFixMe[incompatible-type]
         return makeAiGeneratedEventFailure(
-          `Generated events are not valid: ${resultMessage}\nRead also the attached diagnostics to try to understand what went wrong and either try again differently or consider a different approach.`,
+          `Generated events invalid: ${resultMessage}\nSee diagnostics; retry differently or use a different approach.`,
           {
             generatedEventsErrorDiagnostics: changes
               .map(change => change.diagnosticLines.join('\n'))
@@ -3911,9 +3942,7 @@ const addSceneEvents: EditorFunction = {
       } catch (e) {
         // $FlowFixMe[incompatible-type]
         return makeAiGeneratedEventFailure(
-          `Error when installing extensions: ${
-            e.message
-          }. Consider trying again or a different approach.`
+          `Error installing extensions: ${e.message}. Try again or a different approach.`
         );
       }
       try {
@@ -3962,11 +3991,11 @@ const addSceneEvents: EditorFunction = {
         if (applied === 0) {
           return {
             success: false,
-            message: `Changes were properly generated, but could not be applied. Event generation output is:
+            message: `Events generated but not applied. Generation output:
 
-${aiGeneratedEvent.resultMessage || '(no generation output was given)'}].
+${aiGeneratedEvent.resultMessage || '(none)'}
 
-No changes were done on the project, see attached errors.`,
+No project changes; see errors.`,
             errors,
           };
         }
@@ -3988,13 +4017,13 @@ No changes were done on the project, see attached errors.`,
 
         const resultMessage =
           errors.length > 0
-            ? `Changes were properly generated, but some errors happened when applying some of them in the project. Generation output is:
+            ? `Events generated but some applies failed. Generation output:
 
-${aiGeneratedEvent.resultMessage || '(no generation output was given)'}].
+${aiGeneratedEvent.resultMessage || '(none)'}
 
-See attached errors that happened when some changes were applied in the project. Verify the content of events if necessary to be sure what was done.`
+See errors; verify event contents if needed.`
             : aiGeneratedEvent.resultMessage ||
-              'Properly modified or added new event(s).';
+              'Modified or added event(s).';
         return {
           success: true,
           message: resultMessage,
@@ -4011,9 +4040,7 @@ See attached errors that happened when some changes were applied in the project.
         );
         // $FlowFixMe[incompatible-type]
         return makeAiGeneratedEventFailure(
-          `An unexpected error happened in the GDevelop editor while adding generated events: ${
-            error.message
-          }. Consider a different approach.`
+          `Unexpected error adding generated events: ${error.message}. Try a different approach.`
         );
       }
     } catch (error) {
@@ -4022,9 +4049,7 @@ See attached errors that happened when some changes were applied in the project.
         error
       );
       return makeGenericFailure(
-        `An unexpected error happened in the GDevelop editor while creating generated events: ${
-          error.message
-        }. Consider a different approach.`
+        `Unexpected error creating generated events: ${error.message}. Try a different approach.`
       );
     }
   },
@@ -4076,12 +4101,12 @@ const createScene: EditorFunction = {
         scene.insertNewLayer('UI', scene.getLayersCount());
         addDefaultLightToLayer(scene.getLayer('UI'));
         return makeGenericSuccess(
-          `Scene with name "${scene_name}" already exists, no need to re-create it. A layer called "UI" was added to it.`
+          `Scene "${scene_name}" already exists; added "UI" layer.`
         );
       }
 
       return makeGenericSuccess(
-        `Scene with name "${scene_name}" already exists, no need to re-create it.`
+        `Scene "${scene_name}" already exists.`
       );
     }
 
@@ -4101,8 +4126,8 @@ const createScene: EditorFunction = {
     return {
       success: true,
       message: include_ui_layer
-        ? `Created new scene "${scene_name}" with the base layer and a layer called "UI".`
-        : `Created new scene "${scene_name}".`,
+        ? `Created scene "${scene_name}" with base layer + "UI" layer.`
+        : `Created scene "${scene_name}".`,
       meta: {
         newSceneNames: [scene_name],
       },
@@ -4131,7 +4156,7 @@ const deleteScene: EditorFunction = {
 
     if (!project.hasLayoutNamed(scene_name)) {
       return makeGenericSuccess(
-        `Scene is already non existent or deleted: "${scene_name}". No need to delete it.`
+        `Scene "${scene_name}" already absent.`
       );
     }
 
@@ -4397,9 +4422,9 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         );
         if (propertyName === null || newValue === null) {
           warnings.push(
-            `Missing "property_name" or "new_value" in an item of \`changed_properties\`: ${JSON.stringify(
+            `Missing "property_name" or "new_value" in changed_properties item: ${JSON.stringify(
               changed_property
-            )}. It was ignored and not changed.`
+            )}. Skipped.`
           );
           return;
         }
@@ -4407,36 +4432,34 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         if (isFuzzyMatch(propertyName, 'backgroundColor')) {
           const colorAsRgb = hexNumberToRGBArray(rgbOrHexToHexNumber(newValue));
           scene.setBackgroundColor(colorAsRgb[0], colorAsRgb[1], colorAsRgb[2]);
-          changes.push('Modified the scene background color.');
+          changes.push('Set scene background color.');
         } else if (isFuzzyMatch(propertyName, 'gameResolutionWidth')) {
           project.setGameResolutionSize(
             parseInt(newValue),
             project.getGameResolutionHeight()
           );
-          changes.push('Modified the game resolution width.');
+          changes.push('Set game resolution width.');
         } else if (isFuzzyMatch(propertyName, 'stopSoundsOnStartup')) {
           scene.setStopSoundsOnStartup(newValue.toLowerCase() === 'true');
-          changes.push(
-            'Modified whether sounds should be stopped on scene startup.'
-          );
+          changes.push('Set stopSoundsOnStartup.');
         } else if (isFuzzyMatch(propertyName, 'gameResolutionHeight')) {
           project.setGameResolutionSize(
             project.getGameResolutionWidth(),
             parseInt(newValue)
           );
-          changes.push('Modified the game resolution height.');
+          changes.push('Set game resolution height.');
         } else if (isFuzzyMatch(propertyName, 'gameOrientation')) {
           project.setOrientation(newValue);
-          changes.push('Modified the game orientation.');
+          changes.push('Set game orientation.');
         } else if (isFuzzyMatch(propertyName, 'gameScaleMode')) {
           project.setScaleMode(newValue);
-          changes.push('Modified the game scale mode.');
+          changes.push('Set game scale mode.');
         } else if (isFuzzyMatch(propertyName, 'gameName')) {
           project.setName(newValue);
-          changes.push('Modified the game name.');
+          changes.push('Set game name.');
         } else {
           warnings.push(
-            `Unknown property for the scene: "${propertyName}". It was ignored and not changed.`
+            `Unknown scene property: "${propertyName}". Skipped.`
           );
         }
       });
@@ -4449,7 +4472,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         );
         if (layerName === null) {
           warnings.push(
-            `Missing "layer_name" in an item of changed_layers. It was ignored and not changed.`
+            `Missing "layer_name" in changed_layers item. Skipped.`
           );
           return;
         }
@@ -4549,13 +4572,13 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         );
         if (layerName === null) {
           warnings.push(
-            `Missing "layer_name" in an item of changed_layer_effects. It was ignored and not changed.`
+            `Missing "layer_name" in changed_layer_effects item. Skipped.`
           );
           return;
         }
         if (!scene.hasLayerNamed(layerName)) {
           warnings.push(
-            `Layer not found: "${layerName}". It was ignored and no effects on it were changed.`
+            `Layer "${layerName}" not found. Effects skipped.`
           );
           return;
         }
@@ -4568,7 +4591,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         );
         if (effectName === null) {
           warnings.push(
-            `Missing "effect_name" in an item of changed_layer_effects. It was ignored and not changed.`
+            `Missing "effect_name" in changed_layer_effects item. Skipped.`
           );
           return;
         }
@@ -4642,7 +4665,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         if (changed_properties) {
           if (!effectsContainer.hasEffectNamed(effectName)) {
             warnings.push(
-              `Effect not found: "${effectName}". It was ignored and not changed.`
+              `Effect "${effectName}" not found. Skipped.`
             );
             return;
           }
@@ -4654,7 +4677,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
 
           if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
             warnings.push(
-              `Effect "${effectName}" is not a valid effect. It was ignored and not changed.`
+              `Effect "${effectName}" invalid. Skipped.`
             );
             return;
           }
@@ -4672,7 +4695,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             );
             if (propertyName === null || newValue === null) {
               warnings.push(
-                `Missing "property_name" or "new_value" in an item of \`changed_properties\`. It was ignored and not changed. Make sure you follow the exact format for changing effect properties.`
+                `Missing "property_name" or "new_value" in changed_properties item. Skipped.`
               );
               return;
             }
@@ -4683,7 +4706,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             });
             if (!foundProperty) {
               warnings.push(
-                `Property not found: "${propertyName}" in effect "${effectName}". It was ignored and not changed. Make sure you only change existing effect properties.`
+                `Property "${propertyName}" not on effect "${effectName}". Skipped.`
               );
               return;
             }
@@ -4753,7 +4776,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         );
         if (groupName === null) {
           warnings.push(
-            `Missing "group_name" in an item of \`changed_groups\`. It was ignored and not changed. Make sure you follow the exact format for changing group properties.`
+            `Missing "group_name" in changed_groups item. Skipped.`
           );
           return;
         }
@@ -4832,27 +4855,23 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     if (changes.length === 0 && warnings.length === 0) {
       return {
         success: false,
-        message: 'No changes were made.',
+        message: 'No changes.',
       };
     } else if (changes.length === 0 && warnings.length > 0) {
       return {
         success: false,
-        message:
-          'No changes were made because of the issues listed in the warnings.',
+        message: 'No changes. See warnings.',
         warnings: warnings.join('\n'),
       };
     } else if (changes.length > 0 && warnings.length === 0) {
       return {
         success: true,
-        message: ['Successfully done the changes.', ...changes].join('\n'),
+        message: ['Done.', ...changes].join('\n'),
       };
     } else {
       return {
         success: true,
-        message: [
-          'Successfully done some changes but some issues were found - see the warnings.',
-          ...changes,
-        ].join('\n'),
+        message: ['Done with warnings.', ...changes].join('\n'),
         warnings: warnings.join('\n'),
       };
     }
@@ -4947,7 +4966,7 @@ const addOrEditVariable: EditorFunction = {
     if (variable_scope === 'scene') {
       if (!scene_name) {
         return makeGenericFailure(
-          `Missing "scene_name" argument, required to edit a scene variable.`
+          `Missing "scene_name" (required for scene variable).`
         );
       }
       if (!project.hasLayoutNamed(scene_name)) {
@@ -4957,7 +4976,7 @@ const addOrEditVariable: EditorFunction = {
     } else if (variable_scope === 'object') {
       if (!object_name) {
         return makeGenericFailure(
-          `Missing "object_name" argument, required to edit an object variable.`
+          `Missing "object_name" (required for object variable).`
         );
       }
 
@@ -4969,14 +4988,14 @@ const addOrEditVariable: EditorFunction = {
         objectsContainer = project.getLayout(scene_name).getObjects();
         if (!objectsContainer.hasObjectNamed(object_name)) {
           return makeGenericFailure(
-            `Object not found: "${object_name}" in scene "${scene_name}". Have you created it? For a global object, don't specify the scene name.`
+            `Object "${object_name}" not in scene "${scene_name}". For a global object, omit scene_name.`
           );
         }
       } else {
         objectsContainer = project.getObjects();
         if (!objectsContainer.hasObjectNamed(object_name)) {
           return makeGenericFailure(
-            `Object not found: "${object_name}" in project. Have you created it or forgot to specify the scene name?`
+            `Object "${object_name}" not found globally. Did you forget to specify scene_name?`
           );
         }
       }
@@ -4988,7 +5007,7 @@ const addOrEditVariable: EditorFunction = {
       variablesContainer = project.getVariables();
     } else {
       return makeGenericFailure(
-        `Invalid "variable_scope" argument: "${variable_scope}". Valid values are \`scene\`, \`object\` or \`global\`.`
+        `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\` or \`global\`.`
       );
     }
 
@@ -4999,10 +5018,11 @@ const addOrEditVariable: EditorFunction = {
       value,
     });
 
+    const truncatedValue = truncateValue(value);
     return makeGenericSuccess(
       addedNewVariable
-        ? `Properly added variable "${variable_name_or_path}" of type "${variableType}".`
-        : `Properly edited variable "${variable_name_or_path}".`
+        ? `Added variable "${variable_name_or_path}" (${variableType}) = ${truncatedValue}`
+        : `Edited variable "${variable_name_or_path}" = ${truncatedValue}`
     );
   },
   modifiesProject: true,
@@ -5101,15 +5121,15 @@ const initializeProject: EditorFunctionWithoutProject = {
       }
 
       if (exampleSlug) {
-        output.message = `Initialized project using starter game template "${exampleSlug}".`;
+        output.message = `Initialized project from template "${exampleSlug}".`;
         output.initializedProject = true;
         output.initializedFromTemplateSlug = exampleSlug;
       } else {
         if (template_slug) {
-          output.message = `Initialized project but this is an empty project, with 1 scene.`;
+          output.message = `Initialized empty project (1 scene).`;
           output.initializedProject = true;
         } else {
-          output.message = `Initialized empty project with 1 scene.`;
+          output.message = `Initialized empty project (1 scene).`;
           output.initializedProject = true;
         }
       }
@@ -5122,7 +5142,7 @@ const initializeProject: EditorFunctionWithoutProject = {
       return output;
     } catch (error) {
       return makeGenericFailure(
-        'Unable to initialize project. This might be because of a network error. Please try again.'
+        'Unable to initialize project (possibly a network error). Try again.'
       );
     }
   },

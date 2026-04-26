@@ -3243,6 +3243,37 @@ interface ExpressionCompletionFinder {
     //Inherited from ExpressionParser2NodeWorker:
 };
 
+enum ExpressionColorationDescription_ColorationKind {
+  "ExpressionColorationDescription::String",
+  "ExpressionColorationDescription::Number",
+  "ExpressionColorationDescription::Object",
+  "ExpressionColorationDescription::Variable",
+  "ExpressionColorationDescription::Operator",
+};
+
+interface ExpressionColorationDescription {
+  ExpressionColorationDescription_ColorationKind GetColorationKind();
+  unsigned long GetStartPosition();
+  unsigned long GetEndPosition();
+};
+
+interface VectorExpressionColorationDescription {
+    unsigned long size();
+    [Value] ExpressionColorationDescription at(unsigned long index);
+};
+
+interface ExpressionSyntaxColoringHelper {
+    [Value] VectorExpressionColorationDescription STATIC_GetColorationDescriptionsFor(
+        [Const, Ref] Platform platform, [Const, Ref]
+        ProjectScopedContainers projectScopedContainers,
+        [Const] DOMString rootType,
+        [Ref] ExpressionNode node);
+
+    [Const, Ref] VectorExpressionColorationDescription GetColorationDescriptions();
+
+    //Inherited from ExpressionParser2NodeWorker:
+};
+
 interface ExpressionNodeLocationFinder {
     ExpressionNode STATIC_GetNodeAtPosition([Ref] ExpressionNode node, unsigned long searchedPosition);
 };

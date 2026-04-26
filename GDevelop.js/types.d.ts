@@ -112,6 +112,14 @@ export enum ExpressionCompletionDescription_CompletionKind {
   Parameter = 6,
 }
 
+export enum ExpressionColorationDescription_ColorationKind {
+  String = 0,
+  Number = 1,
+  Object = 2,
+  Variable = 3,
+  Operator = 4,
+}
+
 export enum EventsFunction_FunctionType {
   Action = 0,
   Condition = 1,
@@ -2333,6 +2341,22 @@ export class VectorExpressionCompletionDescription extends EmscriptenObject {
 export class ExpressionCompletionFinder extends EmscriptenObject {
   static getCompletionDescriptionsFor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, node: ExpressionNode, location: number): VectorExpressionCompletionDescription;
   getCompletionDescriptions(): VectorExpressionCompletionDescription;
+}
+
+export class ExpressionColorationDescription extends EmscriptenObject {
+  getColorationKind(): ExpressionColorationDescription_ColorationKind;
+  getStartPosition(): number;
+  getEndPosition(): number;
+}
+
+export class VectorExpressionColorationDescription extends EmscriptenObject {
+  size(): number;
+  at(index: number): ExpressionColorationDescription;
+}
+
+export class ExpressionSyntaxColoringHelper extends EmscriptenObject {
+  static getColorationDescriptionsFor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, node: ExpressionNode): VectorExpressionColorationDescription;
+  getColorationDescriptions(): VectorExpressionColorationDescription;
 }
 
 export class ExpressionNodeLocationFinder extends EmscriptenObject {

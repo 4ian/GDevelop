@@ -236,6 +236,10 @@ declare class libGDevelop {
   ExpressionCompletionDescription: Class<gdExpressionCompletionDescription>;
   VectorExpressionCompletionDescription: Class<gdVectorExpressionCompletionDescription>;
   ExpressionCompletionFinder: Class<gdExpressionCompletionFinder>;
+  ExpressionColorationDescription_ColorationKind: Class<ExpressionColorationDescription_ColorationKind>;
+  ExpressionColorationDescription: Class<gdExpressionColorationDescription>;
+  VectorExpressionColorationDescription: Class<gdVectorExpressionColorationDescription>;
+  ExpressionSyntaxColoringHelper: Class<gdExpressionSyntaxColoringHelper>;
   ExpressionNodeLocationFinder: Class<gdExpressionNodeLocationFinder>;
   ExpressionTypeFinder: Class<gdExpressionTypeFinder>;
   ExpressionNode: Class<gdExpressionNode>;

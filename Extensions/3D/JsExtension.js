@@ -249,6 +249,114 @@ module.exports = {
         .addParameter('number', _('Angle to add (in degrees)'), '', false)
         .markAsAdvanced()
         .setFunctionName('turnAroundZ');
+
+      base3D
+        .addExpression(
+          'ForwardX',
+          _('Forward X'),
+          _('Return the object forward X.'),
+          _('Object local basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getForwardX');
+
+      base3D
+        .addExpression(
+          'ForwardY',
+          _('Forward Y'),
+          _('Return the object forward Y.'),
+          _('Object local basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getForwardY');
+
+      base3D
+        .addExpression(
+          'ForwardZ',
+          _('Forward Z'),
+          _('Return the object forward Z.'),
+          _('Object local basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getForwardZ');
+
+      base3D
+        .addExpression(
+          'UpX',
+          _('Up X'),
+          _('Return the object up X.'),
+          _('Object local basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getUpX');
+
+      base3D
+        .addExpression(
+          'UpY',
+          _('Up Y'),
+          _('Return the object up Y.'),
+          _('Object local basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getUpY');
+
+      base3D
+        .addExpression(
+          'UpZ',
+          _('Up Z'),
+          _('Return the object up Z.'),
+          _('Object local basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getUpZ');
+
+      base3D
+        .addExpression(
+          'RightX',
+          _('Right X'),
+          _('Return the object right X.'),
+          _('Object local basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getRightX');
+
+      base3D
+        .addExpression(
+          'RightY',
+          _('Right Y'),
+          _('Return the object right Y.'),
+          _('Object local basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getRightY');
+
+      base3D
+        .addExpression(
+          'RightZ',
+          _('Right Z'),
+          _('Return the object right Z.'),
+          _('Object local basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getRightZ');
     }
 
     {

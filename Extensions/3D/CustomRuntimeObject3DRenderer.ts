@@ -13,6 +13,7 @@ namespace gdjs {
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isContainerDirty: boolean = true;
     _threeGroup: THREE.Group;
+    private _localBasis: LocalBasis | null = null;
 
     constructor(
       object: gdjs.CustomRuntimeObject3D,
@@ -136,6 +137,71 @@ namespace gdjs {
       // Layers are not handled for 3D custom objects.
     }
 
+    getForwardX(): float {
+      return this.getLocalBasis().forwardX;
+    }
+
+    getForwardY(): float {
+      return this.getLocalBasis().forwardY;
+    }
+
+    getForwardZ(): float {
+      return this.getLocalBasis().forwardZ;
+    }
+
+    getUpX(): float {
+      return this.getLocalBasis().upX;
+    }
+
+    getUpY(): float {
+      return this.getLocalBasis().upY;
+    }
+
+    getUpZ(): float {
+      return this.getLocalBasis().upZ;
+    }
+
+    getRightX(): float {
+      return this.getLocalBasis().rightX;
+    }
+
+    getRightY(): float {
+      return this.getLocalBasis().rightY;
+    }
+
+    getRightZ(): float {
+      return this.getLocalBasis().rightZ;
+    }
+
+    private getLocalBasis(): LocalBasis {
+      if (!this._localBasis) {
+        this._localBasis = new LocalBasis();
+      }
+      if (!this._localBasis.isDirty) {
+        return this._localBasis;
+      }
+
+      const rotationMatrix: THREE.Matrix4 = gdjs.staticObject(
+        CustomRuntimeObject3DRenderer.prototype.getLocalBasis
+      ) as THREE.Matrix4;
+      rotationMatrix.makeRotationFromEuler(this._threeObject3D.rotation);
+      const elements = rotationMatrix.elements;
+
+      this._localBasis.forwardX = elements[0];
+      this._localBasis.forwardY = elements[1];
+      this._localBasis.forwardZ = elements[2];
+
+      this._localBasis.upX = elements[8];
+      this._localBasis.upY = elements[9];
+      this._localBasis.upZ = elements[10];
+
+      this._localBasis.rightX = elements[-4];
+      this._localBasis.rightY = elements[-5];
+      this._localBasis.rightZ = elements[-6];
+
+      return this._localBasis;
+    }
+
     static getAnimationFrameTextureManager(
       imageManager: gdjs.PixiImageManager
     ): ThreeAnimationFrameTextureManager {
@@ -177,5 +243,18 @@ namespace gdjs {
       ).map;
       return map ? map.image.height : 0;
     }
+  }
+
+  class LocalBasis {
+    isDirty = true;
+    forwardX: float = 0;
+    forwardY: float = 0;
+    forwardZ: float = 0;
+    upX: float = 0;
+    upY: float = 0;
+    upZ: float = 0;
+    rightX: float = 0;
+    rightY: float = 0;
+    rightZ: float = 0;
   }
 }

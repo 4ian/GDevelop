@@ -92,37 +92,37 @@ namespace gdjs {
     /**
      * Get the Z component of the forward vector of the object.
      */
-    getForwardZ(): float
+    getForwardZ(): float;
 
     /**
      * Get the X component of the up vector of the object.
      */
-    getUpX(): float
+    getUpX(): float;
 
     /**
      * Get the Y component of the up vector of the object.
      */
-    getUpY(): float
+    getUpY(): float;
 
     /**
      * Get the Z component of the up vector of the object.
      */
-    getUpZ(): float
+    getUpZ(): float;
 
     /**
      * Get the X component of the right vector of the object.
      */
-    getRightX(): float
+    getRightX(): float;
 
     /**
      * Get the Y component of the right vector of the object.
      */
-    getRightY(): float
+    getRightY(): float;
 
     /**
      * Get the Z component of the right vector of the object.
      */
-    getRightZ(): float
+    getRightZ(): float;
 
     /**
      * Get the object size on the Z axis (called "depth").
@@ -274,6 +274,42 @@ namespace gdjs {
 
     turnAroundZ(deltaAngle: float): void {
       this.object.turnAroundZ(deltaAngle);
+    }
+
+    getForwardX(): float {
+      return this.object.getForwardX();
+    }
+
+    getForwardY(): float {
+      return this.object.getForwardY();
+    }
+
+    getForwardZ(): float {
+      return this.object.getForwardZ();
+    }
+
+    getUpX(): float {
+      return this.object.getUpX();
+    }
+
+    getUpY(): float {
+      return this.object.getUpY();
+    }
+
+    getUpZ(): float {
+      return this.object.getUpZ();
+    }
+
+    getRightX(): float {
+      return this.object.getRightX();
+    }
+
+    getRightY(): float {
+      return this.object.getRightY();
+    }
+
+    getRightZ(): float {
+      return this.object.getRightZ();
     }
 
     getDepth(): float {

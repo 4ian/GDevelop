@@ -3,6 +3,7 @@ namespace gdjs {
   export abstract class RuntimeObject3DRenderer {
     protected _object: gdjs.RuntimeObject3D;
     private _threeObject3D: THREE.Object3D;
+    private _localBasis: LocalBasis | null = null;
 
     constructor(
       runtimeObject: gdjs.RuntimeObject3D,

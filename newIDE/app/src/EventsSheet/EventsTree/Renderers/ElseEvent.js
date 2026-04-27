@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import {
   largeSelectedArea,
   largeSelectableArea,
-  executableEventContainer,
+  conditionsActionsContainer,
   invalidElse,
   elseTextContainer,
   disabledText,
@@ -91,7 +91,7 @@ export default class ElseEvent extends React.Component<
           windowSize={this.props.windowSize}
           eventsSheetWidth={this.props.eventsSheetWidth}
           className={classNames({
-            [executableEventContainer]: true,
+            [conditionsActionsContainer]: true,
           })}
           renderConditionsList={({ style, className }) => (
             <InstructionsList

@@ -132,6 +132,9 @@ const useCreateProject = ({
     project.setVersion('1.0.0');
     project.getAuthorIds().clear();
     project.setAuthor('');
+    // Assume all projects created from examples/templates are new projects
+    // and should use current defaults, regardless of the example's gdVersion.
+    project.setUseDeprecatedZeroAsDefaultStringVariable(false);
     if (newProjectSetup.width && newProjectSetup.height) {
       project.setGameResolutionSize(
         newProjectSetup.width,

@@ -125,6 +125,13 @@ export default class Window {
   static setWindowBackgroundColor(newColor: string, targetDocument?: Document) {
     const doc = targetDocument || document;
 
+    if (!newColor) {
+      // Be defensive against themes missing a color (for instance, a
+      // newly added variable that an older or custom theme doesn't define):
+      // skip the update rather than crashing.
+      return;
+    }
+
     if (documentBackgroundColors.get(doc) === newColor) {
       // Avoid potentially expensive DOM query/modification if no changes needed.
       return;

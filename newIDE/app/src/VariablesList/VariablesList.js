@@ -1665,17 +1665,18 @@ const VariablesList: React.ComponentType<{
       if (
         !(
           searchMatchingNodes.includes(nodeId) ||
-          // $FlowFixMe[incompatible-type]
-          searchMatchingNodes.includes(parentNodeId) ||
           searchMatchingNodes.some(matchingNodeId =>
             matchingNodeId.startsWith(nodeId)
+          ) ||
+          searchMatchingNodes.some(matchingNodeId =>
+            nodeId.startsWith(matchingNodeId + separator)
           )
         )
       ) {
         // Display node if one of these is true:
         // - node is in the list of nodes matching search
-        // - parent node is in the list of nodes matching search (to be able to edit direct children of searched structure)
-        // - node is an ancestry of a node in the list of nodes matching search
+        // - node is an ancestor of a node in the list of nodes matching search
+        // - node is a descendant of a node in the list of nodes matching search
         return [];
       }
     }
@@ -1885,7 +1886,16 @@ const VariablesList: React.ComponentType<{
         props.variablesContainer
       );
       if (!variable) return;
+      const oldType = variable.getType();
       variable.castTo(newType);
+      // When changing type to String, reset to an empty string.
+      if (newType === 'string' && oldType === gd.Variable.Number) {
+        variable.setString('');
+      }
+      // When changing type to Number, reset to 0.
+      if (newType === 'number' && oldType === gd.Variable.String) {
+        variable.setValue(0);
+      }
       _onChange();
       forceUpdate();
     },

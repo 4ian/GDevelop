@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import { type Build, type BuildType } from '../Utils/GDevelopServices/Build';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import { type BuildStep } from './Builds/BuildStepsProgress';
@@ -11,6 +12,7 @@ export type ExportPipelineContext<ExportState> = {|
   project: gdProject,
   exportState: ExportState,
   updateStepProgress: (count: number, total: number) => void,
+  i18n: I18nType,
 |};
 
 export type HeaderProps<ExportState> = {|

@@ -180,9 +180,8 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     const sprite = this._sprite;
     if (!sprite) {
       // No sprite is currently selected (e.g. the object has no animations yet).
-      // If the current texture has been destroyed (which can happen after a
-      // resource reload), swap it with the placeholder to avoid crashes when
-      // PIXI later renders or hit-tests the sprite.
+      // If the current texture has been destroyed (should not happen, but extra safety),
+      // swap it with the placeholder.
       if (
         !this._pixiObject.texture ||
         !this._pixiObject.texture.orig ||

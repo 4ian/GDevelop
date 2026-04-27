@@ -22,7 +22,6 @@ import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
-import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import StatusBar from './StatusBar';
 import ProfilerBar from './ProfilerBar';
 import CanvasCursor from './CanvasCursor';
@@ -191,7 +190,6 @@ export default class InstancesEditor extends Component<Props, State> {
   background: Background;
   _unmounted = false;
   _renderingPausedReasons: Set<string> = new Set();
-  _unregisterReloadPauseHandler: (() => void) | null = null;
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
@@ -208,16 +206,6 @@ export default class InstancesEditor extends Component<Props, State> {
     if (this.canvasArea && !this.pixiRenderer) {
       this._initializeCanvasAndRenderer();
     }
-
-    // Pause this editor's rendering for the duration of any resource reload,
-    // so we never render through PIXI/Three while another tab's reload is
-    // destroying a Texture/BaseTexture in the shared cache.
-    this._unregisterReloadPauseHandler = PixiResourcesLoader.registerReloadPauseHandler(
-      {
-        pause: () => this.pauseSceneRendering('global-resource-reload'),
-        resume: () => this.resumeSceneRendering('global-resource-reload'),
-      }
-    );
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -661,11 +649,6 @@ export default class InstancesEditor extends Component<Props, State> {
     // This is an antipattern and is theoretically not needed, but help
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
-
-    if (this._unregisterReloadPauseHandler) {
-      this._unregisterReloadPauseHandler();
-      this._unregisterReloadPauseHandler = null;
-    }
 
     // We've seen all those elements being undefined in some cases, so
     // by security, check that they are defined before deleting them.

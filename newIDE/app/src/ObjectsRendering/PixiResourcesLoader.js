@@ -81,15 +81,6 @@ const pendingResourceReloadCleanupTimers: {
 } = {};
 const RESOURCE_RELOAD_DEDUP_COOLDOWN_MS = 500;
 
-/**
- * Handlers (typically `InstancesEditor`s) that should be paused while any
- * resource reload is in progress, so PIXI/Three render passes don't access
- * a Texture/BaseTexture/atlas while it is being destroyed and recreated.
- */
-type ReloadPauseHandler = {| pause: () => void, resume: () => void |};
-const reloadPauseHandlers: Set<ReloadPauseHandler> = new Set();
-let activeReloadCount = 0;
-
 // $FlowFixMe[value-as-type]
 const createInvalidModel = (): GLTF => {
   /**
@@ -335,42 +326,6 @@ export default class PixiResourcesLoader {
   }
 
   static async _doReloadResource(project: gdProject, resourceName: string) {
-    // Pause every registered handler for as long as ANY reload is in flight.
-    // This prevents background editors (other open scenes/extensions) from
-    // rendering through PIXI/Three while a Texture/BaseTexture is being
-    // destroyed — which would otherwise crash with errors like
-    // "Cannot read properties of null (reading '_batchEnabled')".
-    const wasFirstReload = activeReloadCount === 0;
-    activeReloadCount++;
-    if (wasFirstReload) {
-      reloadPauseHandlers.forEach(handler => {
-        try {
-          handler.pause();
-        } catch (error) {
-          console.error('Error while pausing reload handler:', error);
-        }
-      });
-    }
-    try {
-      await this._doReloadResourceInner(project, resourceName);
-    } finally {
-      activeReloadCount--;
-      if (activeReloadCount === 0) {
-        reloadPauseHandlers.forEach(handler => {
-          try {
-            handler.resume();
-          } catch (error) {
-            console.error('Error while resuming reload handler:', error);
-          }
-        });
-      }
-    }
-  }
-
-  static async _doReloadResourceInner(
-    project: gdProject,
-    resourceName: string
-  ) {
     const loadedTexture = loadedTextures[resourceName];
     if (loadedTexture) {
       // Remove the cached texture BEFORE awaiting the unload.
@@ -529,29 +484,6 @@ export default class PixiResourcesLoader {
         console.log(`No more reload are queued.`);
       }
     }
-  }
-
-  /**
-   * Register a handler (typically an `InstancesEditor`) that should be paused
-   * for the whole duration of any `_doReloadResource` call. This guards
-   * against background tabs continuing to render with a Texture/BaseTexture
-   * that another editor's reload is in the middle of destroying. Returns an
-   * unregister function.
-   */
-  static registerReloadPauseHandler(handler: ReloadPauseHandler): () => void {
-    reloadPauseHandlers.add(handler);
-    if (activeReloadCount > 0) {
-      // A reload is already in progress: pause this handler immediately so it
-      // doesn't render with a half-destroyed asset.
-      try {
-        handler.pause();
-      } catch (error) {
-        console.error('Error while pausing reload handler:', error);
-      }
-    }
-    return () => {
-      reloadPauseHandlers.delete(handler);
-    };
   }
   /**
    * (Re)load the PIXI texture represented by the given resources.

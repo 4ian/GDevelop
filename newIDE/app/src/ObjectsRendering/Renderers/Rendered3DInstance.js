@@ -106,6 +106,14 @@ export default class Rendered3DInstance {
     if (this._threeObject !== null) this._threeGroup.remove(this._threeObject);
   }
 
+  /**
+   * Tear down any child renderer for the given object name (typically because
+   * its resources were reloaded). The default is a no-op; composite renderers
+   * (e.g. for custom objects) override this to recurse into their children.
+   */
+  // eslint-disable-next-line no-unused-vars
+  resetInstanceRenderersFor(objectName: string): void {}
+
   getOriginX(): any {
     return 0;
   }

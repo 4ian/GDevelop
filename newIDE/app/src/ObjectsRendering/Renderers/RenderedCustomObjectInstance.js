@@ -329,6 +329,24 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   };
 
   /**
+   * Tear down child renderers for the given object name so they get recreated
+   * with fresh resources on the next render. Recurse into nested custom
+   * objects so descendants are reset too.
+   */
+  resetInstanceRenderersFor(objectName: string): void {
+    // Iterate over a snapshot since we mutate the map.
+    for (const [ptr, renderedInstance] of Array.from(this.renderedInstances)) {
+      if (renderedInstance.getInstance().getObjectName() === objectName) {
+        renderedInstance.onRemovedFromScene();
+        this.renderedInstances.delete(ptr);
+        this.layoutedInstances.delete(ptr);
+      } else {
+        renderedInstance.resetInstanceRenderersFor(objectName);
+      }
+    }
+  }
+
+  /**
    * Remove rendered instances that are not associated to any instance anymore
    * (this can happen after an instance has been deleted).
    */

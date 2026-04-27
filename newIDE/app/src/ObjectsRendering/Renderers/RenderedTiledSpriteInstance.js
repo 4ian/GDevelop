@@ -78,7 +78,20 @@ export default class RenderedTiledSpriteInstance extends RenderedInstance {
       this._pixiObject.height = tiledSprite.getHeight();
     }
 
-    if (this._texture !== tiledSprite.getTexture()) {
+    // Extra safety check.
+    const currentTexture = this._pixiObject.texture;
+    const isCurrentTextureDestroyed =
+      !currentTexture || !currentTexture.orig || !currentTexture.baseTexture;
+    if (isCurrentTextureDestroyed) {
+      console.warn(
+        'Current texture for a RenderedSpriteInstance is destroyed. This should never happen - verify how resources are (re)loaded.'
+      );
+    }
+
+    if (
+      this._texture !== tiledSprite.getTexture() ||
+      isCurrentTextureDestroyed
+    ) {
       this._texture = tiledSprite.getTexture();
       this._pixiObject.texture = PixiResourcesLoader.getPIXITexture(
         this._project,

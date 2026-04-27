@@ -178,7 +178,19 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     }
     this.updateSprite();
     const sprite = this._sprite;
-    if (!sprite) return;
+    if (!sprite) {
+      // No sprite is currently selected (e.g. the object has no animations yet).
+      // If the current texture has been destroyed (should not happen, but extra safety),
+      // swap it with the placeholder.
+      if (
+        !this._pixiObject.texture ||
+        !this._pixiObject.texture.orig ||
+        !this._pixiObject.texture.baseTexture
+      ) {
+        this._pixiObject.texture = this._pixiResourcesLoader.getInvalidPIXITexture();
+      }
+      return;
+    }
 
     const texture = this._pixiResourcesLoader.getPIXITexture(
       this._project,
@@ -212,8 +224,20 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   }
 
   update(): void {
+    if (!this._pixiObject) return;
     const animation = this._instance.getRawDoubleProperty('animation');
-    if (this._renderedAnimation !== animation) {
+
+    // Extra safety check.
+    const currentTexture = this._pixiObject.texture;
+    const isCurrentTextureDestroyed =
+      !currentTexture || !currentTexture.orig || !currentTexture.baseTexture;
+    if (isCurrentTextureDestroyed) {
+      console.warn(
+        'Current texture for a RenderedSpriteInstance is destroyed. This should never happen - verify how resources are (re)loaded.'
+      );
+    }
+
+    if (this._renderedAnimation !== animation || isCurrentTextureDestroyed) {
       this.updatePIXITextureAndSprite();
     } else {
       this.updatePIXISprite();

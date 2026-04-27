@@ -201,6 +201,18 @@ export default class LegacyRenderedCustomObjectInstance
   }
 
   /**
+   * Children of legacy custom objects are predefined by the events-based
+   * object and aren't bound to a real initial instance, so they can't be torn
+   * down and recreated here. Recurse so any nested custom object can reset
+   * its own descendants.
+   */
+  resetInstanceRenderersFor(objectName: string): void {
+    for (const childRenderedInstance of this.childrenRenderedInstances) {
+      childRenderedInstance.resetInstanceRenderersFor(objectName);
+    }
+  }
+
+  /**
    * Return a URL for thumbnail of the specified object.
    */
   static getThumbnail(

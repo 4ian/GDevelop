@@ -291,6 +291,9 @@ GetResourceWorkerOnEvents(const gd::Project &project,
 }
 
 void ResourceWorkerInObjectsWorker::DoVisitObject(gd::Object &object) {
+  if (!shouldCheckObject(object)) {
+    return;
+  }
   object.GetConfiguration().ExposeResources(worker);
   auto& effects = object.GetEffects();
   for (size_t effectIndex = 0; effectIndex < effects.GetEffectsCount(); effectIndex++)
@@ -307,7 +310,16 @@ void ResourceWorkerInObjectsWorker::DoVisitBehavior(gd::Behavior &behavior){
 gd::ResourceWorkerInObjectsWorker
 GetResourceWorkerOnObjects(const gd::Project &project,
                            gd::ArbitraryResourceWorker &worker) {
-  gd::ResourceWorkerInObjectsWorker resourcesWorker(project, worker);
+  std::function<bool(const gd::Object &)> shouldCheckObject =
+      [](const gd::Object &object) { return true; };
+  return GetResourceWorkerOnObjects(project, worker, shouldCheckObject);
+}
+
+gd::ResourceWorkerInObjectsWorker GetResourceWorkerOnObjects(
+    const gd::Project &project, gd::ArbitraryResourceWorker &worker,
+    std::function<bool(const gd::Object &)> &shouldCheckObject) {
+  gd::ResourceWorkerInObjectsWorker resourcesWorker(project, worker,
+                                                    shouldCheckObject);
   return resourcesWorker;
 }
 

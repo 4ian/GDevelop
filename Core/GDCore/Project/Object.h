@@ -124,6 +124,22 @@ class GD_CORE_API Object {
    */
   const gd::String& GetType() const { return configuration->GetType(); }
 
+  /**
+   * Set when the object resources must be preloaded: `with-scene`(default),
+   * `manually`.
+   */
+  void SetResourcesPreloading(gd::String resourcesPreloading_) {
+    resourcesPreloading = resourcesPreloading_;
+  }
+
+  /**
+   * Get when the object resources must be preloaded: `with-scene`(default),
+   * `manually`.
+   */
+  const gd::String& GetResourcesPreloading() const {
+    return resourcesPreloading;
+  }
+
   ///@}
 
   /** \name Behaviors management
@@ -267,6 +283,8 @@ class GD_CORE_API Object {
       effectsContainer;  ///< The effects container for the object.
   mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
                                       ///< useful for computing changesets.
+  /** When set to `"manually"`, its resources are not preloaded with the scene. */
+  gd::String resourcesPreloading = "with-scene";
 
   /**
    * Initialize object using another object. Used by copy-ctor and assign-op.

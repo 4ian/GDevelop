@@ -578,7 +578,8 @@ void ExporterHelper::StripAndSerializeProjectData(
        layoutIndex++) {
     auto &layout = project.GetLayout(layoutIndex);
     auto sceneUsedResources = gd::SceneResourcesFinder::FindSceneResources(
-        project, layout);
+        project, layout,
+        /* ignoreObjectResourcePreloading= */ isInGameEdition);
     for (auto &&resourceName : projectUsedResources) {
       sceneUsedResources.erase(resourceName);
     }
@@ -619,9 +620,11 @@ void ExporterHelper::StripAndSerializeProjectData(
   gd::ProjectStripper::StripProjectForExport(project);
 
   project.SerializeTo(rootElement);
-  SerializeUsedResources(rootElement, projectUsedResources, scenesUsedResources,
-                         eventsBasedObjectVariantsUsedResources);
+  SerializeUsedResourcesForRuntime(project, rootElement, projectUsedResources,
+                         scenesUsedResources);
   if (isInGameEdition) {
+    SerializeUsedResourcesForInGameEditor(
+        project, rootElement, eventsBasedObjectVariantsUsedResources);
     auto &behaviorsElement = rootElement.AddChild("activatedByDefaultInEditorBehaviors");
     behaviorsElement.ConsiderAsArrayOf("resourceReference");
     auto &platform = project.GetCurrentPlatform();
@@ -638,23 +641,22 @@ void ExporterHelper::StripAndSerializeProjectData(
 }
 
 void ExporterHelper::SerializeUsedResources(
+    gd::SerializerElement &element, std::set<gd::String> &usedResources) {
+  auto &resourcesElement = element.AddChild("usedResources");
+  resourcesElement.ConsiderAsArrayOf("resourceReference");
+  for (auto &resourceName : usedResources) {
+    auto &resourceElement = resourcesElement.AddChild("resourceReference");
+    resourceElement.SetAttribute("name", resourceName);
+  }
+}
+
+void ExporterHelper::SerializeUsedResourcesForRuntime(
+    gd::Project &project,
     gd::SerializerElement &rootElement,
     std::set<gd::String> &projectUsedResources,
-    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources,
-    std::unordered_map<gd::String, std::set<gd::String>>
-        &eventsBasedObjectVariantsUsedResources) {
-  auto serializeUsedResources =
-      [](gd::SerializerElement &element,
-         std::set<gd::String> &usedResources) -> void {
-    auto &resourcesElement = element.AddChild("usedResources");
-    resourcesElement.ConsiderAsArrayOf("resourceReference");
-    for (auto &resourceName : usedResources) {
-      auto &resourceElement = resourcesElement.AddChild("resourceReference");
-      resourceElement.SetAttribute("name", resourceName);
-    }
-  };
+    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources) {
 
-  serializeUsedResources(rootElement, projectUsedResources);
+  SerializeUsedResources(rootElement, projectUsedResources);
 
   auto &layoutsElement = rootElement.GetChild("layouts");
   for (std::size_t layoutIndex = 0;
@@ -663,10 +665,36 @@ void ExporterHelper::SerializeUsedResources(
     auto &layoutElement = layoutsElement.GetChild(layoutIndex);
     const auto layoutName = layoutElement.GetStringAttribute("name");
 
-    auto &layoutUsedResources = scenesUsedResources[layoutName];
-    serializeUsedResources(layoutElement, layoutUsedResources);
-  }
+    auto &sceneUsedResources = scenesUsedResources[layoutName];
+    SerializeUsedResources(layoutElement, sceneUsedResources);
 
+    auto &scene = project.GetLayout(layoutName);
+    auto &objectsElement = layoutElement.GetChild("objects");
+    for (std::size_t objectIndex = 0;
+         objectIndex < objectsElement.GetChildrenCount(); objectIndex++) {
+      auto &objectElement = objectsElement.GetChild(objectIndex);
+      const auto objectName = objectElement.GetStringAttribute("name");
+
+      auto &object = scene.GetObjects().GetObject(objectName);
+      if (object.GetResourcesPreloading() == "manually") {
+        auto objectUsedResources =
+            gd::SceneResourcesFinder::FindObjectResources(project, object);
+        for (auto &&resourceName : projectUsedResources) {
+          objectUsedResources.erase(resourceName);
+        }
+        for (auto &&resourceName : sceneUsedResources) {
+          objectUsedResources.erase(resourceName);
+        }
+        SerializeUsedResources(objectElement, objectUsedResources);
+      }
+    }
+  }
+}
+
+void ExporterHelper::SerializeUsedResourcesForInGameEditor(
+    gd::Project &project, gd::SerializerElement &rootElement,
+    std::unordered_map<gd::String, std::set<gd::String>>
+        &eventsBasedObjectVariantsUsedResources) {
   auto &extensionsElement = rootElement.GetChild("eventsFunctionsExtensions");
   for (std::size_t extensionIndex = 0;
        extensionIndex < extensionsElement.GetChildrenCount();
@@ -685,7 +713,7 @@ void ExporterHelper::SerializeUsedResources(
           gd::PlatformExtension::GetObjectFullType(extensionName, objectName);
       auto &objectUsedResources =
           eventsBasedObjectVariantsUsedResources[eventsBasedObjectType];
-      serializeUsedResources(objectElement, objectUsedResources);
+      SerializeUsedResources(objectElement, objectUsedResources);
 
       auto &variantsElement = objectElement.GetChild("variants");
       for (std::size_t variantIndex = 0;
@@ -697,7 +725,7 @@ void ExporterHelper::SerializeUsedResources(
             extensionName, objectName, variantName);
         auto &variantUsedResources =
             eventsBasedObjectVariantsUsedResources[variantType];
-        serializeUsedResources(variantElement, variantUsedResources);
+        SerializeUsedResources(variantElement, variantUsedResources);
       }
     }
   }

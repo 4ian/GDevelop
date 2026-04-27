@@ -751,14 +751,19 @@ class ExporterHelper {
                              ///< be then copied to the final output directory.
 
  private:
-   static void
-   SerializeUsedResources(gd::SerializerElement &rootElement,
-                          std::set<gd::String> &projectUsedResources,
-                          std::unordered_map<gd::String, std::set<gd::String>>
-                              &layersUsedResources,
-                          std::unordered_map<gd::String, std::set<gd::String>>
-                              &eventsBasedObjectVariantsUsedResources);
+   static void SerializeUsedResourcesForRuntime(
+       gd::Project &project, gd::SerializerElement &rootElement,
+       std::set<gd::String> &projectUsedResources,
+       std::unordered_map<gd::String, std::set<gd::String>>
+           &layersUsedResources);
 
+   static void SerializeUsedResourcesForInGameEditor(
+       gd::Project &project, gd::SerializerElement &rootElement,
+       std::unordered_map<gd::String, std::set<gd::String>>
+           &eventsBasedObjectVariantsUsedResources);
+
+   static void SerializeUsedResources(gd::SerializerElement &element,
+                                      std::set<gd::String> &usedResources);
    /**
     * \brief Strip a project and serialize it to JSON.
     */

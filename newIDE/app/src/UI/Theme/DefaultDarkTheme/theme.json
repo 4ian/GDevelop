@@ -758,7 +758,7 @@
     },
     "warning-instruction": {
       "background-color": {
-        "value": "rgba(255, 188, 87, 0.125)",
+        "value": "rgba(255, 188, 87, 0.13)",
         "comment": "Palette/Yellow/40 and alpha"
       }
     },

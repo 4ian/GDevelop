@@ -178,7 +178,20 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     }
     this.updateSprite();
     const sprite = this._sprite;
-    if (!sprite) return;
+    if (!sprite) {
+      // No sprite is currently selected (e.g. the object has no animations yet).
+      // If the current texture has been destroyed (which can happen after a
+      // resource reload), swap it with the placeholder to avoid crashes when
+      // PIXI later renders or hit-tests the sprite.
+      if (
+        !this._pixiObject.texture ||
+        !this._pixiObject.texture.orig ||
+        !this._pixiObject.texture.baseTexture
+      ) {
+        this._pixiObject.texture = this._pixiResourcesLoader.getInvalidPIXITexture();
+      }
+      return;
+    }
 
     const texture = this._pixiResourcesLoader.getPIXITexture(
       this._project,
@@ -212,8 +225,18 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   }
 
   update(): void {
+    if (!this._pixiObject) return;
     const animation = this._instance.getRawDoubleProperty('animation');
-    if (this._renderedAnimation !== animation) {
+    // The texture may have been destroyed since the last update (typically
+    // because the underlying resource was reloaded). In that case, refresh
+    // it: otherwise PIXI would crash when reading `texture.orig` or
+    // `texture.baseTexture` during rendering or hit-testing.
+    const currentTexture = this._pixiObject.texture;
+    const isCurrentTextureDestroyed =
+      !currentTexture ||
+      !currentTexture.orig ||
+      !currentTexture.baseTexture;
+    if (this._renderedAnimation !== animation || isCurrentTextureDestroyed) {
       this.updatePIXITextureAndSprite();
     } else {
       this.updatePIXISprite();

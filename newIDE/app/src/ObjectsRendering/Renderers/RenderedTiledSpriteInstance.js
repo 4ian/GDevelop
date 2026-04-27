@@ -78,7 +78,19 @@ export default class RenderedTiledSpriteInstance extends RenderedInstance {
       this._pixiObject.height = tiledSprite.getHeight();
     }
 
-    if (this._texture !== tiledSprite.getTexture()) {
+    // The texture may have been destroyed since the last update (typically
+    // because the underlying resource was reloaded). In that case, refresh
+    // it: otherwise PIXI would crash when reading `texture.orig` or
+    // `texture.baseTexture` during rendering or hit-testing.
+    const currentTexture = this._pixiObject.texture;
+    const isCurrentTextureDestroyed =
+      !currentTexture ||
+      !currentTexture.orig ||
+      !currentTexture.baseTexture;
+    if (
+      this._texture !== tiledSprite.getTexture() ||
+      isCurrentTextureDestroyed
+    ) {
       this._texture = tiledSprite.getTexture();
       this._pixiObject.texture = PixiResourcesLoader.getPIXITexture(
         this._project,

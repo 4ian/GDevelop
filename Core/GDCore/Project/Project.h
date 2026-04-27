@@ -997,7 +997,7 @@ class GD_CORE_API Project {
 
   /**
    * Set when the scenes must preload their resources: `at-startup` (default),
-   * `never.
+   * `never`.
    */
   void SetSceneResourcesPreloading(gd::String sceneResourcesPreloading_) {
     sceneResourcesPreloading = sceneResourcesPreloading_;
@@ -1005,7 +1005,7 @@ class GD_CORE_API Project {
 
   /**
    * Get when the scenes must preload their resources: `at-startup` (default),
-   * `never.
+   * `never`.
    */
   const gd::String& GetSceneResourcesPreloading() const {
     return sceneResourcesPreloading;

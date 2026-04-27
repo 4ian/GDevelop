@@ -981,12 +981,14 @@ describe('editorFunctions', () => {
     it('reports the FINAL renamed name when a collision forces a suffix', async () => {
       // The scene already has another object named "Foo": renaming
       // MyTextObject -> Foo must collide and end up as "Foo2".
-      testScene.getObjects().insertNewObject(
-        project,
-        'Sprite',
-        'Foo',
-        testScene.getObjects().getObjectsCount()
-      );
+      testScene
+        .getObjects()
+        .insertNewObject(
+          project,
+          'Sprite',
+          'Foo',
+          testScene.getObjects().getObjectsCount()
+        );
 
       const result: EditorFunctionGenericOutput = await editorFunctions.change_object_property.launchFunction(
         {
@@ -1253,9 +1255,7 @@ describe('editorFunctions', () => {
 
       // A scene-scoped sprite and a global sprite, to exercise the two
       // object-variable scope branches.
-      testScene
-        .getObjects()
-        .insertNewObject(project, 'Sprite', 'Player', 0);
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
       project.getObjects().insertNewObject(project, 'Sprite', 'GlobalEnemy', 0);
     });
 

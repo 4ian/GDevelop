@@ -358,12 +358,9 @@ const makeMultipleChangesOutput = (
 
   return {
     success: true,
-    message: [
-      'Done with warnings.',
-      ...changes,
-      'Warnings:',
-      ...warnings,
-    ].join('\n'),
+    message: ['Done with warnings.', ...changes, 'Warnings:', ...warnings].join(
+      '\n'
+    ),
   };
 };
 
@@ -558,9 +555,7 @@ const getShortMeasurementUnit = (
       const symbol = baseUnit.getSymbol();
       if (!symbol) continue;
       shortLabel +=
-        (shortLabel ? '·' : '') +
-        symbol +
-        (power === 1 ? '' : `^${power}`);
+        (shortLabel ? '·' : '') + symbol + (power === 1 ? '' : `^${power}`);
     }
   } catch (_) {
     // Defensive: if anything goes wrong, fall back to the name.
@@ -622,7 +617,9 @@ const formatPropertiesList = (
     }
 
     if (type === 'number') {
-      nonEmptyParts.push(unit ? `${name}: ${value} (${unit})` : `${name}: ${value}`);
+      nonEmptyParts.push(
+        unit ? `${name}: ${value} (${unit})` : `${name}: ${value}`
+      );
       continue;
     }
 
@@ -939,8 +936,7 @@ const createOrReplaceObject: EditorFunction = {
             return makeGenericSuccess(
               `Created from asset store in ${targetScopeText}: ${createdObjects
                 .map(
-                  object =>
-                    `"${object.getName()}" (type "${object.getType()}")`
+                  object => `"${object.getName()}" (type "${object.getType()}")`
                 )
                 .join(', ')}.`
             );
@@ -1580,9 +1576,7 @@ const changeObjectProperty: EditorFunction = {
       // Renaming an object is a special case by using a property called "name".
       if (isPropertyForChangingObjectName(propertyName)) {
         if (object.getName() === newValue) {
-          changes.push(
-            `Object "${object_name}" already named "${newValue}".`
-          );
+          changes.push(`Object "${object_name}" already named "${newValue}".`);
           return;
         }
 
@@ -2956,7 +2950,7 @@ const put2dInstances: EditorFunction = {
         if (instancesRotation !== null)
           attrs.push(`rotation ${instancesRotation}°`);
         if (instancesOpacity !== null)
-          attrs.push(`opacity ${instancesOpacity}`);
+          attrs.push(`opacity ${instancesOpacity}/255`);
         if (instances_z_order !== null)
           attrs.push(`z-order ${instances_z_order}`);
         changes.push(
@@ -3052,7 +3046,7 @@ const put2dInstances: EditorFunction = {
         changes.push(
           `Changed opacity of ${opacityChangedCount} instance${
             opacityChangedCount > 1 ? 's' : ''
-          } to ${instancesOpacity}.`
+          } to ${instancesOpacity}/255.`
         );
       }
 
@@ -3972,7 +3966,9 @@ const addSceneEvents: EditorFunction = {
       } catch (e) {
         // $FlowFixMe[incompatible-type]
         return makeAiGeneratedEventFailure(
-          `Error installing extensions: ${e.message}. Try again or a different approach.`
+          `Error installing extensions: ${
+            e.message
+          }. Try again or a different approach.`
         );
       }
       try {
@@ -4052,8 +4048,7 @@ No project changes; see errors.`,
 ${aiGeneratedEvent.resultMessage || '(none)'}
 
 See errors; verify event contents if needed.`
-            : aiGeneratedEvent.resultMessage ||
-              'Modified or added event(s).';
+            : aiGeneratedEvent.resultMessage || 'Modified or added event(s).';
         return {
           success: true,
           message: resultMessage,
@@ -4070,7 +4065,9 @@ See errors; verify event contents if needed.`
         );
         // $FlowFixMe[incompatible-type]
         return makeAiGeneratedEventFailure(
-          `Unexpected error adding generated events: ${error.message}. Try a different approach.`
+          `Unexpected error adding generated events: ${
+            error.message
+          }. Try a different approach.`
         );
       }
     } catch (error) {
@@ -4079,7 +4076,9 @@ See errors; verify event contents if needed.`
         error
       );
       return makeGenericFailure(
-        `Unexpected error creating generated events: ${error.message}. Try a different approach.`
+        `Unexpected error creating generated events: ${
+          error.message
+        }. Try a different approach.`
       );
     }
   },
@@ -4135,9 +4134,7 @@ const createScene: EditorFunction = {
         );
       }
 
-      return makeGenericSuccess(
-        `Scene "${scene_name}" already exists.`
-      );
+      return makeGenericSuccess(`Scene "${scene_name}" already exists.`);
     }
 
     const scenesCount = project.getLayoutsCount();
@@ -4185,9 +4182,7 @@ const deleteScene: EditorFunction = {
     const scene_name = extractRequiredString(args, 'scene_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericSuccess(
-        `Scene "${scene_name}" already absent.`
-      );
+      return makeGenericSuccess(`Scene "${scene_name}" already absent.`);
     }
 
     project.removeLayout(scene_name);
@@ -4497,9 +4492,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           project.setName(newValue);
           changes.push(`Set game name to "${newValue}".`);
         } else {
-          warnings.push(
-            `Unknown scene property: "${propertyName}". Skipped.`
-          );
+          warnings.push(`Unknown scene property: "${propertyName}". Skipped.`);
         }
       });
 
@@ -4616,9 +4609,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           return;
         }
         if (!scene.hasLayerNamed(layerName)) {
-          warnings.push(
-            `Layer "${layerName}" not found. Effects skipped.`
-          );
+          warnings.push(`Layer "${layerName}" not found. Effects skipped.`);
           return;
         }
         const layer = scene.getLayers().getLayer(layerName);
@@ -4703,9 +4694,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         );
         if (changed_properties) {
           if (!effectsContainer.hasEffectNamed(effectName)) {
-            warnings.push(
-              `Effect "${effectName}" not found. Skipped.`
-            );
+            warnings.push(`Effect "${effectName}" not found. Skipped.`);
             return;
           }
           const effect = effectsContainer.getEffect(effectName);
@@ -4715,9 +4704,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           );
 
           if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
-            warnings.push(
-              `Effect "${effectName}" invalid. Skipped.`
-            );
+            warnings.push(`Effect "${effectName}" invalid. Skipped.`);
             return;
           }
 

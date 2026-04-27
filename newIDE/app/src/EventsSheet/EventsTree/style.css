@@ -173,6 +173,17 @@
   opacity: 0.3;
 }
 
+.gd-events-sheet .light-theme .rst__lineHalfHorizontalRight::before,
+.gd-events-sheet .light-theme .rst__lineFullVertical::after,
+.gd-events-sheet .light-theme .rst__lineHalfVerticalTop::after,
+.gd-events-sheet .light-theme .rst__lineHalfVerticalBottom::after,
+.gd-events-sheet .dark-theme .rst__lineHalfHorizontalRight::before,
+.gd-events-sheet .dark-theme .rst__lineFullVertical::after,
+.gd-events-sheet .dark-theme .rst__lineHalfVerticalTop::after,
+.gd-events-sheet .dark-theme .rst__lineHalfVerticalBottom::after {
+  opacity: 1;
+}
+
 /**
  * Links to add a condition or an action
  */

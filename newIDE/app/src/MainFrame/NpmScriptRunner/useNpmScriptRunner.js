@@ -7,10 +7,11 @@ import type {
   ToolbarButtonHooksNames,
 } from '../CustomToolbarButton';
 import NpmScriptConfirmDialog from './NpmScriptConfirmDialog';
+import { getProjectDirectory } from '../../Utils/ProjectSettingsReader';
 
 type Props = {|
   toolbarButtons: Array<ToolbarButtonConfig>,
-  projectPath: ?string,
+  fileIdentifier: ?string,
   /**
    * Number of currently active non-edition preview windows, derived from
    * debugger connections. Note: hook callbacks fire *after* the preview window
@@ -24,6 +25,7 @@ export type TriggerNpmScript = (npmScript: string) => void;
 type ReturnType = {|
   triggerNpmScript: TriggerNpmScript,
   renderNpmScriptConfirmDialog: () => React.Node,
+  projectPath: ?string,
 |};
 
 const getScriptsByHookName = (
@@ -43,9 +45,14 @@ const getScriptsByHookName = (
  */
 const useNpmScriptRunner = ({
   toolbarButtons,
-  projectPath,
+  fileIdentifier,
   previewCount,
 }: Props): ReturnType => {
+  const projectPath = React.useMemo(
+    () => (fileIdentifier ? getProjectDirectory(fileIdentifier) : null),
+    [fileIdentifier]
+  );
+
   const isEditorReady = !!projectPath && toolbarButtons.length > 0;
   const {
     values: { disableNpmScriptConfirmation },
@@ -168,6 +175,7 @@ const useNpmScriptRunner = ({
   return {
     triggerNpmScript,
     renderNpmScriptConfirmDialog,
+    projectPath,
   };
 };
 

@@ -211,10 +211,7 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
-import {
-  readProjectSettings,
-  getProjectDirectory,
-} from '../Utils/ProjectSettingsReader';
+import { readProjectSettings } from '../Utils/ProjectSettingsReader';
 import useNpmScriptRunner from './NpmScriptRunner/useNpmScriptRunner';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
@@ -618,21 +615,19 @@ const MainFrame = (props: Props): React.MixedElement => {
     state.currentProject
   );
 
-  const projectPath = React.useMemo(
-    () =>
-      currentFileMetadata
-        ? getProjectDirectory(currentFileMetadata.fileIdentifier)
-        : null,
-    [currentFileMetadata]
-  );
+  const fileIdentifier = currentFileMetadata
+    ? currentFileMetadata.fileIdentifier
+    : null;
 
-  const { triggerNpmScript, renderNpmScriptConfirmDialog } = useNpmScriptRunner(
-    {
-      toolbarButtons: state.toolbarButtons,
-      projectPath,
-      previewCount: nonEditionPreviewsCount,
-    }
-  );
+  const {
+    triggerNpmScript,
+    renderNpmScriptConfirmDialog,
+    projectPath,
+  } = useNpmScriptRunner({
+    fileIdentifier,
+    toolbarButtons: state.toolbarButtons,
+    previewCount: nonEditionPreviewsCount,
+  });
 
   const {
     renderShareDialog,

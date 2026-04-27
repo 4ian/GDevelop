@@ -215,6 +215,7 @@ import {
   readProjectSettings,
   getProjectDirectory,
 } from '../Utils/ProjectSettingsReader';
+import useNpmScriptRunner from './NpmScriptRunner/useNpmScriptRunner';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
   EmbeddedGameFrame,
@@ -534,6 +535,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     _previewLauncher.current.getPreviewDebuggerServer();
   const {
     hasNonEditionPreviewsRunning,
+    nonEditionPreviewsCount,
     gameHotReloadLogs,
     editorHotReloadLogs,
     editorUncaughtError,
@@ -615,6 +617,23 @@ const MainFrame = (props: Props): React.MixedElement => {
   const currentProject = exceptionallyGuardAgainstDeadObject(
     state.currentProject
   );
+
+  const projectPath = React.useMemo(
+    () =>
+      currentFileMetadata
+        ? getProjectDirectory(currentFileMetadata.fileIdentifier)
+        : null,
+    [currentFileMetadata]
+  );
+
+  const { triggerNpmScript, renderNpmScriptConfirmDialog } = useNpmScriptRunner(
+    {
+      toolbarButtons: state.toolbarButtons,
+      projectPath,
+      previewCount: nonEditionPreviewsCount,
+    }
+  );
+
   const {
     renderShareDialog,
     resourceSources,
@@ -5122,9 +5141,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     onRestartInGameEditor,
     showRestartInGameEditorAfterErrorButton,
     toolbarButtons: state.toolbarButtons,
-    projectPath: currentFileMetadata
-      ? getProjectDirectory(currentFileMetadata.fileIdentifier)
-      : null,
+    projectPath,
+    triggerNpmScript,
   };
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');
@@ -5232,6 +5250,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       <LeaderboardProvider
         gameId={currentProject ? currentProject.getProjectUuid() : ''}
       >
+        {renderNpmScriptConfirmDialog()}
         <PanesContainer
           hasEditorsInLeftPane={hasEditorsInLeftPane}
           hasEditorsInRightPane={hasEditorsInRightPane}

@@ -62,6 +62,7 @@ import { type FloatingPaneState } from './PanesContainer';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 import { type ToolbarButtonConfig } from './CustomToolbarButton';
+import { type TriggerNpmScript } from './NpmScriptRunner/useNpmScriptRunner';
 
 const styles = {
   container: {
@@ -105,6 +106,7 @@ export type EditorTabsPaneCommonProps = {|
   setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
   toolbarButtons: Array<ToolbarButtonConfig>,
   projectPath: ?string,
+  triggerNpmScript: TriggerNpmScript,
 
   // Callbacks from MainFrame
   toggleProjectManager: () => void,
@@ -417,6 +419,7 @@ const EditorTabsPane: React.ComponentType<{
     showRestartInGameEditorAfterErrorButton,
     toolbarButtons,
     projectPath,
+    triggerNpmScript,
     onRequestPaneClose,
     drawerState,
     rightPaneDrawerOpen,
@@ -704,6 +707,7 @@ const EditorTabsPane: React.ComponentType<{
         canQuitVersionHistory={!isSavingProject}
         toolbarButtons={toolbarButtons}
         projectPath={projectPath}
+        triggerNpmScript={triggerNpmScript}
       />
       <SpecificDimensionsWindowSizeProvider
         innerWidth={paneWidth}

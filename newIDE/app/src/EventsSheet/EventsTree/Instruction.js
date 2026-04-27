@@ -378,9 +378,11 @@ const Instruction = (props: Props): React.Node => {
               key={i}
               className={classNames({
                 [selectableArea]: true,
-                [instructionParameter]: true,
+                [instructionParameter]:
+                  parameterType !== 'number' && parameterType !== 'string',
                 // $FlowFixMe[invalid-computed-prop]
-                [parameterType]: true,
+                [parameterType]:
+                  parameterType !== 'number' && parameterType !== 'string',
               })}
               onClick={domEvent => {
                 props.onParameterClick(domEvent, parameterIndex);
@@ -403,6 +405,7 @@ const Instruction = (props: Props): React.Node => {
               {ParameterRenderingService.renderInlineParameter({
                 scope,
                 value: formattedValue,
+                expression: instruction.getParameter(parameterIndex),
                 expressionIsValid,
                 hasDeprecationWarning,
                 parameterMetadata,

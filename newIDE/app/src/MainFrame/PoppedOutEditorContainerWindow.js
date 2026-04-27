@@ -159,6 +159,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                     canQuitVersionHistory={!props.isSavingProject}
                     toolbarButtons={props.toolbarButtons}
                     projectPath={props.projectPath}
+                    triggerNpmScript={props.triggerNpmScript}
                   />
                 )}
               />

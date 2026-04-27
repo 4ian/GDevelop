@@ -71,6 +71,7 @@ const defaultProps: MainFrameToolbarProps = {
   },
   toolbarButtons: [],
   projectPath: '',
+  triggerNpmScript: () => {},
 };
 
 export const NoProjectOpen = (): React.Node => (

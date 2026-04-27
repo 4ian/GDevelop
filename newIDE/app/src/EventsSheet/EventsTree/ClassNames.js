@@ -6,7 +6,7 @@ export const icon = 'icon';
 export const largeSelectableArea = 'large-selectable';
 export const largeSelectedArea = 'large-selected';
 
-export const executableEventContainer = 'executable-event-container';
+export const conditionsActionsContainer = 'conditions-actions-container';
 export const actionsContainer = 'actions-container';
 export const conditionsContainer = 'conditions-container';
 export const localVariablesContainer = 'local-variables-container';

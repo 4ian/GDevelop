@@ -15,6 +15,7 @@ import RobotIcon from '../ProjectCreation/RobotIcon';
 import PreferencesContext from './Preferences/PreferencesContext';
 import TextButton from '../UI/TextButton';
 import { useInterval } from '../Utils/UseInterval';
+import classes from './TabsTitlebar.module.css';
 import { useIsMounted } from '../Utils/UseIsMounted';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Window from '../Utils/Window';
@@ -191,6 +192,37 @@ export default function TabsTitlebar({
     preferences.values.showAiAskButtonInTitleBar && displayAskAi && !hideAskAi;
   const isAskAiIconAnimated = useIsAskAiIconAnimated(shouldDisplayAskAi);
 
+  const [isGlowing, setIsGlowing] = React.useState(false);
+  const glowTimeoutRef = React.useRef<?TimeoutID>(null);
+
+  const triggerGlow = React.useCallback(() => {
+    if (glowTimeoutRef.current) clearTimeout(glowTimeoutRef.current);
+    setIsGlowing(true);
+    glowTimeoutRef.current = setTimeout(() => {
+      setIsGlowing(false);
+      glowTimeoutRef.current = null;
+    }, 1000);
+  }, []);
+
+  React.useEffect(
+    () => () => {
+      if (glowTimeoutRef.current) clearTimeout(glowTimeoutRef.current);
+    },
+    []
+  );
+
+  // Desktop: glow when the Ask AI panel is closed (button re-appears).
+  const prevShouldDisplayAskAiRef = React.useRef(shouldDisplayAskAi);
+  React.useEffect(
+    () => {
+      if (shouldDisplayAskAi && !prevShouldDisplayAskAiRef.current) {
+        triggerGlow();
+      }
+      prevShouldDisplayAskAiRef.current = shouldDisplayAskAi;
+    },
+    [shouldDisplayAskAi, triggerGlow]
+  );
+
   const handleDoubleClick = React.useCallback(() => {
     // On macOS, double-clicking the title bar should maximize/restore the window
     if (isMacLike()) {
@@ -233,11 +265,13 @@ export default function TabsTitlebar({
           style={styles.askAiContainer}
           className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
         >
-          <TextButton
-            icon={<RobotIcon size={16} rotating={isAskAiIconAnimated} />}
-            label={'Ask AI'}
-            onClick={onAskAiClicked}
-          />
+          <div className={isGlowing ? classes.askAiGlow : undefined}>
+            <TextButton
+              icon={<RobotIcon size={16} rotating={isAskAiIconAnimated} />}
+              label={'Ask AI'}
+              onClick={onAskAiClicked}
+            />
+          </div>
         </div>
       ) : null}
       {isRightMostPane && <TitleBarRightSafeMargins />}

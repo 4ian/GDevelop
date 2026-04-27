@@ -307,6 +307,8 @@ namespace gdjs {
       this._eventsBasedObjectDatas = new Map<String, EventsBasedObjectData>();
       this._data = data;
       this._updateSceneAndExtensionsData();
+      gdjs.Variable.useDeprecatedZeroAsDefaultStringVariable =
+        !!data.properties.useDeprecatedZeroAsDefaultStringVariable;
 
       this._sceneResourcesPreloading =
         this._data.properties.sceneResourcesPreloading || 'at-startup';

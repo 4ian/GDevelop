@@ -2629,6 +2629,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   </ErrorBoundary>
                 )}
                 <InlineParameterEditor
+                  // Remount when switching parameters so stale local state can't
+                  // bleed into the next parameter via React 18 batched renders.
+                  key={`${
+                    this.state.editedParameter.instruction
+                      ? this.state.editedParameter.instruction.ptr
+                      : 'none'
+                  }-${this.state.editedParameter.parameterIndex}`}
                   open={this.state.inlineEditing}
                   anchorEl={this.state.inlineEditingAnchorEl}
                   onRequestClose={() => {

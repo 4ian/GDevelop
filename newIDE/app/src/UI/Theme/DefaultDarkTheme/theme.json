@@ -661,6 +661,11 @@
         "value": "#282C34"
       }
     },
+    "conditions-actions-container": {
+      "border-color": {
+        "value": "#32323B"
+      }
+    },
     "rst": {
       "ai-generated-event-move-handle": {
         "gradient-color-1": {
@@ -715,9 +720,6 @@
       "border-color": {
         "value": "#3E4452"
       },
-      "border": {
-        "value": "1px #3E4452 solid"
-      },
       "color": {
         "value": "rgb(209, 209, 209)"
       },
@@ -763,12 +765,12 @@
     "instruction-parameter": {
       "base": {
         "color": {
-          "value": "#8BED1C"
+          "value": "#16EF91"
         }
       },
       "number": {
         "color": {
-          "value": "#8AD6FF"
+          "value": "#E0D01F"
         }
       },
       "object": {
@@ -788,7 +790,7 @@
       },
       "var": {
         "color": {
-          "value": "#E2E225"
+          "value": "#8AD6FF"
         }
       },
       "error": {

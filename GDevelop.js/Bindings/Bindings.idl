@@ -607,6 +607,8 @@ interface Project {
     boolean IsFolderProject();
     void SetUseDeprecatedZeroAsDefaultZOrder(boolean enable);
     boolean GetUseDeprecatedZeroAsDefaultZOrder();
+    void SetUseDeprecatedZeroAsDefaultStringVariable(boolean enable);
+    boolean GetUseDeprecatedZeroAsDefaultStringVariable();
     boolean AreEffectsHiddenInEditor();
     void SetEffectsHiddenInEditor(boolean enable);
 

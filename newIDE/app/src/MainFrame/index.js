@@ -5243,6 +5243,9 @@ const MainFrame = (props: Props): React.MixedElement => {
             areSidePanesDrawers,
             onSetPointerEventsNone,
             onSetPaneDrawerState,
+            onRequestPaneClose,
+            drawerState,
+            rightPaneDrawerOpen,
           }) => (
             <EditorTabsPane
               {...editorTabsPaneProps}
@@ -5254,6 +5257,9 @@ const MainFrame = (props: Props): React.MixedElement => {
               onSetPointerEventsNone={onSetPointerEventsNone}
               onSetPaneDrawerState={onSetPaneDrawerState}
               onPopOutTab={onPopOutTab}
+              onRequestPaneClose={onRequestPaneClose}
+              drawerState={drawerState}
+              rightPaneDrawerOpen={rightPaneDrawerOpen}
             />
           )}
         />

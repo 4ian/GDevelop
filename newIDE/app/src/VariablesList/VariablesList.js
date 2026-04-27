@@ -1886,7 +1886,16 @@ const VariablesList: React.ComponentType<{
         props.variablesContainer
       );
       if (!variable) return;
+      const oldType = variable.getType();
       variable.castTo(newType);
+      // When changing type to String, reset to an empty string.
+      if (newType === 'string' && oldType === gd.Variable.Number) {
+        variable.setString('');
+      }
+      // When changing type to Number, reset to 0.
+      if (newType === 'number' && oldType === gd.Variable.String) {
+        variable.setValue(0);
+      }
       _onChange();
       forceUpdate();
     },

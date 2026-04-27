@@ -7,7 +7,7 @@ import {
   largeSelectedArea,
   largeSelectableArea,
   selectableArea,
-  executableEventContainer,
+  conditionsActionsContainer,
   instructionParameter,
   nameAndIconContainer,
   instructionInvalidParameter,
@@ -275,7 +275,6 @@ export default class ForEachEvent extends React.Component<
             className={classNames({
               [largeSelectableArea]: true,
               [largeSelectedArea]: this.props.selected,
-              [executableEventContainer]: true,
             })}
           >
             <VariableDeclarationsList
@@ -521,6 +520,9 @@ export default class ForEachEvent extends React.Component<
               leftIndentWidth={this.props.leftIndentWidth}
               windowSize={this.props.windowSize}
               eventsSheetWidth={this.props.eventsSheetWidth}
+              className={classNames({
+                [conditionsActionsContainer]: true,
+              })}
               renderConditionsList={({ style, className }) => (
                 <InstructionsList
                   platform={this.props.project.getCurrentPlatform()}

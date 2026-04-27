@@ -213,6 +213,12 @@ export type AskAiEditorInterface = {|
    * since the tab is being moved rather than intentionally closed.
    */
   prepareToReposition: () => void,
+  /**
+   * Call when the mobile drawer is closed. On mobile the component is never
+   * unmounted, so the unmount cleanup never fires — this method provides the
+   * equivalent suspend trigger for the drawer close event.
+   */
+  suspendOnDrawerClose: () => void,
 |};
 
 const noop = () => {};
@@ -965,6 +971,12 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         switchInGameEditorIfNoHotReloadIsNeeded: noop,
         prepareToReposition: () => {
           skipSuspendOnCloseRef.current = true;
+        },
+        suspendOnDrawerClose: () => {
+          if (skipSuspendOnCloseRef.current) return;
+          upToDateOnStop.current().catch(err => {
+            console.error('Failed to suspend AI request on drawer close:', err);
+          });
         },
       }));
 

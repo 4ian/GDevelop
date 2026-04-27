@@ -68,7 +68,7 @@ const useNpmScriptRunner = ({
     hookName?: ToolbarButtonHooksNames,
   |} | null>(null);
 
-  const _scheduleOrRun = React.useCallback(
+  const scheduleOrRun = React.useCallback(
     (
       scripts: Array<string>,
       path: string,
@@ -85,15 +85,14 @@ const useNpmScriptRunner = ({
     [disableNpmScriptConfirmation]
   );
 
-  const _scheduleOrRunRef = React.useRef(_scheduleOrRun);
-  _scheduleOrRunRef.current = _scheduleOrRun;
+  const scheduleOrRunRef = React.useRef(scheduleOrRun);
+  scheduleOrRunRef.current = scheduleOrRun;
 
   const callHook = React.useCallback(
     (hookName: ToolbarButtonHooksNames) => {
       if (!projectPath) return;
       const scripts = getScriptsByHookName(toolbarButtons, hookName);
-      const scheduleOrRun = _scheduleOrRunRef.current;
-      scheduleOrRun(scripts, projectPath, hookName);
+      scheduleOrRunRef.current(scripts, projectPath, hookName);
     },
     [toolbarButtons, projectPath]
   );
@@ -101,8 +100,7 @@ const useNpmScriptRunner = ({
   const triggerNpmScript = React.useCallback(
     (npmScript: string) => {
       if (!projectPath) return;
-      const scheduleOrRun = _scheduleOrRunRef.current;
-      scheduleOrRun([npmScript], projectPath);
+      scheduleOrRunRef.current([npmScript], projectPath);
     },
     [projectPath]
   );

@@ -152,20 +152,23 @@ namespace gdjs {
     private sceneResourceLoadingQueue = new ResourceLoadingQueue(
       'scene',
       this.privateResourceManager,
-      (unloadedSceneState, newSceneState) =>
+      (
+        unloadedTaskIdentifier,
+        unloadedTaskState,
+        newTaskIdentifier,
+        newTaskState
+      ) =>
         this._getResourcesOnlyUsedInUnloadedScene(
-          unloadedSceneState,
-          newSceneState
+          unloadedTaskIdentifier,
+          unloadedTaskState,
+          newTaskIdentifier,
+          newTaskState
         )
     );
-    // TODO Handle objects from several scenes since several scene can be alive
-    // simultaneously in the scene stack.
-    private objectResourceLoadingQueue = new ResourceLoadingQueue(
-      'object',
-      this.privateResourceManager,
-      (unloadedSceneState, newSceneState) =>
-        this._getResourcesOnlyUsedInObject(unloadedSceneState)
-    );
+    private objectResourceLoadingQueues = new Map<
+      string,
+      ResourceLoadingQueue
+    >();
 
     /**
      * @param runtimeGame The game.
@@ -237,7 +240,9 @@ namespace gdjs {
 
       // TODO We should probably instanciate new queues to avoid side effects from running tasks.
       this.sceneResourceLoadingQueue.clear();
-      this.objectResourceLoadingQueue.clear();
+      for (const objectResourceLoadingQueue of this.objectResourceLoadingQueues.values()) {
+        objectResourceLoadingQueue.clear();
+      }
 
       for (const layoutData of layoutDataArray) {
         this.sceneResourceLoadingQueue.registerResources(
@@ -292,7 +297,9 @@ namespace gdjs {
       );
 
       this.sceneResourceLoadingQueue.setAllResourcesAs('ready');
-      this.objectResourceLoadingQueue.setAllResourcesAs('ready');
+      for (const objectResourceLoadingQueue of this.objectResourceLoadingQueues.values()) {
+        objectResourceLoadingQueue.setAllResourcesAs('ready');
+      }
     }
 
     async loadResources(
@@ -428,17 +435,17 @@ namespace gdjs {
      * Preload an object assets in background.
      */
     async loadObjectResources(
+      sceneName: string,
       objectName: string,
       usedResources: Array<ResourceReference>
     ): Promise<void> {
       debugLogger.log(
         `Loading of resources for object ${objectName} was requested.`
       );
-      this.objectResourceLoadingQueue.registerResources(
-        objectName,
-        usedResources
-      );
-      const task = this.objectResourceLoadingQueue.enqueue(objectName);
+      const objectResourceLoadingQueue =
+        this.getObjectResourceLoadingQueue(sceneName);
+      objectResourceLoadingQueue.registerResources(objectName, usedResources);
+      const task = objectResourceLoadingQueue.enqueue(objectName);
       return new Promise<void>((resolve, reject) => {
         if (!task) {
           debugLogger.log(
@@ -454,6 +461,33 @@ namespace gdjs {
           resolve();
         });
       });
+    }
+
+    private getObjectResourceLoadingQueue(sceneName: string) {
+      let objectResourceLoadingQueue =
+        this.objectResourceLoadingQueues.get(sceneName);
+      if (!objectResourceLoadingQueue) {
+        objectResourceLoadingQueue = new ResourceLoadingQueue(
+          `Objects of ${sceneName}`,
+          this.privateResourceManager,
+          (
+            unloadedTaskIdentifier,
+            unloadedTaskState,
+            newTaskIdentifier,
+            newTaskState
+          ) =>
+            this._getResourcesOnlyUsedInObject(
+              sceneName,
+              unloadedTaskIdentifier,
+              unloadedTaskState
+            )
+        );
+        this.objectResourceLoadingQueues.set(
+          sceneName,
+          objectResourceLoadingQueue
+        );
+      }
+      return objectResourceLoadingQueue;
     }
 
     /**
@@ -485,7 +519,9 @@ namespace gdjs {
         unloadedSceneName,
         newSceneName
       );
-      this.objectResourceLoadingQueue.clear();
+      const objectResourceLoadingQueue =
+        this.getObjectResourceLoadingQueue(unloadedSceneName);
+      objectResourceLoadingQueue.clear();
 
       debugLogger.log(
         `Unloading of resources for scene ${unloadedSceneName} finished.`
@@ -495,8 +531,10 @@ namespace gdjs {
     /**
      * Unload an object assets in background.
      */
-    unloadObjectResources(objectName: string): void {
-      if (!this.objectResourceLoadingQueue.areAssetsReady(objectName)) {
+    unloadObjectResources(sceneName: string, objectName: string): void {
+      const objectResourceLoadingQueue =
+        this.getObjectResourceLoadingQueue(sceneName);
+      if (!objectResourceLoadingQueue.areAssetsReady(objectName)) {
         debugLogger.log(
           `Can't unload of resources for object ${objectName} as it is not loaded.`
         );
@@ -516,8 +554,8 @@ namespace gdjs {
       debugLogger.log(
         `Unloading of resources for object ${objectName} was requested.`
       );
-      this.objectResourceLoadingQueue.unloadResources(objectName);
-      this.objectResourceLoadingQueue.unregisterResources(objectName);
+      objectResourceLoadingQueue.unloadResources(sceneName, objectName);
+      objectResourceLoadingQueue.unregisterResources(objectName);
       debugLogger.log(
         `Unloading of resources for object ${objectName} finished.`
       );
@@ -532,7 +570,9 @@ namespace gdjs {
         this.privateResourceManager._unloadResource(resource.name);
       }
       this.sceneResourceLoadingQueue.setAllResourcesAs('not-loaded');
-      this.objectResourceLoadingQueue.clear();
+      for (const objectResourceLoadingQueue of this.objectResourceLoadingQueues.values()) {
+        objectResourceLoadingQueue.clear();
+      }
       debugLogger.log(`Unloading of all resources finished.`);
     }
 
@@ -560,8 +600,10 @@ namespace gdjs {
      * @returns true when all the resources of the given object are loaded and
      * parsed.
      */
-    areObjectAssetsReady(objectName: string): boolean {
-      return this.objectResourceLoadingQueue.areAssetsReady(objectName);
+    areObjectAssetsReady(sceneName: string, objectName: string): boolean {
+      return this.getObjectResourceLoadingQueue(sceneName).areAssetsReady(
+        objectName
+      );
     }
 
     getResource(resourceName: string): ResourceData | null {
@@ -718,7 +760,9 @@ namespace gdjs {
      * and that are not used in any other loaded scene (or the scene that is coming next).
      */
     private _getResourcesOnlyUsedInUnloadedScene(
+      unloadedSceneName: string,
       unloadedSceneState: LoadingTaskState,
+      newSceneName: string | null,
       newSceneState: LoadingTaskState | null
     ): Set<string> {
       // Construct the set of all resources to unload. These are the resources
@@ -729,9 +773,14 @@ namespace gdjs {
       );
       // Also add the resources manually loaded for objects during the current scene.
       // TODO Abort loading task to avoid to leave resources from an object that is currently loading.
-      for (const objectLoadingState of this.objectResourceLoadingQueue.loadingStates.values()) {
-        for (const resourceName of objectLoadingState.resourceNames) {
-          resourceNamesToUnload.add(resourceName);
+      const unloadedSceneObjectResourceLoadingQueue = newSceneName
+        ? this.getObjectResourceLoadingQueue(newSceneName)
+        : null;
+      if (unloadedSceneObjectResourceLoadingQueue) {
+        for (const objectLoadingState of unloadedSceneObjectResourceLoadingQueue.loadingStates.values()) {
+          for (const resourceName of objectLoadingState.resourceNames) {
+            resourceNamesToUnload.add(resourceName);
+          }
         }
       }
       for (const sceneLoadingState of this.sceneResourceLoadingQueue.loadingStates.values()) {
@@ -750,20 +799,34 @@ namespace gdjs {
         }
       }
       // Other scenes from the stack may have loaded objects which use the same resources.
-      // TODO Exclude resources from manually loaded objects from other scenes.
+      for (const objectResourceLoadingQueue of this.objectResourceLoadingQueues.values()) {
+        if (
+          objectResourceLoadingQueue !== unloadedSceneObjectResourceLoadingQueue
+        ) {
+          for (const objectLoadingState of objectResourceLoadingQueue.loadingStates.values()) {
+            for (const resourceName of objectLoadingState.resourceNames) {
+              resourceNamesToUnload.delete(resourceName);
+            }
+          }
+        }
+      }
       return resourceNamesToUnload;
     }
 
     private _getResourcesOnlyUsedInObject(
+      currentSceneName: string,
+      objectName: string,
       objectLoadingState: LoadingTaskState
     ): Set<string> {
       const resourceNamesToUnload = new Set<string>(
         objectLoadingState.resourceNames
       );
+      const currentSceneObjectResourceLoadingQueue =
+        this.getObjectResourceLoadingQueue(currentSceneName);
       // The resources used by the current scene are already excluded from the
       // object resources list at export.
       // Other manually loaded objects may use the same resources.
-      for (const otherObjectLoadingState of this.objectResourceLoadingQueue.loadingStates.values()) {
+      for (const otherObjectLoadingState of currentSceneObjectResourceLoadingQueue.loadingStates.values()) {
         if (otherObjectLoadingState === objectLoadingState) {
           continue;
         }
@@ -784,7 +847,17 @@ namespace gdjs {
         }
       }
       // Other scenes from the stack may have loaded objects which use the same resources.
-      // TODO Exclude resources from manually loaded objects from other scenes.
+      for (const objectResourceLoadingQueue of this.objectResourceLoadingQueues.values()) {
+        if (
+          objectResourceLoadingQueue !== currentSceneObjectResourceLoadingQueue
+        ) {
+          for (const objectLoadingState of objectResourceLoadingQueue.loadingStates.values()) {
+            for (const resourceName of objectLoadingState.resourceNames) {
+              resourceNamesToUnload.delete(resourceName);
+            }
+          }
+        }
+      }
       return resourceNamesToUnload;
     }
 
@@ -923,6 +996,13 @@ namespace gdjs {
     }
   }
 
+  type ResourceDifferenceOperation = (
+    unloadedTaskIdentifier: string,
+    unloadedTaskState: LoadingTaskState,
+    newTaskIdentifier: string | null,
+    newTaskState: LoadingTaskState | null
+  ) => Set<string>;
+
   class ResourceLoadingQueue {
     private resourceLoader: PrivateResourceManager;
     private name: string;
@@ -956,18 +1036,12 @@ namespace gdjs {
      */
     isLoadingInForeground = true;
 
-    private getResourcesDifference: (
-      unloadedTaskState: LoadingTaskState,
-      newTaskState: LoadingTaskState | null
-    ) => Set<string>;
+    private getResourcesDifference: ResourceDifferenceOperation;
 
     constructor(
       name: string,
       resourceLoader: PrivateResourceManager,
-      getResourcesDifference: (
-        unloadedTaskState: LoadingTaskState,
-        newTaskState: LoadingTaskState | null
-      ) => Set<string>
+      getResourcesDifference: ResourceDifferenceOperation
     ) {
       this.name = name;
       this.resourceLoader = resourceLoader;
@@ -1203,7 +1277,9 @@ namespace gdjs {
         return;
       }
       for (const resourceName of this.getResourcesDifference(
+        unloadedTaskIdentifier,
         unloadedTaskState,
+        newTaskIdentifier,
         newTaskState
       )) {
         this.resourceLoader._unloadResource(resourceName);

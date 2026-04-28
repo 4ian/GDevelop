@@ -930,21 +930,39 @@ namespace gdjs {
       if (!usedResources) {
         return;
       }
-      this._resourcesLoader.loadObjectResources(objectName, usedResources);
+      this._resourcesLoader.loadObjectResources(
+        currentScene.getName(),
+        objectName,
+        usedResources
+      );
     }
 
     /**
      * @returns true when all the resources of the given object are loaded.
      */
     areObjectAssetsLoaded(objectName: string): boolean {
-      return this._resourcesLoader.areObjectAssetsReady(objectName);
+      const currentScene = this._sceneStack.getCurrentScene();
+      if (!currentScene) {
+        return false;
+      }
+      return this._resourcesLoader.areObjectAssetsReady(
+        currentScene.getName(),
+        objectName
+      );
     }
 
     /**
      * Unload an object assets.
      */
     unloadObjectAssets(objectName: string): void {
-      this._resourcesLoader.unloadObjectResources(objectName);
+      const currentScene = this._sceneStack.getCurrentScene();
+      if (!currentScene) {
+        return;
+      }
+      this._resourcesLoader.unloadObjectResources(
+        currentScene.getName(),
+        objectName
+      );
     }
 
     /**

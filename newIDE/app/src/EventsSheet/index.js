@@ -124,6 +124,7 @@ import {
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { resetParametersAfterSwitch } from '../InstructionOrExpression/SetupInstructionParameters';
 import LocalVariablesDialog from '../VariablesList/LocalVariablesDialog';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
@@ -2670,11 +2671,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     }
                     instruction.setParameter(parameterIndex, value);
 
+                    const typeBeforeSwitch = instruction.getType();
                     gd.VariableInstructionSwitcher.switchBetweenUnifiedInstructionIfNeeded(
                       project.getCurrentPlatform(),
                       editedParameterProjectScopedContainersAccessor.get(),
                       instruction
                     );
+                    if (instruction.getType() !== typeBeforeSwitch) {
+                      resetParametersAfterSwitch(instruction);
+                    }
 
                     // Ask the component to re-render, so that the new parameter
                     // set for the instruction in the state

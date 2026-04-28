@@ -92,9 +92,14 @@ bool EventsVariableInstructionTypeSwitcher::DoVisitInstruction(gd::Instruction& 
             lastObjectName == groupName) {
           if (typeChangedVariableNames.find(variableName) !=
               typeChangedVariableNames.end()) {
+            const gd::String previousType = instruction.GetType();
             gd::VariableInstructionSwitcher::
                 SwitchBetweenUnifiedInstructionIfNeeded(
                     platform, GetProjectScopedContainers(), instruction);
+            if (instruction.GetType() != previousType) {
+              gd::VariableInstructionSwitcher::ResetParametersAfterSwitch(
+                  instruction);
+            }
           }
         }
       });

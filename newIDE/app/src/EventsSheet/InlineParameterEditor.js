@@ -126,26 +126,42 @@ const InlineParameterEditor = ({
       // When the parameter is done being edited, ensure the instruction parameters
       // are properly set up. For example, it's possible that the object name was
       // changed, and so the associated behavior should be updated.
-      if (instruction && instructionMetadata) {
-        const objectParameterIndex = getObjectParameterIndex(
-          instructionMetadata
-        );
-        setupInstructionParameters(
-          project,
-          projectScopedContainersAccessor,
-          instruction,
-          instructionMetadata,
-          objectParameterIndex !== -1
-            ? instruction.getParameter(objectParameterIndex).getPlainString()
-            : null
-        );
+      // Use the current instruction type to get metadata — the type may have
+      // switched during editing (e.g. boolean → number variable), so the
+      // metadata stored in state when the editor opened may be stale and using
+      // it would corrupt the operator parameter.
+      if (instruction) {
+        const currentType = instruction.getType();
+        const currentInstructionMetadata = isCondition
+          ? gd.MetadataProvider.getConditionMetadata(
+              project.getCurrentPlatform(),
+              currentType
+            )
+          : gd.MetadataProvider.getActionMetadata(
+              project.getCurrentPlatform(),
+              currentType
+            );
+        if (currentInstructionMetadata) {
+          const objectParameterIndex = getObjectParameterIndex(
+            currentInstructionMetadata
+          );
+          setupInstructionParameters(
+            project,
+            projectScopedContainersAccessor,
+            instruction,
+            currentInstructionMetadata,
+            objectParameterIndex !== -1
+              ? instruction.getParameter(objectParameterIndex).getPlainString()
+              : null
+          );
+        }
       }
 
       onApply();
     },
     [
       instruction,
-      instructionMetadata,
+      isCondition,
       onApply,
       project,
       projectScopedContainersAccessor,

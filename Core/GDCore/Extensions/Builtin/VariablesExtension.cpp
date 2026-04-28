@@ -61,7 +61,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/conditions/var.png")
       .AddParameter("variableOrPropertyOrParameter", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
-      .SetDefaultValue("true")
+      .SetDefaultValue("True")
       // This parameter allows to keep the operand expression
       // when the editor switch between variable instructions.
       .AddCodeOnlyParameter("trueorfalse", "");
@@ -318,7 +318,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
-      .SetDefaultValue("true")
+      .SetDefaultValue("True")
       .SetRelevantForFunctionEventsOnly()
       .SetHidden();
 
@@ -407,7 +407,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
-      .SetDefaultValue("true")
+      .SetDefaultValue("True")
       .SetRelevantForFunctionEventsOnly()
       .SetHidden();
 

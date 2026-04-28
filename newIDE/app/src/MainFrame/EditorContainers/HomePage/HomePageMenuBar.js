@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { Column, marginsSize } from '../../../UI/Grid';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import IconButton from '../../../UI/IconButton';
+import DoubleChevronArrowLeft from '../../../UI/CustomSvgIcons/DoubleChevronArrowLeft';
 import DoubleChevronArrowRight from '../../../UI/CustomSvgIcons/DoubleChevronArrowRight';
 import VerticalTabButton, {
   verticalTabButtonSize,
@@ -21,6 +22,7 @@ import { Toolbar, ToolbarGroup } from '../../../UI/Toolbar';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { SECTION_DESKTOP_SPACING } from './SectionContainer';
 import Text from '../../../UI/Text';
+import PreferencesContext from '../../Preferences/PreferencesContext';
 
 const iconSize = 24;
 const iconButtonPadding = 4;
@@ -46,6 +48,8 @@ export const styles = {
     minWidth: homepageDesktopMenuBarWidth,
     display: 'flex',
     flexDirection: 'column',
+    position: 'relative',
+    overflow: 'visible',
   },
   mobileMenu: {
     paddingTop: 10,
@@ -77,6 +81,19 @@ export const styles = {
     justifyContent: 'center',
     marginBottom: 2,
   },
+  collapseButton: {
+    position: 'absolute',
+    top: SECTION_DESKTOP_SPACING + 4,
+    right: 0,
+    transform: 'translateX(50%)',
+    zIndex: 1,
+    backgroundColor: 'var(--theme-paper-background-dark)',
+    border: '1px solid var(--theme-home-separator-color)',
+    borderRadius: 999,
+  },
+  desktopTabsColumn: {
+    paddingTop: 22,
+  },
 };
 
 type Props = {|
@@ -98,7 +115,13 @@ const HomePageMenuBar = ({
   const isMobileOrSmallScreen = isMobile || isMediumScreen;
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
+  const preferences = React.useContext(PreferencesContext);
+  const isMenuCollapsed = preferences.values.homePageMenuIsCollapsed;
   const tabsToDisplay = getTabsToDisplay({ limits });
+  const shouldHideLabels = isMobileOrSmallScreen || isMenuCollapsed;
+  const menuWidth = shouldHideLabels
+    ? homepageMediumMenuBarWidth
+    : homepageDesktopMenuBarWidth;
   const largeScreenOnlyButtons: {
     label: React.Node,
     getIcon: GetIconFunction,
@@ -191,28 +214,56 @@ const HomePageMenuBar = ({
     <Paper
       style={{
         ...(isMobileOrSmallScreen ? styles.mobileMenu : styles.desktopMenu),
+        minWidth: menuWidth,
+        width: menuWidth,
         borderRight: `1px solid ${gdevelopTheme.home.separator.color}`,
       }}
       square
       background="dark"
     >
       <Column expand>
-        {isMobileOrSmallScreen && (
+        {isMobileOrSmallScreen ? (
           <IconButton onClick={onOpenHomePageMenuDrawer} size="small">
             <DoubleChevronArrowRight />
           </IconButton>
+        ) : (
+          <IconButton
+            onClick={() =>
+              preferences.setHomePageMenuIsCollapsed(!isMenuCollapsed)
+            }
+            size="small"
+            style={{
+              ...styles.collapseButton,
+              backgroundColor: gdevelopTheme.home.header.backgroundColor,
+              border: `1px solid ${gdevelopTheme.home.separator.color}`,
+            }}
+            tooltip={
+              isMenuCollapsed ? t`Expand navigation` : t`Collapse navigation`
+            }
+          >
+            {isMenuCollapsed ? (
+              <DoubleChevronArrowRight />
+            ) : (
+              <DoubleChevronArrowLeft />
+            )}
+          </IconButton>
         )}
-        {tabsToDisplay.map(({ label, tab, getIcon, id }) => (
-          <VerticalTabButton
-            key={id}
-            label={label}
-            onClick={() => setActiveTab(tab)}
-            getIcon={getIcon}
-            isActive={activeTab === tab}
-            hideLabel={isMobileOrSmallScreen}
-            id={id}
-          />
-        ))}
+        <Column
+          noMargin
+          style={!isMobileOrSmallScreen ? styles.desktopTabsColumn : undefined}
+        >
+          {tabsToDisplay.map(({ label, tab, getIcon, id }) => (
+            <VerticalTabButton
+              key={id}
+              label={label}
+              onClick={() => setActiveTab(tab)}
+              getIcon={getIcon}
+              isActive={activeTab === tab}
+              hideLabel={shouldHideLabels}
+              id={id}
+            />
+          ))}
+        </Column>
       </Column>
 
       <div style={styles.bottomButtonsContainer}>
@@ -224,7 +275,7 @@ const HomePageMenuBar = ({
               onClick={onClick}
               getIcon={getIcon}
               isActive={false}
-              hideLabel={isMobileOrSmallScreen}
+              hideLabel={shouldHideLabels}
               id={id}
             />
           ))}

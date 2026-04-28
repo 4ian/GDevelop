@@ -100,6 +100,7 @@ const SemiControlledRowInput = ({
         }}
         onClick={stopPropagation}
         onDoubleClick={stopPropagation}
+        onContextMenu={stopPropagation}
         onBlur={() => {
           onEndRenaming(value);
         }}
@@ -172,7 +173,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     [onContextMenu, index, node.item]
   );
 
-  const longTouchForContextMenuProps = useLongTouch(openContextMenu, {
+  const {
+    isPressingRef: isLongTouchPressingRef,
+    ...longTouchForContextMenuProps
+  } = useLongTouch(openContextMenu, {
     delay: DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE,
   });
 
@@ -302,7 +306,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           !node.item.isRoot &&
           !node.item.isPlaceholder &&
           // Prevent dragging of item whose name is edited, allowing to select text with click and drag on text.
-          renamedItemId !== node.id
+          renamedItemId !== node.id &&
+          // Prevent drag from starting during a long-press (which opens the context menu on mobile).
+          // When the user moves their finger, useLongTouch cancels, clearing isPressingRef, re-enabling drag.
+          !isLongTouchPressingRef.current
         }
         canDrop={canDrop ? () => canDrop(node.item, whereToDrop) : () => true}
         drop={() => {
@@ -363,6 +370,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           canDrop,
         }) => {
           setIsStayingOver(isOver, canDrop);
+
+          const isRenaming = renamedItemId === node.id;
 
           let itemRow = (
             <div
@@ -460,11 +469,13 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                   onEditItem ? () => onEditItem(node.item) : undefined
                 }
                 onContextMenu={
-                  shouldSelectUponContextMenuOpening
+                  isRenaming
+                    ? undefined
+                    : shouldSelectUponContextMenuOpening
                     ? selectAndOpenContextMenu
                     : openContextMenu
                 }
-                {...longTouchForContextMenuProps}
+                {...(isRenaming ? {} : longTouchForContextMenuProps)}
               >
                 {itemRow}
                 {(node.rightComponent ||

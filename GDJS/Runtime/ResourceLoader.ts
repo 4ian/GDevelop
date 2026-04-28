@@ -158,6 +158,8 @@ namespace gdjs {
           newSceneState
         )
     );
+    // TODO Handle objects from several scenes since several scene can be alive
+    // simultaneously in the scene stack.
     private objectResourceLoadingQueue = new ResourceLoadingQueue(
       'object',
       this.privateResourceManager,
@@ -726,21 +728,19 @@ namespace gdjs {
         unloadedSceneState.resourceNames
       );
       // Also add the resources manually loaded for objects during the current scene.
+      // TODO Abort loading task to avoid to leave resources from an object that is currently loading.
       for (const objectLoadingState of this.objectResourceLoadingQueue.loadingStates.values()) {
         for (const resourceName of objectLoadingState.resourceNames) {
           resourceNamesToUnload.add(resourceName);
         }
       }
       if (newSceneState) {
-        if (
-          newSceneState.status === 'loaded' ||
-          newSceneState.status === 'ready'
-        ) {
-          for (const resourceName of newSceneState.resourceNames) {
-            resourceNamesToUnload.delete(resourceName);
-          }
+        // We don't unload resources when the next scene need them too.
+        for (const resourceName of newSceneState.resourceNames) {
+          resourceNamesToUnload.delete(resourceName);
         }
       }
+      // TODO Exclude resources from any scene that will still be alive (the ones from the scene stack).
       return resourceNamesToUnload;
     }
 
@@ -750,6 +750,9 @@ namespace gdjs {
       const resourceNamesToUnload = new Set<string>(
         objectLoadingState.resourceNames
       );
+      // The resources used by the current scene are already excluded from the
+      // object resources list at export.
+      // Other manually excluded objects may use the same resources.
       for (const otherObjectLoadingState of this.objectResourceLoadingQueue.loadingStates.values()) {
         if (otherObjectLoadingState === objectLoadingState) {
           continue;
@@ -758,6 +761,8 @@ namespace gdjs {
           resourceNamesToUnload.delete(resourceName);
         }
       }
+      // Other scenes from the stack (and their objects) may use the same resources.
+      // TODO Exclude resources from any scene that will still be alive (the ones from the scene stack).
       return resourceNamesToUnload;
     }
 

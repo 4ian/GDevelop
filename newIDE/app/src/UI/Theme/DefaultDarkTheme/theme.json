@@ -750,10 +750,10 @@
     },
     "sub-instructions": {
       "border-color": {
-        "value": "#282C34"
+        "value": "#3E4452"
       },
       "border": {
-        "value": "1px #282C34 solid"
+        "value": "1px #3E4452 solid"
       }
     },
     "warning-instruction": {

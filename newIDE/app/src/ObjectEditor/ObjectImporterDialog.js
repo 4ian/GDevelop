@@ -695,9 +695,10 @@ const ObjectImporterDialog = ({
           resourceKind => resourceKind.kind === serializedResource.kind
         );
         if (!resourceKindMetadata) {
-          throw new Error(
+          console.error(
             `Resource of kind "${serializedResource.kind}" is not supported.`
           );
+          continue;
         }
         // The resource does not exist yet, add it. Note that the "origin" will be preserved.
         const newResource = resourceKindMetadata.createNewResource();
@@ -748,7 +749,10 @@ const ObjectImporterDialog = ({
 
       for (const { objectAsset, folderPathElements } of objectAssets) {
         const objectType: ?string = objectAsset.object.type;
-        if (!objectType) throw new Error('An object has no type specified');
+        if (!objectType) {
+          console.log('An object has no type specified');
+          continue;
+        }
 
         const originalName = gd.Project.getSafeName(objectAsset.object.name);
         const newName = newNameGenerator(originalName, name =>

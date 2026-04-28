@@ -174,8 +174,10 @@ const zipAssets = async (
   try {
     const allRequiredExtensionNames = new Set<string>();
     const extensionDependencyCache = new gd.ExtensionDependencyCache();
-    await Promise.all(
-      enumeratedObjects.map(async ({ object, path }) => {
+
+    const allUsedResourceNames = new Set<string>();
+    const enumeratedSerializedObjects = enumeratedObjects.map(
+      ({ object, path }) => {
         const usedResourceNames: Array<string> = [];
         const serializedObject = serializeToObjectAsset(
           project,
@@ -184,36 +186,46 @@ const zipAssets = async (
           usedResourceNames,
           extensionDependencyCache
         );
-
-        // Download resources to blobs and update the resources.
-        const blobByResourceName: Map<string, Blob> = new Map();
-        await ensureDownloadResourcesAsBlobsIsDone({
-          project,
-          resourceNames: usedResourceNames,
-          onAddBlobFile: (resourceName: string, blob: Blob) => {
-            blobByResourceName.set(resourceName, blob);
-          },
-        });
-
-        const resourcesManager = project.getResourcesManager();
-        for (const [resourceName, blob] of blobByResourceName) {
-          const resource = resourcesManager.getResource(resourceName);
-          const resourceFile = 'resources/' + resource.getFile();
-          blobFiles.set(resourceFile, { filePath: resourceFile, blob });
+        for (const resourceName of usedResourceNames) {
+          allUsedResourceNames.add(resourceName);
         }
-
-        const requiredExtensions: Array<ExtensionDependency> =
-          serializedObject.objectAssets[0].requiredExtensions || [];
-        for (const { extensionName } of requiredExtensions) {
-          allRequiredExtensionNames.add(extensionName);
-        }
-
-        textFiles.push({
-          text: addFinalNewline(JSON.stringify(serializedObject, null, 2)),
-          filePath: 'objects/' + path + object.getName() + '.asset.json',
-        });
-      })
+        return { object, path, serializedObject };
+      }
     );
+
+    // Download resources to blobs and update the resources.
+    const blobByResourceName: Map<string, Blob> = new Map();
+    await ensureDownloadResourcesAsBlobsIsDone({
+      project,
+      resourceNames: [...allUsedResourceNames],
+      onAddBlobFile: (resourceName: string, blob: Blob) => {
+        blobByResourceName.set(resourceName, blob);
+      },
+    });
+
+    for (const {
+      object,
+      path,
+      serializedObject,
+    } of enumeratedSerializedObjects) {
+      const resourcesManager = project.getResourcesManager();
+      for (const [resourceName, blob] of blobByResourceName) {
+        const resource = resourcesManager.getResource(resourceName);
+        const resourceFile = 'resources/' + resource.getFile();
+        blobFiles.set(resourceFile, { filePath: resourceFile, blob });
+      }
+
+      const requiredExtensions: Array<ExtensionDependency> =
+        serializedObject.objectAssets[0].requiredExtensions || [];
+      for (const { extensionName } of requiredExtensions) {
+        allRequiredExtensionNames.add(extensionName);
+      }
+
+      textFiles.push({
+        text: addFinalNewline(JSON.stringify(serializedObject, null, 2)),
+        filePath: 'objects/' + path + object.getName() + '.asset.json',
+      });
+    }
     extensionDependencyCache.delete();
     for (const extensionName of allRequiredExtensionNames) {
       allRequiredExtensionNames.add(extensionName);

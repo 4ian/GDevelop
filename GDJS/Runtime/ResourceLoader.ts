@@ -734,13 +734,23 @@ namespace gdjs {
           resourceNamesToUnload.add(resourceName);
         }
       }
-      if (newSceneState) {
-        // We don't unload resources when the next scene need them too.
-        for (const resourceName of newSceneState.resourceNames) {
-          resourceNamesToUnload.delete(resourceName);
+      for (const sceneLoadingState of this.sceneResourceLoadingQueue.loadingStates.values()) {
+        if (sceneLoadingState === unloadedSceneState) continue;
+
+        if (
+          // We don't unload resources when the next scene need them too.
+          sceneLoadingState === newSceneState ||
+          // We don't unload resources used by any loaded scene.
+          sceneLoadingState.status === 'loaded' ||
+          sceneLoadingState.status === 'ready'
+        ) {
+          for (const resourceName of sceneLoadingState.resourceNames) {
+            resourceNamesToUnload.delete(resourceName);
+          }
         }
       }
-      // TODO Exclude resources from any scene that will still be alive (the ones from the scene stack).
+      // Other scenes from the stack may have loaded objects which use the same resources.
+      // TODO Exclude resources from manually loaded objects from other scenes.
       return resourceNamesToUnload;
     }
 
@@ -752,7 +762,7 @@ namespace gdjs {
       );
       // The resources used by the current scene are already excluded from the
       // object resources list at export.
-      // Other manually excluded objects may use the same resources.
+      // Other manually loaded objects may use the same resources.
       for (const otherObjectLoadingState of this.objectResourceLoadingQueue.loadingStates.values()) {
         if (otherObjectLoadingState === objectLoadingState) {
           continue;
@@ -761,8 +771,20 @@ namespace gdjs {
           resourceNamesToUnload.delete(resourceName);
         }
       }
-      // Other scenes from the stack (and their objects) may use the same resources.
-      // TODO Exclude resources from any scene that will still be alive (the ones from the scene stack).
+      // Other scenes may use the same resources.
+      for (const sceneLoadingState of this.sceneResourceLoadingQueue.loadingStates.values()) {
+        if (
+          // We don't unload resources used by any loaded scene.
+          sceneLoadingState.status === 'loaded' ||
+          sceneLoadingState.status === 'ready'
+        ) {
+          for (const resourceName of sceneLoadingState.resourceNames) {
+            resourceNamesToUnload.delete(resourceName);
+          }
+        }
+      }
+      // Other scenes from the stack may have loaded objects which use the same resources.
+      // TODO Exclude resources from manually loaded objects from other scenes.
       return resourceNamesToUnload;
     }
 

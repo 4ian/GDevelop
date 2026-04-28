@@ -152,6 +152,7 @@ namespace gdjs {
     private sceneResourceLoadingQueue = new ResourceLoadingQueue(
       'scene',
       this.privateResourceManager,
+      /** shouldProcessResources= */ false,
       (
         unloadedTaskIdentifier,
         unloadedTaskState,
@@ -468,8 +469,9 @@ namespace gdjs {
         this.objectResourceLoadingQueues.get(sceneName);
       if (!objectResourceLoadingQueue) {
         objectResourceLoadingQueue = new ResourceLoadingQueue(
-          `Objects of ${sceneName}`,
+          `Independent objects of ${sceneName}`,
           this.privateResourceManager,
+          /** shouldProcessResources= */ true,
           (
             unloadedTaskIdentifier,
             unloadedTaskState,
@@ -554,7 +556,7 @@ namespace gdjs {
       debugLogger.log(
         `Unloading of resources for object ${objectName} was requested.`
       );
-      objectResourceLoadingQueue.unloadResources(sceneName, objectName);
+      objectResourceLoadingQueue.unloadResources(objectName);
       objectResourceLoadingQueue.unregisterResources(objectName);
       debugLogger.log(
         `Unloading of resources for object ${objectName} finished.`
@@ -1037,14 +1039,17 @@ namespace gdjs {
     isLoadingInForeground = true;
 
     private getResourcesDifference: ResourceDifferenceOperation;
+    private shouldProcessResources: boolean;
 
     constructor(
       name: string,
       resourceLoader: PrivateResourceManager,
+      shouldProcessResources: boolean,
       getResourcesDifference: ResourceDifferenceOperation
     ) {
       this.name = name;
       this.resourceLoader = resourceLoader;
+      this.shouldProcessResources = shouldProcessResources;
       this.getResourcesDifference = getResourcesDifference;
     }
 
@@ -1075,7 +1080,6 @@ namespace gdjs {
             await this._doLoadResources(loadingState, async (count, total) =>
               task.onProgress(count, total)
             );
-            // TODO Parse the resources for objects
           } else {
             logger.warn(
               `Can\'t load resource for unknown ${this.name}: "${task.identifier}".`
@@ -1119,6 +1123,9 @@ namespace gdjs {
             return;
           }
           await this.resourceLoader._loadResource(resource);
+          if (this.shouldProcessResources) {
+            await this.resourceLoader._processResource(resource);
+          }
           loadedCount++;
           this.currentTaskProgress =
             loadedCount / loadingState.resourceNames.length;
@@ -1126,7 +1133,7 @@ namespace gdjs {
             (await onProgress(loadedCount, loadingState.resourceNames.length));
         }
       );
-      loadingState.status = 'loaded';
+      loadingState.status = this.shouldProcessResources ? 'ready' : 'loaded';
     }
 
     /**

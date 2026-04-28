@@ -690,7 +690,7 @@
       },
       "line": {
         "background-color": {
-          "value": "#ABB2BF"
+          "value": "#494952"
         }
       },
       "row-contents": {
@@ -750,22 +750,22 @@
     },
     "sub-instructions": {
       "border-color": {
-        "value": "#282C34"
+        "value": "#3E4452"
       },
       "border": {
-        "value": "1px #282C34 solid"
+        "value": "1px #3E4452 solid"
       }
     },
     "warning-instruction": {
       "background-color": {
-        "value": "rgba(255, 188, 87, 0.125)",
+        "value": "rgba(255, 188, 87, 0.13)",
         "comment": "Palette/Yellow/40 and alpha"
       }
     },
     "instruction-parameter": {
       "base": {
         "color": {
-          "value": "#16EF91"
+          "value": "#0ECD7A"
         }
       },
       "number": {
@@ -798,7 +798,7 @@
           "value": "#FE6C46"
         },
         "background-color": {
-          "value": "#FE6C46"
+          "value": "#FE6C4666"
         }
       },
       "warning": {

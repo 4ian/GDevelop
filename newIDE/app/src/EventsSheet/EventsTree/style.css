@@ -11,7 +11,7 @@
  */
 .gd-events-sheet .move-handle {
     width: 10px;
-    margin: 0.5px;
+    margin: 1px 0.5px;
     flex-grow: 0;
     flex-shrink: 0;
     cursor: move;
@@ -52,7 +52,7 @@
     right: 0;
 
     min-width: 0; /* But don't shrink scaffolding lines */
-    margin-bottom: 2px; /* Margin after an event */
+    margin-bottom: 1px; /* Margin after an event */
 }
 
 .gd-events-sheet .rst__row {
@@ -171,6 +171,17 @@
  */
 .gd-events-sheet .rst__lineHalfHorizontalRight::before, .rst__lineFullVertical::after, .rst__lineHalfVerticalTop::after, .rst__lineHalfVerticalBottom::after {
   opacity: 0.3;
+}
+
+.gd-events-sheet .light-theme .rst__lineHalfHorizontalRight::before,
+.gd-events-sheet .light-theme .rst__lineFullVertical::after,
+.gd-events-sheet .light-theme .rst__lineHalfVerticalTop::after,
+.gd-events-sheet .light-theme .rst__lineHalfVerticalBottom::after,
+.gd-events-sheet .dark-theme .rst__lineHalfHorizontalRight::before,
+.gd-events-sheet .dark-theme .rst__lineFullVertical::after,
+.gd-events-sheet .dark-theme .rst__lineHalfVerticalTop::after,
+.gd-events-sheet .dark-theme .rst__lineHalfVerticalBottom::after {
+  opacity: 1;
 }
 
 /**

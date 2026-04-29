@@ -120,9 +120,9 @@ namespace gdjs {
       this._basis.upY = elements[9];
       this._basis.upZ = elements[10];
 
-      this._basis.rightX = elements[-4];
-      this._basis.rightY = elements[-5];
-      this._basis.rightZ = elements[-6];
+      this._basis.rightX = -elements[4];
+      this._basis.rightY = -elements[5];
+      this._basis.rightZ = -elements[6];
 
       return this._basis;
     }

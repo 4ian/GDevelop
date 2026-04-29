@@ -215,7 +215,7 @@ namespace gdjs {
       | null = null;
     private _threeCameraDirty: boolean = false;
     private _threeEffectComposer: THREE_ADDONS.EffectComposer | null = null;
-    private _localBasis: LocalBasis | null = null;
+    private _basis: Basis | null = null;
 
     // For a 2D+3D layer, the 2D rendering is done on the render texture
     // and then must be displayed on a plane in the 3D world:
@@ -1035,74 +1035,74 @@ namespace gdjs {
     }
 
     invalidateRotation(): void {
-      if (this._localBasis) {
-        this._localBasis.isDirty = true;
+      if (this._basis) {
+        this._basis.isDirty = true;
       }
     }
 
     getCameraForwardX(): number {
-      return this.getLocalBasis().forwardX;
+      return this.getBasis().forwardX;
     }
 
     getCameraForwardY(): number {
-      return this.getLocalBasis().forwardY;
+      return this.getBasis().forwardY;
     }
 
     getCameraForwardZ(): number {
-      return this.getLocalBasis().forwardZ;
+      return this.getBasis().forwardZ;
     }
 
     getCameraUpX(): number {
-      return this.getLocalBasis().upX;
+      return this.getBasis().upX;
     }
 
     getCameraUpY(): number {
-      return this.getLocalBasis().upY;
+      return this.getBasis().upY;
     }
 
     getCameraUpZ(): number {
-      return this.getLocalBasis().upZ;
+      return this.getBasis().upZ;
     }
 
     getCameraRightX(): number {
-      return this.getLocalBasis().rightX;
+      return this.getBasis().rightX;
     }
 
     getCameraRightY(): number {
-      return this.getLocalBasis().rightY;
+      return this.getBasis().rightY;
     }
 
     getCameraRightZ(): number {
-      return this.getLocalBasis().rightZ;
+      return this.getBasis().rightZ;
     }
 
-    private getLocalBasis(): LocalBasis {
-      if (!this._localBasis) {
-        this._localBasis = new LocalBasis();
+    private getBasis(): Basis {
+      if (!this._basis) {
+        this._basis = new Basis();
       }
-      if (!this._localBasis.isDirty || !this._threeCamera) {
-        return this._localBasis;
+      if (!this._basis.isDirty || !this._threeCamera) {
+        return this._basis;
       }
 
       const rotationMatrix: THREE.Matrix4 = gdjs.staticObject(
-        LayerPixiRenderer.prototype.getLocalBasis
+        LayerPixiRenderer.prototype.getBasis
       ) as THREE.Matrix4;
       rotationMatrix.makeRotationFromEuler(this._threeCamera.rotation);
       const elements = rotationMatrix.elements;
 
-      this._localBasis.forwardX = -elements[8];
-      this._localBasis.forwardY = elements[9];
-      this._localBasis.forwardZ = -elements[10];
+      this._basis.forwardX = -elements[8];
+      this._basis.forwardY = elements[9];
+      this._basis.forwardZ = -elements[10];
 
-      this._localBasis.upX = -elements[8];
-      this._localBasis.upY = elements[9];
-      this._localBasis.upZ = -elements[10];
+      this._basis.upX = -elements[8];
+      this._basis.upY = elements[9];
+      this._basis.upZ = -elements[10];
 
-      this._localBasis.rightX = elements[4];
-      this._localBasis.rightY = -elements[5];
-      this._localBasis.rightZ = elements[6];
+      this._basis.rightX = elements[4];
+      this._basis.rightY = -elements[5];
+      this._basis.rightZ = elements[6];
 
-      return this._localBasis;
+      return this._basis;
     }
 
     transformTo3DWorld(
@@ -1362,7 +1362,7 @@ namespace gdjs {
     }
   }
 
-  class LocalBasis {
+  class Basis {
     isDirty = true;
     forwardX: float = 0;
     forwardY: float = 0;

@@ -13,7 +13,7 @@ namespace gdjs {
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isContainerDirty: boolean = true;
     _threeGroup: THREE.Group;
-    private _localBasis: LocalBasis | null = null;
+    private _basis: Basis | null = null;
 
     constructor(
       object: gdjs.CustomRuntimeObject3D,
@@ -119,6 +119,9 @@ namespace gdjs {
 
     updateRotation() {
       this._isContainerDirty = true;
+      if (this._basis) {
+        this._basis.isDirty = true;
+      }
     }
 
     updateSize() {
@@ -138,68 +141,68 @@ namespace gdjs {
     }
 
     getForwardX(): float {
-      return this.getLocalBasis().forwardX;
+      return this.getBasis().forwardX;
     }
 
     getForwardY(): float {
-      return this.getLocalBasis().forwardY;
+      return this.getBasis().forwardY;
     }
 
     getForwardZ(): float {
-      return this.getLocalBasis().forwardZ;
+      return this.getBasis().forwardZ;
     }
 
     getUpX(): float {
-      return this.getLocalBasis().upX;
+      return this.getBasis().upX;
     }
 
     getUpY(): float {
-      return this.getLocalBasis().upY;
+      return this.getBasis().upY;
     }
 
     getUpZ(): float {
-      return this.getLocalBasis().upZ;
+      return this.getBasis().upZ;
     }
 
     getRightX(): float {
-      return this.getLocalBasis().rightX;
+      return this.getBasis().rightX;
     }
 
     getRightY(): float {
-      return this.getLocalBasis().rightY;
+      return this.getBasis().rightY;
     }
 
     getRightZ(): float {
-      return this.getLocalBasis().rightZ;
+      return this.getBasis().rightZ;
     }
 
-    private getLocalBasis(): LocalBasis {
-      if (!this._localBasis) {
-        this._localBasis = new LocalBasis();
+    private getBasis(): Basis {
+      if (!this._basis) {
+        this._basis = new Basis();
       }
-      if (!this._localBasis.isDirty) {
-        return this._localBasis;
+      if (!this._basis.isDirty) {
+        return this._basis;
       }
 
       const rotationMatrix: THREE.Matrix4 = gdjs.staticObject(
-        CustomRuntimeObject3DRenderer.prototype.getLocalBasis
+        CustomRuntimeObject3DRenderer.prototype.getBasis
       ) as THREE.Matrix4;
-      rotationMatrix.makeRotationFromEuler(this._threeObject3D.rotation);
+      rotationMatrix.makeRotationFromEuler(this._threeGroup.rotation);
       const elements = rotationMatrix.elements;
 
-      this._localBasis.forwardX = elements[0];
-      this._localBasis.forwardY = elements[1];
-      this._localBasis.forwardZ = elements[2];
+      this._basis.forwardX = elements[0];
+      this._basis.forwardY = elements[1];
+      this._basis.forwardZ = elements[2];
 
-      this._localBasis.upX = elements[8];
-      this._localBasis.upY = elements[9];
-      this._localBasis.upZ = elements[10];
+      this._basis.upX = elements[8];
+      this._basis.upY = elements[9];
+      this._basis.upZ = elements[10];
 
-      this._localBasis.rightX = elements[-4];
-      this._localBasis.rightY = elements[-5];
-      this._localBasis.rightZ = elements[-6];
+      this._basis.rightX = elements[-4];
+      this._basis.rightY = elements[-5];
+      this._basis.rightZ = elements[-6];
 
-      return this._localBasis;
+      return this._basis;
     }
 
     static getAnimationFrameTextureManager(
@@ -245,7 +248,7 @@ namespace gdjs {
     }
   }
 
-  class LocalBasis {
+  class Basis {
     isDirty = true;
     forwardX: float = 0;
     forwardY: float = 0;

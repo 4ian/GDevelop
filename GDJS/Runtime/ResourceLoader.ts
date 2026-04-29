@@ -542,16 +542,13 @@ namespace gdjs {
         );
         return;
       }
-      const scene = this._runtimeGame._sceneStack.getCurrentScene();
-      if (!scene) {
-        return;
-      }
-      if (scene.getObjects(objectName).length > 0) {
-        // TODO Should all instances be automatically removed from the scene?
-        debugLogger.log(
-          `Can't unload of resources for object ${objectName} as it still have instances living in the scene.`
-        );
-        return;
+      for (const scene of this._runtimeGame._sceneStack.getAllScenes()) {
+        if (scene.getObjects(objectName).length > 0) {
+          debugLogger.log(
+            `Can't unload of resources for object ${objectName} as it still have instances living in the scene.`
+          );
+          return;
+        }
       }
       debugLogger.log(
         `Unloading of resources for object ${objectName} was requested.`

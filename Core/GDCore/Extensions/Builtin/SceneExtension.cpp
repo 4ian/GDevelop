@@ -235,7 +235,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddAction(
           "UnloadObjectAssets",
           _("Unload object"),
-          _("Unload an object resources."),
+          _("Unload an object resources. The \"resource preloading\" property must be set to \"preload with an action\" for this action to actually unload resources."),
           _("Unload object _PARAM1_"),
           "",
           "res/actions/hourglass_black.svg",

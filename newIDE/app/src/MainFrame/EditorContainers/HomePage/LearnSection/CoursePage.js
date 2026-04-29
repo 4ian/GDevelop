@@ -39,6 +39,7 @@ import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserConte
 import { RatingBanner } from './RatingBanner';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import { type OpenAskAiOptions } from '../../../../AiGeneration/Utils';
+import { MarkdownText } from '../../../../UI/MarkdownText';
 
 const styles = {
   desktopContainer: { display: 'flex', gap: 16 },
@@ -342,8 +343,16 @@ const CoursePage = ({
                 />
                 {course.introByLocale && (
                   <Line>
-                    <AlertMessage background="light">
-                      {selectMessageByLocale(i18n, course.introByLocale)}
+                    <AlertMessage background="light" contentOnly>
+                      <Column expand>
+                        <MarkdownText
+                          source={selectMessageByLocale(
+                            i18n,
+                            course.introByLocale
+                          )}
+                          allowParagraphs
+                        />
+                      </Column>
                     </AlertMessage>
                   </Line>
                 )}

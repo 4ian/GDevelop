@@ -93,6 +93,40 @@ const VideoBasedCourseChapterView: React.ComponentType<{
     const [openTasks, setOpenTasks] = React.useState<boolean>(false);
     const youtubeVideoId = getYoutubeVideoIdFromUrl(courseChapter.videoUrl);
 
+    const youtubeVideo = youtubeVideoId ? (
+      <div
+        style={{
+          ...styles.videoContainer,
+          maxWidth: windowSize === 'xlarge' ? 960 : 640,
+        }}
+      >
+        <iframe
+          title={`Video for lesson ${courseChapter.title}`}
+          type="text/html"
+          style={styles.videoIFrame}
+          src={`https://www.youtube.com/embed/${youtubeVideoId}?cc_load_policy=1&cc_lang_pref=${
+            // Having another language than `en` as the requested caption language prevents the player from displaying the auto-translated captions.
+            'en'
+          }&hl=${userLanguage2LetterCode}`}
+          frameBorder="0"
+          referrerPolicy={
+            // https://developers.google.com/youtube/terms/required-minimum-functionality#embedded-player-api-client-identity
+            'strict-origin-when-cross-origin'
+          }
+          credentialless={
+            // See https://developer.chrome.com/blog/iframe-credentialless
+            // It's in case we start using "COEP" or "CORP" in the future.
+            true
+          }
+          credentialLess={
+            // See https://developer.chrome.com/blog/iframe-credentialless
+            // It's in case we start using "COEP" or "CORP" in the future.
+            true
+          }
+        />
+      </div>
+    ) : null;
+
     return (
       <ColumnStackLayout expand noMargin>
         <CourseChapterTitle
@@ -102,47 +136,14 @@ const VideoBasedCourseChapterView: React.ComponentType<{
           getChapterCompletion={getChapterCompletion}
           ref={ref}
         />
-        {courseChapter.isLocked ? (
+        {courseChapter.isLocked && (
           <LockedCourseChapterPreview
             course={course}
             courseChapter={courseChapter}
             onClickUnlock={onClickUnlock}
           />
-        ) : youtubeVideoId ? (
-          <div
-            style={{
-              ...styles.videoContainer,
-              maxWidth: windowSize === 'xlarge' ? 960 : 640,
-            }}
-          >
-            <iframe
-              title={`Video for lesson ${courseChapter.title}`}
-              type="text/html"
-              style={styles.videoIFrame}
-              src={`https://www.youtube.com/embed/${youtubeVideoId}?cc_load_policy=1&cc_lang_pref=${
-                // Having another language than `en` as the requested caption language prevents the player from displaying the auto-translated captions.
-                'en'
-              }&hl=${userLanguage2LetterCode}`}
-              frameBorder="0"
-              referrerPolicy={
-                // https://developers.google.com/youtube/terms/required-minimum-functionality#embedded-player-api-client-identity
-                'strict-origin-when-cross-origin'
-              }
-              credentialless={
-                // See https://developer.chrome.com/blog/iframe-credentialless
-                // It's in case we start using "COEP" or "CORP" in the future.
-                true
-              }
-              credentialLess={
-                // See https://developer.chrome.com/blog/iframe-credentialless
-                // It's in case we start using "COEP" or "CORP" in the future.
-                true
-              }
-            />
-          </div>
-        ) : (
-          undefined
         )}
+        {course.videoPosition === 'top' && youtubeVideo}
         {!courseChapter.isLocked && (
           <div
             style={{
@@ -196,12 +197,14 @@ const VideoBasedCourseChapterView: React.ComponentType<{
                       <Trans>Template</Trans>
                     </Text>
                   </Line>
-                  <Text color="secondary" noMargin>
-                    <Trans>
-                      After watching the video, use this template to complete
-                      the following tasks.
-                    </Trans>
-                  </Text>
+                  {course.videoPosition === 'top' && (
+                    <Text color="secondary" noMargin>
+                      <Trans>
+                        After watching the video, use this template to complete
+                        the following tasks.
+                      </Trans>
+                    </Text>
+                  )}
                   <Line noMargin>
                     <RaisedButton
                       primary
@@ -226,6 +229,18 @@ const VideoBasedCourseChapterView: React.ComponentType<{
             ))}
           </ColumnStackLayout>
         )}
+        {!courseChapter.isLocked &&
+          course.videoPosition === 'bottom' &&
+          youtubeVideo && (
+            <ColumnStackLayout noMargin>
+              <Line noMargin>
+                <Text noMargin size="block-title">
+                  <Trans>Answers video</Trans>
+                </Text>
+              </Line>
+              {youtubeVideo}
+            </ColumnStackLayout>
+          )}
       </ColumnStackLayout>
     );
   }

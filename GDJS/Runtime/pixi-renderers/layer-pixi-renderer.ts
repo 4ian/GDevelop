@@ -1093,13 +1093,13 @@ namespace gdjs {
       this._basis.forwardY = elements[9];
       this._basis.forwardZ = -elements[10];
 
-      this._basis.upX = -elements[8];
-      this._basis.upY = elements[9];
-      this._basis.upZ = -elements[10];
+      this._basis.rightX = elements[0];
+      this._basis.rightY = -elements[1];
+      this._basis.rightZ = elements[2];
 
-      this._basis.rightX = elements[4];
-      this._basis.rightY = -elements[5];
-      this._basis.rightZ = elements[6];
+      this._basis.upX = elements[4];
+      this._basis.upY = -elements[5];
+      this._basis.upZ = elements[6];
 
       return this._basis;
     }

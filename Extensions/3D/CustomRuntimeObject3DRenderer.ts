@@ -201,13 +201,13 @@ namespace gdjs {
       this._basis.forwardY = elements[1];
       this._basis.forwardZ = elements[2];
 
-      this._basis.upX = elements[8];
-      this._basis.upY = elements[9];
-      this._basis.upZ = elements[10];
-
       this._basis.rightX = -elements[4];
       this._basis.rightY = -elements[5];
       this._basis.rightZ = -elements[6];
+
+      this._basis.upX = elements[8];
+      this._basis.upY = elements[9];
+      this._basis.upZ = elements[10];
 
       return this._basis;
     }

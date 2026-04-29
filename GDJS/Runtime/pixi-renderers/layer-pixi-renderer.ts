@@ -216,6 +216,7 @@ namespace gdjs {
     private _threeCameraDirty: boolean = false;
     private _threeEffectComposer: THREE_ADDONS.EffectComposer | null = null;
     private _basis: Basis | null = null;
+    private static matrix4: THREE.Matrix4 = new THREE.Matrix4();
 
     // For a 2D+3D layer, the 2D rendering is done on the render texture
     // and then must be displayed on a plane in the 3D world:
@@ -1084,9 +1085,7 @@ namespace gdjs {
         return this._basis;
       }
 
-      const rotationMatrix: THREE.Matrix4 = gdjs.staticObject(
-        LayerPixiRenderer.prototype.getBasis
-      ) as THREE.Matrix4;
+      const rotationMatrix: THREE.Matrix4 = gdjs.LayerPixiRenderer.matrix4;
       rotationMatrix.makeRotationFromEuler(this._threeCamera.rotation);
       const elements = rotationMatrix.elements;
 

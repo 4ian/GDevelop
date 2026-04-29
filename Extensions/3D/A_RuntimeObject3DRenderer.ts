@@ -4,6 +4,7 @@ namespace gdjs {
     protected _object: gdjs.RuntimeObject3D;
     private _threeObject3D: THREE.Object3D;
     private _basis: Basis | null = null;
+    private static matrix4: THREE.Matrix4 = new THREE.Matrix4();
 
     constructor(
       runtimeObject: gdjs.RuntimeObject3D,
@@ -107,9 +108,7 @@ namespace gdjs {
         return this._basis;
       }
 
-      const rotationMatrix: THREE.Matrix4 = gdjs.staticObject(
-        RuntimeObject3DRenderer.prototype.getBasis
-      ) as THREE.Matrix4;
+      const rotationMatrix: THREE.Matrix4 = gdjs.RuntimeObject3DRenderer.matrix4;
       rotationMatrix.makeRotationFromEuler(this._threeObject3D.rotation);
       const elements = rotationMatrix.elements;
 

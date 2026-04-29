@@ -185,8 +185,16 @@ namespace gdjs {
         return this._basis;
       }
 
+      const threeObject3D = this.get3DRendererObject();
+      // Make sure the rotation is up to date.
+      threeObject3D.rotation.set(
+        gdjs.toRad(this._object.getRotationX()),
+        gdjs.toRad(this._object.getRotationY()),
+        gdjs.toRad(this._object.angle)
+      );
+
       const rotationMatrix: THREE.Matrix4 = gdjs.CustomRuntimeObject3DRenderer.matrix4;
-      rotationMatrix.makeRotationFromEuler(this._threeGroup.rotation);
+      rotationMatrix.makeRotationFromEuler(threeObject3D.rotation);
       const elements = rotationMatrix.elements;
 
       this._basis.forwardX = elements[0];

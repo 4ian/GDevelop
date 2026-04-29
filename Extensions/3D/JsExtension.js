@@ -1875,7 +1875,7 @@ module.exports = {
       .addExpression(
         'CameraForwardX',
         _('Camera forward X'),
-        _('Return the camera forward X.'),
+        _('Return the camera forward vector X component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
@@ -1891,7 +1891,7 @@ module.exports = {
       .addExpression(
         'CameraForwardY',
         _('Camera forward Y'),
-        _('Return the camera forward Y.'),
+        _('Return the camera forward vector Y component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
@@ -1907,7 +1907,7 @@ module.exports = {
       .addExpression(
         'CameraForwardZ',
         _('Camera forward Z'),
-        _('Return the camera forward Z.'),
+        _('Return the camera forward vector Z component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
@@ -1923,7 +1923,7 @@ module.exports = {
       .addExpression(
         'CameraUpX',
         _('Camera up X'),
-        _('Return the camera up X.'),
+        _('Return the camera up vector X component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
@@ -1939,7 +1939,7 @@ module.exports = {
       .addExpression(
         'CameraUpY',
         _('Camera up Y'),
-        _('Return the camera up Y.'),
+        _('Return the camera up vector Y component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
@@ -1955,7 +1955,7 @@ module.exports = {
       .addExpression(
         'CameraUpZ',
         _('Camera up Z'),
-        _('Return the camera up Z.'),
+        _('Return the camera up vector Z component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
@@ -1971,7 +1971,7 @@ module.exports = {
       .addExpression(
         'CameraRightX',
         _('Camera right X'),
-        _('Return the camera right X.'),
+        _('Return the camera right vector X component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
@@ -1987,7 +1987,7 @@ module.exports = {
       .addExpression(
         'CameraRightY',
         _('Camera right Y'),
-        _('Return the camera right Y.'),
+        _('Return the camera right vector Y component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
@@ -2003,7 +2003,7 @@ module.exports = {
       .addExpression(
         'CameraRightZ',
         _('Camera right Z'),
-        _('Return the camera right Z.'),
+        _('Return the camera right vector Z component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
       )

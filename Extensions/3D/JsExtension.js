@@ -254,7 +254,7 @@ module.exports = {
         .addExpression(
           'ForwardX',
           _('Forward X'),
-          _('Return the object forward X.'),
+          _('Return the object forward vector X component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
         )
@@ -266,7 +266,7 @@ module.exports = {
         .addExpression(
           'ForwardY',
           _('Forward Y'),
-          _('Return the object forward Y.'),
+          _('Return the object forward vector Y component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
         )
@@ -278,7 +278,7 @@ module.exports = {
         .addExpression(
           'ForwardZ',
           _('Forward Z'),
-          _('Return the object forward Z.'),
+          _('Return the object forward vector Z component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
         )
@@ -290,7 +290,7 @@ module.exports = {
         .addExpression(
           'UpX',
           _('Up X'),
-          _('Return the object up X.'),
+          _('Return the object up vector X component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
         )
@@ -302,7 +302,7 @@ module.exports = {
         .addExpression(
           'UpY',
           _('Up Y'),
-          _('Return the object up Y.'),
+          _('Return the object up vector Y component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
         )
@@ -314,7 +314,7 @@ module.exports = {
         .addExpression(
           'UpZ',
           _('Up Z'),
-          _('Return the object up Z.'),
+          _('Return the object up vector Z component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
         )
@@ -326,7 +326,7 @@ module.exports = {
         .addExpression(
           'RightX',
           _('Right X'),
-          _('Return the object right X.'),
+          _('Return the object right vector X component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
         )
@@ -338,7 +338,7 @@ module.exports = {
         .addExpression(
           'RightY',
           _('Right Y'),
-          _('Return the object right Y.'),
+          _('Return the object right vector Y component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
         )
@@ -350,7 +350,7 @@ module.exports = {
         .addExpression(
           'RightZ',
           _('Right Z'),
-          _('Return the object right Z.'),
+          _('Return the object right vector Z component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
         )

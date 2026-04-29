@@ -6,7 +6,7 @@
 namespace gdjs {
   const logger = new gdjs.Logger('ResourceLoader');
   // TODO add a condition before each log to avoid building the message for nothing.
-  const debugLogger = new gdjs.Logger('ResourceLoader - debug').enable(true);
+  const debugLogger = new gdjs.Logger('ResourceLoader - debug').enable(false);
 
   const addSearchParameterToUrl = (
     url: string,

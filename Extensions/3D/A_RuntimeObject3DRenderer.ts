@@ -108,7 +108,7 @@ namespace gdjs {
         return this._basis;
       }
 
-      const rotationMatrix: THREE.Matrix4 = gdjs.RuntimeObject3DRenderer.matrix4;
+      const rotationMatrix = gdjs.RuntimeObject3DRenderer.matrix4;
       rotationMatrix.makeRotationFromEuler(this._threeObject3D.rotation);
       const elements = rotationMatrix.elements;
 

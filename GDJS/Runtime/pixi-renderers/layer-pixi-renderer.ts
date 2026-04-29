@@ -1085,7 +1085,7 @@ namespace gdjs {
         return this._basis;
       }
 
-      const rotationMatrix: THREE.Matrix4 = gdjs.LayerPixiRenderer.matrix4;
+      const rotationMatrix = gdjs.LayerPixiRenderer.matrix4;
       rotationMatrix.makeRotationFromEuler(this._threeCamera.rotation);
       const elements = rotationMatrix.elements;
 

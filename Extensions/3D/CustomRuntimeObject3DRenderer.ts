@@ -193,7 +193,7 @@ namespace gdjs {
         gdjs.toRad(this._object.angle)
       );
 
-      const rotationMatrix: THREE.Matrix4 = gdjs.CustomRuntimeObject3DRenderer.matrix4;
+      const rotationMatrix = gdjs.CustomRuntimeObject3DRenderer.matrix4;
       rotationMatrix.makeRotationFromEuler(threeObject3D.rotation);
       const elements = rotationMatrix.elements;
 

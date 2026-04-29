@@ -255,7 +255,7 @@ module.exports = {
           'ForwardX',
           _('Forward X'),
           _('Return the object forward X.'),
-          _('Object local basis'),
+          _('Object basis'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -267,7 +267,7 @@ module.exports = {
           'ForwardY',
           _('Forward Y'),
           _('Return the object forward Y.'),
-          _('Object local basis'),
+          _('Object basis'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -279,7 +279,7 @@ module.exports = {
           'ForwardZ',
           _('Forward Z'),
           _('Return the object forward Z.'),
-          _('Object local basis'),
+          _('Object basis'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -291,7 +291,7 @@ module.exports = {
           'UpX',
           _('Up X'),
           _('Return the object up X.'),
-          _('Object local basis'),
+          _('Object basis'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -303,7 +303,7 @@ module.exports = {
           'UpY',
           _('Up Y'),
           _('Return the object up Y.'),
-          _('Object local basis'),
+          _('Object basis'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -315,7 +315,7 @@ module.exports = {
           'UpZ',
           _('Up Z'),
           _('Return the object up Z.'),
-          _('Object local basis'),
+          _('Object basis'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -327,7 +327,7 @@ module.exports = {
           'RightX',
           _('Right X'),
           _('Return the object right X.'),
-          _('Object local basis'),
+          _('Object basis'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -339,7 +339,7 @@ module.exports = {
           'RightY',
           _('Right Y'),
           _('Return the object right Y.'),
-          _('Object local basis'),
+          _('Object basis'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -351,7 +351,7 @@ module.exports = {
           'RightZ',
           _('Right Z'),
           _('Return the object right Z.'),
-          _('Object local basis'),
+          _('Object basis'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -1876,7 +1876,7 @@ module.exports = {
         'CameraForwardX',
         _('Camera forward X'),
         _('Return the camera forward X.'),
-        _('Camera local basis'),
+        _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -1892,7 +1892,7 @@ module.exports = {
         'CameraForwardY',
         _('Camera forward Y'),
         _('Return the camera forward Y.'),
-        _('Camera local basis'),
+        _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -1908,7 +1908,7 @@ module.exports = {
         'CameraForwardZ',
         _('Camera forward Z'),
         _('Return the camera forward Z.'),
-        _('Camera local basis'),
+        _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -1924,7 +1924,7 @@ module.exports = {
         'CameraUpX',
         _('Camera up X'),
         _('Return the camera up X.'),
-        _('Camera local basis'),
+        _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -1940,7 +1940,7 @@ module.exports = {
         'CameraUpY',
         _('Camera up Y'),
         _('Return the camera up Y.'),
-        _('Camera local basis'),
+        _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -1956,7 +1956,7 @@ module.exports = {
         'CameraUpZ',
         _('Camera up Z'),
         _('Return the camera up Z.'),
-        _('Camera local basis'),
+        _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -1972,7 +1972,7 @@ module.exports = {
         'CameraRightX',
         _('Camera right X'),
         _('Return the camera right X.'),
-        _('Camera local basis'),
+        _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -1988,7 +1988,7 @@ module.exports = {
         'CameraRightY',
         _('Camera right Y'),
         _('Return the camera right Y.'),
-        _('Camera local basis'),
+        _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -2004,7 +2004,7 @@ module.exports = {
         'CameraRightZ',
         _('Camera right Z'),
         _('Return the camera right Z.'),
-        _('Camera local basis'),
+        _('Camera basis'),
         'res/conditions/3d_box.svg'
       )
       .addCodeOnlyParameter('currentScene', '')

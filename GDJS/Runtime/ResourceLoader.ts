@@ -6,7 +6,7 @@
 namespace gdjs {
   const logger = new gdjs.Logger('ResourceLoader');
   // TODO add a condition before each log to avoid building the message for nothing.
-  const debugLogger = new gdjs.Logger('ResourceLoader - debug').enable(false);
+  const debugLogger = new gdjs.Logger('ResourceLoader - debug').enable(true);
 
   const addSearchParameterToUrl = (
     url: string,
@@ -447,6 +447,7 @@ namespace gdjs {
         this.getObjectResourceLoadingQueue(sceneName);
       objectResourceLoadingQueue.registerResources(objectName, usedResources);
       const task = objectResourceLoadingQueue.enqueue(objectName);
+      objectResourceLoadingQueue.loadAllTasksInBackground();
       return new Promise<void>((resolve, reject) => {
         if (!task) {
           debugLogger.log(
@@ -1236,7 +1237,7 @@ namespace gdjs {
     }
 
     /**
-     * Preload an object assets in background.
+     * Add a task without starting it.
      */
     enqueue(taskIdentifier: string): LoadingTask | null {
       const objectLoadingState = this.loadingStates.get(taskIdentifier);
@@ -1257,7 +1258,6 @@ namespace gdjs {
       );
       const task = new LoadingTask(taskIdentifier);
       this.loadingTaskQueue.push(task);
-      this.loadAllTasksInBackground();
       return task;
     }
 

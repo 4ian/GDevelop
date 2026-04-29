@@ -1804,7 +1804,7 @@ module.exports = {
         'CameraZ',
         _('Camera Z position'),
         _('the camera position on Z axis'),
-        _('the camera position on Z axis'),
+        _('the camera position on Z axis (layer: _PARAM3_)'),
         '',
         'res/conditions/3d_box.svg'
       )
@@ -1825,7 +1825,7 @@ module.exports = {
         'CameraRotationX',
         _('Camera X rotation'),
         _('the camera rotation on X axis'),
-        _('the camera rotation on X axis'),
+        _('the camera rotation on X axis (layer: _PARAM3_)'),
         '',
         'res/conditions/3d_box.svg'
       )
@@ -1851,7 +1851,7 @@ module.exports = {
         'CameraRotationY',
         _('Camera Y rotation'),
         _('the camera rotation on Y axis'),
-        _('the camera rotation on Y axis'),
+        _('the camera rotation on Y axis (layer: _PARAM3_)'),
         '',
         'res/conditions/3d_box.svg'
       )

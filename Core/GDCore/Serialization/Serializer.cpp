@@ -6,8 +6,10 @@
 
 #include "GDCore/Serialization/Serializer.h"
 
+#include <functional>
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>
@@ -21,6 +23,8 @@
 using namespace rapidjson;
 
 namespace gd {
+
+bool Serializer::s_canonicalMode = false;
 
 gd::String Serializer::ToEscapedXMLString(const gd::String& str) {
   return str.FindAndReplace("&", "&amp;")
@@ -95,19 +99,61 @@ void ElementToRapidJson(const gd::SerializerElement& element,
     const auto& attributes = element.GetAllAttributes();
     const auto& children = element.GetAllChildren();
 
-    for (const auto& attribute : attributes) {
-      Value name(attribute.first.c_str(),
-                 allocator);  // Copying the name is required.
-      Value childValue;
-      ElementToRapidJson(attribute.second, childValue, allocator);
-      value.AddMember(name, childValue, allocator);
-    }
-    for (const auto& child : children) {
-      Value name(child.first.c_str(),
-                 allocator);  // Copying the name is required.
-      Value childValue;
-      ElementToRapidJson(*child.second, childValue, allocator);
-      value.AddMember(name, childValue, allocator);
+    if (gd::Serializer::IsCanonicalMode()) {
+      // In canonical mode, merge attributes and children into a single
+      // alphabetically-sorted sequence so that the resulting JSON has
+      // stable, alphabetical key order. Attributes are stored in a
+      // std::map (already sorted) but children are stored in insertion
+      // order; we re-sort the union here.
+      //
+      // Children with the same name (rare, but allowed) keep their
+      // relative insertion order thanks to std::multimap stability.
+      struct Entry {
+        bool isAttribute;
+        const SerializerValue* attributeValue;     // valid if isAttribute
+        const gd::SerializerElement* childElement; // valid if !isAttribute
+      };
+      std::multimap<gd::String, Entry> sortedEntries;
+
+      for (const auto& attribute : attributes) {
+        sortedEntries.emplace(
+            attribute.first,
+            Entry{true, &attribute.second, nullptr});
+      }
+      for (const auto& child : children) {
+        sortedEntries.emplace(
+            child.first,
+            Entry{false, nullptr, child.second.get()});
+      }
+
+      for (const auto& entry : sortedEntries) {
+        Value name(entry.first.c_str(), allocator);
+        Value childValue;
+        if (entry.second.isAttribute) {
+          // Implicit conversion SerializerValue -> SerializerElement.
+          ElementToRapidJson(
+              *entry.second.attributeValue, childValue, allocator);
+        } else {
+          ElementToRapidJson(
+              *entry.second.childElement, childValue, allocator);
+        }
+        value.AddMember(name, childValue, allocator);
+      }
+    } else {
+      for (const auto& attribute : attributes) {
+        Value name(attribute.first.c_str(),
+                   allocator);  // Copying the name is required.
+        Value childValue;
+        ElementToRapidJson(attribute.second, childValue, allocator);
+        value.AddMember(name, childValue, allocator);
+      }
+      for (const auto& child : children) {
+        Value name(child.first.c_str(),
+                   allocator);  // Copying the name is required.
+        Value childValue;
+        ElementToRapidJson(*child.second, childValue, allocator);
+        value.AddMember(name, childValue, allocator);
+      }
     }
   }
 }

@@ -606,6 +606,8 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_GetSafeName GetSafeName
 #define STATIC_ToJSON ToJSON
 #define STATIC_FromJSON(x) FromJSON(x)
+#define STATIC_SetCanonicalMode SetCanonicalMode
+#define STATIC_IsCanonicalMode IsCanonicalMode
 #define STATIC_SerializeTo SerializeTo
 #define STATIC_IsObject IsObject
 #define STATIC_IsBehavior IsBehavior

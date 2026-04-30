@@ -917,7 +917,7 @@ namespace gdjs {
     /**
      * Preload an object assets in background.
      */
-    loadObjectAssets(objectOrGroupName: string): void {
+    loadObjectOrGroupAssets(objectOrGroupName: string): void {
       const currentScene = this._sceneStack.getCurrentScene();
       if (!currentScene) {
         return;
@@ -928,14 +928,14 @@ namespace gdjs {
       );
       if (objectGroupData) {
         for (const object of objectGroupData.objects) {
-          this._loadOneObjectAssets(currentScene, object.name);
+          this._loadObjectAssets(currentScene, object.name);
         }
       } else {
-        this._loadOneObjectAssets(currentScene, objectOrGroupName);
+        this._loadObjectAssets(currentScene, objectOrGroupName);
       }
     }
 
-    private _loadOneObjectAssets(
+    private _loadObjectAssets(
       currentScene: RuntimeScene,
       objectName: string
     ) {
@@ -957,7 +957,7 @@ namespace gdjs {
     /**
      * @returns true when all the resources of the given object are loaded.
      */
-    areObjectAssetsLoaded(objectOrGroupName: string): boolean {
+    areObjectOrGroupAssetsLoaded(objectOrGroupName: string): boolean {
       const currentScene = this._sceneStack.getCurrentScene();
       if (!currentScene) {
         return false;
@@ -988,7 +988,7 @@ namespace gdjs {
     /**
      * Unload an object assets.
      */
-    unloadObjectAssets(objectOrGroupName: string): void {
+    unloadObjectOrGroupAssets(objectOrGroupName: string): void {
       const currentScene = this._sceneStack.getCurrentScene();
       if (!currentScene) {
         return;

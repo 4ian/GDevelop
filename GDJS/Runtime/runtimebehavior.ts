@@ -79,11 +79,11 @@ namespace gdjs {
       oldBehaviorData: BehaviorData,
       newBehaviorData: BehaviorData
     ): boolean {
-      const diffBehaviorData = {
+      const diffBehaviorData: BehaviorData = {
         name: newBehaviorData.name,
         type: newBehaviorData.type,
       };
-      for (const key in diffBehaviorData) {
+      for (const key in newBehaviorData) {
         const oldValue = oldBehaviorData[key];
         const newValue = newBehaviorData[key];
         if (newValue !== oldValue) {

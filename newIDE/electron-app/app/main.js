@@ -67,11 +67,16 @@ let windowCounter = 0; // Counter for creating unique session partitions
 
 // Parse arguments (knowing that in dev, we run electron with an argument,
 // so have to ignore one more).
-const args = parseArgs(process.argv.slice(isDev ? 2 : 1), {
+// CLI flags:
+//   --run-command <NAME>  Run a Command Palette command after the project loads
+//   --keep-open           Keep the app open after --run-command finishes
+//                         (default is to quit with proper exit code).
+const argsParserOptions = {
   // "Officially" supported arguments and their types:
-  boolean: ['dev-tools', 'disable-update-check'],
-  string: '_', // Files are always strings
-});
+  boolean: ['dev-tools', 'disable-update-check', 'keep-open'],
+  string: ['_', 'run-command'],
+};
+const args = parseArgs(process.argv.slice(isDev ? 2 : 1), argsParserOptions);
 
 const devTools = !!args['dev-tools'];
 
@@ -85,20 +90,32 @@ if (process.platform === 'win32') {
 }
 
 // Single instance lock - prevents multiple Electron processes
-// This solves Firebase IndexedDB locking issues while still allowing multiple windows
-const gotTheLock = app.requestSingleInstanceLock();
+// This solves Firebase IndexedDB locking issues while still allowing multiple windows.
+//
+// When invoked via `--run-command` (CLI / CI scenarios), we deliberately
+// SKIP the single-instance lock so each CLI invocation runs in its own
+// process. This lets the launching shell wait for completion and observe
+// the exit code, instead of being immediately backgrounded by the existing
+// instance taking over via the second-instance handler.
+const isCliRunCommand = !!args['run-command'];
+const gotTheLock = isCliRunCommand ? true : app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
   // Second instance attempted - quit immediately
   app.quit();
-} else {
+} else if (!isCliRunCommand) {
   // First instance - handle second-instance events by creating new windows
   app.on('second-instance', (event, commandLine, workingDirectory) => {
     // User tried to launch app again - create a new window instead
-    const secondInstanceArgs = parseArgs(commandLine.slice(isDev ? 2 : 1), {
-      boolean: ['dev-tools', 'disable-update-check'],
-      string: '_',
-    });
+    const secondInstanceArgs = parseArgs(
+      commandLine.slice(isDev ? 2 : 1),
+      argsParserOptions
+    );
+
+    // Update the global args so the new window's renderer (which reads them
+    // via remote.getGlobal('args')) picks up the second-instance CLI flags
+    // (e.g. --run-command, positional project file).
+    global['args'] = secondInstanceArgs;
 
     // Create a new window in the existing process
     createNewWindow(secondInstanceArgs);

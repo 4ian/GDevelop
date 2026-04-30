@@ -3,8 +3,6 @@ namespace gdjs {
   export abstract class RuntimeObject3DRenderer {
     protected _object: gdjs.RuntimeObject3D;
     private _threeObject3D: THREE.Object3D;
-    private _basis: Basis | null = null;
-    private static matrix4: THREE.Matrix4 = new THREE.Matrix4();
 
     constructor(
       runtimeObject: gdjs.RuntimeObject3D,
@@ -41,7 +39,6 @@ namespace gdjs {
         gdjs.toRad(this._object.getRotationY()),
         gdjs.toRad(this._object.angle)
       );
-      this.invalidateRotation();
     }
 
     updateSize() {
@@ -57,87 +54,5 @@ namespace gdjs {
     updateVisibility() {
       this._threeObject3D.visible = !this._object.isHidden();
     }
-
-    invalidateRotation(): void {
-      if (this._basis) {
-        this._basis.isDirty = true;
-      }
-    }
-
-    getForwardX(): float {
-      return this.getBasis().forwardX;
-    }
-
-    getForwardY(): float {
-      return this.getBasis().forwardY;
-    }
-
-    getForwardZ(): float {
-      return this.getBasis().forwardZ;
-    }
-
-    getUpX(): float {
-      return this.getBasis().upX;
-    }
-
-    getUpY(): float {
-      return this.getBasis().upY;
-    }
-
-    getUpZ(): float {
-      return this.getBasis().upZ;
-    }
-
-    getRightX(): float {
-      return this.getBasis().rightX;
-    }
-
-    getRightY(): float {
-      return this.getBasis().rightY;
-    }
-
-    getRightZ(): float {
-      return this.getBasis().rightZ;
-    }
-
-    private getBasis(): Basis {
-      if (!this._basis) {
-        this._basis = new Basis();
-      }
-      if (!this._basis.isDirty) {
-        return this._basis;
-      }
-
-      const rotationMatrix = gdjs.RuntimeObject3DRenderer.matrix4;
-      rotationMatrix.makeRotationFromEuler(this._threeObject3D.rotation);
-      const elements = rotationMatrix.elements;
-
-      this._basis.forwardX = elements[0];
-      this._basis.forwardY = elements[1];
-      this._basis.forwardZ = elements[2];
-
-      this._basis.rightX = -elements[4];
-      this._basis.rightY = -elements[5];
-      this._basis.rightZ = -elements[6];
-
-      this._basis.upX = elements[8];
-      this._basis.upY = elements[9];
-      this._basis.upZ = elements[10];
-
-      return this._basis;
-    }
-  }
-
-  class Basis {
-    isDirty = true;
-    forwardX: float = 0;
-    forwardY: float = 0;
-    forwardZ: float = 0;
-    upX: float = 0;
-    upY: float = 0;
-    upZ: float = 0;
-    rightX: float = 0;
-    rightY: float = 0;
-    rightZ: float = 0;
   }
 }

@@ -13,8 +13,6 @@ namespace gdjs {
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isContainerDirty: boolean = true;
     _threeGroup: THREE.Group;
-    private _basis: Basis | null = null;
-    private static matrix4: THREE.Matrix4 = new THREE.Matrix4();
 
     constructor(
       object: gdjs.CustomRuntimeObject3D,
@@ -120,9 +118,6 @@ namespace gdjs {
 
     updateRotation() {
       this._isContainerDirty = true;
-      if (this._basis) {
-        this._basis.isDirty = true;
-      }
     }
 
     updateSize() {
@@ -139,77 +134,6 @@ namespace gdjs {
 
     setLayerIndex(layer: gdjs.RuntimeLayer, index: float): void {
       // Layers are not handled for 3D custom objects.
-    }
-
-    getForwardX(): float {
-      return this.getBasis().forwardX;
-    }
-
-    getForwardY(): float {
-      return this.getBasis().forwardY;
-    }
-
-    getForwardZ(): float {
-      return this.getBasis().forwardZ;
-    }
-
-    getUpX(): float {
-      return this.getBasis().upX;
-    }
-
-    getUpY(): float {
-      return this.getBasis().upY;
-    }
-
-    getUpZ(): float {
-      return this.getBasis().upZ;
-    }
-
-    getRightX(): float {
-      return this.getBasis().rightX;
-    }
-
-    getRightY(): float {
-      return this.getBasis().rightY;
-    }
-
-    getRightZ(): float {
-      return this.getBasis().rightZ;
-    }
-
-    private getBasis(): Basis {
-      if (!this._basis) {
-        this._basis = new Basis();
-      }
-      if (!this._basis.isDirty) {
-        return this._basis;
-      }
-
-      const threeObject3D = this.get3DRendererObject();
-      // Make sure the rotation is up to date.
-      threeObject3D.rotation.set(
-        gdjs.toRad(this._object.getRotationX()),
-        gdjs.toRad(this._object.getRotationY()),
-        gdjs.toRad(this._object.angle)
-      );
-
-      const rotationMatrix = gdjs.CustomRuntimeObject3DRenderer.matrix4;
-      rotationMatrix.makeRotationFromEuler(threeObject3D.rotation);
-      const elements = rotationMatrix.elements;
-
-      this._basis.forwardX = elements[0];
-      this._basis.forwardY = elements[1];
-      this._basis.forwardZ = elements[2];
-
-      this._basis.rightX = -elements[4];
-      this._basis.rightY = -elements[5];
-      this._basis.rightZ = -elements[6];
-
-      this._basis.upX = elements[8];
-      this._basis.upY = elements[9];
-      this._basis.upZ = elements[10];
-
-      return this._basis;
     }
 
     static getAnimationFrameTextureManager(
@@ -253,18 +177,5 @@ namespace gdjs {
       ).map;
       return map ? map.image.height : 0;
     }
-  }
-
-  class Basis {
-    isDirty = true;
-    forwardX: float = 0;
-    forwardY: float = 0;
-    forwardZ: float = 0;
-    upX: float = 0;
-    upY: float = 0;
-    upZ: float = 0;
-    rightX: float = 0;
-    rightY: float = 0;
-    rightZ: float = 0;
   }
 }

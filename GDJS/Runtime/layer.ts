@@ -270,7 +270,7 @@ namespace gdjs {
     }
 
     override getCameraRotationX(cameraId?: integer): float {
-      return this._renderer.getCameraRotationY();
+      return this._renderer.getCameraRotationX();
     }
 
     override setCameraRotationX(rotationX: float, cameraId?: integer): void {

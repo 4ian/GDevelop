@@ -331,6 +331,42 @@ namespace gdjs {
       this.setAngle(gdjs.toDegrees(mesh.rotation.z));
     }
 
+    getForwardX(): float {
+      return this.getRenderer().getForwardX();
+    }
+
+    getForwardY(): float {
+      return this.getRenderer().getForwardY();
+    }
+
+    getForwardZ(): float {
+      return this.getRenderer().getForwardZ();
+    }
+
+    getUpX(): float {
+      return this.getRenderer().getUpX();
+    }
+
+    getUpY(): float {
+      return this.getRenderer().getUpY();
+    }
+
+    getUpZ(): float {
+      return this.getRenderer().getUpZ();
+    }
+
+    getRightX(): float {
+      return this.getRenderer().getRightX();
+    }
+
+    getRightY(): float {
+      return this.getRenderer().getRightY();
+    }
+
+    getRightZ(): float {
+      return this.getRenderer().getRightZ();
+    }
+
     override getOriginalWidth(): float {
       return this._originalWidth;
     }

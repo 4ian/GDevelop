@@ -258,59 +258,6 @@ namespace gdjs {
     override setCameraRotation(rotation: float, cameraId?: integer): void {
       this._cameraRotation = rotation;
       this._renderer.updatePosition();
-      this._renderer.invalidateRotation();
-    }
-
-    override getCameraRotationY(cameraId?: integer): float {
-      return this._renderer.getCameraRotationY();
-    }
-
-    override setCameraRotationY(rotationY: float, cameraId?: integer): void {
-      this._renderer.setCameraRotationY(rotationY);
-    }
-
-    override getCameraRotationX(cameraId?: integer): float {
-      return this._renderer.getCameraRotationY();
-    }
-
-    override setCameraRotationX(rotationX: float, cameraId?: integer): void {
-      this._renderer.setCameraRotationX(rotationX);
-    }
-
-    override getCameraForwardX(cameraId?: integer): number {
-      return this._renderer.getCameraForwardX();
-    }
-
-    override getCameraForwardY(cameraId?: integer): number {
-      return this._renderer.getCameraForwardY();
-    }
-
-    override getCameraForwardZ(cameraId?: integer): number {
-      return this._renderer.getCameraForwardZ();
-    }
-
-    override getCameraUpX(cameraId?: integer): number {
-      return this._renderer.getCameraUpX();
-    }
-
-    override getCameraUpY(cameraId?: integer): number {
-      return this._renderer.getCameraUpY();
-    }
-
-    override getCameraUpZ(cameraId?: integer): number {
-      return this._renderer.getCameraUpZ();
-    }
-
-    override getCameraRightX(cameraId?: integer): number {
-      return this._renderer.getCameraRightX();
-    }
-
-    override getCameraRightY(cameraId?: integer): number {
-      return this._renderer.getCameraRightY();
-    }
-
-    override getCameraRightZ(cameraId?: integer): number {
-      return this._renderer.getCameraRightZ();
     }
 
     /**

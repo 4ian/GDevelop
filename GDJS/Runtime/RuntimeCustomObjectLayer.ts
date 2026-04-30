@@ -67,54 +67,6 @@ namespace gdjs {
 
     override setCameraRotation(rotation: float, cameraId?: integer): void {}
 
-    override getCameraRotationY(cameraId?: integer): float {
-      return 0;
-    }
-
-    override setCameraRotationY(rotationY: float, cameraId?: integer): void {}
-
-    override getCameraRotationX(cameraId?: integer): float {
-      return 0;
-    }
-
-    override setCameraRotationX(rotationX: float, cameraId?: integer): void {}
-
-    override getCameraForwardX(cameraId?: integer): number {
-      return 0;
-    }
-
-    override getCameraForwardY(cameraId?: integer): number {
-      return 0;
-    }
-
-    override getCameraForwardZ(cameraId?: integer): number {
-      return -1;
-    }
-
-    override getCameraUpX(cameraId?: integer): number {
-      return 0;
-    }
-
-    override getCameraUpY(cameraId?: integer): number {
-      return -1;
-    }
-
-    override getCameraUpZ(cameraId?: integer): number {
-      return 0;
-    }
-
-    override getCameraRightX(cameraId?: integer): number {
-      return 1;
-    }
-
-    override getCameraRightY(cameraId?: integer): number {
-      return 0;
-    }
-
-    override getCameraRightZ(cameraId?: integer): number {
-      return 0;
-    }
-
     override convertCoords(
       x: float,
       y: float,

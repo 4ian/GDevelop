@@ -46,6 +46,11 @@ declare type ObjectData = {
   usedResources?: ResourceReference[];
 };
 
+declare type ObjectGroupData = {
+  name: string;
+  objects: Array<{ name: string }>;
+};
+
 declare type GetNetworkSyncDataOptions = {
   playerNumber?: number;
   isHost?: boolean;
@@ -283,6 +288,7 @@ declare interface InstanceContainerData {
   variables: RootVariableData[];
   instances: InstanceData[];
   objects: ObjectData[];
+  objectsGroups: ObjectGroupData[];
   layers: LayerData[];
 }
 

@@ -917,11 +917,28 @@ namespace gdjs {
     /**
      * Preload an object assets in background.
      */
-    loadObjectAssets(objectName: string): void {
+    loadObjectAssets(objectOrGroupName: string): void {
       const currentScene = this._sceneStack.getCurrentScene();
       if (!currentScene) {
         return;
       }
+      const objectGroupData = this.getObjectGroupData(
+        currentScene.getName(),
+        objectOrGroupName
+      );
+      if (objectGroupData) {
+        for (const object of objectGroupData.objects) {
+          this._loadOneObjectAssets(currentScene, object.name);
+        }
+      } else {
+        this._loadOneObjectAssets(currentScene, objectOrGroupName);
+      }
+    }
+
+    private _loadOneObjectAssets(
+      currentScene: RuntimeScene,
+      objectName: string
+    ) {
       const objectData = currentScene._objects.get(objectName);
       if (!objectData) {
         return;
@@ -940,29 +957,74 @@ namespace gdjs {
     /**
      * @returns true when all the resources of the given object are loaded.
      */
-    areObjectAssetsLoaded(objectName: string): boolean {
+    areObjectAssetsLoaded(objectOrGroupName: string): boolean {
       const currentScene = this._sceneStack.getCurrentScene();
       if (!currentScene) {
         return false;
       }
+      const objectGroupData = this.getObjectGroupData(
+        currentScene.getName(),
+        objectOrGroupName
+      );
+      if (objectGroupData) {
+        for (const object of objectGroupData.objects) {
+          if (
+            !this._resourcesLoader.areObjectAssetsReady(
+              currentScene.getName(),
+              object.name
+            )
+          ) {
+            return false;
+          }
+        }
+        return true;
+      }
       return this._resourcesLoader.areObjectAssetsReady(
         currentScene.getName(),
-        objectName
+        objectOrGroupName
       );
     }
 
     /**
      * Unload an object assets.
      */
-    unloadObjectAssets(objectName: string): void {
+    unloadObjectAssets(objectOrGroupName: string): void {
       const currentScene = this._sceneStack.getCurrentScene();
       if (!currentScene) {
         return;
       }
-      this._resourcesLoader.unloadObjectResources(
+      const objectGroupData = this.getObjectGroupData(
         currentScene.getName(),
-        objectName
+        objectOrGroupName
       );
+      if (objectGroupData) {
+        for (const object of objectGroupData.objects) {
+          this._resourcesLoader.unloadObjectResources(
+            currentScene.getName(),
+            object.name
+          );
+        }
+      } else {
+        this._resourcesLoader.unloadObjectResources(
+          currentScene.getName(),
+          objectOrGroupName
+        );
+      }
+    }
+
+    private getObjectGroupData(
+      sceneName: string,
+      objectGroupName: string
+    ): ObjectGroupData | null {
+      const sceneData = this.getSceneData(sceneName);
+      if (sceneData) {
+        for (const objectGroup of sceneData.objectsGroups) {
+          if (objectGroup.name === objectGroupName) {
+            return objectGroup;
+          }
+        }
+      }
+      return null;
     }
 
     /**

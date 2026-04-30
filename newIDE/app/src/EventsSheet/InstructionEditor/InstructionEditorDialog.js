@@ -337,16 +337,7 @@ const InstructionEditorDialog = ({
               key="back"
             />
           ) : null,
-          <HelpButton
-            key="help"
-            helpPagePath={
-              instructionHelpPage &&
-              isRelativePathToDocumentationRoot(instructionHelpPage)
-                ? instructionHelpPage
-                : '/events'
-            }
-            scopeName="Events"
-          />,
+          <HelpButton key="help" helpPagePath="/events" scopeName="Events" />,
         ]}
         open={open}
         onRequestClose={onCancel}

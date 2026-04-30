@@ -495,14 +495,9 @@ const InstructionParametersEditor: React.ComponentType<{
                 )}
               </div>
               <Line>
-                {!noHelpButton &&
-                  helpPage &&
-                  isRelativePathToDocumentationRoot(helpPage) && (
-                    <HelpButton
-                      helpPagePath={helpPage}
-                      scopeName={isCondition ? 'this condition' : 'this action'}
-                    />
-                  )}
+                {!noHelpButton && (
+                  <HelpButton helpPagePath="/events" scopeName="Events" />
+                )}
               </Line>
             </ColumnStackLayout>
           </ScrollView>

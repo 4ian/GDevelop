@@ -371,7 +371,7 @@ namespace gdjs {
         runtimeScene: gdjs.RuntimeScene,
         objectOrGroupName: string
       ): void => {
-        runtimeScene.getGame().loadObjectAssets(objectOrGroupName);
+        runtimeScene.getGame().loadObjectOrGroupAssets(objectOrGroupName);
       };
 
       /**
@@ -381,7 +381,7 @@ namespace gdjs {
         runtimeScene: gdjs.RuntimeScene,
         objectOrGroupName: string
       ): void => {
-        runtimeScene.getGame().unloadObjectAssets(objectOrGroupName);
+        runtimeScene.getGame().unloadObjectOrGroupAssets(objectOrGroupName);
       };
 
       /**
@@ -391,7 +391,9 @@ namespace gdjs {
         runtimeScene: gdjs.RuntimeScene,
         objectOrGroupName: string
       ): boolean => {
-        return runtimeScene.getGame().areObjectAssetsLoaded(objectOrGroupName);
+        return runtimeScene
+          .getGame()
+          .areObjectOrGroupAssetsLoaded(objectOrGroupName);
       };
     }
   }

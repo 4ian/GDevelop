@@ -68,6 +68,7 @@ describe('SaveState', () => {
         updateIfNotVisible: false,
       },
     ],
+    objectsGroups: [],
     instances: instances || [],
     variables: [],
     usedResources: [],

@@ -935,10 +935,7 @@ namespace gdjs {
       }
     }
 
-    private _loadObjectAssets(
-      currentScene: RuntimeScene,
-      objectName: string
-    ) {
+    private _loadObjectAssets(currentScene: RuntimeScene, objectName: string) {
       const objectData = currentScene._objects.get(objectName);
       if (!objectData) {
         return;

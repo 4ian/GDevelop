@@ -15,6 +15,7 @@ describe('gdjs.ResourceLoader', () => {
       mangledName: name,
       name,
       objects: [],
+      objectsGroups: [],
       layers: [],
       instances: [],
       behaviorsSharedData: [],

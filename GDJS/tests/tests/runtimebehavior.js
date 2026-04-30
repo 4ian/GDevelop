@@ -47,30 +47,23 @@ describe('gdjs.RuntimeBehavior', () => {
     };
 
     it('forwards every property that changed (not only name/type)', () => {
-      const behavior = makeBehavior({
+      const initialData = {
         name: 'MyBehavior',
         type: 'TestBehavior::RecordingBehavior',
         speed: 100,
         gravity: 9.8,
         jumpHeight: 200,
-      });
+      };
+      const newData = {
+        name: 'MyBehavior',
+        type: 'TestBehavior::RecordingBehavior',
+        speed: 250,
+        gravity: 9.8,
+        jumpHeight: 400,
+      };
+      const behavior = makeBehavior(initialData);
 
-      const result = behavior.updateFromBehaviorData(
-        {
-          name: 'MyBehavior',
-          type: 'TestBehavior::RecordingBehavior',
-          speed: 100,
-          gravity: 9.8,
-          jumpHeight: 200,
-        },
-        {
-          name: 'MyBehavior',
-          type: 'TestBehavior::RecordingBehavior',
-          speed: 250,
-          gravity: 9.8,
-          jumpHeight: 400,
-        }
-      );
+      const result = behavior.updateFromBehaviorData(initialData, newData);
 
       expect(result).to.be(true);
       expect(behavior.lastOverriding).to.eql({
@@ -82,27 +75,15 @@ describe('gdjs.RuntimeBehavior', () => {
     });
 
     it('does not include unchanged properties beyond name and type', () => {
-      const behavior = makeBehavior({
+      const data = {
         name: 'MyBehavior',
         type: 'TestBehavior::RecordingBehavior',
         speed: 100,
         gravity: 9.8,
-      });
+      };
+      const behavior = makeBehavior(data);
 
-      behavior.updateFromBehaviorData(
-        {
-          name: 'MyBehavior',
-          type: 'TestBehavior::RecordingBehavior',
-          speed: 100,
-          gravity: 9.8,
-        },
-        {
-          name: 'MyBehavior',
-          type: 'TestBehavior::RecordingBehavior',
-          speed: 100,
-          gravity: 9.8,
-        }
-      );
+      behavior.updateFromBehaviorData(data, { ...data });
 
       expect(behavior.lastOverriding).to.eql({
         name: 'MyBehavior',
@@ -129,10 +110,8 @@ describe('gdjs.RuntimeBehavior', () => {
         object
       );
 
-      const result = behavior.updateFromBehaviorData(behaviorData, {
-        ...behaviorData,
-        speed: 200,
-      });
+      const updatedData = { ...behaviorData, speed: 200 };
+      const result = behavior.updateFromBehaviorData(behaviorData, updatedData);
       expect(result).to.be(false);
     });
   });

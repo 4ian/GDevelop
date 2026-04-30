@@ -500,13 +500,7 @@ const InstructionParametersEditor: React.ComponentType<{
                   isRelativePathToDocumentationRoot(helpPage) && (
                     <HelpButton
                       helpPagePath={helpPage}
-                      label={
-                        isCondition ? (
-                          <Trans>Help for this condition</Trans>
-                        ) : (
-                          <Trans>Help for this action</Trans>
-                        )
-                      }
+                      scopeName={isCondition ? 'this condition' : 'this action'}
                     />
                   )}
               </Line>

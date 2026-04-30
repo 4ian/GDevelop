@@ -416,6 +416,7 @@ const ProjectPropertiesDialog = (props: Props) => {
               <HelpButton
                 helpPagePath="/interface/project-manager/properties"
                 key="help"
+                scopeName="Project properties"
               />,
               hotReloadPreviewButtonProps ? (
                 <FlatButton

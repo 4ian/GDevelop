@@ -87,7 +87,11 @@ export default function ExtensionFunctionSelectorDialog({
         />,
       ]}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath="/events/functions" />,
+        <HelpButton
+          key="help"
+          helpPagePath="/events/functions"
+          scopeName="Functions"
+        />,
       ]}
       open
       onRequestClose={onCancel}

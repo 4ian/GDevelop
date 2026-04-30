@@ -79,6 +79,7 @@ const SceneVariablesDialog = ({
         shouldCreateInitiallySelectedVariable
       }
       helpPagePath={'/all-features/variables/scene-variables'}
+      scopeName="Scene variables"
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="scene-variables-dialog"
       isListLocked={isListLocked}

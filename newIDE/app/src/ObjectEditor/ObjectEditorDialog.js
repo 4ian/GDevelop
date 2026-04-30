@@ -273,7 +273,11 @@ const InnerDialog = (props: InnerDialogProps) => {
         />,
       ]}
       secondaryActions={[
-        <HelpButton key="help-button" helpPagePath={helpPagePath} />,
+        <HelpButton
+          key="help-button"
+          helpPagePath={helpPagePath}
+          scopeName="Objects"
+        />,
         <HotReloadPreviewButton
           key="hot-reload-preview-button"
           {...props.hotReloadPreviewButtonProps}

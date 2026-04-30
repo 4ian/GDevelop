@@ -66,6 +66,7 @@ export default function EventsBasedObjectSelectorDialog({
         <HelpButton
           key="help"
           helpPagePath="/objects/custom-objects-prefab-template"
+          scopeName="Custom objects"
         />,
       ]}
       open

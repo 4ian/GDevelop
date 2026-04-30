@@ -101,7 +101,11 @@ const LoginWithPurchaseClaimDialog = ({
   ];
 
   const secondaryActions = [
-    <HelpButton key="help" helpPagePath={'/interface/profile'} />,
+    <HelpButton
+      key="help"
+      helpPagePath={'/interface/profile'}
+      scopeName="Account"
+    />,
   ];
 
   const dialogContent = (

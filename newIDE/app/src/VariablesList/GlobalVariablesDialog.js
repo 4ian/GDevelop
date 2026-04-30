@@ -77,6 +77,7 @@ const GlobalVariablesDialog = ({
         shouldCreateInitiallySelectedVariable
       }
       helpPagePath={'/all-features/variables/global-variables'}
+      scopeName="Global variables"
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="global-variables-dialog"
       isListLocked={isListLocked}

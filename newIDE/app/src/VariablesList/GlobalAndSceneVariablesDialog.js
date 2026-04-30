@@ -128,6 +128,7 @@ const GlobalAndSceneVariablesDialog = ({
         shouldCreateInitiallySelectedVariable
       }
       helpPagePath={'/all-features/variables/scene-variables'}
+      scopeName="Variables"
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="global-and-scene-variables-dialog"
       isListLocked={isListLocked}

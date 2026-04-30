@@ -105,6 +105,7 @@ export const SetupExportHeader = ({
             <HelpButton
               helpPagePath="/publishing/android/play-store/upgrading-from-apk-to-aab"
               key="help"
+              scopeName="Android publishing"
             />,
           ]}
           open

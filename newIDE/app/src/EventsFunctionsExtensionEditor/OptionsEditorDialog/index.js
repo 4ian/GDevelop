@@ -45,7 +45,11 @@ export default function OptionsEditorDialog({
     <Dialog
       title={<Trans>{eventsFunctionsExtension.getName()} options</Trans>}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath="/extensions/create" />,
+        <HelpButton
+          key="help"
+          helpPagePath="/extensions/create"
+          scopeName="Extensions"
+        />,
         eventsFunctionsExtensionWriter ? (
           <FlatButton
             leftIcon={<Upload />}

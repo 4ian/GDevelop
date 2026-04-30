@@ -173,7 +173,11 @@ const CreateAccountDialog = ({
         </LeftLoader>,
       ]}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath={'/interface/profile'} />,
+        <HelpButton
+          key="help"
+          helpPagePath={'/interface/profile'}
+          scopeName="Account"
+        />,
       ]}
       cannotBeDismissed={createAccountInProgress}
       onApply={createAccount}

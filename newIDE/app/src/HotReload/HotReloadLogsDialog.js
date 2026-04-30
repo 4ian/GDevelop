@@ -61,7 +61,11 @@ export default function HotReloadLogsDialog({
         />,
       ]}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath={'/interface/preview'} />,
+        <HelpButton
+          key="help"
+          helpPagePath={'/interface/preview'}
+          scopeName="Preview"
+        />,
       ]}
       onRequestClose={onClose}
       open

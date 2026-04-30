@@ -38,6 +38,7 @@ const LeaderboardDialog = ({
         <HelpButton
           key="help"
           helpPagePath="/interface/games-dashboard/leaderboard-administration"
+          scopeName="Leaderboards"
         />,
       ]}
       open={open}

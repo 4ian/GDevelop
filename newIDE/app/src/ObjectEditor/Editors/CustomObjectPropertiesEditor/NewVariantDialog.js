@@ -51,6 +51,7 @@ const NewVariantDialog = ({
         <HelpButton
           key="help-button"
           helpPagePath="/objects/custom-objects-prefab-template"
+          scopeName="Custom objects"
         />,
       ]}
       onRequestClose={onCancel}

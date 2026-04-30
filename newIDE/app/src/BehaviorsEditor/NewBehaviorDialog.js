@@ -254,7 +254,11 @@ export default function NewBehaviorDialog({
             />,
           ]}
           secondaryActions={[
-            <HelpButton helpPagePath="/behaviors" key="help" />,
+            <HelpButton
+              helpPagePath="/behaviors"
+              key="help"
+              scopeName="Behaviors"
+            />,
           ]}
           open
           onRequestClose={onClose}

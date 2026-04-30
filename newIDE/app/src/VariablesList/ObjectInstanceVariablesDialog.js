@@ -92,6 +92,7 @@ const ObjectInstanceVariablesDialog = ({
       tabs={tabs}
       initiallySelectedVariableName={initiallySelectedVariableName}
       helpPagePath={'/all-features/variables/instance-variables'}
+      scopeName="Instance variables"
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="instance-variables-dialog"
       onEditObjectVariables={onEditObjectVariables}

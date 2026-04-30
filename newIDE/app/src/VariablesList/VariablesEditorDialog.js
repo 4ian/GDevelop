@@ -57,6 +57,7 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps | null,
 
   helpPagePath: ?string,
+  scopeName?: string,
   id?: string,
 |};
 
@@ -69,6 +70,7 @@ const VariablesEditorDialog = ({
   project,
   hotReloadPreviewButtonProps,
   helpPagePath,
+  scopeName,
   id,
   tabs,
   initiallyOpenTabId,
@@ -242,7 +244,11 @@ const VariablesEditorDialog = ({
           />
         ) : null,
         helpPagePath ? (
-          <HelpButton helpPagePath={helpPagePath} key="help" />
+          <HelpButton
+            helpPagePath={helpPagePath}
+            key="help"
+            scopeName={scopeName}
+          />
         ) : null,
       ]}
       onRequestClose={onCancelChanges}

@@ -40,7 +40,11 @@ const BuildsDialog = ({
         />,
       ]}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath={'/publishing'} />,
+        <HelpButton
+          key="help"
+          helpPagePath={'/publishing'}
+          scopeName="Publishing"
+        />,
       ]}
       onRequestClose={onClose}
       open={open}

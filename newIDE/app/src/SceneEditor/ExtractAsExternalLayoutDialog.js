@@ -47,6 +47,7 @@ export default function ExtractAsExternalLayoutDialog({
         <HelpButton
           helpPagePath="/interface/scene-editor/external-layouts/"
           key="help"
+          scopeName="External layouts"
         />,
       ]}
       onRequestClose={onCancel}

@@ -105,7 +105,11 @@ export const SigningCredentialsDialog = ({
         />,
       ]}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath="/publishing/ios" />,
+        <HelpButton
+          key="help"
+          helpPagePath="/publishing/ios"
+          scopeName="iOS publishing"
+        />,
         signingCredentials && signingCredentials.length > 0 ? (
           <RaisedButton
             key="add-new"

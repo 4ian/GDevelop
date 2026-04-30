@@ -205,7 +205,10 @@ export default class DebuggerContent extends React.Component<Props, State> {
             </ScrollView>
             <MiniToolbar>
               <Line justifyContent="space-between" alignItems="center" noMargin>
-                <HelpButton helpPagePath="/interface/debugger" />
+                <HelpButton
+                  helpPagePath="/interface/debugger"
+                  scopeName="Debugger"
+                />
                 <div>
                   <Checkbox
                     checkedIcon={<Flash />}

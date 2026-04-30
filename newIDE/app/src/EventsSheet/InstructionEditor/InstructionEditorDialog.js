@@ -345,17 +345,7 @@ const InstructionEditorDialog = ({
                 ? instructionHelpPage
                 : '/events'
             }
-            label={
-              !instructionHelpPage ||
-              !isRelativePathToDocumentationRoot(instructionHelpPage) ||
-              (isMobile || step === 'object-or-free-instructions') ? (
-                <Trans>Help</Trans>
-              ) : isCondition ? (
-                <Trans>Help for this condition</Trans>
-              ) : (
-                <Trans>Help for this action</Trans>
-              )
-            }
+            scopeName="Events"
           />,
         ]}
         open={open}

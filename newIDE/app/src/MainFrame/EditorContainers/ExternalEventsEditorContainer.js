@@ -300,7 +300,10 @@ export class ExternalEventsEditorContainer extends React.Component<
                   tutorialId="Intermediate-externals"
                   label={<Trans>Watch tutorial</Trans>}
                   renderIfNotFound={
-                    <HelpButton helpPagePath="/interface/events-editor/external-events" />
+                    <HelpButton
+                      helpPagePath="/interface/events-editor/external-events"
+                      scopeName="External events"
+                    />
                   }
                 />
               </Line>

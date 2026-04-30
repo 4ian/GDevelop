@@ -7,6 +7,7 @@
 #if defined(GD_IDE_ONLY)
 #include "WhileEvent.h"
 #include "GDCore/Events/Serialization.h"
+#include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
 using namespace std;
@@ -45,6 +46,7 @@ vector<const gd::InstructionsList*> WhileEvent::GetAllActionsVectors() const {
 }
 
 void WhileEvent::SerializeTo(SerializerElement& element) const {
+  const bool canonical = gd::Serializer::IsCanonicalMode();
   element.SetAttribute("infiniteLoopWarning", infiniteLoopWarning);
   gd::EventsListSerialization::SerializeInstructionsTo(
       whileConditions, element.AddChild("whileConditions"));
@@ -53,13 +55,13 @@ void WhileEvent::SerializeTo(SerializerElement& element) const {
   gd::EventsListSerialization::SerializeInstructionsTo(
       actions, element.AddChild("actions"));
 
-  if (!events.IsEmpty())
+  if (canonical || !events.IsEmpty())
     gd::EventsListSerialization::SerializeEventsTo(events,
                                                   element.AddChild("events"));
-  if (HasVariables()) {
+  if (canonical || HasVariables()) {
     variables.SerializeTo(element.AddChild("variables"));
   }
-  if (!loopIndexVariableName.empty()) {
+  if (canonical || !loopIndexVariableName.empty()) {
     element.AddChild("loopIndexVariable").SetStringValue(loopIndexVariableName);
   }
 }

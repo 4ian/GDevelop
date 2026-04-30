@@ -1641,6 +1641,8 @@ interface SharedPtrSerializerElement {
 interface Serializer {
     [Const, Value] DOMString STATIC_ToJSON([Const, Ref] SerializerElement element);
     [Value] SerializerElement STATIC_FromJSON([Const] DOMString json);
+    void STATIC_SetCanonicalMode(boolean canonical);
+    boolean STATIC_IsCanonicalMode();
 };
 
 [NoDelete]

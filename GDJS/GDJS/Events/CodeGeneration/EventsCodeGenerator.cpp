@@ -667,22 +667,30 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // TODO: we could speed this up by storing a map of object names, but
          // the cost of creating/storing it for each events function might not
          // be worth it.
-         "    if (objectsList) {\n" +
-         "      const object = parentEventsFunctionContext && "
-         // Check if  `objectName` is not a child object and is passed by
-         // parameter from a parent instance container.
-         "!(scopeInstanceContainer && "
-         "scopeInstanceContainer.isObjectRegistered(objectName)) ?\n" +
-         "        "
-         "parentEventsFunctionContext.createObject(objectsList.firstKey()) "
-         ":\n" +
-         "        runtimeScene.createObject(objectsList.firstKey());\n" +
+         "    if (objectsList) {\n"
+         "      if (parentEventsFunctionContext && !(scopeInstanceContainer &&\n"
+         "          scopeInstanceContainer.isObjectRegistered(objectName))) {\n"
+         // The object is not a child object and is passed by parameter from a
+         // parent instance container.
+         "        const object = parentEventsFunctionContext.createObject(objectsList.firstKey());\n"
+         "        if (object) {\n"
          // Add the new instance to object lists
-         "      if (object) {\n" +
-         "        objectsList.get(objectsList.firstKey()).push(object);\n" +
-         "        "
-         "eventsFunctionContext._objectArraysMap[objectName].push(object);\n" +
-         "      }\n" + "      return object;\n" + "    }\n" +
+         "          objectsList.get(objectsList.firstKey()).push(object);\n"
+         "          eventsFunctionContext._objectArraysMap[objectName].push(object);\n"
+         "        }\n"
+         "        return object;\n"
+         "      } else {\n"
+         // The object is not a child object
+         "        const object = runtimeScene.createObject(objectsList.firstKey());\n"
+         "        if (object) {\n"
+         // Add the new instance to object lists.  `_objectsMap` and
+         // `_objectArraysMap` contains the same Array instance so we only add
+         // it once
+         "          eventsFunctionContext._objectArraysMap[objectName].push(object);\n"
+         "        }\n"
+         "        return object;\n"
+         "      }\n"
+         "    }\n"
          // Unknown object, don't create anything:
          "    return null;\n" +
          "  },\n"

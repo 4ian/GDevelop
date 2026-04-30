@@ -79,15 +79,15 @@ namespace gdjs {
       oldBehaviorData: BehaviorData,
       newBehaviorData: BehaviorData
     ): boolean {
-      const diffBehaviorData = {
+      const diffBehaviorData: BehaviorData & { [key: string]: any } = {
         name: newBehaviorData.name,
         type: newBehaviorData.type,
       };
-      for (const key in diffBehaviorData) {
-        const oldValue = oldBehaviorData[key];
-        const newValue = newBehaviorData[key];
-        if (newValue !== oldValue) {
-          diffBehaviorData[key] = newValue;
+      const oldData = oldBehaviorData as { [key: string]: any };
+      const newData = newBehaviorData as { [key: string]: any };
+      for (const key in newData) {
+        if (newData[key] !== oldData[key]) {
+          diffBehaviorData[key] = newData[key];
         }
       }
       // If not redefined, mark by default the hot-reload as failed.

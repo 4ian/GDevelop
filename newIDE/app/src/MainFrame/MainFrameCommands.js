@@ -60,6 +60,7 @@ type CommandHandlers = {|
   onCloseProject: () => Promise<void>,
   onReloadProject: () => Promise<void>,
   onExportGame: () => void,
+  onExportHtml5External: () => void,
   onInviteCollaborators: () => void,
   onOpenLayout: string => void,
   onOpenExternalEvents: string => void,
@@ -157,6 +158,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('EXPORT_GAME', !!handlers.project, {
     handler: handlers.onExportGame,
+  });
+
+  useCommand('EXPORT_HTML5_EXTERNAL', !!handlers.project, {
+    handler: handlers.onExportHtml5External,
   });
 
   useCommand('INVITE_COLLABORATORS', !!handlers.project, {

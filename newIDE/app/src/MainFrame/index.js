@@ -75,6 +75,7 @@ import {
   type ObjectGroupsOutsideEditorChanges,
 } from './EditorContainers/BaseEditor';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
+import { exportLocalHtml5Headless } from '../ExportAndShare/Headless/exportLocalHtml5Headless';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
@@ -4891,6 +4892,15 @@ const MainFrame = (props: Props): React.MixedElement => {
     onReloadProject: reloadProject,
     onExportGame: () => {
       openShareDialog('publish');
+    },
+    onExportHtml5External: async () => {
+      const project = state.currentProject;
+      if (!project) return;
+      try {
+        await exportLocalHtml5Headless({ project, i18n });
+      } catch (error) {
+        console.error('Headless HTML5 export failed:', error);
+      }
     },
     onInviteCollaborators: () => {
       openShareDialog('invite');

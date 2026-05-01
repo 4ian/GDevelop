@@ -745,11 +745,9 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
     });
 
     it('Modifies a created child object only once via picked-list actions', () => {
-      // If the created child instance was picked twice, an action modifying
-      // a variable on the picked list would still affect the same object
-      // (idempotent). Use an "AddVariable" semantics by checking the picked
-      // count is 1 after re-picking, and that the underlying scene only has
-      // the single instance.
+      // If the created child instance was picked twice, an additive action
+      // on the picked list would run twice on the same object. Using "+"
+      // makes the doubling observable on the resulting variable value.
       const { runtimeScene, object } = setupCustomObjectWithChild([
         {
           type: 'BuiltinCommonInstructions::Standard',
@@ -758,10 +756,6 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
             {
               type: { value: 'Create' },
               parameters: ['', 'MyChildObject', '0', '0', ''],
-            },
-            {
-              type: { value: 'ModVarObjet' },
-              parameters: ['MyChildObject', 'Tag', '=', '7'],
             },
           ],
         },
@@ -774,12 +768,8 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
               parameters: ['', 'MyChildObject'],
             },
             {
-              type: { value: 'ModVarScene' },
-              parameters: [
-                'PickedAfterRePick',
-                '=',
-                'PickedInstancesCount(MyChildObject)',
-              ],
+              type: { value: 'ModVarObjet' },
+              parameters: ['MyChildObject', 'Tag', '+', '7'],
             },
           ],
         },
@@ -789,14 +779,12 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
 
       const childInstances = runtimeScene.getObjects('MyChildObject');
       expect(childInstances.length).toBe(1);
-      // The variable has been set on the unique child instance.
+      // The "+ 7" action must have run exactly once on the unique child
+      // instance. Without the fix, the picked list contained the same
+      // instance twice, so the variable would be incremented twice (14).
       expect(
         childInstances[0].getVariables().get('Tag').getAsNumber()
       ).toBe(7);
-      // And the re-pick still finds exactly one instance, not two.
-      expect(
-        runtimeScene.getVariables().get('PickedAfterRePick').getAsNumber()
-      ).toBe(1);
     });
   });
 });

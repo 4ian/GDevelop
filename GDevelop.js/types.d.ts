@@ -1658,6 +1658,7 @@ export class ValueTypeMetadata extends EmscriptenObject {
   isNumber(): boolean;
   isString(): boolean;
   isVariable(): boolean;
+  isResource(): boolean;
   static isTypeObject(parameterType: string): boolean;
   static isTypeBehavior(parameterType: string): boolean;
   static isTypeExpression(type: string, parameterType: string): boolean;

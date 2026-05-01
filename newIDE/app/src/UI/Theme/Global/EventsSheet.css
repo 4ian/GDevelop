@@ -143,7 +143,8 @@
   color: var(--event-sheet-instruction-parameter-base-color);
 }
 
-.gd-events-sheet .instruction-parameter.string {
+.gd-events-sheet .instruction-parameter.string,
+.gd-events-sheet .instruction-parameter.resource {
   color: var(--event-sheet-instruction-parameter-base-color);
 }
 

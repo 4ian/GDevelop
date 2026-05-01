@@ -379,8 +379,12 @@ const Instruction = (props: Props): React.Node => {
               className={classNames({
                 [selectableArea]: true,
                 [instructionParameter]: true,
+                // Resources are string literals they use the same color as strings.
                 // $FlowFixMe[invalid-computed-prop]
-                [parameterType]:
+                [parameterMetadata.getValueTypeMetadata().isResource()
+                  ? 'resource'
+                  : parameterType]:
+                  // Variables, numbers and strings are expressions with syntax coloring.
                   parameterType !== 'number' &&
                   parameterType !== 'string' &&
                   !parameterMetadata.getValueTypeMetadata().isVariable(),

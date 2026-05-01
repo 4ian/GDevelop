@@ -1986,6 +1986,7 @@ interface ValueTypeMetadata {
     boolean IsNumber();
     boolean IsString();
     boolean IsVariable();
+    boolean IsResource();
 
     boolean STATIC_IsTypeObject([Const] DOMString parameterType);
     boolean STATIC_IsTypeBehavior([Const] DOMString parameterType);

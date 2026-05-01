@@ -53,15 +53,17 @@ public:
    */
   size_t GetEndPosition() const { return endPosition; }
 
+  void SetEndPosition(size_t endPosition_) { endPosition = endPosition_; }
+
   /** Default constructor, only to be used by Emscripten bindings. */
   ExpressionColorationDescription() : colorationKind(String){};
 
   ExpressionColorationDescription(ColorationKind colorationKind_,
-                                  size_t replacementStartPosition_,
-                                  size_t replacementEndPosition_)
+                                  size_t startPosition_,
+                                  size_t endPosition_)
       : colorationKind(colorationKind_),
-        startPosition(replacementStartPosition_),
-        endPosition(replacementEndPosition_) {}
+        startPosition(startPosition_),
+        endPosition(endPosition_) {}
 
 private:
   ColorationKind colorationKind;
@@ -81,7 +83,7 @@ public:
    * \brief Given the expression, find the node at the specified location
    * and returns colorations for it.
    */
-  static std::vector<ExpressionColorationDescription>
+  static const std::vector<ExpressionColorationDescription>
   GetColorationDescriptionsFor(
       const gd::Platform &platform,
       const gd::ProjectScopedContainers &projectScopedContainers,
@@ -106,71 +108,59 @@ protected:
   void OnVisitSubExpressionNode(SubExpressionNode &node) override {
     // TODO node.location should includes the parenthesis.
     {
-      gd::ExpressionColorationDescription coloration(
+      AddColoration(
           gd::ExpressionColorationDescription::ColorationKind::Operator,
           node.location.GetStartPosition() - 1,
           node.expression->location.GetStartPosition());
-      colorations.push_back(coloration);
     }
     node.expression->Visit(*this);
     {
-      gd::ExpressionColorationDescription coloration(
+      AddColoration(
           gd::ExpressionColorationDescription::ColorationKind::Operator,
           node.expression->location.GetEndPosition(),
           node.location.GetEndPosition() + 1);
-      colorations.push_back(coloration);
     }
   }
   void OnVisitOperatorNode(OperatorNode &node) override {
     node.leftHandSide->Visit(*this);
 
-    gd::ExpressionColorationDescription coloration(
-        gd::ExpressionColorationDescription::ColorationKind::Operator,
-        node.leftHandSide->location.GetEndPosition(),
-        node.rightHandSide->location.GetStartPosition());
-    colorations.push_back(coloration);
+    AddColoration(gd::ExpressionColorationDescription::ColorationKind::Operator,
+                  node.leftHandSide->location.GetEndPosition(),
+                  node.rightHandSide->location.GetStartPosition());
 
     node.rightHandSide->Visit(*this);
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode &node) override {
-    gd::ExpressionColorationDescription coloration(
-        gd::ExpressionColorationDescription::ColorationKind::Operator,
-        node.location.GetStartPosition(),
-        node.factor->location.GetStartPosition());
-    colorations.push_back(coloration);
+    AddColoration(gd::ExpressionColorationDescription::ColorationKind::Operator,
+                  node.location.GetStartPosition(),
+                  node.factor->location.GetStartPosition());
 
     node.factor->Visit(*this);
   }
   void OnVisitNumberNode(NumberNode &node) override {
-    gd::ExpressionColorationDescription coloration(
-        gd::ExpressionColorationDescription::ColorationKind::Number,
-        node.location.GetStartPosition(), node.location.GetEndPosition());
-    colorations.push_back(coloration);
+    AddColoration(gd::ExpressionColorationDescription::ColorationKind::Number,
+                  node.location.GetStartPosition(),
+                  node.location.GetEndPosition());
   }
 
   void OnVisitTextNode(TextNode &node) override {
-    gd::ExpressionColorationDescription coloration(
-        gd::ExpressionColorationDescription::ColorationKind::String,
-        node.location.GetStartPosition(), node.location.GetEndPosition());
-    colorations.push_back(coloration);
+    AddColoration(gd::ExpressionColorationDescription::ColorationKind::String,
+                  node.location.GetStartPosition(),
+                  node.location.GetEndPosition());
   }
   void OnVisitVariableNode(VariableNode &node) override {
-    gd::ExpressionColorationDescription coloration(
-        gd::ExpressionColorationDescription::ColorationKind::Variable,
-        node.nameLocation.GetStartPosition(),
-        node.nameLocation.GetEndPosition());
-    colorations.push_back(coloration);
+    AddColoration(gd::ExpressionColorationDescription::ColorationKind::Variable,
+                  node.nameLocation.GetStartPosition(),
+                  node.nameLocation.GetEndPosition());
 
     if (node.child) {
       node.child->Visit(*this);
     }
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode &node) override {
-    gd::ExpressionColorationDescription coloration(
-        gd::ExpressionColorationDescription::ColorationKind::Variable,
-        node.dotLocation.GetStartPosition(),
-        node.nameLocation.GetEndPosition());
-    colorations.push_back(coloration);
+    AddColoration(gd::ExpressionColorationDescription::ColorationKind::Variable,
+                  node.dotLocation.GetStartPosition(),
+                  node.nameLocation.GetEndPosition());
 
     if (node.child) {
       node.child->Visit(*this);
@@ -179,20 +169,18 @@ protected:
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode &node) override {
     {
-      gd::ExpressionColorationDescription coloration(
+      AddColoration(
           gd::ExpressionColorationDescription::ColorationKind::Variable,
           node.location.GetStartPosition(),
           node.expression->location.GetStartPosition());
-      colorations.push_back(coloration);
     }
     node.expression->Visit(*this);
     {
-      gd::ExpressionColorationDescription coloration(
+      AddColoration(
           gd::ExpressionColorationDescription::ColorationKind::Variable,
           node.expression->location.GetEndPosition(),
           node.child ? node.child->location.GetStartPosition()
                      : node.location.GetEndPosition());
-      colorations.push_back(coloration);
     }
     if (node.child) {
       node.child->Visit(*this);
@@ -204,16 +192,15 @@ protected:
     auto type = gd::ExpressionTypeFinder::GetType(
         platform, projectScopedContainers, rootType, node);
     if (gd::ParameterMetadata::IsObject(type)) {
-      gd::ExpressionColorationDescription coloration(
-          gd::ExpressionColorationDescription::ColorationKind::Object,
-          node.identifierNameLocation.GetStartPosition(),
-          node.identifierNameLocation.GetStartPosition());
-      colorations.push_back(coloration);
+      AddColoration(gd::ExpressionColorationDescription::ColorationKind::Object,
+                    node.identifierNameLocation.GetStartPosition(),
+                    node.identifierNameLocation.GetStartPosition());
+
     } else if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
-      gd::ExpressionColorationDescription coloration(
+      AddColoration(
           gd::ExpressionColorationDescription::ColorationKind::Variable,
           node.location.GetStartPosition(), node.location.GetStartPosition());
-      colorations.push_back(coloration);
+
     } else {
       // Might be:
       // - An object variable, object behavior or object expression.
@@ -222,43 +209,38 @@ protected:
           node.identifierName,
           [&]() {
             // This is an object.
-            gd::ExpressionColorationDescription coloration(
+            AddColoration(
                 gd::ExpressionColorationDescription::ColorationKind::Object,
                 node.identifierNameLocation.GetStartPosition(),
                 node.identifierNameLocation.GetEndPosition());
-            colorations.push_back(coloration);
 
             if (node.childIdentifierNameLocation.IsValid()) {
-              gd::ExpressionColorationDescription coloration(
+              AddColoration(
                   gd::ExpressionColorationDescription::ColorationKind::Variable,
                   node.childIdentifierNameLocation.GetStartPosition(),
                   node.childIdentifierNameLocation.GetEndPosition());
-              colorations.push_back(coloration);
             }
           },
           [&]() {
             // This is a variable.
-            gd::ExpressionColorationDescription coloration(
+            AddColoration(
                 gd::ExpressionColorationDescription::ColorationKind::Variable,
                 node.location.GetStartPosition(),
                 node.location.GetEndPosition());
-            colorations.push_back(coloration);
           },
           [&]() {
             // This is a property.
-            gd::ExpressionColorationDescription coloration(
+            AddColoration(
                 gd::ExpressionColorationDescription::ColorationKind::Variable,
                 node.location.GetStartPosition(),
                 node.location.GetEndPosition());
-            colorations.push_back(coloration);
           },
           [&]() {
             // This is a parameter.
-            gd::ExpressionColorationDescription coloration(
+            AddColoration(
                 gd::ExpressionColorationDescription::ColorationKind::Variable,
                 node.location.GetStartPosition(),
                 node.location.GetEndPosition());
-            colorations.push_back(coloration);
           },
           [&]() {
             // Ignore unrecognised identifiers here.
@@ -270,11 +252,10 @@ protected:
   }
   void OnVisitFunctionCallNode(FunctionCallNode &node) override {
     if (node.objectNameLocation.IsValid()) {
-      gd::ExpressionColorationDescription coloration(
+      AddColoration(
           gd::ExpressionColorationDescription::ColorationKind::Object,
           node.objectNameLocation.GetStartPosition(),
           node.objectNameLocation.GetEndPosition());
-      colorations.push_back(coloration);
     }
     for (auto &&parameter : node.parameters) {
       parameter->Visit(*this);
@@ -292,6 +273,20 @@ private:
         rootObjectName("") // Always empty, might be changed if variable fields
                            // in the editor are changed to use coloration.
         {};
+
+  void AddColoration(
+      gd::ExpressionColorationDescription::ColorationKind colorationKind,
+      size_t startPosition, size_t endPosition) {
+    if (!colorations.empty() &&
+        colorations.back().GetColorationKind() == colorationKind &&
+        colorations.back().GetEndPosition() == startPosition) {
+      colorations.back().SetEndPosition(endPosition);
+    } else {
+      gd::ExpressionColorationDescription coloration(
+          colorationKind, startPosition, endPosition);
+      colorations.push_back(coloration);
+    }
+  }
 
   std::vector<ExpressionColorationDescription> colorations;
   size_t searchedPosition;

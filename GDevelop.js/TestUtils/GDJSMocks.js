@@ -755,6 +755,21 @@ const getPickedInstancesCount = (objectsLists) => {
   return count;
 };
 
+/**
+ * @param {any} objectsContext
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ */
+const pickAllObjects = (objectsContext, objectsLists) => {
+  for (const name in objectsLists.items) {
+    if (objectsLists.items.hasOwnProperty(name)) {
+      const allObjects = objectsContext.getObjects(name);
+      const objectsList = objectsLists.items[name];
+      copyArray(allObjects, objectsList);
+    }
+  }
+  return true;
+};
+
 class RuntimeGame {
   constructor(gameData) {
     this._variablesContainer = new VariablesContainer(
@@ -1024,6 +1039,7 @@ function makeMinimalGDJSMock(options) {
           createObjectOnScene,
           getSceneInstancesCount,
           getPickedInstancesCount,
+          pickAllObjects,
         },
         runtimeScene: {
           wait: () => new FakeAsyncTask(),

@@ -532,6 +532,273 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
         .getAsNumber()
     ).toBe(456);
   });
+
+  describe('Child object instance creation', () => {
+    // Builds an events-based object with a child object and an events function
+    // running the provided list of events.
+    const setupCustomObjectWithChild = (events) => {
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+        'MyExtension',
+        0
+      );
+      const eventsBasedObject = eventsFunctionsExtension
+        .getEventsBasedObjects()
+        .insertNew('MyCustomObject', 0);
+
+      eventsBasedObject
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'MyChildObject', 0);
+
+      const eventsSerializerElement = gd.Serializer.fromJSObject(events);
+      eventsBasedObject
+        .getEventsFunctions()
+        .insertNewEventsFunction('MyFunction', 0)
+        .getEvents()
+        .unserializeFrom(project, eventsSerializerElement);
+      gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+        eventsFunctionsExtension,
+        eventsBasedObject
+      );
+
+      return generatedCustomObject(
+        gd,
+        project,
+        eventsFunctionsExtension,
+        eventsBasedObject,
+        { logCode: false }
+      );
+    };
+
+    it('Picks a created child object only once in the same event scope', () => {
+      const { runtimeScene, object } = setupCustomObjectWithChild([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Create' },
+              parameters: ['', 'MyChildObject', '0', '0', ''],
+            },
+            {
+              type: { value: 'ModVarScene' },
+              parameters: [
+                'PickedAfterCreate',
+                '=',
+                'PickedInstancesCount(MyChildObject)',
+              ],
+            },
+          ],
+        },
+      ]);
+
+      object.MyFunction();
+
+      // The created child object should be picked exactly once.
+      expect(
+        runtimeScene.getVariables().get('PickedAfterCreate').getAsNumber()
+      ).toBe(1);
+      // And it should only be created once on the scene.
+      expect(runtimeScene.getObjects('MyChildObject').length).toBe(1);
+    });
+
+    it('Picks a created child object only once when picked again in a sibling event', () => {
+      // This is the scenario broken by the regression: after a child object
+      // is created, a subsequent event re-picking all instances of the child
+      // object would see it twice because it had been pushed twice into the
+      // function-level child object list.
+      const { runtimeScene, object } = setupCustomObjectWithChild([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Create' },
+              parameters: ['', 'MyChildObject', '0', '0', ''],
+            },
+          ],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'PickAllInstances' },
+              parameters: ['', 'MyChildObject'],
+            },
+            {
+              type: { value: 'ModVarScene' },
+              parameters: [
+                'PickedAfterRePick',
+                '=',
+                'PickedInstancesCount(MyChildObject)',
+              ],
+            },
+          ],
+        },
+      ]);
+
+      object.MyFunction();
+
+      // After re-picking all instances, the created child object should
+      // appear exactly once.
+      expect(
+        runtimeScene.getVariables().get('PickedAfterRePick').getAsNumber()
+      ).toBe(1);
+      expect(runtimeScene.getObjects('MyChildObject').length).toBe(1);
+    });
+
+    it('Counts created child object instances once in scene instances count', () => {
+      const { runtimeScene, object } = setupCustomObjectWithChild([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Create' },
+              parameters: ['', 'MyChildObject', '0', '0', ''],
+            },
+            {
+              type: { value: 'PickAllInstances' },
+              parameters: ['', 'MyChildObject'],
+            },
+            {
+              type: { value: 'ModVarScene' },
+              parameters: [
+                'SceneCount',
+                '=',
+                'SceneInstancesCount(MyChildObject)',
+              ],
+            },
+            {
+              type: { value: 'ModVarScene' },
+              parameters: [
+                'PickedCount',
+                '=',
+                'PickedInstancesCount(MyChildObject)',
+              ],
+            },
+          ],
+        },
+      ]);
+
+      object.MyFunction();
+
+      // Both the scene-instances count and the picked-instances count must
+      // agree: a single child object was created.
+      expect(
+        runtimeScene.getVariables().get('SceneCount').getAsNumber()
+      ).toBe(1);
+      expect(
+        runtimeScene.getVariables().get('PickedCount').getAsNumber()
+      ).toBe(1);
+      expect(runtimeScene.getObjects('MyChildObject').length).toBe(1);
+    });
+
+    it('Picks several created child object instances once each', () => {
+      const { runtimeScene, object } = setupCustomObjectWithChild([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Create' },
+              parameters: ['', 'MyChildObject', '0', '0', ''],
+            },
+            {
+              type: { value: 'Create' },
+              parameters: ['', 'MyChildObject', '0', '0', ''],
+            },
+            {
+              type: { value: 'Create' },
+              parameters: ['', 'MyChildObject', '0', '0', ''],
+            },
+          ],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'PickAllInstances' },
+              parameters: ['', 'MyChildObject'],
+            },
+            {
+              type: { value: 'ModVarScene' },
+              parameters: [
+                'PickedAfterRePick',
+                '=',
+                'PickedInstancesCount(MyChildObject)',
+              ],
+            },
+          ],
+        },
+      ]);
+
+      object.MyFunction();
+
+      // Three creations should yield three picked instances - not six.
+      expect(
+        runtimeScene.getVariables().get('PickedAfterRePick').getAsNumber()
+      ).toBe(3);
+      expect(runtimeScene.getObjects('MyChildObject').length).toBe(3);
+    });
+
+    it('Modifies a created child object only once via picked-list actions', () => {
+      // If the created child instance was picked twice, an action modifying
+      // a variable on the picked list would still affect the same object
+      // (idempotent). Use an "AddVariable" semantics by checking the picked
+      // count is 1 after re-picking, and that the underlying scene only has
+      // the single instance.
+      const { runtimeScene, object } = setupCustomObjectWithChild([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Create' },
+              parameters: ['', 'MyChildObject', '0', '0', ''],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: ['MyChildObject', 'Tag', '=', '7'],
+            },
+          ],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'PickAllInstances' },
+              parameters: ['', 'MyChildObject'],
+            },
+            {
+              type: { value: 'ModVarScene' },
+              parameters: [
+                'PickedAfterRePick',
+                '=',
+                'PickedInstancesCount(MyChildObject)',
+              ],
+            },
+          ],
+        },
+      ]);
+
+      object.MyFunction();
+
+      const childInstances = runtimeScene.getObjects('MyChildObject');
+      expect(childInstances.length).toBe(1);
+      // The variable has been set on the unique child instance.
+      expect(
+        childInstances[0].getVariables().get('Tag').getAsNumber()
+      ).toBe(7);
+      // And the re-pick still finds exactly one instance, not two.
+      expect(
+        runtimeScene.getVariables().get('PickedAfterRePick').getAsNumber()
+      ).toBe(1);
+    });
+  });
 });
 
 function generatedCustomObject(

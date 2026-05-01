@@ -378,11 +378,12 @@ const Instruction = (props: Props): React.Node => {
               key={i}
               className={classNames({
                 [selectableArea]: true,
-                [instructionParameter]:
-                  parameterType !== 'number' && parameterType !== 'string',
+                [instructionParameter]: true,
                 // $FlowFixMe[invalid-computed-prop]
                 [parameterType]:
-                  parameterType !== 'number' && parameterType !== 'string',
+                  parameterType !== 'number' &&
+                  parameterType !== 'string' &&
+                  !parameterMetadata.getValueTypeMetadata().isVariable(),
               })}
               onClick={domEvent => {
                 props.onParameterClick(domEvent, parameterIndex);

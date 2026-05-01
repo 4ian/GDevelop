@@ -1,5 +1,10 @@
 // @flow
 import * as React from 'react';
+import { mapVector } from '../Utils/MapFor';
+import classNames from 'classnames';
+import { instructionParameter } from '../EventsSheet/EventsTree/ClassNames';
+
+const gd: libGDevelop = global.gd;
 
 const GLOBAL_SEARCH_MATCH_CLASS_NAME = 'global-search-text-match';
 
@@ -158,4 +163,84 @@ export const highlightSearchText = (
     text,
     getHighlightSearchTextParts(text, searchText, spanProps)
   );
+};
+
+const getColorationName = (
+  colorationKind: ExpressionColorationDescription_ColorationKind
+) => {
+  switch (colorationKind) {
+    case gd.ExpressionColorationDescription.Number:
+      return 'number';
+
+    case gd.ExpressionColorationDescription.Object:
+      return 'object';
+
+    case gd.ExpressionColorationDescription.Variable:
+      return 'variable';
+
+    case gd.ExpressionColorationDescription.Operator:
+      return 'operator';
+
+    case gd.ExpressionColorationDescription.String:
+    default:
+      return 'string';
+  }
+};
+
+export const applySyntaxColoring = ({
+  text,
+  platform,
+  projectScopedContainers,
+  rootType,
+  expression,
+}: {
+  text: string,
+  platform: gdPlatform,
+  projectScopedContainers: gdProjectScopedContainers,
+  rootType: string,
+  expression: gdExpression,
+}): Array<TextStyle> => {
+  const colorationDescriptions = gd.ExpressionSyntaxColoringHelper.getColorationDescriptionsFor(
+    platform,
+    projectScopedContainers,
+    rootType,
+    expression.getRootNode()
+  );
+  let nextCharacterIndex = 0;
+  const coloredTextParts: Array<TextStyle> = [];
+  mapVector(colorationDescriptions, colorationDescription => {
+    const startPosition = colorationDescription.getStartPosition();
+    if (startPosition > nextCharacterIndex) {
+      coloredTextParts.push({
+        startIndex: nextCharacterIndex,
+        endIndex: startPosition,
+        props: {},
+        key: `color-part--${coloredTextParts.length}`,
+      });
+      nextCharacterIndex = startPosition;
+    }
+    const endPosition = colorationDescription.getEndPosition();
+    coloredTextParts.push({
+      startIndex: startPosition,
+      endIndex: endPosition,
+      props: {
+        className: classNames({
+          [instructionParameter]: true,
+          //$FlowFixMe[invalid-computed-prop]
+          [getColorationName(colorationDescription.getColorationKind())]: true,
+        }),
+      },
+      key: `color-part--${coloredTextParts.length}`,
+    });
+    nextCharacterIndex = endPosition;
+  });
+  if (nextCharacterIndex < text.length) {
+    coloredTextParts.push({
+      startIndex: nextCharacterIndex,
+      endIndex: text.length,
+      props: {},
+      key: `color-part--${coloredTextParts.length}`,
+    });
+  }
+  return coloredTextParts;
 };

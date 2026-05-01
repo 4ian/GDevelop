@@ -10,17 +10,11 @@ import {
 } from './ParameterFieldCommons';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import {
-  highlightSearchText,
   renderStylizedText,
-  type TextStyle,
   mergeStylizedText,
   getHighlightSearchTextParts,
+  applySyntaxColoring,
 } from '../../Utils/HighlightSearchText';
-import { mapVector } from '../../Utils/MapFor';
-import classNames from 'classnames';
-import { instructionParameter } from '../EventsTree/ClassNames';
-
-const gd: libGDevelop = global.gd;
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function DefaultField(props: ParameterFieldProps, ref) {
@@ -57,86 +51,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   +ref?: React.RefSetter<ParameterFieldInterface>,
 }>);
 
-const getColorationName = (
-  colorationKind: ExpressionColorationDescription_ColorationKind
-) => {
-  switch (colorationKind) {
-    case gd.ExpressionColorationDescription.Number:
-      return 'number';
-
-    case gd.ExpressionColorationDescription.Object:
-      return 'object';
-
-    case gd.ExpressionColorationDescription.Variable:
-      return 'variable';
-
-    case gd.ExpressionColorationDescription.Operator:
-      return 'operator';
-
-    case gd.ExpressionColorationDescription.String:
-    default:
-      return 'string';
-  }
-};
-
-export const applySyntaxColoring = ({
-  text,
-  platform,
-  projectScopedContainers,
-  rootType,
-  expression,
-}: {
-  text: string,
-  platform: gdPlatform,
-  projectScopedContainers: gdProjectScopedContainers,
-  rootType: string,
-  expression: gdExpression,
-}): Array<TextStyle> => {
-  const colorationDescriptions = gd.ExpressionSyntaxColoringHelper.getColorationDescriptionsFor(
-    platform,
-    projectScopedContainers,
-    rootType,
-    expression.getRootNode()
-  );
-  let nextCharacterIndex = 0;
-  const coloredTextParts: Array<TextStyle> = [];
-  mapVector(colorationDescriptions, colorationDescription => {
-    const startPosition = colorationDescription.getStartPosition();
-    if (startPosition > nextCharacterIndex) {
-      coloredTextParts.push({
-        startIndex: nextCharacterIndex,
-        endIndex: startPosition,
-        props: {},
-        key: `color-part--${coloredTextParts.length}`,
-      });
-      nextCharacterIndex = startPosition;
-    }
-    const endPosition = colorationDescription.getEndPosition();
-    coloredTextParts.push({
-      startIndex: startPosition,
-      endIndex: endPosition,
-      props: {
-        className: classNames({
-          [instructionParameter]: true,
-          //$FlowFixMe[invalid-computed-prop]
-          [getColorationName(colorationDescription.getColorationKind())]: true,
-        }),
-      },
-      key: `color-part--${coloredTextParts.length}`,
-    });
-    nextCharacterIndex = endPosition;
-  });
-  if (nextCharacterIndex < text.length) {
-    coloredTextParts.push({
-      startIndex: nextCharacterIndex,
-      endIndex: text.length,
-      props: {},
-      key: `color-part--${coloredTextParts.length}`,
-    });
-  }
-  return coloredTextParts;
-};
-
 export const renderInlineDefaultField = ({
   value,
   expressionIsValid,
@@ -157,22 +71,16 @@ export const renderInlineDefaultField = ({
   if (!expressionIsValid) {
     return (
       <InvalidParameterValue>
-        {highlightSearchText(value, highlightedSearchText, {
-          matchCase: highlightedSearchMatchCase,
-        })}
+        {renderStylizedText(
+          value,
+          getHighlightSearchTextParts(value, highlightedSearchText, {
+            matchCase: highlightedSearchMatchCase,
+          })
+        )}
       </InvalidParameterValue>
     );
   }
-  if (hasDeprecationWarning) {
-    return (
-      <DeprecatedParameterValue>
-        {highlightSearchText(value, highlightedSearchText, {
-          matchCase: highlightedSearchMatchCase,
-        })}
-      </DeprecatedParameterValue>
-    );
-  }
-  return renderStylizedText(
+  const stylizedText = renderStylizedText(
     value,
     mergeStylizedText(
       getHighlightSearchTextParts(value, highlightedSearchText, {
@@ -187,4 +95,8 @@ export const renderInlineDefaultField = ({
       })
     )
   );
+  if (hasDeprecationWarning) {
+    return <DeprecatedParameterValue>{stylizedText}</DeprecatedParameterValue>;
+  }
+  return stylizedText;
 };

@@ -143,6 +143,10 @@
   color: var(--event-sheet-instruction-parameter-base-color);
 }
 
+.gd-events-sheet .instruction-parameter.string {
+  color: var(--event-sheet-instruction-parameter-base-color);
+}
+
 .gd-events-sheet .instruction-parameter.number {
   color: var(--event-sheet-instruction-parameter-number-color);
 }

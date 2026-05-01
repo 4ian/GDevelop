@@ -100,6 +100,7 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
       .insertNewEventsFunction('MyFunction', 0)
       .getEvents()
       .unserializeFrom(project, eventsSerializerElement);
+    eventsSerializerElement.delete();
     gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
       eventsFunctionsExtension,
       eventsBasedObject
@@ -164,6 +165,7 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
       .insertNewEventsFunction('MyFunction', 0)
       .getEvents()
       .unserializeFrom(project, eventsSerializerElement);
+    eventsSerializerElement.delete();
     gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
       eventsFunctionsExtension,
       eventsBasedObject
@@ -244,6 +246,7 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
       .insertNewEventsFunction('MyFunction', 0)
       .getEvents()
       .unserializeFrom(project, eventsSerializerElement);
+    eventsSerializerElement.delete();
     gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
       eventsFunctionsExtension,
       eventsBasedObject
@@ -312,6 +315,7 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
     eventsFunction
       .getEvents()
       .unserializeFrom(project, eventsSerializerElement);
+    eventsSerializerElement.delete();
     gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
       eventsFunctionsExtension,
       eventsBasedObject
@@ -400,6 +404,7 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
     eventsFunction
       .getEvents()
       .unserializeFrom(project, eventsSerializerElement);
+    eventsSerializerElement.delete();
     gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
       eventsFunctionsExtension,
       eventsBasedObject
@@ -495,6 +500,7 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
     eventsFunction
       .getEvents()
       .unserializeFrom(project, eventsSerializerElement);
+    eventsSerializerElement.delete();
     gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
       eventsFunctionsExtension,
       eventsBasedObject
@@ -556,6 +562,7 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
         .insertNewEventsFunction('MyFunction', 0)
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
+      eventsSerializerElement.delete();
       gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
         eventsFunctionsExtension,
         eventsBasedObject
@@ -769,7 +776,7 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
             },
             {
               type: { value: 'ModVarObjet' },
-              parameters: ['MyChildObject', 'Tag', '+', '7'],
+              parameters: ['MyChildObject', 'Counter', '+', '1'],
             },
           ],
         },
@@ -779,12 +786,156 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
 
       const childInstances = runtimeScene.getObjects('MyChildObject');
       expect(childInstances.length).toBe(1);
-      // The "+ 7" action must have run exactly once on the unique child
-      // instance. Without the fix, the picked list contained the same
-      // instance twice, so the variable would be incremented twice (14).
+      // The "+ 1" action must have run exactly once on the unique child
+      // instance, so the counter is 1 (not 2).
       expect(
-        childInstances[0].getVariables().get('Tag').getAsNumber()
-      ).toBe(7);
+        childInstances[0].getVariables().get('Counter').getAsNumber()
+      ).toBe(1);
+    });
+
+    it('Picks only the newly created child object instance in each sibling event', () => {
+      // Two child object instances are created in two sibling events.
+      // Each sibling event has its own picking scope, so the action
+      // following the Create must only affect the instance created in
+      // that scope - not the instance created in the previous scope.
+      const { runtimeScene, object } = setupCustomObjectWithChild([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Create' },
+              parameters: ['', 'MyChildObject', '0', '0', ''],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: ['MyChildObject', 'CreatedIn', '=', '1'],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: ['MyChildObject', 'Counter', '+', '1'],
+            },
+          ],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Create' },
+              parameters: ['', 'MyChildObject', '0', '0', ''],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: ['MyChildObject', 'CreatedIn', '=', '2'],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: ['MyChildObject', 'Counter', '+', '1'],
+            },
+          ],
+        },
+      ]);
+
+      object.MyFunction();
+
+      const childInstances = runtimeScene.getObjects('MyChildObject');
+      expect(childInstances.length).toBe(2);
+
+      // Each instance was created in its own scope, so the "CreatedIn"
+      // variable must distinguish them: one is tagged 1, the other 2.
+      const createdInValues = childInstances
+        .map((instance) => instance.getVariables().get('CreatedIn').getAsNumber())
+        .sort();
+      expect(createdInValues).toEqual([1, 2]);
+
+      // The "+ 1" counter ran exactly once on each instance: the action
+      // in the second sibling event must not see the instance created in
+      // the first sibling event.
+      for (const instance of childInstances) {
+        expect(instance.getVariables().get('Counter').getAsNumber()).toBe(1);
+      }
+    });
+
+    it('Picks all created child object instances exactly once when re-picked', () => {
+      // Two child object instances are created in two sibling events.
+      // A third sibling event re-picks all instances and applies a
+      // counter increment. Each instance must be picked exactly once.
+      const { runtimeScene, object } = setupCustomObjectWithChild([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Create' },
+              parameters: ['', 'MyChildObject', '0', '0', ''],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: ['MyChildObject', 'CreatedIn', '=', '1'],
+            },
+          ],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Create' },
+              parameters: ['', 'MyChildObject', '0', '0', ''],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: ['MyChildObject', 'CreatedIn', '=', '2'],
+            },
+          ],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'PickAllInstances' },
+              parameters: ['', 'MyChildObject'],
+            },
+            {
+              type: { value: 'ModVarScene' },
+              parameters: [
+                'PickedAfterRePick',
+                '=',
+                'PickedInstancesCount(MyChildObject)',
+              ],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: ['MyChildObject', 'AllPickedCounter', '+', '1'],
+            },
+          ],
+        },
+      ]);
+
+      object.MyFunction();
+
+      const childInstances = runtimeScene.getObjects('MyChildObject');
+      expect(childInstances.length).toBe(2);
+
+      // After re-picking, exactly the two created instances are picked
+      // (not duplicated entries of the same instance).
+      expect(
+        runtimeScene.getVariables().get('PickedAfterRePick').getAsNumber()
+      ).toBe(2);
+
+      // Both instances have been incremented exactly once each by the
+      // re-pick + ModVarObjet action.
+      const createdInValues = childInstances
+        .map((instance) => instance.getVariables().get('CreatedIn').getAsNumber())
+        .sort();
+      expect(createdInValues).toEqual([1, 2]);
+      for (const instance of childInstances) {
+        expect(
+          instance.getVariables().get('AllPickedCounter').getAsNumber()
+        ).toBe(1);
+      }
     });
   });
 });

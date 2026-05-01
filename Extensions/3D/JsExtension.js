@@ -253,7 +253,7 @@ module.exports = {
       base3D
         .addExpression(
           'ForwardX',
-          _('Forward X'),
+          _('Forward vector X component'),
           _('Return the object forward vector X component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
@@ -265,7 +265,7 @@ module.exports = {
       base3D
         .addExpression(
           'ForwardY',
-          _('Forward Y'),
+          _('Forward vector Y component'),
           _('Return the object forward vector Y component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
@@ -277,7 +277,7 @@ module.exports = {
       base3D
         .addExpression(
           'ForwardZ',
-          _('Forward Z'),
+          _('Forward vector Z component'),
           _('Return the object forward vector Z component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
@@ -289,7 +289,7 @@ module.exports = {
       base3D
         .addExpression(
           'UpX',
-          _('Up X'),
+          _('Up vector X component'),
           _('Return the object up vector X component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
@@ -301,7 +301,7 @@ module.exports = {
       base3D
         .addExpression(
           'UpY',
-          _('Up Y'),
+          _('Up vector Y component'),
           _('Return the object up vector Y component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
@@ -313,7 +313,7 @@ module.exports = {
       base3D
         .addExpression(
           'UpZ',
-          _('Up Z'),
+          _('Up vector Z component'),
           _('Return the object up vector Z component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
@@ -325,7 +325,7 @@ module.exports = {
       base3D
         .addExpression(
           'RightX',
-          _('Right X'),
+          _('Right vector X component'),
           _('Return the object right vector X component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
@@ -337,7 +337,7 @@ module.exports = {
       base3D
         .addExpression(
           'RightY',
-          _('Right Y'),
+          _('Right vector Y component'),
           _('Return the object right vector Y component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
@@ -349,7 +349,7 @@ module.exports = {
       base3D
         .addExpression(
           'RightZ',
-          _('Right Z'),
+          _('Right vector Z component'),
           _('Return the object right vector Z component.'),
           _('Object basis'),
           'res/conditions/3d_box.svg'
@@ -1874,7 +1874,7 @@ module.exports = {
     extension
       .addExpression(
         'CameraForwardX',
-        _('Camera forward X'),
+        _('Camera forward vector X component'),
         _('Return the camera forward vector X component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
@@ -1890,7 +1890,7 @@ module.exports = {
     extension
       .addExpression(
         'CameraForwardY',
-        _('Camera forward Y'),
+        _('Camera forward vector Y component'),
         _('Return the camera forward vector Y component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
@@ -1906,7 +1906,7 @@ module.exports = {
     extension
       .addExpression(
         'CameraForwardZ',
-        _('Camera forward Z'),
+        _('Camera forward vector Z component'),
         _('Return the camera forward vector Z component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
@@ -1922,7 +1922,7 @@ module.exports = {
     extension
       .addExpression(
         'CameraUpX',
-        _('Camera up X'),
+        _('Camera up vector X component'),
         _('Return the camera up vector X component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
@@ -1938,7 +1938,7 @@ module.exports = {
     extension
       .addExpression(
         'CameraUpY',
-        _('Camera up Y'),
+        _('Camera up vector Y component'),
         _('Return the camera up vector Y component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
@@ -1954,7 +1954,7 @@ module.exports = {
     extension
       .addExpression(
         'CameraUpZ',
-        _('Camera up Z'),
+        _('Camera up vector Z component'),
         _('Return the camera up vector Z component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
@@ -1970,7 +1970,7 @@ module.exports = {
     extension
       .addExpression(
         'CameraRightX',
-        _('Camera right X'),
+        _('Camera right vector X component'),
         _('Return the camera right vector X component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
@@ -1986,7 +1986,7 @@ module.exports = {
     extension
       .addExpression(
         'CameraRightY',
-        _('Camera right Y'),
+        _('Camera right vector Y component'),
         _('Return the camera right vector Y component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'
@@ -2002,7 +2002,7 @@ module.exports = {
     extension
       .addExpression(
         'CameraRightZ',
-        _('Camera right Z'),
+        _('Camera right vector Z component'),
         _('Return the camera right vector Z component.'),
         _('Camera basis'),
         'res/conditions/3d_box.svg'

@@ -439,6 +439,22 @@ class GD_CORE_API Project {
   }
 
   /**
+   * \brief Check if the project should use "0" as the default value for
+   * unset string variables (deprecated behavior from before 5.6.267).
+   */
+  bool GetUseDeprecatedZeroAsDefaultStringVariable() const {
+    return useDeprecatedZeroAsDefaultStringVariable;
+  }
+
+  /**
+   * \brief Set if the project should use "0" as the default value for
+   * unset string variables (deprecated behavior from before 5.6.267).
+   */
+  void SetUseDeprecatedZeroAsDefaultStringVariable(bool enable) {
+    useDeprecatedZeroAsDefaultStringVariable = enable;
+  }
+
+  /**
    * \brief Change the project UUID.
    */
   void SetProjectUuid(const gd::String& projectUuid_) {
@@ -1126,6 +1142,11 @@ class GD_CORE_API Project {
               ///< instead of the highest Z order
               ///< found on the layer at the scene
               ///< startup.
+  bool useDeprecatedZeroAsDefaultStringVariable =
+      false;  ///< If true, string variables with
+              ///< no stored value default to "0"
+              ///< at runtime (behavior before
+              ///< 5.6.267).
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
   gd::VariablesContainer variables;  ///< Initial global variables
   gd::ObjectsContainer objectsContainer;

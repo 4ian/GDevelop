@@ -546,6 +546,7 @@ declare interface ProjectPropertiesData {
   currentPlatform: string;
   extensionProperties: Array<ExtensionProperty>;
   useDeprecatedZeroAsDefaultZOrder?: boolean;
+  useDeprecatedZeroAsDefaultStringVariable?: boolean;
   projectUuid?: string;
   sceneResourcesPreloading?: 'at-startup' | 'never';
   sceneResourcesUnloading?: 'at-scene-exit' | 'never';

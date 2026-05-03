@@ -52,6 +52,8 @@ declare class gdProject {
   isFolderProject(): boolean;
   setUseDeprecatedZeroAsDefaultZOrder(enable: boolean): void;
   getUseDeprecatedZeroAsDefaultZOrder(): boolean;
+  setUseDeprecatedZeroAsDefaultStringVariable(enable: boolean): void;
+  getUseDeprecatedZeroAsDefaultStringVariable(): boolean;
   areEffectsHiddenInEditor(): boolean;
   setEffectsHiddenInEditor(enable: boolean): void;
   setLastCompilationDirectory(path: string): void;

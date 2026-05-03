@@ -864,6 +864,10 @@ export default class LayerRenderer {
               renderedInstance
             );
           delete this.renderedInstances[i];
+        } else {
+          // The renderer might be a custom object that contains a child of
+          // the changed object: recurse so its descendants are reset too.
+          renderedInstance.resetInstanceRenderersFor(objectName);
         }
       }
     }

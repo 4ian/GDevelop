@@ -314,8 +314,8 @@
     "message": {
       "warning": {
         "color": {
-          "value": "#FFBC57",
-          "comment": "Palette/Yellow/40"
+          "value": "#FB9600",
+          "comment": "Palette/Yellow/60"
         }
       },
       "error": {
@@ -688,7 +688,7 @@
       },
       "line": {
         "background-color": {
-          "value": "black"
+          "value": "#D9D9DE"
         }
       },
       "row-contents": {
@@ -756,8 +756,8 @@
     },
     "warning-instruction": {
       "background-color": {
-        "value": "rgba(255, 188, 87, 0.125)",
-        "comment": "Palette/Yellow/40 and alpha"
+        "value": "rgba(255, 169, 41, 0.13)",
+        "comment": "Palette/Yellow/50 and alpha"
       }
     },
     "instruction-parameter": {
@@ -796,7 +796,7 @@
           "value": "#C92906"
         },
         "background-color": {
-          "value": "#F03F18"
+          "value": "#F03F1866"
         }
       },
       "warning": {

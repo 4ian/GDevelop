@@ -69,6 +69,18 @@ let pendingResourceReloadPromises: {
   [resourceName: string]: Promise<void>,
 } = {};
 
+/**
+ * Pending cleanup timers for the dedup entries above. We hold each entry for a
+ * short window after a reload completes so that other editors which call
+ * `reloadResource` shortly after still dedup against the resolved promise
+ * instead of starting a fresh `_doReloadResource` that would re-destroy the
+ * just-loaded texture (and crash any tab still rendering it).
+ */
+const pendingResourceReloadCleanupTimers: {
+  [resourceName: string]: TimeoutID,
+} = {};
+const RESOURCE_RELOAD_DEDUP_COOLDOWN_MS = 500;
+
 // $FlowFixMe[value-as-type]
 const createInvalidModel = (): GLTF => {
   /**
@@ -430,8 +442,9 @@ export default class PixiResourcesLoader {
   }
 
   static async reloadResource(project: gdProject, resourceName: string) {
-    // If a reload for this specific resource is already pending, wait for it
-    // instead of queuing a duplicate. This prevents a race condition when
+    // If a reload for this specific resource is already pending (still
+    // running, or recently completed within the cooldown window), wait for
+    // it instead of queuing a duplicate. This prevents a race condition when
     // multiple SceneEditors are open: both get notified of a resource change
     // and both call reloadResource. Without deduplication, the second reload
     // would unload the texture that was just freshly loaded by the first,
@@ -452,8 +465,20 @@ export default class PixiResourcesLoader {
     try {
       await currentReload;
     } finally {
-      delete pendingResourceReloadPromises[resourceName];
       console.log(`Finished reload of resource "${resourceName}".`);
+      // Keep the dedup entry alive for a short cooldown so other editors
+      // calling reloadResource right after completion still dedup against
+      // the resolved promise. The timer is cancelled if a fresh reload is
+      // requested in the meantime.
+      if (pendingResourceReloadCleanupTimers[resourceName]) {
+        clearTimeout(pendingResourceReloadCleanupTimers[resourceName]);
+      }
+      pendingResourceReloadCleanupTimers[resourceName] = setTimeout(() => {
+        if (pendingResourceReloadPromises[resourceName] === currentReload) {
+          delete pendingResourceReloadPromises[resourceName];
+        }
+        delete pendingResourceReloadCleanupTimers[resourceName];
+      }, RESOURCE_RELOAD_DEDUP_COOLDOWN_MS);
       if (ongoingResourceReloads === currentReload) {
         ongoingResourceReloads = null;
         console.log(`No more reload are queued.`);

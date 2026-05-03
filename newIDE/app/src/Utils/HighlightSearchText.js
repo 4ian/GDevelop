@@ -192,19 +192,19 @@ export const applySyntaxColoring = ({
   platform,
   projectScopedContainers,
   rootType,
-  expression,
+  rootNode,
 }: {
   text: string,
   platform: gdPlatform,
   projectScopedContainers: gdProjectScopedContainers,
   rootType: string,
-  expression: gdExpression,
+  rootNode: gdExpressionNode,
 }): Array<TextStyle> => {
   const colorationDescriptions = gd.ExpressionSyntaxColoringHelper.getColorationDescriptionsFor(
     platform,
     projectScopedContainers,
     rootType,
-    expression.getRootNode()
+    rootNode
   );
   let nextCharacterIndex = 0;
   const coloredTextParts: Array<TextStyle> = [];
@@ -215,7 +215,7 @@ export const applySyntaxColoring = ({
         startIndex: nextCharacterIndex,
         endIndex: startPosition,
         props: {},
-        key: `color-part--${coloredTextParts.length}`,
+        key: `color-part-${coloredTextParts.length}`,
       });
       nextCharacterIndex = startPosition;
     }
@@ -230,7 +230,7 @@ export const applySyntaxColoring = ({
           [getColorationName(colorationDescription.getColorationKind())]: true,
         }),
       },
-      key: `color-part--${coloredTextParts.length}`,
+      key: `color-part-${coloredTextParts.length}`,
     });
     nextCharacterIndex = endPosition;
   });
@@ -239,7 +239,7 @@ export const applySyntaxColoring = ({
       startIndex: nextCharacterIndex,
       endIndex: text.length,
       props: {},
-      key: `color-part--${coloredTextParts.length}`,
+      key: `color-part-${coloredTextParts.length}`,
     });
   }
   return coloredTextParts;

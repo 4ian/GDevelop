@@ -712,7 +712,7 @@ export const renderVariableWithIcon = (
                 }),
                 applySyntaxColoring({
                   text: value,
-                  expression,
+                  rootNode: expression.getRootNode(),
                   rootType: parameterMetadata.getValueTypeMetadata().getName(),
                   platform: scope.project.getCurrentPlatform(),
                   projectScopedContainers: projectScopedContainersAccessor.get(),

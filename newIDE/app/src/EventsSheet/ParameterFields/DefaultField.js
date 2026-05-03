@@ -88,7 +88,7 @@ export const renderInlineDefaultField = ({
       }),
       applySyntaxColoring({
         text: value,
-        expression,
+        rootNode: expression.getRootNode(),
         rootType: parameterMetadata.getValueTypeMetadata().getName(),
         platform: scope.project.getCurrentPlatform(),
         projectScopedContainers: projectScopedContainersAccessor.get(),

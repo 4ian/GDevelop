@@ -106,11 +106,10 @@ public:
 
 protected:
   void OnVisitSubExpressionNode(SubExpressionNode &node) override {
-    // TODO node.location should includes the parenthesis.
     {
       AddColoration(
           gd::ExpressionColorationDescription::ColorationKind::Operator,
-          node.location.GetStartPosition() - 1,
+          node.location.GetStartPosition(),
           node.expression->location.GetStartPosition());
     }
     node.expression->Visit(*this);
@@ -118,7 +117,7 @@ protected:
       AddColoration(
           gd::ExpressionColorationDescription::ColorationKind::Operator,
           node.expression->location.GetEndPosition(),
-          node.location.GetEndPosition() + 1);
+          node.location.GetEndPosition());
     }
   }
   void OnVisitOperatorNode(OperatorNode &node) override {

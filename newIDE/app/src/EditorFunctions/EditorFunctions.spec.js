@@ -1478,6 +1478,67 @@ describe('editorFunctions', () => {
       expect(inventory.getAtIndex(2).getString()).toBe('Magic Sword');
     });
 
+    it('preserves existing sibling fields when editing one field of a structure', async () => {
+      // Pre-populate a structure with multiple children to ensure none are lost.
+      const variables = project.getVariables();
+      const struct = variables.insertNew('player', 0);
+      struct.castTo('Structure');
+      struct.getChild('hp').setValue(10);
+      struct.getChild('name').setString('Hero');
+      struct.getChild('alive').setBool(true);
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'player.hp',
+          variable_scope: 'global',
+          value: '42',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Edited global variable \\"player.hp\\" = 42"`
+      );
+      expect(struct.getType()).toBe(gd.Variable.Structure);
+      expect(struct.getChild('hp').getValue()).toBe(42);
+      // Siblings must still be intact (no data loss from cast).
+      expect(struct.hasChild('name')).toBe(true);
+      expect(struct.getChild('name').getString()).toBe('Hero');
+      expect(struct.hasChild('alive')).toBe(true);
+      expect(struct.getChild('alive').getBool()).toBe(true);
+    });
+
+    it('preserves existing array elements when editing one element', async () => {
+      // Pre-populate an array with multiple items to ensure none are lost.
+      const variables = project.getVariables();
+      const array = variables.insertNew('inventory', 0);
+      array.castTo('Array');
+      array.pushNew().setString('Sword');
+      array.pushNew().setString('Shield');
+      array.pushNew().setString('Potion');
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'inventory[1]',
+          variable_scope: 'global',
+          value: 'Magic Shield',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Edited global variable \\"inventory[1]\\" = Magic Shield"`
+      );
+      expect(array.getType()).toBe(gd.Variable.Array);
+      // Other elements must still be intact (no data loss from cast).
+      expect(array.getChildrenCount()).toBe(3);
+      expect(array.getAtIndex(0).getString()).toBe('Sword');
+      expect(array.getAtIndex(1).getString()).toBe('Magic Shield');
+      expect(array.getAtIndex(2).getString()).toBe('Potion');
+    });
+
     it('sets a structure field inside an array element', async () => {
       const result = await editorFunctions.add_or_edit_variable.launchFunction({
         ...makeFakeLaunchFunctionOptionsWithProject(project),

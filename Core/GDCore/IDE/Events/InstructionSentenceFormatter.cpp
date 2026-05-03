@@ -67,7 +67,9 @@ InstructionSentenceFormatter::GetAsFormattedText(
       TextFormatting format;
       format.userData = firstParamIndex;
 
-      gd::String text = instr.GetParameter(firstParamIndex).GetPlainString();
+      gd::String text = GetFormattedParameterValue(
+          instr.GetParameter(firstParamIndex).GetPlainString(),
+          metadata.GetParameter(firstParamIndex).GetType());
       std::replace(text.Raw().begin(),
                    text.Raw().end(),
                    '\n',
@@ -87,6 +89,18 @@ InstructionSentenceFormatter::GetAsFormattedText(
   }
 
   return formattedStr;
+}
+
+gd::String InstructionSentenceFormatter::GetFormattedParameterValue(
+    const gd::String &rawValue, const gd::String &parameterType) {
+  // This is duplicated in `EventsCodeGenerator::GenerateParameterCodes` and
+  // `AdvancedExtension.cpp` for GDJS.
+  if (parameterType == "yesorno") {
+    return (rawValue == "yes" || rawValue == "oui") ? "yes" : "no";
+  } else if (parameterType == "trueorfalse") {
+    return (rawValue == "True" || rawValue == "Vrai") ? "True" : "False";
+  }
+  return rawValue;
 }
 
 gd::String InstructionSentenceFormatter::GetFullText(

@@ -55,14 +55,23 @@ public:
 
   void SetEndPosition(size_t endPosition_) { endPosition = endPosition_; }
 
+  gd::String ToString() const {
+    return (colorationKind == 0   ? "String"
+            : colorationKind == 1 ? "Number"
+            : colorationKind == 2 ? "Object"
+            : colorationKind == 3 ? "Variable"
+            : colorationKind == 4 ? "Operator"
+                                  : "Unknown") +
+           gd::String(" [") + gd::String::From(startPosition) + " " +
+           gd::String::From(endPosition) + "[";
+  }
+
   /** Default constructor, only to be used by Emscripten bindings. */
   ExpressionColorationDescription() : colorationKind(String){};
 
   ExpressionColorationDescription(ColorationKind colorationKind_,
-                                  size_t startPosition_,
-                                  size_t endPosition_)
-      : colorationKind(colorationKind_),
-        startPosition(startPosition_),
+                                  size_t startPosition_, size_t endPosition_)
+      : colorationKind(colorationKind_), startPosition(startPosition_),
         endPosition(endPosition_) {}
 
 private:
@@ -251,10 +260,9 @@ protected:
   }
   void OnVisitFunctionCallNode(FunctionCallNode &node) override {
     if (node.objectNameLocation.IsValid()) {
-      AddColoration(
-          gd::ExpressionColorationDescription::ColorationKind::Object,
-          node.objectNameLocation.GetStartPosition(),
-          node.objectNameLocation.GetEndPosition());
+      AddColoration(gd::ExpressionColorationDescription::ColorationKind::Object,
+                    node.objectNameLocation.GetStartPosition(),
+                    node.objectNameLocation.GetEndPosition());
     }
     for (auto &&parameter : node.parameters) {
       parameter->Visit(*this);

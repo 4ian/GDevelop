@@ -74,6 +74,19 @@ InstructionSentenceFormatter::GetAsFormattedText(
                    ' ');  // Using the raw std::string inside gd::String (no
                           // problems because it's only ANSI characters)
 
+      // Normalize "yesorno" and "trueorfalse" parameter values to match the
+      // case-sensitive interpretation of the runtime: anything that is not
+      // exactly "yes" (resp. "True") is considered as "no" (resp. "False").
+      // This ensures the displayed sentence is consistent with what the
+      // generated code will actually do at runtime.
+      const gd::String &parameterType =
+          metadata.GetParameter(firstParamIndex).GetType();
+      if (parameterType == "yesorno") {
+        text = (text == "yes") ? "yes" : "no";
+      } else if (parameterType == "trueorfalse") {
+        text = (text == "True") ? "True" : "False";
+      }
+
       formattedStr.push_back(std::make_pair(text, format));
       gd::String placeholder =
           "_PARAM" + gd::String::From(firstParamIndex) + "_";

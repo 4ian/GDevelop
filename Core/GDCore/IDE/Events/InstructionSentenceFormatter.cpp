@@ -67,25 +67,14 @@ InstructionSentenceFormatter::GetAsFormattedText(
       TextFormatting format;
       format.userData = firstParamIndex;
 
-      gd::String text = instr.GetParameter(firstParamIndex).GetPlainString();
+      gd::String text = GetFormattedParameterValue(
+          instr.GetParameter(firstParamIndex).GetPlainString(),
+          metadata.GetParameter(firstParamIndex).GetType());
       std::replace(text.Raw().begin(),
                    text.Raw().end(),
                    '\n',
                    ' ');  // Using the raw std::string inside gd::String (no
                           // problems because it's only ANSI characters)
-
-      // Normalize "yesorno" and "trueorfalse" parameter values to match the
-      // case-sensitive interpretation of the runtime: anything that is not
-      // exactly "yes" (resp. "True") is considered as "no" (resp. "False").
-      // This ensures the displayed sentence is consistent with what the
-      // generated code will actually do at runtime.
-      const gd::String &parameterType =
-          metadata.GetParameter(firstParamIndex).GetType();
-      if (parameterType == "yesorno") {
-        text = (text == "yes") ? "yes" : "no";
-      } else if (parameterType == "trueorfalse") {
-        text = (text == "True") ? "True" : "False";
-      }
 
       formattedStr.push_back(std::make_pair(text, format));
       gd::String placeholder =
@@ -100,6 +89,18 @@ InstructionSentenceFormatter::GetAsFormattedText(
   }
 
   return formattedStr;
+}
+
+gd::String InstructionSentenceFormatter::GetFormattedParameterValue(
+    const gd::String &rawValue, const gd::String &parameterType) {
+  // This is duplicated in `EventsCodeGenerator::GenerateParameterCodes` and
+  // `AdvancedExtension.cpp` for GDJS.
+  if (parameterType == "yesorno") {
+    return (rawValue == "yes" || rawValue == "oui") ? "yes" : "no";
+  } else if (parameterType == "trueorfalse") {
+    return (rawValue == "True" || rawValue == "Vrai") ? "True" : "False";
+  }
+  return rawValue;
 }
 
 gd::String InstructionSentenceFormatter::GetFullText(

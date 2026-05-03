@@ -1684,7 +1684,7 @@ describe('editorFunctions', () => {
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
         expect.stringContaining(
-          'Created 2 new instances of object "Player" using point brush at 50, 60 on layer "base" (size 64x64, rotation 45°, opacity 128, z-order 5).'
+          'Created 2 new instances of object "Player" using point brush at 50, 60 on layer "base" (size 64x64, rotation 45°, opacity 128/255, z-order 5).'
         )
       );
     });

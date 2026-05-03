@@ -604,7 +604,7 @@ const formatPropertiesList = (
       continue;
     }
 
-    if (value === '' || value === null || value === undefined) {
+    if (value === '' || value === undefined) {
       // Group empty properties by their descriptor (type + optional unit/choices).
       const choicesText = choices
         ? `one of: [${choices.map(c => `"${c}"`).join(', ')}]`
@@ -3902,7 +3902,7 @@ const addSceneEvents: EditorFunction = {
         details?: {|
           generatedEventsErrorDiagnostics: string,
         |}
-      ) => {
+      ): EditorFunctionGenericOutput => {
         return {
           success: false,
           message,
@@ -3938,7 +3938,6 @@ const addSceneEvents: EditorFunction = {
         const resultMessage =
           aiGeneratedEvent.resultMessage ||
           'Likely the request is not possible.';
-        // $FlowFixMe[incompatible-type]
         return makeAiGeneratedEventFailure(
           `Generated events invalid: ${resultMessage}\nSee diagnostics; retry differently or use a different approach.`,
           {
@@ -4474,7 +4473,9 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         } else if (isFuzzyMatch(propertyName, 'stopSoundsOnStartup')) {
           const newStop = newValue.toLowerCase() === 'true';
           scene.setStopSoundsOnStartup(newStop);
-          changes.push(`Set stopSoundsOnStartup to ${newStop}.`);
+          changes.push(
+            `Set stopSoundsOnStartup to ${newStop ? 'true' : 'false'}.`
+          );
         } else if (isFuzzyMatch(propertyName, 'gameResolutionHeight')) {
           const newHeight = parseInt(newValue);
           project.setGameResolutionSize(
@@ -5263,6 +5264,8 @@ export const editorFunctions: { [string]: EditorFunction } = {
   run_edit_agent: runEditAgent,
   read_game_project_json: readGameProjectJson,
   search_object_asset_store: searchObjectAssetStore,
+
+  generate_events: addSceneEvents,
 };
 
 export const editorFunctionsWithoutProject: {

@@ -4,6 +4,7 @@ declare class gdMultipleInstructionMetadata extends gdAbstractFunctionMetadata {
   addCodeOnlyParameter(type: string, supplementaryInformation: string): gdMultipleInstructionMetadata;
   setDefaultValue(defaultValue: string): gdMultipleInstructionMetadata;
   setParameterLongDescription(longDescription: string): gdMultipleInstructionMetadata;
+  setParameterHint(hint: string): gdMultipleInstructionMetadata;
   setParameterExtraInfo(extraInfo: string): gdMultipleInstructionMetadata;
   useStandardParameters(type: string, options: gdParameterOptions): gdMultipleInstructionMetadata;
   setHidden(): gdMultipleInstructionMetadata;

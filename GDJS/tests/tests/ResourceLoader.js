@@ -537,7 +537,7 @@ describe('gdjs.ResourceLoader', () => {
     );
     await delay(10);
 
-    // Object1 and Object2 should now be ready
+    // Object1 should now be ready
     expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1')).to.be(true);
     expect(runtimeGame.areObjectOrGroupAssetsLoaded('MyGroup')).to.be(false);
 

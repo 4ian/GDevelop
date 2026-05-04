@@ -423,6 +423,101 @@ namespace gdjs {
     abstract setCameraRotation(rotation: float, cameraId?: integer): void;
 
     /**
+     * Get the rotation around Y axis of the 3D camera, expressed in degrees.
+     *
+     * @param cameraId The camera number. Currently ignored.
+     * @return The rotation, in degrees.
+     */
+    abstract getCameraRotationY(cameraId?: integer): float;
+
+    /**
+     * Set the rotation around Y axis of the 3D camera, expressed in degrees.
+     *
+     * @param rotation The new rotation, in degrees.
+     * @param cameraId The camera number. Currently ignored.
+     */
+    abstract setCameraRotationY(rotationY: float, cameraId?: integer): void;
+
+    /**
+     * Get the rotation around X axis of the 3D camera, expressed in degrees.
+     *
+     * @param cameraId The camera number. Currently ignored.
+     * @return The rotation, in degrees.
+     */
+    abstract getCameraRotationX(cameraId?: integer): float;
+
+    /**
+     * Set the rotation around X axis of the 3D camera, expressed in degrees.
+     *
+     * @param rotation The new rotation, in degrees.
+     * @param cameraId The camera number. Currently ignored.
+     */
+    abstract setCameraRotationX(rotationX: float, cameraId?: integer): void;
+
+    /**
+     * Get the X component of the forward vector of the 3D camera.
+     *
+     * @param cameraId The camera number. Currently ignored.
+     */
+    abstract getCameraForwardX(cameraId?: integer): number;
+
+    /**
+     * Get the Y component of the forward vector of the 3D camera.
+     *
+     * @param cameraId The camera number. Currently ignored.
+     */
+    abstract getCameraForwardY(cameraId?: integer): number;
+
+    /**
+     * Get the Z component of the forward vector of the 3D camera.
+     *
+     * @param cameraId The camera number. Currently ignored.
+     */
+    abstract getCameraForwardZ(cameraId?: integer): number;
+
+    /**
+     * Get the X component of the up vector of the 3D camera.
+     *
+     * @param cameraId The camera number. Currently ignored.
+     */
+    abstract getCameraUpX(cameraId?: integer): number;
+
+    /**
+     * Get the Y component of the up vector of the 3D camera.
+     *
+     * @param cameraId The camera number. Currently ignored.
+     */
+    abstract getCameraUpY(cameraId?: integer): number;
+
+    /**
+     * Get the Z component of the up vector of the 3D camera.
+     *
+     * @param cameraId The camera number. Currently ignored.
+     */
+    abstract getCameraUpZ(cameraId?: integer): number;
+
+    /**
+     * Get the X component of the right vector of the 3D camera.
+     *
+     * @param cameraId The camera number. Currently ignored.
+     */
+    abstract getCameraRightX(cameraId?: integer): number;
+
+    /**
+     * Get the Y component of the right vector of the 3D camera.
+     *
+     * @param cameraId The camera number. Currently ignored.
+     */
+    abstract getCameraRightY(cameraId?: integer): number;
+
+    /**
+     * Get the Z component of the right vector of the 3D camera.
+     *
+     * @param cameraId The camera number. Currently ignored.
+     */
+    abstract getCameraRightZ(cameraId?: integer): number;
+
+    /**
      * Convert a point from the canvas coordinates (for example,
      * the mouse position) to the container coordinates.
      *

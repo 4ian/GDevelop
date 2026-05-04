@@ -12,12 +12,12 @@ using namespace std;
 namespace gd {
 
 namespace {
-const char* const kForceMultiplierHint =
+const gd::String forceMultiplierHint =
     "Forces can be \"instant\" or \"permanent\". An \"instant\" force "
     "only moves the object during one frame. A \"permanent\" force keeps "
     "applying every frame; it should not be applied at each frame, "
     "otherwise forces will accumulate.";
-const char* const kObjectTimerHint =
+const gd::String objectTimerHint =
     "Object timers are NOT started automatically when an object instance "
     "is created. Make sure to start the timer (e.g. with the \"Start (or "
     "reset) an object timer\" action) before using it.";
@@ -380,7 +380,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Speed on X axis (in pixels per second)"))
       .AddParameter("expression", _("Speed on Y axis (in pixels per second)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
-      .SetParameterHint(kForceMultiplierHint)
+      .SetParameterHint(forceMultiplierHint)
       .SetDefaultValue("0")
       .SetHelpPath("/tutorials/how-to-move-objects/");
 
@@ -398,7 +398,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Angle"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
-      .SetParameterHint(kForceMultiplierHint)
+      .SetParameterHint(forceMultiplierHint)
       .SetDefaultValue("0")
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
@@ -418,7 +418,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Y position"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
-      .SetParameterHint(kForceMultiplierHint)
+      .SetParameterHint(forceMultiplierHint)
       .SetDefaultValue("0")
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
@@ -446,7 +446,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", "Speed (in Degrees per seconds)")
       .AddParameter("expression", "Distance (in pixels)")
       .AddParameter("forceMultiplier", "Force multiplier")
-      .SetParameterHint(kForceMultiplierHint)
+      .SetParameterHint(forceMultiplierHint)
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .SetHidden();
 
@@ -1154,7 +1154,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectPtr", _("Target Object"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
-      .SetParameterHint(kForceMultiplierHint)
+      .SetParameterHint(forceMultiplierHint)
       .SetDefaultValue("0")
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
@@ -1180,7 +1180,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Speed (in degrees per second)"))
       .AddParameter("expression", _("Distance (in pixels)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
-      .SetParameterHint(kForceMultiplierHint)
+      .SetParameterHint(forceMultiplierHint)
       .SetDefaultValue("0")
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
@@ -1298,7 +1298,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/conditions/timer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
-      .SetParameterHint(kObjectTimerHint)
+      .SetParameterHint(objectTimerHint)
       .AddParameter("expression", _("Time in seconds"))
       .SetHelpPath("/all-features/timers-and-time/")
       .SetHidden();
@@ -1314,7 +1314,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/conditions/timer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
-      .SetParameterHint(kObjectTimerHint)
+      .SetParameterHint(objectTimerHint)
       .AddParameter("relationalOperator", _("Sign of the test"), "time")
       .AddParameter("expression", _("Time in seconds"))
       .SetHelpPath("/all-features/timers-and-time/")
@@ -1329,7 +1329,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "res/conditions/timerPaused.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
-      .SetParameterHint(kObjectTimerHint)
+      .SetParameterHint(objectTimerHint)
       .SetHelpPath("/all-features/timers-and-time/")
       .MarkAsAdvanced();
 
@@ -1344,7 +1344,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/actions/timer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
-      .SetParameterHint(kObjectTimerHint)
+      .SetParameterHint(objectTimerHint)
       .SetHelpPath("/all-features/timers-and-time/");
 
   obj.AddAction("PauseObjectTimer",
@@ -1356,7 +1356,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/pauseTimer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
-      .SetParameterHint(kObjectTimerHint)
+      .SetParameterHint(objectTimerHint)
       .SetHelpPath("/all-features/timers-and-time/")
       .MarkAsAdvanced();
 
@@ -1369,7 +1369,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/unPauseTimer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
-      .SetParameterHint(kObjectTimerHint)
+      .SetParameterHint(objectTimerHint)
       .SetHelpPath("/all-features/timers-and-time/")
       .MarkAsAdvanced();
 
@@ -1382,7 +1382,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/timer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
-      .SetParameterHint(kObjectTimerHint)
+      .SetParameterHint(objectTimerHint)
       .SetHelpPath("/all-features/timers-and-time/")
       .MarkAsAdvanced();
 
@@ -1566,7 +1566,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "res/actions/time.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
-      .SetParameterHint(kObjectTimerHint)
+      .SetParameterHint(objectTimerHint)
       .SetHelpPath("/all-features/timers-and-time/");
 
   obj.AddExpression("AngleToObject",

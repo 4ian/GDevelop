@@ -478,7 +478,7 @@ const generateInstructionReferenceRowsText = ({
     hints.size > 0
       ? [
           '!!! tip',
-          ...[...hints].map(hint =>
+          ...Array.from(hints, hint =>
             hint
               .split('\n')
               .map(line => `${paramPadding}${line}`)

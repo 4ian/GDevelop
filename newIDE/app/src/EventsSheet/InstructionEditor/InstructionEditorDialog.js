@@ -16,14 +16,10 @@ import InstructionOrObjectSelector, {
 } from './InstructionOrObjectSelector';
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import HelpButton from '../../UI/HelpButton';
-import { isRelativePathToDocumentationRoot } from '../../Utils/HelpLink';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { SelectColumns } from '../../UI/Responsive/SelectColumns';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import {
-  useInstructionEditor,
-  getInstructionMetadata,
-} from './InstructionEditor';
+import { useInstructionEditor } from './InstructionEditor';
 import NewBehaviorDialog from '../../BehaviorsEditor/NewBehaviorDialog';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import getObjectByName from '../../Utils/GetObjectByName';
@@ -221,15 +217,6 @@ const InstructionEditorDialog = ({
     },
     [step, shouldAutofocusInput]
   );
-
-  const instructionMetadata = getInstructionMetadata({
-    instructionType,
-    isCondition,
-    project,
-  });
-  const instructionHelpPage = instructionMetadata
-    ? instructionMetadata.getHelpPath()
-    : undefined;
 
   const renderInstructionOrObjectSelector = () => (
     <I18n>

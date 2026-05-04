@@ -10,10 +10,7 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import ParameterRenderingService from '../ParameterRenderingService';
 import HelpButton from '../../UI/HelpButton';
 import HelpIcon from '../../UI/HelpIcon';
-import {
-  isRelativePathToDocumentationRoot,
-  isDocumentationAbsoluteUrl,
-} from '../../Utils/HelpLink';
+import { isDocumentationAbsoluteUrl } from '../../Utils/HelpLink';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';

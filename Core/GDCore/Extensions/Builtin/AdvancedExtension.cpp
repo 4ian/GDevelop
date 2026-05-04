@@ -33,7 +33,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           "",
           "res/functions/expression_black.svg",
           "res/functions/expression_black.svg")
-      .SetHelpPath("/events/functions/return")
+      .SetHelpPath("/all-features/advanced/reference/#actions")
       .AddParameter("expression", _("The number to be returned"))
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
@@ -48,7 +48,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           "",
           "res/functions/expression_black.svg",
           "res/functions/expression_black.svg")
-      .SetHelpPath("/events/functions/return")
+      .SetHelpPath("/all-features/advanced/reference/#actions")
       .AddParameter("string", _("The text to be returned"))
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
@@ -62,7 +62,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "",
                  "res/functions/condition_black.svg",
                  "res/functions/condition_black.svg")
-      .SetHelpPath("/events/functions/return")
+      .SetHelpPath("/all-features/advanced/reference/#actions")
       .AddParameter("trueorfalse", _("Should the condition be true or false?"))
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
@@ -77,7 +77,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "",
                  "res/functions/extension_black.svg",
                  "res/functions/extension_black.svg")
-      .SetHelpPath("/events/functions/return")
+      .SetHelpPath("/all-features/advanced/reference/#actions")
       .AddParameter("functionParameterName", _("Parameter name"), "variable")
       .AddParameter("scenevar", _("Scene variable"))
       .SetHidden()
@@ -92,7 +92,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "",
                  "res/functions/extension_black.svg",
                  "res/functions/extension_black.svg")
-      .SetHelpPath("/events/functions/return")
+      .SetHelpPath("/all-features/advanced/reference/#actions")
       .AddParameter("functionParameterName", _("Parameter name"), "variable")
       .AddParameter("variable", _("Variable"))
       .SetRelevantForFunctionEventsOnly()
@@ -108,7 +108,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "",
                  "res/functions/extension_black.svg",
                  "res/functions/extension_black.svg")
-      .SetHelpPath("/events/functions/return")
+      .SetHelpPath("/all-features/advanced/reference/#actions")
       .AddParameter("functionParameterName", _("Parameter name"), "variable")
       .AddParameter("scenevar", _("Scene variable"))
       .SetHidden()
@@ -123,7 +123,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "",
                  "res/functions/extension_black.svg",
                  "res/functions/extension_black.svg")
-      .SetHelpPath("/events/functions/return")
+      .SetHelpPath("/all-features/advanced/reference/#actions")
       .AddParameter("functionParameterName", _("Parameter name"), "variable")
       .AddParameter("variable", _("Variable"))
       .SetRelevantForFunctionEventsOnly()

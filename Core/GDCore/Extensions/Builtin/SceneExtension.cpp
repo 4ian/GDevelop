@@ -44,7 +44,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                     "",
                     "res/conditions/depart24.png",
                     "res/conditions/depart.png")
-      .SetHelpPath("/interface/scene-editor/events")
+      .SetHelpPath("/interface/events-editor/")
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
 
@@ -60,7 +60,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                     "",
                     "res/conditions/depart24.png",
                     "res/conditions/depart.png")
-      .SetHelpPath("/interface/scene-editor/events")
+      .SetHelpPath("/interface/events-editor/")
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
 
@@ -72,7 +72,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                     "",
                     "res/actions/texte.png",
                     "res/actions/texte.png")
-      .SetHelpPath("/interface/scene-editor/events")
+      .SetHelpPath("/interface/events-editor/")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Name of the scene to check"))
       .MarkAsSimple();
@@ -85,7 +85,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "",
                  "res/actions/replaceScene24.png",
                  "res/actions/replaceScene.png")
-      .SetHelpPath("/interface/scene-editor/events")
+      .SetHelpPath("/interface/events-editor/")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Name of the new scene"))
       .AddParameter("yesorno", _("Stop any other paused scenes?"))
@@ -102,7 +102,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "",
                  "res/actions/pushScene24.png",
                  "res/actions/pushScene.png")
-      .SetHelpPath("/interface/scene-editor/events")
+      .SetHelpPath("/interface/events-editor/")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Name of the new scene"))
       .MarkAsAdvanced();
@@ -117,7 +117,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
           "",
           "res/actions/popScene24.png",
           "res/actions/popScene.png")
-      .SetHelpPath("/interface/scene-editor/events")
+      .SetHelpPath("/interface/events-editor/")
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
 
@@ -129,7 +129,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "",
                  "res/actions/quit24.png",
                  "res/actions/quit.png")
-      .SetHelpPath("/interface/scene-editor/events")
+      .SetHelpPath("/interface/events-editor/")
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
 
@@ -141,7 +141,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "",
                  "res/actions/background24.png",
                  "res/actions/background.png")
-      .SetHelpPath("/interface/scene-editor/events")
+      .SetHelpPath("/interface/events-editor/")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("color", _("Color"))
       .MarkAsAdvanced();
@@ -155,7 +155,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "",
                  "res/actions/window24.png",
                  "res/actions/window.png")
-      .SetHelpPath("/interface/scene-editor/events")
+      .SetHelpPath("/interface/events-editor/")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("yesorno", _("Deactivate input when focus is lost"))
       .MarkAsAdvanced();
@@ -171,7 +171,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
           "",
           "res/actions/window24.png",
           "res/actions/window.png")
-      .SetHelpPath("/interface/scene-editor/events")
+      .SetHelpPath("/interface/events-editor/")
       .AddCodeOnlyParameter("currentScene", "");
 
   extension

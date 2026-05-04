@@ -19,7 +19,10 @@ import HelpButton from '../../UI/HelpButton';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { SelectColumns } from '../../UI/Responsive/SelectColumns';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import { useInstructionEditor } from './InstructionEditor';
+import {
+  useInstructionEditor,
+  getInstructionMetadata,
+} from './InstructionEditor';
 import NewBehaviorDialog from '../../BehaviorsEditor/NewBehaviorDialog';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import getObjectByName from '../../Utils/GetObjectByName';
@@ -153,6 +156,16 @@ const InstructionEditorDialog = ({
   const { isMobile, windowSize, isMediumScreen } = useResponsiveWindowSize();
   const isLargeScreen = windowSize === 'large' || windowSize === 'xlarge';
   const instructionType: string = instruction.getType();
+  const instructionMetadata = getInstructionMetadata({
+    instructionType,
+    isCondition,
+    project,
+  });
+  const rawHelpPath = instructionMetadata
+    ? instructionMetadata.getHelpPath()
+    : null;
+  const validHelpPath =
+    rawHelpPath && rawHelpPath !== 'MISSING' ? rawHelpPath : null;
   const [
     newBehaviorDialogOpen,
     setNewBehaviorDialogOpen,
@@ -324,7 +337,22 @@ const InstructionEditorDialog = ({
               key="back"
             />
           ) : null,
-          <HelpButton key="help" helpPagePath="/events" scopeName="Events" />,
+          <HelpButton
+            key="help"
+            helpPagePath={validHelpPath || '/events'}
+            label={
+              validHelpPath ? (
+                isCondition ? (
+                  <Trans>About this condition</Trans>
+                ) : (
+                  <Trans>About this action</Trans>
+                )
+              ) : (
+                undefined
+              )
+            }
+            scopeName={validHelpPath ? undefined : 'Events'}
+          />,
         ]}
         open={open}
         onRequestClose={onCancel}

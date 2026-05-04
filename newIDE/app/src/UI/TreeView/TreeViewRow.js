@@ -175,7 +175,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
 
   const {
     isPressingRef: isLongTouchPressingRef,
-    ...longTouchForContextMenuProps
+    contextMenuProps: longTouchForContextMenuProps,
   } = useLongTouch(openContextMenu, {
     delay: DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE,
   });

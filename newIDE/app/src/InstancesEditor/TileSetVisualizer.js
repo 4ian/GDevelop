@@ -434,7 +434,7 @@ const TileSetVisualizer = ({
     [displayTileIdTooltip]
   );
 
-  const longTouchProps = useLongTouch(handleLongTouch, {
+  const { contextMenuProps: longTouchProps } = useLongTouch(handleLongTouch, {
     doNotCancelOnScroll: true,
   });
 

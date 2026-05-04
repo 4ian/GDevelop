@@ -477,7 +477,8 @@ const generateInstructionReferenceRowsText = ({
   const hintsBlock =
     hints.size > 0
       ? [
-          '!!! tip',
+          '??? tip "Hints and advice"',
+          '',
           ...Array.from(hints, hint =>
             hint
               .split('\n')

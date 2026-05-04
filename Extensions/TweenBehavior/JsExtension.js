@@ -1681,6 +1681,9 @@ module.exports = {
         'JsPlatform/Extensions/tween_behavior24.png',
         'JsPlatform/Extensions/tween_behavior32.png'
       )
+      .setHint(
+        'This action only works on 2D objects, not on 3D objects.'
+      )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')

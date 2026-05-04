@@ -58,6 +58,7 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
         title: '',
         behaviorsSharedData: [],
         objects: [],
+        objectsGroups: [],
         instances: [],
         variables: [],
         usedResources: [],

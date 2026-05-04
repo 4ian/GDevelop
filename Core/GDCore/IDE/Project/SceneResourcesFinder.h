@@ -32,8 +32,9 @@ public:
    *
    * It doesn't include resources used globally.
    */
-  static std::set<gd::String> FindSceneResources(gd::Project &project,
-                                                      gd::Layout &layout);
+  static std::set<gd::String>
+  FindSceneResources(gd::Project &project, gd::Layout &layout,
+                     bool ignoreObjectResourcePreloading);
 
   /**
    * @brief Find resource that are used globally in the project.
@@ -41,6 +42,12 @@ public:
    * It doesn't include resources used in scenes.
    */
   static std::set<gd::String> FindProjectResources(gd::Project &project);
+
+  /**
+   * @brief Find resource usages in a given object.
+   */
+  static std::set<gd::String> FindObjectResources(gd::Project &project,
+                                                  gd::Object &object);
 
   /**
    * @brief Find resource usages in a given events-based object variant.

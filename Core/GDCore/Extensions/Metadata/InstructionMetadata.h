@@ -216,6 +216,21 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
   const gd::String &GetDeprecationMessage() const { return deprecationMessage; }
 
   /**
+   * \brief Set a hint attached to the instruction itself. Hints are short
+   * reminders about how the instruction should be used and can be surfaced by
+   * tooling, documentation or AI/LLM agents.
+   */
+  InstructionMetadata &SetHint(const gd::String &hint_) {
+    hint = hint_;
+    return *this;
+  }
+
+  /**
+   * \brief Get the hint attached to the instruction itself. See SetHint.
+   */
+  const gd::String &GetHint() const { return hint; }
+
+  /**
    * \brief Set the group of the instruction in the IDE.
    */
   InstructionMetadata &SetGroup(const gd::String &str) {
@@ -288,6 +303,21 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
       const gd::String &longDescription) override {
     if (parameters.GetParametersCount() > 0) {
       parameters.GetInternalVector().back()->SetLongDescription(longDescription);
+    }
+    return *this;
+  }
+
+  /**
+   * \brief Set a hint attached to the last added parameter. Hints are short
+   * reminders about how the parameter should be used (e.g. "object timers
+   * must be started manually") and can be surfaced by tooling, documentation
+   * or AI/LLM agents.
+   *
+   * \see AddParameter
+   */
+  InstructionMetadata &SetParameterHint(const gd::String &hint) override {
+    if (parameters.GetParametersCount() > 0) {
+      parameters.GetInternalVector().back()->SetHint(hint);
     }
     return *this;
   }
@@ -602,6 +632,7 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
   gd::String requiredBaseObjectCapability;
   gd::String relevantContext;
   gd::String deprecationMessage;
+  gd::String hint;
 };
 
 }  // namespace gd

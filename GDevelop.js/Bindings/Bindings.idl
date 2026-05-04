@@ -1740,6 +1740,7 @@ interface AbstractFunctionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] AbstractFunctionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] AbstractFunctionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] AbstractFunctionMetadata SetParameterHint([Const] DOMString hint);
     [Ref] AbstractFunctionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
     [Ref] AbstractFunctionMetadata SetHidden();
@@ -1792,7 +1793,10 @@ interface InstructionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] InstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] InstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] InstructionMetadata SetParameterHint([Const] DOMString hint);
     [Ref] InstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
+    [Ref] InstructionMetadata SetHint([Const] DOMString hint);
+    [Const, Ref] DOMString GetHint();
 
     [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
     [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
@@ -1859,6 +1863,7 @@ interface ExpressionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] ExpressionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] ExpressionMetadata SetParameterHint([Const] DOMString hint);
     [Ref] ExpressionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
     [Ref] ExpressionMetadata GetCodeExtraInformation();
@@ -1881,6 +1886,7 @@ interface MultipleInstructionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] MultipleInstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] MultipleInstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] MultipleInstructionMetadata SetParameterHint([Const] DOMString hint);
     [Ref] MultipleInstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
     [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
@@ -1945,6 +1951,8 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetDescription([Const] DOMString description_);
     [Const, Ref] DOMString GetLongDescription();
     [Ref] ParameterMetadata SetLongDescription([Const] DOMString longDescription_);
+    [Const, Ref] DOMString GetHint();
+    [Ref] ParameterMetadata SetHint([Const] DOMString hint_);
     boolean IsCodeOnly();
     [Ref] ParameterMetadata SetCodeOnly(boolean codeOnly_);
     [Const, Ref] DOMString GetDefaultValue();

@@ -209,7 +209,7 @@ export default function InstructionsList({
       ? addButtonTooltipLabelTouch
       : addButtonTooltipLabelMouse;
 
-  const longTouchForContextMenuProps = useLongTouch(
+  const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
     React.useCallback(
       event => {
         addButton.current &&

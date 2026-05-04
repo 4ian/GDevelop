@@ -274,6 +274,15 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     <div style={style} ref={containerRef}>
       <DragSourceAndDropTarget
         beginDrag={() => {
+          // During a long-press (which will open the context menu on mobile), suppress
+          // the drag preview by returning an item with no data. We cannot block canDrag()
+          // instead, because react-dnd-touch-backend evaluates canDrag() once (after its
+          // delayTouchStart of 100ms), at which point isPressingRef is always true — so
+          // blocking canDrag() would permanently break intentional drags on mobile.
+          if (isLongTouchPressingRef.current) {
+            return {};
+          }
+
           if (!node.selected) onSelect({ node, exclusive: !node.selected });
 
           if (forceDefaultDraggingPreview) {
@@ -306,10 +315,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           !node.item.isRoot &&
           !node.item.isPlaceholder &&
           // Prevent dragging of item whose name is edited, allowing to select text with click and drag on text.
-          renamedItemId !== node.id &&
-          // Prevent drag from starting during a long-press (which opens the context menu on mobile).
-          // When the user moves their finger, useLongTouch cancels, clearing isPressingRef, re-enabling drag.
-          !isLongTouchPressingRef.current
+          renamedItemId !== node.id
         }
         canDrop={canDrop ? () => canDrop(node.item, whereToDrop) : () => true}
         drop={() => {

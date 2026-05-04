@@ -145,7 +145,8 @@ const CustomDragLayer = ({
   const screenType = useScreenType();
   const renderedItem = React.useMemo(
     () => {
-      if (!item || !clientOffset) return null;
+      if (!item || (!item.name && !item.thumbnail) || !clientOffset)
+        return null;
 
       if (shouldHidePreviewBecauseDraggingOnSceneEditorCanvas(clientOffset)) {
         return null;

@@ -9,6 +9,14 @@
 using namespace std;
 namespace gd {
 
+namespace {
+const char* const kSceneTimerHint =
+    "Scene timers must be started (e.g. with the \"Start (or reset) a "
+    "scene timer\" action) before being used. They are scene-wide and "
+    "should not be (re)started at each frame, otherwise they keep "
+    "restarting.";
+}  // namespace
+
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
     gd::PlatformExtension& extension) {
   extension
@@ -41,11 +49,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Time in seconds"))
       .AddParameter("identifier", _("Timer's name"), "sceneTimer")
-      .SetParameterHint(
-          "Scene timers must be started (e.g. with the \"Start (or reset) a "
-          "scene timer\" action) before being used. They are scene-wide and "
-          "should not be (re)started at each frame, otherwise they keep "
-          "restarting.")
+      .SetParameterHint(kSceneTimerHint)
       .SetHidden();
 
   extension
@@ -62,11 +66,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     "res/conditions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("identifier", _("Timer's name"), "sceneTimer")
-      .SetParameterHint(
-          "Scene timers must be started (e.g. with the \"Start (or reset) a "
-          "scene timer\" action) before being used. They are scene-wide and "
-          "should not be (re)started at each frame, otherwise they keep "
-          "restarting.")
+      .SetParameterHint(kSceneTimerHint)
       .AddParameter("relationalOperator", _("Sign of the test"), "time")
       .AddParameter("expression", _("Time in seconds"))
       .SetManipulatedType("number");
@@ -98,11 +98,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     "res/conditions/timerPaused.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("identifier", _("Timer's name"), "sceneTimer")
-      .SetParameterHint(
-          "Scene timers must be started (e.g. with the \"Start (or reset) a "
-          "scene timer\" action) before being used. They are scene-wide and "
-          "should not be (re)started at each frame, otherwise they keep "
-          "restarting.")
+      .SetParameterHint(kSceneTimerHint)
       .MarkAsAdvanced();
 
   extension
@@ -118,11 +114,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           "res/actions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("identifier", _("Timer's name"), "sceneTimer")
-      .SetParameterHint(
-          "Scene timers must be started (e.g. with the \"Start (or reset) a "
-          "scene timer\" action) before being used. They are scene-wide and "
-          "should not be (re)started at each frame, otherwise they keep "
-          "restarting.");
+      .SetParameterHint(kSceneTimerHint);
 
   extension
       .AddAction("PauseTimer",
@@ -135,11 +127,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/actions/pauseTimer.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("identifier", _("Timer's name"), "sceneTimer")
-      .SetParameterHint(
-          "Scene timers must be started (e.g. with the \"Start (or reset) a "
-          "scene timer\" action) before being used. They are scene-wide and "
-          "should not be (re)started at each frame, otherwise they keep "
-          "restarting.")
+      .SetParameterHint(kSceneTimerHint)
       .MarkAsAdvanced();
 
   extension
@@ -153,11 +141,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/actions/unPauseTimer.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("identifier", _("Timer's name"), "sceneTimer")
-      .SetParameterHint(
-          "Scene timers must be started (e.g. with the \"Start (or reset) a "
-          "scene timer\" action) before being used. They are scene-wide and "
-          "should not be (re)started at each frame, otherwise they keep "
-          "restarting.")
+      .SetParameterHint(kSceneTimerHint)
       .MarkAsAdvanced();
 
   extension
@@ -171,11 +155,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/actions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("identifier", _("Timer's name"), "sceneTimer")
-      .SetParameterHint(
-          "Scene timers must be started (e.g. with the \"Start (or reset) a "
-          "scene timer\" action) before being used. They are scene-wide and "
-          "should not be (re)started at each frame, otherwise they keep "
-          "restarting.")
+      .SetParameterHint(kSceneTimerHint)
       .MarkAsAdvanced();
 
   extension
@@ -236,11 +216,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("identifier", _("Timer's name"), "sceneTimer")
-      .SetParameterHint(
-          "Scene timers must be started (e.g. with the \"Start (or reset) a "
-          "scene timer\" action) before being used. They are scene-wide and "
-          "should not be (re)started at each frame, otherwise they keep "
-          "restarting.");
+      .SetParameterHint(kSceneTimerHint);
 
   extension
       .AddExpression(

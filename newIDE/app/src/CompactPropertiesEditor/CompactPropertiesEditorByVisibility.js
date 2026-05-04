@@ -156,7 +156,7 @@ export const CompactCollapsibleAdvancedSection = ({
     uncollapsedByDefault
   );
   return showAdvancedOptions ? (
-    <React.Fragment>
+    <ColumnStackLayout noMargin expand>
       {children}
       <FlatButton
         fullWidth
@@ -167,7 +167,7 @@ export const CompactCollapsibleAdvancedSection = ({
           setShowAdvancedOptions(false);
         }}
       />
-    </React.Fragment>
+    </ColumnStackLayout>
   ) : (
     <FlatButton
       fullWidth

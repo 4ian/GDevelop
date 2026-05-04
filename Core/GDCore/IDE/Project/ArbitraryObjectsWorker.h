@@ -4,8 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef ARBITRARYOBJECTSWORKER_H
-#define ARBITRARYOBJECTSWORKER_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -37,6 +36,11 @@ class GD_CORE_API ArbitraryObjectsWorker {
    */
   void Launch(gd::ObjectsContainer& objects) { VisitObjectContainer(objects); };
 
+  /**
+   * \brief Launch the worker on the specified object.
+   */
+  void Launch(gd::Object& object) { VisitObject(object); };
+
  private:
   void VisitObjectContainer(gd::ObjectsContainer& objects);
   void VisitObject(gd::Object& object);
@@ -60,4 +64,3 @@ class GD_CORE_API ArbitraryObjectsWorker {
 
 }  // namespace gd
 
-#endif  // ARBITRARYOBJECTSWORKER_H

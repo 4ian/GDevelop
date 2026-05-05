@@ -530,6 +530,21 @@ private:
                location);
   }
 
+  void RaiseWarning(gd::ExpressionParserError::ErrorType type,
+                    const gd::String &message,
+                    const ExpressionParserLocation &location) {
+    auto diagnostic = gd::make_unique<ExpressionParserError>(
+        type, message, location);
+    deprecationWarnings.push_back(diagnostic.get());
+    supplementalErrors.push_back(std::move(diagnostic));
+  }
+
+  void RaiseDeprecationWarning(const gd::String &message,
+                               const ExpressionParserLocation &location) {
+    RaiseWarning(gd::ExpressionParserError::ErrorType::DeprecatedExpression,
+                 message, location);
+  }
+
   void ReadChildTypeFromVariable(gd::Variable::Type variableType) {
     if (variableType == gd::Variable::Number) {
       childType = Type::Number;

@@ -298,13 +298,11 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
   // Check if the expression is deprecated
   if (metadata.IsDeprecated()) {
     gd::String deprecationMessage = metadata.GetDeprecationMessage();
-    auto diagnostic = gd::make_unique<ExpressionParserError>(
+    RaiseDiagnostic(
         gd::ExpressionParserError::ErrorType::DeprecatedExpression,
         _("This expression is deprecated.") +
             (deprecationMessage.empty() ? "" : " " + deprecationMessage),
-        function.location);
-    deprecationWarnings.push_back(diagnostic.get());
-    supplementalErrors.push_back(std::move(diagnostic));
+        function.location, deprecationWarnings);
   }
 
   // Validate the type of the function

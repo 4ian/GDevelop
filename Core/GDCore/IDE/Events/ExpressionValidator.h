@@ -488,6 +488,17 @@ private:
     supplementalErrors.push_back(std::move(diagnostic));
   }
 
+  void RaiseWarning(gd::ExpressionParserError::ErrorType type,
+                    const gd::String &message,
+                    const ExpressionParserLocation &location,
+                    const gd::String &actualValue = "",
+                    const gd::String &objectName = "") {
+    auto diagnostic = gd::make_unique<ExpressionParserError>(
+        type, message, location, actualValue, objectName);
+    deprecationWarnings.push_back(diagnostic.get());
+    supplementalErrors.push_back(std::move(diagnostic));
+  }
+
   void RaiseUnknownIdentifierError(const gd::String &message,
                                    const ExpressionParserLocation &location) {
     RaiseError(gd::ExpressionParserError::ErrorType::UnknownIdentifier, message,

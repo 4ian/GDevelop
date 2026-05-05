@@ -146,10 +146,34 @@ const eventCasters: { [string]: ?(event: gdBaseEvent) => any } = {
   'BuiltinCommonInstructions::Else': e => gd.asElseEvent(e),
 };
 
+// Derives the stable list label stored in history for a given live instruction
+// list reference. 'whileConditions' identifies the loop-guard list of a WhileEvent,
+// which shares isCondition=true with the body conditions but is a distinct list.
+const getInstructionListLabel = (
+  event: gdBaseEvent,
+  instrsList: gdInstructionsList,
+  isCondition: boolean
+): string => {
+  if (
+    isCondition &&
+    event.getType() === 'BuiltinCommonInstructions::While' &&
+    instrsList.ptr === gd.asWhileEvent(event).getWhileConditions().ptr
+  ) {
+    return 'whileConditions';
+  }
+  return isCondition ? 'conditions' : 'actions';
+};
+
 const getInstructionsListFromEvent = (
   event: gdBaseEvent,
-  isCondition: boolean
+  listLabel: string
 ): gdInstructionsList | null => {
+  if (listLabel === 'whileConditions') {
+    if (event.getType() === 'BuiltinCommonInstructions::While')
+      return gd.asWhileEvent(event).getWhileConditions();
+    return null;
+  }
+  const isCondition = listLabel === 'conditions';
   const caster = eventCasters[event.getType()];
   if (!caster) return null;
   const e = caster(event);
@@ -950,7 +974,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             positionsBeforeAction: positions,
             positionAfterAction: positions,
             instructionIndex,
-            isCondition,
+            instructionListLabel: instrsList
+              ? getInstructionListLabel(
+                  eventContext.event,
+                  instrsList,
+                  isCondition
+                )
+              : undefined,
           });
         }
       }
@@ -1632,8 +1662,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const deleteInstructionIndex = firstDeletedInstrCtx
       ? firstDeletedInstrCtx.indexInList
       : undefined;
-    const deleteIsCondition = firstDeletedInstrCtx
-      ? firstDeletedInstrCtx.isCondition
+    const deleteInstructionListLabel = firstDeletedInstrCtx
+      ? getInstructionListLabel(
+          firstDeletedInstrCtx.eventContext.event,
+          firstDeletedInstrCtx.instrsList,
+          firstDeletedInstrCtx.isCondition
+        )
       : undefined;
 
     if (deleteInstructions) {
@@ -1667,7 +1701,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             positionsBeforeAction: positions,
             positionAfterAction: positions,
             instructionIndex: deleteInstructionIndex,
-            isCondition: deleteIsCondition,
+            instructionListLabel: deleteInstructionListLabel,
           });
         // Deletion of an event/instruction will remove it from the DOM,
         // potentially losing the focus on the associated DOM elements. Ensure
@@ -1717,10 +1751,16 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const lastListCtx = getLastSelectedInstructionsListsContext(
       this.state.selection
     );
-    const pasteIsCondition = lastInstrCtx
-      ? lastInstrCtx.isCondition
+    const pasteInstructionListLabel = lastInstrCtx
+      ? getInstructionListLabel(
+          lastInstrCtx.eventContext.event,
+          lastInstrCtx.instrsList,
+          lastInstrCtx.isCondition
+        )
       : lastListCtx
       ? lastListCtx.isCondition
+        ? 'conditions'
+        : 'actions'
       : undefined;
     // Capture the selected instruction's ptr and list before paste so we can
     // find where it ended up after (paste may insert before it, shifting it).
@@ -1770,7 +1810,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         positionsBeforeAction: positions,
         positionAfterAction: positions,
         instructionIndex: pasteInstructionIndex,
-        isCondition: pasteIsCondition,
+        instructionListLabel: pasteInstructionListLabel,
       },
       () => {
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -1792,7 +1832,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   ) => {
     // Capture index before paste (paste always appends at the end of the list).
     const instructionIndex = instructionsListContext.instrsList.size();
-    const { isCondition } = instructionsListContext;
+    const instructionListLabel = getInstructionListLabel(
+      eventContext.event,
+      instructionsListContext.instrsList,
+      instructionsListContext.isCondition
+    );
 
     if (
       !pasteInstructionsFromClipboardInInstructionsList(
@@ -1809,7 +1853,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         positionsBeforeAction: positions,
         positionAfterAction: positions,
         instructionIndex,
-        isCondition,
+        instructionListLabel,
       },
       () => {
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -1921,7 +1965,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       positionsBeforeAction: Array<number>,
       positionAfterAction: Array<number>,
       instructionIndex?: ?number,
-      isCondition?: ?boolean,
+      instructionListLabel?: ?string,
     },
     cb: ?Function
   ) => {
@@ -1960,7 +2004,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // C++ ptrs from the old selection don't accidentally match newly allocated
     // objects (WASM ptr reuse) and cause a spurious highlight flash during
     // the re-render triggered by forceEventsUpdate below.
-    // $FlowFixMe[incompatible-type]
     this.setState({
       selection: clearSelection(),
       eventsHistory: newEventsHistory,
@@ -1974,23 +2017,20 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         newEventsHistory.futureActions.length - 1
       ];
 
-      // Always compute eventContexts — needed for both selection and scroll.
       const eventContexts = eventsTree.getEventContextAtRowIndexes(
         positions.positionsBeforeAction
       );
 
-      // $FlowFixMe[incompatible-type]
       let newSelection: SelectionState = clearSelection();
       if (type !== 'ADD') {
         if (
           positions.instructionIndex !== undefined &&
-          positions.isCondition !== undefined &&
+          positions.instructionListLabel !== undefined &&
           eventContexts[0]
         ) {
           const instrsList = getInstructionsListFromEvent(
             eventContexts[0].event,
-            // $FlowFixMe[incompatible-type]
-            positions.isCondition
+            positions.instructionListLabel
           );
           // Select the instruction at instructionIndex if it exists, otherwise
           // select the closest one before it (e.g. after undoing a paste at end).
@@ -1998,12 +2038,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             ? Math.min(positions.instructionIndex, instrsList.size() - 1)
             : -1;
           if (instrsList && clampedIdx >= 0) {
-            // $FlowFixMe[incompatible-type]
             newSelection = selectInstruction(
               eventContexts[0],
               clearSelection(),
               {
-                isCondition: positions.isCondition,
+                isCondition: positions.instructionListLabel !== 'actions',
                 instrsList,
                 instruction: instrsList.get(clampedIdx),
                 indexInList: clampedIdx,
@@ -2011,40 +2050,34 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               false
             );
           } else {
-            // $FlowFixMe[incompatible-type]
             newSelection = selectEventsAfterHistoryChange(eventContexts);
           }
         } else {
-          // $FlowFixMe[incompatible-type]
           newSelection = selectEventsAfterHistoryChange(eventContexts);
         }
       }
 
-      this.setState(
-        // $FlowFixMe[incompatible-type]
-        { selection: newSelection },
-        () => {
-          const row = positions.positionsBeforeAction[0];
+      this.setState({ selection: newSelection }, () => {
+        const row = positions.positionsBeforeAction[0];
 
-          if (row !== undefined) {
-            if (
-              positions.instructionIndex !== undefined &&
-              positions.isCondition !== undefined &&
-              eventContexts[0]
-            ) {
-              eventsTree.scrollToInstruction(
-                row,
-                positions.isCondition,
-                positions.instructionIndex
-              );
-            } else {
-              eventsTree.scrollToRow(row);
-            }
+        if (row !== undefined) {
+          if (
+            positions.instructionIndex !== undefined &&
+            positions.instructionListLabel !== undefined &&
+            eventContexts[0]
+          ) {
+            eventsTree.scrollToInstruction(
+              row,
+              positions.instructionListLabel,
+              positions.instructionIndex
+            );
+          } else {
+            eventsTree.scrollToRow(row);
           }
-          this._ensureFocused();
-          this.updateToolbar();
         }
-      );
+        this._ensureFocused();
+        this.updateToolbar();
+      });
     });
   };
 
@@ -2063,7 +2096,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (!eventsTree) return;
 
     // Clear selection immediately to prevent stale ptr flashes (see undo above).
-    // $FlowFixMe[incompatible-type]
     this.setState({
       selection: clearSelection(),
       eventsHistory: newEventsHistory,
@@ -2081,29 +2113,26 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         positions.positionsBeforeAction
       );
 
-      // $FlowFixMe[incompatible-type]
       let newSelection: SelectionState = clearSelection();
       if (type !== 'DELETE') {
         if (
           positions.instructionIndex !== undefined &&
-          positions.isCondition !== undefined &&
+          positions.instructionListLabel !== undefined &&
           eventContextsForScroll[0]
         ) {
           const instrsList = getInstructionsListFromEvent(
             eventContextsForScroll[0].event,
-            // $FlowFixMe[incompatible-type]
-            positions.isCondition
+            positions.instructionListLabel
           );
           const clampedIdx = instrsList
             ? Math.min(positions.instructionIndex, instrsList.size() - 1)
             : -1;
           if (instrsList && clampedIdx >= 0) {
-            // $FlowFixMe[incompatible-type]
             newSelection = selectInstruction(
               eventContextsForScroll[0],
               clearSelection(),
               {
-                isCondition: positions.isCondition,
+                isCondition: positions.instructionListLabel !== 'actions',
                 instrsList,
                 instruction: instrsList.get(clampedIdx),
                 indexInList: clampedIdx,
@@ -2114,43 +2143,37 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             const eventContexts = eventsTree.getEventContextAtRowIndexes(
               positions.positionAfterAction
             );
-            // $FlowFixMe[incompatible-type]
             newSelection = selectEventsAfterHistoryChange(eventContexts);
           }
         } else {
           const eventContexts = eventsTree.getEventContextAtRowIndexes(
             positions.positionAfterAction
           );
-          // $FlowFixMe[incompatible-type]
           newSelection = selectEventsAfterHistoryChange(eventContexts);
         }
       }
 
-      this.setState(
-        // $FlowFixMe[incompatible-type]
-        { selection: newSelection },
-        () => {
-          const row = positions.positionsBeforeAction[0];
+      this.setState({ selection: newSelection }, () => {
+        const row = positions.positionsBeforeAction[0];
 
-          if (row !== undefined) {
-            if (
-              positions.instructionIndex !== undefined &&
-              positions.isCondition !== undefined &&
-              eventContextsForScroll[0]
-            ) {
-              eventsTree.scrollToInstruction(
-                row,
-                positions.isCondition,
-                positions.instructionIndex
-              );
-            } else {
-              eventsTree.scrollToRow(row);
-            }
+        if (row !== undefined) {
+          if (
+            positions.instructionIndex !== undefined &&
+            positions.instructionListLabel !== undefined &&
+            eventContextsForScroll[0]
+          ) {
+            eventsTree.scrollToInstruction(
+              row,
+              positions.instructionListLabel,
+              positions.instructionIndex
+            );
+          } else {
+            eventsTree.scrollToRow(row);
           }
-          this._ensureFocused();
-          this.updateToolbar();
         }
-      );
+        this._ensureFocused();
+        this.updateToolbar();
+      });
     });
   };
 

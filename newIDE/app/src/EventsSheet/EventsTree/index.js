@@ -460,7 +460,7 @@ export type EventsTreeInterface = {|
   scrollToRow: (row: number) => void,
   scrollToInstruction: (
     rowIndex: number,
-    isCondition: boolean,
+    listLabel: string,
     instructionIndex: number
   ) => void,
   getEventRow: (event: gdBaseEvent) => number,
@@ -485,22 +485,12 @@ const EventsTree: React.ComponentType<{
   const _list = React.useRef<?any>(null);
   const eventsHeightsCache = React.useMemo(() => new EventHeightsCache(), []);
 
-  // When a child EventContainer measures its height (inside its own useLayoutEffect),
-  // it calls _onHeightsChanged. We dispatch here so that React batches all such calls
-  // from the same layout-effect phase into ONE synchronous EventsTree re-render —
-  // which fires the version-gated useLayoutEffect below, calling recomputeRowHeights
-  // before the browser paints. Using requestAnimationFrame instead would defer the
-  // recompute to after the first paint, causing a visible frame of wrong-size slots.
-  const [, forceHeightRecompute] = (React.useReducer(x => x + 1, 0): [
-    number,
-    () => void,
-  ]);
   React.useLayoutEffect(
     () => {
-      eventsHeightsCache.setOnHeightsChanged(forceHeightRecompute);
+      eventsHeightsCache.setOnHeightsChanged(forceUpdate);
       return () => eventsHeightsCache.setOnHeightsChanged(null);
     },
-    [eventsHeightsCache, forceHeightRecompute]
+    [eventsHeightsCache, forceUpdate]
   );
   const temporaryUnfoldedNodes = React.useRef<Array<SortableTreeNode>>([]);
   const _hoverTimerId = React.useRef<?TimeoutID>(null);
@@ -645,7 +635,7 @@ const EventsTree: React.ComponentType<{
   );
 
   const scrollToInstruction = React.useCallback(
-    (rowIndex: number, isCondition: boolean, instructionIndex: number) => {
+    (rowIndex: number, listLabel: string, instructionIndex: number) => {
       // Do NOT call scrollToRow here unconditionally. For tall event rows (many
       // actions), scrollToRow snaps the row's top edge to the viewport top even
       // when the target instruction is already visible. We only fall back to it
@@ -680,17 +670,22 @@ const EventsTree: React.ComponentType<{
           findNode(treeDataRoot.current);
           if (!relativeNodePath) return;
 
-          const type = isCondition ? 'condition' : 'action';
-          const idPrefix = `event-${relativeNodePath.join('-')}`;
+          // For WhileEvent's loop-guard list the idPrefix gets a '-while' suffix
+          // (set in WhileEvent.js) to avoid colliding with the body conditions.
+          const listIdPrefix =
+            listLabel === 'whileConditions'
+              ? `event-${relativeNodePath.join('-')}-while`
+              : `event-${relativeNodePath.join('-')}`;
+          const type = listLabel === 'actions' ? 'action' : 'condition';
           const doc = list.container.ownerDocument;
 
           // Try the exact index first, then one below (covers undo of add where
           // the instruction at instructionIndex was removed).
           const element =
-            doc.getElementById(`${idPrefix}-${type}-${instructionIndex}`) ||
+            doc.getElementById(`${listIdPrefix}-${type}-${instructionIndex}`) ||
             (instructionIndex > 0
               ? doc.getElementById(
-                  `${idPrefix}-${type}-${instructionIndex - 1}`
+                  `${listIdPrefix}-${type}-${instructionIndex - 1}`
                 )
               : null);
 

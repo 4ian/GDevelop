@@ -3200,6 +3200,7 @@ interface ExpressionValidator {
 
     [Const, Ref] VectorExpressionParserError GetAllErrors();
     [Const, Ref] VectorExpressionParserError GetFatalErrors();
+    [Const, Ref] VectorExpressionParserError GetDeprecationWarnings();
 
     //Inherited from ExpressionParser2NodeWorker:
 };

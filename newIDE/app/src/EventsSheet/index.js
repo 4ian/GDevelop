@@ -132,19 +132,9 @@ import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent
 import { findEventByPath } from '../Utils/EventsValidationScanner';
 import type { SearchFilterParams } from '../Utils/Search';
 import type { InitialSearchFilterParams } from './SearchPanel';
+import { isNullPtr } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
-
-// Maps event types that have conditions+actions to their gd cast function.
-const eventCasters: { [string]: ?(event: gdBaseEvent) => any } = {
-  'BuiltinCommonInstructions::Standard': e => gd.asStandardEvent(e),
-  'BuiltinCommonInstructions::While': e => gd.asWhileEvent(e),
-  'BuiltinCommonInstructions::Repeat': e => gd.asRepeatEvent(e),
-  'BuiltinCommonInstructions::ForEach': e => gd.asForEachEvent(e),
-  'BuiltinCommonInstructions::ForEachChildVariable': e =>
-    gd.asForEachChildVariableEvent(e),
-  'BuiltinCommonInstructions::Else': e => gd.asElseEvent(e),
-};
 
 // Derives the stable list label stored in history for a given live instruction
 // list reference. 'whileConditions' identifies the loop-guard list of a WhileEvent,
@@ -154,30 +144,12 @@ const getInstructionListLabel = (
   instrsList: gdInstructionsList,
   isCondition: boolean
 ): string => {
-  if (
-    isCondition &&
-    event.getType() === 'BuiltinCommonInstructions::While' &&
-    instrsList.ptr === gd.asWhileEvent(event).getWhileConditions().ptr
-  ) {
+  if (!isCondition) return 'actions';
+  const whileList = event.getInstructionList('whileConditions');
+  // $FlowFixMe[incompatible-exact]
+  if (!isNullPtr(gd, whileList) && whileList.ptr === instrsList.ptr)
     return 'whileConditions';
-  }
-  return isCondition ? 'conditions' : 'actions';
-};
-
-const getInstructionsListFromEvent = (
-  event: gdBaseEvent,
-  listLabel: string
-): gdInstructionsList | null => {
-  if (listLabel === 'whileConditions') {
-    if (event.getType() === 'BuiltinCommonInstructions::While')
-      return gd.asWhileEvent(event).getWhileConditions();
-    return null;
-  }
-  const isCondition = listLabel === 'conditions';
-  const caster = eventCasters[event.getType()];
-  if (!caster) return null;
-  const e = caster(event);
-  return isCondition ? e.getConditions() : e.getActions();
+  return 'conditions';
 };
 
 const zoomLevel = { min: 1, max: 50 };
@@ -2028,10 +2000,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           positions.instructionListLabel !== undefined &&
           eventContexts[0]
         ) {
-          const instrsList = getInstructionsListFromEvent(
-            eventContexts[0].event,
+          const maybeInstrsList = eventContexts[0].event.getInstructionList(
             positions.instructionListLabel
           );
+          // $FlowFixMe[incompatible-exact]
+          const instrsList = !isNullPtr(gd, maybeInstrsList)
+            ? maybeInstrsList
+            : null;
           // Select the instruction at instructionIndex if it exists, otherwise
           // select the closest one before it (e.g. after undoing a paste at end).
           const clampedIdx = instrsList
@@ -2120,10 +2095,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           positions.instructionListLabel !== undefined &&
           eventContextsForScroll[0]
         ) {
-          const instrsList = getInstructionsListFromEvent(
-            eventContextsForScroll[0].event,
+          const maybeInstrsList = eventContextsForScroll[0].event.getInstructionList(
             positions.instructionListLabel
           );
+          // $FlowFixMe[incompatible-exact]
+          const instrsList = !isNullPtr(gd, maybeInstrsList)
+            ? maybeInstrsList
+            : null;
           const clampedIdx = instrsList
             ? Math.min(positions.instructionIndex, instrsList.size() - 1)
             : -1;

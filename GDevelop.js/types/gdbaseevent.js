@@ -15,6 +15,7 @@ declare class gdBaseEvent extends gdBaseEvent {
   setDisabled(disable: boolean): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
+  getInstructionList(label: string): gdInstructionsList;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   getAiGeneratedEventId(): string;

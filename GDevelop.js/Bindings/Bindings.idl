@@ -2491,6 +2491,8 @@ interface BaseEvent {
     boolean IsFolded();
     void SetFolded(boolean folded);
 
+    InstructionsList GetInstructionList([Const] DOMString label);
+
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 

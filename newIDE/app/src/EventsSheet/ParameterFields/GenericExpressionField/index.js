@@ -154,24 +154,32 @@ const extractErrors = (
   expressionNode.visit(expressionValidator);
   const errors = expressionValidator.getAllErrors();
   const fatalErrors = expressionValidator.getFatalErrors();
+  const deprecationWarnings = expressionValidator.getDeprecationWarnings();
   const hasFatalErrors = fatalErrors.size() > 0;
 
   const errorHighlights: Array<Highlight> = mapVector(errors, error => {
-    const errorType = error.getType();
-    const isDeprecated =
-      errorType === gd.ExpressionParserError.DeprecatedExpression;
-    // Skip deprecation warnings if the preference is set to 'no'
-    if (isDeprecated && showDeprecatedInstructionWarning === 'no') {
-      return null;
-    }
     const highlight: Highlight = {
       begin: error.getStartPosition(),
       end: error.getEndPosition() + 1,
       message: error.getMessage(),
-      type: isDeprecated ? 'deprecated' : 'error',
+      type: 'error',
     };
     return highlight;
-  }).filter(Boolean);
+  });
+
+  // Skip deprecation warnings if the preference is set to 'no'
+  if (showDeprecatedInstructionWarning !== 'no') {
+    mapVector(deprecationWarnings, error => {
+      const highlight: Highlight = {
+        begin: error.getStartPosition(),
+        end: error.getEndPosition() + 1,
+        message: error.getMessage(),
+        type: 'deprecated',
+      };
+      errorHighlights.push(highlight);
+    });
+  }
+
   const otherErrorsCount = Math.max(
     0,
     errorHighlights.length - MAX_ERRORS_COUNT

@@ -82,6 +82,14 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     return allErrors;
   };
 
+  /**
+   * \brief Get all deprecation warnings
+   */
+  const std::vector<ExpressionParserError*> &
+  GetDeprecationWarnings() {
+    return deprecationWarnings;
+  };
+
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
     ReportAnyError(node);
@@ -550,6 +558,7 @@ private:
 
   std::vector<ExpressionParserError*> fatalErrors;
   std::vector<ExpressionParserError*> allErrors;
+  std::vector<ExpressionParserError*> deprecationWarnings;
   std::vector<std::unique_ptr<ExpressionParserError>> supplementalErrors;
   Type childType; ///< The type "discovered" down the tree and passed up.
   Type parentType; ///< The type "required" by the top of the tree.

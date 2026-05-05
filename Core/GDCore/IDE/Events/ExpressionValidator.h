@@ -476,16 +476,28 @@ private:
                   const ExpressionParserLocation &location, bool isFatal = true,
                   const gd::String &actualValue = "",
                   const gd::String &objectName = "") {
+    auto diagnostic =
+        RaiseDiagnostic(type, message, location, actualValue, objectName);
+    allErrors.push_back(diagnostic);
+    if (isFatal) {
+      fatalErrors.push_back(diagnostic);
+    }
+  }
+
+  ExpressionParserError *RaiseDiagnostic(
+      gd::ExpressionParserError::ErrorType type,
+      const gd::String &message,
+      const ExpressionParserLocation &location,
+      const gd::String &actualValue = "",
+      const gd::String &objectName = "") {
     auto diagnostic = gd::make_unique<ExpressionParserError>(
         type, message, location, actualValue, objectName);
-    allErrors.push_back(diagnostic.get());
-    if (isFatal) {
-      fatalErrors.push_back(diagnostic.get());
-    }
-    // Errors found by the validator are not holden by the AST nodes.
+    auto diagnosticPointer = diagnostic.get();
+    // Diagnostics found by the validator are not holden by the AST nodes.
     // They must be owned by the validator to keep living while errors are
     // handled by the caller.
     supplementalErrors.push_back(std::move(diagnostic));
+    return diagnosticPointer;
   }
 
   void RaiseUnknownIdentifierError(const gd::String &message,

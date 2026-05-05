@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -O3 -DNDEBUG -shared -Wl,-soname,SpineObject.xgde -o /workspace/Binaries/Output/Release_Linux/CppPlatform/Extensions/SpineObject.xgde CMakeFiles/SpineObject.dir/SpineObjectConfiguration.cpp.o  -Wl,-rpath,/workspace/Binaries/Output/Release_Linux /workspace/Binaries/Output/Release_Linux/libGDCore.so 

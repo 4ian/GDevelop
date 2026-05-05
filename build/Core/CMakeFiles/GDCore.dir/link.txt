@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -O3 -DNDEBUG -shared -Wl,-soname,libGDCore.so -o /workspace/Binaries/Output/Release_Linux/libGDCore.so @CMakeFiles/GDCore.dir/objects1.rsp 

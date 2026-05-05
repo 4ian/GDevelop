@@ -471,21 +471,32 @@ private:
     }
   }
 
+  ExpressionParserError* RaiseDiagnostic(
+      gd::ExpressionParserError::ErrorType type, const gd::String &message,
+      const ExpressionParserLocation &location,
+      const gd::String &actualValue = "",
+      const gd::String &objectName = "") {
+    auto diagnostic = gd::make_unique<ExpressionParserError>(
+        type, message, location, actualValue, objectName);
+    auto *rawPointer = diagnostic.get();
+    // Diagnostics found by the validator are not held by the AST nodes.
+    // They must be owned by the validator to keep living while diagnostics are
+    // handled by the caller.
+    supplementalErrors.push_back(std::move(diagnostic));
+    return rawPointer;
+  }
+
   void RaiseError(gd::ExpressionParserError::ErrorType type,
                   const gd::String &message,
                   const ExpressionParserLocation &location, bool isFatal = true,
                   const gd::String &actualValue = "",
                   const gd::String &objectName = "") {
-    auto diagnostic = gd::make_unique<ExpressionParserError>(
-        type, message, location, actualValue, objectName);
-    allErrors.push_back(diagnostic.get());
+    auto *error = RaiseDiagnostic(type, message, location, actualValue,
+                                  objectName);
+    allErrors.push_back(error);
     if (isFatal) {
-      fatalErrors.push_back(diagnostic.get());
+      fatalErrors.push_back(error);
     }
-    // Errors found by the validator are not holden by the AST nodes.
-    // They must be owned by the validator to keep living while errors are
-    // handled by the caller.
-    supplementalErrors.push_back(std::move(diagnostic));
   }
 
   void RaiseUnknownIdentifierError(const gd::String &message,

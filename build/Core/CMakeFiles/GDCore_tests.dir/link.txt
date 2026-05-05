@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG @CMakeFiles/GDCore_tests.dir/objects1.rsp -o GDCore_tests  -Wl,-rpath,/workspace/Binaries/Output/Release_Linux /workspace/Binaries/Output/Release_Linux/libGDCore.so -ldl 

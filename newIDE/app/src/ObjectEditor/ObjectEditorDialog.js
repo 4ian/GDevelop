@@ -175,6 +175,40 @@ const InnerDialog = (props: InnerDialogProps) => {
     project.getCurrentPlatform(),
     object.getType()
   );
+  const objectDisplayName = objectMetadata
+    ? objectMetadata.getFullName()
+    : null;
+
+  const isSpriteObject = object.getType() === 'Sprite';
+  const spriteHasAnimations =
+    isSpriteObject &&
+    gd.asSpriteConfiguration(object.getConfiguration()).getAnimationsCount() >
+      0;
+
+  const contextualHelpPagePath = (() => {
+    if (currentTab === 'behaviors') return '/behaviors';
+    if (currentTab === 'variables')
+      return '/all-features/variables/object-variables';
+    if (currentTab === 'effects') return '/objects/effects';
+    if (isSpriteObject) return '/objects/sprite';
+    return helpPagePath || '/objects';
+  })();
+
+  const contextualHelpAnchor = (() => {
+    if (isSpriteObject && spriteHasAnimations) return 'adding-an-animation';
+    return undefined;
+  })();
+
+  const contextualLabel = (() => {
+    if (currentTab === 'behaviors') return <Trans>About Behaviors</Trans>;
+    if (currentTab === 'variables')
+      return <Trans>About Object Variables</Trans>;
+    if (currentTab === 'effects') return <Trans>About Effects</Trans>;
+    if (isSpriteObject && spriteHasAnimations)
+      return <Trans>About Animations</Trans>;
+    if (objectDisplayName) return <Trans>About {objectDisplayName}</Trans>;
+    return undefined;
+  })();
 
   const EditorComponent: ?React.ComponentType<EditorProps> =
     props.editorComponent;
@@ -275,8 +309,10 @@ const InnerDialog = (props: InnerDialogProps) => {
       secondaryActions={[
         <HelpButton
           key="help-button"
-          helpPagePath={helpPagePath}
-          scopeName="Objects"
+          helpPagePath={contextualHelpPagePath}
+          anchor={contextualHelpAnchor}
+          label={contextualLabel}
+          scopeName={contextualLabel ? undefined : 'Objects'}
         />,
         <HotReloadPreviewButton
           key="hot-reload-preview-button"

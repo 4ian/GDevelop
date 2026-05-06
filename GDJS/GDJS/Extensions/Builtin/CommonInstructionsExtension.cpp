@@ -297,8 +297,17 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           // Create new objects lists and generate condition
           conditionsCode +=
               codeGenerator.GenerateObjectsDeclarationCode(context);
-          if (!conditions[cId].GetType().empty())
+          if (!conditions[cId].GetType().empty()) {
+            // Reset the branch's boolean to false: condition codegen does
+            // not zero its return boolean, so without this each branch
+            // would inherit the previous branch's truth value, causing a
+            // false branch that picks 0 to be treated as a contribution.
+            conditionsCode +=
+                codeGenerator.GenerateBooleanFullName("isConditionTrue",
+                                                      context) +
+                " = false;\n";
             conditionsCode += conditionCode;
+          }
 
           // If the condition is true : merge all objects picked in the
           // final object lists.
@@ -454,8 +463,16 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               conditionsCode += "{\n";
               conditionsCode +=
                   codeGenerator.GenerateObjectsDeclarationCode(context);
-              if (!conditions[cId].GetType().empty())
+              if (!conditions[cId].GetType().empty()) {
+                // See the matching reset comment in the Or generator above:
+                // each branch must start with isConditionTrue = false so a
+                // previous true branch does not leak into this one.
+                conditionsCode +=
+                    codeGenerator.GenerateBooleanFullName("isConditionTrue",
+                                                          context) +
+                    " = false;\n";
                 conditionsCode += conditionCode;
+              }
 
               conditionsCode += "if(" +
                                 codeGenerator.GenerateBooleanFullName(

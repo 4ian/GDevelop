@@ -17,14 +17,28 @@
  *   the action acts on objects unrelated to the branch that fired
  *   (TextInput + SubmitButton pattern).
  *
+ * Each test seeds three instances per object (MyVariable=1, 2 and 3) so a
+ * picking condition such as `VarObjet(ObjectX, "MyVariable", "=", N)`
+ * deterministically picks the Nth instance. After running, an
+ * `ModVarObjet(..., "Touched", "+", "1")` action is used per relevant object
+ * to reveal exactly which instances were picked at action time — the test
+ * asserts on the `Touched` array, not just on totals, so each instance's
+ * fate is checked individually. An unrelated `ObjectC` is included (and
+ * picked by a sibling condition outside the Or) to verify that the Or
+ * never disturbs picks for objects it does not reference.
+ *
  * The canonical patterns covered below:
- *   1. Door/Coin           — preserve-picks Or only.
- *   2. AllowedArea pair    — preserve-picks Or only (bug-fix path).
- *   3. Both branches false — both Or variants must leave parent picks alone.
- *   4. Input + Submit      — distributive Or only.
- *   5. "Score on trigger"  — distributive Or only.
- *   6. Sanity              — distributive Or breaks Door/Coin (documents the
- *                            difference between the two operators).
+ *   1. Door/Coin                 — preserve-picks Or only.
+ *   2. AllowedArea pair          — preserve-picks Or only (bug-fix path).
+ *   3. All-false                 — both Or variants must return false
+ *                                  (no action runs).
+ *   4. Input + Submit            — distributive Or only.
+ *   5. Score-on-trigger          — distributive Or only.
+ *   6. Door/Coin sanity (negative test for OrDistributive).
+ *   7. Branches with `And`       — multi-condition branches that pick
+ *                                  several objects at once.
+ *   8. Unrelated objects         — picks for objects the Or doesn't
+ *                                  reference are never disturbed.
  */
 
 const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.js');
@@ -40,17 +54,13 @@ describe('libGD.js - GDJS Or object picking semantics integration tests', () => 
   });
 
   /**
-   * Build a small project with two object parameters, run the supplied events,
-   * and return the resulting (mutated) parameter object lists plus the
-   * runtime scene so tests can assert on picked lists and scene variables.
-   *
-   * The events function is given two object parameters: ObjectA and ObjectB.
-   * Each test seeds these with a single instance whose 'MyVariable' is set
-   * to a value the test controls, so that picking conditions of the form
-   * `VarObjet(ObjectX, "MyVariable", "=", N)` deterministically pick or skip
-   * the instance.
+   * Build a small project with three object parameters (ObjectA, ObjectB,
+   * ObjectC), seed each with three instances whose `MyVariable` is 1, 2 and
+   * 3 respectively, run the supplied events, and return both the runtime
+   * scene and the per-object instance arrays so tests can assert on the
+   * `Touched` flag of each individual instance.
    */
-  const runEventsWithTwoObjects = (events, { aValue, bValue }) => {
+  const runEventsWithThreeObjectsThreeInstances = (events, logCode) => {
     const serializerElement = gd.Serializer.fromJSObject(events);
     const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
       gd,
@@ -59,317 +69,543 @@ describe('libGD.js - GDJS Or object picking semantics integration tests', () => 
         parameterTypes: {
           ObjectA: 'object',
           ObjectB: 'object',
+          ObjectC: 'object',
         },
-        logCode: false,
+        logCode: !!logCode,
       }
     );
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
 
-    const a1 = runtimeScene.createObject('ObjectA');
-    a1.getVariables().get('MyVariable').setNumber(aValue);
-    const objectAList = new gdjs.Hashtable();
-    objectAList.put('ObjectA', [a1]);
+    const makeInstances = (objectName) => {
+      const insts = [1, 2, 3].map((value) => {
+        const obj = runtimeScene.createObject(objectName);
+        obj.getVariables().get('MyVariable').setNumber(value);
+        return obj;
+      });
+      const lists = new gdjs.Hashtable();
+      // Pre-pick every instance so the picked list starts populated. The
+      // generated events function uses `eventsFunctionContext.getObjects` for
+      // the parameter as the source for picking, so a pre-populated list is
+      // what conditions filter against.
+      lists.put(objectName, insts.slice());
+      return { insts, lists };
+    };
 
-    const b1 = runtimeScene.createObject('ObjectB');
-    b1.getVariables().get('MyVariable').setNumber(bValue);
-    const objectBList = new gdjs.Hashtable();
-    objectBList.put('ObjectB', [b1]);
+    const a = makeInstances('ObjectA');
+    const b = makeInstances('ObjectB');
+    const c = makeInstances('ObjectC');
 
-    runCompiledEvents(gdjs, runtimeScene, [objectAList, objectBList]);
+    runCompiledEvents(gdjs, runtimeScene, [a.lists, b.lists, c.lists]);
 
-    return { runtimeScene, objectAList, objectBList, a1, b1 };
+    return {
+      runtimeScene,
+      aInsts: a.insts,
+      bInsts: b.insts,
+      cInsts: c.insts,
+      aLists: a.lists,
+      bLists: b.lists,
+      cLists: c.lists,
+    };
   };
 
-  // Picks ObjectA where MyVariable === expectedAValue.
-  const pickAByVar = (expectedAValue) => ({
+  // Returns [touched1, touched2, touched3] for the given instance array,
+  // where each entry is the value of the "Touched" object variable. A 0 in
+  // the array means "the action did not run on this instance".
+  const touchedFlags = (insts) =>
+    insts.map((o) => o.getVariables().get('Touched').getAsNumber());
+
+  const pickByVar = (objectName, expectedValue) => ({
     type: { value: 'VarObjet' },
-    parameters: ['ObjectA', 'MyVariable', '=', String(expectedAValue)],
+    parameters: [
+      objectName,
+      'MyVariable',
+      '=',
+      String(expectedValue),
+    ],
   });
-  // Picks ObjectB where MyVariable === expectedBValue.
-  const pickBByVar = (expectedBValue) => ({
-    type: { value: 'VarObjet' },
-    parameters: ['ObjectB', 'MyVariable', '=', String(expectedBValue)],
-  });
+  const pickAByVar = (v) => pickByVar('ObjectA', v);
+  const pickBByVar = (v) => pickByVar('ObjectB', v);
+  const pickCByVar = (v) => pickByVar('ObjectC', v);
+
   // Free condition with constant truth value (does not reference any object).
   const freeCondition = (alwaysTrue) => ({
     type: { value: 'Egal' },
     parameters: ['1', '=', alwaysTrue ? '1' : '0'],
   });
 
-  // Action: increment ObjectA's "Touched" variable. Runs once per picked
-  // ObjectA instance, so the post-condition variable reveals how many were
-  // picked when the action ran.
-  const touchA = {
+  // Action that increments the per-instance "Touched" variable. Runs once
+  // per picked instance.
+  const touch = (objectName) => ({
     type: { value: 'ModVarObjet' },
-    parameters: ['ObjectA', 'Touched', '+', '1'],
-  };
-  const touchB = {
-    type: { value: 'ModVarObjet' },
-    parameters: ['ObjectB', 'Touched', '+', '1'],
-  };
-  // Action: set scene variable, runs once regardless of picks. Used to
-  // confirm the Or's truth value (whether the action block ran at all).
+    parameters: [objectName, 'Touched', '+', '1'],
+  });
+  const touchA = touch('ObjectA');
+  const touchB = touch('ObjectB');
+  const touchC = touch('ObjectC');
+
+  // Action that sets a scene variable, runs once regardless of picks. Used
+  // to confirm the Or's truth value (whether the action block ran at all).
   const setScene = (name, value) => ({
     type: { value: 'ModVarScene' },
     parameters: [name, '=', String(value)],
   });
 
-  /* ------------------------------------------------------------------ */
-  /* 1. Door/Coin — the preserve-picks Or must scope picks to the       */
-  /*    branch that fired.                                              */
-  /* ------------------------------------------------------------------ */
-  describe('Or — Door/Coin (act on the touched object)', () => {
-    const buildEvents = (orType) => [
+  const andOf = (...subInstructions) => ({
+    type: { value: 'BuiltinCommonInstructions::And' },
+    parameters: [],
+    subInstructions,
+  });
+  const orOf = (...subInstructions) => ({
+    type: { value: 'BuiltinCommonInstructions::Or' },
+    parameters: [],
+    subInstructions,
+  });
+  const orDistributiveOf = (...subInstructions) => ({
+    type: { value: 'BuiltinCommonInstructions::OrDistributive' },
+    parameters: [],
+    subInstructions,
+  });
+
+  /* ================================================================== */
+  /* 1. Door/Coin — the preserve-picks Or scopes picks to the branch    */
+  /*    that fired. Only the matching instance(s) get touched.          */
+  /* ================================================================== */
+  describe('Or — Door/Coin (act on the touched object), three instances each', () => {
+    const buildEvents = () => [
       {
         type: 'BuiltinCommonInstructions::Standard',
-        conditions: [
-          {
-            type: { value: orType },
-            parameters: [],
-            subInstructions: [pickAByVar(5), pickBByVar(7)],
-          },
-        ],
+        conditions: [orOf(pickAByVar(2), pickBByVar(2))],
         actions: [touchA, touchB, setScene('OrFired', 1)],
         events: [],
       },
     ];
 
-    it('Or picks A only when A matches', () => {
-      const { runtimeScene, a1, b1 } = runEventsWithTwoObjects(
-        buildEvents('BuiltinCommonInstructions::Or'),
-        { aValue: 5, bValue: 999 }
-      );
+    it('only A=2 matches: only A2 is touched, no B is touched', () => {
+      // Branch A picks A=2 (matches A2 only). Branch B picks B=2 (B has
+      // value 2 too — but with multi-instance we need to control which B
+      // values exist). Here B values are [1, 2, 3] so branch B is also
+      // true and picks B2. To exercise "only A matches", make branch B
+      // false: pick B=999.
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [orOf(pickAByVar(2), pickBByVar(999))],
+          actions: [touchA, touchB, setScene('OrFired', 1)],
+          events: [],
+        },
+      ];
+      const { runtimeScene, aInsts, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
       expect(runtimeScene.getVariables().get('OrFired').getAsNumber()).toBe(1);
-      expect(a1.getVariables().get('Touched').getAsNumber()).toBe(1);
-      expect(b1.getVariables().get('Touched').getAsNumber()).toBe(0);
+      expect(touchedFlags(aInsts)).toEqual([0, 1, 0]);
+      expect(touchedFlags(bInsts)).toEqual([0, 0, 0]);
     });
 
-    it('Or picks B only when B matches', () => {
-      const { runtimeScene, a1, b1 } = runEventsWithTwoObjects(
-        buildEvents('BuiltinCommonInstructions::Or'),
-        { aValue: 999, bValue: 7 }
-      );
+    it('only B=3 matches: only B3 is touched, no A is touched', () => {
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [orOf(pickAByVar(999), pickBByVar(3))],
+          actions: [touchA, touchB, setScene('OrFired', 1)],
+          events: [],
+        },
+      ];
+      const { runtimeScene, aInsts, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
       expect(runtimeScene.getVariables().get('OrFired').getAsNumber()).toBe(1);
-      expect(a1.getVariables().get('Touched').getAsNumber()).toBe(0);
-      expect(b1.getVariables().get('Touched').getAsNumber()).toBe(1);
+      expect(touchedFlags(aInsts)).toEqual([0, 0, 0]);
+      expect(touchedFlags(bInsts)).toEqual([0, 0, 1]);
     });
 
-    it('Or picks both when both match', () => {
-      const { runtimeScene, a1, b1 } = runEventsWithTwoObjects(
-        buildEvents('BuiltinCommonInstructions::Or'),
-        { aValue: 5, bValue: 7 }
-      );
+    it('both branches match: only the picked instances get touched, others stay untouched', () => {
+      const { runtimeScene, aInsts, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(buildEvents());
       expect(runtimeScene.getVariables().get('OrFired').getAsNumber()).toBe(1);
-      expect(a1.getVariables().get('Touched').getAsNumber()).toBe(1);
-      expect(b1.getVariables().get('Touched').getAsNumber()).toBe(1);
+      expect(touchedFlags(aInsts)).toEqual([0, 1, 0]);
+      expect(touchedFlags(bInsts)).toEqual([0, 1, 0]);
     });
   });
 
-  /* ------------------------------------------------------------------ */
+  /* ================================================================== */
   /* 2. AllowedArea pair — outside-Or picking that the Or must not      */
-  /*    erase (the bug fix).                                            */
-  /* ------------------------------------------------------------------ */
+  /*    erase (the bug fix). Only the originally picked A2 should be    */
+  /*    touched.                                                        */
+  /* ================================================================== */
   describe('Or — preserves outside picks when no true branch contributed', () => {
-    // Outside the Or, ObjectA is filtered to the instance with var=5. Then
-    // the Or runs:
-    //   branch B: VarObjet(ObjectA, "MyVariable", "=", 999)  — references A,
-    //                                                          but is false.
-    //   branch C: Egal(1, 1)                                  — true, free.
-    // No true branch contributed for A, so the action should still run on
-    // the previously picked A. Before the fix, the Or overwrote A with the
-    // empty "final" list and the action saw nothing.
+    // Outside the Or, ObjectA is filtered to A2. Inside the Or:
+    //   branch B: pickA=999 — references A but is false.
+    //   branch C: free, true — does not reference A.
+    // No true branch contributed for A, so the bug-fixed Or leaves the
+    // outside pick of A2 alone. Only A2 should be touched.
     const events = [
       {
         type: 'BuiltinCommonInstructions::Standard',
-        conditions: [
-          pickAByVar(5),
-          {
-            type: { value: 'BuiltinCommonInstructions::Or' },
-            parameters: [],
-            subInstructions: [pickAByVar(999), freeCondition(true)],
-          },
-        ],
+        conditions: [pickAByVar(2), orOf(pickAByVar(999), freeCondition(true))],
         actions: [touchA, setScene('OrFired', 1)],
         events: [],
       },
     ];
 
-    it('keeps the outside-Or pick of ObjectA when only the free branch is true', () => {
-      const { runtimeScene, a1 } = runEventsWithTwoObjects(events, {
-        aValue: 5,
-        bValue: 0,
-      });
+    it('keeps the outside-Or pick (A2) when only the free branch is true', () => {
+      const { runtimeScene, aInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
       expect(runtimeScene.getVariables().get('OrFired').getAsNumber()).toBe(1);
-      expect(a1.getVariables().get('Touched').getAsNumber()).toBe(1);
+      expect(touchedFlags(aInsts)).toEqual([0, 1, 0]);
+    });
+
+    it('keeps the outside-Or pick (A2) when the free branch comes BEFORE the false A-branch', () => {
+      // Branch order matters: this test exercises the boolean-reset fix.
+      // Without it, the true free branch would leak its truth value into
+      // the next branch's "if(isConditionTrue)" check, and the false
+      // pickA(999) branch would be wrongly treated as a contribution
+      // — collapsing parent.A to the empty filtered list.
+      const eventsReversed = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            pickAByVar(2),
+            orOf(freeCondition(true), pickAByVar(999)),
+          ],
+          actions: [touchA, setScene('OrFired', 1)],
+          events: [],
+        },
+      ];
+      const { runtimeScene, aInsts } =
+        runEventsWithThreeObjectsThreeInstances(eventsReversed);
+      expect(runtimeScene.getVariables().get('OrFired').getAsNumber()).toBe(1);
+      expect(touchedFlags(aInsts)).toEqual([0, 1, 0]);
     });
   });
 
-  /* ------------------------------------------------------------------ */
-  /* 3. All-false Or returns false (sanity check that a both-false      */
-  /*    Or properly fails the parent event so the action does not run). */
-  /*    The "preserve parent picks when no branch contributed" path is  */
-  /*    fully exercised by case 2 above; once the Or is false, the      */
-  /*    parent event short-circuits before any action can observe the   */
-  /*    picked-list state, so there is nothing more to assert here.     */
-  /* ------------------------------------------------------------------ */
+  /* ================================================================== */
+  /* 3. All-false Or returns false (sanity check that the Or correctly  */
+  /*    fails the parent event so the action does not run).             */
+  /* ================================================================== */
   describe('Or — all-false returns false', () => {
-    const buildEvents = (orType) => [
+    const buildEvents = (orWrapper) => [
       {
         type: 'BuiltinCommonInstructions::Standard',
-        conditions: [
-          {
-            type: { value: orType },
-            parameters: [],
-            subInstructions: [pickAByVar(999), pickBByVar(999)],
-          },
-        ],
-        actions: [setScene('OrFired', 1)],
+        conditions: [orWrapper(pickAByVar(999), pickBByVar(999))],
+        actions: [touchA, touchB, setScene('OrFired', 1)],
         events: [],
       },
     ];
 
     it('Or: action does not run when both branches are false', () => {
-      const { runtimeScene } = runEventsWithTwoObjects(
-        buildEvents('BuiltinCommonInstructions::Or'),
-        { aValue: 5, bValue: 0 }
-      );
+      const { runtimeScene, aInsts, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(buildEvents(orOf));
       expect(runtimeScene.getVariables().has('OrFired')).toBe(false);
+      expect(touchedFlags(aInsts)).toEqual([0, 0, 0]);
+      expect(touchedFlags(bInsts)).toEqual([0, 0, 0]);
     });
 
     it('OrDistributive: action does not run when both branches are false', () => {
-      const { runtimeScene } = runEventsWithTwoObjects(
-        buildEvents('BuiltinCommonInstructions::OrDistributive'),
-        { aValue: 5, bValue: 0 }
-      );
+      const { runtimeScene, aInsts, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(buildEvents(orDistributiveOf));
       expect(runtimeScene.getVariables().has('OrFired')).toBe(false);
+      expect(touchedFlags(aInsts)).toEqual([0, 0, 0]);
+      expect(touchedFlags(bInsts)).toEqual([0, 0, 0]);
     });
   });
 
-  /* ------------------------------------------------------------------ */
-  /* 4. Input + SubmitButton — the canonical case for OrDistributive.   */
+  /* ================================================================== */
+  /* 4. Input + SubmitButton — canonical case for OrDistributive.       */
   /*    A branch that doesn't reference ObjectA must keep ObjectA       */
   /*    available to the action.                                        */
-  /* ------------------------------------------------------------------ */
+  /* ================================================================== */
   describe('OrDistributive — Input/Button (act on ObjectA regardless)', () => {
-    // branch A: pickAByVar(5)        — references A, may be true or false.
-    // branch B: free, always true    — does NOT reference A.
-    // Action: touch A. The action should run on ObjectA whenever the Or
-    // returns true, even if branch A failed to pick A.
-    const buildEvents = (orType) => [
+    // branch 1: pickA=999 — references A, false (no instance has var=999).
+    // branch 2: free, true — does not reference A.
+    // With OrDistributive, all three A instances stay available.
+    const events = [
       {
         type: 'BuiltinCommonInstructions::Standard',
-        conditions: [
-          {
-            type: { value: orType },
-            parameters: [],
-            subInstructions: [pickAByVar(5), freeCondition(true)],
-          },
-        ],
+        conditions: [orDistributiveOf(pickAByVar(999), freeCondition(true))],
         actions: [touchA, setScene('OrFired', 1)],
         events: [],
       },
     ];
 
-    it('OrDistributive picks A when only the free branch is true', () => {
-      const { runtimeScene, a1 } = runEventsWithTwoObjects(
-        buildEvents('BuiltinCommonInstructions::OrDistributive'),
-        { aValue: 999, bValue: 0 } // branch A is false (var != 5)
-      );
+    it('OrDistributive: all A instances stay picked when only the free branch is true', () => {
+      const { runtimeScene, aInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
       expect(runtimeScene.getVariables().get('OrFired').getAsNumber()).toBe(1);
-      expect(a1.getVariables().get('Touched').getAsNumber()).toBe(1);
+      expect(touchedFlags(aInsts)).toEqual([1, 1, 1]);
     });
 
-    it('OrDistributive picks A when branch A also matches', () => {
-      const { runtimeScene, a1 } = runEventsWithTwoObjects(
-        buildEvents('BuiltinCommonInstructions::OrDistributive'),
-        { aValue: 5, bValue: 0 }
-      );
-      expect(runtimeScene.getVariables().get('OrFired').getAsNumber()).toBe(1);
-      expect(a1.getVariables().get('Touched').getAsNumber()).toBe(1);
+    it('OrDistributive: when both branches true, every A is still picked (union over all branches)', () => {
+      const events2 = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            orDistributiveOf(pickAByVar(2), freeCondition(true)),
+          ],
+          actions: [touchA, setScene('OrFired', 1)],
+          events: [],
+        },
+      ];
+      const { aInsts } = runEventsWithThreeObjectsThreeInstances(events2);
+      // Branch 1 contributes only A2. Branch 2 is unconstrained so it
+      // contributes the parent's full A list (A1, A2, A3). Union = all
+      // three.
+      expect(touchedFlags(aInsts)).toEqual([1, 1, 1]);
     });
 
     it('preserve-picks Or fails on this pattern (expected; documents why a separate condition exists)', () => {
-      // With the regular Or, branch A is false and branch B does not
-      // reference A. No true branch contributed for A, so the bug-fixed Or
-      // leaves the parent's A list at whatever it was at the start of the
-      // Or. Because A is registered by the Or as "empty if just declared",
-      // its list starts empty here — and so the action runs on zero
-      // instances. This is the case where users need OrDistributive.
-      const { a1 } = runEventsWithTwoObjects(
-        buildEvents('BuiltinCommonInstructions::Or'),
-        { aValue: 999, bValue: 0 }
-      );
-      expect(a1.getVariables().get('Touched').getAsNumber()).toBe(0);
+      // With the regular Or, branch 1 is false and branch 2 does not
+      // reference A. No true branch contributed for A, so the bug-fixed
+      // Or leaves A at whatever it was at the start of the Or — and
+      // because A is registered as "empty if just declared", that's an
+      // empty list. The action runs zero times.
+      const events3 = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [orOf(pickAByVar(999), freeCondition(true))],
+          actions: [touchA, setScene('OrFired', 1)],
+          events: [],
+        },
+      ];
+      const { aInsts } = runEventsWithThreeObjectsThreeInstances(events3);
+      expect(touchedFlags(aInsts)).toEqual([0, 0, 0]);
     });
   });
 
-  /* ------------------------------------------------------------------ */
+  /* ================================================================== */
   /* 5. "Score on trigger" — OrDistributive lets unrelated objects be   */
   /*    available regardless of which branch fired.                     */
-  /* ------------------------------------------------------------------ */
+  /* ================================================================== */
   describe('OrDistributive — score-on-trigger (unrelated object stays available)', () => {
-    // Same pattern as Input/Button but the action targets ObjectB while the
-    // branches test ObjectA / a free condition. With OrDistributive,
-    // ObjectB stays unconstrained and the action runs on it.
     const events = [
       {
         type: 'BuiltinCommonInstructions::Standard',
-        conditions: [
-          {
-            type: { value: 'BuiltinCommonInstructions::OrDistributive' },
-            parameters: [],
-            subInstructions: [pickAByVar(5), freeCondition(true)],
-          },
-        ],
+        conditions: [orDistributiveOf(pickAByVar(2), freeCondition(true))],
+        // Action acts on B although neither branch references B.
         actions: [touchB, setScene('OrFired', 1)],
         events: [],
       },
     ];
 
-    it('action acts on ObjectB even though no branch references it', () => {
-      const { runtimeScene, b1 } = runEventsWithTwoObjects(events, {
-        aValue: 999,
-        bValue: 42,
-      });
+    it('action acts on every B instance even though no branch references B', () => {
+      const { runtimeScene, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
       expect(runtimeScene.getVariables().get('OrFired').getAsNumber()).toBe(1);
-      expect(b1.getVariables().get('Touched').getAsNumber()).toBe(1);
+      expect(touchedFlags(bInsts)).toEqual([1, 1, 1]);
     });
   });
 
-  /* ------------------------------------------------------------------ */
+  /* ================================================================== */
   /* 6. Sanity check: OrDistributive is NOT a drop-in replacement for   */
-  /*    Or in the Door/Coin pattern. This test documents that distributive */
-  /*    Or, when used on Door/Coin, "leaks" the unrelated-branch object */
-  /*    into the action — which is exactly why we keep both operators.  */
-  /* ------------------------------------------------------------------ */
+  /*    Or in the Door/Coin pattern. This test documents the leak.       */
+  /* ================================================================== */
   describe('OrDistributive — Door/Coin shows why both operators are needed', () => {
+    // Branch 1 picks A=2. Branch 2 picks B=999 (false). With distributive
+    // semantics, branch 1 leaves B unconstrained and contributes B's
+    // entire parent list, so the action ends up touching every B.
     const events = [
       {
         type: 'BuiltinCommonInstructions::Standard',
-        conditions: [
-          {
-            type: { value: 'BuiltinCommonInstructions::OrDistributive' },
-            parameters: [],
-            subInstructions: [pickAByVar(5), pickBByVar(7)],
-          },
-        ],
+        conditions: [orDistributiveOf(pickAByVar(2), pickBByVar(999))],
         actions: [touchA, touchB],
         events: [],
       },
     ];
 
-    it('only A matches: OrDistributive still touches B (use regular Or for this case)', () => {
-      // Branch A picks A=5. Branch B is false. Distributive Or keeps B
-      // unconstrained for branch A's contribution, so B ends up picked too.
-      // This is the documented mis-fit between distributive Or and the
-      // Door/Coin pattern.
-      const { a1, b1 } = runEventsWithTwoObjects(events, {
-        aValue: 5,
-        bValue: 999,
-      });
-      expect(a1.getVariables().get('Touched').getAsNumber()).toBe(1);
-      expect(b1.getVariables().get('Touched').getAsNumber()).toBe(1);
+    it('only A=2 matches but distributive Or also touches every B (use regular Or for this case)', () => {
+      const { aInsts, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([0, 1, 0]);
+      expect(touchedFlags(bInsts)).toEqual([1, 1, 1]);
+    });
+  });
+
+  /* ================================================================== */
+  /* 7. Branches with `And` — a single branch can constrain several     */
+  /*    objects at once. The branch is true only when every             */
+  /*    sub-condition is true; when true, every sub-condition's picks   */
+  /*    contribute to the corresponding object's picked list.           */
+  /* ================================================================== */
+  describe('Or — branches with And { picks A and B together }', () => {
+    it('Or: each true And-branch contributes its own A and B picks; others untouched', () => {
+      // Branch 1: And{A=1, B=1} — both match → branch 1 true → contribute
+      // A1, B1.
+      // Branch 2: And{A=3, B=3} — both match → branch 2 true → contribute
+      // A3, B3.
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            orOf(
+              andOf(pickAByVar(1), pickBByVar(1)),
+              andOf(pickAByVar(3), pickBByVar(3))
+            ),
+          ],
+          actions: [touchA, touchB],
+          events: [],
+        },
+      ];
+      const { aInsts, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([1, 0, 1]);
+      expect(touchedFlags(bInsts)).toEqual([1, 0, 1]);
+    });
+
+    it('Or: And-branch is false if any sub-condition fails → no contribution from that branch', () => {
+      // Branch 1: And{A=1, B=1} — both match → contribute A1, B1.
+      // Branch 2: And{A=2, B=999} — A=2 picks A2 but B=999 picks nothing,
+      //                              so And is false → no contribution.
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            orOf(
+              andOf(pickAByVar(1), pickBByVar(1)),
+              andOf(pickAByVar(2), pickBByVar(999))
+            ),
+          ],
+          actions: [touchA, touchB],
+          events: [],
+        },
+      ];
+      const { aInsts, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([1, 0, 0]);
+      expect(touchedFlags(bInsts)).toEqual([1, 0, 0]);
+    });
+  });
+
+  describe('OrDistributive — branches with And { picks A and B together }', () => {
+    it('OrDistributive: each true And-branch is symmetric to Or because every branch references both A and B', () => {
+      // When every branch references every object in the union, the
+      // unconstrained-fill of OrDistributive does not engage and the
+      // result is identical to the regular Or above.
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            orDistributiveOf(
+              andOf(pickAByVar(1), pickBByVar(1)),
+              andOf(pickAByVar(3), pickBByVar(3))
+            ),
+          ],
+          actions: [touchA, touchB],
+          events: [],
+        },
+      ];
+      const { aInsts, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([1, 0, 1]);
+      expect(touchedFlags(bInsts)).toEqual([1, 0, 1]);
+    });
+
+    it('OrDistributive: asymmetric branches — branch with And{A=1} leaves B unconstrained, the lone B-branch leaves A unconstrained', () => {
+      // Branch 1: And{A=1} — references only A; B is unconstrained for
+      //   this branch (contributes the parent's full B list when branch
+      //   is true).
+      // Branch 2: pickB=2 — references only B; A is unconstrained for
+      //   this branch (contributes the parent's full A list when branch
+      //   is true).
+      // Both branches are true → every A and every B end up in the union.
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            orDistributiveOf(andOf(pickAByVar(1)), pickBByVar(2)),
+          ],
+          actions: [touchA, touchB],
+          events: [],
+        },
+      ];
+      const { aInsts, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([1, 1, 1]);
+      expect(touchedFlags(bInsts)).toEqual([1, 1, 1]);
+    });
+
+    it('OrDistributive: same asymmetric branches with the regular Or only touch the picked instances', () => {
+      // Same shape as above but with the preserve-picks Or — branches
+      // contribute only what they actually picked, so only A1 and B2
+      // are touched.
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [orOf(andOf(pickAByVar(1)), pickBByVar(2))],
+          actions: [touchA, touchB],
+          events: [],
+        },
+      ];
+      const { aInsts, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([1, 0, 0]);
+      expect(touchedFlags(bInsts)).toEqual([0, 1, 0]);
+    });
+  });
+
+  /* ================================================================== */
+  /* 8. Unrelated objects — picks for objects the Or doesn't reference  */
+  /*    are never disturbed. ObjectC is picked by a sibling top-level   */
+  /*    event whose conditions reference only C, and that should yield  */
+  /*    the same C picks regardless of how the Or above behaved.        */
+  /* ================================================================== */
+  describe('Or / OrDistributive — unrelated ObjectC is picked independently', () => {
+    const buildTwoEvents = (orWrapper) => [
+      // Event 1 — exercises Or behavior on A and B. ObjectC is never
+      // mentioned in this event.
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [orWrapper(pickAByVar(2), pickBByVar(2))],
+        actions: [touchA, touchB],
+        events: [],
+      },
+      // Event 2 — sibling event picking ObjectC by its variable. This
+      // event has no relation to the Or above; its picks must be
+      // unaffected by what happened in event 1.
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [pickCByVar(3)],
+        actions: [touchC],
+        events: [],
+      },
+    ];
+
+    it('Or: ObjectC=3 is picked independently of the Or on A and B', () => {
+      const { aInsts, bInsts, cInsts } =
+        runEventsWithThreeObjectsThreeInstances(buildTwoEvents(orOf));
+      expect(touchedFlags(aInsts)).toEqual([0, 1, 0]);
+      expect(touchedFlags(bInsts)).toEqual([0, 1, 0]);
+      expect(touchedFlags(cInsts)).toEqual([0, 0, 1]);
+    });
+
+    it('OrDistributive: ObjectC=3 is picked independently of the OrDistributive on A and B', () => {
+      const { cInsts } = runEventsWithThreeObjectsThreeInstances(
+        buildTwoEvents(orDistributiveOf)
+      );
+      expect(touchedFlags(cInsts)).toEqual([0, 0, 1]);
+    });
+
+    it('Or with Or false: ObjectC is still picked correctly by the sibling event', () => {
+      // The Or in event 1 is false, so event 1's actions do not run. The
+      // sibling event 2 picks ObjectC normally because event contexts
+      // are independent.
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [orOf(pickAByVar(999), pickBByVar(999))],
+          actions: [touchA, touchB],
+          events: [],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [pickCByVar(1)],
+          actions: [touchC],
+          events: [],
+        },
+      ];
+      const { aInsts, bInsts, cInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([0, 0, 0]);
+      expect(touchedFlags(bInsts)).toEqual([0, 0, 0]);
+      expect(touchedFlags(cInsts)).toEqual([1, 0, 0]);
     });
   });
 });

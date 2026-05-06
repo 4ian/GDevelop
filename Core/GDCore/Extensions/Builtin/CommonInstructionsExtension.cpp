@@ -67,8 +67,35 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
           _("Checks if at least one sub-condition is true. If no "
             "sub-condition is specified, it will always be false. "
             "This is rarely used — multiple events and sub-events are "
-            "usually a better approach."),
+            "usually a better approach.\n\n"
+            "Picked objects: each branch contributes the objects it "
+            "actually picked. Objects that no true branch referenced are "
+            "left as they were before the Or."),
           _("If one of these conditions is true:"),
+          "",
+          "res/conditions/or24_black.png",
+          "res/conditions/or_black.png")
+      .SetCanHaveSubInstructions()
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition(
+          "OrDistributive",
+          _("Or (independent object picking)"),
+          _("Checks if at least one sub-condition is true, while keeping "
+            "object picking independent across branches. A branch that "
+            "does not constrain a given object behaves as if all instances "
+            "of that object were picked for that branch (instead of "
+            "contributing nothing).\n\n"
+            "Use this when the action acts on objects that are unrelated "
+            "to the branch that fired (for example: \"text input was "
+            "submitted OR submit button was clicked\" → read the text "
+            "input). Do not use this when the action should act only on "
+            "the specific object whose state was tested in the branch "
+            "that fired (for example: \"door collided OR coin collided\" "
+            "→ hide the touched object) — use the regular Or for that."),
+          _("If one of these conditions is true (independent object "
+            "picking):"),
           "",
           "res/conditions/or24_black.png",
           "res/conditions/or_black.png")

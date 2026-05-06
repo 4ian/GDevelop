@@ -33,7 +33,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           "",
           "res/functions/expression_black.svg",
           "res/functions/expression_black.svg")
-      .SetHelpPath("/all-features/advanced/reference/#actions")
+      .SetHelpPath("events/functions/#return-a-value-from-a-function")
       .AddParameter("expression", _("The number to be returned"))
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();

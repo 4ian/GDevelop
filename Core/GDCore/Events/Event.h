@@ -118,26 +118,6 @@ class GD_CORE_API BaseEvent {
   bool HasVariables() const;
 
   /**
-   * \brief Return the instruction list identified by \a label, or nullptr if
-   * the event has no such list.
-   *
-   * Supported labels are "conditions", "actions", and "whileConditions" (only
-   * for WhileEvent). Derived classes should override this; the base
-   * implementation always returns nullptr.
-   */
-  virtual gd::InstructionsList* GetInstructionList(const gd::String& label) {
-    return nullptr;
-  };
-  virtual const gd::InstructionsList* GetInstructionList(
-      const gd::String& label) const {
-    return nullptr;
-  };
-
-  static const gd::String conditionsLabel;
-  static const gd::String actionsLabel;
-  static const gd::String whileConditionsLabel;
-
-  /**
    * \brief Return a list of all conditions of the event.
    * \note Used to preprocess or search in the conditions.
    */

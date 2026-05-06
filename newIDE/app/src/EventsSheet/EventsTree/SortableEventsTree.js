@@ -64,7 +64,6 @@ type Props = {|
   searchFocusOffset?: ?number,
   searchFocusedEvent?: ?gdBaseEvent,
   className?: string,
-  eventsSheetWidth?: number,
   reactVirtualizedListProps?: {
     ref?: (list: {
       scrollToRow: (row: number) => void,
@@ -366,7 +365,6 @@ const SortableEventsTree = ({
   searchFocusOffset,
   searchFocusedEvent,
   className,
-  eventsSheetWidth,
   reactVirtualizedListProps,
 }: Props): React.MixedElement => {
   // $FlowFixMe[value-as-type]
@@ -392,7 +390,7 @@ const SortableEventsTree = ({
     [flatData, searchMethod, searchQuery]
   );
 
-  React.useLayoutEffect(
+  React.useEffect(
     () => {
       if (!reactVirtualizedListProps || !reactVirtualizedListProps.ref) return;
       reactVirtualizedListProps.ref({
@@ -466,7 +464,7 @@ const SortableEventsTree = ({
 
   return (
     <div className={className}>
-      <AutoSizer defaultWidth={eventsSheetWidth || 0}>
+      <AutoSizer>
         {({ width, height }) => (
           <VariableSizeList
             ref={listRef}
@@ -479,7 +477,6 @@ const SortableEventsTree = ({
             itemData={itemData}
             itemKey={itemKey}
             onScroll={handleScroll}
-            overscanCount={10}
           >
             {TreeRow}
           </VariableSizeList>

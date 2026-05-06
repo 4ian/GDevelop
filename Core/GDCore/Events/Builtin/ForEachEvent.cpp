@@ -21,19 +21,6 @@ ForEachEvent::ForEachEvent()
       limit(""),
       variables(gd::VariablesContainer::SourceType::Local) {}
 
-gd::InstructionsList* ForEachEvent::GetInstructionList(
-    const gd::String& label) {
-  if (label == BaseEvent::conditionsLabel) return &conditions;
-  if (label == BaseEvent::actionsLabel) return &actions;
-  return nullptr;
-}
-const gd::InstructionsList* ForEachEvent::GetInstructionList(
-    const gd::String& label) const {
-  if (label == BaseEvent::conditionsLabel) return &conditions;
-  if (label == BaseEvent::actionsLabel) return &actions;
-  return nullptr;
-}
-
 vector<gd::InstructionsList*> ForEachEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;
   allConditions.push_back(&conditions);

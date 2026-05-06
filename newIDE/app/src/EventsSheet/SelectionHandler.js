@@ -48,7 +48,11 @@ export type SelectionState = {|
   selectedEvents: Array<EventContext>,
 |};
 
-export const getInitialSelection = (): SelectionState => {
+export const getInitialSelection = (): {
+  selectedEvents: Array<empty>,
+  selectedInstructions: Array<empty>,
+  selectedInstructionsLists: Array<empty>,
+} => {
   return {
     selectedInstructions: [],
     selectedEvents: [],
@@ -338,7 +342,11 @@ export const selectInstructionsList = (
 
 export const selectEventsAfterHistoryChange = (
   eventContexts: Array<EventContext>
-): SelectionState => {
+): {
+  selectedEvents: Array<empty>,
+  selectedInstructions: Array<empty>,
+  selectedInstructionsLists: Array<empty>,
+} => {
   let newSelection = getInitialSelection();
 
   eventContexts.forEach(eventContext => {

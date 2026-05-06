@@ -394,11 +394,19 @@ namespace gdjs {
     }
 
     getViewportOriginX(): float {
-      return this._customObject.getUnscaledCenterX();
+      // We don't use `getUnscaledCenterX` because of custom center.
+      return (
+        this._customObject.getInnerAreaMinX() +
+        this._customObject.getInnerAreaMaxX()
+      ) / 2;
     }
 
     getViewportOriginY(): float {
-      return this._customObject.getUnscaledCenterY();
+      // We don't use `getUnscaledCenterY` because of custom center.
+      return (
+        this._customObject.getInnerAreaMinY() +
+        this._customObject.getInnerAreaMaxY()
+      ) / 2;
     }
 
     onChildrenLocationChanged(): void {

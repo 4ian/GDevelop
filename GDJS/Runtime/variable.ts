@@ -17,6 +17,9 @@ namespace gdjs {
    * @category Core Engine > Variables
    */
   export class Variable {
+    // Set by RuntimeGame on startup based on project properties.
+    static useDeprecatedZeroAsDefaultStringVariable: boolean = false;
+
     // TODO: convert this to an integer to speed up the type checks at runtime.
     _type: VariableType = 'number';
     _value: float = 0;
@@ -54,7 +57,11 @@ namespace gdjs {
           // Protect against NaN.
           if (this._value !== this._value) this._value = 0;
         } else if (this._type === 'string') {
-          this._str = '' + varData.value || '0';
+          this._str = gdjs.Variable.useDeprecatedZeroAsDefaultStringVariable
+            ? '' + varData.value || '0'
+            : varData.value !== undefined
+              ? '' + varData.value
+              : '';
         } else if (this._type === 'boolean') {
           this._bool = !!varData.value;
         } else if (this._type === 'structure') {

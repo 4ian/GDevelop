@@ -450,7 +450,7 @@ const Instruction = (props: Props): React.Node => {
   const dragAllowed = screenType !== 'touch';
 
   // Allow a long press to show the context menu
-  const longTouchForContextMenuProps = useLongTouch(
+  const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
     React.useCallback(
       event => {
         onContextMenu(event.clientX, event.clientY);

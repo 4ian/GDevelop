@@ -180,6 +180,22 @@ class GD_CORE_API ParameterMetadata {
     return *this;
   }
 
+  /**
+   * \brief Get the hint attached to the parameter. Hints are short reminders
+   * about how the parameter should be used (e.g. "object timers must be
+   * started manually"). They can be surfaced by tooling, documentation or
+   * AI/LLM agents.
+   */
+  const gd::String &GetHint() const { return hint; }
+
+  /**
+   * \brief Set a hint attached to the parameter. See GetHint.
+   */
+  ParameterMetadata &SetHint(const gd::String &hint_) {
+    hint = hint_;
+    return *this;
+  }
+
   // TODO Remove these deprecated functions.
 
   /**
@@ -249,6 +265,8 @@ class GD_CORE_API ParameterMetadata {
  private:
   gd::ValueTypeMetadata valueTypeMetadata; ///< Parameter type
   gd::String longDescription;  ///< Long description shown in the editor.
+  gd::String hint;             ///< Reminder/hint about the parameter's usage,
+                               ///< usable by tooling, docs and AI agents.
   gd::String name;             ///< The name of the parameter to be used in code
                                ///< generation. Optional.
 };

@@ -160,6 +160,9 @@ export default class CommentEvent extends React.Component<
         style={{
           ...styles.container,
           backgroundColor,
+          borderRadius:
+            this.props.screenType === 'touch' ? '0 1px 1px 0' : '0 2px 2px 0',
+          overflow: 'hidden',
         }}
         onClick={this.edit}
         onKeyUp={event => {

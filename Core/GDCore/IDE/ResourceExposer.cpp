@@ -15,6 +15,7 @@
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/Object.h"
 #include "GDCore/String.h"
 
 namespace gd {
@@ -89,11 +90,20 @@ void ResourceExposer::ExposeProjectResources(
 }
 
 void ResourceExposer::ExposeLayoutResources(
-    gd::Project &project,
-    gd::Layout &layout,
+    gd::Project &project, gd::Layout &layout,
     gd::ArbitraryResourceWorker &worker) {
+  std::function<bool(const gd::Object &)> shouldCheckObject =
+      [](const gd::Object &object) { return true; };
+  gd::ResourceExposer::ExposeLayoutResources(project, layout, worker,
+                                             shouldCheckObject);
+}
+
+void ResourceExposer::ExposeLayoutResources(
+    gd::Project &project, gd::Layout &layout,
+    gd::ArbitraryResourceWorker &worker,
+    std::function<bool(const gd::Object &)> &shouldCheckObject) {
   // Expose object configuration resources
-  auto objectWorker = gd::GetResourceWorkerOnObjects(project, worker);
+  auto objectWorker = gd::GetResourceWorkerOnObjects(project, worker, shouldCheckObject);
   gd::ProjectBrowserHelper::ExposeLayoutObjects(layout, objectWorker);
 
   // Expose layer effect resources

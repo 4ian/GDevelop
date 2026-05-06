@@ -359,6 +359,7 @@ export type Course = {|
   shortDescriptionByLocale: MessageByLocale,
   levelByLocale: MessageByLocale,
   introByLocale?: MessageByLocale,
+  videoPosition?: 'top' | 'bottom',
 
   isLocked?: boolean,
   includedInSubscriptions: string[],

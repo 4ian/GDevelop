@@ -534,4 +534,110 @@ describe('applyVariableChange', () => {
       `);
     });
   });
+
+  describe('JSON value replaces existing data', () => {
+    it('replaces a whole structure (root and nested) with new JSON, dropping old fields', () => {
+      // Pre-populate a structure with multiple children, including a nested one.
+      const root = variablesContainer.insertNew('player', 0);
+      root.castTo('Structure');
+      root.getChild('hp').setValue(10);
+      root.getChild('name').setString('Hero');
+      const stats = root.getChild('stats');
+      stats.castTo('Structure');
+      stats.getChild('strength').setValue(5);
+      stats.getChild('agility').setValue(7);
+
+      // Replace the whole root structure: only "newContent" should remain.
+      applyVariableChange({
+        variablePath: 'player',
+        forcedVariableType: null,
+        variablesContainer,
+        value: '{"newContent": 123}',
+      });
+
+      const replacedRoot = variablesContainer.get('player');
+      expect(replacedRoot.getType()).toBe(gd.Variable.Structure);
+      expect(replacedRoot.getAllChildrenNames().size()).toBe(1);
+      expect(replacedRoot.hasChild('newContent')).toBe(true);
+      expect(replacedRoot.getChild('newContent').getValue()).toBe(123);
+      expect(replacedRoot.hasChild('hp')).toBe(false);
+      expect(replacedRoot.hasChild('name')).toBe(false);
+      expect(replacedRoot.hasChild('stats')).toBe(false);
+
+      // Re-populate to test nested replacement: only the nested subtree
+      // should be replaced, siblings at the parent level must be preserved.
+      replacedRoot.getChild('hp').setValue(10);
+      const newStats = replacedRoot.getChild('stats');
+      newStats.castTo('Structure');
+      newStats.getChild('strength').setValue(5);
+      newStats.getChild('agility').setValue(7);
+
+      applyVariableChange({
+        variablePath: 'player.stats',
+        forcedVariableType: null,
+        variablesContainer,
+        value: '{"luck": 99}',
+      });
+
+      // Siblings of the replaced subtree are intact.
+      expect(replacedRoot.hasChild('hp')).toBe(true);
+      expect(replacedRoot.getChild('hp').getValue()).toBe(10);
+      expect(replacedRoot.hasChild('newContent')).toBe(true);
+      // The replaced nested structure only has the new field.
+      const replacedStats = replacedRoot.getChild('stats');
+      expect(replacedStats.getType()).toBe(gd.Variable.Structure);
+      expect(replacedStats.getAllChildrenNames().size()).toBe(1);
+      expect(replacedStats.hasChild('luck')).toBe(true);
+      expect(replacedStats.getChild('luck').getValue()).toBe(99);
+      expect(replacedStats.hasChild('strength')).toBe(false);
+      expect(replacedStats.hasChild('agility')).toBe(false);
+    });
+
+    it('replaces a whole array (root and nested) with new JSON, dropping old elements', () => {
+      // Pre-populate an array with multiple items, plus a nested array.
+      const root = variablesContainer.insertNew('inventory', 0);
+      root.castTo('Array');
+      root.pushNew().setString('Sword');
+      root.pushNew().setString('Shield');
+      root.pushNew().setString('Potion');
+      const nested = variablesContainer.insertNew('matrix', 0);
+      nested.castTo('Structure');
+      const row = nested.getChild('row');
+      row.castTo('Array');
+      row.pushNew().setValue(1);
+      row.pushNew().setValue(2);
+      row.pushNew().setValue(3);
+
+      // Replace the whole root array: only the new elements should remain.
+      applyVariableChange({
+        variablePath: 'inventory',
+        forcedVariableType: null,
+        variablesContainer,
+        value: '["NewItem"]',
+      });
+
+      const replacedRoot = variablesContainer.get('inventory');
+      expect(replacedRoot.getType()).toBe(gd.Variable.Array);
+      expect(replacedRoot.getChildrenCount()).toBe(1);
+      expect(replacedRoot.getAtIndex(0).getString()).toBe('NewItem');
+
+      // Replace a nested array: parent structure's other fields are intact.
+      nested.getChild('label').setString('mainMatrix');
+      applyVariableChange({
+        variablePath: 'matrix.row',
+        forcedVariableType: null,
+        variablesContainer,
+        value: '[42]',
+      });
+
+      // Sibling field on the parent structure is preserved.
+      expect(nested.hasChild('label')).toBe(true);
+      expect(nested.getChild('label').getString()).toBe('mainMatrix');
+      // The replaced nested array only has the new element.
+      const replacedRow = nested.getChild('row');
+      expect(replacedRow.getType()).toBe(gd.Variable.Array);
+      expect(replacedRow.getChildrenCount()).toBe(1);
+      expect(replacedRow.getAtIndex(0).getValue()).toBe(42);
+    });
+  });
 });

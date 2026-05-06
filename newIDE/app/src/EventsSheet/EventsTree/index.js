@@ -6,7 +6,6 @@ import SortableEventsTree, {
   getNodeAtPath,
   type SortableTreeNode,
 } from './SortableEventsTree';
-import { type ConnectDragSource } from 'react-dnd';
 import { mapFor } from '../../Utils/MapFor';
 import { isEventSelected } from '../SelectionHandler';
 import EventsRenderingService from './EventsRenderingService';
@@ -61,6 +60,13 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 const gd: libGDevelop = global.gd;
 
 const eventsSheetEventsDnDType = 'events-sheet-events-dnd-type';
+
+const EventDragSourceAndDropTarget = makeDragSourceAndDropTarget<SortableTreeNode>(
+  eventsSheetEventsDnDType
+);
+const EventDropTarget = makeDropTarget<SortableTreeNode>(
+  eventsSheetEventsDnDType
+);
 
 const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
   ObjectsRenderingService
@@ -167,7 +173,6 @@ type EventsContainerProps = {|
   eventsSheetWidth: number,
   eventsSheetHeight: number,
 
-  connectDragSource: ConnectDragSource,
   windowSize: WindowSizeType,
 
   idPrefix: string,
@@ -177,6 +182,12 @@ type EventsContainerProps = {|
   isValidElseEvent: boolean,
   highlightedSearchText: ?string,
   highlightedSearchMatchCase?: boolean,
+
+  node: SortableTreeNode,
+  isDragged: boolean,
+  onBeginDrag: () => void,
+  onEndDrag: () => void,
+  onTemporaryUnfoldNode: (isOverLazy: boolean) => void,
 |};
 
 /**
@@ -227,7 +238,7 @@ const EventContainer = (props: EventsContainerProps) => {
     [onEventContextMenu]
   );
 
-  const longTouchForContextMenuProps = useLongTouch(
+  const { isPressingRef, contextMenuProps } = useLongTouch(
     React.useCallback(
       (domEvent: any) => {
         onEventContextMenu(domEvent.clientX, domEvent.clientY);
@@ -239,80 +250,139 @@ const EventContainer = (props: EventsContainerProps) => {
 
   const EventComponent = EventsRenderingService.getEventComponent(event);
 
+  const eventType = event.getType();
+  const coloredHandleStyle = (() => {
+    if (eventType === 'BuiltinCommonInstructions::Comment') {
+      const commentEvent = gd.asCommentEvent(event);
+      return {
+        backgroundColor: `rgb(${commentEvent.getBackgroundColorRed()}, ${commentEvent.getBackgroundColorGreen()}, ${commentEvent.getBackgroundColorBlue()})`,
+        filter: 'brightness(0.8)',
+      };
+    }
+    if (eventType === 'BuiltinCommonInstructions::Group') {
+      const groupEvent = gd.asGroupEvent(event);
+      return {
+        backgroundColor: `rgb(${groupEvent.getBackgroundColorR()}, ${groupEvent.getBackgroundColorG()}, ${groupEvent.getBackgroundColorB()})`,
+        filter: 'brightness(0.8)',
+      };
+    }
+    return undefined;
+  })();
+
   return (
-    <div
-      ref={containerRef}
-      onClick={props.onEventClick}
-      onContextMenu={_onEventContextMenu}
-      {...longTouchForContextMenuProps}
+    <EventDragSourceAndDropTarget
+      beginDrag={() => {
+        // During a long-press (which will open the context menu on mobile), suppress
+        // the drag by returning an item with no data. We cannot block canDrag()
+        // instead, because react-dnd-touch-backend evaluates canDrag() once (after its
+        // delayTouchStart of 100ms), at which point isPressingRef is always true — so
+        // blocking canDrag() would permanently break drags on mobile.
+        if (isPressingRef.current) {
+          // $FlowFixMe[incompatible-type]
+          return {};
+        }
+        props.onBeginDrag();
+        // $FlowFixMe[incompatible-type]
+        return props.node;
+      }}
+      canDrag={() => !!props.node && !!props.node.event}
+      canDrop={() => true}
+      drop={() => {}}
+      endDrag={props.onEndDrag}
     >
-      {!!EventComponent && (
-        <div style={styles.eventComponentContainer}>
-          {props.connectDragSource(
-            <div
-              className={classNames({
-                [handle]: true,
-                [aiGeneratedEventHandle]: highlightedAiGeneratedEventIds.has(
-                  event.getAiGeneratedEventId()
-                ),
-              })}
-              style={{ position: 'relative' }}
-            >
-              {props.hasBreakpoint && <div style={styles.breakpointDot} />}
-            </div>
-          )}
+      {({ connectDragSource, connectDropTarget, isOverLazy }) => {
+        props.onTemporaryUnfoldNode(isOverLazy);
+        const content = (
           <div
-            style={
-              props.isPausedOn
-                ? { ...styles.container, ...styles.pausedContainerOverlay }
-                : styles.container
-            }
+            ref={containerRef}
+            onClick={props.onEventClick}
+            onContextMenu={_onEventContextMenu}
+            {...contextMenuProps}
           >
-            {props.isPausedOn && <div style={styles.pausedLeftBar} />}
-            <EventComponent
-              project={project}
-              scope={scope}
-              event={event}
-              globalObjectsContainer={props.globalObjectsContainer}
-              objectsContainer={props.objectsContainer}
-              projectScopedContainersAccessor={projectScopedContainersAccessor}
-              selected={isEventSelected(props.selection, event)}
-              selection={props.selection}
-              leftIndentWidth={props.leftIndentWidth}
-              onUpdate={_onUpdate}
-              onAddNewInstruction={props.onAddNewInstruction}
-              onPasteInstructions={props.onPasteInstructions}
-              onMoveToInstruction={props.onMoveToInstruction}
-              onMoveToInstructionsList={props.onMoveToInstructionsList}
-              onInstructionClick={props.onInstructionClick}
-              onInstructionDoubleClick={props.onInstructionDoubleClick}
-              onInstructionContextMenu={props.onInstructionContextMenu}
-              onAddInstructionContextMenu={props.onAddInstructionContextMenu}
-              onVariableDeclarationClick={props.onVariableDeclarationClick}
-              onVariableDeclarationDoubleClick={
-                props.onVariableDeclarationDoubleClick
-              }
-              onEndEditingEvent={props.onEndEditingEvent}
-              onParameterClick={props.onParameterClick}
-              onOpenExternalEvents={props.onOpenExternalEvents}
-              onOpenLayout={props.onOpenLayout}
-              disabled={
-                disabled /* Use disabled (not event.disabled) as it is true if a parent event is disabled*/
-              }
-              renderObjectThumbnail={props.renderObjectThumbnail}
-              screenType={props.screenType}
-              eventsSheetWidth={props.eventsSheetWidth}
-              eventsSheetHeight={props.eventsSheetHeight}
-              windowSize={props.windowSize}
-              idPrefix={props.idPrefix}
-              isValidElseEvent={props.isValidElseEvent}
-              highlightedSearchText={props.highlightedSearchText}
-              highlightedSearchMatchCase={props.highlightedSearchMatchCase}
-            />
+            {!!EventComponent && (
+              <div style={styles.eventComponentContainer}>
+                {connectDragSource(
+                  <div
+                    className={classNames({
+                      [handle]: true,
+                      [aiGeneratedEventHandle]: highlightedAiGeneratedEventIds.has(
+                        event.getAiGeneratedEventId()
+                      ),
+                    })}
+                    style={coloredHandleStyle || { position: 'relative' }}
+                  >
+                    {props.hasBreakpoint && (
+                      <div style={styles.breakpointDot} />
+                    )}
+                  </div>
+                )}
+                <div
+                  style={
+                    props.isPausedOn
+                      ? {
+                          ...styles.container,
+                          ...styles.pausedContainerOverlay,
+                        }
+                      : styles.container
+                  }
+                >
+                  {props.isPausedOn && <div style={styles.pausedLeftBar} />}
+                  <EventComponent
+                    project={project}
+                    scope={scope}
+                    event={event}
+                    globalObjectsContainer={props.globalObjectsContainer}
+                    objectsContainer={props.objectsContainer}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    selected={isEventSelected(props.selection, event)}
+                    selection={props.selection}
+                    leftIndentWidth={props.leftIndentWidth}
+                    onUpdate={_onUpdate}
+                    onAddNewInstruction={props.onAddNewInstruction}
+                    onPasteInstructions={props.onPasteInstructions}
+                    onMoveToInstruction={props.onMoveToInstruction}
+                    onMoveToInstructionsList={props.onMoveToInstructionsList}
+                    onInstructionClick={props.onInstructionClick}
+                    onInstructionDoubleClick={props.onInstructionDoubleClick}
+                    onInstructionContextMenu={props.onInstructionContextMenu}
+                    onAddInstructionContextMenu={
+                      props.onAddInstructionContextMenu
+                    }
+                    onVariableDeclarationClick={
+                      props.onVariableDeclarationClick
+                    }
+                    onVariableDeclarationDoubleClick={
+                      props.onVariableDeclarationDoubleClick
+                    }
+                    onEndEditingEvent={props.onEndEditingEvent}
+                    onParameterClick={props.onParameterClick}
+                    onOpenExternalEvents={props.onOpenExternalEvents}
+                    onOpenLayout={props.onOpenLayout}
+                    disabled={
+                      disabled /* Use disabled (not event.disabled) as it is true if a parent event is disabled*/
+                    }
+                    renderObjectThumbnail={props.renderObjectThumbnail}
+                    screenType={props.screenType}
+                    eventsSheetWidth={props.eventsSheetWidth}
+                    eventsSheetHeight={props.eventsSheetHeight}
+                    windowSize={props.windowSize}
+                    idPrefix={props.idPrefix}
+                    isValidElseEvent={props.isValidElseEvent}
+                    highlightedSearchText={props.highlightedSearchText}
+                    highlightedSearchMatchCase={
+                      props.highlightedSearchMatchCase
+                    }
+                  />
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
-    </div>
+        );
+        return props.isDragged ? content : connectDropTarget(content);
+      }}
+    </EventDragSourceAndDropTarget>
   );
 };
 
@@ -451,15 +521,6 @@ const EventsTree: React.ComponentType<{
   const _list = React.useRef<?any>(null);
   const eventsHeightsCache = React.useMemo(() => new EventHeightsCache(), []);
 
-  const DragSourceAndDropTarget = React.useMemo(
-    () =>
-      makeDragSourceAndDropTarget<SortableTreeNode>(eventsSheetEventsDnDType),
-    []
-  );
-  const DropTarget = React.useMemo(
-    () => makeDropTarget<SortableTreeNode>(eventsSheetEventsDnDType),
-    []
-  );
   const temporaryUnfoldedNodes = React.useRef<Array<SortableTreeNode>>([]);
   const _hoverTimerId = React.useRef<?TimeoutID>(null);
 
@@ -538,14 +599,6 @@ const EventsTree: React.ComponentType<{
     () => getTutorial(props.preferences, props.tutorials, 'the-events'),
     [props.preferences, props.tutorials]
   );
-
-  const _canDrag = React.useCallback((node: ?SortableTreeNode) => {
-    return !!node && !!node.event;
-  }, []);
-
-  const _canDrop = React.useCallback((hoveredNode: SortableTreeNode) => {
-    return true;
-  }, []);
 
   const _restoreFoldedNodes = React.useCallback(
     () => {
@@ -691,184 +744,148 @@ const EventsTree: React.ComponentType<{
       !!draggedNode &&
       // $FlowFixMe[invalid-compare]
       (isDescendant(draggedNode, node) || node.key === draggedNode.key);
+
+    const eventContext = {
+      eventsList: node.eventsList,
+      event: event,
+      indexInList: node.indexInList,
+      projectScopedContainersAccessor: node.projectScopedContainersAccessor,
+    };
+
     return (
-      <DragSourceAndDropTarget
-        beginDrag={() => {
-          // $FlowFixMe[incompatible-type]
-          setDraggedNode(node);
-          return node;
+      <div
+        style={{
+          opacity: isDragged ? 0.5 : 1,
+          ...getEventContainerStyle(props.windowSize),
         }}
-        canDrag={() => _canDrag(node)}
-        canDrop={() => _canDrop(node)}
-        // Drop operations are handled by DropContainers.
-        drop={() => {
-          return;
-        }}
-        endDrag={_onEndDrag}
+        {...dataObjectToProps({ rowIndex: node.rowIndex.toString() })}
       >
-        {({ connectDragSource, connectDropTarget, isOverLazy }) => {
-          temporaryUnfoldNode(isOverLazy, node);
-
-          const eventContext = {
-            eventsList: node.eventsList,
-            event: event,
-            indexInList: node.indexInList,
-            projectScopedContainersAccessor:
-              node.projectScopedContainersAccessor,
-          };
-
-          const dropTarget = (
-            <div
-              style={{
-                opacity: isDragged ? 0.5 : 1,
-                ...getEventContainerStyle(props.windowSize),
-              }}
-              {...dataObjectToProps({ rowIndex: node.rowIndex.toString() })}
-            >
-              <EventContainer
-                project={props.project}
-                scope={props.scope}
-                globalObjectsContainer={props.globalObjectsContainer}
-                objectsContainer={props.objectsContainer}
-                projectScopedContainersAccessor={
-                  node.projectScopedContainersAccessor
-                }
-                event={event}
-                key={event.ptr}
-                eventsHeightsCache={eventsHeightsCache}
-                selection={props.selection}
-                leftIndentWidth={
-                  depth * (getIndentWidth(props.windowSize) * props.indentScale)
-                }
-                onUpdate={forceUpdate}
-                onAddNewInstruction={instructionsListContext =>
-                  props.onAddNewInstruction(
-                    eventContext,
-                    instructionsListContext
-                  )
-                }
-                onPasteInstructions={instructionsListContext =>
-                  props.onPasteInstructions(
-                    eventContext,
-                    instructionsListContext
-                  )
-                }
-                onMoveToInstruction={instructionContext =>
-                  props.onMoveToInstruction(eventContext, instructionContext)
-                }
-                onMoveToInstructionsList={instructionContext =>
-                  props.onMoveToInstructionsList(
-                    eventContext,
-                    instructionContext
-                  )
-                }
-                onInstructionClick={instructionContext =>
-                  props.onInstructionClick(eventContext, instructionContext)
-                }
-                onInstructionDoubleClick={instructionContext =>
-                  props.onInstructionDoubleClick(
-                    eventContext,
-                    instructionContext
-                  )
-                }
-                onParameterClick={parameterContext =>
-                  props.onParameterClick(eventContext, parameterContext)
-                }
-                onVariableDeclarationClick={variableDeclarationContext =>
-                  props.onVariableDeclarationClick(
-                    eventContext,
-                    variableDeclarationContext
-                  )
-                }
-                onVariableDeclarationDoubleClick={variableDeclarationContext =>
-                  props.onVariableDeclarationDoubleClick(
-                    eventContext,
-                    variableDeclarationContext
-                  )
-                }
-                onEventClick={() =>
-                  props.onEventClick({
-                    eventsList: node.eventsList,
-                    event: event,
-                    indexInList: node.indexInList,
-                    projectScopedContainersAccessor:
-                      node.projectScopedContainersAccessor,
-                  })
-                }
-                onEndEditingEvent={() => props.onEndEditingEvent(event)}
-                onEventContextMenu={(x, y) =>
-                  props.onEventContextMenu(x, y, {
-                    eventsList: node.eventsList,
-                    event: event,
-                    indexInList: node.indexInList,
-                    projectScopedContainersAccessor:
-                      node.projectScopedContainersAccessor,
-                  })
-                }
-                onInstructionContextMenu={(...args) =>
-                  props.onInstructionContextMenu(eventContext, ...args)
-                }
-                onAddInstructionContextMenu={(...args) =>
-                  props.onAddInstructionContextMenu(eventContext, ...args)
-                }
-                onOpenExternalEvents={props.onOpenExternalEvents}
-                onOpenLayout={(name: string) => {
-                  props.onOpenLayout(name);
-                }}
-                disabled={
-                  disabled /* Use node.disabled (not event.disabled) as it is true if a parent event is disabled*/
-                }
-                renderObjectThumbnail={renderObjectThumbnail}
-                screenType={props.screenType}
-                eventsSheetWidth={props.eventsSheetWidth}
-                eventsSheetHeight={props.eventsSheetHeight}
-                connectDragSource={connectDragSource}
-                windowSize={props.windowSize}
-                idPrefix={`event-${node.relativeNodePath.join('-')}`}
-                isValidElseEvent={isValidElseEvent}
-                highlightedSearchText={props.highlightedSearchText}
-                highlightedSearchMatchCase={props.highlightedSearchMatchCase}
-                highlightedAiGeneratedEventIds={
-                  props.highlightedAiGeneratedEventIds
-                }
-                hasBreakpoint={props.breakpoints.has(event.ptr)}
-                isPausedOn={
-                  props.pausedOnEventPath === node.relativeNodePath.join('/')
-                }
-              />
-              {/* $FlowFixMe[constant-condition] */}
-              {draggedNode && (
-                <DropContainer
-                  node={node}
-                  draggedNode={draggedNode}
-                  draggedNodeHeight={_getRowHeight({
-                    node: draggedNode,
-                  })}
-                  DnDComponent={DropTarget}
-                  onDrop={_onDrop}
-                  activateTargets={!isDragged && !!draggedNode}
-                  windowSize={props.windowSize}
-                  indentScale={props.indentScale}
-                  getNodeAtPath={path => {
-                    const result = getNodeAtPath({
-                      path,
-                      treeData: treeDataRoot.current,
-                      getNodeKey,
-                    });
-                    if (!result)
-                      throw new Error(
-                        'Could not find node at path in events tree.'
-                      );
-                    return result.node;
-                  }}
-                />
-              )}
-            </div>
-          );
-
-          return isDragged ? dropTarget : connectDropTarget(dropTarget);
-        }}
-      </DragSourceAndDropTarget>
+        <EventContainer
+          project={props.project}
+          scope={props.scope}
+          globalObjectsContainer={props.globalObjectsContainer}
+          objectsContainer={props.objectsContainer}
+          projectScopedContainersAccessor={node.projectScopedContainersAccessor}
+          event={event}
+          key={event.ptr}
+          eventsHeightsCache={eventsHeightsCache}
+          selection={props.selection}
+          leftIndentWidth={
+            depth * (getIndentWidth(props.windowSize) * props.indentScale)
+          }
+          onUpdate={forceUpdate}
+          onAddNewInstruction={instructionsListContext =>
+            props.onAddNewInstruction(eventContext, instructionsListContext)
+          }
+          onPasteInstructions={instructionsListContext =>
+            props.onPasteInstructions(eventContext, instructionsListContext)
+          }
+          onMoveToInstruction={instructionContext =>
+            props.onMoveToInstruction(eventContext, instructionContext)
+          }
+          onMoveToInstructionsList={instructionContext =>
+            props.onMoveToInstructionsList(eventContext, instructionContext)
+          }
+          onInstructionClick={instructionContext =>
+            props.onInstructionClick(eventContext, instructionContext)
+          }
+          onInstructionDoubleClick={instructionContext =>
+            props.onInstructionDoubleClick(eventContext, instructionContext)
+          }
+          onParameterClick={parameterContext =>
+            props.onParameterClick(eventContext, parameterContext)
+          }
+          onVariableDeclarationClick={variableDeclarationContext =>
+            props.onVariableDeclarationClick(
+              eventContext,
+              variableDeclarationContext
+            )
+          }
+          onVariableDeclarationDoubleClick={variableDeclarationContext =>
+            props.onVariableDeclarationDoubleClick(
+              eventContext,
+              variableDeclarationContext
+            )
+          }
+          onEventClick={() =>
+            props.onEventClick({
+              eventsList: node.eventsList,
+              event: event,
+              indexInList: node.indexInList,
+              projectScopedContainersAccessor:
+                node.projectScopedContainersAccessor,
+            })
+          }
+          onEndEditingEvent={() => props.onEndEditingEvent(event)}
+          onEventContextMenu={(x, y) =>
+            props.onEventContextMenu(x, y, {
+              eventsList: node.eventsList,
+              event: event,
+              indexInList: node.indexInList,
+              projectScopedContainersAccessor:
+                node.projectScopedContainersAccessor,
+            })
+          }
+          onInstructionContextMenu={(...args) =>
+            props.onInstructionContextMenu(eventContext, ...args)
+          }
+          onAddInstructionContextMenu={(...args) =>
+            props.onAddInstructionContextMenu(eventContext, ...args)
+          }
+          onOpenExternalEvents={props.onOpenExternalEvents}
+          onOpenLayout={(name: string) => {
+            props.onOpenLayout(name);
+          }}
+          disabled={
+            disabled /* Use node.disabled (not event.disabled) as it is true if a parent event is disabled*/
+          }
+          renderObjectThumbnail={renderObjectThumbnail}
+          screenType={props.screenType}
+          eventsSheetWidth={props.eventsSheetWidth}
+          eventsSheetHeight={props.eventsSheetHeight}
+          windowSize={props.windowSize}
+          idPrefix={`event-${node.relativeNodePath.join('-')}`}
+          isValidElseEvent={isValidElseEvent}
+          highlightedSearchText={props.highlightedSearchText}
+          highlightedSearchMatchCase={props.highlightedSearchMatchCase}
+          highlightedAiGeneratedEventIds={props.highlightedAiGeneratedEventIds}
+          hasBreakpoint={props.breakpoints.has(event.ptr)}
+          isPausedOn={
+            props.pausedOnEventPath === node.relativeNodePath.join('/')
+          }
+          node={node}
+          isDragged={isDragged}
+          // $FlowFixMe[incompatible-type]
+          onBeginDrag={() => setDraggedNode(node)}
+          onEndDrag={_onEndDrag}
+          onTemporaryUnfoldNode={isOverLazy =>
+            temporaryUnfoldNode(isOverLazy, node)
+          }
+        />
+        {/* $FlowFixMe[constant-condition] */}
+        {draggedNode && (
+          <DropContainer
+            node={node}
+            draggedNode={draggedNode}
+            draggedNodeHeight={_getRowHeight({ node: draggedNode })}
+            DnDComponent={EventDropTarget}
+            onDrop={_onDrop}
+            activateTargets={!isDragged && !!draggedNode}
+            windowSize={props.windowSize}
+            indentScale={props.indentScale}
+            getNodeAtPath={path => {
+              const result = getNodeAtPath({
+                path,
+                treeData: treeDataRoot.current,
+                getNodeKey,
+              });
+              if (!result)
+                throw new Error('Could not find node at path in events tree.');
+              return result.node;
+            }}
+          />
+        )}
+      </div>
     );
   };
 
@@ -950,7 +967,7 @@ const EventsTree: React.ComponentType<{
                 onAddEvent={(eventType: string) =>
                   props.onAddNewEvent(eventType, props.events)
                 }
-                DnDComponent={DropTarget}
+                DnDComponent={EventDropTarget}
                 draggedNode={draggedNode}
                 rootEventsList={eventsList}
               />
@@ -1149,9 +1166,6 @@ const EventsTree: React.ComponentType<{
         ...styles.container,
         fontSize: `${zoomLevel}px`,
         '--icon-size': `${Math.round(zoomLevel * 1.14)}px`,
-        '--instruction-missing-parameter-min-height': `${Math.round(
-          zoomLevel * 1.1
-        )}px`,
         '--instruction-missing-parameter-min-width': `${Math.round(
           zoomLevel * 3
         )}px`,
@@ -1162,14 +1176,14 @@ const EventsTree: React.ComponentType<{
       {props.screenType !== 'touch' && (
         <>
           <AutoScroll
-            DnDComponent={DropTarget}
+            DnDComponent={EventDropTarget}
             direction="top"
             // $FlowFixMe[constant-condition]
             activateTargets={!!draggedNode && !isScrolledTop}
             onHover={_scrollUp}
           />
           <AutoScroll
-            DnDComponent={DropTarget}
+            DnDComponent={EventDropTarget}
             direction="bottom"
             // $FlowFixMe[constant-condition]
             activateTargets={!!draggedNode && !isScrolledBottom}

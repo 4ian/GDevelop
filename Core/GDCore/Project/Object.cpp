@@ -52,6 +52,7 @@ void Object::CopyWithoutConfiguration(const gd::Object& object) {
   objectVariables = object.objectVariables;
   effectsContainer = object.effectsContainer;
   behaviors = object.behaviors;
+  resourcesPreloading = object.resourcesPreloading;
 }
 
 gd::ObjectConfiguration& Object::GetConfiguration() { return *configuration; }
@@ -95,6 +96,7 @@ void Object::UnserializeFrom(gd::Project& project,
   SetType(element.GetStringAttribute("type"));
   assetStoreId = element.GetStringAttribute("assetStoreId");
   name = element.GetStringAttribute("name", name, "nom");
+  resourcesPreloading = element.GetStringAttribute("resourcesPreloading", "with-scene");
 
   objectVariables.UnserializeFrom(
       element.GetChild("variables", 0, "Variables"));
@@ -134,6 +136,9 @@ void Object::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
   element.SetAttribute("assetStoreId", GetAssetStoreId());
   element.SetAttribute("type", GetType());
+  if (GetResourcesPreloading() != "with-scene") {
+    element.SetAttribute("resourcesPreloading", GetResourcesPreloading());
+  }
   objectVariables.SerializeTo(element.AddChild("variables"));
   effectsContainer.SerializeTo(element.AddChild("effects"));
   behaviors.SerializeTo(element.AddChild("behaviors"));

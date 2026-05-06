@@ -100,6 +100,7 @@ const SemiControlledRowInput = ({
         }}
         onClick={stopPropagation}
         onDoubleClick={stopPropagation}
+        onContextMenu={stopPropagation}
         onBlur={() => {
           onEndRenaming(value);
         }}
@@ -172,7 +173,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     [onContextMenu, index, node.item]
   );
 
-  const longTouchForContextMenuProps = useLongTouch(openContextMenu, {
+  const {
+    isPressingRef: isLongTouchPressingRef,
+    contextMenuProps: longTouchForContextMenuProps,
+  } = useLongTouch(openContextMenu, {
     delay: DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE,
   });
 
@@ -270,6 +274,15 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     <div style={style} ref={containerRef}>
       <DragSourceAndDropTarget
         beginDrag={() => {
+          // During a long-press (which will open the context menu on mobile), suppress
+          // the drag preview by returning an item with no data. We cannot block canDrag()
+          // instead, because react-dnd-touch-backend evaluates canDrag() once (after its
+          // delayTouchStart of 100ms), at which point isPressingRef is always true — so
+          // blocking canDrag() would permanently break intentional drags on mobile.
+          if (isLongTouchPressingRef.current) {
+            return {};
+          }
+
           if (!node.selected) onSelect({ node, exclusive: !node.selected });
 
           if (forceDefaultDraggingPreview) {
@@ -363,6 +376,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           canDrop,
         }) => {
           setIsStayingOver(isOver, canDrop);
+
+          const isRenaming = renamedItemId === node.id;
 
           let itemRow = (
             <div
@@ -460,11 +475,13 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                   onEditItem ? () => onEditItem(node.item) : undefined
                 }
                 onContextMenu={
-                  shouldSelectUponContextMenuOpening
+                  isRenaming
+                    ? undefined
+                    : shouldSelectUponContextMenuOpening
                     ? selectAndOpenContextMenu
                     : openContextMenu
                 }
-                {...longTouchForContextMenuProps}
+                {...(isRenaming ? {} : longTouchForContextMenuProps)}
               >
                 {itemRow}
                 {(node.rightComponent ||

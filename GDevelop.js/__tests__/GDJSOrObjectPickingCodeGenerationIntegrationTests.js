@@ -206,51 +206,43 @@ describe('libGD.js - GDJS Or object picking semantics integration tests', () => 
   });
 
   /* ------------------------------------------------------------------ */
-  /* 3. Both branches false — both Or variants leave parent picks       */
-  /*    untouched (the action does not run, but sub-events that read    */
-  /*    parent picks should not see them wiped).                        */
+  /* 3. All-false Or returns false (sanity check that a both-false      */
+  /*    Or properly fails the parent event so the action does not run). */
+  /*    The "preserve parent picks when no branch contributed" path is  */
+  /*    fully exercised by case 2 above; once the Or is false, the      */
+  /*    parent event short-circuits before any action can observe the   */
+  /*    picked-list state, so there is nothing more to assert here.     */
   /* ------------------------------------------------------------------ */
-  describe('Or — all-false leaves parent picks alone', () => {
+  describe('Or — all-false returns false', () => {
     const buildEvents = (orType) => [
       {
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [
-          pickAByVar(5),
           {
             type: { value: orType },
             parameters: [],
             subInstructions: [pickAByVar(999), pickBByVar(999)],
           },
         ],
-        // The Or is false so the action does not run, but a sub-event runs
-        // unconditionally on whatever ObjectA list survives. If the Or
-        // (incorrectly) wiped the list, ObjectA.Touched would be 0.
-        actions: [],
-        events: [
-          {
-            type: 'BuiltinCommonInstructions::Standard',
-            conditions: [],
-            actions: [touchA],
-            events: [],
-          },
-        ],
+        actions: [setScene('OrFired', 1)],
+        events: [],
       },
     ];
 
-    it('Or: picks survive when the Or is false', () => {
-      const { a1 } = runEventsWithTwoObjects(
+    it('Or: action does not run when both branches are false', () => {
+      const { runtimeScene } = runEventsWithTwoObjects(
         buildEvents('BuiltinCommonInstructions::Or'),
         { aValue: 5, bValue: 0 }
       );
-      expect(a1.getVariables().get('Touched').getAsNumber()).toBe(1);
+      expect(runtimeScene.getVariables().has('OrFired')).toBe(false);
     });
 
-    it('OrDistributive: picks survive when the Or is false', () => {
-      const { a1 } = runEventsWithTwoObjects(
+    it('OrDistributive: action does not run when both branches are false', () => {
+      const { runtimeScene } = runEventsWithTwoObjects(
         buildEvents('BuiltinCommonInstructions::OrDistributive'),
         { aValue: 5, bValue: 0 }
       );
-      expect(a1.getVariables().get('Touched').getAsNumber()).toBe(1);
+      expect(runtimeScene.getVariables().has('OrFired')).toBe(false);
     });
   });
 

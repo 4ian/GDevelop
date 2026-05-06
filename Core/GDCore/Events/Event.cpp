@@ -18,6 +18,9 @@ namespace gd {
 
 EventsList BaseEvent::badSubEvents;
 VariablesContainer BaseEvent::badLocalVariables;
+const gd::String BaseEvent::conditionsLabel = "conditions";
+const gd::String BaseEvent::actionsLabel = "actions";
+const gd::String BaseEvent::whileConditionsLabel = "whileConditions";
 
 BaseEvent::BaseEvent()
     : totalTimeDuringLastSession(0),

@@ -49,6 +49,9 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
   const gd::InstructionsList& GetActions() const { return actions; };
   gd::InstructionsList& GetActions() { return actions; };
 
+  virtual gd::InstructionsList* GetInstructionList(const gd::String& label) override;
+  virtual const gd::InstructionsList* GetInstructionList(const gd::String& label) const override;
+
   const gd::String& GetObjectToPick() const {
     return objectsToPick.GetPlainString();
   };

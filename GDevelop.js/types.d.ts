@@ -1925,6 +1925,7 @@ export class BaseEvent extends EmscriptenObject {
   setDisabled(disable: boolean): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
+  getInstructionList(label: string): InstructionsList;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
   getAiGeneratedEventId(): string;

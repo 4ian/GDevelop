@@ -5215,10 +5215,15 @@ const readGameProjectJson: EditorFunction = {
       text: <Trans>Inspect the game structure.</Trans>,
     };
   },
+  // The frontend handler is a trivial no-op: it just returns success so that
+  // the function-call processing pipeline triggers an `add-message` carrying
+  // a freshly-rebuilt `simplifiedProject`. The backend's add-message handler
+  // then runs the actual navigation against that fresh content and replaces
+  // this output before persisting. Routing through the frontend ensures the
+  // orchestrator sees up-to-date project data even when sub-agents have
+  // edited the project server-side without round-tripping here.
   launchFunction: async ({ args }) => {
-    return makeGenericFailure(
-      `Unable to get game project JSON - this is handled server-side.`
-    );
+    return { success: true };
   },
   modifiesProject: false,
 };

@@ -43,6 +43,10 @@ import ParameterIcon from '../../UI/CustomSvgIcons/Parameter';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import Link from '../../UI/Link';
 import Add from '../../UI/CustomSvgIcons/Add';
+import {
+  lookupVariable,
+  formatVariableValue,
+} from '../RuntimeVariablesContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -535,6 +539,9 @@ export const renderVariableWithIcon = (
     projectScopedContainersAccessor,
     highlightedSearchText,
     highlightedSearchMatchCase,
+    runtimeVariables,
+    scope,
+    lastObjectName,
   }: ParameterInlineRendererProps,
   tooltip: string,
   getVariableSourceFromIdentifier: (
@@ -545,12 +552,79 @@ export const renderVariableWithIcon = (
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }
-  const VariableIcon = getVariableSourceIcon(
-    getVariableSourceFromIdentifier(
-      value,
-      projectScopedContainersAccessor.get()
-    )
+
+  const sourceType = getVariableSourceFromIdentifier(
+    value,
+    projectScopedContainersAccessor.get()
   );
+  const VariableIcon = getVariableSourceIcon(sourceType);
+
+  let effectiveTooltip = tooltip;
+  if (runtimeVariables && value) {
+    // Prefer `sourceType` (actual container kind resolved from the scope)
+    // over the legacy `tooltip` string for scope selection — the tooltip
+    // is just free-form text in most callers. This also lets us detect
+    // the Local / Object cases which have no dedicated wrapper field.
+    let varScope: 'global' | 'scene' | 'local' | 'object' | 'any';
+    if (
+      sourceType === gd.VariablesContainer.Global ||
+      sourceType === gd.VariablesContainer.ExtensionGlobal
+    ) {
+      varScope = 'global';
+    } else if (
+      sourceType === gd.VariablesContainer.Scene ||
+      sourceType === gd.VariablesContainer.ExtensionScene
+    ) {
+      varScope = 'scene';
+    } else if (sourceType === gd.VariablesContainer.Local) {
+      varScope = 'local';
+    } else if (sourceType === gd.VariablesContainer.Object) {
+      varScope = 'object';
+    } else if (tooltip === 'global variable') {
+      varScope = 'global';
+    } else if (tooltip === 'scene variable') {
+      varScope = 'scene';
+    } else if (tooltip === 'object variable') {
+      varScope = 'object';
+    } else {
+      varScope = 'any';
+    }
+    const extName = scope.eventsFunctionsExtension
+      ? scope.eventsFunctionsExtension.getName()
+      : undefined;
+    // Local lookup requires the scene's generated code namespace to match
+    // the one the runtime keyed its `localVariables` stack under. Only
+    // scene-scoped sheets are supported — extension function locals live
+    // on the per-call `eventsFunctionContext` and aren't reachable from
+    // globals, so the dump omits them.
+    const codeNamespace =
+      varScope === 'local' && scope.layout && !scope.eventsFunctionsExtension
+        ? gd.MetadataDeclarationHelper.getSceneCodeNamespace(
+            scope.layout.getName()
+          )
+        : undefined;
+    // Object variables need the preceding `object` parameter from the
+    // same instruction to disambiguate — `value` only carries the
+    // variable path, not the object name.
+    const runtimeVar =
+      varScope === 'object' && !lastObjectName
+        ? null
+        : lookupVariable(
+            runtimeVariables,
+            varScope,
+            value,
+            extName,
+            codeNamespace,
+            lastObjectName
+          );
+    if (runtimeVar) {
+      const displayName =
+        varScope === 'object' && lastObjectName
+          ? `${lastObjectName}.${value}`
+          : value;
+      effectiveTooltip = `${displayName} = ${formatVariableValue(runtimeVar)}`;
+    }
+  }
 
   let IconAndNameContainer;
   if (!expressionIsValid) {
@@ -563,7 +637,7 @@ export const renderVariableWithIcon = (
 
   return (
     <span
-      title={tooltip}
+      title={effectiveTooltip}
       className={classNames({
         [nameAndIconContainer]: true,
         [instructionWarningParameter]:

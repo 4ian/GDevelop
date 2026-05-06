@@ -75,6 +75,10 @@ const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
 const defaultIndentWidth = 22;
 const smallIndentWidth = 11;
 
+// Visual marker color shared by the breakpoint dot and the paused-on-event
+// highlight. Red is intentional (matches Chrome DevTools' paused-frame UI).
+const BREAKPOINT_ACCENT_COLOR = '#e53935';
+
 const styles = {
   container: { flex: 1, position: 'relative' },
   defaultEventContainer: {
@@ -90,6 +94,34 @@ const styles = {
     flexDirection: 'row',
     justifyContent: 'stretch',
     position: 'relative',
+  },
+  breakpointDot: {
+    position: 'absolute',
+    top: 4,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 12,
+    height: 12,
+    borderRadius: '50%',
+    backgroundColor: BREAKPOINT_ACCENT_COLOR,
+    boxShadow: `0 0 3px ${BREAKPOINT_ACCENT_COLOR}b3`,
+    zIndex: 1,
+    pointerEvents: 'none',
+  },
+  pausedContainerOverlay: {
+    outline: `3px solid ${BREAKPOINT_ACCENT_COLOR}`,
+    outlineOffset: -3,
+    backgroundColor: `${BREAKPOINT_ACCENT_COLOR}14`,
+    boxShadow: `0 0 12px ${BREAKPOINT_ACCENT_COLOR}59`,
+  },
+  pausedLeftBar: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    width: 4,
+    height: '100%',
+    backgroundColor: BREAKPOINT_ACCENT_COLOR,
+    zIndex: 2,
   },
 };
 
@@ -145,6 +177,8 @@ type EventsContainerProps = {|
 
   idPrefix: string,
   highlightedAiGeneratedEventIds: Set<string>,
+  hasBreakpoint: boolean,
+  isPausedOn: boolean,
   isValidElseEvent: boolean,
   highlightedSearchText: ?string,
   highlightedSearchMatchCase?: boolean,
@@ -275,10 +309,24 @@ const EventContainer = (props: EventsContainerProps) => {
                         event.getAiGeneratedEventId()
                       ),
                     })}
-                    style={coloredHandleStyle}
-                  />
+                    style={coloredHandleStyle || { position: 'relative' }}
+                  >
+                    {props.hasBreakpoint && (
+                      <div style={styles.breakpointDot} />
+                    )}
+                  </div>
                 )}
-                <div style={styles.container}>
+                <div
+                  style={
+                    props.isPausedOn
+                      ? {
+                          ...styles.container,
+                          ...styles.pausedContainerOverlay,
+                        }
+                      : styles.container
+                  }
+                >
+                  {props.isPausedOn && <div style={styles.pausedLeftBar} />}
                   <EventComponent
                     project={project}
                     scope={scope}
@@ -439,6 +487,8 @@ type EventsTreeProps = {|
   tutorials: ?Array<Tutorial>,
 
   highlightedAiGeneratedEventIds: Set<string>,
+  breakpoints: Set<number>,
+  pausedOnEventPath: string | null,
 |};
 
 export type EventsTreeInterface = {|
@@ -581,7 +631,12 @@ const EventsTree: React.ComponentType<{
   const eventPtrToRowIndex = React.useRef<{ [key: string]: number }>({});
   const getEventRow = React.useCallback(
     (searchedEvent: gdBaseEvent) => {
-      return eventPtrToRowIndex.current['' + searchedEvent.ptr] || -1;
+      // Explicit presence check: row index 0 is a valid value (top row) but
+      // would be swallowed by a `|| -1` fallback.
+      const key = '' + searchedEvent.ptr;
+      const map = eventPtrToRowIndex.current;
+      const value = map[key];
+      return value === undefined ? -1 : value;
     },
     [eventPtrToRowIndex]
   );
@@ -794,6 +849,10 @@ const EventsTree: React.ComponentType<{
           highlightedSearchText={props.highlightedSearchText}
           highlightedSearchMatchCase={props.highlightedSearchMatchCase}
           highlightedAiGeneratedEventIds={props.highlightedAiGeneratedEventIds}
+          hasBreakpoint={props.breakpoints.has(event.ptr)}
+          isPausedOn={
+            props.pausedOnEventPath === node.relativeNodePath.join('/')
+          }
           node={node}
           isDragged={isDragged}
           // $FlowFixMe[incompatible-type]

@@ -101,6 +101,30 @@ namespace gdjs {
 
     abstract getAsyncTasksManager(): gdjs.AsyncTasksManager;
 
+    // Stub so generated profiler code works on any instance container.
+    // RuntimeScene overrides this with a real implementation.
+    getProfiler(): null {
+      return null;
+    }
+
+    // Delegate breakpoint calls to the owning RuntimeScene.
+    // RuntimeScene overrides these with real implementations.
+    __pushBpFunction(functionId: string): void {
+      this.getScene().__pushBpFunction(functionId);
+    }
+    __popBpFunction(): void {
+      this.getScene().__popBpFunction();
+    }
+    __checkBreakpoint(functionId: string, eventIndex: number): boolean {
+      const scene = this.getScene();
+      const result = scene.__checkBreakpoint(functionId, eventIndex);
+      // Scene's `_triggerBreakpoint` stashed itself as the calling container.
+      // Override here so the dump builder reads object instances from the
+      // actual sub-container (custom-object internals are not on the scene).
+      if (result) scene._runtimeGame._debugState.lastBpCallingContainer = this;
+      return result;
+    }
+
     /**
      * Convert a point from the canvas coordinates (for example,
      * the mouse position) to the container coordinates.

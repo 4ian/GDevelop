@@ -19,7 +19,6 @@ import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import AlertMessage from '../../UI/AlertMessage';
 import classes from './AiRequestChat.module.css';
 import RobotIcon from '../../ProjectCreation/RobotIcon';
-import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   type Quota,
   type UsagePrice,
@@ -34,8 +33,6 @@ import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from '../AiRequestUtils';
-import HelpQuestion from '../../UI/CustomSvgIcons/HelpQuestion';
-import Hammer from '../../UI/CustomSvgIcons/Hammer';
 import { ChatMessages } from './ChatMessages';
 import Send from '../../UI/CustomSvgIcons/Send';
 import classNames from 'classnames';
@@ -43,7 +40,7 @@ import {
   type AiConfigurationPresetWithAvailability,
   getDefaultAiConfigurationPresetId,
 } from '../AiConfiguration';
-import { AiConfigurationPresetSelector } from './AiConfigurationPresetSelector';
+import { ReasoningLevelSelector } from './ReasoningLevelSelector';
 import { AiRequestContext } from '../AiRequestContext';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useStickyVisibility } from './UseStickyVisibility';
@@ -54,9 +51,8 @@ import GoldCompact from '../../Profile/Subscription/Icons/GoldCompact';
 import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import Paper from '../../UI/Paper';
-import SelectOption from '../../UI/SelectOption';
-import CompactSelectField from '../../UI/CompactSelectField';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import ButtonBase from '@material-ui/core/ButtonBase';
 import { type FileMetadata } from '../../ProjectsStorage';
 import Stop from '../../UI/CustomSvgIcons/Stop';
 
@@ -64,6 +60,17 @@ const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 15;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 20;
 
 const styles = {
+  autoEditPaper: {
+    borderRadius: 24,
+    overflow: 'hidden',
+    display: 'flex',
+  },
+  autoEditButton: {
+    padding: '2px 12px',
+    fontSize: 14,
+    fontFamily: 'var(--gdevelop-modern-font-family)',
+    color: 'inherit',
+  },
   chatScrollView: {
     display: 'flex',
     flexDirection: 'column',
@@ -97,14 +104,12 @@ const getPriceAndRequestsTextAndTooltip = ({
   quota,
   price,
   availableCredits,
-  selectedMode,
   automaticallyUseCreditsForAiRequests,
   isRefreshingLimits,
 }: {|
   quota: Quota | null,
   price: UsagePrice | null,
   availableCredits: number,
-  selectedMode: 'chat' | 'agent' | 'orchestrator',
   automaticallyUseCreditsForAiRequests: boolean,
   isRefreshingLimits?: boolean,
 |}): React.Node => {
@@ -238,45 +243,7 @@ const getPriceAndRequestsTextAndTooltip = ({
   );
 };
 
-const getSendButtonLabelAndIcon = ({
-  aiRequest,
-  selectedMode,
-  isWorking,
-  isMobile,
-  hasOpenedProject,
-  standAloneForm,
-}: {|
-  aiRequest: AiRequest | null,
-  selectedMode?: 'chat' | 'agent' | 'orchestrator',
-  isWorking: boolean,
-  isMobile: boolean,
-  hasOpenedProject: boolean,
-  standAloneForm?: boolean,
-|}): { label: React.Node, icon: React.Node } => {
-  if (aiRequest && !standAloneForm) {
-    // We're in a running chat, that is not standalone,
-    // hide label.
-    return { label: null, icon: <Send fontSize="small" /> };
-  }
-
-  return selectedMode === 'agent' || selectedMode === 'orchestrator'
-    ? isWorking
-      ? { label: <Trans>Building...</Trans>, icon: <Send fontSize="small" /> }
-      : isMobile
-      ? { label: <Trans>Build</Trans>, icon: <Send fontSize="small" /> }
-      : hasOpenedProject && !standAloneForm
-      ? {
-          label: <Trans>Build this on my game</Trans>,
-          icon: <Send fontSize="small" />,
-        }
-      : {
-          label: <Trans>Start building the game</Trans>,
-          icon: <Send fontSize="small" />,
-        }
-    : isWorking
-    ? { label: <Trans>Sending...</Trans>, icon: <Send fontSize="small" /> }
-    : { label: <Trans>Send</Trans>, icon: <Send fontSize="small" /> };
-};
+const getSendButtonIcon = (): React.Node => <Send fontSize="small" />;
 
 const actionsOnExistingProject = [
   t`Add solid rocks that falls from the sky at a random position around the player every 0.5 seconds`,
@@ -320,10 +287,12 @@ type Props = {|
     mode: 'chat' | 'agent' | 'orchestrator',
     userRequest: string,
     aiConfigurationPresetId: string,
+    autoEdit: boolean,
   |}) => void,
   onSendUserMessage: ({|
     userMessage: string,
     mode: 'chat' | 'agent' | 'orchestrator',
+    autoEdit: boolean,
   |}) => Promise<void>,
   onSendFeedback: (
     aiRequestId: string,
@@ -412,11 +381,9 @@ export const AiRequestChat: React.ComponentType<{
     const {
       aiRequestHistory: { handleNavigateHistory, resetNavigation },
     } = React.useContext(AiRequestContext);
-    const [selectedMode, setSelectedMode] = React.useState<
-      'chat' | 'agent' | 'orchestrator'
-    >(
-      (aiRequest && aiRequest.mode) ||
-        (hasOpenedProject ? 'chat' : 'orchestrator')
+    const selectedMode = 'orchestrator';
+    const [isAutoEditEnabled, setIsAutoEditEnabled] = React.useState<boolean>(
+      true
     );
     const {
       values: { automaticallyUseCreditsForAiRequests },
@@ -465,11 +432,7 @@ export const AiRequestChat: React.ComponentType<{
         );
         setAiConfigurationPresetId(null);
       },
-      [
-        selectedMode,
-        aiConfigurationPresetsWithAvailability,
-        aiConfigurationPresetId,
-      ]
+      [aiConfigurationPresetsWithAvailability, aiConfigurationPresetId]
     );
 
     const aiRequestId: string = aiRequest ? aiRequest.id : '';
@@ -515,20 +478,19 @@ export const AiRequestChat: React.ComponentType<{
 
     const newChatPlaceholder = React.useMemo(
       () => {
-        const newChatPlaceholders: Array<MessageDescriptor> =
-          selectedMode === 'agent' || selectedMode === 'orchestrator'
-            ? hasOpenedProject && !standAloneForm
-              ? actionsOnExistingProject
-              : actionsToCreateAProject
-            : hasOpenedProject && !standAloneForm
-            ? [...questionsOnExistingProject, ...generalQuestions]
-            : generalQuestions;
+        const newChatPlaceholders: Array<MessageDescriptor> = isAutoEditEnabled
+          ? hasOpenedProject && !standAloneForm
+            ? actionsOnExistingProject
+            : actionsToCreateAProject
+          : hasOpenedProject && !standAloneForm
+          ? [...questionsOnExistingProject, ...generalQuestions]
+          : generalQuestions;
 
         return newChatPlaceholders[
           Math.floor(Math.random() * newChatPlaceholders.length)
         ];
       },
-      [selectedMode, hasOpenedProject, standAloneForm]
+      [isAutoEditEnabled, hasOpenedProject, standAloneForm]
     );
 
     const onUserRequestTextChange = React.useCallback(
@@ -564,8 +526,6 @@ export const AiRequestChat: React.ComponentType<{
       },
     }));
 
-    const { isMobile } = useResponsiveWindowSize();
-
     const errorText = lastSendError ? (
       <Text size="body-small" color="error">
         <Trans>
@@ -584,7 +544,6 @@ export const AiRequestChat: React.ComponentType<{
       quota,
       price,
       availableCredits,
-      selectedMode,
       automaticallyUseCreditsForAiRequests,
       isRefreshingLimits: isRefreshingLimitsStable,
     });
@@ -650,17 +609,7 @@ export const AiRequestChat: React.ComponentType<{
       // If a request is ongoing, the ChatMessages.js will show the prompt instead.
       !aiRequest;
 
-    const {
-      label: sendButtonLabel,
-      icon: sendButtonIcon,
-    } = getSendButtonLabelAndIcon({
-      aiRequest,
-      selectedMode,
-      isWorking,
-      isMobile,
-      hasOpenedProject,
-      standAloneForm,
-    });
+    const sendButtonIcon = getSendButtonIcon();
 
     const onSubmitForNewChat = React.useCallback(
       async () => {
@@ -685,6 +634,7 @@ export const AiRequestChat: React.ComponentType<{
           userRequest: userRequestTextPerAiRequestId[''],
           aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
           mode: selectedMode,
+          autoEdit: isAutoEditEnabled,
         });
       },
       [
@@ -695,7 +645,7 @@ export const AiRequestChat: React.ComponentType<{
         cannotContinue,
         hasOpenedProject,
         showConfirmation,
-        selectedMode,
+        isAutoEditEnabled,
         standAloneForm,
       ]
     );
@@ -710,6 +660,7 @@ export const AiRequestChat: React.ComponentType<{
         return onSendUserMessage({
           userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
           mode: selectedMode,
+          autoEdit: isAutoEditEnabled,
         });
       },
       [
@@ -718,7 +669,7 @@ export const AiRequestChat: React.ComponentType<{
         userRequestTextPerAiRequestId,
         scrollToBottom,
         cannotContinue,
-        selectedMode,
+        isAutoEditEnabled,
       ]
     );
 
@@ -815,25 +766,11 @@ export const AiRequestChat: React.ComponentType<{
                       <Column>
                         <LineStackLayout
                           alignItems="flex-end"
-                          justifyContent="space-between"
+                          justifyContent="flex-end"
                         >
-                          <AiConfigurationPresetSelector
-                            chosenOrDefaultAiConfigurationPresetId={
-                              chosenOrDefaultAiConfigurationPresetId
-                            }
-                            setAiConfigurationPresetId={
-                              setAiConfigurationPresetId
-                            }
-                            aiConfigurationPresetsWithAvailability={
-                              aiConfigurationPresetsWithAvailability
-                            }
-                            aiRequestMode={selectedMode}
-                            disabled={isWorking}
-                          />
                           <RaisedButton
                             color="primary"
                             icon={sendButtonIcon}
-                            label={sendButtonLabel}
                             style={{ flexShrink: 0 }}
                             disabled={isButtonLoading || shouldDisableButton}
                             onClick={onClickNewChatButton}
@@ -949,44 +886,31 @@ export const AiRequestChat: React.ComponentType<{
                   alignItems="center"
                   justifyContent="space-between"
                 >
-                  <Column noMargin>
-                    {!standAloneForm && (
-                      <CompactSelectField
+                  <LineStackLayout noMargin alignItems="center">
+                    <Paper background="light" style={styles.autoEditPaper}>
+                      <ButtonBase
+                        onClick={() => setIsAutoEditEnabled(v => !v)}
                         disabled={isWorking}
-                        value={selectedMode}
-                        onChange={value => {
-                          if (
-                            value !== 'chat' &&
-                            value !== 'agent' &&
-                            value !== 'orchestrator'
-                          ) {
-                            return;
-                          }
-                          setSelectedMode(value);
-                        }}
-                        renderOptionIcon={className =>
-                          selectedMode === 'chat' ? (
-                            <HelpQuestion className={className} />
-                          ) : (
-                            <Hammer className={className} />
-                          )
-                        }
-                        rounded
+                        style={styles.autoEditButton}
                       >
-                        <SelectOption key="chat" value="chat" label={t`Ask`} />
-                        <SelectOption
-                          key="agent"
-                          value="agent"
-                          label={t`Simple change`}
-                        />
-                        <SelectOption
-                          key="orchestrator"
-                          value="orchestrator"
-                          label={t`Build`}
-                        />
-                      </CompactSelectField>
-                    )}
-                  </Column>
+                        {isAutoEditEnabled ? (
+                          <Trans>Auto edit on</Trans>
+                        ) : (
+                          <Trans>Auto edit off</Trans>
+                        )}
+                      </ButtonBase>
+                    </Paper>
+                    <ReasoningLevelSelector
+                      chosenOrDefaultAiConfigurationPresetId={
+                        chosenOrDefaultAiConfigurationPresetId
+                      }
+                      setAiConfigurationPresetId={setAiConfigurationPresetId}
+                      aiConfigurationPresetsWithAvailability={
+                        aiConfigurationPresetsWithAvailability
+                      }
+                      disabled={isWorking}
+                    />
+                  </LineStackLayout>
                   <Column noMargin>{errorText || priceAndRequestsText}</Column>
                 </LineStackLayout>
               </ColumnStackLayout>
@@ -1156,7 +1080,7 @@ export const AiRequestChat: React.ComponentType<{
                             sendButtonIcon
                           )
                         }
-                        label={canRequestBeStopped ? null : sendButtonLabel}
+                        label={null}
                         onClick={onClickExistingChatButton}
                       />
                     </LineStackLayout>
@@ -1170,42 +1094,31 @@ export const AiRequestChat: React.ComponentType<{
               alignItems="center"
               justifyContent="space-between"
             >
-              <Column noMargin>
-                <CompactSelectField
-                  disabled={isWorking}
-                  value={selectedMode}
-                  onChange={value => {
-                    if (
-                      value !== 'chat' &&
-                      value !== 'agent' &&
-                      value !== 'orchestrator'
-                    ) {
-                      return;
-                    }
-                    setSelectedMode(value);
-                  }}
-                  renderOptionIcon={className =>
-                    selectedMode === 'chat' ? (
-                      <HelpQuestion className={className} />
+              <LineStackLayout noMargin alignItems="center">
+                <Paper background="light" style={styles.autoEditPaper}>
+                  <ButtonBase
+                    onClick={() => setIsAutoEditEnabled(v => !v)}
+                    disabled={isWorking}
+                    style={styles.autoEditButton}
+                  >
+                    {isAutoEditEnabled ? (
+                      <Trans>Auto edit on</Trans>
                     ) : (
-                      <Hammer className={className} />
-                    )
+                      <Trans>Auto edit off</Trans>
+                    )}
+                  </ButtonBase>
+                </Paper>
+                <ReasoningLevelSelector
+                  chosenOrDefaultAiConfigurationPresetId={
+                    chosenOrDefaultAiConfigurationPresetId
                   }
-                  rounded
-                >
-                  <SelectOption key="chat" value="chat" label={t`Ask`} />
-                  <SelectOption
-                    key="agent"
-                    value="agent"
-                    label={t`Simple change`}
-                  />
-                  <SelectOption
-                    key="orchestrator"
-                    value="orchestrator"
-                    label={t`Build`}
-                  />
-                </CompactSelectField>
-              </Column>
+                  setAiConfigurationPresetId={setAiConfigurationPresetId}
+                  aiConfigurationPresetsWithAvailability={
+                    aiConfigurationPresetsWithAvailability
+                  }
+                  disabled={isWorking}
+                />
+              </LineStackLayout>
               <Column noMargin>
                 {isForAnotherProjectText || errorText || priceAndRequestsText}
               </Column>

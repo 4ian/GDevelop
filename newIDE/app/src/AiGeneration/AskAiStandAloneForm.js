@@ -299,6 +299,7 @@ export const AskAiStandAloneForm = ({
             fileMetadata: null, // No file metadata when starting from the standalone form.
             storageProviderName,
             mode: aiRequestModeForForm,
+            autoEdit: true,
             toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
             aiConfiguration: {
               presetId: aiConfigurationPresetId,
@@ -377,12 +378,14 @@ export const AskAiStandAloneForm = ({
       createdSceneNames,
       createdProject,
       editorFunctionCallResults,
+      autoEdit,
     }: {|
       aiRequestId: string,
       userMessage: string,
       createdSceneNames?: Array<string>,
       createdProject?: ?gdProject,
       editorFunctionCallResults: Array<EditorFunctionCallResult>,
+      autoEdit?: boolean,
     |}) => {
       if (!profile) return;
 
@@ -464,6 +467,7 @@ export const AskAiStandAloneForm = ({
             // If we switch back to agent mode for the standalone form in the future,
             // check if it has just initialized the project to mark it as paused.
             paused: false,
+            autoEdit,
             mode: aiRequestModeForForm,
             toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
           })
@@ -610,14 +614,17 @@ export const AskAiStandAloneForm = ({
         onSendUserMessage={async ({
           userMessage,
           mode,
+          autoEdit,
         }: {|
           userMessage: string,
           mode: 'chat' | 'agent' | 'orchestrator',
+          autoEdit: boolean,
         |}) => {
           if (!aiRequestIdForForm) return;
           await onSendMessage({
             aiRequestId: aiRequestIdForForm,
             userMessage,
+            autoEdit,
             // mode, Mode is forced to agent in standalone form, no need to pass it here.
             editorFunctionCallResults: aiRequestForForm
               ? getEditorFunctionCallResults(aiRequestForForm.id) || []

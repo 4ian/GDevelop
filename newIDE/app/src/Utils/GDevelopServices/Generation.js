@@ -118,6 +118,7 @@ export type AiRequest = {
   gameProjectJson?: string | null,
   status: GenerationStatus,
   mode?: 'chat' | 'agent' | 'orchestrator',
+  autoEdit?: boolean,
   aiConfiguration?: AiConfiguration,
   toolsVersion?: string,
   toolOptions?: AiRequestToolOptions | null,
@@ -376,6 +377,7 @@ export const createAiRequest = async (
     projectSpecificExtensionsSummaryJsonUserRelativeKey,
     payWithCredits,
     mode,
+    autoEdit,
     aiConfiguration,
     gameId,
     projectVersionIdBeforeMessage,
@@ -391,6 +393,7 @@ export const createAiRequest = async (
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
     payWithCredits: boolean,
     mode: 'chat' | 'agent' | 'orchestrator',
+    autoEdit: boolean,
     aiConfiguration: AiConfiguration,
     gameId: string | null,
     projectVersionIdBeforeMessage?: string | null,
@@ -417,6 +420,7 @@ export const createAiRequest = async (
       payWithCredits: !!payWithCredits,
       payWithAiCredits: !payWithCredits,
       mode,
+      autoEdit,
       aiConfiguration,
       gameId,
       projectVersionIdBeforeMessage,
@@ -456,6 +460,7 @@ export const addMessageToAiRequest = async (
     projectSpecificExtensionsSummaryJsonUserRelativeKey,
     paused,
     mode,
+    autoEdit,
     toolsVersion,
   }: {|
     userId: string,
@@ -471,6 +476,7 @@ export const addMessageToAiRequest = async (
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
     paused?: boolean,
     mode?: 'chat' | 'agent' | 'orchestrator',
+    autoEdit?: boolean,
     toolsVersion?: string,
   |}
 ): Promise<AiRequest> => {
@@ -491,6 +497,7 @@ export const addMessageToAiRequest = async (
       projectSpecificExtensionsSummaryJsonUserRelativeKey,
       paused,
       mode,
+      autoEdit,
       toolsVersion,
     },
     {

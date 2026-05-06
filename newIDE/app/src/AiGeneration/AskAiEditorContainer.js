@@ -476,6 +476,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               mode,
               userRequest,
               aiConfigurationPresetId,
+              autoEdit,
             } = newAiRequestOptions;
             startNewAiRequest(null);
 
@@ -538,6 +539,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 fileMetadata,
                 storageProviderName,
                 mode,
+                autoEdit,
                 toolsVersion: getToolsVersionForAiRequestMode(mode),
                 aiConfiguration: {
                   presetId: aiConfigurationPresetId,
@@ -618,6 +620,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           createdProject,
           editorFunctionCallResults,
           newMode,
+          autoEdit,
         }: {|
           aiRequestId: string,
           userMessage: string,
@@ -625,6 +628,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           createdProject?: ?gdProject,
           editorFunctionCallResults: Array<EditorFunctionCallResult>,
           newMode?: 'chat' | 'agent' | 'orchestrator',
+          autoEdit?: boolean,
         |}) => {
           if (!profile) return;
 
@@ -765,6 +769,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 userMessage,
                 paused:
                   hasJustInitializedProject && modeForThisMessage === 'agent',
+                autoEdit,
                 //  These are defined only if there is a mode change:
                 mode: newMode,
                 toolsVersion: newMode
@@ -1406,15 +1411,18 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 onSendUserMessage={async ({
                   userMessage,
                   mode,
+                  autoEdit,
                 }: {|
                   userMessage: string,
                   mode: 'chat' | 'agent' | 'orchestrator',
+                  autoEdit: boolean,
                 |}) => {
                   if (!selectedAiRequestId) return;
                   await onSendMessage({
                     aiRequestId: selectedAiRequestId,
                     userMessage,
                     newMode: mode,
+                    autoEdit,
                     editorFunctionCallResults: selectedAiRequest
                       ? getEditorFunctionCallResults(selectedAiRequest.id) || []
                       : [],

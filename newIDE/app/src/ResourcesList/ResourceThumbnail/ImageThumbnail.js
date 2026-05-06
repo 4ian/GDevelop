@@ -49,7 +49,7 @@ const ImageThumbnail = (props: Props): React.MixedElement => {
   const [error, setError] = React.useState(false);
 
   // Allow a long press to show the context menu
-  const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
+  const longTouchForContextMenuProps = useLongTouch(
     React.useCallback(
       event => {
         if (onContextMenu) onContextMenu(event.clientX, event.clientY);

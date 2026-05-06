@@ -43,9 +43,6 @@ class GD_CORE_API RepeatEvent : public gd::BaseEvent {
   const gd::InstructionsList& GetActions() const { return actions; };
   gd::InstructionsList& GetActions() { return actions; };
 
-  virtual gd::InstructionsList* GetInstructionList(const gd::String& label) override;
-  virtual const gd::InstructionsList* GetInstructionList(const gd::String& label) const override;
-
   const gd::Expression& GetRepeatExpression() const {
     return repeatNumberExpression;
   };

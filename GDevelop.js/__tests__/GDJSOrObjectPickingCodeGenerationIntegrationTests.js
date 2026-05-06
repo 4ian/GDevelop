@@ -663,4 +663,220 @@ describe('libGD.js - GDJS Or object picking semantics integration tests', () => 
       expect(touchedFlags(cInsts)).toEqual([0, 0, 1]);
     });
   });
+
+  /* ================================================================== */
+  /* 9. Empty Or / OrDistributive — per the metadata, an Or with no     */
+  /*    sub-conditions is always false. Confirm the parent event fails  */
+  /*    and no action runs.                                             */
+  /* ================================================================== */
+  describe('Or / OrDistributive — empty (no sub-conditions) is always false', () => {
+    it('Or with zero sub-conditions: action does not run', () => {
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [orOf()],
+          actions: [touchA, touchB, touchC, setScene('OrFired', 1)],
+          events: [],
+        },
+      ];
+      const { runtimeScene, aInsts, bInsts, cInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
+      expect(runtimeScene.getVariables().has('OrFired')).toBe(false);
+      expect(touchedFlags(aInsts)).toEqual([0, 0, 0]);
+      expect(touchedFlags(bInsts)).toEqual([0, 0, 0]);
+      expect(touchedFlags(cInsts)).toEqual([0, 0, 0]);
+    });
+
+    it('OrDistributive with zero sub-conditions: action does not run', () => {
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [orDistributiveOf()],
+          actions: [touchA, touchB, touchC, setScene('OrFired', 1)],
+          events: [],
+        },
+      ];
+      const { runtimeScene, aInsts, bInsts, cInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
+      expect(runtimeScene.getVariables().has('OrFired')).toBe(false);
+      expect(touchedFlags(aInsts)).toEqual([0, 0, 0]);
+      expect(touchedFlags(bInsts)).toEqual([0, 0, 0]);
+      expect(touchedFlags(cInsts)).toEqual([0, 0, 0]);
+    });
+  });
+
+  /* ================================================================== */
+  /* 10. Inverted sub-condition inside Or — for object-picking          */
+  /*     conditions, the inversion picks the COMPLEMENT (instances     */
+  /*     for which the predicate is false). The Or must propagate the  */
+  /*     inverted branch's picks correctly.                             */
+  /*                                                                    */
+  /*     Note: setting `inverted: true` directly on Or/And/OrDistributive */
+  /*     itself is currently a no-op in GDevelop's custom lambdas (a    */
+  /*     pre-existing limitation, not introduced by these changes); the */
+  /*     canonical way to invert an Or is to wrap it in a Not condition */
+  /*     and that path is covered by the existing Boolean-operators     */
+  /*     test file.                                                     */
+  /* ================================================================== */
+  describe('Or / OrDistributive — inverted picking sub-condition picks the complement', () => {
+    const invertedPickAByVar = (v) => ({
+      type: { inverted: true, value: 'VarObjet' },
+      parameters: ['ObjectA', 'MyVariable', '=', String(v)],
+    });
+
+    it('Or { !pickA=2, false }: branch 1 picks A1 and A3 (complement of A=2)', () => {
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [orOf(invertedPickAByVar(2), freeCondition(false))],
+          actions: [touchA],
+          events: [],
+        },
+      ];
+      const { aInsts } = runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([1, 0, 1]);
+    });
+
+    it('OrDistributive { !pickA=2, false }: branch 1 picks A1 and A3 (complement of A=2)', () => {
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            orDistributiveOf(invertedPickAByVar(2), freeCondition(false)),
+          ],
+          actions: [touchA],
+          events: [],
+        },
+      ];
+      const { aInsts } = runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([1, 0, 1]);
+    });
+  });
+
+  /* ================================================================== */
+  /* 11. Parent pre-pick narrowing — when an outside-Or condition       */
+  /*     narrows an object's picked list, OrDistributive must inherit  */
+  /*     the narrowed list (not refill from scene). The unconstrained  */
+  /*     branch contributes the parent's already-narrowed list.        */
+  /* ================================================================== */
+  describe('OrDistributive — respects parent pre-pick narrowing', () => {
+    it('OrDistributive { pickB=999 [false], free [true] } after outside pickB=2: only B2 stays picked', () => {
+      // Outside the OrDistributive, pickB=2 narrows parent.B to [B2].
+      // Branch 1 references B and is false. Branch 2 is free (true) and
+      // unconstrained on B — it must contribute parent's narrowed B
+      // ([B2]), NOT the scene's full B list. After the OrDistributive,
+      // parent.B should still be [B2], so only B2 gets touched.
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            pickBByVar(2),
+            orDistributiveOf(pickBByVar(999), freeCondition(true)),
+          ],
+          actions: [touchB],
+          events: [],
+        },
+      ];
+      const { bInsts } = runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(bInsts)).toEqual([0, 1, 0]);
+    });
+  });
+
+  /* ================================================================== */
+  /* 12. Nested OrDistributive — an OrDistributive inside an And        */
+  /*     inside another OrDistributive must propagate context depth     */
+  /*     and object-list copies correctly.                              */
+  /* ================================================================== */
+  describe('Or / OrDistributive — nested operators', () => {
+    it('Or wrapping And { pickA=1, inner OrDistributive { pickB=1, pickB=2 } }: inner OD union {B1,B2}, outer And true → A1, B1, B2 touched', () => {
+      // Outer Or has a single branch: And { pickA=1, OrDistributive { pickB=1, pickB=2 } }.
+      // The inner OrDistributive's two branches both reference B and
+      // pick B1 and B2 respectively → its union is [B1, B2]. The And's
+      // pickA=1 picks A1. Both And-children are true → outer branch
+      // contributes A1 and B1, B2.
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            orOf(
+              andOf(
+                pickAByVar(1),
+                orDistributiveOf(pickBByVar(1), pickBByVar(2))
+              )
+            ),
+          ],
+          actions: [touchA, touchB],
+          events: [],
+        },
+      ];
+      const { aInsts, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([1, 0, 0]);
+      expect(touchedFlags(bInsts)).toEqual([1, 1, 0]);
+    });
+
+    it('OrDistributive wrapping And { pickA=1, inner OrDistributive { pickB=1, pickB=2 } } + pickA=3: distributive outer leaks unconstrained B for branch 2', () => {
+      // Outer is OrDistributive with two branches:
+      //   branch 1: And { pickA=1, inner OrDistributive { pickB=1, pickB=2 } }
+      //             → contributes A1 and B1, B2.
+      //   branch 2: pickA=3 → references only A; B is unconstrained
+      //             on this branch, so the parent's full B list (all
+      //             three) is contributed.
+      // Final A = {A1, A3}; final B = union → all three.
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            orDistributiveOf(
+              andOf(
+                pickAByVar(1),
+                orDistributiveOf(pickBByVar(1), pickBByVar(2))
+              ),
+              pickAByVar(3)
+            ),
+          ],
+          actions: [touchA, touchB],
+          events: [],
+        },
+      ];
+      const { aInsts, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([1, 0, 1]);
+      expect(touchedFlags(bInsts)).toEqual([1, 1, 1]);
+    });
+  });
+
+  /* ================================================================== */
+  /* 13. Duplicate-instance union — two true branches that both pick    */
+  /*     the same instance must not double-count it. The action is      */
+  /*     declared once so the Touched variable should be 1 (not 2),     */
+  /*     proving the per-object indexOf dedup at union time.            */
+  /* ================================================================== */
+  describe('Or / OrDistributive — duplicate-instance union does not double-count', () => {
+    it('Or { pickA=2, pickA=2 }: A2 only touched once', () => {
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [orOf(pickAByVar(2), pickAByVar(2))],
+          actions: [touchA],
+          events: [],
+        },
+      ];
+      const { aInsts } = runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([0, 1, 0]);
+    });
+
+    it('OrDistributive { pickA=2, pickA=2 }: A2 only touched once', () => {
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [orDistributiveOf(pickAByVar(2), pickAByVar(2))],
+          actions: [touchA],
+          events: [],
+        },
+      ];
+      const { aInsts } = runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([0, 1, 0]);
+    });
+  });
 });

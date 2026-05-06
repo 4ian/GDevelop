@@ -28,7 +28,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
                      _("Random integer"),
                      "",
                      "res/dice-6.svg")
-      .SetHelpPath("https://wiki.gdevelop.io/gdevelop5/events/expressions/#expressions")
+      .SetHelpPath("/events/expressions/#expressions")
       .AddParameter("expression", _("Maximum value"));
 
   extension
@@ -37,7 +37,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
                      _("Random integer in range"),
                      "",
                      "res/dice-6.svg")
-      .SetHelpPath("https://wiki.gdevelop.io/gdevelop5/events/expressions/#expressions")
+      .SetHelpPath("/events/expressions/#expressions")
       .AddParameter("expression", _("Minimum value"))
       .AddParameter("expression", _("Maximum value"));
 
@@ -47,7 +47,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
                      _("Random float"),
                      "",
                      "res/dice-6.svg")
-      .SetHelpPath("https://wiki.gdevelop.io/gdevelop5/events/expressions/#expressions")
+      .SetHelpPath("/events/expressions/#expressions")
       .AddParameter("expression", _("Maximum value"));
 
   extension
@@ -56,7 +56,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
                      _("Random float in range"),
                      "",
                      "res/dice-6.svg")
-      .SetHelpPath("https://wiki.gdevelop.io/gdevelop5/events/expressions/#expressions")
+      .SetHelpPath("/events/expressions/#expressions")
       .AddParameter("expression", _("Minimum value"))
       .AddParameter("expression", _("Maximum value"));
 
@@ -66,7 +66,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
                      _("Random value in steps"),
                      "",
                      "res/dice-6.svg")
-      .SetHelpPath("https://wiki.gdevelop.io/gdevelop5/events/expressions/#expressions")
+      .SetHelpPath("/events/expressions/#expressions")
       .AddParameter("expression", _("Minimum value"))
       .AddParameter("expression", _("Maximum value"))
       .AddParameter("expression", _("Step"));
@@ -476,7 +476,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
                      _("The number Pi (3.1415...)"),
                      "",
                      "res/mathfunction.png")
-      .SetHelpPath("https://wiki.gdevelop.io/gdevelop5/events/expressions/#expressions");
+      .SetHelpPath("/events/expressions/#expressions");
 
   extension
       .AddExpression("lerpAngle",

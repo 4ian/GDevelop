@@ -291,8 +291,8 @@
       },
       "secondary": {
         "color": {
-          "value": "#494952",
-          "comment": "Palette/Grey/70 - Text/ Secondary"
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50 - Text/ Secondary"
         }
       },
       "disabled": {

@@ -86,7 +86,7 @@ const renderSortableHeader = ({
       style={{
         color: isActive
           ? 'var(--theme-text-default-color)'
-          : 'var(--table-text-color-header)',
+          : 'var(--theme-text-secondary-color)',
         display: 'flex',
         alignItems: 'center',
         gap: 4,
@@ -341,6 +341,13 @@ class InstancesList extends Component<Props, State> {
                       width={Math.max(width * 0.35, minimumWidths.objectName)}
                       className={'tableColumn'}
                       headerRenderer={renderSortableHeader}
+                      cellRenderer={({ cellData }) => (
+                        <span
+                          style={{ color: 'var(--theme-text-default-color)' }}
+                        >
+                          {cellData}
+                        </span>
+                      )}
                     />
                     <RVColumn
                       label={<Trans>X</Trans>}
@@ -349,7 +356,7 @@ class InstancesList extends Component<Props, State> {
                         width * 0.1,
                         minimumWidths.numberProperty
                       )}
-                      className={'tableColumn'}
+                      className={'tableColumn tableColumnSecondary'}
                       headerRenderer={renderSortableHeader}
                     />
                     <RVColumn
@@ -359,7 +366,7 @@ class InstancesList extends Component<Props, State> {
                         width * 0.1,
                         minimumWidths.numberProperty
                       )}
-                      className={'tableColumn'}
+                      className={'tableColumn tableColumnSecondary'}
                       headerRenderer={renderSortableHeader}
                     />
                     <RVColumn
@@ -369,7 +376,7 @@ class InstancesList extends Component<Props, State> {
                         width * 0.1,
                         minimumWidths.numberProperty
                       )}
-                      className={'tableColumn'}
+                      className={'tableColumn tableColumnSecondary'}
                       headerRenderer={renderSortableHeader}
                     />
                     <RVColumn
@@ -384,7 +391,7 @@ class InstancesList extends Component<Props, State> {
                         width * 0.1,
                         minimumWidths.numberProperty
                       )}
-                      className={'tableColumn'}
+                      className={'tableColumn tableColumnSecondary'}
                       headerRenderer={renderSortableHeader}
                     />
                     <RVColumn
@@ -396,7 +403,7 @@ class InstancesList extends Component<Props, State> {
                       }
                       dataKey="layer"
                       width={Math.max(width * 0.2, minimumWidths.layerName)}
-                      className={'tableColumn'}
+                      className={'tableColumn tableColumnSecondary'}
                       headerRenderer={renderSortableHeader}
                     />
                     <RVColumn

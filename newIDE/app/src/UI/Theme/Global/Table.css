@@ -42,3 +42,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.gd-table .tableColumnSecondary {
+  color: var(--theme-text-secondary-color);
+}

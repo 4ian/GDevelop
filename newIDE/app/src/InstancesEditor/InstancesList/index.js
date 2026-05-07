@@ -14,6 +14,8 @@ import CompactSearchBar from '../../UI/CompactSearchBar';
 import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
 import Lock from '../../UI/CustomSvgIcons/Lock';
 import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
+import RotateZ from '../../UI/CustomSvgIcons/RotateZ';
+import Layers from '../../UI/CustomSvgIcons/Layers';
 import { toFixedWithoutTrailingZeros } from '../../Utils/Mathematics';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -118,7 +120,7 @@ class InstancesList extends Component<Props, State> {
           y: toFixedWithoutTrailingZeros(instance.getY(), 2),
           angle: toFixedWithoutTrailingZeros(instance.getAngle(), 2),
           layer: instance.getLayer(),
-          zOrder: instance.getZOrder(),
+          zOrder: String(instance.getZOrder()),
         });
       }
     };
@@ -325,7 +327,12 @@ class InstancesList extends Component<Props, State> {
                       className={'tableColumn'}
                     />
                     <RVColumn
-                      label={<Trans>Angle</Trans>}
+                      label={
+                        <RotateZ
+                          titleAccess="Rotation (Z)"
+                          style={{ width: 18, height: 18, display: 'block' }}
+                        />
+                      }
                       dataKey="angle"
                       width={Math.max(
                         width * 0.1,
@@ -334,7 +341,12 @@ class InstancesList extends Component<Props, State> {
                       className={'tableColumn'}
                     />
                     <RVColumn
-                      label={<Trans>Layer</Trans>}
+                      label={
+                        <Layers
+                          titleAccess="Layer"
+                          style={{ width: 18, height: 18, display: 'block' }}
+                        />
+                      }
                       dataKey="layer"
                       width={Math.max(width * 0.2, minimumWidths.layerName)}
                       className={'tableColumn'}

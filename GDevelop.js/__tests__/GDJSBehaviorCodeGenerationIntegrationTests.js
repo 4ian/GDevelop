@@ -916,14 +916,17 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
         eventsFunctionsExtension,
         eventsBasedBehavior
       );
-      // Add the object parameter used in the behavior's events.
+      // Add the object parameter used in the behavior's events. Use
+      // "objectListOrEmptyIfJustDeclared" (the IDE's "Created objects"
+      // parameter type) so the parameter starts empty in the caller scope
+      // and only contains the instances created inside the action.
       const objectParameter = behaviorEventsFunction
         .getParameters()
         .insertNewParameter(
           'MyObjectParam',
           behaviorEventsFunction.getParameters().getParametersCount()
         );
-      objectParameter.setType('object');
+      objectParameter.setType('objectListOrEmptyIfJustDeclared');
 
       // Scene with the two objects:
       // - Bullet, the object passed as parameter
@@ -933,6 +936,25 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
       const cannon = layout
         .getObjects()
         .insertNewObject(project, 'Sprite', 'Cannon', 1);
+      // Register the events-based behavior on the platform so that the
+      // layout code generator can find the metadata for the action call.
+      const platformExtension = new gd.PlatformExtension();
+      gd.MetadataDeclarationHelper.declareExtension(
+        platformExtension,
+        eventsFunctionsExtension
+      );
+      const behaviorMethodMangledNames = new gd.MapStringString();
+      gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+        project,
+        platformExtension,
+        eventsFunctionsExtension,
+        eventsBasedBehavior,
+        behaviorMethodMangledNames
+      );
+      behaviorMethodMangledNames.delete();
+      gd.JsPlatform.get().addNewExtension(platformExtension);
+      platformExtension.delete();
+
       cannon.addNewBehavior(
         project,
         'MyExtension::MyBehavior',

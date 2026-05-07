@@ -105,6 +105,14 @@ describe('libGD.js - GDJS Or object picking semantics integration tests', () => 
   const pickBByVar = (v) => pickByVar('ObjectB', v);
   const pickCByVar = (v) => pickByVar('ObjectC', v);
 
+  // Inverted picking: keeps the *complement* (instances where MyVariable
+  // is NOT equal to the supplied value).
+  const invertedPickByVar = (objectName, expectedValue) => ({
+    type: { inverted: true, value: 'VarObjet' },
+    parameters: [objectName, 'MyVariable', '=', String(expectedValue)],
+  });
+  const invertedPickAByVar = (v) => invertedPickByVar('ObjectA', v);
+
   // Free condition with constant truth value (does not reference any object).
   const freeCondition = (alwaysTrue) => ({
     type: { value: 'Egal' },
@@ -719,11 +727,6 @@ describe('libGD.js - GDJS Or object picking semantics integration tests', () => 
   /*     test file.                                                     */
   /* ================================================================== */
   describe('Or / OrDistributive — inverted picking sub-condition picks the complement', () => {
-    const invertedPickAByVar = (v) => ({
-      type: { inverted: true, value: 'VarObjet' },
-      parameters: ['ObjectA', 'MyVariable', '=', String(v)],
-    });
-
     it('Or { !pickA=2, false }: branch 1 picks A1 and A3 (complement of A=2)', () => {
       const events = [
         {
@@ -877,6 +880,58 @@ describe('libGD.js - GDJS Or object picking semantics integration tests', () => 
       ];
       const { aInsts } = runEventsWithThreeObjectsThreeInstances(events);
       expect(touchedFlags(aInsts)).toEqual([0, 1, 0]);
+    });
+  });
+
+  /* ================================================================== */
+  /* 14. Residual non-equivalence between Or and OrDistributive even    */
+  /*     when an outside-Or condition pre-narrows X — pins down the     */
+  /*     "★ row 8" of the Setup B truth table.                          */
+  /*                                                                    */
+  /*     Outside narrows ObjectA to {A1, A2} (= S0). Then:               */
+  /*       branch 1: pickA=1 — references A, true, narrows to {A1}.    */
+  /*       branch 2: free, true — does not reference A.                */
+  /*                                                                    */
+  /*     - Or commits to the narrower branch-1 pick: parent.A = {A1}.   */
+  /*     - OrDistributive un-narrows back to S0: branch 2 contributes  */
+  /*       parent.A unchanged, so the union is {A1, A2}.                */
+  /*                                                                    */
+  /*     This case maps to the original Door/Coin vs Input/Button       */
+  /*     intent split at the "subset of subset" scale; it is the only   */
+  /*     residual difference between fixed Or and OrDistributive when   */
+  /*     parent already has a pre-pick.                                 */
+  /* ================================================================== */
+  describe('Or vs OrDistributive — residual non-equivalence even with outside pre-pick', () => {
+    it('Or: a true narrowing X-ref branch + a true free branch → parent.A narrows further to {A1}', () => {
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            invertedPickAByVar(3), // narrow A to {A1, A2}
+            orOf(pickAByVar(1), freeCondition(true)),
+          ],
+          actions: [touchA],
+          events: [],
+        },
+      ];
+      const { aInsts } = runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([1, 0, 0]);
+    });
+
+    it('OrDistributive: same shape → parent.A stays at the outside pre-pick {A1, A2}', () => {
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            invertedPickAByVar(3), // narrow A to {A1, A2}
+            orDistributiveOf(pickAByVar(1), freeCondition(true)),
+          ],
+          actions: [touchA],
+          events: [],
+        },
+      ];
+      const { aInsts } = runEventsWithThreeObjectsThreeInstances(events);
+      expect(touchedFlags(aInsts)).toEqual([1, 1, 0]);
     });
   });
 });

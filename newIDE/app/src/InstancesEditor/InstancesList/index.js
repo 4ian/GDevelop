@@ -85,8 +85,8 @@ class InstancesList extends Component<Props, State> {
   // $FlowFixMe[missing-local-annot]
   state = {
     searchText: '',
-    sortBy: '',
-    sortDirection: SortDirection.ASC,
+    sortBy: 'zOrder',
+    sortDirection: SortDirection.DESC,
   };
   renderedRows: Array<RenderedRowInfo> = [];
   instanceRowRenderer: ?typeof gd.InitialInstanceJSFunctor;

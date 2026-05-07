@@ -67,7 +67,17 @@ const compareStrings = (x: string, y: string, direction: number): number => {
   return 0;
 };
 
-const renderSortableHeader = ({ dataKey, label, sortBy, sortDirection }) => {
+const renderSortableHeader = ({
+  dataKey,
+  label,
+  sortBy,
+  sortDirection,
+}: {
+  dataKey: string,
+  label: React$Node,
+  sortBy: string,
+  sortDirection: string,
+}) => {
   const isActive = dataKey === sortBy;
   return (
     <span

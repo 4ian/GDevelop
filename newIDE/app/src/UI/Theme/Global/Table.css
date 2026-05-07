@@ -4,6 +4,7 @@
 .gd-table {
   font-family: var(--gdevelop-classic-font-family);
   color: var(--table-text-color);
+  background-color: var(--table-row-odd-background-color);
 }
 
 .gd-table .tableHeaderRow {

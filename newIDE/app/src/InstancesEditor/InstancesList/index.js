@@ -298,16 +298,6 @@ class InstancesList extends Component<Props, State> {
                       className={'tableColumn'}
                     />
                     <RVColumn
-                      label=""
-                      dataKey="locked"
-                      width={Math.max(
-                        width * 0.05,
-                        minimumWidths.numberProperty
-                      )}
-                      className={'tableColumn'}
-                      cellRenderer={this._renderLockCell}
-                    />
-                    <RVColumn
                       label={<Trans>X</Trans>}
                       dataKey="x"
                       width={Math.max(
@@ -319,6 +309,15 @@ class InstancesList extends Component<Props, State> {
                     <RVColumn
                       label={<Trans>Y</Trans>}
                       dataKey="y"
+                      width={Math.max(
+                        width * 0.1,
+                        minimumWidths.numberProperty
+                      )}
+                      className={'tableColumn'}
+                    />
+                    <RVColumn
+                      label={<Trans>Z</Trans>}
+                      dataKey="zOrder"
                       width={Math.max(
                         width * 0.1,
                         minimumWidths.numberProperty
@@ -341,13 +340,14 @@ class InstancesList extends Component<Props, State> {
                       className={'tableColumn'}
                     />
                     <RVColumn
-                      label={<Trans>Z Order</Trans>}
-                      dataKey="zOrder"
+                      label=""
+                      dataKey="locked"
                       width={Math.max(
-                        width * 0.1,
+                        width * 0.05,
                         minimumWidths.numberProperty
                       )}
                       className={'tableColumn'}
+                      cellRenderer={this._renderLockCell}
                     />
                   </RVTable>
                 )}

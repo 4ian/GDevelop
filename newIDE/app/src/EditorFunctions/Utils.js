@@ -137,6 +137,85 @@ export const getObjectSizeInfo = (
     };
   }
 
+  if (objectType === 'TextInput::TextInputObject') {
+    // Defaults match DEFAULT_WIDTH/DEFAULT_HEIGHT in Extensions/TextInput/JsExtension.js.
+    const width = 300;
+    const height = 30;
+    return {
+      width,
+      height,
+      depth: 0,
+      originX: 0,
+      originY: 0,
+      originZ: 0,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: 0,
+    };
+  }
+
+  if (objectType === 'Lighting::LightObject') {
+    const properties = objectConfiguration.getProperties();
+    const radius = properties.has('radius')
+      ? parseFloat(properties.get('radius').getValue()) || 0
+      : 0;
+    const width = radius * 2;
+    const height = radius * 2;
+    return {
+      width,
+      height,
+      depth: 0,
+      originX: radius,
+      originY: radius,
+      originZ: 0,
+      centerX: radius,
+      centerY: radius,
+      centerZ: 0,
+    };
+  }
+
+  if (objectType === 'Scene3D::Cube3DObject') {
+    const properties = objectConfiguration.getProperties();
+    const width = properties.has('width')
+      ? parseFloat(properties.get('width').getValue()) || 0
+      : 0;
+    const height = properties.has('height')
+      ? parseFloat(properties.get('height').getValue()) || 0
+      : 0;
+    const depth = properties.has('depth')
+      ? parseFloat(properties.get('depth').getValue()) || 0
+      : 0;
+    return {
+      width,
+      height,
+      depth,
+      originX: 0,
+      originY: 0,
+      originZ: 0,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: depth / 2,
+    };
+  }
+
+  if (objectType === 'Scene3D::Model3DObject') {
+    const config = gd.asModel3DConfiguration(objectConfiguration);
+    const width = config.getWidth();
+    const height = config.getHeight();
+    const depth = config.getDepth();
+    return {
+      width,
+      height,
+      depth,
+      originX: 0,
+      originY: 0,
+      originZ: 0,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: depth / 2,
+    };
+  }
+
   // Events-based (custom) objects: derive size from their declared area.
   if (project.hasEventsBasedObject(objectType)) {
     const eventsBasedObject = project.getEventsBasedObject(objectType);

@@ -417,6 +417,32 @@ describe('getObjectSizeInfo', () => {
     });
   });
 
+  describe('TextInput::TextInputObject', () => {
+    it('returns the default 300x30 size with centered center point', () => {
+      const objects = project.getObjects();
+      const object = objects.insertNewObject(
+        project,
+        'TextInput::TextInputObject',
+        'MyTextInput',
+        objects.getObjectsCount()
+      );
+
+      expect(
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
+      ).toEqual({
+        width: 300,
+        height: 30,
+        depth: 0,
+        originX: 0,
+        originY: 0,
+        originZ: 0,
+        centerX: 150,
+        centerY: 15,
+        centerZ: 0,
+      });
+    });
+  });
+
   describe('Unsupported object type', () => {
     it('returns 0 dimensions for unknown types', () => {
       const objects = project.getObjects();

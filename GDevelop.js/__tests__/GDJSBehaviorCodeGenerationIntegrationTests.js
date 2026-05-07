@@ -864,6 +864,106 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
         .getAsNumber()
     ).toBe(456);
   });
+
+  it('Creates instances of an object passed as parameter and ensures only the newly created instances are picked in the calling container', () => {
+    // This mirrors a real-world case like FireBullet::FireBullet::Fire where
+    // a behavior action receives an object parameter (the bullet) and creates
+    // instances of it. The newly created instances must be picked in the
+    // calling scene/container so subsequent actions only affect them.
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedBehavior = eventsFunctionsExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+
+    // The behavior's action creates the parameter object twice at given
+    // positions.
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'Create' },
+            parameters: ['', 'ParamObject', '10', '20', ''],
+          },
+          {
+            type: { value: 'Create' },
+            parameters: ['', 'ParamObject', '30', '40', ''],
+          },
+        ],
+      },
+    ]);
+    const eventsFunction = eventsBasedBehavior
+      .getEventsFunctions()
+      .insertNewEventsFunction('CreateTwice', 0);
+    eventsFunction
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      eventsFunctionsExtension,
+      eventsBasedBehavior
+    );
+    // Add the object parameter (after the implicit Object/Behavior
+    // parameters added by ensureBehaviorEventsFunctionsProperParameters).
+    eventsFunction
+      .getParameters()
+      .insertNewParameter(
+        'ParamObject',
+        eventsFunction.getParameters().getParametersCount()
+      )
+      .setType('object');
+
+    const { gdjs, runtimeScene, behavior } = generatedBehavior(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      { logCode: false }
+    );
+
+    // Simulate a previous event in the outside scene/container that creates
+    // one ParamObject directly (without going through the behavior). This
+    // instance must NOT be picked when the behavior's action returns.
+    const preExistingObject = runtimeScene.createObject('ParamObject');
+
+    // Simulate a fresh event in the outside scene/container that calls the
+    // behavior's action: nothing was picked yet for ParamObject in this event.
+    const paramObjectsLists = gdjs.Hashtable.newFrom({ ParamObject: [] });
+    behavior.CreateTwice(paramObjectsLists);
+
+    // After the call, only the newly created instances should be picked in
+    // the outside container.
+    const pickedParamObjects = paramObjectsLists.get('ParamObject');
+    expect(pickedParamObjects.length).toBe(2);
+    expect(pickedParamObjects).not.toContain(preExistingObject);
+
+    // Subsequent actions in the outside container only affect the picked
+    // (newly created) instances.
+    for (const pickedObject of pickedParamObjects) {
+      pickedObject.getVariables().get('Counter').add(1);
+    }
+
+    // The scene now contains 3 instances: the pre-existing one and the
+    // 2 created by the behavior.
+    const allParamObjects = runtimeScene.getObjects('ParamObject');
+    expect(allParamObjects.length).toBe(3);
+
+    // Only the 2 newly created instances had their variable updated.
+    expect(preExistingObject.getVariables().get('Counter').getAsNumber()).toBe(
+      0
+    );
+    let updatedCount = 0;
+    for (const object of allParamObjects) {
+      if (object.getVariables().get('Counter').getAsNumber() === 1) {
+        updatedCount++;
+      }
+    }
+    expect(updatedCount).toBe(2);
+  });
 });
 
 function generatedBehavior(

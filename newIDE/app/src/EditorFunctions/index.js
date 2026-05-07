@@ -124,7 +124,7 @@ export type EditorFunctionGenericOutput = {|
   newlyAddedResources?: Array<SingleResourceSearchAndInstallResult>,
 
   // Default size, origin and center of the object(s) being operated on, keyed by object name:
-  objectSizeInfo?: { [string]: ObjectSizeInfo },
+  objectSizeInfo?: { [string]: ObjectSizeInfo | null },
 
   // Set to true when the function call was aborted mid-execution (e.g. the AI
   // request was suspended while event generation was still polling).
@@ -2447,13 +2447,19 @@ const describeInstances: EditorFunction = {
 
           const width = instance.hasCustomSize()
             ? instance.getCustomWidth()
-            : defaultSize.width;
+            : defaultSize
+            ? defaultSize.width
+            : null;
           const height = instance.hasCustomSize()
             ? instance.getCustomHeight()
-            : defaultSize.height;
+            : defaultSize
+            ? defaultSize.height
+            : null;
           const depth = instance.hasCustomDepth()
             ? instance.getCustomDepth()
-            : defaultSize.depth;
+            : defaultSize
+            ? defaultSize.depth
+            : null;
 
           const serializedInstance = serializeToJSObject(instance);
           instances.push({

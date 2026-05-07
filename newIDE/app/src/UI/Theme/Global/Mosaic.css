@@ -25,6 +25,10 @@
 
 .mosaic-gd-theme .mosaic-window-body {
   background: var(--mosaic-layout-background-color) !important;
+}
+
+.mosaic-gd-theme .mosaic-editor-instances-list .mosaic-window-body {
+  background: var(--mosaic-toolbar-background-color) !important;
   border-bottom-left-radius: 4px !important;
   border-bottom-right-radius: 4px !important;
 }

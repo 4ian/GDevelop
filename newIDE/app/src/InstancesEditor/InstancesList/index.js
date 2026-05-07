@@ -50,11 +50,13 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'stretch',
     minWidth: 0,
+    backgroundColor: 'var(--theme-surface-toolbar-background-color)',
   },
   tableContainer: {
     flex: 1,
     overflowX: 'auto',
     overflowY: 'hidden',
+    backgroundColor: 'var(--theme-surface-toolbar-background-color)',
   },
 };
 
@@ -319,6 +321,10 @@ class InstancesList extends Component<Props, State> {
                     height={height}
                     className={`gd-table`}
                     headerClassName={'tableHeaderColumn'}
+                    headerStyle={{
+                      backgroundColor:
+                        'var(--theme-surface-toolbar-background-color)',
+                    }}
                     rowCount={this.renderedRows.length}
                     rowGetter={this._rowGetter}
                     rowHeight={32}

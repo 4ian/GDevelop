@@ -939,12 +939,12 @@
     "row": {
       "odd": {
         "background-color": {
-          "value": "#fafafa"
+          "value": "#F5F5F7"
         }
       },
       "even": {
         "background-color": {
-          "value": "#FFFFFF"
+          "value": "#F5F5F7"
         }
       },
       "selected": {

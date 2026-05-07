@@ -16,6 +16,8 @@ import Lock from '../../UI/CustomSvgIcons/Lock';
 import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
 import RotateZ from '../../UI/CustomSvgIcons/RotateZ';
 import Layers from '../../UI/CustomSvgIcons/Layers';
+import SortArrowUp from '../../UI/CustomSvgIcons/SortArrowUp';
+import SortArrowDown from '../../UI/CustomSvgIcons/SortArrowDown';
 import { toFixedWithoutTrailingZeros } from '../../Utils/Mathematics';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -63,6 +65,30 @@ const compareStrings = (x: string, y: string, direction: number): number => {
   if (x < y) return direction * 1;
   if (x > y) return direction * -1;
   return 0;
+};
+
+const renderSortableHeader = ({ dataKey, label, sortBy, sortDirection }) => {
+  const isActive = dataKey === sortBy;
+  return (
+    <span
+      style={{
+        color: isActive
+          ? 'var(--theme-text-default-color)'
+          : 'var(--table-text-color-header)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+      }}
+    >
+      {label}
+      {isActive &&
+        (sortDirection === 'ASC' ? (
+          <SortArrowUp style={{ width: 12, height: 12, display: 'block' }} />
+        ) : (
+          <SortArrowDown style={{ width: 12, height: 12, display: 'block' }} />
+        ))}
+    </span>
+  );
 };
 
 export type InstancesListInterface = {|
@@ -298,6 +324,7 @@ class InstancesList extends Component<Props, State> {
                       dataKey="name"
                       width={Math.max(width * 0.35, minimumWidths.objectName)}
                       className={'tableColumn'}
+                      headerRenderer={renderSortableHeader}
                     />
                     <RVColumn
                       label={<Trans>X</Trans>}
@@ -307,6 +334,7 @@ class InstancesList extends Component<Props, State> {
                         minimumWidths.numberProperty
                       )}
                       className={'tableColumn'}
+                      headerRenderer={renderSortableHeader}
                     />
                     <RVColumn
                       label={<Trans>Y</Trans>}
@@ -316,6 +344,7 @@ class InstancesList extends Component<Props, State> {
                         minimumWidths.numberProperty
                       )}
                       className={'tableColumn'}
+                      headerRenderer={renderSortableHeader}
                     />
                     <RVColumn
                       label={<Trans>Z</Trans>}
@@ -325,6 +354,7 @@ class InstancesList extends Component<Props, State> {
                         minimumWidths.numberProperty
                       )}
                       className={'tableColumn'}
+                      headerRenderer={renderSortableHeader}
                     />
                     <RVColumn
                       label={
@@ -339,6 +369,7 @@ class InstancesList extends Component<Props, State> {
                         minimumWidths.numberProperty
                       )}
                       className={'tableColumn'}
+                      headerRenderer={renderSortableHeader}
                     />
                     <RVColumn
                       label={
@@ -350,6 +381,7 @@ class InstancesList extends Component<Props, State> {
                       dataKey="layer"
                       width={Math.max(width * 0.2, minimumWidths.layerName)}
                       className={'tableColumn'}
+                      headerRenderer={renderSortableHeader}
                     />
                     <RVColumn
                       label=""

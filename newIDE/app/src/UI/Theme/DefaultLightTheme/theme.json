@@ -949,10 +949,12 @@
       },
       "selected": {
         "background-color": {
-          "value": "#4c92ff"
+          "value": "#ECE5FF",
+          "comment": "Palette/Purple/10"
         },
         "color": {
-          "value": "#FFFFFF"
+          "value": "#1D1D26",
+          "comment": "Text/Primary"
         }
       }
     }

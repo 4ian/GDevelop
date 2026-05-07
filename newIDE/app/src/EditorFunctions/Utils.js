@@ -6,13 +6,13 @@ const gd: libGDevelop = global.gd;
 export type ObjectSizeInfo = {|
   width: number,
   height: number,
-  depth: number,
+  depth: number | null,
   originX: number,
   originY: number,
-  originZ: number,
+  originZ: number | null,
   centerX: number,
   centerY: number,
-  centerZ: number,
+  centerZ: number | null,
 |};
 
 /**
@@ -27,7 +27,7 @@ export const getObjectSizeInfo = (
   project: gdProject,
   pixiResourcesLoader: any,
   assetShortHeader?: AssetShortHeader | null
-): ObjectSizeInfo => {
+): ObjectSizeInfo | null => {
   const objectConfiguration = object.getConfiguration();
   const objectType = object.getType();
 
@@ -80,27 +80,17 @@ export const getObjectSizeInfo = (
         return {
           width,
           height,
-          depth: 0,
+          depth: null,
           originX,
           originY,
-          originZ: 0,
+          originZ: null,
           centerX,
           centerY,
-          centerZ: 0,
+          centerZ: null,
         };
       }
     }
-    return {
-      width: 0,
-      height: 0,
-      depth: 0,
-      originX: 0,
-      originY: 0,
-      originZ: 0,
-      centerX: 0,
-      centerY: 0,
-      centerZ: 0,
-    };
+    return null;
   }
 
   if (objectType === 'TiledSpriteObject::TiledSprite') {
@@ -110,13 +100,13 @@ export const getObjectSizeInfo = (
     return {
       width,
       height,
-      depth: 0,
+      depth: null,
       originX: 0,
       originY: 0,
-      originZ: 0,
+      originZ: null,
       centerX: width / 2,
       centerY: height / 2,
-      centerZ: 0,
+      centerZ: null,
     };
   }
 
@@ -127,13 +117,92 @@ export const getObjectSizeInfo = (
     return {
       width,
       height,
-      depth: 0,
+      depth: null,
+      originX: 0,
+      originY: 0,
+      originZ: null,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: null,
+    };
+  }
+
+  if (objectType === 'TextInput::TextInputObject') {
+    // Defaults match DEFAULT_WIDTH/DEFAULT_HEIGHT in Extensions/TextInput/JsExtension.js.
+    const width = 300;
+    const height = 30;
+    return {
+      width,
+      height,
+      depth: null,
+      originX: 0,
+      originY: 0,
+      originZ: null,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: null,
+    };
+  }
+
+  if (objectType === 'Lighting::LightObject') {
+    const properties = objectConfiguration.getProperties();
+    const radius = properties.has('radius')
+      ? parseFloat(properties.get('radius').getValue()) || 0
+      : 0;
+    const width = radius * 2;
+    const height = radius * 2;
+    return {
+      width,
+      height,
+      depth: null,
+      originX: radius,
+      originY: radius,
+      originZ: null,
+      centerX: radius,
+      centerY: radius,
+      centerZ: null,
+    };
+  }
+
+  if (objectType === 'Scene3D::Cube3DObject') {
+    const properties = objectConfiguration.getProperties();
+    const width = properties.has('width')
+      ? parseFloat(properties.get('width').getValue()) || 0
+      : 0;
+    const height = properties.has('height')
+      ? parseFloat(properties.get('height').getValue()) || 0
+      : 0;
+    const depth = properties.has('depth')
+      ? parseFloat(properties.get('depth').getValue()) || 0
+      : 0;
+    return {
+      width,
+      height,
+      depth,
       originX: 0,
       originY: 0,
       originZ: 0,
       centerX: width / 2,
       centerY: height / 2,
-      centerZ: 0,
+      centerZ: depth / 2,
+    };
+  }
+
+  if (objectType === 'Scene3D::Model3DObject') {
+    const config = gd.asModel3DConfiguration(objectConfiguration);
+    const width = config.getWidth();
+    const height = config.getHeight();
+    const depth = config.getDepth();
+    return {
+      width,
+      height,
+      depth,
+      originX: 0,
+      originY: 0,
+      originZ: 0,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: depth / 2,
     };
   }
 
@@ -163,25 +232,15 @@ export const getObjectSizeInfo = (
     return {
       width,
       height,
-      depth,
+      depth: isRenderedIn3D ? depth : null,
       originX: -minX || 0,
       originY: -minY || 0,
-      originZ: -minZ || 0,
+      originZ: isRenderedIn3D ? -minZ || 0 : null,
       centerX: width / 2,
       centerY: height / 2,
-      centerZ: depth / 2,
+      centerZ: isRenderedIn3D ? depth / 2 : null,
     };
   }
 
-  return {
-    width: 0,
-    height: 0,
-    depth: 0,
-    originX: 0,
-    originY: 0,
-    originZ: 0,
-    centerX: 0,
-    centerY: 0,
-    centerZ: 0,
-  };
+  return null;
 };

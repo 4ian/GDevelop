@@ -908,8 +908,8 @@
         "value": "#bbbbbb"
       },
       "background-color": {
-        "value": "#FAFAFA",
-        "comment": "Palette/Grey/00"
+        "value": "#F5F5F7",
+        "comment": "Palette/Grey/10 - Background Primary"
       }
     },
     "toolbar": {

@@ -9,7 +9,6 @@ import {
 } from 'react-virtualized';
 import IconButton from '../../UI/IconButton';
 import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
-import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import CompactSearchBar from '../../UI/CompactSearchBar';
 import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
 import Lock from '../../UI/CustomSvgIcons/Lock';
@@ -50,13 +49,13 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'stretch',
     minWidth: 0,
-    backgroundColor: 'var(--theme-surface-toolbar-background-color)',
+    backgroundColor: 'var(--theme-surface-window-background-color)',
   },
   tableContainer: {
     flex: 1,
     overflowX: 'auto',
     overflowY: 'hidden',
-    backgroundColor: 'var(--theme-surface-toolbar-background-color)',
+    backgroundColor: 'var(--table-row-odd-background-color)',
   },
 };
 
@@ -76,7 +75,7 @@ const renderSortableHeader = ({
   sortDirection,
 }: {
   dataKey: string,
-  label: React$Node,
+  label: React.Node,
   sortBy: string,
   sortDirection: string,
 }) => {
@@ -86,7 +85,7 @@ const renderSortableHeader = ({
       style={{
         color: isActive
           ? 'var(--theme-text-default-color)'
-          : 'var(--theme-text-secondary-color)',
+          : 'var(--table-text-color-header)',
         display: 'flex',
         alignItems: 'center',
         gap: 4,
@@ -290,139 +289,112 @@ class InstancesList extends Component<Props, State> {
     const tableKey = instances.ptr;
 
     return (
-      <GDevelopThemeContext.Consumer>
-        {gdevelopTheme => (
-          <div style={styles.container}>
-            <Line>
-              <Column expand noOverflowParent>
-                <CompactSearchBar
-                  value={searchText}
-                  onChange={searchText =>
-                    this.setState({
-                      searchText,
-                    })
-                  }
-                  onRequestSearch={this._selectFirstInstance}
-                  placeholder={t`Search instances`}
+      <div style={styles.container}>
+        <Line>
+          <Column expand noOverflowParent>
+            <CompactSearchBar
+              value={searchText}
+              onChange={searchText =>
+                this.setState({
+                  searchText,
+                })
+              }
+              onRequestSearch={this._selectFirstInstance}
+              placeholder={t`Search instances`}
+            />
+          </Column>
+        </Line>
+        <div
+          style={styles.tableContainer}
+          onKeyDown={this._keyboardShortcuts.onKeyDown}
+          onKeyUp={this._keyboardShortcuts.onKeyUp}
+        >
+          <AutoSizer>
+            {({ height, width }) => (
+              <RVTable
+                ref={table => (this.table = table)}
+                key={tableKey}
+                headerHeight={30}
+                height={height}
+                className={`gd-table`}
+                headerClassName={'tableHeaderColumn'}
+                headerStyle={{
+                  backgroundColor: 'var(--table-row-odd-background-color)',
+                }}
+                rowCount={this.renderedRows.length}
+                rowGetter={this._rowGetter}
+                rowHeight={32}
+                onRowClick={this._onRowClick}
+                rowClassName={this._rowClassName}
+                sort={this._sort}
+                sortBy={sortBy}
+                sortDirection={sortDirection}
+                width={Math.max(width, minimumWidths.table)}
+              >
+                <RVColumn
+                  label={<Trans>Object name</Trans>}
+                  dataKey="name"
+                  width={Math.max(width * 0.35, minimumWidths.objectName)}
+                  className={'tableColumn'}
+                  headerRenderer={renderSortableHeader}
                 />
-              </Column>
-            </Line>
-            <div
-              style={styles.tableContainer}
-              onKeyDown={this._keyboardShortcuts.onKeyDown}
-              onKeyUp={this._keyboardShortcuts.onKeyUp}
-            >
-              <AutoSizer>
-                {({ height, width }) => (
-                  <RVTable
-                    ref={table => (this.table = table)}
-                    key={tableKey}
-                    headerHeight={30}
-                    height={height}
-                    className={`gd-table`}
-                    headerClassName={'tableHeaderColumn'}
-                    headerStyle={{
-                      backgroundColor:
-                        'var(--theme-surface-toolbar-background-color)',
-                    }}
-                    rowCount={this.renderedRows.length}
-                    rowGetter={this._rowGetter}
-                    rowHeight={32}
-                    onRowClick={this._onRowClick}
-                    rowClassName={this._rowClassName}
-                    sort={this._sort}
-                    sortBy={sortBy}
-                    sortDirection={sortDirection}
-                    width={Math.max(width, minimumWidths.table)}
-                  >
-                    <RVColumn
-                      label={<Trans>Object name</Trans>}
-                      dataKey="name"
-                      width={Math.max(width * 0.35, minimumWidths.objectName)}
-                      className={'tableColumn'}
-                      headerRenderer={renderSortableHeader}
-                      cellRenderer={({ cellData }) => (
-                        <span
-                          style={{ color: 'var(--theme-text-default-color)' }}
-                        >
-                          {cellData}
-                        </span>
-                      )}
+                <RVColumn
+                  label={<Trans>X</Trans>}
+                  dataKey="x"
+                  width={Math.max(width * 0.1, minimumWidths.numberProperty)}
+                  className={'tableColumn tableColumnSecondary'}
+                  headerRenderer={renderSortableHeader}
+                />
+                <RVColumn
+                  label={<Trans>Y</Trans>}
+                  dataKey="y"
+                  width={Math.max(width * 0.1, minimumWidths.numberProperty)}
+                  className={'tableColumn tableColumnSecondary'}
+                  headerRenderer={renderSortableHeader}
+                />
+                <RVColumn
+                  label={<Trans>Z</Trans>}
+                  dataKey="zOrder"
+                  width={Math.max(width * 0.1, minimumWidths.numberProperty)}
+                  className={'tableColumn tableColumnSecondary'}
+                  headerRenderer={renderSortableHeader}
+                />
+                <RVColumn
+                  label={
+                    <RotateZ
+                      titleAccess="Rotation (Z)"
+                      style={{ width: 18, height: 18, display: 'block' }}
                     />
-                    <RVColumn
-                      label={<Trans>X</Trans>}
-                      dataKey="x"
-                      width={Math.max(
-                        width * 0.1,
-                        minimumWidths.numberProperty
-                      )}
-                      className={'tableColumn tableColumnSecondary'}
-                      headerRenderer={renderSortableHeader}
+                  }
+                  dataKey="angle"
+                  width={Math.max(width * 0.1, minimumWidths.numberProperty)}
+                  className={'tableColumn tableColumnSecondary'}
+                  headerRenderer={renderSortableHeader}
+                />
+                <RVColumn
+                  label={
+                    <Layers
+                      titleAccess="Layer"
+                      style={{ width: 18, height: 18, display: 'block' }}
                     />
-                    <RVColumn
-                      label={<Trans>Y</Trans>}
-                      dataKey="y"
-                      width={Math.max(
-                        width * 0.1,
-                        minimumWidths.numberProperty
-                      )}
-                      className={'tableColumn tableColumnSecondary'}
-                      headerRenderer={renderSortableHeader}
-                    />
-                    <RVColumn
-                      label={<Trans>Z</Trans>}
-                      dataKey="zOrder"
-                      width={Math.max(
-                        width * 0.1,
-                        minimumWidths.numberProperty
-                      )}
-                      className={'tableColumn tableColumnSecondary'}
-                      headerRenderer={renderSortableHeader}
-                    />
-                    <RVColumn
-                      label={
-                        <RotateZ
-                          titleAccess="Rotation (Z)"
-                          style={{ width: 18, height: 18, display: 'block' }}
-                        />
-                      }
-                      dataKey="angle"
-                      width={Math.max(
-                        width * 0.1,
-                        minimumWidths.numberProperty
-                      )}
-                      className={'tableColumn tableColumnSecondary'}
-                      headerRenderer={renderSortableHeader}
-                    />
-                    <RVColumn
-                      label={
-                        <Layers
-                          titleAccess="Layer"
-                          style={{ width: 18, height: 18, display: 'block' }}
-                        />
-                      }
-                      dataKey="layer"
-                      width={Math.max(width * 0.2, minimumWidths.layerName)}
-                      className={'tableColumn tableColumnSecondary'}
-                      headerRenderer={renderSortableHeader}
-                    />
-                    <RVColumn
-                      label=""
-                      dataKey="locked"
-                      width={Math.max(
-                        width * 0.05,
-                        minimumWidths.numberProperty
-                      )}
-                      className={'tableColumn'}
-                      cellRenderer={this._renderLockCell}
-                    />
-                  </RVTable>
-                )}
-              </AutoSizer>
-            </div>
-          </div>
-        )}
-      </GDevelopThemeContext.Consumer>
+                  }
+                  dataKey="layer"
+                  width={Math.max(width * 0.2, minimumWidths.layerName)}
+                  className={'tableColumn tableColumnSecondary'}
+                  headerRenderer={renderSortableHeader}
+                />
+                <RVColumn
+                  label=""
+                  dataKey="locked"
+                  width={Math.max(width * 0.05, minimumWidths.numberProperty)}
+                  className={'tableColumn'}
+                  cellRenderer={this._renderLockCell}
+                />
+              </RVTable>
+            )}
+          </AutoSizer>
+        </div>
+      </div>
     );
   }
 }

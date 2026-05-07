@@ -5215,10 +5215,11 @@ const readGameProjectJson: EditorFunction = {
       text: <Trans>Inspect the game structure.</Trans>,
     };
   },
+  // No-op: the function call output is sent to the backend along with an
+  // up-to-date game project JSON, which the backend uses to compute the
+  // actual read result.
   launchFunction: async ({ args }) => {
-    return makeGenericFailure(
-      `Unable to get game project JSON - this is handled server-side.`
-    );
+    return { success: true };
   },
   modifiesProject: false,
 };

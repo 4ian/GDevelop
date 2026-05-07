@@ -2555,9 +2555,9 @@ const put2dInstances: EditorFunction = {
     const existingInstanceCount = existing_instance_ids
       ? existing_instance_ids.split(',').length
       : 0;
-    const brushPosition = brush_position
-      ? brush_position.split(',').map(Number)
-      : null;
+    const brushPosition = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
+      brush_position
+    );
 
     if (brush_kind === 'erase') {
       return {
@@ -2687,9 +2687,9 @@ const put2dInstances: EditorFunction = {
     const initialInstances = layout.getInitialInstances();
 
     if (brush_kind === 'erase') {
-      const brushPosition: Array<number> | null = brush_position
-        ? brush_position.split(',').map(Number)
-        : null;
+      const brushPosition = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
+        brush_position
+      );
       const brushSize = brush_size || 0;
 
       // Iterate on existing instances and remove them, and/or those inside the brush radius.
@@ -2760,16 +2760,15 @@ const put2dInstances: EditorFunction = {
         eraseResult.objectSizeInfo = { [object_name]: objectSizeInfo };
       return eraseResult;
     } else {
-      const brushPosition: Array<number> = brush_position
-        ? brush_position.split(',').map(Number)
-        : [
-            project.getGameResolutionWidth() / 2,
-            project.getGameResolutionHeight() / 2,
-          ];
+      const brushPosition: [number, number] = (brush_position &&
+        SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(brush_position)) || [
+        project.getGameResolutionWidth() / 2,
+        project.getGameResolutionHeight() / 2,
+      ];
       const brushSize = brush_size || 0;
-      const brushEndPosition = brush_end_position
-        ? brush_end_position.split(',').map(Number)
-        : null;
+      const brushEndPosition = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
+        brush_end_position
+      );
 
       // Compute the number of instances to create.
       const rowCount = SafeExtractor.extractNumberProperty(args, 'row_count');
@@ -2919,9 +2918,9 @@ const put2dInstances: EditorFunction = {
         }
       }
 
-      const instancesSize = instances_size
-        ? instances_size.split(',').map(Number)
-        : null;
+      const instancesSize = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
+        instances_size
+      );
       const instancesRotation = SafeExtractor.extractNumberProperty(
         args,
         'instances_rotation'
@@ -3134,9 +3133,9 @@ const put3dInstances: EditorFunction = {
     const existingInstanceCount = existing_instance_ids
       ? existing_instance_ids.split(',').length
       : 0;
-    const brushPosition = brush_position
-      ? brush_position.split(',').map(Number)
-      : null;
+    const brushPosition = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
+      brush_position
+    );
 
     if (brush_kind === 'erase') {
       return {
@@ -3266,9 +3265,9 @@ const put3dInstances: EditorFunction = {
     const initialInstances = layout.getInitialInstances();
 
     if (brush_kind === 'erase') {
-      const brushPosition: Array<number> | null = brush_position
-        ? brush_position.split(',').map(Number)
-        : null;
+      const brushPosition = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
+        brush_position
+      );
       const brushSize = brush_size || 0;
 
       // Iterate on existing instances and remove them, and/or those inside the brush radius.
@@ -3341,17 +3340,18 @@ const put3dInstances: EditorFunction = {
         eraseResult.objectSizeInfo = { [object_name]: objectSizeInfo };
       return eraseResult;
     } else {
-      const brushPosition: Array<number> = brush_position
-        ? brush_position.split(',').map(Number)
-        : [
-            project.getGameResolutionWidth() / 2,
-            project.getGameResolutionHeight() / 2,
-            0,
-          ];
+      const brushPosition: [number, number, number] = (brush_position &&
+        SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
+          brush_position
+        )) || [
+        project.getGameResolutionWidth() / 2,
+        project.getGameResolutionHeight() / 2,
+        0,
+      ];
       const brushSize = brush_size || 0;
-      const brushEndPosition: Array<number> | null = brush_end_position
-        ? brush_end_position.split(',').map(Number)
-        : null;
+      const brushEndPosition = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
+        brush_end_position
+      );
 
       let newInstancesCount =
         new_instances_count !== null ? new_instances_count : 0;
@@ -3488,15 +3488,15 @@ const put3dInstances: EditorFunction = {
         }
       }
 
-      const instancesSizeArray = instances_size
-        ? instances_size.split(',').map(Number)
-        : null;
+      const instancesSizeArray = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
+        instances_size
+      );
       const instancesRotationArray = instances_rotation
         ? instances_rotation.split(',').map(coord => parseFloat(coord) || 0)
         : null;
 
       modifiedAndCreatedInstances.forEach(instance => {
-        if (instancesSizeArray && instancesSizeArray.length >= 3) {
+        if (instancesSizeArray) {
           instance.setHasCustomSize(true);
           instance.setHasCustomDepth(true);
           instance.setCustomWidth(instancesSizeArray[0]);
@@ -3513,7 +3513,7 @@ const put3dInstances: EditorFunction = {
       // Track specific changes that were made
       if (newInstancesCount > 0) {
         const attrs = [];
-        if (instancesSizeArray && instancesSizeArray.length >= 3)
+        if (instancesSizeArray)
           attrs.push(
             `size ${instancesSizeArray[0]}x${instancesSizeArray[1]}x${
               instancesSizeArray[2]
@@ -3556,7 +3556,6 @@ const put3dInstances: EditorFunction = {
         }
         if (
           instancesSizeArray &&
-          instancesSizeArray.length >= 3 &&
           (originalState.originalCustomWidth !== instance.getCustomWidth() ||
             originalState.originalCustomHeight !== instance.getCustomHeight() ||
             originalState.originalCustomDepth !== instance.getCustomDepth())

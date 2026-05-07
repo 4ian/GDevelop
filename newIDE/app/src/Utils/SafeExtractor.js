@@ -117,4 +117,43 @@ export class SafeExtractor {
 
     return null;
   }
+
+  static parseCommaSeparatedTwoFiniteNumbers(
+    anything: any
+  ): [number, number] | null {
+    if (typeof anything !== 'string') return null;
+
+    const array = anything
+      .split(',')
+      .slice(0, 2)
+      .map(str => {
+        if (str === '') return null;
+        const num = Number(str.trim());
+        return Number.isFinite(num) ? num : null;
+      });
+
+    if (array[0] === null || array[1] === null) return null;
+
+    return [array[0], array[1]];
+  }
+
+  static parseCommaSeparatedThreeFiniteNumbers(
+    anything: any
+  ): [number, number, number] | null {
+    if (typeof anything !== 'string') return null;
+
+    const array = anything
+      .split(',')
+      .slice(0, 3)
+      .map(str => {
+        if (str === '') return null;
+        const num = Number(str.trim());
+        return Number.isFinite(num) ? num : null;
+      });
+
+    if (array[0] === null || array[1] === null || array[2] === null)
+      return null;
+
+    return [array[0], array[1], array[2]];
+  }
 }

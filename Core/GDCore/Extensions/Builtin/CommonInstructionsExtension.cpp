@@ -64,13 +64,14 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       .AddCondition(
           "Or",
           _("Or"),
-          _("Checks if at least one sub-condition is true. If no "
-            "sub-condition is specified, it will always be false. "
-            "This is rarely used — multiple events and sub-events are "
-            "usually a better approach.\n\n"
-            "Picked objects: each branch contributes the objects it "
-            "actually picked. Objects that no true branch referenced are "
-            "left as they were before the Or."),
+          _("True if at least one sub-condition is true.\n\n"
+            "Picked objects: only the instances picked by the true "
+            "branches. Objects not referenced by any true branch keep "
+            "what they had before the Or.\n\n"
+            "Use this when the action acts on the specific object whose "
+            "condition was tested.\n"
+            "Example: \"Door collided with Player OR Coin collided with "
+            "Player\" → hide the touched object."),
           _("If one of these conditions is true:"),
           "",
           "res/conditions/or24_black.png",
@@ -82,18 +83,17 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       .AddCondition(
           "OrDistributive",
           _("Or (independent object picking)"),
-          _("Checks if at least one sub-condition is true, while keeping "
-            "object picking independent across branches. A branch that "
-            "does not constrain a given object behaves as if all instances "
-            "of that object were picked for that branch (instead of "
-            "contributing nothing).\n\n"
-            "Use this when the action acts on objects that are unrelated "
-            "to the branch that fired (for example: \"text input was "
-            "submitted OR submit button was clicked\" → read the text "
-            "input). Do not use this when the action should act only on "
-            "the specific object whose state was tested in the branch "
-            "that fired (for example: \"door collided OR coin collided\" "
-            "→ hide the touched object) — use the regular Or for that."),
+          _("True if at least one sub-condition is true.\n\n"
+            "Picked objects stay the same as before the Or, unless a "
+            "true branch explicitly filters them. A true branch that "
+            "does not reference an object leaves that object's "
+            "selection alone.\n\n"
+            "Use this when the action acts on an object that some "
+            "branches do not mention.\n"
+            "Example: \"Text input is submitted OR Submit button is "
+            "clicked\" → set a variable to the text input's value. "
+            "(The button branch doesn't pick the text input; with the "
+            "regular Or the input would no longer be selected.)"),
           _("If one of these conditions is true (independent object "
             "picking):"),
           "",

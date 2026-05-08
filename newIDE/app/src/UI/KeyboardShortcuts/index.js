@@ -50,6 +50,7 @@ type ShortcutCallbacks = {|
   onShift2?: () => void | Promise<void>,
   onShift3?: () => void | Promise<void>,
   onSelectAll?: () => void | Promise<void>,
+  onDeselectAll?: () => void | Promise<void>,
   onToggleGrabbingTool?: (isEnabled: boolean) => void | Promise<void>,
   onRename?: () => void | Promise<void>,
 |};
@@ -261,6 +262,7 @@ export default class KeyboardShortcuts {
       onPaste,
       onDuplicate,
       onSelectAll,
+      onDeselectAll,
       onUndo,
       onRedo,
       onSearch,
@@ -312,7 +314,20 @@ export default class KeyboardShortcuts {
       evt.preventDefault();
       onDuplicate();
     }
-    if (onSelectAll && this._isControlOrCmdPressed() && evt.which === A_KEY) {
+    if (
+      onDeselectAll &&
+      this._isControlOrCmdPressed() &&
+      evt.shiftKey &&
+      evt.which === A_KEY
+    ) {
+      evt.preventDefault();
+      onDeselectAll();
+    } else if (
+      onSelectAll &&
+      this._isControlOrCmdPressed() &&
+      !evt.shiftKey &&
+      evt.which === A_KEY
+    ) {
       evt.preventDefault();
       onSelectAll();
     }

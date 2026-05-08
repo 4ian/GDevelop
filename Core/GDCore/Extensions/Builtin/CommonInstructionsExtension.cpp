@@ -65,13 +65,16 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
           "Or",
           _("Or"),
           _("True if at least one sub-condition is true.\n\n"
-            "Picked objects: only the instances picked by the true "
-            "branches. Objects not referenced by any true branch keep "
-            "what they had before the Or.\n\n"
+            "Picked objects: the action only sees objects picked by a "
+            "true branch. Objects mentioned only by false branches end "
+            "up with no selection.\n\n"
             "Use this when the action acts on the specific object whose "
             "condition was tested.\n"
             "Example: \"Door collided with Player OR Coin collided with "
-            "Player\" → hide the touched object."),
+            "Player\" → hide the touched object. (When the Door branch "
+            "fires, the Door and Player from that collision are picked; "
+            "the Coin is not selected, so an action on Coin does "
+            "nothing.)"),
           _("If one of these conditions is true:"),
           "",
           "res/conditions/or24_black.png",

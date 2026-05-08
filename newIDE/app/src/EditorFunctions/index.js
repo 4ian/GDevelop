@@ -269,6 +269,14 @@ type LaunchFunctionOptionsWithoutProject = {|
   searchAndInstallResources: (
     options: ResourceSearchAndInstallOptions
   ) => Promise<ResourceSearchAndInstallResult>,
+  /**
+   * Returns the asset store tag for a given object type, when the type is
+   * mainly meant to be picked from the asset store (e.g. premade UI objects).
+   * Reads from the remote objects registry so it works even before the
+   * underlying extension is installed. Returns null if no tag is set or if
+   * the registry is not loaded yet.
+   */
+  getAssetStoreTagForNewObject: (objectType: string) => string | null,
 |};
 
 export type LaunchFunctionOptionsWithProject = {|
@@ -754,6 +762,7 @@ const createOrReplaceObject: EditorFunction = {
     onWillInstallExtension,
     onExtensionInstalled,
     PixiResourcesLoader,
+    getAssetStoreTagForNewObject,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_type = SafeExtractor.extractStringProperty(
@@ -863,11 +872,24 @@ const createOrReplaceObject: EditorFunction = {
       const targetScopeText =
         target_object_scope === 'global' ? 'global' : `scene "${scene_name}"`;
 
-      if (candidateType && !search_terms && !asset_id) {
-        // Do nothing: there is nothing given apart from an object type,
-        // which we can still use to fallback to create from scratch.
+      // If no search_terms or asset_id were provided but the object type has
+      // an `assetStoreTag` (i.e. the type is mainly meant to be picked from
+      // the asset store, e.g. premade UI objects), use the tag as default
+      // search terms.
+      let effectiveSearchTerms = search_terms;
+      let assetStoreTag: string | null = null;
+      if (candidateType && !effectiveSearchTerms && !asset_id) {
+        assetStoreTag = getAssetStoreTagForNewObject(candidateType);
+        if (assetStoreTag) {
+          effectiveSearchTerms = `${assetStoreTag}, default`;
+        }
+      }
+
+      if (candidateType && !effectiveSearchTerms && !asset_id) {
+        // Nothing given apart from an object type without an assetStoreTag:
+        // fall back to creating from scratch.
       } else {
-        if (!search_terms && !asset_id) {
+        if (!effectiveSearchTerms && !asset_id) {
           return makeGenericFailure(
             `No search_terms or asset_id provided for "${targetObjectName}". Not created.`
           );
@@ -885,7 +907,7 @@ const createOrReplaceObject: EditorFunction = {
             objectsContainer: targetObjectsContainer,
             objectName: targetObjectName,
             objectType: candidateType,
-            searchTerms: search_terms || '',
+            searchTerms: effectiveSearchTerms || '',
             description: description || '',
             twoDimensionalViewKind: two_dimensional_view_kind || '',
             exactOrPartialAssetId: asset_id || null,
@@ -944,6 +966,13 @@ const createOrReplaceObject: EditorFunction = {
             if (asset_id) {
               return makeGenericFailure(
                 `No asset found with id "${asset_id}". Object not created.`
+              );
+            }
+
+            if (assetStoreTag) {
+              console.warn(
+                `No asset found from store for object type "${candidateType ||
+                  ''}" (assetStoreTag: "${assetStoreTag}"). Falling back to creating "${targetObjectName}" from scratch.`
               );
             }
 

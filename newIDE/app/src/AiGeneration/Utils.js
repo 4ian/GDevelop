@@ -36,6 +36,7 @@ import { useSearchAndInstallAsset } from './UseSearchAndInstallAsset';
 import { useSearchAndInstallResource } from './UseSearchAndInstallResource';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AiRequestContext } from './AiRequestContext';
+import { ObjectStoreContext } from '../AssetStore/ObjectStoreContext';
 
 import { delay } from '../Utils/Delay';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
@@ -185,6 +186,25 @@ export const useProcessFunctionCalls = ({
     resourceManagementProps,
   });
   const { generateEvents } = useGenerateEvents({ project });
+
+  const { translatedObjectShortHeadersByType, fetchObjects } = React.useContext(
+    ObjectStoreContext
+  );
+
+  React.useEffect(
+    () => {
+      fetchObjects();
+    },
+    [fetchObjects]
+  );
+  const getAssetStoreTagForNewObject = React.useCallback(
+    (objectType: string): string | null => {
+      const header = translatedObjectShortHeadersByType[objectType];
+      return (header && header.assetStoreTag) || null;
+    },
+    [translatedObjectShortHeadersByType]
+  );
+
   // In-memory guard against duplicate processing of the same function call.
   //
   // The main protection is marking calls as "working" in the ref-backed
@@ -263,6 +283,7 @@ export const useProcessFunctionCalls = ({
           onExtensionInstalled,
           searchAndInstallAsset,
           searchAndInstallResources,
+          getAssetStoreTagForNewObject,
         });
 
         // If the request was suspended while we were processing, discard the
@@ -306,6 +327,7 @@ export const useProcessFunctionCalls = ({
       onExtensionInstalled,
       searchAndInstallAsset,
       searchAndInstallResources,
+      getAssetStoreTagForNewObject,
       generateEvents,
       onSendEditorFunctionCallResults,
     ]

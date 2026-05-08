@@ -80,6 +80,7 @@ describe('editorFunctions', () => {
     onObjectsModifiedOutsideEditor: jest.fn(),
     onWillInstallExtension: jest.fn(),
     onExtensionInstalled: jest.fn(),
+    getAssetStoreTagForNewObject: () => null,
     PixiResourcesLoader: PixiResourcesLoaderMock,
   });
 

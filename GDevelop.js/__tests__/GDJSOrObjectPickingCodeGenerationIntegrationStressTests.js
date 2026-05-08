@@ -107,16 +107,12 @@ describe('libGD.js - GDJS Or object picking stress tests', () => {
   /*                                                                    */
   /*    Worst-case dedup scenario for the regular Or: every branch       */
   /*    contributes the same N instances, so the final list never       */
-  /*    grows but every push is rejected by the dedup check. This is    */
-  /*    what shifted from O(K · N²) (indexOf on the growing array) to   */
-  /*    O(K · N) (Set membership check). At K = 10, N = 1000 the         */
-  /*    pre-optimization cost is 10⁷ comparisons; post-optimization it  */
-  /*    is 10⁴ Set ops, while the observable result is the same:        */
-  /*    every instance touched exactly once.                            */
+  /*    grows but every push is rejected by the dedup check.
+  /*    O(K · N) (Set membership check).
   /* ------------------------------------------------------------------ */
-  it('Or: 10 identical branches each picking 1000 instances dedupes to 1000 unique touches', () => {
-    const N = 1000;
-    const K = 10;
+  it('Or: 100 identical branches each picking 20000 instances', () => {
+    const N = 20000;
+    const K = 100;
     const aValues = new Array(N).fill(1); // every instance matches MyVariable=1
     const branches = new Array(K).fill(null).map(() => pickByVar('ObjectA', 1));
 
@@ -199,11 +195,10 @@ describe('libGD.js - GDJS Or object picking stress tests', () => {
   /*    Each instance has MyVariable in [0, K). Branch i picks          */
   /*    MyVariable = i, so each instance ends up in exactly one         */
   /*    branch's filtered list — the union is a partition of the        */
-  /*    instances. With K = 10, N = 200 per branch, the union is        */
-  /*    K · N = 2000 instances and every one is touched exactly once.   */
+  /*    instances.
   /* ------------------------------------------------------------------ */
-  it('Or: 10 partition branches over 2000 instances → every instance touched once', () => {
-    const K = 10;
+  it('Or: many partition branches over many instances → every instance touched once', () => {
+    const K = 100;
     const N = 200;
     const aValues = [];
     for (let i = 0; i < K; i++) {
@@ -231,13 +226,12 @@ describe('libGD.js - GDJS Or object picking stress tests', () => {
   /* 4. OrDistributive — many free branches that all leave A            */
   /*    unconstrained. Every true free branch contributes the parent's  */
   /*    full A list, so the union accumulates K copies of N instances   */
-  /*    that all dedup back to N. Pre-optimization: K · N² indexOf      */
-  /*    scans over a list that stays at size N. Post-optimization:      */
-  /*    K · N Set ops. With K = 20, N = 500: 5 · 10⁶ vs 10⁴.             */
+  /*    that all dedup back to N.
+  /*    K · N Set ops.
   /* ------------------------------------------------------------------ */
-  it('OrDistributive: 1 picking branch + 19 free branches over 500 instances → all 500 touched once', () => {
-    const N = 500;
-    const numFreeBranches = 19;
+  it('OrDistributive: 1 picking branch + 100 free branches over 20000 instances → all touched once', () => {
+    const N = 20000;
+    const numFreeBranches = 100;
     const aValues = new Array(N).fill(1);
 
     const branches = [pickByVar('ObjectA', 1)];
@@ -262,13 +256,10 @@ describe('libGD.js - GDJS Or object picking stress tests', () => {
 
   /* ------------------------------------------------------------------ */
   /* 5. Or with And-inside — multi-condition branches that pick several */
-  /*    objects together at scale. Each true And-branch contributes its */
-  /*    own A and B picks; the dedup happens independently per object   */
-  /*    in the per-object final lists. Confirms the two final lists    */
-  /*    do not interfere and that both Set-keyed dedups stay correct.   */
+  /*    objects together at scale.
   /* ------------------------------------------------------------------ */
-  it('Or: 8 And-branches × 250 A and 250 B per branch → 8 × 250 = 2000 touches each, deduped to 2000', () => {
-    const K = 8;
+  it('Or: And-branches inside', () => {
+    const K = 15;
     const PER_BRANCH = 250;
     // Instances are partitioned by branch: aValues = [0,...,0, 1,...,1, ...].
     // Branch i is And{ pickA=i, pickB=i }, picking its own A-slice and
@@ -311,13 +302,10 @@ describe('libGD.js - GDJS Or object picking stress tests', () => {
 
   /* ------------------------------------------------------------------ */
   /* 6. Pathological — many branches all picking the SAME single        */
-  /*    instance. The final list never grows past 1, so dedup work is   */
-  /*    bounded; this is essentially a smoke test that the Set-based   */
-  /*    path doesn't double-count even after a large number of          */
-  /*    redundant pushes.                                               */
+  /*    instance.
   /* ------------------------------------------------------------------ */
-  it('Or: 100 branches all picking the same single instance → Touched = 1', () => {
-    const K = 100;
+  it('Or: many branches all picking the same single instance → Touched = 1', () => {
+    const K = 1000;
     const branches = new Array(K).fill(null).map(() => pickByVar('ObjectA', 1));
     const events = [
       {

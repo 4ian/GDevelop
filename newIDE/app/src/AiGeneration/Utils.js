@@ -31,6 +31,7 @@ import {
 import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
 import { useSearchAndInstallAsset } from './UseSearchAndInstallAsset';
+import { useGetObjectShortHeader } from './UseGetObjectShortHeader';
 import { useSearchAndInstallResource } from './UseSearchAndInstallResource';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AiRequestContext } from './AiRequestContext';
@@ -155,6 +156,7 @@ export const useProcessFunctionCalls = ({
     onWillInstallExtension,
     onExtensionInstalled,
   });
+  const getObjectShortHeader = useGetObjectShortHeader();
   const { searchAndInstallResources } = useSearchAndInstallResource({
     project,
     resourceManagementProps,
@@ -234,6 +236,7 @@ export const useProcessFunctionCalls = ({
           onWillInstallExtension,
           onExtensionInstalled,
           searchAndInstallAsset,
+          getObjectShortHeader,
           searchAndInstallResources,
         });
 
@@ -283,6 +286,7 @@ export const useProcessFunctionCalls = ({
       onWillInstallExtension,
       onExtensionInstalled,
       searchAndInstallAsset,
+      getObjectShortHeader,
       searchAndInstallResources,
       generateEvents,
       onSendEditorFunctionCallResults,

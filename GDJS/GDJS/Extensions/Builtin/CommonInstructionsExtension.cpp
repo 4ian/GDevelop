@@ -326,15 +326,19 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             emptyListsNeeded.insert(*it);
             gd::String objList = codeGenerator.GetObjectListName(*it, context);
             gd::String finalObjList = finalListName(*it);
+            gd::String finalObjSet = finalObjList + "Set";
             // Mark that this object got a contribution from a true branch
             // that referenced it.
             conditionsCode += "    " + hasContribName(*it) + " = true;\n";
             conditionsCode += "    for (let j = 0, jLen = " + objList +
                               ".length; j < jLen ; ++j) {\n";
-            conditionsCode += "        if ( " + finalObjList + ".indexOf(" +
-                              objList + "[j]) === -1 )\n";
+            conditionsCode += "        if (!" + finalObjSet + ".has(" +
+                              objList + "[j])) {\n";
+            conditionsCode += "            " + finalObjSet + ".add(" +
+                              objList + "[j]);\n";
             conditionsCode +=
                 "            " + finalObjList + ".push(" + objList + "[j]);\n";
+            conditionsCode += "        }\n";
             conditionsCode += "    }\n";
           }
           conditionsCode += "}\n";
@@ -356,8 +360,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           // incidence on further conditions, as conditions use "normal"
           // ones.
           gd::String finalObjList = finalListName(*it);
+          gd::String finalObjSet = finalObjList + "Set";
           codeGenerator.AddGlobalDeclaration(finalObjList + " = [];\n");
+          codeGenerator.AddGlobalDeclaration(finalObjSet + " = new Set();\n");
           declarationsCode += finalObjList + ".length = 0;\n";
+          declarationsCode += finalObjSet + ".clear();\n";
           // Per-object contribution flag, reset at the start of every Or.
           codeGenerator.AddGlobalDeclaration(hasContribName(*it) + " = false;\n");
           declarationsCode += hasContribName(*it) + " = false;\n";
@@ -495,12 +502,16 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 gd::String objList =
                     codeGenerator.GetObjectListName(objectName, context);
                 gd::String finalObjList = finalListName(objectName);
+                gd::String finalObjSet = finalObjList + "Set";
                 conditionsCode += "    for (let j = 0, jLen = " + objList +
                                   ".length; j < jLen ; ++j) {\n";
-                conditionsCode += "        if ( " + finalObjList +
-                                  ".indexOf(" + objList + "[j]) === -1 )\n";
+                conditionsCode += "        if (!" + finalObjSet + ".has(" +
+                                  objList + "[j])) {\n";
+                conditionsCode += "            " + finalObjSet + ".add(" +
+                                  objList + "[j]);\n";
                 conditionsCode += "            " + finalObjList + ".push(" +
                                   objList + "[j]);\n";
+                conditionsCode += "        }\n";
                 conditionsCode += "    }\n";
               }
               conditionsCode += "}\n";
@@ -511,8 +522,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             gd::String declarationsCode;
             for (auto &objectName : allReferencedObjects) {
               gd::String finalObjList = finalListName(objectName);
+              gd::String finalObjSet = finalObjList + "Set";
               codeGenerator.AddGlobalDeclaration(finalObjList + " = [];\n");
+              codeGenerator.AddGlobalDeclaration(finalObjSet + " = new Set();\n");
               declarationsCode += finalObjList + ".length = 0;\n";
+              declarationsCode += finalObjSet + ".clear();\n";
             }
             declarationsCode += "let " +
                                 codeGenerator.GenerateBooleanFullName(

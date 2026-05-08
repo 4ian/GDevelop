@@ -293,7 +293,18 @@ export const selectEvent = (
   multiSelection: boolean = false
 ): SelectionState => {
   const event = eventContext.event;
-  if (isEventSelected(selection, event)) return selection;
+  const alreadySelected = isEventSelected(selection, event);
+
+  if (multiSelection && alreadySelected) {
+    return {
+      ...selection,
+      selectedEvents: selection.selectedEvents.filter(
+        selectedEventContext => selectedEventContext.event.ptr !== event.ptr
+      ),
+    };
+  }
+
+  if (alreadySelected) return selection;
 
   const existingSelection = multiSelection ? selection : clearSelection();
   return {

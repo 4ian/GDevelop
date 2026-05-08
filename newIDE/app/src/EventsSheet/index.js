@@ -42,6 +42,7 @@ import {
   type VariableDeclarationContext,
   getInitialSelection,
   selectEvent,
+  selectAllTopLevelEvents,
   selectInstruction,
   hasSomethingSelected,
   hasEventSelected,
@@ -285,6 +286,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onCopy: () => this.copySelection(),
       onCut: () => this.cutSelection(),
       onPaste: () => this.pasteEventsOrInstructions(),
+      onSelectAll: () => this.selectAllEvents(),
       onSearch: () => this._toggleSearchPanel(),
       onEscape: () => this._closeSearchPanel(),
       onUndo: () => this.undo(),
@@ -988,6 +990,23 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
+  selectAllEvents = () => {
+    const eventsTree = this._eventsTree;
+    if (!eventsTree) return;
+
+    const { events } = this.props;
+    const rowIndexes: Array<number> = [];
+    for (let i = 0; i < events.getEventsCount(); i++) {
+      const rowIndex = eventsTree.getEventRow(events.getEventAt(i));
+      if (rowIndex !== -1) rowIndexes.push(rowIndex);
+    }
+    const eventContexts = eventsTree.getEventContextAtRowIndexes(rowIndexes);
+
+    this.setState({ selection: selectAllTopLevelEvents(eventContexts) }, () =>
+      this.updateToolbar()
+    );
+  };
+
   collapseAll = () => {
     if (this._eventsTree) this._eventsTree.foldAll();
   };
@@ -1025,6 +1044,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       label: i18n._(t`Delete`),
       click: () => this.deleteSelection(),
       accelerator: 'Delete',
+    },
+    {
+      label: i18n._(t`Select All`),
+      click: () => this.selectAllEvents(),
+      accelerator: 'CmdOrCtrl+A',
     },
     {
       label: i18n._(t`Toggle Disabled`),
@@ -2832,6 +2856,7 @@ export type EventsSheetInterface = {|
     searchFilters?: SearchFilterParams
   ) => void,
   clearGlobalSearchResults: () => void,
+  selectAllEvents: () => void,
 |};
 
 // EventsSheet is a wrapper so that the component can use multiple
@@ -2845,6 +2870,7 @@ const EventsSheet = (props, ref) => {
     scrollToEventPath,
     setGlobalSearchResults,
     clearGlobalSearchResults,
+    selectAllEvents,
   }));
 
   const {
@@ -2883,6 +2909,9 @@ const EventsSheet = (props, ref) => {
   };
   const clearGlobalSearchResults = () => {
     if (component.current) component.current.clearGlobalSearchResults();
+  };
+  const selectAllEvents = () => {
+    if (component.current) component.current.selectAllEvents();
   };
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

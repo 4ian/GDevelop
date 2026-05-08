@@ -302,6 +302,15 @@ export const selectEvent = (
   };
 };
 
+export const selectAllTopLevelEvents = (
+  eventContexts: Array<EventContext>
+): SelectionState => {
+  return {
+    ...clearSelection(),
+    selectedEvents: eventContexts,
+  };
+};
+
 export const selectInstruction = (
   eventContext: EventContext,
   selection: SelectionState,

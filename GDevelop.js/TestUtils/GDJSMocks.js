@@ -1080,6 +1080,11 @@ function makeMinimalGDJSMock(options) {
       ManuallyResolvableTask,
       Variable,
       VariablesContainer,
+      // Deprecated-Or-picking compatibility flag, defaults to false here.
+      // Tests that need to exercise the pre-5.6.269 picking semantics flip
+      // this on the returned `gdjs` object before calling the compiled
+      // events, and reset it afterwards.
+      useDeprecatedOrConditionPicking: false,
     },
     mocks: {
       runRuntimeScenePreEventsCallbacks: () => {

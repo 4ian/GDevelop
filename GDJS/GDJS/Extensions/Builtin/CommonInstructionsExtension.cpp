@@ -377,13 +377,21 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // contribution (a true branch that actually referenced the object).
         // If no true branch contributed, leave the parent's picked list
         // untouched so picks established before the Or are preserved.
+        //
+        // Backwards compatibility: projects from before 5.6.269 expect the
+        // old "always overwrite parent.X with final.X" semantics. The
+        // runtime flag `gdjs.useDeprecatedOrConditionPicking` is set from
+        // the project's `useDeprecatedOrConditionPicking` property, and
+        // when true forces the unconditional overwrite — reproducing the
+        // pre-fix behavior for those projects.
         code += "{\n";
         for (set<gd::String>::iterator it = emptyListsNeeded.begin();
              it != emptyListsNeeded.end(); ++it) {
           gd::String finalObjList = finalListName(*it);
-          code += "if (" + hasContribName(*it) + ") gdjs.copyArray(" +
-                  finalObjList + ", " +
-                  codeGenerator.GetObjectListName(*it, parentContext) + ");\n";
+          code += "if (gdjs.useDeprecatedOrConditionPicking || " +
+                  hasContribName(*it) + ") gdjs.copyArray(" + finalObjList +
+                  ", " + codeGenerator.GetObjectListName(*it, parentContext) +
+                  ");\n";
         }
         code += "}\n";
 

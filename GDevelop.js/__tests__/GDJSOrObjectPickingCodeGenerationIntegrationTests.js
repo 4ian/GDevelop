@@ -934,4 +934,119 @@ describe('libGD.js - GDJS Or object picking semantics integration tests', () => 
       expect(touchedFlags(aInsts)).toEqual([1, 1, 0]);
     });
   });
+
+  /* ================================================================== */
+  /* 15. Backwards compatibility — the project flag                     */
+  /*     `useDeprecatedOrConditionPicking` (set automatically for       */
+  /*     projects from before 5.6.269) restores the pre-fix Or behavior */
+  /*     of unconditionally overwriting the parent's picked list with   */
+  /*     the union of branch contributions, including empty ones.       */
+  /*                                                                    */
+  /*     The runtime flag is read at the Or's final copy step. With     */
+  /*     it set, parent.A gets wiped to ∅ in the AllowedArea pattern    */
+  /*     (the original bug); with it unset (the default), the bug fix  */
+  /*     preserves parent.A. The flag does not affect OrDistributive,   */
+  /*     which is a separate condition with its own semantics.          */
+  /* ================================================================== */
+  describe('Or — useDeprecatedOrConditionPicking project flag', () => {
+    // Run the supplied events with the flag temporarily flipped on, then
+    // restore so the rest of the suite stays in default-mode.
+    const runWithDeprecatedFlag = (events) => {
+      const serializerElement = gd.Serializer.fromJSObject(events);
+      const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+        gd,
+        serializerElement,
+        {
+          parameterTypes: { ObjectA: 'object', ObjectB: 'object', ObjectC: 'object' },
+          logCode: false,
+        }
+      );
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+      const aInsts = [1, 2, 3].map((value) => {
+        const obj = runtimeScene.createObject('ObjectA');
+        obj.getVariables().get('MyVariable').setNumber(value);
+        return obj;
+      });
+      const aLists = new gdjs.Hashtable();
+      aLists.put('ObjectA', aInsts.slice());
+
+      const bInsts = [1, 2, 3].map((value) => {
+        const obj = runtimeScene.createObject('ObjectB');
+        obj.getVariables().get('MyVariable').setNumber(value);
+        return obj;
+      });
+      const bLists = new gdjs.Hashtable();
+      bLists.put('ObjectB', bInsts.slice());
+
+      const cInsts = [1, 2, 3].map((value) => {
+        const obj = runtimeScene.createObject('ObjectC');
+        obj.getVariables().get('MyVariable').setNumber(value);
+        return obj;
+      });
+      const cLists = new gdjs.Hashtable();
+      cLists.put('ObjectC', cInsts.slice());
+
+      gdjs.useDeprecatedOrConditionPicking = true;
+      try {
+        runCompiledEvents(gdjs, runtimeScene, [aLists, bLists, cLists]);
+      } finally {
+        gdjs.useDeprecatedOrConditionPicking = false;
+      }
+      return { aInsts, bInsts, cInsts };
+    };
+
+    // Same shape as test 2 above (AllowedArea preservation): outside
+    // narrows A to A2; the Or is true via a free branch; an X-ref
+    // branch is false. With the flag OFF (default), the fix preserves
+    // A2. With the flag ON (legacy), the Or wipes A → ∅ — reproducing
+    // the pre-5.6.269 bug for projects that depend on it.
+    const allowedAreaEvents = [
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          pickAByVar(2),
+          orOf(pickAByVar(999), freeCondition(true)),
+        ],
+        actions: [touchA],
+        events: [],
+      },
+    ];
+
+    it('flag OFF (default): bug-fix path — outside-Or pick of A2 is preserved', () => {
+      const { aInsts } =
+        runEventsWithThreeObjectsThreeInstances(allowedAreaEvents);
+      expect(touchedFlags(aInsts)).toEqual([0, 1, 0]);
+    });
+
+    it('flag ON: pre-fix legacy path — outside-Or pick of A2 is wiped (action sees no A)', () => {
+      const { aInsts } = runWithDeprecatedFlag(allowedAreaEvents);
+      expect(touchedFlags(aInsts)).toEqual([0, 0, 0]);
+    });
+
+    // Door/Coin pattern is unchanged by the flag — the pre-fix Or
+    // already produced the right result here, so flipping the flag must
+    // not regress it.
+    const doorCoinEvents = [
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [orOf(pickAByVar(2), pickBByVar(999))],
+        actions: [touchA, touchB],
+        events: [],
+      },
+    ];
+
+    it('flag OFF: Door/Coin only-A-true → only A2 touched', () => {
+      const { aInsts, bInsts } =
+        runEventsWithThreeObjectsThreeInstances(doorCoinEvents);
+      expect(touchedFlags(aInsts)).toEqual([0, 1, 0]);
+      expect(touchedFlags(bInsts)).toEqual([0, 0, 0]);
+    });
+
+    it('flag ON: Door/Coin only-A-true → still only A2 touched (no regression on this pattern)', () => {
+      const { aInsts, bInsts } = runWithDeprecatedFlag(doorCoinEvents);
+      expect(touchedFlags(aInsts)).toEqual([0, 1, 0]);
+      expect(touchedFlags(bInsts)).toEqual([0, 0, 0]);
+    });
+  });
 });

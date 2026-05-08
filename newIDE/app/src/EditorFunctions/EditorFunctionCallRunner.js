@@ -24,6 +24,7 @@ import {
 } from '.';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
+import { type ObjectShortHeader } from '../Utils/GDevelopServices/Extension';
 
 type ProcessEditorFunctionCallsOptions = {|
   project: ?gdProject,
@@ -56,6 +57,7 @@ type ProcessEditorFunctionCallsOptions = {|
   searchAndInstallAsset: (
     options: AssetSearchAndInstallOptions
   ) => Promise<AssetSearchAndInstallResult>,
+  getObjectShortHeader: (objectType: string) => ?ObjectShortHeader,
   searchAndInstallResources: (
     options: ResourceSearchAndInstallOptions
   ) => Promise<ResourceSearchAndInstallResult>,
@@ -78,6 +80,7 @@ export const processEditorFunctionCalls = async ({
   onWillInstallExtension,
   onExtensionInstalled,
   searchAndInstallAsset,
+  getObjectShortHeader,
   searchAndInstallResources,
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
@@ -177,6 +180,7 @@ export const processEditorFunctionCalls = async ({
         onWillInstallExtension,
         onExtensionInstalled,
         searchAndInstallAsset,
+        getObjectShortHeader,
         searchAndInstallResources,
         PixiResourcesLoader,
       };

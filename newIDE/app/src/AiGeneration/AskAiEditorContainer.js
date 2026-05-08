@@ -200,6 +200,7 @@ export type AskAiEditorInterface = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  selectAllEvents: () => void,
   startOrOpenChat: (
     ?{|
       aiRequestId: string | null,
@@ -966,6 +967,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onInstancesModifiedOutsideEditor: noop,
         onObjectsModifiedOutsideEditor: noop,
         onObjectGroupsModifiedOutsideEditor: noop,
+        selectAllEvents: noop,
         startOrOpenChat: onStartOrOpenChat,
         notifyChangesToInGameEditor: setEditorHotReloadNeeded,
         switchInGameEditorIfNoHotReloadIsNeeded: noop,

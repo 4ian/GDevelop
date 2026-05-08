@@ -63,6 +63,10 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     // No thing to be done.
   }
 
+  selectAllEvents() {
+    // No thing to be done.
+  }
+
   notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
     setEditorHotReloadNeeded(hotReloadSteps);
   }

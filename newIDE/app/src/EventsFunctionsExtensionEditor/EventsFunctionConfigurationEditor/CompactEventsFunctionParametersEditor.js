@@ -11,6 +11,7 @@ import IconButton from '../../UI/IconButton';
 import EmptyMessage from '../../UI/EmptyMessage';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import CompactSemiControlledTextField from '../../UI/CompactSemiControlledTextField';
+import { type CompactTextFieldInterface } from '../../UI/CompactTextField';
 import { ParametersIndexOffsets } from '../../EventsFunctionsExtensionsLoader';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import {
@@ -181,17 +182,26 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
     const parameterRefs = React.useRef(
       new Map<string, React.ElementRef<any>>()
     );
+    const parameterNameFieldRefs = React.useRef(
+      new Map<string, CompactTextFieldInterface | null>()
+    );
 
     React.useEffect(
       () => {
-        if (
-          scrollView.current &&
-          justAddedParameterElement.current &&
-          justAddedParameterName
-        ) {
+        if (!justAddedParameterName) {
+          return;
+        }
+        if (scrollView.current && justAddedParameterElement.current) {
           scrollView.current.scrollTo(justAddedParameterElement.current);
           setJustAddedParameterName(null);
           justAddedParameterElement.current = null;
+        }
+        const parameterNameField = parameterNameFieldRefs.current.get(
+          justAddedParameterName
+        );
+        if (parameterNameField) {
+          parameterNameField.focus();
+          parameterNameField.select();
         }
       },
       [justAddedParameterName]
@@ -204,6 +214,13 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
           if (scrollView.current) {
             scrollView.current.scrollTo(parameterEditor);
           }
+        }
+        const parameterNameField = parameterNameFieldRefs.current.get(
+          parameterName
+        );
+        if (parameterNameField) {
+          parameterNameField.focus();
+          parameterNameField.select();
         }
       }
     }, []);
@@ -663,6 +680,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
     );
 
     parameterRefs.current.clear();
+    parameterNameFieldRefs.current.clear();
 
     return (
       <I18n>
@@ -764,6 +782,12 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                                           </Trans>
                                         </Text>
                                         <CompactSemiControlledTextField
+                                          ref={ref => {
+                                            parameterNameFieldRefs.current.set(
+                                              parameter.getName(),
+                                              ref
+                                            );
+                                          }}
                                           commitOnBlur
                                           placeholder={i18n._(
                                             t`Enter the parameter name (mandatory)`

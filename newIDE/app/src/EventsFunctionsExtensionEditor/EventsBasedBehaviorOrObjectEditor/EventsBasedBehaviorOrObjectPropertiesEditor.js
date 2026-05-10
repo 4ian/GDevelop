@@ -86,6 +86,33 @@ const renderValueTypeIcon = (type: string, className: string): React.Node => {
   }
 };
 
+export const fillBehaviorProperty = (
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  eventsBasedBehavior: gdEventsBasedBehavior,
+  property: gdNamedPropertyDescriptor,
+  behaviorType: string
+) => {
+  // Change the type of the required behavior.
+  const extraInfo = property.getExtraInfo();
+  if (extraInfo.size() === 0) {
+    extraInfo.push_back(behaviorType);
+  } else {
+    extraInfo.set(0, behaviorType);
+  }
+  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+    projectScopedContainersAccessor.getScope().project.getCurrentPlatform(),
+    behaviorType
+  );
+  const projectScopedContainers = projectScopedContainersAccessor.get();
+  const validatedNewName = getValidatedPropertyName(
+    eventsBasedBehavior.getPropertyDescriptors(),
+    projectScopedContainers,
+    behaviorMetadata.getDefaultName()
+  );
+  property.setName(validatedNewName);
+  property.setLabel(behaviorMetadata.getFullName());
+};
+
 const setExtraInfoString = (
   property: gdNamedPropertyDescriptor,
   value: string
@@ -663,26 +690,14 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
                                       : property.getExtraInfo().at(0)
                                   }
                                   onChange={(newValue: string) => {
-                                    // Change the type of the required behavior.
-                                    const extraInfo = property.getExtraInfo();
-                                    if (extraInfo.size() === 0) {
-                                      extraInfo.push_back(newValue);
-                                    } else {
-                                      extraInfo.set(0, newValue);
+                                    if (!eventsBasedBehavior) {
+                                      return;
                                     }
-                                    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-                                      project.getCurrentPlatform(),
+                                    fillBehaviorProperty(
+                                      projectScopedContainersAccessor,
+                                      eventsBasedBehavior,
+                                      property,
                                       newValue
-                                    );
-                                    const projectScopedContainers = projectScopedContainersAccessor.get();
-                                    const validatedNewName = getValidatedPropertyName(
-                                      properties,
-                                      projectScopedContainers,
-                                      behaviorMetadata.getDefaultName()
-                                    );
-                                    property.setName(validatedNewName);
-                                    property.setLabel(
-                                      behaviorMetadata.getFullName()
                                     );
                                     forceUpdate();
                                     onPropertiesUpdated();

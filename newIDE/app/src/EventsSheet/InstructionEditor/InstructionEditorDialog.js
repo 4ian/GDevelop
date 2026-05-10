@@ -36,6 +36,11 @@ import { sendBehaviorAdded } from '../../Utils/Analytics/EventSender';
 import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { fillBehaviorParameter } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/CompactEventsFunctionParametersEditor.js';
+import { fillBehaviorProperty } from '../../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor/EventsBasedBehaviorOrObjectPropertiesEditor';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
+
+const gd: libGDevelop = global.gd;
 
 const styles = {
   fullHeightSelector: {
@@ -74,6 +79,7 @@ type Props = {|
   onPasteInstructions: () => void, // Unused
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  editEventsFunctionParameter: VariableDialogOpeningProps => void,
 |};
 
 const getInitialStepName = (isNewInstruction: boolean): StepName => {
@@ -110,6 +116,7 @@ const InstructionEditorDialog = ({
   onWillInstallExtension,
   onExtensionInstalled,
   i18n,
+  editEventsFunctionParameter,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const [
@@ -181,23 +188,87 @@ const InstructionEditorDialog = ({
 
   const addBehavior = (type: string, defaultName: string) => {
     // Avoid to add behaviors to object parameters.
-    if (!chosenObject || !scope.layout) return;
+    if (!chosenObject) return;
 
-    const wasBehaviorAdded = addBehaviorToObject(
-      project,
-      chosenObject,
-      type,
-      defaultName
-    );
+    if (scope.layout) {
+      const wasBehaviorAdded = addBehaviorToObject(
+        project,
+        chosenObject,
+        type,
+        defaultName
+      );
 
-    if (wasBehaviorAdded) {
-      setNewBehaviorDialogOpen(false);
-      sendBehaviorAdded({
-        behaviorType: type,
-        parentEditor: 'instruction-editor-dialog',
-      });
-      if (scope.layout) {
-        scope.layout.updateBehaviorsSharedData(project);
+      if (wasBehaviorAdded) {
+        setNewBehaviorDialogOpen(false);
+        sendBehaviorAdded({
+          behaviorType: type,
+          parentEditor: 'instruction-editor-dialog',
+        });
+        if (scope.layout) {
+          scope.layout.updateBehaviorsSharedData(project);
+        }
+      }
+    } else {
+      const projectScopedContainers = projectScopedContainersAccessor.get();
+      const objectsContainersList = projectScopedContainers.getObjectsContainersList();
+      const objectsContainerSourceType = objectsContainersList.getObjectsContainerSourceType(
+        chosenObject.getName()
+      );
+
+      if (objectsContainerSourceType === gd.ObjectsContainer.Object) {
+        const wasBehaviorAdded = addBehaviorToObject(
+          project,
+          chosenObject,
+          type,
+          defaultName
+        );
+
+        if (wasBehaviorAdded) {
+          setNewBehaviorDialogOpen(false);
+          sendBehaviorAdded({
+            behaviorType: type,
+            parentEditor: 'instruction-editor-dialog',
+          });
+        }
+      } else if (objectsContainerSourceType === gd.ObjectsContainer.Function) {
+        const { eventsFunction, eventsBasedBehavior } = scope;
+        if (eventsFunction) {
+          if (eventsBasedBehavior && chosenObject.getName() === 'Object') {
+            const properties = eventsBasedBehavior.getPropertyDescriptors();
+            const property = properties.insertNew('NewBehavior', 0);
+            property.setType('Behavior');
+            fillBehaviorProperty(
+              projectScopedContainersAccessor,
+              eventsBasedBehavior,
+              property,
+              type
+            );
+            setNewBehaviorDialogOpen(false);
+          } else {
+            const parameters = eventsFunction.getParameters();
+            const objectParameterIndex = parameters.getParameterPosition(
+              parameters.getParameter(chosenObject.getName())
+            );
+
+            const behaviorParameter = parameters.insertNewParameter(
+              'NewBehavior',
+              objectParameterIndex + 1
+            );
+            behaviorParameter.setType('behavior');
+            behaviorParameter.setExtraInfo(type);
+            fillBehaviorParameter(
+              projectScopedContainersAccessor,
+              eventsFunction,
+              behaviorParameter
+            );
+            editEventsFunctionParameter({
+              variableName: behaviorParameter.getName(),
+              shouldCreate: false,
+              variableType: null,
+            });
+            setNewBehaviorDialogOpen(false);
+          }
+        }
       }
     }
 
@@ -302,7 +373,11 @@ const InstructionEditorDialog = ({
         focusOnMount={shouldAutofocusInput && !instructionType}
         searchPlaceholderObjectName={chosenObjectName}
         searchPlaceholderIsCondition={isCondition}
-        onClickMore={scope.layout ? () => setNewBehaviorDialogOpen(true) : null}
+        onClickMore={
+          scope.eventsBasedObject && chosenObjectName === 'Object'
+            ? null
+            : () => setNewBehaviorDialogOpen(true)
+        }
         id="object-instruction-selector"
       />
     ) : null;

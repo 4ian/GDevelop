@@ -24,7 +24,7 @@ const gd: libGDevelop = global.gd;
 export type VariableDialogOpeningProps = {
   variableName: string,
   shouldCreate: boolean,
-  variableType: 'number' | 'string' | 'boolean',
+  variableType: 'number' | 'string' | 'boolean' | null,
 };
 
 type TabProps = {

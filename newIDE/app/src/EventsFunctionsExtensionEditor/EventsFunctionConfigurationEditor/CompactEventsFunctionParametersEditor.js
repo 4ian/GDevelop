@@ -101,6 +101,28 @@ const getValidatedParameterName = (
   return safeAndUniqueNewName;
 };
 
+export const fillBehaviorParameter = (
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  eventsFunction: gdEventsFunction,
+  parameter: gdParameterMetadata
+) => {
+  const valueTypeMetadata = parameter.getValueTypeMetadata();
+  if (parameter.getValueTypeMetadata().isBehavior()) {
+    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+      projectScopedContainersAccessor.getScope().project.getCurrentPlatform(),
+      valueTypeMetadata.getExtraInfo()
+    );
+    const projectScopedContainers = projectScopedContainersAccessor.get();
+    const validatedNewName = getValidatedParameterName(
+      eventsFunction.getParameters(),
+      projectScopedContainers,
+      behaviorMetadata.getDefaultName()
+    );
+    parameter.setName(validatedNewName);
+    parameter.setDescription(behaviorMetadata.getFullName());
+  }
+};
+
 export type CompactEventsFunctionParametersEditorInterface = {
   editEventsFunctionParameter: VariableDialogOpeningProps => void,
 };
@@ -206,24 +228,6 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       },
       [justAddedParameterName]
     );
-
-    const scrollToParameter = React.useCallback((parameterName: string) => {
-      if (parameterRefs.current) {
-        const parameterEditor = parameterRefs.current.get(parameterName);
-        if (parameterEditor) {
-          if (scrollView.current) {
-            scrollView.current.scrollTo(parameterEditor);
-          }
-        }
-        const parameterNameField = parameterNameFieldRefs.current.get(
-          parameterName
-        );
-        if (parameterNameField) {
-          parameterNameField.focus();
-          parameterNameField.select();
-        }
-      }
-    }, []);
 
     const draggedParameter = React.useRef<?gdParameterMetadata>(null);
 
@@ -335,12 +339,15 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
 
     React.useImperativeHandle(ref, () => ({
       editEventsFunctionParameter: (props: VariableDialogOpeningProps) => {
-        if (props.shouldCreate) {
+        if (props.shouldCreate && props.variableType) {
           const parameterType =
             props.variableType === 'boolean' ? 'yesorno' : props.variableType;
           addParameter(props.variableName, parameterType);
         } else {
-          scrollToParameter(props.variableName);
+          // Make sure parameters can be selected even if they have just been created.
+          forceUpdate();
+          onParametersUpdated();
+          setJustAddedParameterName(props.variableName);
         }
       },
     }));
@@ -906,27 +913,11 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                                           i
                                         )}
                                         onTypeUpdated={() => {
-                                          const valueTypeMetadata = parameter.getValueTypeMetadata();
-                                          if (
+                                          fillBehaviorParameter(
+                                            projectScopedContainersAccessor,
+                                            eventsFunction,
                                             parameter
-                                              .getValueTypeMetadata()
-                                              .isBehavior()
-                                          ) {
-                                            const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-                                              project.getCurrentPlatform(),
-                                              valueTypeMetadata.getExtraInfo()
-                                            );
-                                            const projectScopedContainers = projectScopedContainersAccessor.get();
-                                            const validatedNewName = getValidatedParameterName(
-                                              eventsFunction.getParameters(),
-                                              projectScopedContainers,
-                                              behaviorMetadata.getDefaultName()
-                                            );
-                                            parameter.setName(validatedNewName);
-                                            parameter.setDescription(
-                                              behaviorMetadata.getFullName()
-                                            );
-                                          }
+                                          );
                                           onFunctionParameterTypeChanged(
                                             eventsFunction,
                                             parameter.getName()

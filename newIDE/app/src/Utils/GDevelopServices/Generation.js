@@ -197,6 +197,14 @@ export type AiGeneratedEventChange = {
   missingResources: AiGeneratedEventMissingResource[],
 };
 
+export type AiGeneratedEventBatch = {
+  eventsDescription: string,
+  placementRelation: string,
+  placementTargetEventId: string | null,
+  placementExpectedParentEventId: string | null,
+  placementRationale: string | null,
+};
+
 export type AiGeneratedEvent = {
   id: string,
   createdAt: string,
@@ -205,7 +213,8 @@ export type AiGeneratedEvent = {
   status: GenerationStatus,
 
   partialGameProjectJson: string,
-  eventsDescription: string,
+  eventsDescription: string | null,
+  eventBatches: Array<AiGeneratedEventBatch> | null,
   extensionNamesList: string,
   objectsList: string,
   existingEventsAsText: string,
@@ -671,6 +680,7 @@ export const createAiGeneratedEvent = async (
     projectSpecificExtensionsSummaryJsonUserRelativeKey,
     sceneName,
     eventsDescription,
+    eventBatches,
     extensionNamesList,
     objectsList,
     existingEventsAsText,
@@ -686,7 +696,8 @@ export const createAiGeneratedEvent = async (
     projectSpecificExtensionsSummaryJson: string | null,
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
     sceneName: string,
-    eventsDescription: string,
+    eventsDescription: string | null,
+    eventBatches: Array<AiGeneratedEventBatch> | null,
     extensionNamesList: string,
     objectsList: string,
     existingEventsAsText: string,
@@ -708,6 +719,7 @@ export const createAiGeneratedEvent = async (
       projectSpecificExtensionsSummaryJsonUserRelativeKey,
       sceneName,
       eventsDescription,
+      eventBatches,
       extensionNamesList,
       objectsList,
       existingEventsAsText,

@@ -144,14 +144,23 @@ export type EventsGenerationResult =
       generationAborted: true,
     |};
 
+export type EventBatch = {|
+  eventsDescription: string,
+  placementRelation: string,
+  placementTargetEventId: string | null,
+  placementExpectedParentEventId: string | null,
+  placementRationale: string | null,
+|};
+
 export type EventsGenerationOptions = {|
   sceneName: string,
-  eventsDescription: string,
+  eventsDescription: string | null,
+  eventBatches: Array<EventBatch> | null,
   extensionNamesList: string,
   objectsList: string,
   existingEventsAsText: string,
   existingEventsJson: string | null,
-  placementHint: string,
+  placementHint: string | null,
   relatedAiRequestId: string,
   estimatedComplexity: number | null,
 |};
@@ -3726,7 +3735,14 @@ const addSceneEvents: EditorFunction = {
     editorFunctionCallResultOutput,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
-    const eventsDescription = extractRequiredString(args, 'events_description');
+    const eventsDescription = SafeExtractor.extractStringProperty(
+      args,
+      'events_description'
+    );
+    const eventBatches = SafeExtractor.extractArrayProperty(
+      args,
+      'event_batches'
+    );
     const objectsListArgument = SafeExtractor.extractStringProperty(
       args,
       'objects_list'
@@ -3751,6 +3767,102 @@ const addSceneEvents: EditorFunction = {
             : {eventsDescription}
           </Text>
         )}
+        {eventBatches &&
+          eventBatches.map(batch => {
+            const eventsDescription = SafeExtractor.extractStringProperty(
+              batch,
+              'events_description'
+            );
+            const placementRelation = SafeExtractor.extractStringProperty(
+              batch,
+              'placement_relation'
+            );
+            const placementTargetEventId = SafeExtractor.extractStringProperty(
+              batch,
+              'placement_target_event_id'
+            );
+            const placementExpectedParentEventId = SafeExtractor.extractStringProperty(
+              batch,
+              'placement_expected_parent_event_id'
+            );
+            const placementRationale = SafeExtractor.extractStringProperty(
+              batch,
+              'placement_rationale'
+            );
+
+            return (
+              <ColumnStackLayout noMargin>
+                <Text
+                  noMargin
+                  allowSelection
+                  color="secondary"
+                  size="body-small"
+                  style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+                >
+                  <b>
+                    <Trans>Description</Trans>
+                  </b>
+                  : {eventsDescription}
+                </Text>
+                {placementRelation && (
+                  <Text
+                    noMargin
+                    allowSelection
+                    color="secondary"
+                    size="body-small"
+                    style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+                  >
+                    <b>
+                      <Trans>Placement</Trans>
+                    </b>
+                    : {placementRelation}
+                  </Text>
+                )}
+                {placementTargetEventId && (
+                  <Text
+                    noMargin
+                    allowSelection
+                    color="secondary"
+                    size="body-small"
+                    style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+                  >
+                    <b>
+                      <Trans>Target event</Trans>
+                    </b>
+                    : {placementTargetEventId}
+                  </Text>
+                )}
+                {placementExpectedParentEventId && (
+                  <Text
+                    noMargin
+                    allowSelection
+                    color="secondary"
+                    size="body-small"
+                    style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+                  >
+                    <b>
+                      <Trans>Expected parent event</Trans>
+                    </b>
+                    : {placementExpectedParentEventId}
+                  </Text>
+                )}
+                {placementRationale && (
+                  <Text
+                    noMargin
+                    allowSelection
+                    color="secondary"
+                    size="body-small"
+                    style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+                  >
+                    <b>
+                      <Trans>Placement rationale</Trans>
+                    </b>
+                    : {placementRationale}
+                  </Text>
+                )}
+              </ColumnStackLayout>
+            );
+          })}
         {placementHint && (
           <Text
             noMargin
@@ -3866,7 +3978,14 @@ const addSceneEvents: EditorFunction = {
     searchAndInstallResources,
   }) => {
     const sceneName = extractRequiredString(args, 'scene_name');
-    const eventsDescription = extractRequiredString(args, 'events_description');
+    const eventsDescription = SafeExtractor.extractStringProperty(
+      args,
+      'events_description'
+    );
+    const eventBatches = SafeExtractor.extractArrayProperty(
+      args,
+      'event_batches'
+    );
     const extensionNamesList = extractRequiredString(
       args,
       'extension_names_list'
@@ -3902,11 +4021,56 @@ const addSceneEvents: EditorFunction = {
         ? serializeToJSON(currentSceneEvents)
         : null;
 
+    const parsedEventBatches = eventBatches
+      ? eventBatches.map(batch => {
+          return {
+            eventsDescription:
+              SafeExtractor.extractStringProperty(
+                batch,
+                'events_description'
+              ) || '',
+            placementRelation:
+              SafeExtractor.extractStringProperty(
+                batch,
+                'placement_relation'
+              ) || '(unspecified)',
+            placementTargetEventId: SafeExtractor.extractStringProperty(
+              batch,
+              'placement_target_event_id'
+            ),
+            placementExpectedParentEventId: SafeExtractor.extractStringProperty(
+              batch,
+              'placement_expected_parent_event_id'
+            ),
+            placementRationale: SafeExtractor.extractStringProperty(
+              batch,
+              'placement_rationale'
+            ),
+          };
+        })
+      : null;
+
+    if (parsedEventBatches) {
+      if (parsedEventBatches.length === 0) {
+        return makeGenericFailure(
+          'No event batches provided. Provide one or more with a description of events to generate.'
+        );
+      }
+      if (parsedEventBatches.some(batch => !batch.eventsDescription)) {
+        return makeGenericFailure(
+          'No events description provided for some event batches. Provide a description for each event(s) to generate.'
+        );
+      }
+    } else if (!eventsDescription) {
+      return makeGenericFailure('No events description provided.');
+    }
+
     try {
       const eventsGenerationResult: EventsGenerationResult = await generateEvents(
         {
           sceneName,
           eventsDescription,
+          eventBatches: parsedEventBatches,
           extensionNamesList,
           objectsList,
           existingEventsAsText,

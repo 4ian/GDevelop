@@ -4,8 +4,8 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import VariableField, {
   renderVariableWithIcon,
   type VariableFieldInterface,
-  type VariableDialogOpeningProps,
 } from './VariableField';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import ObjectVariablesDialog from '../../VariablesList/ObjectVariablesDialog';
 import ObjectGroupVariablesDialog from '../../VariablesList/ObjectGroupVariablesDialog';
 import {
@@ -224,8 +224,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               open
               onCancel={() => setEditorOpen(null)}
               onApply={onVariableEditorApply}
-              initiallySelectedVariableName={editorOpen.variableName}
-              shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+              initiallySelectedVariable={editorOpen}
               onComputeAllVariableNames={onComputeAllVariableNames}
               hotReloadPreviewButtonProps={null}
               isListLocked={false}

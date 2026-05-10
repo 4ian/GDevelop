@@ -43,14 +43,9 @@ import ParameterIcon from '../../UI/CustomSvgIcons/Parameter';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import Link from '../../UI/Link';
 import Add from '../../UI/CustomSvgIcons/Add';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 
 const gd: libGDevelop = global.gd;
-
-export type VariableDialogOpeningProps = {
-  variableName: string,
-  shouldCreate: boolean,
-  variableType: 'number' | 'string' | 'boolean',
-};
 
 const getVariableTypeName = (
   variableType: Variable_Type | null

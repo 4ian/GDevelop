@@ -4,7 +4,7 @@ import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import { type VariableDialogOpeningProps } from './VariableField';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 
 export type ParameterRenderingServiceType = {
   components: any,

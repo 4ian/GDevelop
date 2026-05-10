@@ -3310,6 +3310,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                           this.props.hotReloadPreviewButtonProps
                         }
                         isListLocked={true}
+                        initiallySelectedVariable={null}
                       />
                     )}
                   {!!this.state.layerRemoved &&
@@ -3425,6 +3426,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                         this.props.hotReloadPreviewButtonProps
                       }
                       isListLocked={false}
+                      initiallySelectedVariable={null}
                     />
                   )}
                   <React.Fragment>

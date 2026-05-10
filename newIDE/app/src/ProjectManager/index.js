@@ -1465,6 +1465,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       }}
                       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                       isListLocked={false}
+                      initiallySelectedVariable={null}
                     />
                   )}
                   {!!editedPropertiesLayout &&
@@ -1504,6 +1505,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       }}
                       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                       isListLocked={false}
+                      initiallySelectedVariable={null}
                     />
                   )}
                   {project && extensionsSearchDialogOpen && (

@@ -44,7 +44,7 @@ import Text from '../../UI/Text';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import CompactPropertiesEditorRowField from '../../CompactPropertiesEditor/CompactPropertiesEditorRowField';
 import { CompactTextAreaField } from '../../UI/CompactTextAreaField';
-import { type VariableDialogOpeningProps } from '../../EventsSheet/ParameterFields/VariableField';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -336,7 +336,9 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
     React.useImperativeHandle(ref, () => ({
       editEventsFunctionParameter: (props: VariableDialogOpeningProps) => {
         if (props.shouldCreate) {
-          addParameter(props.variableName, props.variableType);
+          const parameterType =
+            props.variableType === 'boolean' ? 'yesorno' : props.variableType;
+          addParameter(props.variableName, parameterType);
         } else {
           scrollToParameter(props.variableName);
         }

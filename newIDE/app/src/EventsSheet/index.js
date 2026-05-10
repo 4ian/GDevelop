@@ -134,7 +134,7 @@ import { findEventByPath } from '../Utils/EventsValidationScanner';
 import type { SearchFilterParams } from '../Utils/Search';
 import type { InitialSearchFilterParams } from './SearchPanel';
 import { isNullPtr } from '../Utils/IsNullPtr';
-import { type VariableDialogOpeningProps } from './ParameterFields/VariableField';
+import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -3013,12 +3013,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               }
             }}
             variablesContainer={this.state.editedVariable.variablesContainer}
-            initiallySelectedVariableName={
-              this.state.editedVariable.variableName
-            }
-            shouldCreateInitiallySelectedVariable={
-              this.state.editedVariable.shouldCreateVariable
-            }
+            initiallySelectedVariable={this.state.editedVariable}
             isListLocked={false}
             loopIndexVariableName={
               editedVariableLoopEvent
@@ -3049,6 +3044,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             onApply={() => this.editLayoutVariables(false)}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             isListLocked={false}
+            initiallySelectedVariable={null}
           />
         )}
         {this.state.textEditedEvent && (

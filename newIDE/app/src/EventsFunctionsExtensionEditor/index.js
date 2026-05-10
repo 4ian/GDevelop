@@ -52,7 +52,7 @@ import PropertyListEditor, {
 } from './PropertyListEditor';
 import type { EventPath } from '../Utils/EventPath';
 import type { SearchFilterParams } from '../Utils/Search';
-import { type VariableDialogOpeningProps } from '../EventsSheet/ParameterFields/VariableField';
+import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -1935,6 +1935,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             onApply={() => this._editVariables(null)}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             isListLocked={false}
+            initiallySelectedVariable={null}
           />
         )}
         {objectMethodSelectorDialogOpen && selectedEventsBasedObject && (

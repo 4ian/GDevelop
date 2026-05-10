@@ -4,8 +4,8 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import VariableField, {
   renderVariableWithIcon,
   type VariableFieldInterface,
-  type VariableDialogOpeningProps,
 } from './VariableField';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import GlobalVariablesDialog from '../../VariablesList/GlobalVariablesDialog';
 import {
   type ParameterFieldProps,
@@ -82,8 +82,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               setEditorOpen(null);
               if (field.current) field.current.updateAutocompletions();
             }}
-            initiallySelectedVariableName={editorOpen.variableName}
-            shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+            initiallySelectedVariable={editorOpen}
             hotReloadPreviewButtonProps={null}
             isListLocked={false}
           />

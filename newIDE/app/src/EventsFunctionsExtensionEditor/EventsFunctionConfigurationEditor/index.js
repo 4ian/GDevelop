@@ -15,7 +15,7 @@ import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
-import { type VariableDialogOpeningProps } from '../../EventsSheet/ParameterFields/VariableField';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 
 const gd: libGDevelop = global.gd;
@@ -112,7 +112,6 @@ const EventsFunctionConfigurationEditor: React.ComponentType<{
 
     React.useImperativeHandle(ref, () => ({
       editEventsFunctionParameter: (props: VariableDialogOpeningProps) => {
-        console.log('editEventsFunctionParameter', props);
         if (parametersEditor.current) {
           parametersEditor.current.editEventsFunctionParameter(props);
         }

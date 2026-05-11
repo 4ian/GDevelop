@@ -219,7 +219,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
     // No thing to be done.
   }
 
-  selectAllEvents() {
+  selectAllInsideEditor() {
     // No thing to be done.
   }
 

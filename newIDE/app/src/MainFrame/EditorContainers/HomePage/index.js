@@ -217,7 +217,7 @@ export type HomePageEditorInterface = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
-  selectAllEvents: () => void,
+  selectAllInsideEditor: () => void,
 |};
 
 export const HomePage: React.ComponentType<Props> = React.memo<Props>(
@@ -561,7 +561,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
         onInstancesModifiedOutsideEditor: noop,
         onObjectsModifiedOutsideEditor: noop,
         onObjectGroupsModifiedOutsideEditor: noop,
-        selectAllEvents: noop,
+        selectAllInsideEditor: noop,
       }));
 
       // As the homepage is never unmounted, we need to ensure the games platform

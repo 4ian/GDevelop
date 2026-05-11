@@ -161,7 +161,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     // No thing to be done.
   }
 
-  selectAllEvents() {
+  selectAllInsideEditor() {
     // No thing to be done.
   }
 

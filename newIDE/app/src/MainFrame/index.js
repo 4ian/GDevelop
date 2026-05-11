@@ -3482,7 +3482,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     [state.editorTabs]
   );
 
-  const selectAllEventsInActiveEditors = React.useCallback(
+  const selectAllInActiveEditors = React.useCallback(
     () => {
       for (const paneIdentifier in state.editorTabs.panes) {
         const currentTab = getCurrentTabForPane(
@@ -3491,7 +3491,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         );
         const editorRef = currentTab ? currentTab.editorRef : null;
         if (editorRef) {
-          editorRef.selectAllEvents();
+          editorRef.selectAllInsideEditor();
         }
       }
     },
@@ -5041,7 +5041,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenLanguage: () => openLanguageDialog(true),
     onOpenProfile: onOpenProfileDialog,
     onOpenAskAi: openAskAi,
-    onSelectAll: selectAllEventsInActiveEditors,
+    onSelectAll: selectAllInActiveEditors,
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 

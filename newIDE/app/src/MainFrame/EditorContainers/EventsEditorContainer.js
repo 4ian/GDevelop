@@ -89,7 +89,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     if (this.editor) this.editor.clearGlobalSearchResults();
   }
 
-  selectAllEvents() {
+  selectAllInsideEditor() {
     if (this.editor) this.editor.selectAllEvents();
   }
 

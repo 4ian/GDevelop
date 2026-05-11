@@ -120,7 +120,7 @@ export class ExternalEventsEditorContainer extends React.Component<
     if (this.editor) this.editor.clearGlobalSearchResults();
   }
 
-  selectAllEvents() {
+  selectAllInsideEditor() {
     if (this.editor) this.editor.selectAllEvents();
   }
 

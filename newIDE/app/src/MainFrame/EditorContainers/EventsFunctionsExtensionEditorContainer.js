@@ -78,7 +78,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     }
   }
 
-  selectAllEvents() {
+  selectAllInsideEditor() {
     if (this.editor) {
       this.editor.selectAllEvents();
     }

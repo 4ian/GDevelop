@@ -63,7 +63,7 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     // No thing to be done.
   }
 
-  selectAllEvents() {
+  selectAllInsideEditor() {
     // No thing to be done.
   }
 

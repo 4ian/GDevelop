@@ -63,7 +63,7 @@ export const exportLocalHtml5Headless = async ({
   const context = {
     project,
     exportState: { outputDir: resolvedOutputDir },
-    updateStepProgress: () => {},
+    updateStepProgress: (count: number, total: number) => {},
     i18n,
   };
 

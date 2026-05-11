@@ -2,14 +2,9 @@
 import { type I18n as I18nType } from '@lingui/core';
 import { exportLocalHtml5Headless } from '../ExportAndShare/Headless/exportLocalHtml5Headless';
 
-/**
- * Runner for a Command Palette command invoked via the `--run-command` CLI
- * flag. Returns a Promise so the CLI dispatcher can await completion and
- * exit the process with a meaningful exit code.
- *
- * This is the path used for "awaitable" commands. Commands not registered
- * here will fall back to the regular fire-and-forget `launchCommand` path.
- */
+// Commands registered here are awaited by the CLI dispatcher so the process
+// exits with a meaningful code. Unregistered commands fall back to
+// fire-and-forget via launchCommand.
 export type CliCommandRunner = (
   project: gdProject,
   i18n: I18nType

@@ -4926,12 +4926,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
   });
 
-  // Dispatch a Command Palette command requested via the `--run-command` CLI
-  // flag once the project is fully loaded. Runs at most once per session.
-  // For "awaitable" commands (registered in CliCommandRunner.js) the headless
-  // implementation is awaited so we can exit with a meaningful exit code.
-  // Other commands fall back to commandPaletteRef.launchCommand and a small
-  // grace delay before quitting.
+  // Dispatch `--run-command` once the project is loaded. "Awaitable" commands
+  // (CliCommandRunner.js) are awaited for a proper exit code; others fall back
+  // to fire-and-forget via commandPaletteRef.launchCommand.
   const cliCommandRanRef = React.useRef(false);
   React.useEffect(
     () => {
@@ -4946,9 +4943,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       cliCommandRanRef.current = true;
       const keepOpen = !!appArguments['keep-open'];
 
-      // Number of milliseconds to wait after a fire-and-forget launchCommand
-      // call before quitting the app. Gives the command's React handler time
-      // to start before the renderer goes away.
       const FIRE_AND_FORGET_GRACE_MS = 1500;
 
       const exitApp = (exitCode: number) => {
@@ -4998,9 +4992,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     [state.currentProject, i18n]
   );
 
-  // Safety net: if the project hasn't loaded within the timeout while in CLI
-  // mode, exit with an error code so CI runners don't hang indefinitely.
-  const CLI_PROJECT_LOAD_TIMEOUT_MS = 120_000; // 2 minutes
+  const CLI_PROJECT_LOAD_TIMEOUT_MS = 120_000;
   React.useEffect(
     () => {
       if (!Window.isRunningCommandFromCli()) return;

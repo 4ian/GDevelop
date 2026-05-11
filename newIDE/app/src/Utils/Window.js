@@ -245,10 +245,7 @@ export default class Window {
     return remote.getCurrentWindow().on('close', cb);
   }
 
-  /**
-   * True when the app was launched with `--run-command` (CLI / CI mode).
-   * Useful to skip interactive dialogs that would block headless execution.
-   */
+  /** True when the app was launched with `--run-command` (CLI / CI mode). */
   static isRunningCommandFromCli(): boolean {
     const args = Window.getArguments();
     return !!args['run-command'];

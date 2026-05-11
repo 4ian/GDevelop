@@ -67,12 +67,7 @@ let windowCounter = 0; // Counter for creating unique session partitions
 
 // Parse arguments (knowing that in dev, we run electron with an argument,
 // so have to ignore one more).
-// CLI flags:
-//   --run-command <NAME>  Run a Command Palette command after the project loads
-//   --keep-open           Keep the app open after --run-command finishes
-//                         (default is to quit with proper exit code).
 const argsParserOptions = {
-  // "Officially" supported arguments and their types:
   boolean: ['dev-tools', 'disable-update-check', 'keep-open'],
   string: ['_', 'run-command'],
 };
@@ -101,12 +96,9 @@ const isCliRunCommand = !!args['run-command'];
 const gotTheLock = isCliRunCommand ? true : app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
-  // Second instance attempted - quit immediately
   app.quit();
 } else if (!isCliRunCommand) {
-  // First instance - handle second-instance events by creating new windows
   app.on('second-instance', (event, commandLine, workingDirectory) => {
-    // User tried to launch app again - create a new window instead
     const secondInstanceArgs = parseArgs(
       commandLine.slice(isDev ? 2 : 1),
       argsParserOptions
@@ -117,7 +109,6 @@ if (!gotTheLock) {
     // (e.g. --run-command, positional project file).
     global['args'] = secondInstanceArgs;
 
-    // Create a new window in the existing process
     createNewWindow(secondInstanceArgs);
   });
 }
@@ -208,7 +199,6 @@ function createNewWindow(windowArgs = args) {
     options.show = false;
   }
 
-  // CLI/CI mode: hide the window so no display is required on headless runners.
   if (isCliRunCommand && !windowArgs['keep-open']) {
     options.show = false;
     options.skipTaskbar = true;
@@ -235,9 +225,8 @@ function createNewWindow(windowArgs = args) {
   // Enable `@electron/remote` module for renderer process
   require('@electron/remote/main').enable(newWindow.webContents);
 
-  // Forward renderer console to main-process stdout/stderr in CLI mode.
-  // Uses process.stdout/stderr directly to avoid electron-log re-entering
-  // the renderer console and causing an infinite loop.
+  // Uses process.stdout/stderr directly (not electron-log) to avoid
+  // re-entering the renderer console and causing an infinite loop.
   if (isCliRunCommand) {
     newWindow.webContents.on('console-message', (_event, level, message) => {
       if (level < 1) return;

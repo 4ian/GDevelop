@@ -5,15 +5,8 @@ import { localHTML5ExportPipeline } from '../LocalExporters/LocalHTML5Export';
 
 const path = optionalRequire('path');
 
-// Default sub-folder used when the project does not yet have a stored
-// last compilation directory. Created next to the project file.
 const DEFAULT_BUILD_FOLDER_NAME = 'build';
 
-/**
- * Resolve the output directory used by the headless HTML5 export.
- * Reads `latestCompilationDirectory` from the project; if empty or absent,
- * falls back to `<projectDirectory>/build`.
- */
 export const resolveHtml5OutputDir = (project: gdProject): string => {
   const stored = project.getLastCompilationDirectory();
   if (stored) return stored;
@@ -41,15 +34,8 @@ type Options = {|
 type Result = {| outputDir: string |};
 
 /**
- * Run the local HTML5 ("Share -> Browser -> HTML5 external websites") export
- * pipeline without any UI: no Share dialog, no progress, no notifications.
- *
- * On success, the resolved output directory is returned and persisted on the
- * project via `setLastCompilationDirectory` (matching the regular dialog
- * behavior). On failure, the returned promise rejects.
- *
- * Designed to be reused from a future CLI entry point: this module has no
- * React/UI dependencies and accepts a stub `i18n` such as
+ * Headless HTML5 export — no UI, no dialogs.
+ * Has no React dependencies; accepts a stub i18n like
  * `{ _: msg => (msg && msg.message) || String(msg) }`.
  */
 export const exportLocalHtml5Headless = async ({

@@ -16,8 +16,6 @@ import Window from '../../Utils/Window';
 type Props = {| children: React.Node |};
 
 function ConfirmProvider({ children }: Props): React.Node {
-  // In CLI mode, resolve every dialog immediately with a safe default
-  // so no interactive confirmation can block headless execution.
   const isCli = Window.isRunningCommandFromCli();
 
   // Alert

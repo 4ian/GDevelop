@@ -85,7 +85,6 @@ const config = {
   ],
 };
 
-// Portable/CI builds: skip all code-signing and notarization.
 if (process.env.GD_PORTABLE_BUILD === 'true') {
   config.mac.identity = null;
   config.mac.hardenedRuntime = false;

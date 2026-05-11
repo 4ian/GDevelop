@@ -629,7 +629,9 @@ const EventsTree: React.ComponentType<{
   const eventPtrToRowIndex = React.useRef<{ [key: string]: number }>({});
   const getEventRow = React.useCallback(
     (searchedEvent: gdBaseEvent) => {
-      return eventPtrToRowIndex.current['' + searchedEvent.ptr] || -1;
+      const key = '' + searchedEvent.ptr;
+      const rowIndex = eventPtrToRowIndex.current[key];
+      return rowIndex === undefined ? -1 : rowIndex;
     },
     [eventPtrToRowIndex]
   );

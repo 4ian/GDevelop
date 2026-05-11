@@ -42,6 +42,7 @@ import {
   type VariableDeclarationContext,
   getInitialSelection,
   selectEvent,
+  selectEvents,
   selectInstruction,
   hasSomethingSelected,
   hasEventSelected,
@@ -303,8 +304,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onCopy: () => this.copySelection(),
       onCut: () => this.cutSelection(),
       onPaste: () => this.pasteEventsOrInstructions(),
+      onSelectAll: () => this.selectAllEvents(),
+      onDeselectAll: () => this.deselectAll(),
       onSearch: () => this._toggleSearchPanel(),
-      onEscape: () => this._closeSearchPanel(),
+      onEscape: () => this._handleEscape(),
       onUndo: () => this.undo(),
       onRedo: () => this.redo(),
       onZoomIn: (event: KeyboardEvent) => this.onZoomEvent('IN')(event),
@@ -832,6 +835,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         click: () => this.deleteSelection(),
         accelerator: 'Delete',
       },
+      {
+        label: i18n._(t`Deselect All`),
+        click: () => this.deselectAll(),
+        accelerator: 'CmdOrCtrl+Shift+A',
+        visible: hasSomethingSelected(this.state.selection),
+      },
       hasSelectedAtLeastOneCondition(this.state.selection)
         ? {
             label: i18n._(t`Invert Condition`),
@@ -1029,6 +1038,38 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
+  selectAllEvents = () => {
+    const eventsTree = this._eventsTree;
+    if (!eventsTree) return;
+
+    const { events } = this.props;
+    const rowIndexes: Array<number> = [];
+    for (let i = 0; i < events.getEventsCount(); i++) {
+      const rowIndex = eventsTree.getEventRow(events.getEventAt(i));
+      if (rowIndex !== -1) rowIndexes.push(rowIndex);
+    }
+    const eventContexts = eventsTree.getEventContextAtRowIndexes(rowIndexes);
+
+    this.setState({ selection: selectEvents(eventContexts) }, () =>
+      this.updateToolbar()
+    );
+  };
+
+  deselectAll = () => {
+    if (!hasSomethingSelected(this.state.selection)) return;
+    this.setState({ selection: clearSelection() }, () => this.updateToolbar());
+  };
+
+  _handleEscape = () => {
+    if (this.state.showSearchPanel) {
+      this._closeSearchPanel();
+      return;
+    }
+    if (hasSomethingSelected(this.state.selection)) {
+      this.deselectAll();
+    }
+  };
+
   collapseAll = () => {
     if (this._eventsTree) this._eventsTree.foldAll();
   };
@@ -1066,6 +1107,17 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       label: i18n._(t`Delete`),
       click: () => this.deleteSelection(),
       accelerator: 'Delete',
+    },
+    {
+      label: i18n._(t`Select All`),
+      click: () => this.selectAllEvents(),
+      accelerator: 'CmdOrCtrl+A',
+    },
+    {
+      label: i18n._(t`Deselect All`),
+      click: () => this.deselectAll(),
+      accelerator: 'CmdOrCtrl+Shift+A',
+      visible: hasSomethingSelected(this.state.selection),
     },
     {
       label: i18n._(t`Toggle Disabled`),
@@ -3025,6 +3077,7 @@ export type EventsSheetInterface = {|
     searchFilters?: SearchFilterParams
   ) => void,
   clearGlobalSearchResults: () => void,
+  selectAllEvents: () => void,
 |};
 
 // EventsSheet is a wrapper so that the component can use multiple
@@ -3038,6 +3091,7 @@ const EventsSheet = (props, ref) => {
     scrollToEventPath,
     setGlobalSearchResults,
     clearGlobalSearchResults,
+    selectAllEvents,
   }));
 
   const {
@@ -3076,6 +3130,9 @@ const EventsSheet = (props, ref) => {
   };
   const clearGlobalSearchResults = () => {
     if (component.current) component.current.clearGlobalSearchResults();
+  };
+  const selectAllEvents = () => {
+    if (component.current) component.current.selectAllEvents();
   };
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

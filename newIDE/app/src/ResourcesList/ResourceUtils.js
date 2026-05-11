@@ -48,7 +48,12 @@ export const getLocalResourceFullPath = (
       resourcePath.lastIndexOf('?cache=')
     );
   }
-  return resourcePath;
+
+  try {
+    return decodeURIComponent(resourcePath);
+  } catch (error) {
+    return resourcePath;
+  }
 };
 
 export const isPathInProjectFolder = (

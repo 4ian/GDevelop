@@ -208,8 +208,14 @@ function createNewWindow(windowArgs = args) {
     options.show = false;
   }
 
+  // CLI/CI mode: hide the window so no display is required on headless runners.
+  if (isCliRunCommand && !windowArgs['keep-open']) {
+    options.show = false;
+    options.skipTaskbar = true;
+  }
+
   const newWindow = new BrowserWindow(options);
-  if (!isIntegrated) newWindow.maximize();
+  if (!isIntegrated && !isCliRunCommand) newWindow.maximize();
 
   // Capture window ID and whether this is the primary window before it can be destroyed
   const windowId = newWindow.id;
@@ -228,6 +234,20 @@ function createNewWindow(windowArgs = args) {
 
   // Enable `@electron/remote` module for renderer process
   require('@electron/remote/main').enable(newWindow.webContents);
+
+  // Forward renderer console to main-process stdout/stderr in CLI mode.
+  // Uses process.stdout/stderr directly to avoid electron-log re-entering
+  // the renderer console and causing an infinite loop.
+  if (isCliRunCommand) {
+    newWindow.webContents.on('console-message', (_event, level, message) => {
+      if (level < 1) return;
+      if (message.startsWith('%c')) return;
+      if (message.includes('[renderer:')) return; // break recursion
+      const tag = ['verbose', 'info', 'warning', 'error'][level] || 'log';
+      const stream = level >= 2 ? process.stderr : process.stdout;
+      stream.write(`[renderer:${tag}] ${message}\n`);
+    });
+  }
 
   // Log process ID to verify separate renderer processes
   newWindow.webContents.once('did-finish-load', () => {
@@ -553,7 +573,9 @@ app.on('ready', function() {
       const subscriptionId = setupWatcher(
         folderPath,
         changedFilePath => {
-          event.sender.send('project-file-changed', changedFilePath);
+          if (!event.sender.isDestroyed()) {
+            event.sender.send('project-file-changed', changedFilePath);
+          }
         },
         options
       );

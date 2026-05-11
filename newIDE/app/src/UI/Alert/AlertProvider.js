@@ -11,10 +11,15 @@ import {
   type ShowYesNoCancelDialogOptionsWithCallback,
 } from './AlertContext';
 import YesNoCancelDialog from './YesNoCancelDialog';
+import Window from '../../Utils/Window';
 
 type Props = {| children: React.Node |};
 
 function ConfirmProvider({ children }: Props): React.Node {
+  // In CLI mode, resolve every dialog immediately with a safe default
+  // so no interactive confirmation can block headless execution.
+  const isCli = Window.isRunningCommandFromCli();
+
   // Alert
   const [alertDialogOpen, setAlertDialogOpen] = React.useState<boolean>(false);
   const [
@@ -23,10 +28,14 @@ function ConfirmProvider({ children }: Props): React.Node {
   ] = React.useState<?ShowAlertDialogOptionsWithCallback>(null);
   const openAlertDialog = React.useCallback(
     (options: ShowAlertDialogOptionsWithCallback) => {
+      if (isCli) {
+        options.callback();
+        return;
+      }
       setAlertDialogOpen(true);
       setAlertDialogConfig(options);
     },
-    []
+    [isCli]
   );
 
   // Confirm
@@ -39,10 +48,14 @@ function ConfirmProvider({ children }: Props): React.Node {
   ] = React.useState<?ShowConfirmDialogOptionsWithCallback>(null);
   const openConfirmDialog = React.useCallback(
     (options: ShowConfirmDialogOptionsWithCallback) => {
+      if (isCli) {
+        options.callback(false);
+        return;
+      }
       setConfirmDialogOpen(true);
       setConfirmDialogConfig(options);
     },
-    []
+    [isCli]
   );
 
   // Confirm Delete
@@ -56,13 +69,17 @@ function ConfirmProvider({ children }: Props): React.Node {
   ] = React.useState<?ShowConfirmDeleteDialogOptionsWithCallback>(null);
   const openConfirmDeleteDialog = React.useCallback(
     (options: ShowConfirmDeleteDialogOptionsWithCallback) => {
+      if (isCli) {
+        options.callback(false);
+        return;
+      }
       setConfirmDeleteDialogOpen(true);
       setConfirmDeleteDialogConfig(options);
     },
-    []
+    [isCli]
   );
 
-  // Confirm
+  // YesNoCancel
   const [
     yesNoCancelDialogOpen,
     setYesNoCancelDialogOpen,
@@ -73,10 +90,14 @@ function ConfirmProvider({ children }: Props): React.Node {
   ] = React.useState<?ShowYesNoCancelDialogOptionsWithCallback>(null);
   const openYesNoCancelDialog = React.useCallback(
     (options: ShowYesNoCancelDialogOptionsWithCallback) => {
+      if (isCli) {
+        options.callback(2); // Cancel
+        return;
+      }
       setYesNoCancelDialogOpen(true);
       setYesNoCancelDialogConfig(options);
     },
-    []
+    [isCli]
   );
 
   return (

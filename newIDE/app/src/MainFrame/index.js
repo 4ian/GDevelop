@@ -933,7 +933,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     // We use the current storage provider, as it's supposed to be able to open
     // the initial file metadata. Indeed, it's the responsibility of the `ProjectStorageProviders`
     // to set the initial storage provider if an initial file metadata is set.
-    const state = await openFromFileMetadata(initialFileMetadataToOpen);
+    const state = await openFromFileMetadata(initialFileMetadataToOpen, {
+      ignoreAutoSave: Window.isRunningCommandFromCli(),
+    });
     if (state)
       openSceneOrProjectManager({
         currentProject: state.currentProject,
@@ -1183,6 +1185,13 @@ const MainFrame = (props: Props): React.MixedElement => {
       ResourcesLoader.burstAllUrlsCache();
       PixiResourcesLoader.burstCache();
 
+      // Set the on-disk path before exposing the project via state so that
+      // consumers (like the CLI command dispatcher) can call getProjectFile()
+      // immediately after the re-render triggered by setState.
+      if (updatedFileMetadata) {
+        project.setProjectFile(updatedFileMetadata.fileIdentifier);
+      }
+
       const state = await setState(state => ({
         ...state,
         currentProject: project,
@@ -1196,8 +1205,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       );
 
       if (updatedFileMetadata) {
-        project.setProjectFile(updatedFileMetadata.fileIdentifier);
-
         const storageProvider = getStorageProvider();
         const storageProviderOperations = getStorageProviderOperations(
           storageProvider
@@ -4991,6 +4998,23 @@ const MainFrame = (props: Props): React.MixedElement => {
     [state.currentProject, i18n]
   );
 
+  // Safety net: if the project hasn't loaded within the timeout while in CLI
+  // mode, exit with an error code so CI runners don't hang indefinitely.
+  const CLI_PROJECT_LOAD_TIMEOUT_MS = 120_000; // 2 minutes
+  React.useEffect(
+    () => {
+      if (!Window.isRunningCommandFromCli()) return;
+      if (state.currentProject) return;
+      const timer = setTimeout(() => {
+        console.error('[CLI] Project failed to load within timeout. Exiting.');
+        const remoteModule = optionalRequire('@electron/remote');
+        if (remoteModule && remoteModule.app) remoteModule.app.exit(1);
+      }, CLI_PROJECT_LOAD_TIMEOUT_MS);
+      return () => clearTimeout(timer);
+    },
+    [state.currentProject]
+  );
+
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
     () => ({
       resourceSources,
@@ -5508,7 +5532,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         language={props.i18n.language}
         hasUnsavedChanges={hasUnsavedChanges}
       />
-      <ChangelogDialogContainer />
+      {!Window.isRunningCommandFromCli() && <ChangelogDialogContainer />}
       {selectedInAppTutorialInfo && (
         <StartInAppTutorialDialog
           open

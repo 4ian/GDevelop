@@ -78,6 +78,12 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     }
   }
 
+  selectAllInsideEditor() {
+    if (this.editor) {
+      this.editor.selectAllEvents();
+    }
+  }
+
   forceUpdateEditor() {
     // No updates to be done.
   }

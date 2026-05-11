@@ -89,6 +89,10 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     if (this.editor) this.editor.clearGlobalSearchResults();
   }
 
+  selectAllEvents() {
+    if (this.editor) this.editor.selectAllEvents();
+  }
+
   forceUpdateEditor() {
     // No updates to be done.
   }

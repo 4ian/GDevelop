@@ -956,20 +956,26 @@ function generatedCustomObject(
     gameData: JSON.parse(gd.Serializer.toJSON(serializedProjectElement)),
     sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
   });
+  const objectType =
+    eventsFunctionsExtension.getName() + '::' + eventsBasedObject.getName();
 
-  const CompiledRuntimeCustomObject = generateCompiledEventsForEventsBasedObject(
-    gd,
-    project,
-    eventsFunctionsExtension,
-    eventsBasedObject,
-    gdjs,
-    options
-  );
+  const CompiledRuntimeCustomObject =
+    generateCompiledEventsForEventsBasedObject(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      gdjs,
+      options
+    );
   serializedProjectElement.delete();
   serializedSceneElement.delete();
   project.delete();
 
-  const object = new CompiledRuntimeCustomObject(runtimeScene, { content: {} });
+  const object = new CompiledRuntimeCustomObject(runtimeScene, {
+    type: objectType,
+    content: {},
+  });
 
   return { gdjs, runtimeScene, object };
 }

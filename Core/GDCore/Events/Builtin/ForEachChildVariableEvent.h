@@ -47,6 +47,9 @@ class GD_CORE_API ForEachChildVariableEvent : public gd::BaseEvent {
   const gd::InstructionsList& GetActions() const { return actions; };
   gd::InstructionsList& GetActions() { return actions; };
 
+  virtual gd::InstructionsList* GetInstructionList(const gd::String& label) override;
+  virtual const gd::InstructionsList* GetInstructionList(const gd::String& label) const override;
+
   /**
    * \brief Get the iterable variable name attached to the event.
    *

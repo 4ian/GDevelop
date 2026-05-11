@@ -20,6 +20,19 @@ StandardEvent::StandardEvent()
 
 StandardEvent::~StandardEvent(){};
 
+gd::InstructionsList* StandardEvent::GetInstructionList(
+    const gd::String& label) {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  return nullptr;
+}
+const gd::InstructionsList* StandardEvent::GetInstructionList(
+    const gd::String& label) const {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  return nullptr;
+}
+
 vector<const gd::InstructionsList*> StandardEvent::GetAllConditionsVectors()
     const {
   vector<const gd::InstructionsList*> allConditions;

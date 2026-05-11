@@ -42,7 +42,7 @@ import {
   type VariableDeclarationContext,
   getInitialSelection,
   selectEvent,
-  selectAllTopLevelEvents,
+  selectEvents,
   selectInstruction,
   hasSomethingSelected,
   hasEventSelected,
@@ -1009,7 +1009,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     }
     const eventContexts = eventsTree.getEventContextAtRowIndexes(rowIndexes);
 
-    this.setState({ selection: selectAllTopLevelEvents(eventContexts) }, () =>
+    this.setState({ selection: selectEvents(eventContexts) }, () =>
       this.updateToolbar()
     );
   };

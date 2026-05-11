@@ -313,7 +313,7 @@ export const selectEvent = (
   };
 };
 
-export const selectAllTopLevelEvents = (
+export const selectEvents = (
   eventContexts: Array<EventContext>
 ): SelectionState => {
   return {

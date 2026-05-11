@@ -67,11 +67,11 @@ let windowCounter = 0; // Counter for creating unique session partitions
 
 // Parse arguments (knowing that in dev, we run electron with an argument,
 // so have to ignore one more).
-const args = parseArgs(process.argv.slice(isDev ? 2 : 1), {
-  // "Officially" supported arguments and their types:
-  boolean: ['dev-tools', 'disable-update-check'],
-  string: '_', // Files are always strings
-});
+const argsParserOptions = {
+  boolean: ['dev-tools', 'disable-update-check', 'keep-open'],
+  string: ['_', 'run-command'],
+};
+const args = parseArgs(process.argv.slice(isDev ? 2 : 1), argsParserOptions);
 
 const devTools = !!args['dev-tools'];
 
@@ -85,22 +85,30 @@ if (process.platform === 'win32') {
 }
 
 // Single instance lock - prevents multiple Electron processes
-// This solves Firebase IndexedDB locking issues while still allowing multiple windows
-const gotTheLock = app.requestSingleInstanceLock();
+// This solves Firebase IndexedDB locking issues while still allowing multiple windows.
+//
+// When invoked via `--run-command` (CLI / CI scenarios), we deliberately
+// SKIP the single-instance lock so each CLI invocation runs in its own
+// process. This lets the launching shell wait for completion and observe
+// the exit code, instead of being immediately backgrounded by the existing
+// instance taking over via the second-instance handler.
+const isCliRunCommand = !!args['run-command'];
+const gotTheLock = isCliRunCommand ? true : app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
-  // Second instance attempted - quit immediately
   app.quit();
-} else {
-  // First instance - handle second-instance events by creating new windows
+} else if (!isCliRunCommand) {
   app.on('second-instance', (event, commandLine, workingDirectory) => {
-    // User tried to launch app again - create a new window instead
-    const secondInstanceArgs = parseArgs(commandLine.slice(isDev ? 2 : 1), {
-      boolean: ['dev-tools', 'disable-update-check'],
-      string: '_',
-    });
+    const secondInstanceArgs = parseArgs(
+      commandLine.slice(isDev ? 2 : 1),
+      argsParserOptions
+    );
 
-    // Create a new window in the existing process
+    // Update the global args so the new window's renderer (which reads them
+    // via remote.getGlobal('args')) picks up the second-instance CLI flags
+    // (e.g. --run-command, positional project file).
+    global['args'] = secondInstanceArgs;
+
     createNewWindow(secondInstanceArgs);
   });
 }
@@ -191,8 +199,13 @@ function createNewWindow(windowArgs = args) {
     options.show = false;
   }
 
+  if (isCliRunCommand && !windowArgs['keep-open']) {
+    options.show = false;
+    options.skipTaskbar = true;
+  }
+
   const newWindow = new BrowserWindow(options);
-  if (!isIntegrated) newWindow.maximize();
+  if (!isIntegrated && !isCliRunCommand) newWindow.maximize();
 
   // Capture window ID and whether this is the primary window before it can be destroyed
   const windowId = newWindow.id;
@@ -211,6 +224,19 @@ function createNewWindow(windowArgs = args) {
 
   // Enable `@electron/remote` module for renderer process
   require('@electron/remote/main').enable(newWindow.webContents);
+
+  // Uses process.stdout/stderr directly (not electron-log) to avoid
+  // re-entering the renderer console and causing an infinite loop.
+  if (isCliRunCommand) {
+    newWindow.webContents.on('console-message', (_event, level, message) => {
+      if (level < 1) return;
+      if (message.startsWith('%c')) return;
+      if (message.includes('[renderer:')) return; // break recursion
+      const tag = ['verbose', 'info', 'warning', 'error'][level] || 'log';
+      const stream = level >= 2 ? process.stderr : process.stdout;
+      stream.write(`[renderer:${tag}] ${message}\n`);
+    });
+  }
 
   // Log process ID to verify separate renderer processes
   newWindow.webContents.once('did-finish-load', () => {
@@ -536,7 +562,9 @@ app.on('ready', function() {
       const subscriptionId = setupWatcher(
         folderPath,
         changedFilePath => {
-          event.sender.send('project-file-changed', changedFilePath);
+          if (!event.sender.isDestroyed()) {
+            event.sender.send('project-file-changed', changedFilePath);
+          }
         },
         options
       );

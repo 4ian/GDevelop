@@ -186,36 +186,26 @@ const InstructionEditorDialog = ({
     }
   };
 
-  const addBehavior = (type: string, defaultName: string) => {
-    // Avoid to add behaviors to object parameters.
-    if (!chosenObject) return;
-
-    if (scope.layout) {
-      const wasBehaviorAdded = addBehaviorToObject(
-        project,
-        chosenObject,
-        type,
-        defaultName
-      );
-
-      if (wasBehaviorAdded) {
-        setNewBehaviorDialogOpen(false);
-        sendBehaviorAdded({
-          behaviorType: type,
-          parentEditor: 'instruction-editor-dialog',
-        });
-        if (scope.layout) {
-          scope.layout.updateBehaviorsSharedData(project);
-        }
+  const isSceneObject = React.useCallback(
+    (objectName: string) => {
+      if (scope.layout) {
+        return true;
       }
-    } else {
       const projectScopedContainers = projectScopedContainersAccessor.get();
       const objectsContainersList = projectScopedContainers.getObjectsContainersList();
       const objectsContainerSourceType = objectsContainersList.getObjectsContainerSourceType(
-        chosenObject.getName()
+        objectName
       );
+      return objectsContainerSourceType === gd.ObjectsContainer.Object;
+    },
+    [projectScopedContainersAccessor, scope.layout]
+  );
 
-      if (objectsContainerSourceType === gd.ObjectsContainer.Object) {
+  const addBehavior = React.useCallback(
+    (type: string, defaultName: string) => {
+      if (!chosenObject) return;
+
+      if (scope.layout) {
         const wasBehaviorAdded = addBehaviorToObject(
           project,
           chosenObject,
@@ -229,54 +219,90 @@ const InstructionEditorDialog = ({
             behaviorType: type,
             parentEditor: 'instruction-editor-dialog',
           });
+          if (scope.layout) {
+            scope.layout.updateBehaviorsSharedData(project);
+          }
         }
-      } else if (objectsContainerSourceType === gd.ObjectsContainer.Function) {
-        const { eventsFunction, eventsBasedBehavior } = scope;
-        if (eventsFunction) {
-          if (eventsBasedBehavior && chosenObject.getName() === 'Object') {
-            const properties = eventsBasedBehavior.getPropertyDescriptors();
-            const property = properties.insertNew('NewBehavior', 0);
-            property.setType('Behavior');
-            fillBehaviorProperty(
-              projectScopedContainersAccessor,
-              eventsBasedBehavior,
-              property,
-              type
-            );
-            setNewBehaviorDialogOpen(false);
-          } else {
-            const parameters = eventsFunction.getParameters();
-            const objectParameterIndex = parameters.getParameterPosition(
-              parameters.getParameter(chosenObject.getName())
-            );
+      } else {
+        const projectScopedContainers = projectScopedContainersAccessor.get();
+        const objectsContainersList = projectScopedContainers.getObjectsContainersList();
+        const objectsContainerSourceType = objectsContainersList.getObjectsContainerSourceType(
+          chosenObject.getName()
+        );
 
-            const behaviorParameter = parameters.insertNewParameter(
-              'NewBehavior',
-              objectParameterIndex + 1
-            );
-            behaviorParameter.setType('behavior');
-            behaviorParameter.setExtraInfo(type);
-            fillBehaviorParameter(
-              projectScopedContainersAccessor,
-              eventsFunction,
-              behaviorParameter
-            );
-            editEventsFunctionParameter({
-              variableName: behaviorParameter.getName(),
-              shouldCreate: false,
-              variableType: null,
-            });
+        if (objectsContainerSourceType === gd.ObjectsContainer.Object) {
+          const wasBehaviorAdded = addBehaviorToObject(
+            project,
+            chosenObject,
+            type,
+            defaultName
+          );
+
+          if (wasBehaviorAdded) {
             setNewBehaviorDialogOpen(false);
+            sendBehaviorAdded({
+              behaviorType: type,
+              parentEditor: 'instruction-editor-dialog',
+            });
+          }
+        } else if (
+          objectsContainerSourceType === gd.ObjectsContainer.Function
+        ) {
+          const { eventsFunction, eventsBasedBehavior } = scope;
+          if (eventsFunction) {
+            if (eventsBasedBehavior && chosenObject.getName() === 'Object') {
+              const properties = eventsBasedBehavior.getPropertyDescriptors();
+              const property = properties.insertNew('NewBehavior', 0);
+              property.setType('Behavior');
+              fillBehaviorProperty(
+                projectScopedContainersAccessor,
+                eventsBasedBehavior,
+                property,
+                type
+              );
+              setNewBehaviorDialogOpen(false);
+            } else {
+              const parameters = eventsFunction.getParameters();
+              const objectParameterIndex = parameters.getParameterPosition(
+                parameters.getParameter(chosenObject.getName())
+              );
+
+              const behaviorParameter = parameters.insertNewParameter(
+                'NewBehavior',
+                objectParameterIndex + 1
+              );
+              behaviorParameter.setType('behavior');
+              behaviorParameter.setExtraInfo(type);
+              fillBehaviorParameter(
+                projectScopedContainersAccessor,
+                eventsFunction,
+                behaviorParameter
+              );
+              editEventsFunctionParameter({
+                variableName: behaviorParameter.getName(),
+                shouldCreate: false,
+                variableType: null,
+              });
+              setNewBehaviorDialogOpen(false);
+            }
           }
         }
       }
-    }
 
-    // Re-choose the same object to force recomputation of chosenObjectInstructionsInfoTree
-    // This is not done automatically because a change in the object behaviors
-    // is not detected by React at this level.
-    chooseObject(chosenObject.getName());
-  };
+      // Re-choose the same object to force recomputation of chosenObjectInstructionsInfoTree
+      // This is not done automatically because a change in the object behaviors
+      // is not detected by React at this level.
+      chooseObject(chosenObject.getName());
+    },
+    [
+      chooseObject,
+      chosenObject,
+      editEventsFunctionParameter,
+      project,
+      projectScopedContainersAccessor,
+      scope,
+    ]
+  );
 
   const instructionParametersEditor = React.useRef<?InstructionParametersEditorInterface>(
     null
@@ -523,6 +549,9 @@ const InstructionEditorDialog = ({
               freeInstructionComponentRef.current.reEnumerateInstructions(i18n);
             onExtensionInstalled(extensionName);
           }}
+          shouldShowCapabilityBehaviors={
+            chosenObject && !isSceneObject(chosenObject.getName())
+          }
         />
       )}
       {newExtensionDialogOpen && (

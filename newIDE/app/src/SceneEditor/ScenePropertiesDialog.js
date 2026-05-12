@@ -16,6 +16,7 @@ import { ColumnStackLayout } from '../UI/Layout';
 import {
   rgbColorToRGBString,
   rgbStringAndAlphaToRGBColor,
+  clampRgbComponent,
   type RGBColor,
 } from '../Utils/ColorTransformer';
 import HelpIcon from '../UI/HelpIcon';
@@ -109,9 +110,9 @@ const ScenePropertiesDialog = ({
       layout.getBackgroundColorGreen() !== backgroundColor.g &&
       layout.getBackgroundColorBlue() !== backgroundColor.b;
     layout.setBackgroundColor(
-      backgroundColor ? backgroundColor.r : 0,
-      backgroundColor ? backgroundColor.g : 0,
-      backgroundColor ? backgroundColor.b : 0
+      backgroundColor ? clampRgbComponent(backgroundColor.r) : 0,
+      backgroundColor ? clampRgbComponent(backgroundColor.g) : 0,
+      backgroundColor ? clampRgbComponent(backgroundColor.b) : 0
     );
     onApply();
     if (hasBackgroundColorChanged) {
@@ -287,9 +288,7 @@ const ScenePropertiesDialog = ({
         />
         <Checkbox
           checked={shouldStopSoundsOnStartup}
-          label={
-            <Trans>Stop music and sounds at the beginning of this scene</Trans>
-          }
+          label={<Trans>Stop music and sounds at scene startup</Trans>}
           onCheck={(e, check) => setShouldStopSoundsOnStartup(check)}
         />
         {!some(propertiesEditors) && (

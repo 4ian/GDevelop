@@ -22,10 +22,10 @@
   border-bottom: 1px solid var(--table-border-color);
 }
 .gd-table .tableOddRow {
-  background-color: var(--table-row-odd-background-color);
+  background-color: var(--theme-surface-canvas-background-color);
 }
 .gd-table .tableEvenRow {
-  background-color: var(--table-row-even-background-color);
+  background-color: var(--theme-surface-canvas-background-color);
 }
 .gd-table .tableSelectedRow {
   background-color: var(--table-row-selected-background-color); /*OS X selection*/

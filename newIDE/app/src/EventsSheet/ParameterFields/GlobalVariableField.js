@@ -65,6 +65,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           projectScopedContainersAccessor={projectScopedContainersAccessor}
           scope={scope}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
+          editEventsFunctionParameter={null}
         />
         {editorOpen && project && (
           <GlobalVariablesDialog

@@ -97,15 +97,9 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const onOpenDialog = React.useCallback(
       (props: VariableDialogOpeningProps) => {
-        if (variableSourceType === gd.VariablesContainer.Parameters) {
-          if (editEventsFunctionParameter) {
-            editEventsFunctionParameter(props);
-          }
-        } else {
-          setEditorOpen(props);
-        }
+        setEditorOpen(props);
       },
-      [editEventsFunctionParameter, variableSourceType]
+      []
     );
 
     return (
@@ -136,6 +130,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           }
           onInstructionTypeChanged={onInstructionTypeChanged}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
+          editEventsFunctionParameter={editEventsFunctionParameter || null}
         />
         {editorOpen &&
           (variableSourceType === gd.VariablesContainer.Local ? (

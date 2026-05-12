@@ -225,12 +225,6 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       }
     }, []);
 
-    React.useImperativeHandle(ref, () => ({
-      editEventsFunctionParameter: (props: VariableDialogOpeningProps) => {
-        scrollToParameter(props.variableName);
-      },
-    }));
-
     const draggedParameter = React.useRef<?gdParameterMetadata>(null);
 
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -308,17 +302,15 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
     );
 
     const addParameterAt = React.useCallback(
-      (index: number) => {
+      (index: number, name: string = '', type: string = 'objectList') => {
         const parameters = eventsFunction.getParameters();
         const projectScopedContainers = projectScopedContainersAccessor.get();
         const validatedNewName = getValidatedParameterName(
           eventsFunction.getParameters(),
           projectScopedContainers,
-          'Parameter'
+          name || 'Parameter'
         );
-        parameters
-          .insertNewParameter(validatedNewName, index)
-          .setType('objectList');
+        parameters.insertNewParameter(validatedNewName, index).setType(type);
         forceUpdate();
         onParametersUpdated();
         setJustAddedParameterName(validatedNewName);
@@ -332,12 +324,22 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
     );
 
     const addParameter = React.useCallback(
-      () => {
+      (name: string = '', type: string = 'objectList') => {
         const parameters = eventsFunction.getParameters();
-        addParameterAt(parameters.getParametersCount());
+        addParameterAt(parameters.getParametersCount(), name, type);
       },
       [addParameterAt, eventsFunction]
     );
+
+    React.useImperativeHandle(ref, () => ({
+      editEventsFunctionParameter: (props: VariableDialogOpeningProps) => {
+        if (props.shouldCreate) {
+          addParameter(props.variableName, props.variableType);
+        } else {
+          scrollToParameter(props.variableName);
+        }
+      },
+    }));
 
     const removeParameter = React.useCallback(
       (name: string) => {
@@ -1001,7 +1003,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                         <RaisedButton
                           primary
                           label={<Trans>Add</Trans>}
-                          onClick={addParameter}
+                          onClick={() => addParameter()}
                           icon={<Add />}
                         />
                       </LineStackLayout>

@@ -128,6 +128,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           }
           onInstructionTypeChanged={onInstructionTypeChanged}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
+          editEventsFunctionParameter={null}
         />
         {editorOpen &&
           (variableSourceType === gd.VariablesContainer.Local ? (

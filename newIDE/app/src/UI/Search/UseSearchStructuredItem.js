@@ -86,7 +86,11 @@ export const getFuseSearchQueryForMultipleKeys = (
   }[] = tokenisedSearchQuery.map((searchToken: string) => {
     // $FlowFixMe[value-as-type]
     const orFields: Fuse.Expression[] = keys.map(key => ({
-      [key]: searchToken,
+      // Use the include-match prefix (') so each token is matched as a
+      // case-insensitive substring rather than a fuzzy pattern.
+      // This ensures $or filtering is reliable: items that don't contain
+      // a token as a substring are excluded, not just scored poorly.
+      [key]: `'${searchToken}`,
     }));
 
     return {
@@ -94,6 +98,8 @@ export const getFuseSearchQueryForMultipleKeys = (
     };
   });
 
+  // Use $or so partial matches are still included (items matching any token
+  // are returned), relying on composite scoring to rank full matches first.
   return {
     $or: searchQuery,
   };
@@ -481,6 +487,7 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
           minMatchCharLength: 2,
           threshold: 0.35,
           includeMatches: true,
+          includeScore: true,
           ignoreLocation: true,
           useExtendedSearch: true,
           findAllMatches: true,
@@ -544,12 +551,45 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
           );
           return;
         }
+        // For multi-word searches, compute a composite score that ranks
+        // items matching more tokens above those matching fewer.
+        // score = (unmatched token count) + fuseScore, so a full match
+        // always beats a partial match regardless of raw Fuse.js score.
+        const tokens = searchText
+          .trim()
+          .toLowerCase()
+          .split(' ')
+          .filter(t => t.length >= 2);
+        const isMultiWordSearch = tokens.length > 1;
+
+        const processedResults = results.map(result => {
+          const fuseScore = result.score || 0;
+          let compositeScore = fuseScore;
+          if (isMultiWordSearch) {
+            const matchedTokenCount = tokens.filter(
+              token =>
+                result.matches &&
+                result.matches.some(
+                  match =>
+                    match.value && match.value.toLowerCase().includes(token)
+                )
+            ).length;
+            compositeScore = tokens.length - matchedTokenCount + fuseScore;
+          }
+          return {
+            item: result.item,
+            matches: tuneMatches(result, searchText),
+            score: compositeScore,
+          };
+        });
+
+        if (isMultiWordSearch) {
+          processedResults.sort((a, b) => (a.score || 0) - (b.score || 0));
+        }
+
         setSearchResults(
           filterSearchResults(
-            results.map(result => ({
-              item: result.item,
-              matches: tuneMatches(result, searchText),
-            })),
+            processedResults,
             chosenItemCategory,
             chosenCategory,
             chosenFilters,

@@ -39,16 +39,20 @@ const config = {
     category: 'public.app-category.developer-tools',
     hardenedRuntime: true,
     entitlements: './build/entitlements.mac.inherit.plist',
-    target: {
-      target: 'default',
-      arch: ['universal'],
-    },
+    target: [
+      { target: 'default', arch: ['universal'] },
+      { target: 'zip', arch: ['universal'] },
+    ],
     mergeASARs: false,
     x64ArchFiles:
       'Contents/Resources/app.asar.unpacked/node_modules/steamworks.js/dist/osx/steamworksjs.darwin-*.node',
   },
   win: {
     executableName: 'GDevelop',
+    target: [
+      { target: 'nsis', arch: ['x64'] },
+      { target: 'zip', arch: ['x64'] },
+    ],
   },
   nsis: {
     oneClick: false,
@@ -81,7 +85,16 @@ const config = {
   ],
 };
 
-if (
+if (process.env.GD_PORTABLE_BUILD === 'true') {
+  config.mac.identity = null;
+  config.mac.hardenedRuntime = false;
+  config.afterSign = undefined;
+  // Exclude .exe from signing so signIf() never reaches signtool.
+  config.win.signExts = ['!.exe'];
+  console.log(
+    'ℹ️ GD_PORTABLE_BUILD is set — skipping macOS signing/notarization and Windows Authenticode (exe signing).'
+  );
+} else if (
   process.env.GD_SIGNTOOL_SUBJECT_NAME &&
   process.env.GD_SIGNTOOL_THUMBPRINT
 ) {

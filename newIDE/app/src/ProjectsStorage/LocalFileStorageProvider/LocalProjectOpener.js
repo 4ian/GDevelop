@@ -39,21 +39,25 @@ export const onOpen = (
       // of large game files.
       maxUnsplitDepth: 3,
     })
-      .then(() =>
-        readJSONFile(getProjectEditorSettingsFilePath(projectPath))
+      .then(() => {
+        const projectEditorSettingsFilePath = getProjectEditorSettingsFilePath(
+          projectPath
+        );
+        if (!fs.existsSync(projectEditorSettingsFilePath)) {
+          return;
+        }
+
+        return readJSONFile(projectEditorSettingsFilePath)
           .then(projectEditorSettings => {
             applyProjectEditorSettings(object, projectEditorSettings);
           })
           .catch(error => {
-            if (error && error.code === 'ENOENT') {
-              return;
-            }
             console.warn(
               'Unable to read project editor settings. Opening the project without them.',
               error
             );
-          })
-      )
+          });
+      })
       .then(() => {
         return { content: object };
       });

@@ -96,8 +96,10 @@ const isCliRunCommand = !!args['run-command'];
 const gotTheLock = isCliRunCommand ? true : app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
+  // Second instance attempted - quit immediately
   app.quit();
 } else if (!isCliRunCommand) {
+  // First instance - handle second-instance events by creating new windows
   app.on('second-instance', (event, commandLine, workingDirectory) => {
     const secondInstanceArgs = parseArgs(
       commandLine.slice(isDev ? 2 : 1),
@@ -414,6 +416,10 @@ app.on('ready', function() {
       },
     ]);
   }
+
+  ipcMain.on('app-exit', (_event, exitCode) => {
+    app.exit(typeof exitCode === 'number' ? exitCode : 0);
+  });
 
   ipcMain.on('set-main-menu', (event, mainMenuTemplate) => {
     const window = BrowserWindow.fromWebContents(event.sender);

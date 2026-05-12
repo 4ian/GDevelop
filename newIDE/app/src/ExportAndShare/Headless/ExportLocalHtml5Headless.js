@@ -33,11 +33,7 @@ type Options = {|
 
 type Result = {| outputDir: string |};
 
-/**
- * Headless HTML5 export — no UI, no dialogs.
- * Has no React dependencies; accepts a stub i18n like
- * `{ _: msg => (msg && msg.message) || String(msg) }`.
- */
+/** Headless HTML5 export — no UI, no dialogs. */
 export const exportLocalHtml5Headless = async ({
   project,
   i18n,

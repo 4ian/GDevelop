@@ -75,8 +75,8 @@ import {
   type ObjectGroupsOutsideEditorChanges,
 } from './EditorContainers/BaseEditor';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
-import { exportLocalHtml5Headless } from '../ExportAndShare/Headless/exportLocalHtml5Headless';
-import { getAwaitableCliRunner } from './CliCommandRunner';
+import { exportLocalHtml5Headless } from '../ExportAndShare/Headless/ExportLocalHtml5Headless';
+import { useCliCommandRunner } from './CliCommandRunner';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
@@ -4926,86 +4926,11 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
   });
 
-  // Dispatch `--run-command` once the project is loaded. "Awaitable" commands
-  // (CliCommandRunner.js) are awaited for a proper exit code; others fall back
-  // to fire-and-forget via commandPaletteRef.launchCommand.
-  const cliCommandRanRef = React.useRef(false);
-  React.useEffect(
-    () => {
-      if (cliCommandRanRef.current) return;
-      const project = state.currentProject;
-      if (!project) return;
-
-      const appArguments = Window.getArguments();
-      const commandName = appArguments['run-command'];
-      if (!commandName || typeof commandName !== 'string') return;
-
-      cliCommandRanRef.current = true;
-      const keepOpen = !!appArguments['keep-open'];
-
-      const FIRE_AND_FORGET_GRACE_MS = 1500;
-
-      const exitApp = (exitCode: number) => {
-        if (keepOpen) return;
-        const remoteModule = optionalRequire('@electron/remote');
-        if (remoteModule && remoteModule.app) {
-          remoteModule.app.exit(exitCode);
-        }
-      };
-
-      const run = async () => {
-        try {
-          const awaitableRunner = getAwaitableCliRunner(commandName);
-          if (awaitableRunner) {
-            await awaitableRunner(project, i18n);
-            console.info(
-              `[CLI] Command "${commandName}" finished successfully.`
-            );
-            exitApp(0);
-            return;
-          }
-
-          if (
-            commandPaletteRef.current &&
-            commandPaletteRef.current.launchCommand
-          ) {
-            commandPaletteRef.current.launchCommand((commandName: any));
-            console.info(
-              `[CLI] Command "${commandName}" dispatched (fire-and-forget).`
-            );
-            setTimeout(() => exitApp(0), FIRE_AND_FORGET_GRACE_MS);
-            return;
-          }
-
-          console.error(
-            `[CLI] Command "${commandName}" could not be dispatched: command palette not ready.`
-          );
-          exitApp(1);
-        } catch (error) {
-          console.error(`[CLI] Command "${commandName}" failed:`, error);
-          exitApp(1);
-        }
-      };
-
-      run();
-    },
-    [state.currentProject, i18n]
-  );
-
-  const CLI_PROJECT_LOAD_TIMEOUT_MS = 120_000;
-  React.useEffect(
-    () => {
-      if (!Window.isRunningCommandFromCli()) return;
-      if (state.currentProject) return;
-      const timer = setTimeout(() => {
-        console.error('[CLI] Project failed to load within timeout. Exiting.');
-        const remoteModule = optionalRequire('@electron/remote');
-        if (remoteModule && remoteModule.app) remoteModule.app.exit(1);
-      }, CLI_PROJECT_LOAD_TIMEOUT_MS);
-      return () => clearTimeout(timer);
-    },
-    [state.currentProject]
-  );
+  useCliCommandRunner({
+    project: state.currentProject,
+    i18n,
+    commandPaletteRef,
+  });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
     () => ({

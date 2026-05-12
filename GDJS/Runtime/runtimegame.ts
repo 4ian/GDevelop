@@ -1130,7 +1130,8 @@ namespace gdjs {
           gdjs.getAllAsynchronouslyLoadingLibraryPromise(),
         ]);
       } catch (e) {
-        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e as Error);
+        if (this._debuggerClient)
+          this._debuggerClient.onUncaughtException(e as Error);
 
         throw e;
       }
@@ -1373,7 +1374,8 @@ namespace gdjs {
           this._captureManager.setupCaptureOptions(this._isPreview);
         }
       } catch (e) {
-        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e as Error);
+        if (this._debuggerClient)
+          this._debuggerClient.onUncaughtException(e as Error);
 
         throw e;
       }

@@ -31,6 +31,10 @@
   background-color: var(--table-row-selected-background-color); /*OS X selection*/
   color: var(--table-row-selected-color);
 }
+.gd-table .tableEvenRow:hover,
+.gd-table .tableOddRow:hover {
+  background-color: var(--theme-list-item-hover-background-color);
+}
 .gd-table .tableHeaderColumn {
   text-transform: none;
   font-weight: 400;

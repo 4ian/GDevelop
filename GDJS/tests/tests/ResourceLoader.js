@@ -434,7 +434,7 @@ describe('gdjs.ResourceLoader', () => {
    * @param {gdjs.MockedResourceManager} mockedResourceManager
    */
   const loadObject1AndCheck = async (runtimeGame, mockedResourceManager) => {
-    runtimeGame.loadObjectOrGroupAssets('Object1');
+    runtimeGame.loadObjectOrGroupAssets('Object1', 'Scene1');
 
     // Object1 resources should be pending download
     expect(
@@ -447,7 +447,7 @@ describe('gdjs.ResourceLoader', () => {
         'scene1-object1-resource2.png'
       )
     ).to.be(true);
-    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1')).to.be(false);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1', 'Scene1')).to.be(false);
 
     // Mark Object1 resources as loaded
     mockedResourceManager.markPendingResourcesAsLoaded(
@@ -459,7 +459,7 @@ describe('gdjs.ResourceLoader', () => {
     await delay(10);
 
     // Object1 should now be ready
-    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1')).to.be(true);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1', 'Scene1')).to.be(true);
   };
 
   it('can load object resources with an action', async () => {
@@ -485,10 +485,58 @@ describe('gdjs.ResourceLoader', () => {
     runtimeGame._sceneStack.push('Scene1');
     await loadObject1AndCheck(runtimeGame, mockedResourceManager);
 
-    runtimeGame.unloadObjectOrGroupAssets('Object1');
-    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1')).to.be(false);
+    runtimeGame.unloadObjectOrGroupAssets('Object1', 'Scene1');
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1', 'Scene1')).to.be(false);
 
     await loadObject1AndCheck(runtimeGame, mockedResourceManager);
+  });
+
+  it('can unload a scene with its objects that where manually loaded', async () => {
+    const mockedResourceManager = new gdjs.MockedResourceManager();
+    const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithThreeScenes);
+    const resourceLoader = runtimeGame.getResourceLoader();
+    resourceLoader.injectMockResourceManagerForTesting(
+      'fake-resource-kind-for-testing-only',
+      mockedResourceManager
+    );
+
+    // Start loading first scene and background loading
+    runtimeGame.loadFirstAssetsAndStartBackgroundLoading('Scene1');
+    // Mark Scene1 resources as loaded
+    mockedResourceManager.markPendingResourcesAsLoaded('scene1-resource1.png');
+    mockedResourceManager.markPendingResourcesAsLoaded('scene1-resource2.png');
+    await delay(10);
+
+    // Scene1 should now be ready
+    expect(runtimeGame.areSceneAssetsLoaded('Scene1')).to.be(true);
+    expect(runtimeGame.areSceneAssetsReady('Scene1')).to.be(true);
+
+    runtimeGame._sceneStack.push('Scene1');
+    await loadObject1AndCheck(runtimeGame, mockedResourceManager);
+
+    // First, unload Scene2 (which shares resources with Scene3)
+    resourceLoader.unloadSceneResources({
+      unloadedSceneName: 'Scene1',
+      newSceneName: 'Scene2',
+    });
+
+    // Scene resources are unloaded.
+    expect(
+      mockedResourceManager.isResourceDisposed('scene1-resource1.png')
+    ).to.be(true);
+    expect(
+      mockedResourceManager.isResourceDisposed('scene1-resource2.png')
+    ).to.be(true);
+    expect(runtimeGame.areSceneAssetsLoaded('Scene1')).to.be(false);
+    expect(runtimeGame.areSceneAssetsReady('Scene1')).to.be(false);
+    // Scene objects are unloaded too.
+    expect(
+      mockedResourceManager.isResourceDisposed('scene1-object1-resource1.png')
+    ).to.be(true);
+    expect(
+      mockedResourceManager.isResourceDisposed('scene1-object1-resource2.png')
+    ).to.be(true);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1', 'Scene1')).to.be(false);
   });
 
   it('can load object group resources with an action', async () => {
@@ -525,8 +573,8 @@ describe('gdjs.ResourceLoader', () => {
         'scene1-object1-resource2.png'
       )
     ).to.be(true);
-    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1')).to.be(false);
-    expect(runtimeGame.areObjectOrGroupAssetsLoaded('MyGroup')).to.be(false);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1', 'Scene1')).to.be(false);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('MyGroup', 'Scene1')).to.be(false);
 
     // Mark Object1 resources as loaded
     mockedResourceManager.markPendingResourcesAsLoaded(
@@ -538,8 +586,8 @@ describe('gdjs.ResourceLoader', () => {
     await delay(10);
 
     // Object1 should now be ready
-    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1')).to.be(true);
-    expect(runtimeGame.areObjectOrGroupAssetsLoaded('MyGroup')).to.be(false);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1', 'Scene1')).to.be(true);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('MyGroup', 'Scene1')).to.be(false);
 
     // Object2 resources should be pending download
     expect(
@@ -552,8 +600,8 @@ describe('gdjs.ResourceLoader', () => {
         'scene1-object2-resource2.png'
       )
     ).to.be(true);
-    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object2')).to.be(false);
-    expect(runtimeGame.areObjectOrGroupAssetsLoaded('MyGroup')).to.be(false);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object2', 'Scene1')).to.be(false);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('MyGroup', 'Scene1')).to.be(false);
 
     mockedResourceManager.markPendingResourcesAsLoaded(
       'scene1-object2-resource1.png'
@@ -564,8 +612,8 @@ describe('gdjs.ResourceLoader', () => {
     await delay(10);
 
     // Object1 and Object2 should now be ready
-    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1')).to.be(true);
-    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object2')).to.be(true);
-    expect(runtimeGame.areObjectOrGroupAssetsLoaded('MyGroup')).to.be(true);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1', 'Scene1')).to.be(true);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object2', 'Scene1')).to.be(true);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('MyGroup', 'Scene1')).to.be(true);
   });
 });

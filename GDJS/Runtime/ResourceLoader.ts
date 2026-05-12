@@ -773,8 +773,8 @@ namespace gdjs {
       );
       // Also add the resources manually loaded for objects during the current scene.
       // TODO Abort loading task to avoid to leave resources from an object that is currently loading.
-      const unloadedSceneObjectResourceLoadingQueue = newSceneName
-        ? this.getObjectResourceLoadingQueue(newSceneName)
+      const unloadedSceneObjectResourceLoadingQueue = unloadedSceneName
+        ? this.getObjectResourceLoadingQueue(unloadedSceneName)
         : null;
       if (unloadedSceneObjectResourceLoadingQueue) {
         for (const objectLoadingState of unloadedSceneObjectResourceLoadingQueue.loadingStates.values()) {

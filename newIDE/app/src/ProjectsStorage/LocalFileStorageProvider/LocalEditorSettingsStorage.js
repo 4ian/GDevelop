@@ -35,7 +35,7 @@ const makeProjectEditorSettings = (): ProjectEditorSettings => ({
 });
 
 const hasOwn = (object: Object, propertyName: string): boolean =>
-  Object.prototype.hasOwnProperty.call(object, propertyName);
+  Object.keys(object).indexOf(propertyName) !== -1;
 
 const isEmpty = (object: Object): boolean => Object.keys(object).length === 0;
 
@@ -70,9 +70,8 @@ export const extractProjectEditorSettings = (
         typeof externalLayout.name === 'string' &&
         hasOwn(externalLayout, 'editionSettings')
       ) {
-        projectEditorSettings.externalLayoutSettings[
-          externalLayout.name
-        ] = externalLayout.editionSettings;
+        projectEditorSettings.externalLayoutSettings[externalLayout.name] =
+          externalLayout.editionSettings;
         delete externalLayout.editionSettings;
       }
     });

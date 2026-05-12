@@ -201,9 +201,6 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       setJustAddedParameterName,
     ] = React.useState<?string>(null);
     const justAddedParameterElement = React.useRef<?any>(null);
-    const parameterRefs = React.useRef(
-      new Map<string, React.ElementRef<any>>()
-    );
     const parameterNameFieldRefs = React.useRef(
       new Map<string, CompactTextFieldInterface | null>()
     );
@@ -345,7 +342,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
           addParameter(props.variableName, parameterType);
         } else {
           // Make sure parameters can be selected even if they have just been created.
-          forceUpdate();
+          //forceUpdate();
           onParametersUpdated();
           setJustAddedParameterName(props.variableName);
         }
@@ -692,7 +689,6 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       PARAMETERS_CLIPBOARD_KIND
     );
 
-    parameterRefs.current.clear();
     parameterNameFieldRefs.current.clear();
 
     return (
@@ -746,12 +742,6 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                                 <div
                                   key={parameter.ptr}
                                   style={styles.rowContainer}
-                                  ref={ref => {
-                                    parameterRefs.current.set(
-                                      parameter.getName(),
-                                      ref
-                                    );
-                                  }}
                                 >
                                   {isOver && (
                                     <DropIndicator canDrop={canDrop} />

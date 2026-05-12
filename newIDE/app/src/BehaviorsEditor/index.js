@@ -609,6 +609,7 @@ export const useManageObjectBehaviors = ({
       eventsFunctionsExtension={eventsFunctionsExtension}
       onWillInstallExtension={onWillInstallExtension}
       onExtensionInstalled={onExtensionInstalled}
+      shouldShowCapabilityBehaviors={false}
     />
   );
 

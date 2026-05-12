@@ -463,9 +463,9 @@ describe('EventsTree/TextRenderer', () => {
          Actions:
          - Change the number of the animation of MySpriteObject: = 1
          - Show GroupOfObjects
-         - Activate behavior PlatformerObject of GroupOfSpriteObjectsWithBehaviors: 
+         - Activate behavior PlatformerObject of GroupOfSpriteObjectsWithBehaviors: no
          - Activate behavior PlatformerObject of GroupOfSpriteObjectsWithBehaviors: yes
-         - Activate behavior PlatformerObject of GroupOfSpriteObjectsWithBehaviors: something else
+         - Activate behavior PlatformerObject of GroupOfSpriteObjectsWithBehaviors: no
          Sub-events:
           <event-0.0>
            ~~Else~~ (Else is ignored because not following a standard event)

@@ -304,10 +304,10 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
 
     const addParameterAt = React.useCallback(
       (index: number, name: string = '', type: string = 'objectList') => {
-        const parameters = eventsFunction.getParameters();
         const projectScopedContainers = projectScopedContainersAccessor.get();
+        const parameters = eventsFunction.getParameters();
         const validatedNewName = getValidatedParameterName(
-          eventsFunction.getParameters(),
+          parameters,
           projectScopedContainers,
           name || 'Parameter'
         );
@@ -1027,7 +1027,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                       actionLabel={<Trans>Add a parameter</Trans>}
                       helpPagePath={helpPagePath}
                       helpPageAnchor={'add-and-use-parameters'}
-                      onAction={addParameter}
+                      onAction={() => addParameter()}
                       secondaryActionIcon={<PasteIcon />}
                       secondaryActionLabel={
                         isClipboardContainingParameters ? (

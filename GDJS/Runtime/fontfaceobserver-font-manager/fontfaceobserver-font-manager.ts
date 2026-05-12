@@ -186,7 +186,8 @@ namespace gdjs {
       this._loadedFontFamilySet.add(fontFamily);
       try {
         await this._loadFont(fontFamily, file);
-      } catch (error) {
+      } catch (e) {
+        const error = e as Error;
         logger.error(
           'Error loading font resource "' +
             resource.name +

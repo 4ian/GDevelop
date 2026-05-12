@@ -189,7 +189,7 @@ namespace gdjs {
           const parsedData = JSON.parse(receivedData);
           return parsedData;
         } catch (e) {
-          logger.error(`Error while parsing message: ${e.toString()}`);
+          logger.error(`Error while parsing message: ${(e as Error).toString()}`);
           return;
         }
       }
@@ -221,7 +221,7 @@ namespace gdjs {
         const parsedData = JSON.parse(jsonStringData);
         return parsedData;
       } catch (e) {
-        logger.error(`Error while parsing message: ${e.toString()}`);
+        logger.error(`Error while parsing message: ${(e as Error).toString()}`);
         return;
       }
     }

@@ -334,14 +334,15 @@ namespace gdjs {
             this._runtimeGame
           );
         }
-      } catch (error) {
-        const errorTarget = error.target;
+      } catch (e) {
+        const errorTarget = (e as ErrorEvent).target;
         if (errorTarget instanceof HTMLScriptElement) {
           this._logs.push({
             kind: 'fatal',
             message: 'Unable to reload script: ' + errorTarget.src,
           });
         } else {
+          const error = e as Error;
           this._logs.push({
             kind: 'fatal',
             message:

@@ -1785,7 +1785,7 @@ namespace gdjs {
 
         handleJoinLobbyEvent(runtimeScene, lobbyID);
       } catch (error) {
-        const errorCode = parseInt(error.message.match(/\d{3}/)?.[0]);
+        const errorCode = parseInt((error as Error).message.match(/\d{3}/)?.[0] || '');
         if (errorCode === 404) {
           logger.error('Lobby does not exist.');
           _quickJoinLobbyFailureReason = 'DOES_NOT_EXIST';

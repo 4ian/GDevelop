@@ -1130,7 +1130,7 @@ namespace gdjs {
           gdjs.getAllAsynchronouslyLoadingLibraryPromise(),
         ]);
       } catch (e) {
-        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
+        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e as Error);
 
         throw e;
       }
@@ -1361,7 +1361,7 @@ namespace gdjs {
             return true;
           } catch (e) {
             if (this._debuggerClient)
-              this._debuggerClient.onUncaughtException(e);
+              this._debuggerClient.onUncaughtException(e as Error);
 
             throw e;
           }
@@ -1373,7 +1373,7 @@ namespace gdjs {
           this._captureManager.setupCaptureOptions(this._isPreview);
         }
       } catch (e) {
-        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
+        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e as Error);
 
         throw e;
       }

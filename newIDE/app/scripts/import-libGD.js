@@ -66,17 +66,28 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     return branch;
   };
 
+  const getHashFromGitRef = gitRef => {
+    const hashShellString = shell.exec(`git rev-parse "${gitRef}"`, {
+      silent: true,
+    });
+    const hash = (hashShellString.stdout || 'unknown-hash').trim();
+
+    if (hashShellString.stderr || hashShellString.code) {
+      shell.echo(`⚠️ Can't find the hash of the associated commit.`);
+      return null;
+    }
+
+    return hash;
+  };
+
   // Try to download libGD.js from a specific commit on the current branch
   const downloadCommitLibGdJs = (branch, gitRef) =>
     new Promise((resolve, reject) => {
       shell.echo(`ℹ️ Trying to download libGD.js for ${gitRef}.`);
 
-      var hashShellString = shell.exec(`git rev-parse "${gitRef}"`, {
-        silent: true,
-      });
-      const hash = (hashShellString.stdout || 'unknown-hash').trim();
+      const hash = getHashFromGitRef(gitRef);
       const branch = getBranchFromGitRef(gitRef);
-      if (hashShellString.stderr || hashShellString.code || !branch) {
+      if (!hash || !branch) {
         shell.echo(
           `⚠️ Can't find the hash or branch of the associated commit.`
         );
@@ -87,6 +98,25 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
       resolve(
         downloadLibGdJs(
           `https://s3.amazonaws.com/gdevelop-gdevelop.js/${branch}/commit/${hash}`
+        )
+      );
+    });
+
+  const downloadMasterCommitLibGdJs = gitRef =>
+    new Promise((resolve, reject) => {
+      shell.echo(
+        `ℹ️ Trying to download libGD.js for ${gitRef} from master.`
+      );
+
+      const hash = getHashFromGitRef(gitRef);
+      if (!hash) {
+        reject();
+        return;
+      }
+
+      resolve(
+        downloadLibGdJs(
+          `https://s3.amazonaws.com/gdevelop-gdevelop.js/master/commit/${hash}`
         )
       );
     });
@@ -151,10 +181,14 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
   };
 
   const branch = getBranchFromGitRef('HEAD');
+  const downloadCommitLibGdJsWithMasterFallback = gitRef =>
+    downloadCommitLibGdJs(branch, gitRef).catch(() =>
+      downloadMasterCommitLibGdJs(gitRef)
+    );
 
   // Try to download the latest libGD.js, fallback to previous or master ones
   // if not found (including different parents, for handling of merge commits).
-  downloadCommitLibGdJs(branch, 'HEAD').then(onLibGdJsDownloaded, () => {
+  downloadCommitLibGdJsWithMasterFallback('HEAD').then(onLibGdJsDownloaded, () => {
     // Force the exact version of GDevelop.js to be downloaded for AppVeyor - because
     // this means we build the app and we don't want to risk mismatch (Core C++ not up to date
     // with the IDE JavaScript).
@@ -168,9 +202,9 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
       shell.exit(1);
     }
 
-    downloadCommitLibGdJs(branch, 'HEAD~1').then(onLibGdJsDownloaded, () =>
-      downloadCommitLibGdJs(branch, 'HEAD~2').then(onLibGdJsDownloaded, () =>
-        downloadCommitLibGdJs(branch, 'HEAD~3').then(onLibGdJsDownloaded, () =>
+    downloadCommitLibGdJsWithMasterFallback('HEAD~1').then(onLibGdJsDownloaded, () =>
+      downloadCommitLibGdJsWithMasterFallback('HEAD~2').then(onLibGdJsDownloaded, () =>
+        downloadCommitLibGdJsWithMasterFallback('HEAD~3').then(onLibGdJsDownloaded, () =>
           downloadBranchLatestLibGdJs(branch).then(onLibGdJsDownloaded, () =>
             downloadBranchLatestLibGdJs('master').then(
               onLibGdJsDownloaded,

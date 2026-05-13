@@ -34,6 +34,7 @@ import {
 } from '../InstanceOrObjectPropertiesEditorContainer';
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
 import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 
 export const swipeableDrawerContainerId = 'swipeable-drawer-container';
 
@@ -199,13 +200,16 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       ]
     );
 
-    const startSceneRendering = React.useCallback((start: boolean) => {
-      const editor = editorRef.current;
-      if (!editor) return;
+    const startSceneRendering = React.useCallback(
+      (start: boolean, reason: string) => {
+        const editor = editorRef.current;
+        if (!editor) return;
 
-      if (start) editor.restartSceneRendering();
-      else editor.pauseSceneRendering();
-    }, []);
+        if (start) editor.resumeSceneRendering(reason);
+        else editor.pauseSceneRendering(reason);
+      },
+      []
+    );
 
     React.useLayoutEffect(
       () => {
@@ -287,7 +291,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
         const { objectFolderOrObject } = objectFolderOrObjectWithContext;
         if (!objectFolderOrObject) return null; // Protect ourselves from an unexpected null value.
         if (objectFolderOrObject.isFolder()) return null;
-        return objectFolderOrObject.getObject();
+        return exceptionallyGuardAgainstDeadObject(
+          objectFolderOrObject.getObject()
+        );
       })
       .filter(Boolean);
 
@@ -405,6 +411,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                           props.onOpenEventBasedObjectVariantEditor
                         }
                         onExportAssets={props.onExportAssets}
+                        onImportAssets={props.onImportAssets}
                         onDeleteObjects={(objectWithContext, cb) =>
                           props.onDeleteObjects(i18n, objectWithContext, cb)
                         }

@@ -6,6 +6,7 @@ import { SketchPicker } from 'react-color';
 import Popover from '@material-ui/core/Popover';
 import muiZIndex from '@material-ui/core/styles/zIndex';
 import { type RGBColor } from '../../Utils/ColorTransformer';
+import PortalContainerContext from '../PortalContainerContext';
 
 export type ColorResult = {
   rgb: RGBColor,
@@ -62,6 +63,7 @@ const ColorPicker = ({
 }: Props): React.Node => {
   const swatchRef = React.useRef<?HTMLDivElement>(null);
   const [displayColorPicker, setDisplayColorPicker] = React.useState(false);
+  const portalContainer = React.useContext(PortalContainerContext);
 
   const handleClick = () => {
     if (disabled) return;
@@ -110,6 +112,7 @@ const ColorPicker = ({
           open
           onClose={handleClose}
           anchorEl={swatchRef.current}
+          container={portalContainer}
           style={styles.popover}
         >
           <SketchPicker

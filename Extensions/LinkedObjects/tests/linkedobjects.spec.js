@@ -26,6 +26,7 @@ describe('gdjs.LinksManager', function () {
         variables: [],
         behaviorsSharedData: [],
         objects: [],
+        objectsGroups: [],
         instances: [],
         r: 0,
         v: 0,

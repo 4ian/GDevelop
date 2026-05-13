@@ -8,10 +8,12 @@ import {
   type EditorFunctionWithoutProject,
   type EditorCallbacks,
   type EditorFunctionCall,
+  type EditorFunctionCallResult,
   type EditorFunctionGenericOutput,
   type EventsGenerationOptions,
   type AssetSearchAndInstallOptions,
   type AssetSearchAndInstallResult,
+  type RelatedAiRequestLastMessages,
   type ResourceSearchAndInstallOptions,
   type ResourceSearchAndInstallResult,
   type SceneEventsOutsideEditorChanges,
@@ -23,29 +25,14 @@ import {
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 
-export type EditorFunctionCallResult =
-  | {|
-      status: 'working',
-      call_id: string,
-    |}
-  | {|
-      status: 'finished',
-      call_id: string,
-      success: boolean,
-      output: any,
-    |}
-  | {|
-      status: 'ignored',
-      call_id: string,
-    |};
-
-export type ProcessEditorFunctionCallsOptions = {|
+type ProcessEditorFunctionCallsOptions = {|
   project: ?gdProject,
   functionCalls: Array<EditorFunctionCall>,
   i18n: I18nType,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
-  ignore: boolean,
+  relatedAiRequestId: string | null,
+  getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
   generateEvents: (
     options: EventsGenerationOptions
   ) => Promise<EventsGenerationResult>,
@@ -85,7 +72,8 @@ export const processEditorFunctionCalls = async ({
   onInstancesModifiedOutsideEditor,
   onObjectsModifiedOutsideEditor,
   onObjectGroupsModifiedOutsideEditor,
-  ignore,
+  relatedAiRequestId,
+  getRelatedAiRequestLastMessages,
   ensureExtensionInstalled,
   onWillInstallExtension,
   onExtensionInstalled,
@@ -102,14 +90,6 @@ export const processEditorFunctionCalls = async ({
 
   for (const functionCall of functionCalls) {
     const call_id = functionCall.call_id;
-    if (ignore) {
-      results.push({
-        status: 'ignored',
-        call_id,
-      });
-      continue;
-    }
-
     const name = functionCall.name;
     if (!project && name !== 'initialize_project') {
       results.push({
@@ -186,6 +166,8 @@ export const processEditorFunctionCalls = async ({
         i18n,
         toolOptions,
         editorCallbacks,
+        relatedAiRequestId,
+        getRelatedAiRequestLastMessages,
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
@@ -224,12 +206,23 @@ export const processEditorFunctionCalls = async ({
         }: EditorFunctionGenericOutput);
       }
 
+      if (result.aborted) {
+        results.push({ status: 'aborted', call_id });
+        continue;
+      }
+
       const { success, meta, ...output } = result;
+      const editorFunctionDef = editorFunction || editorFunctionWithoutProject;
+      const didModifyProject =
+        editorFunctionDef && editorFunctionDef.modifiesProject && success
+          ? true
+          : undefined;
       results.push({
         status: 'finished',
         call_id,
         success,
         output,
+        didModifyProject,
       });
 
       if (meta && meta.newSceneNames) {

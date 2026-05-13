@@ -34,7 +34,8 @@ type RouteKey =
   | 'playable-game-id'
   | 'purchase-id'
   | 'claimable-token'
-  | 'coupon-code';
+  | 'coupon-code'
+  | 'new-project';
 export type RouteArguments = { [RouteKey]: string };
 
 export type Router = {|

@@ -20,11 +20,14 @@ export const groupMembersByGroupId = ({
   inactive: User[],
 |} => {
   if (!(groups && members && memberships)) return null;
+  const sortedMembers = members
+    .slice()
+    .sort((a, b) => a.createdAt - b.createdAt);
   const membersByGroupId = {
     NONE: { group: { id: 'none', name: 'none' }, members: [] },
   };
   const deactivatedMembers = [];
-  members.forEach(member => {
+  sortedMembers.forEach(member => {
     const membership = memberships.find(
       membership => membership.userId === member.id
     );

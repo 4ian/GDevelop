@@ -2,7 +2,6 @@
 import * as React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { I18n } from '@lingui/react';
 import classNames from 'classnames';
 import Window from '../../Utils/Window';
 import { getHelpLink } from '../../Utils/HelpLink';
@@ -156,16 +155,12 @@ export const ChatMarkdownText: React.ComponentType<Props> = React.memo<Props>(
     );
 
     const markdownElement = (
-      <I18n>
-        {({ i18n }) => (
-          <ReactMarkdown
-            components={markdownCustomComponents}
-            remarkPlugins={[remarkGfm]}
-          >
-            {props.source}
-          </ReactMarkdown>
-        )}
-      </I18n>
+      <ReactMarkdown
+        components={markdownCustomComponents}
+        remarkPlugins={[remarkGfm]}
+      >
+        {props.source}
+      </ReactMarkdown>
     );
 
     const className = classNames({

@@ -29,6 +29,7 @@ import AnimationPreview from '../ObjectEditor/Editors/SpriteEditor/AnimationPrev
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import AssetsList from './AssetsList';
 import { SimilarAssetStoreSearchFilter } from './AssetStoreSearchFilter';
+import { type SearchFilter } from '../UI/Search/UseSearchItem';
 import EmptyMessage from '../UI/EmptyMessage';
 import Link from '../UI/Link';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
@@ -272,7 +273,9 @@ export const AssetDetails: React.ComponentType<{
         ? direction.sprites.map(sprite => assetResources[sprite.image])
         : null;
 
-    const similarAssetFilters = React.useMemo(
+    const similarAssetFilters: Array<
+      SearchFilter<AssetShortHeader>
+    > = React.useMemo(
       () => [new SimilarAssetStoreSearchFilter(assetShortHeader)],
       [assetShortHeader]
     );

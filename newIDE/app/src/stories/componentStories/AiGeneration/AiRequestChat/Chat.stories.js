@@ -105,8 +105,7 @@ const commonProps = {
   editorFunctionCallResults: [],
   increaseQuotaOffering: 'subscribe',
   onProcessFunctionCalls: async () => {},
-  setAutoProcessFunctionCalls: () => {},
-  isAutoProcessingFunctionCalls: false,
+  onStop: async () => {},
   onStartOrOpenChat: () => {},
   aiRequestMode: 'chat',
   saveProject: async () => {},
@@ -366,7 +365,6 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): React.Node => 
     <WrappedChatComponent
       aiRequest={aiRequestWithAiResponses}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...defaultAuthenticatedUserWithNoSubscription,
         limits: {
@@ -400,7 +398,6 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeft = (): Rea
     <WrappedChatComponent
       aiRequest={aiRequestWithAiResponses}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...defaultAuthenticatedUserWithNoSubscription,
         limits: {
@@ -434,7 +431,6 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilver
     <WrappedChatComponent
       aiRequest={aiRequestWithAiResponses}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...fakeSilverAuthenticatedUser,
         limits: {
@@ -468,7 +464,6 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartu
     <WrappedChatComponent
       aiRequest={aiRequestWithAiResponses}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...fakeStartupAuthenticatedUser,
         limits: {
@@ -502,7 +497,6 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): React.Node 
     <WrappedChatComponent
       aiRequest={aiRequestWithAiResponses}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...defaultAuthenticatedUserWithNoSubscription,
         limits: {
@@ -536,7 +530,6 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeft = (): 
     <WrappedChatComponent
       aiRequest={aiRequestWithAiResponses}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...defaultAuthenticatedUserWithNoSubscription,
         limits: {
@@ -570,7 +563,6 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubsc
     <WrappedChatComponent
       aiRequest={aiRequestWithAiResponses}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...defaultAuthenticatedUserWithNoSubscription,
         limits: {
@@ -604,7 +596,6 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSil
     <WrappedChatComponent
       aiRequest={aiRequestWithAiResponses}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...fakeSilverAuthenticatedUser,
         limits: {
@@ -638,7 +629,6 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSta
     <WrappedChatComponent
       aiRequest={aiRequestWithAiResponses}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...fakeStartupAuthenticatedUser,
         limits: {

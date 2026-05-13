@@ -22,6 +22,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
             "scratch."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Check if a key is pressed or released. Last pressed key expression.")
       .SetExtensionHelpPath("/all-features/keyboard")
       .SetCategory("Input");
   extension.AddInstructionOrExpressionGroupMetadata(_("Keyboard"))

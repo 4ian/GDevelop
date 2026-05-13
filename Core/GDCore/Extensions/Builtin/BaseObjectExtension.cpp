@@ -11,6 +11,18 @@
 using namespace std;
 namespace gd {
 
+namespace {
+const gd::String forceMultiplierHint =
+    "Forces can be \"instant\" or \"permanent\". An \"instant\" force "
+    "only moves the object during one frame. A \"permanent\" force keeps "
+    "applying every frame; it should not be applied at each frame, "
+    "otherwise forces will accumulate.";
+const gd::String objectTimerHint =
+    "Object timers are NOT started automatically when an object instance "
+    "is created. Make sure to start the timer (e.g. with the \"Start (or "
+    "reset) an object timer\" action) before using it.";
+}  // namespace
+
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
     gd::PlatformExtension& extension) {
   extension
@@ -20,6 +32,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Common features that can be used for all objects in GDevelop."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Base object: position, angle, size, visibility, layer, z-order, distance, collision, variables, timers, effects.")
       .SetExtensionHelpPath("/objects/base_object/events");
   extension.AddInstructionOrExpressionGroupMetadata(_("Collision"))
       .SetIcon("res/conditions/collision24.png");
@@ -66,7 +79,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetKind("internal-in-game-editor-only-svg");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
-      "", _("Base object"), _("Base object"), "res/objeticon24.png");
+      "", _("Base object"), _("Base object"), "res/functions/object_black.svg");
 
   obj.AddCondition("PosX",
                    _("X position"),
@@ -367,6 +380,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Speed on X axis (in pixels per second)"))
       .AddParameter("expression", _("Speed on Y axis (in pixels per second)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetParameterHint(forceMultiplierHint)
       .SetDefaultValue("0")
       .SetHelpPath("/tutorials/how-to-move-objects/");
 
@@ -384,6 +398,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Angle"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetParameterHint(forceMultiplierHint)
       .SetDefaultValue("0")
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
@@ -403,6 +418,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Y position"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetParameterHint(forceMultiplierHint)
       .SetDefaultValue("0")
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
@@ -430,6 +446,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", "Speed (in Degrees per seconds)")
       .AddParameter("expression", "Distance (in pixels)")
       .AddParameter("forceMultiplier", "Force multiplier")
+      .SetParameterHint(forceMultiplierHint)
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .SetHidden();
 
@@ -1105,8 +1122,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Check if the behavior is activated for the object."),
                    _("Behavior _PARAM1_ of _PARAM0_ is activated"),
                    _("Behaviors"),
-                   "res/behavior24.png",
-                   "res/behavior16.png")
+                   "res/functions/activate_black.svg",
+                   "res/functions/activate_black.svg")
 
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"))
@@ -1117,8 +1134,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("De/activate the behavior for the object."),
                 _("Activate behavior _PARAM1_ of _PARAM0_: _PARAM2_"),
                 _("Behaviors"),
-                "res/behavior24.png",
-                "res/behavior16.png")
+                "res/functions/activate_black.svg",
+                "res/functions/activate_black.svg")
 
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"))
@@ -1137,6 +1154,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectPtr", _("Target Object"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetParameterHint(forceMultiplierHint)
       .SetDefaultValue("0")
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
@@ -1162,6 +1180,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Speed (in degrees per second)"))
       .AddParameter("expression", _("Distance (in pixels)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetParameterHint(forceMultiplierHint)
       .SetDefaultValue("0")
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
@@ -1279,6 +1298,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/conditions/timer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
+      .SetParameterHint(objectTimerHint)
       .AddParameter("expression", _("Time in seconds"))
       .SetHelpPath("/all-features/timers-and-time/")
       .SetHidden();
@@ -1294,6 +1314,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/conditions/timer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
+      .SetParameterHint(objectTimerHint)
       .AddParameter("relationalOperator", _("Sign of the test"), "time")
       .AddParameter("expression", _("Time in seconds"))
       .SetHelpPath("/all-features/timers-and-time/")
@@ -1308,6 +1329,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "res/conditions/timerPaused.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
+      .SetParameterHint(objectTimerHint)
       .SetHelpPath("/all-features/timers-and-time/")
       .MarkAsAdvanced();
 
@@ -1322,6 +1344,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/actions/timer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
+      .SetParameterHint(objectTimerHint)
       .SetHelpPath("/all-features/timers-and-time/");
 
   obj.AddAction("PauseObjectTimer",
@@ -1333,6 +1356,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/pauseTimer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
+      .SetParameterHint(objectTimerHint)
       .SetHelpPath("/all-features/timers-and-time/")
       .MarkAsAdvanced();
 
@@ -1345,6 +1369,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/unPauseTimer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
+      .SetParameterHint(objectTimerHint)
       .SetHelpPath("/all-features/timers-and-time/")
       .MarkAsAdvanced();
 
@@ -1357,6 +1382,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/timer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
+      .SetParameterHint(objectTimerHint)
       .SetHelpPath("/all-features/timers-and-time/")
       .MarkAsAdvanced();
 
@@ -1540,6 +1566,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "res/actions/time.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
+      .SetParameterHint(objectTimerHint)
       .SetHelpPath("/all-features/timers-and-time/");
 
   obj.AddExpression("AngleToObject",
@@ -1671,8 +1698,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Include or exclude a child from its parent collision mask."),
                 _("Include _PARAM0_ in parent object collision mask: _PARAM1_"),
                 _("Collision"),
-                "res/function32.png",
-                "res/function32.png")
+                "res/functions/extension.svg",
+                "res/functions/extension.svg")
       .AddParameter("object", _("Object"))
       .AddParameter("yesorno", "Include in parent collision mask")
       .SetRelevantForCustomObjectEventsOnly();

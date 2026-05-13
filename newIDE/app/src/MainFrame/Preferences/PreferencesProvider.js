@@ -5,6 +5,8 @@ import PreferencesContext, {
   initialPreferences,
   type Preferences,
   type AlertMessageIdentifier,
+  type EditorStateForProject,
+  type EditorStateForProjectUpdate,
 } from './PreferencesContext';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getIDEVersion } from '../../Version';
@@ -21,14 +23,16 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
-import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import {
   getBrowserLanguageOrLocale,
   setLanguageInDOM,
   selectLanguageOrLocale,
 } from '../../Utils/Language';
 import { type GamesDashboardOrderBy } from '../../GameDashboard/GamesList';
-import { CHECK_APP_UPDATES_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
+import {
+  CHECK_APP_UPDATES_TIMEOUT,
+  PERIODIC_APP_UPDATES_TIMEOUT,
+} from '../../Utils/GlobalFetchTimeouts';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -81,7 +85,6 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
 };
 
 export const getInitialPreferences = (): {
-  aiState: { aiRequestId: null },
   autoDisplayChangelog: boolean,
   autoDownloadUpdates: boolean,
   autoOpenMostRecentProject: boolean,
@@ -132,6 +135,7 @@ export const getInitialPreferences = (): {
   themeName: any,
   use3DEditor: any,
   useBackgroundSerializerForSaving: boolean,
+  showJsTypeError: boolean,
   useGDJSDevelopmentWatcher: boolean,
   useShortcutToClosePreviewWindow: boolean,
   userShortcutMap: {},
@@ -157,6 +161,9 @@ const getPreferences = (): PreferencesValues => {
 };
 
 export default class PreferencesProvider extends React.Component<Props, State> {
+  _periodicUpdateCheckTimeout: ?TimeoutID = null;
+  _periodicUpdateCheckInterval: ?IntervalID = null;
+
   // $FlowFixMe[missing-local-annot]
   state = {
     values: (getPreferences(): PreferencesValues),
@@ -171,7 +178,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     // $FlowFixMe[method-unbinding]
     setAutoDownloadUpdates: (this._setAutoDownloadUpdates.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    checkUpdates: (this._checkUpdates.bind(this): any),
+    checkUpdates: ((forceDownload?: boolean) =>
+      this._checkUpdates(forceDownload, true): any),
     // $FlowFixMe[method-unbinding]
     setAutoDisplayChangelog: (this._setAutoDisplayChangelog.bind(this): any),
     // $FlowFixMe[method-unbinding]
@@ -389,8 +397,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ): any),
     // $FlowFixMe[method-unbinding]
-    setAiState: (this._setAiState.bind(this): any),
-    // $FlowFixMe[method-unbinding]
     setAutomaticallyUseCreditsForAiRequests: (this._setAutomaticallyUseCreditsForAiRequests.bind(
       this
     ): any),
@@ -398,10 +404,24 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setUseBackgroundSerializerForSaving: (this._setUseBackgroundSerializerForSaving.bind(
       this
     ): any),
+    // $FlowFixMe[method-unbinding]
+    setShowJsTypeError: (this._setShowJsTypeError.bind(this): any),
   };
 
   componentDidMount() {
-    setTimeout(() => this._checkUpdates(), CHECK_APP_UPDATES_TIMEOUT);
+    this._periodicUpdateCheckTimeout = setTimeout(
+      () => this._checkUpdates(),
+      CHECK_APP_UPDATES_TIMEOUT
+    );
+    this._periodicUpdateCheckInterval = setInterval(
+      () => this._checkUpdates(),
+      PERIODIC_APP_UPDATES_TIMEOUT
+    );
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this._periodicUpdateCheckTimeout);
+    clearInterval(this._periodicUpdateCheckInterval);
   }
 
   _setMultipleValues(updates: ProjectSpecificPreferencesValues) {
@@ -777,7 +797,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _checkUpdates(forceDownload?: boolean) {
+  _checkUpdates(forceDownload?: boolean, explicit?: boolean) {
     // Checking for updates is only done on Electron.
     // Note: This could be abstracted away later if other updates mechanisms
     // should be supported.
@@ -785,9 +805,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     if (!ipcRenderer || disableCheckForUpdates) return;
 
     if (!!forceDownload || this.state.values.autoDownloadUpdates) {
-      ipcRenderer.send('updates-check-and-download');
+      ipcRenderer.send('updates-check-and-download', { explicit: !!explicit });
     } else {
-      ipcRenderer.send('updates-check');
+      ipcRenderer.send('updates-check', { explicit: !!explicit });
     }
   }
 
@@ -1248,25 +1268,60 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setShowJsTypeError(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: { ...state.values, showJsTypeError: newValue },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _getEditorStateForProject(projectId: string): any {
-    return this.state.values.editorStateByProject[projectId];
+    const editorState = this.state.values.editorStateByProject[projectId];
+    if (!editorState) return null;
+
+    return {
+      editorTabs:
+        editorState.editorTabs == null ? null : editorState.editorTabs,
+      propertiesPanelScroll: editorState.propertiesPanelScroll || {},
+    };
   }
 
   _setEditorStateForProject(
     projectId: string,
-    editorState?: {| editorTabs: EditorTabsPersistedState |}
+    editorState: EditorStateForProjectUpdate | null
   ) {
     this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          editorStateByProject: {
-            ...state.values.editorStateByProject,
-            // $FlowFixMe[incompatible-type]
-            [projectId]: editorState,
+      state => {
+        const nextEditorStateByProject = {
+          ...state.values.editorStateByProject,
+        };
+
+        if (editorState === null) {
+          delete nextEditorStateByProject[projectId];
+        } else {
+          const previousEditorState = state.values.editorStateByProject[
+            projectId
+          ] || {
+            editorTabs: null,
+            propertiesPanelScroll: {},
+          };
+          const mergedEditorState: EditorStateForProject = {
+            ...previousEditorState,
+            ...editorState,
+          };
+
+          nextEditorStateByProject[projectId] = mergedEditorState;
+        }
+
+        return {
+          values: {
+            ...state.values,
+            editorStateByProject: nextEditorStateByProject,
           },
-        },
-      }),
+        };
+      },
       () => this._persistValuesToLocalStorage(this.state)
     );
   }
@@ -1325,21 +1380,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           showAiAskButtonInTitleBar: newValue,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
-  _setAiState(newValue: {| aiRequestId: string | null |}) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          aiState: {
-            ...state.values.aiState,
-            ...newValue,
-          },
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

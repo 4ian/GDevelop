@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { type State } from './MainFrameState';
 import './MainFrame.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
@@ -11,6 +12,7 @@ import EventsIcon from '../UI/CustomSvgIcons/Events';
 import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
 import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
+import SearchIcon from '../UI/CustomSvgIcons/Search';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
@@ -24,6 +26,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import EditorTabsPane, {
   type EditorTabsPaneCommonProps,
 } from './EditorTabsPane';
+import PoppedOutWindows from './PoppedOutWindows';
 import {
   getEditorTabsInitialState,
   openEditorTab,
@@ -35,6 +38,7 @@ import {
   closeCustomObjectTab,
   closeEventsBasedObjectVariantTab,
   saveUiSettings,
+  type EditorTab,
   type EditorTabsState,
   type EditorKind,
   getEventsFunctionsExtensionEditor,
@@ -42,10 +46,13 @@ import {
   getCurrentTabForPane,
   getCustomObjectEditor,
   getOpenedAskAiEditor,
+  getEditorTabOpenedWithKey,
   changeCurrentTab,
   getAllEditorTabs,
   hasEditorsInPane,
   closeEditorTab,
+  popOutTab,
+  popInTab,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -56,8 +63,10 @@ import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainer
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
+import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
 import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
@@ -75,13 +84,12 @@ import {
 } from '../ExportAndShare/PreviewLauncher.flow';
 import {
   type ResourceSource,
-  type ChooseResourceFunction,
-  type ChooseResourceOptions,
   type ResourceManagementProps,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor';
 import { type JsExtensionsLoader } from '../JsExtensionsLoader';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import optionalRequire from '../Utils/OptionalRequire';
 import {
   getElectronUpdateNotificationTitle,
   getElectronUpdateNotificationBody,
@@ -126,8 +134,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
-import {
-  CommandPaletteWithAlgoliaSearch,
+import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
@@ -142,7 +149,7 @@ import { delay } from '../Utils/Delay';
 import useNewProjectDialog from './UseNewProjectDialog';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
-import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
+import useNewResourceDialog from '../ResourcesList/useNewResourceDialog';
 import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_DEBUG,
@@ -180,7 +187,9 @@ import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
 import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
-import useCreateProject from '../Utils/UseCreateProject';
+import useCreateProject, {
+  type UseCreateProjectReturnType,
+} from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
@@ -192,6 +201,7 @@ import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
 import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
+import MemoryTrackedRegistryDialog from './MemoryTrackedRegistryDialog';
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
 import useSaveReminder from './UseSaveReminder';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
@@ -201,11 +211,8 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
-import {
-  readProjectSettings,
-  getProjectDirectory,
-} from '../Utils/ProjectSettingsReader';
-import { type ToolbarButtonConfig } from './CustomToolbarButton';
+import { readProjectSettings } from '../Utils/ProjectSettingsReader';
+import useNpmScriptRunner from './NpmScriptRunner/useNpmScriptRunner';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
   EmbeddedGameFrame,
@@ -214,6 +221,7 @@ import {
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import useHomePageSwitch from './useHomePageSwitch';
 import { useNavigationToEvent } from './UseNavigationToEvent';
+import useNavigateFromGlobalSearch from './UseNavigateFromGlobalSearch';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
@@ -232,6 +240,8 @@ import StandaloneDialog from './StandAloneDialog';
 import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
+const electron = optionalRequire('electron');
+const ipcRendererForUpdates = electron ? electron.ipcRenderer : null;
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -249,6 +259,7 @@ const editorKindToRenderer: {
   'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
+  'global-search': renderGlobalEventsSearchEditorContainer,
   'ask-ai': renderAskAiEditorContainer,
 };
 
@@ -307,20 +318,6 @@ const updateFileMetadataWithOpenedProject = (
   gameId: project.getProjectUuid(),
   name: project.getName(),
 });
-
-export type State = {|
-  currentProject: ?gdProject,
-  currentFileMetadata: ?FileMetadata,
-  editorTabs: EditorTabsState,
-  snackMessage: string,
-  snackMessageOpen: boolean,
-  snackDuration: ?number,
-  updateStatus: ElectronUpdateStatus,
-  openFromStorageProviderDialogOpen: boolean,
-  saveToStorageProviderDialogOpen: boolean,
-  gdjsDevelopmentWatcherEnabled: boolean,
-  toolbarButtons: Array<ToolbarButtonConfig>,
-|};
 
 const initialPreviewState: PreviewState = {
   previewLayoutName: null,
@@ -414,14 +411,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     cloudProjectSaveChoiceOpen,
     setCloudProjectSaveChoiceOpen,
   ] = React.useState<boolean>(false);
-  const [
-    chooseResourceOptions,
-    setChooseResourceOptions,
-  ] = React.useState<?ChooseResourceOptions>(null);
-  const [onResourceChosen, setOnResourceChosen] = React.useState<?({|
-    selectedResources: Array<gdResource>,
-    selectedSourceName: string,
-  |}) => void>(null);
+  const { onChooseResource, renderNewResourceDialog } = useNewResourceDialog();
   const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
   const forceUpdate = useForceUpdate();
   const [isLoadingProject, setIsLoadingProject] = React.useState<boolean>(
@@ -473,6 +463,10 @@ const MainFrame = (props: Props): React.MixedElement => {
   const [
     diagnosticReportDialogOpen,
     setDiagnosticReportDialogOpen,
+  ] = React.useState<boolean>(false);
+  const [
+    memoryTrackerRegistryDialogOpen,
+    setMemoryTrackedRegistryDialogOpen,
   ] = React.useState<boolean>(false);
 
   /**
@@ -538,6 +532,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     _previewLauncher.current.getPreviewDebuggerServer();
   const {
     hasNonEditionPreviewsRunning,
+    nonEditionPreviewsCount,
     gameHotReloadLogs,
     editorHotReloadLogs,
     editorUncaughtError,
@@ -615,7 +610,25 @@ const MainFrame = (props: Props): React.MixedElement => {
   //   console.log(state);
   // });
 
-  const { currentProject, currentFileMetadata, updateStatus } = state;
+  const { currentFileMetadata, updateStatus } = state;
+  const currentProject = exceptionallyGuardAgainstDeadObject(
+    state.currentProject
+  );
+
+  const fileIdentifier = currentFileMetadata
+    ? currentFileMetadata.fileIdentifier
+    : null;
+
+  const {
+    triggerNpmScript,
+    renderNpmScriptConfirmDialog,
+    projectPath,
+  } = useNpmScriptRunner({
+    fileIdentifier,
+    toolbarButtons: state.toolbarButtons,
+    previewCount: nonEditionPreviewsCount,
+  });
+
   const {
     renderShareDialog,
     resourceSources,
@@ -680,11 +693,6 @@ const MainFrame = (props: Props): React.MixedElement => {
    */
   const currentProjectRef = useStableUpToDateRef(currentProject);
 
-  /**
-   * Similar to `currentProjectRef`, an always fresh reference to the latest `currentFileMetadata`.
-   */
-  const currentFileMetadataRef = useStableUpToDateRef(currentFileMetadata);
-
   const getEditorOpeningOptions = React.useCallback(
     ({
       kind,
@@ -704,6 +712,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       const label =
         kind === 'resources'
           ? i18n._(t`Resources`)
+          : kind === 'global-search'
+          ? i18n._(t`Global search`)
           : kind === 'ask-ai'
           ? i18n._(t`Ask AI`)
           : kind === 'start page'
@@ -753,6 +763,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           <DebuggerIcon />
         ) : kind === 'resources' ? (
           <ProjectResourcesIcon />
+        ) : kind === 'global-search' ? (
+          <SearchIcon />
         ) : kind === 'layout' ? (
           <SceneIcon />
         ) : kind === 'layout events' ? (
@@ -814,13 +826,41 @@ const MainFrame = (props: Props): React.MixedElement => {
     [setState]
   );
 
+  const onPopOutTab = React.useCallback(
+    (editorTab: EditorTab) => {
+      setState(prevState => ({
+        ...prevState,
+        editorTabs: popOutTab(prevState.editorTabs, editorTab.key),
+      }));
+    },
+    [setState]
+  );
+
+  const onPopInTab = React.useCallback(
+    (editorTab: EditorTab) => {
+      setState(prevState => ({
+        ...prevState,
+        editorTabs: popInTab(prevState.editorTabs, editorTab.key),
+      }));
+    },
+    [setState]
+  );
+
+  const onExternalWindowClose = React.useCallback(
+    (editorTab: EditorTab) => {
+      setState(prevState => ({
+        ...prevState,
+        editorTabs: closeEditorTab(prevState.editorTabs, editorTab),
+      }));
+    },
+    [setState]
+  );
+
   const {
     hasAPreviousSaveForEditorTabsState,
     openEditorTabsFromPersistedState,
   } = useEditorTabsStateSaving({
-    currentProjectId: state.currentProject
-      ? state.currentProject.getProjectUuid()
-      : null,
+    currentProjectId: currentProject ? currentProject.getProjectUuid() : null,
     editorTabs: state.editorTabs,
     setEditorTabs: setEditorTabs,
     // $FlowFixMe[incompatible-type]
@@ -967,6 +1007,11 @@ const MainFrame = (props: Props): React.MixedElement => {
           if (openedEditor.paneIdentifier !== newPaneIdentifier) {
             // The editor is opened, but not at the right position, close it.
             // It will re-open in the right pane.
+            // Tell the editor not to suspend the AI request on close, since
+            // we're just repositioning it, not intentionally closing it.
+            if (openedEditor.askAiEditor) {
+              openedEditor.askAiEditor.prepareToReposition();
+            }
             newEditorTabs = closeEditorTab(
               newEditorTabs,
               openedEditor.editorTab
@@ -1072,10 +1117,12 @@ const MainFrame = (props: Props): React.MixedElement => {
       // Delete the project from memory. All references to it have been dropped previously
       // by the setState.
       console.info('Deleting project from memory...');
+      // Wait for any in-progress load to complete before unloading, otherwise the
+      // pending load would re-add the old project's extensions after we remove them.
+      await eventsFunctionsExtensionsState.ensureLoadFinished();
       eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
         currentProject
       );
-      await eventsFunctionsExtensionsState.ensureLoadFinished();
       currentProject.delete();
       sealUnsavedChanges();
       console.info('Project closed.');
@@ -1172,14 +1219,14 @@ const MainFrame = (props: Props): React.MixedElement => {
 
         // Read and apply project settings from gdevelop-settings.yaml if it exists
         try {
-          const rawSettings = await readProjectSettings(
+          const parsedProjectSettings = await readProjectSettings(
             updatedFileMetadata.fileIdentifier
           );
-          if (rawSettings) {
-            applyProjectPreferences(rawSettings.preferences, preferences);
+          if (parsedProjectSettings) {
+            applyProjectPreferences(parsedProjectSettings, preferences);
             setState(currentState => ({
               ...currentState,
-              toolbarButtons: rawSettings.toolbarButtons || [],
+              toolbarButtons: parsedProjectSettings.toolbarButtons || [],
             }));
           }
         } catch (error) {
@@ -1402,7 +1449,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     createProjectFromInAppTutorial,
     createProjectFromTutorial,
     createProjectFromCourseChapter,
-  } = useCreateProject({
+  }: UseCreateProjectReturnType = useCreateProject({
     beforeCreatingProject: () => {
       setIsProjectOpening(true);
     },
@@ -1412,15 +1459,15 @@ const MainFrame = (props: Props): React.MixedElement => {
       project,
       editorTabs,
       oldProjectId,
+      fileMetadata,
       options,
     }) => {
       // Update the currentFileMetadata based on the updated project, as
       // it can have been updated in the meantime (gameId, project name, etc...).
-      // Use the ref here to be sure to have the latest file metadata.
-      if (currentFileMetadataRef.current) {
+      if (fileMetadata) {
         // $FlowFixMe[incompatible-type]
         const newFileMetadata: FileMetadata = updateFileMetadataWithOpenedProject(
-          currentFileMetadataRef.current,
+          fileMetadata,
           project
         );
         setState(state => ({
@@ -1428,7 +1475,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           currentFileMetadata: newFileMetadata,
         }));
       }
-      setNewProjectSetupDialogOpen(false);
+      closeNewProjectDialog();
       if (options.openQuickCustomizationDialog) {
         setQuickCustomizationDialogOpenedFromGameId(oldProjectId);
       } else {
@@ -1444,10 +1491,10 @@ const MainFrame = (props: Props): React.MixedElement => {
           })
         : openSceneOrProjectManager({
             currentProject: project,
-            editorTabs: editorTabs,
+            editorTabs,
           });
       // If Ask AI editor was opened, reposition it.
-      const openedAskAIEditor = getOpenedAskAiEditor(state.editorTabs);
+      const openedAskAIEditor = getOpenedAskAiEditor(editorTabs);
       if (openedAskAIEditor || options.forceOpenAskAiEditor) {
         openAskAi({
           paneIdentifier: 'right',
@@ -1832,8 +1879,11 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const onResourceExternallyChanged = React.useCallback(
     () => {
+      console.info(
+        'Resource externally changed: notifying changes to in-game editor.'
+      );
       notifyChangesToInGameEditor({
-        shouldReloadProjectData: false,
+        shouldReloadProjectData: true, // A resource file might have been changed.
         shouldReloadLibraries: false,
         shouldReloadResources: true,
         shouldHardReload: false,
@@ -1845,11 +1895,14 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const onResourceUsageChanged = React.useCallback(
     () => {
+      console.info(
+        'Resource usage changed: notifying changes to in-game editor.'
+      );
       if (isEditorHotReloadNeeded()) {
         notifyChangesToInGameEditor({
-          shouldReloadProjectData: false,
+          shouldReloadProjectData: true,
           shouldReloadLibraries: false,
-          shouldReloadResources: false,
+          shouldReloadResources: true,
           shouldHardReload: false,
           reasons: ['resource-usage-changed'],
         });
@@ -1857,7 +1910,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         notifyChangesToInGameEditor({
           shouldReloadProjectData: true,
           shouldReloadLibraries: false,
-          shouldReloadResources: false,
+          shouldReloadResources: true,
           shouldHardReload: false,
           reasons: ['resource-usage-changed'],
         });
@@ -2775,6 +2828,54 @@ const MainFrame = (props: Props): React.MixedElement => {
     [getEditorOpeningOptions, setState]
   );
 
+  const openGlobalSearch = React.useCallback(
+    () => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          // $FlowFixMe[incompatible-type]
+          getEditorOpeningOptions({ kind: 'global-search', name: '' })
+        ),
+      }));
+      // Focus the search bar when re-opening an already opened tab.
+      const existingEditor = getEditorTabOpenedWithKey(
+        state.editorTabs,
+        'global-search'
+      );
+      if (existingEditor) {
+        const { editorRef } = existingEditor.editorTab;
+        // $FlowFixMe[prop-missing] - focusInitialField is optionally implemented by editors.
+        if (editorRef && editorRef.focusInitialField) {
+          // $FlowFixMe[not-a-function]
+          editorRef.focusInitialField();
+        }
+      }
+    },
+    [getEditorOpeningOptions, setState, state.editorTabs]
+  );
+
+  const {
+    navigateToEventFromGlobalSearch,
+    clearGlobalSearchHighlightsInEditorTabs,
+  } = useNavigateFromGlobalSearch({
+    editorTabs: state.editorTabs,
+    setState,
+    setPendingEventNavigation,
+    openLayout,
+    openExternalEvents,
+    openEventsFunctionsExtension,
+  });
+
+  const onEditorTabClosing = React.useCallback(
+    (editorTab: EditorTab) => {
+      if (editorTab.kind === 'global-search') {
+        clearGlobalSearchHighlightsInEditorTabs(state.editorTabs);
+      }
+    },
+    [clearGlobalSearchHighlightsInEditorTabs, state.editorTabs]
+  );
+
   const openHomePage = React.useCallback(
     () => {
       setState(state => ({
@@ -3375,6 +3476,22 @@ const MainFrame = (props: Props): React.MixedElement => {
         const { editorRef } = editor;
         if (editorRef) {
           editorRef.onObjectGroupsModifiedOutsideEditor(changes);
+        }
+      }
+    },
+    [state.editorTabs]
+  );
+
+  const selectAllInActiveEditors = React.useCallback(
+    () => {
+      for (const paneIdentifier in state.editorTabs.panes) {
+        const currentTab = getCurrentTabForPane(
+          state.editorTabs,
+          paneIdentifier
+        );
+        const editorRef = currentTab ? currentTab.editorRef : null;
+        if (editorRef) {
+          editorRef.selectAllInsideEditor();
         }
       }
     },
@@ -4253,6 +4370,41 @@ const MainFrame = (props: Props): React.MixedElement => {
     [currentProject, hasUnsavedChanges, i18n, closeProject]
   );
 
+  const reloadProject = React.useCallback(
+    async (): Promise<void> => {
+      if (!currentProject || !currentFileMetadata) return;
+
+      if (hasUnsavedChanges) {
+        const answer = Window.showConfirmDialog(
+          i18n._(
+            t`Reload the project? Any changes that have not been saved will be lost.`
+          )
+        );
+        if (!answer) return;
+      }
+
+      const storageProviderName = getStorageProvider().internalName;
+      await openFromFileMetadataWithStorageProvider(
+        {
+          fileMetadata: currentFileMetadata,
+          storageProviderName,
+        },
+        {
+          ignoreUnsavedChanges: true,
+          ignoreAutoSave: true,
+        }
+      );
+    },
+    [
+      currentProject,
+      currentFileMetadata,
+      hasUnsavedChanges,
+      i18n,
+      getStorageProvider,
+      openFromFileMetadataWithStorageProvider,
+    ]
+  );
+
   const endTutorial = React.useCallback(
     async (shouldCloseProject?: boolean) => {
       if (shouldCloseProject) {
@@ -4352,33 +4504,38 @@ const MainFrame = (props: Props): React.MixedElement => {
     [getStorageProvider]
   );
 
-  const onChooseResource: ChooseResourceFunction = React.useCallback(
-    (options: ChooseResourceOptions) => {
-      return new Promise(resolve => {
-        setChooseResourceOptions(options);
-        const onResourceChosenSetter: () => ({|
-          selectedResources: Array<gdResource>,
-          selectedSourceName: string,
-        |}) => void = () => resolve;
-
-        setOnResourceChosen(onResourceChosenSetter);
-      });
-    },
-    [setOnResourceChosen, setChooseResourceOptions]
-  );
-
   const setElectronUpdateStatus = (updateStatus: ElectronUpdateStatus) => {
     setState(state => ({ ...state, updateStatus }));
 
-    // TODO: use i18n to translate title and body in notification.
-    // Also, find a way to use preferences to know if user deactivated auto-update.
-    const notificationTitle = getElectronUpdateNotificationTitle(updateStatus);
-    const notificationBody = getElectronUpdateNotificationBody(updateStatus);
-    if (notificationTitle) {
-      const notification = new window.Notification(notificationTitle, {
-        body: notificationBody,
-      });
-      notification.onclick = () => openAboutDialog(true);
+    if (updateStatus.status === 'update-downloaded') {
+      // Update is ready: offer a one-click restart instead of a generic notification.
+      const version = updateStatus.info && updateStatus.info.version;
+      const restartNotification = new window.Notification(
+        version
+          ? i18n._(t`GDevelop update ready (${version})`)
+          : i18n._(t`GDevelop update ready`),
+        { body: i18n._(t`Click to restart and install the update now.`) }
+      );
+      restartNotification.onclick = () => {
+        if (ipcRendererForUpdates)
+          ipcRendererForUpdates.send('updates-install-and-quit');
+      };
+    } else {
+      const notificationTitle = getElectronUpdateNotificationTitle(
+        updateStatus,
+        i18n
+      );
+      const notificationBody = getElectronUpdateNotificationBody(
+        updateStatus,
+        i18n,
+        preferences.values.autoDownloadUpdates
+      );
+      if (notificationTitle) {
+        const notification = new window.Notification(notificationTitle, {
+          body: notificationBody,
+        });
+        notification.onclick = () => openAboutDialog(true);
+      }
     }
   };
 
@@ -4560,6 +4717,12 @@ const MainFrame = (props: Props): React.MixedElement => {
     ]
   );
 
+  /**
+   * Similar to `currentProjectRef`, a fresh reference (fresh=value of the last render)
+   * to the latest `currentFileMetadata`. Only use this reference in fetchNewlyAddedResources.
+   * Anywhere else, pass the currentFileMetadata directly as argument.
+   */
+  const currentFileMetadataRef = useStableUpToDateRef(currentFileMetadata);
   const fetchNewlyAddedResources = React.useCallback(
     async (): Promise<void> => {
       if (!currentProjectRef.current || !currentFileMetadataRef.current) return;
@@ -4741,6 +4904,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onCloseProject: async () => {
       askToCloseProject();
     },
+    onReloadProject: reloadProject,
     onExportGame: () => {
       openShareDialog('publish');
     },
@@ -4756,6 +4920,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenCommandPalette: openCommandPalette,
     onOpenProfile: onOpenProfileDialog,
     onRestartInGameEditor,
+    onOpenGlobalSearch: openGlobalSearch,
+    onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -4797,6 +4963,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     renderNewProjectDialog,
     fetchAndOpenNewProjectSetupDialogForExample,
     openNewProjectDialog,
+    closeNewProjectDialog,
   } = useNewProjectDialog({
     project: state.currentProject,
     fileMetadata: currentFileMetadata,
@@ -4810,7 +4977,18 @@ const MainFrame = (props: Props): React.MixedElement => {
     storageProviders: props.storageProviders,
     storageProvider: getStorageProvider(),
     resourceManagementProps,
-    onOpenLayout: (name, options) => openLayout(name, options),
+    onOpenLayout: (
+      name: string,
+      options?: {|
+        openEventsEditor: boolean,
+        openSceneEditor: boolean,
+        focusWhenOpened:
+          | 'scene-or-events-otherwise'
+          | 'scene'
+          | 'events'
+          | 'none',
+      |}
+    ) => openLayout(name, options),
     onWillInstallExtension,
     onExtensionInstalled,
   });
@@ -4857,11 +5035,13 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenProjectManager: () => openProjectManager(true),
     onOpenHomePage: openHomePage,
     onOpenDebugger: openDebugger,
+    onOpenGlobalSearch: openGlobalSearch,
     onOpenAbout: () => openAboutDialog(true),
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
     onOpenProfile: onOpenProfileDialog,
     onOpenAskAi: openAskAi,
+    onSelectAll: selectAllInActiveEditors,
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 
@@ -4921,9 +5101,12 @@ const MainFrame = (props: Props): React.MixedElement => {
     onCreateEventsFunction: onCreateEventsFunction,
     openInstructionOrExpression: openInstructionOrExpression,
     onOpenCustomObjectEditor: openCustomObjectEditor,
+    onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
     onDeletedEventsBasedObject: onDeletedEventsBasedObject,
     openObjectEvents: openObjectEvents,
+    onNavigateToEventFromGlobalSearch: navigateToEventFromGlobalSearch,
+    onEditorTabClosing: onEditorTabClosing,
     canOpen: !!props.storageProviders.filter(
       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
     ).length,
@@ -4970,9 +5153,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     onRestartInGameEditor,
     showRestartInGameEditorAfterErrorButton,
     toolbarButtons: state.toolbarButtons,
-    projectPath: currentFileMetadata
-      ? getProjectDirectory(currentFileMetadata.fileIdentifier)
-      : null,
+    projectPath,
+    triggerNpmScript,
   };
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');
@@ -5078,10 +5260,9 @@ const MainFrame = (props: Props): React.MixedElement => {
       // in what to display (ex: Loader of play section)
       gamesPlatformFrameTools.renderGamesPlatformFrame()}
       <LeaderboardProvider
-        gameId={
-          state.currentProject ? state.currentProject.getProjectUuid() : ''
-        }
+        gameId={currentProject ? currentProject.getProjectUuid() : ''}
       >
+        {renderNpmScriptConfirmDialog()}
         <PanesContainer
           hasEditorsInLeftPane={hasEditorsInLeftPane}
           hasEditorsInRightPane={hasEditorsInRightPane}
@@ -5093,6 +5274,9 @@ const MainFrame = (props: Props): React.MixedElement => {
             areSidePanesDrawers,
             onSetPointerEventsNone,
             onSetPaneDrawerState,
+            onRequestPaneClose,
+            drawerState,
+            rightPaneDrawerOpen,
           }) => (
             <EditorTabsPane
               {...editorTabsPaneProps}
@@ -5103,11 +5287,20 @@ const MainFrame = (props: Props): React.MixedElement => {
               areSidePanesDrawers={areSidePanesDrawers}
               onSetPointerEventsNone={onSetPointerEventsNone}
               onSetPaneDrawerState={onSetPaneDrawerState}
+              onPopOutTab={onPopOutTab}
+              onRequestPaneClose={onRequestPaneClose}
+              drawerState={drawerState}
+              rightPaneDrawerOpen={rightPaneDrawerOpen}
             />
           )}
         />
       </LeaderboardProvider>
-      <CommandPaletteWithAlgoliaSearch ref={commandPaletteRef} />
+      <PoppedOutWindows
+        {...editorTabsPaneProps}
+        onClose={onExternalWindowClose}
+        onPopIn={onPopInTab}
+      />
+      <CommandPalette ref={commandPaletteRef} />
       <LoaderModal
         showImmediately={showLoaderImmediately}
         showAfterDelay={showLoaderAfterDelay}
@@ -5139,29 +5332,13 @@ const MainFrame = (props: Props): React.MixedElement => {
           initialTab: shareDialogInitialTab,
           gamesList,
         })}
-      {chooseResourceOptions && onResourceChosen && !!currentProject && (
-        <NewResourceDialog
-          project={currentProject}
-          fileMetadata={currentFileMetadata}
-          getStorageProvider={getStorageProvider}
-          i18n={i18n}
-          resourceSources={resourceSources}
-          onChooseResources={resourcesOptions => {
-            setOnResourceChosen(null);
-            setChooseResourceOptions(null);
-            onResourceChosen(resourcesOptions);
-          }}
-          onClose={() => {
-            setOnResourceChosen(null);
-            setChooseResourceOptions(null);
-            onResourceChosen({
-              selectedResources: [],
-              selectedSourceName: '',
-            });
-          }}
-          options={chooseResourceOptions}
-        />
-      )}
+      {renderNewResourceDialog({
+        project: currentProject,
+        fileMetadata: currentFileMetadata,
+        getStorageProvider,
+        i18n,
+        resourceSources,
+      })}
       {profileDialogOpen && (
         // ProfileDialog is dependent on multiple contexts,
         // which are dependent of AuthenticatedUserContext.
@@ -5391,6 +5568,28 @@ const MainFrame = (props: Props): React.MixedElement => {
             });
             openExternalEvents(externalEventsName);
           }}
+          onNavigateToExtensionEvent={({
+            extensionName,
+            functionName,
+            behaviorName,
+            objectName,
+            eventPath,
+          }) => {
+            setPendingEventNavigation({
+              name: extensionName,
+              locationType: 'extension',
+              eventPath,
+              functionName,
+              behaviorName,
+              objectName,
+            });
+            openEventsFunctionsExtension(
+              extensionName,
+              functionName,
+              behaviorName,
+              objectName
+            );
+          }}
         />
       )}
       {standaloneDialogOpen && (
@@ -5463,6 +5662,11 @@ const MainFrame = (props: Props): React.MixedElement => {
           onScreenshotsClaimed={onGameScreenshotsClaimed}
           onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={onExtensionInstalled}
+        />
+      )}
+      {memoryTrackerRegistryDialogOpen && (
+        <MemoryTrackedRegistryDialog
+          onClose={() => setMemoryTrackedRegistryDialogOpen(false)}
         />
       )}
       <CustomDragLayer />

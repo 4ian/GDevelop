@@ -19,6 +19,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
             "entered with a keyboard by a player.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Deprecated. Invisible object capturing keyboard text input into a string.")
       .SetCategory("User interface")
       .SetExtensionHelpPath("/objects/text_entry");
 

@@ -147,8 +147,7 @@ const AnimationList: React.ComponentType<{
     const { isMobile } = useResponsiveWindowSize();
     const { showConfirmation } = useAlertDialog();
     const animationsCount = animations.getAnimationsCount();
-    // $FlowFixMe[underconstrained-implicit-instantiation]
-    const animationsIndices = new Array(animationsCount)
+    const animationsIndices = new Array<number>(animationsCount)
       .fill(0)
       .map((_, index) => index);
 

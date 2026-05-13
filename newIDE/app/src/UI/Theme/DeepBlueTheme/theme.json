@@ -39,7 +39,7 @@
       },
       "alternate-canvas-light": {
         "background-color": {
-          "value": "#21262d" 
+          "value": "#21262d"
         }
       }
     },
@@ -480,6 +480,11 @@
         "value": "#0d1117"
       }
     },
+    "conditions-actions-container": {
+      "border-color": {
+        "value": "#30363d"
+      }
+    },
     "rst": {
       "ai-generated-event-move-handle": {
         "gradient-color-1": {
@@ -533,9 +538,6 @@
       },
       "border-color": {
         "value": "#30363d"
-      },
-      "border": {
-        "value": "1px solid {event-sheet.conditions.border-color.value}"
       },
       "color": {
         "value": "rgb(201, 209, 217)"

@@ -183,3 +183,81 @@ export const archiveFiles = async ({
     );
   });
 };
+
+export const listArchiveFiles = async ({
+  archiveBlob,
+  onProgress,
+  sizeLimit,
+}: {|
+  archiveBlob: Blob,
+  onProgress: (count: number, total: number) => void,
+  sizeLimit?: number,
+|}): Promise<any> => {
+  const zipJs: ZipJs = await initializeZipJs();
+
+  return new Promise((resolve, reject) => {
+    zipJs.createReader(
+      // $FlowFixMe[invalid-constructor]
+      new zipJs.BlobReader(archiveBlob),
+      function(zipReader) {
+        zipReader.getEntries(entries => {
+          const enumeratedEntries = entries.map(entry => entry.filename);
+          zipReader.close(() => {
+            resolve(enumeratedEntries);
+          });
+        });
+      },
+      error => {
+        console.error('Error while making zip:', error);
+        reject(error);
+      }
+    );
+  });
+};
+
+export const getFileBlob = async ({
+  archiveBlob,
+  filePath,
+  contentType,
+  onProgress,
+  sizeLimit,
+}: {|
+  archiveBlob: Blob,
+  filePath: string,
+  contentType: string,
+  onProgress: (count: number, total: number) => void,
+  sizeLimit?: number,
+|}): Promise<Blob> => {
+  const zipJs: ZipJs = await initializeZipJs();
+
+  return new Promise((resolve, reject) => {
+    zipJs.createReader(
+      // $FlowFixMe[invalid-constructor]
+      new zipJs.BlobReader(archiveBlob),
+      function(zipReader) {
+        zipReader.getEntries(entries => {
+          const entry = entries.find(entry => entry.filename === filePath);
+          if (!entry) {
+            const error = `The archive doesn't contain: ${filePath}`;
+            console.error(error);
+            reject(error);
+            return;
+          }
+          entry.getData(
+            // $FlowFixMe[invalid-constructor]
+            new zipJs.BlobWriter(contentType),
+            result => {
+              zipReader.close(() => {
+                resolve(result);
+              });
+            }
+          );
+        });
+      },
+      error => {
+        console.error('Error while making zip:', error);
+        reject(error);
+      }
+    );
+  });
+};

@@ -7,7 +7,7 @@ import {
   selectableArea,
   largeSelectableArea,
   largeSelectedArea,
-  executableEventContainer,
+  conditionsActionsContainer,
   disabledText,
   instructionParameter,
   nameAndIconContainer,
@@ -207,7 +207,6 @@ export default class ForEachChildVariableEvent extends React.Component<
       <div
         style={styles.container}
         className={classNames({
-          [executableEventContainer]: true,
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
         })}
@@ -331,6 +330,9 @@ export default class ForEachChildVariableEvent extends React.Component<
           leftIndentWidth={this.props.leftIndentWidth}
           windowSize={this.props.windowSize}
           eventsSheetWidth={this.props.eventsSheetWidth}
+          className={classNames({
+            [conditionsActionsContainer]: true,
+          })}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
               platform={this.props.project.getCurrentPlatform()}
@@ -362,6 +364,8 @@ export default class ForEachChildVariableEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
           renderActionsList={({ className }) => (
@@ -399,6 +403,8 @@ export default class ForEachChildVariableEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
         />

@@ -26,6 +26,15 @@ export const unregisterOnResourceExternallyChangedCallback = (
   delete callbacks[callbackId];
 };
 
+export const triggerOnResourceExternallyChanged = (resourceInfo: {|
+  identifier: string,
+|}) => {
+  ResourcesLoader.burstAllUrlsCache();
+  Object.keys(callbacks).forEach(callbackId =>
+    callbacks[callbackId](resourceInfo)
+  );
+};
+
 const useResourcesWatcher = ({
   getStorageProvider,
   fileMetadata,
@@ -44,10 +53,7 @@ const useResourcesWatcher = ({
 
   const informEditorsResourceExternallyChanged = React.useCallback(
     (resourceInfo: {| identifier: string |}) => {
-      ResourcesLoader.burstAllUrlsCache();
-      Object.keys(callbacks).forEach(callbackId =>
-        callbacks[callbackId](resourceInfo)
-      );
+      triggerOnResourceExternallyChanged(resourceInfo);
     },
     []
   );

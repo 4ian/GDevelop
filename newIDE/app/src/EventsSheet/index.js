@@ -42,6 +42,7 @@ import {
   type VariableDeclarationContext,
   getInitialSelection,
   selectEvent,
+  selectEvents,
   selectInstruction,
   hasSomethingSelected,
   hasEventSelected,
@@ -59,6 +60,7 @@ import {
   getLastSelectedEventContext,
   getLastSelectedEventContextWhichCanHaveSubEvents,
   getLastSelectedInstructionContext,
+  getLastSelectedInstructionsListsContext,
   getLastSelectedInstructionEventContextWhichCanHaveSubEvents,
   getLastSelectedEventContextWhichCanHaveVariables,
   getLastSelectedInstructionEventContextWhichCanHaveVariables,
@@ -85,6 +87,7 @@ import PreferencesContext, {
 import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope';
+import type { EventPath } from '../Utils/EventPath';
 import {
   pasteEventsFromClipboardInSelection,
   copySelectionToClipboard,
@@ -94,7 +97,10 @@ import {
   hasClipboardConditions,
   pasteInstructionsFromClipboardInInstructionsList,
 } from './ClipboardKind';
-import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
+import {
+  useScreenType,
+  type ScreenType,
+} from '../UI/Responsive/ScreenTypeMeasurer';
 import {
   type WindowSizeType,
   useResponsiveWindowSize,
@@ -125,8 +131,27 @@ import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariab
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent';
 import { findEventByPath } from '../Utils/EventsValidationScanner';
+import type { SearchFilterParams } from '../Utils/Search';
+import type { InitialSearchFilterParams } from './SearchPanel';
+import { isNullPtr } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
+
+// Derives the stable list label stored in history for a given live instruction
+// list reference. 'whileConditions' identifies the loop-guard list of a WhileEvent,
+// which shares isCondition=true with the body conditions but is a distinct list.
+const getInstructionListLabel = (
+  event: gdBaseEvent,
+  instrsList: gdInstructionsList,
+  isCondition: boolean
+): string => {
+  if (!isCondition) return 'actions';
+  const whileList = event.getInstructionList('whileConditions');
+  // $FlowFixMe[incompatible-exact]
+  if (!isNullPtr(gd, whileList) && whileList.ptr === instrsList.ptr)
+    return 'whileConditions';
+  return 'conditions';
+};
 
 const zoomLevel = { min: 1, max: 50 };
 const loopEventTypes = [
@@ -173,12 +198,20 @@ type Props = {|
 type ComponentProps = {|
   ...Props,
   windowSize: WindowSizeType,
+  screenType: ScreenType,
   authenticatedUser: AuthenticatedUser,
   preferences: Preferences,
   tutorials: ?Array<Tutorial>,
   leaderboardsManager: ?LeaderboardState,
   shortcutMap: ShortcutMap,
   highlightedAiGeneratedEventIds: Set<string>,
+|};
+
+type SearchHighlight = {|
+  results: Array<gdBaseEvent>,
+  focusOffset: number,
+  text: string,
+  searchFilterParams: SearchFilterParams,
 |};
 
 type State = {|
@@ -221,8 +254,9 @@ type State = {|
   textEditedEvent: ?gdBaseEvent,
 
   showSearchPanel: boolean,
-  searchResults: ?Array<gdBaseEvent>,
-  searchFocusOffset: ?number,
+  searchHighlight: ?SearchHighlight,
+  localSearchText: string,
+  localSearchMatchCase: boolean,
   navigationHighlightEvent: ?gdBaseEvent,
 
   layoutVariablesDialogOpen: boolean,
@@ -270,8 +304,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onCopy: () => this.copySelection(),
       onCut: () => this.cutSelection(),
       onPaste: () => this.pasteEventsOrInstructions(),
+      onSelectAll: () => this.selectAllEvents(),
+      onDeselectAll: () => this.deselectAll(),
       onSearch: () => this._toggleSearchPanel(),
-      onEscape: () => this._closeSearchPanel(),
+      onEscape: () => this._handleEscape(),
       onUndo: () => this.undo(),
       onRedo: () => this.redo(),
       onZoomIn: (event: KeyboardEvent) => this.onZoomEvent('IN')(event),
@@ -321,8 +357,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     serializedEventsToExtract: null,
 
     showSearchPanel: false,
-    searchResults: null,
-    searchFocusOffset: null,
+    searchHighlight: null,
+    localSearchText: '',
+    localSearchMatchCase: false,
     navigationHighlightEvent: null,
 
     layoutVariablesDialogOpen: false,
@@ -398,7 +435,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
-  scrollToEventPath = (eventPath: Array<number>) => {
+  scrollToEventPath = (eventPath: EventPath) => {
     const eventsTree = this._eventsTree;
     if (!eventsTree || eventPath.length === 0) return;
 
@@ -423,6 +460,75 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     setTimeout(() => {
       this.setState({ navigationHighlightEvent: null });
     }, 3000);
+  };
+
+  setGlobalSearchResults = (
+    eventPaths: Array<EventPath>,
+    focusedEventPath: EventPath,
+    searchText: string,
+    searchFilters?: SearchFilterParams
+  ) => {
+    const eventsTree = this._eventsTree;
+    const eventsByPtr = new Map<number, gdBaseEvent>();
+    eventPaths.forEach(path => {
+      const event = findEventByPath(this.props.events, path);
+      if (event) {
+        // $FlowFixMe[prop-missing] - ptr is a numeric identifier for the C++ object.
+        eventsByPtr.set(event.ptr, event);
+      }
+    });
+    const resultEvents = [...eventsByPtr.values()];
+
+    let focusOffset = 0;
+    if (focusedEventPath) {
+      const focusedEvent = findEventByPath(this.props.events, focusedEventPath);
+      if (focusedEvent) {
+        const focusedEventIndex = resultEvents.findIndex(event =>
+          // $FlowFixMe[incompatible-exact]
+          gd.compare(event, focusedEvent)
+        );
+        focusOffset = focusedEventIndex === -1 ? 0 : focusedEventIndex;
+      }
+    }
+
+    const searchHighlight: SearchHighlight = {
+      results: resultEvents,
+      focusOffset,
+      text: searchText || '',
+      searchFilterParams: {
+        matchCase: searchFilters?.matchCase,
+        searchInConditions: searchFilters?.searchInConditions,
+        searchInActions: searchFilters?.searchInActions,
+        searchInEventStrings: searchFilters?.searchInEventStrings,
+        searchInInstructionNames: searchFilters?.searchInInstructionNames,
+      },
+    };
+
+    this.setState(
+      {
+        searchHighlight,
+        navigationHighlightEvent: null,
+        showSearchPanel: true,
+        localSearchText: searchText || '',
+        localSearchMatchCase: searchFilters?.matchCase,
+      },
+      () => {
+        if (!eventsTree) return;
+        const focusedEvent = resultEvents[focusOffset];
+        if (!focusedEvent) return;
+        eventsTree.unfoldForEvent(focusedEvent);
+        const row = eventsTree.getEventRow(focusedEvent);
+        if (row !== -1) {
+          eventsTree.scrollToRow(row);
+        }
+      }
+    );
+  };
+
+  clearGlobalSearchResults = () => {
+    this.setState({
+      searchHighlight: null,
+    });
   };
 
   updateToolbar() {
@@ -488,6 +594,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         const show = !state.showSearchPanel;
         if (!show) {
           if (this._eventSearcher) this._eventSearcher.reset();
+        } else {
+          this.clearGlobalSearchResults();
         }
 
         return {
@@ -504,7 +612,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   _closeSearchPanel = () => {
     if (this._eventSearcher) this._eventSearcher.reset();
-    this.setState({ showSearchPanel: false });
+    this.setState({
+      showSearchPanel: false,
+      localSearchText: '',
+      localSearchMatchCase: false,
+      searchHighlight: null,
+    });
   };
 
   addSubEvent = () => {
@@ -646,19 +759,27 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           }
         );
 
-        // This is not a real hook.
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const screenType = useScreenType();
+        const screenType = this.props.screenType;
         if (
           screenType !== 'touch' &&
           (type === 'BuiltinCommonInstructions::Comment' ||
             type === 'BuiltinCommonInstructions::Group')
         ) {
           const rowIndex = eventsTree.getEventRow(newEvent);
-          const clickableElement = document.querySelector(
-            `[data-row-index="${rowIndex}"] [data-editable-text="true"]`
-          );
-          if (clickableElement) clickableElement.click();
+
+          // Use the ownerDocument of the container element to get the correct
+          // document — important when rendered inside a WindowPortal (external
+          // browser window) where the main window's `document` is different.
+          const containerDivElement = this._containerDiv.current;
+          const ownerDoc = containerDivElement
+            ? containerDivElement.ownerDocument
+            : document;
+          if (ownerDoc) {
+            const clickableElement = ownerDoc.querySelector(
+              `[data-row-index="${rowIndex}"] [data-editable-text="true"]`
+            );
+            if (clickableElement) clickableElement.click();
+          }
         }
       });
     }
@@ -713,6 +834,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         label: i18n._(t`Delete`),
         click: () => this.deleteSelection(),
         accelerator: 'Delete',
+      },
+      {
+        label: i18n._(t`Deselect All`),
+        click: () => this.deselectAll(),
+        accelerator: 'CmdOrCtrl+Shift+A',
+        visible: hasSomethingSelected(this.state.selection),
       },
       hasSelectedAtLeastOneCondition(this.state.selection)
         ? {
@@ -788,7 +915,22 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   closeInstructionEditor(saveChanges: boolean = false) {
-    const { instruction, eventContext } = this.state.editedInstruction;
+    const {
+      instruction,
+      eventContext,
+      instrsList,
+      indexInList,
+      isCondition,
+    } = this.state.editedInstruction;
+    // Capture instruction index before state is reset:
+    // - for edit: use the existing indexInList
+    // - for add: instruction was just inserted at the end of the list
+    const instructionIndex =
+      indexInList !== undefined && indexInList !== null
+        ? indexInList
+        : instrsList
+        ? instrsList.size() - 1
+        : undefined;
 
     this.setState(
       {
@@ -812,6 +954,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           this._saveChangesToHistory('EDIT', {
             positionsBeforeAction: positions,
             positionAfterAction: positions,
+            instructionIndex,
+            instructionListLabel: instrsList
+              ? getInstructionListLabel(
+                  eventContext.event,
+                  instrsList,
+                  isCondition
+                )
+              : undefined,
           });
         }
       }
@@ -888,6 +1038,38 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
+  selectAllEvents = () => {
+    const eventsTree = this._eventsTree;
+    if (!eventsTree) return;
+
+    const { events } = this.props;
+    const rowIndexes: Array<number> = [];
+    for (let i = 0; i < events.getEventsCount(); i++) {
+      const rowIndex = eventsTree.getEventRow(events.getEventAt(i));
+      if (rowIndex !== -1) rowIndexes.push(rowIndex);
+    }
+    const eventContexts = eventsTree.getEventContextAtRowIndexes(rowIndexes);
+
+    this.setState({ selection: selectEvents(eventContexts) }, () =>
+      this.updateToolbar()
+    );
+  };
+
+  deselectAll = () => {
+    if (!hasSomethingSelected(this.state.selection)) return;
+    this.setState({ selection: clearSelection() }, () => this.updateToolbar());
+  };
+
+  _handleEscape = () => {
+    if (this.state.showSearchPanel) {
+      this._closeSearchPanel();
+      return;
+    }
+    if (hasSomethingSelected(this.state.selection)) {
+      this.deselectAll();
+    }
+  };
+
   collapseAll = () => {
     if (this._eventsTree) this._eventsTree.foldAll();
   };
@@ -927,6 +1109,17 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       accelerator: 'Delete',
     },
     {
+      label: i18n._(t`Select All`),
+      click: () => this.selectAllEvents(),
+      accelerator: 'CmdOrCtrl+A',
+    },
+    {
+      label: i18n._(t`Deselect All`),
+      click: () => this.deselectAll(),
+      accelerator: 'CmdOrCtrl+Shift+A',
+      visible: hasSomethingSelected(this.state.selection),
+    },
+    {
       label: i18n._(t`Toggle Disabled`),
       click: () => this.toggleDisabled(),
       enabled: this._selectionCanToggleDisabled(),
@@ -945,6 +1138,18 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       click: () => this._removeLoopIndexVariable(),
       visible:
         this._selectionIsLoopEvent() && this._selectionHasIndexVariable(),
+    },
+    {
+      label: i18n._(t`Add Ordering`),
+      click: () => this._addOrdering(),
+      visible:
+        this._selectionIsForEachEvent() && !this._selectionForEachHasOrderBy(),
+    },
+    {
+      label: i18n._(t`Remove Ordering`),
+      click: () => this._removeOrdering(),
+      visible:
+        this._selectionIsForEachEvent() && this._selectionForEachHasOrderBy(),
     },
     { type: 'separator' },
     {
@@ -983,6 +1188,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           click: () => this._addLoopIndexVariable(),
           visible:
             this._selectionIsLoopEvent() && !this._selectionHasIndexVariable(),
+        },
+        {
+          label: i18n._(t`Ordering`),
+          click: () => this._addOrdering(),
+          visible:
+            this._selectionIsForEachEvent() &&
+            !this._selectionForEachHasOrderBy(),
         },
         {
           type: 'separator',
@@ -1126,6 +1338,67 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (!eventContext) return false;
     const loopEvent = this._asLoopEvent(eventContext.event);
     return !!loopEvent && loopEvent.getLoopIndexVariableName() !== '';
+  };
+
+  _selectionIsForEachEvent = (): boolean => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return false;
+    return (
+      eventContext.event.getType() === 'BuiltinCommonInstructions::ForEach'
+    );
+  };
+
+  _selectionForEachHasOrderBy = (): boolean => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return false;
+    if (eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach')
+      return false;
+    const forEachEvent = gd.asForEachEvent(eventContext.event);
+    return !!forEachEvent.getOrderBy();
+  };
+
+  _addOrdering = () => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return;
+    if (eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach')
+      return;
+
+    const forEachEvent = gd.asForEachEvent(eventContext.event);
+    const objectName = forEachEvent.getObjectToPick();
+    const objectPrefix = objectName || '<Object>';
+    forEachEvent.setOrderBy(`${objectPrefix}.`);
+    forEachEvent.setOrder('asc');
+
+    if (this._eventsTree) {
+      this._eventsTree.forceEventsUpdate(() => {
+        const positions = this._getChangedEventRows([eventContext.event]);
+        this._saveChangesToHistory('EDIT', {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        });
+      });
+    }
+  };
+
+  _removeOrdering = () => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return;
+    if (eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach')
+      return;
+
+    const forEachEvent = gd.asForEachEvent(eventContext.event);
+    forEachEvent.setOrderBy('');
+    forEachEvent.setLimit('');
+
+    if (this._eventsTree) {
+      this._eventsTree.forceEventsUpdate(() => {
+        const positions = this._getChangedEventRows([eventContext.event]);
+        this._saveChangesToHistory('EDIT', {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        });
+      });
+    }
   };
 
   _addLoopIndexVariable = () => {
@@ -1405,6 +1678,22 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       selectedEvents.forEach(event => eventsRemover.addEventToRemove(event));
       eventsWithDeletion = eventsWithDeletion.concat(selectedEvents);
     }
+    // Capture instruction index before deletion for precise undo scroll.
+    const firstDeletedInstrCtx =
+      deleteInstructions && !deleteEvents
+        ? getSelectedInstructionsContexts(this.state.selection)[0]
+        : undefined;
+    const deleteInstructionIndex = firstDeletedInstrCtx
+      ? firstDeletedInstrCtx.indexInList
+      : undefined;
+    const deleteInstructionListLabel = firstDeletedInstrCtx
+      ? getInstructionListLabel(
+          firstDeletedInstrCtx.eventContext.event,
+          firstDeletedInstrCtx.instrsList,
+          firstDeletedInstrCtx.isCondition
+        )
+      : undefined;
+
     if (deleteInstructions) {
       getSelectedInstructions(this.state.selection).forEach(instruction =>
         eventsRemover.addInstructionToRemove(instruction)
@@ -1435,6 +1724,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           this._saveChangesToHistory('DELETE', {
             positionsBeforeAction: positions,
             positionAfterAction: positions,
+            instructionIndex: deleteInstructionIndex,
+            instructionListLabel: deleteInstructionListLabel,
           });
         // Deletion of an event/instruction will remove it from the DOM,
         // potentially losing the focus on the associated DOM elements. Ensure
@@ -1478,6 +1769,32 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   pasteInstructions = () => {
+    const lastInstrCtx = getLastSelectedInstructionContext(
+      this.state.selection
+    );
+    const lastListCtx = getLastSelectedInstructionsListsContext(
+      this.state.selection
+    );
+    const pasteInstructionListLabel = lastInstrCtx
+      ? getInstructionListLabel(
+          lastInstrCtx.eventContext.event,
+          lastInstrCtx.instrsList,
+          lastInstrCtx.isCondition
+        )
+      : lastListCtx
+      ? lastListCtx.isCondition
+        ? 'conditions'
+        : 'actions'
+      : undefined;
+    // Capture the selected instruction's ptr and list before paste so we can
+    // find where it ended up after (paste may insert before it, shifting it).
+    const selectedInstructionPtr = lastInstrCtx
+      ? lastInstrCtx.instruction.ptr
+      : null;
+    const listSizeBeforePaste = lastListCtx
+      ? lastListCtx.instrsList.size()
+      : null;
+
     if (
       !pasteInstructionsFromClipboardInSelection(
         this.props.project,
@@ -1486,6 +1803,27 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     ) {
       return;
     }
+
+    // Compute instructionIndex AFTER paste by finding where the originally
+    // selected instruction ended up (paste may have inserted before it).
+    // This ensures undo/redo always highlights the original instruction, not
+    // whatever happens to occupy the paste position.
+    let pasteInstructionIndex: ?number = undefined;
+    if (lastInstrCtx && selectedInstructionPtr !== null) {
+      const instrsList = lastInstrCtx.instrsList;
+      for (let i = instrsList.size() - 1; i >= 0; i--) {
+        if (instrsList.get(i).ptr === selectedInstructionPtr) {
+          pasteInstructionIndex = i;
+          break;
+        }
+      }
+      if (pasteInstructionIndex === undefined) {
+        pasteInstructionIndex = instrsList.size() - 1;
+      }
+    } else if (lastListCtx && listSizeBeforePaste !== null) {
+      pasteInstructionIndex = listSizeBeforePaste;
+    }
+
     const locatingEvents = getSelectedInstructionsLocatingEvents(
       this.state.selection
     );
@@ -1495,6 +1833,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       {
         positionsBeforeAction: positions,
         positionAfterAction: positions,
+        instructionIndex: pasteInstructionIndex,
+        instructionListLabel: pasteInstructionListLabel,
       },
       () => {
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -1514,6 +1854,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     eventContext: EventContext,
     instructionsListContext: InstructionsListContext
   ) => {
+    // Capture index before paste (paste always appends at the end of the list).
+    const instructionIndex = instructionsListContext.instrsList.size();
+    const instructionListLabel = getInstructionListLabel(
+      eventContext.event,
+      instructionsListContext.instrsList,
+      instructionsListContext.isCondition
+    );
+
     if (
       !pasteInstructionsFromClipboardInInstructionsList(
         this.props.project,
@@ -1528,6 +1876,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       {
         positionsBeforeAction: positions,
         positionAfterAction: positions,
+        instructionIndex,
+        instructionListLabel,
       },
       () => {
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -1638,6 +1988,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     positions: {
       positionsBeforeAction: Array<number>,
       positionAfterAction: Array<number>,
+      instructionIndex?: ?number,
+      instructionListLabel?: ?string,
     },
     cb: ?Function
   ) => {
@@ -1671,6 +2023,16 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     const { _eventsTree: eventsTree } = this;
     if (!eventsTree) return;
+
+    // Clear selection immediately alongside the history update so that stale
+    // C++ ptrs from the old selection don't accidentally match newly allocated
+    // objects (WASM ptr reuse) and cause a spurious highlight flash during
+    // the re-render triggered by forceEventsUpdate below.
+    this.setState({
+      selection: clearSelection(),
+      eventsHistory: newEventsHistory,
+    });
+
     eventsTree.forceEventsUpdate(() => {
       const {
         changeContext: { positions },
@@ -1679,44 +2041,70 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         newEventsHistory.futureActions.length - 1
       ];
 
-      // $FlowFixMe[incompatible-type]
-      let newSelection: SelectionState = getInitialSelection();
-      // If it is a DELETE or EDIT, then the element will be present, so we can select them.
-      // If it is an ADD, then it will not be present, so we can't select them.
-      if (type === 'ADD') {
-        newSelection = clearSelection();
-      } else {
-        const eventContexts = eventsTree.getEventContextAtRowIndexes(
-          positions.positionsBeforeAction
-        );
-        // $FlowFixMe[incompatible-type]
-        newSelection = selectEventsAfterHistoryChange(eventContexts);
+      const eventContexts = eventsTree.getEventContextAtRowIndexes(
+        positions.positionsBeforeAction
+      );
+
+      let newSelection: SelectionState = clearSelection();
+      if (type !== 'ADD') {
+        if (
+          positions.instructionIndex !== undefined &&
+          positions.instructionListLabel !== undefined &&
+          eventContexts[0]
+        ) {
+          const maybeInstrsList = eventContexts[0].event.getInstructionList(
+            positions.instructionListLabel
+          );
+          // $FlowFixMe[incompatible-exact]
+          const instrsList = !isNullPtr(gd, maybeInstrsList)
+            ? maybeInstrsList
+            : null;
+          // Select the instruction at instructionIndex if it exists, otherwise
+          // select the closest one before it (e.g. after undoing a paste at end).
+          const clampedIdx = instrsList
+            ? Math.min(positions.instructionIndex, instrsList.size() - 1)
+            : -1;
+          if (instrsList && clampedIdx >= 0) {
+            newSelection = selectInstruction(
+              eventContexts[0],
+              clearSelection(),
+              {
+                isCondition: positions.instructionListLabel !== 'actions',
+                instrsList,
+                instruction: instrsList.get(clampedIdx),
+                indexInList: clampedIdx,
+              },
+              false
+            );
+          } else {
+            newSelection = selectEventsAfterHistoryChange(eventContexts);
+          }
+        } else {
+          newSelection = selectEventsAfterHistoryChange(eventContexts);
+        }
       }
 
-      this.setState(
-        // $FlowFixMe[incompatible-type]
-        {
-          selection: newSelection,
-          eventsHistory: newEventsHistory,
-        },
-        () => {
-          const row = positions.positionsBeforeAction[0];
+      this.setState({ selection: newSelection }, () => {
+        const row = positions.positionsBeforeAction[0];
 
-          if (row !== undefined) {
-            // Whether it is an ADD, EDIT or DELETE, scroll to the place where it was done.
+        if (row !== undefined) {
+          if (
+            positions.instructionIndex !== undefined &&
+            positions.instructionListLabel !== undefined &&
+            eventContexts[0]
+          ) {
+            eventsTree.scrollToInstruction(
+              row,
+              positions.instructionListLabel,
+              positions.instructionIndex
+            );
+          } else {
             eventsTree.scrollToRow(row);
-            // Hack: because of the virtualization and the undo/redo, we lose the heights of events
-            // (at least some, because they are different objects in memory).
-            // While they are recomputed when rendered, scroll again to be sure we don't end
-            // up at the very beginning (if everything was recomputed from 0) or at
-            // an offset too large.
-            setTimeout(() => {
-              eventsTree.scrollToRow(row);
-            }, 70);
           }
-          this.updateToolbar();
         }
-      );
+        this._ensureFocused();
+        this.updateToolbar();
+      });
     });
   };
 
@@ -1733,6 +2121,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     const { _eventsTree: eventsTree } = this;
     if (!eventsTree) return;
+
+    // Clear selection immediately to prevent stale ptr flashes (see undo above).
+    this.setState({
+      selection: clearSelection(),
+      eventsHistory: newEventsHistory,
+    });
+
     eventsTree.forceEventsUpdate(() => {
       const {
         changeContext: { positions },
@@ -1741,44 +2136,74 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         newEventsHistory.previousActions.length - 1
       ];
 
-      // If it is a ADD or EDIT, then the element will be present, so we can select them.
-      // If it is a DELETE, then they will not be present, so we can't select them.
-      // $FlowFixMe[incompatible-type]
-      let newSelection: SelectionState = getInitialSelection();
-      if (type === 'DELETE') {
-        newSelection = clearSelection();
-      } else {
-        const eventContexts = eventsTree.getEventContextAtRowIndexes(
-          positions.positionAfterAction
-        );
-        // $FlowFixMe[incompatible-type]
-        newSelection = selectEventsAfterHistoryChange(eventContexts);
+      const eventContextsForScroll = eventsTree.getEventContextAtRowIndexes(
+        positions.positionsBeforeAction
+      );
+
+      let newSelection: SelectionState = clearSelection();
+      if (type !== 'DELETE') {
+        if (
+          positions.instructionIndex !== undefined &&
+          positions.instructionListLabel !== undefined &&
+          eventContextsForScroll[0]
+        ) {
+          const maybeInstrsList = eventContextsForScroll[0].event.getInstructionList(
+            positions.instructionListLabel
+          );
+          // $FlowFixMe[incompatible-exact]
+          const instrsList = !isNullPtr(gd, maybeInstrsList)
+            ? maybeInstrsList
+            : null;
+          const clampedIdx = instrsList
+            ? Math.min(positions.instructionIndex, instrsList.size() - 1)
+            : -1;
+          if (instrsList && clampedIdx >= 0) {
+            newSelection = selectInstruction(
+              eventContextsForScroll[0],
+              clearSelection(),
+              {
+                isCondition: positions.instructionListLabel !== 'actions',
+                instrsList,
+                instruction: instrsList.get(clampedIdx),
+                indexInList: clampedIdx,
+              },
+              false
+            );
+          } else {
+            const eventContexts = eventsTree.getEventContextAtRowIndexes(
+              positions.positionAfterAction
+            );
+            newSelection = selectEventsAfterHistoryChange(eventContexts);
+          }
+        } else {
+          const eventContexts = eventsTree.getEventContextAtRowIndexes(
+            positions.positionAfterAction
+          );
+          newSelection = selectEventsAfterHistoryChange(eventContexts);
+        }
       }
 
-      this.setState(
-        // $FlowFixMe[incompatible-type]
-        {
-          selection: newSelection,
-          eventsHistory: newEventsHistory,
-        },
-        () => {
-          const row = positions.positionsBeforeAction[0];
+      this.setState({ selection: newSelection }, () => {
+        const row = positions.positionsBeforeAction[0];
 
-          if (row !== undefined) {
-            // Whether it was an ADD, EDIT or DELETE, scroll to the place where it will happen.
+        if (row !== undefined) {
+          if (
+            positions.instructionIndex !== undefined &&
+            positions.instructionListLabel !== undefined &&
+            eventContextsForScroll[0]
+          ) {
+            eventsTree.scrollToInstruction(
+              row,
+              positions.instructionListLabel,
+              positions.instructionIndex
+            );
+          } else {
             eventsTree.scrollToRow(row);
-            // Hack: because of the virtualization and the undo/redo, we lose the heights of events
-            // (at least some, because they are different objects in memory).
-            // While they are recomputed when rendered, scroll again to be sure we don't end
-            // up at the very beginning (if everything was recomputed from 0) or at
-            // an offset too large.
-            setTimeout(() => {
-              eventsTree.scrollToRow(row);
-            }, 70);
           }
-          this.updateToolbar();
         }
-      );
+        this._ensureFocused();
+        this.updateToolbar();
+      });
     });
   };
 
@@ -1931,6 +2356,33 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     }
   };
 
+  _goToNextFromGlobalSearch = (): ?gdBaseEvent => {
+    const { searchHighlight } = this.state;
+    if (!searchHighlight || !searchHighlight.results.length) return null;
+    const results = searchHighlight.results;
+    const newOffset = (searchHighlight.focusOffset + 1) % results.length;
+    const event = results[newOffset];
+    this.setState({
+      searchHighlight: { ...searchHighlight, focusOffset: newOffset },
+    });
+    return event;
+  };
+
+  _goToPreviousFromGlobalSearch = (): ?gdBaseEvent => {
+    const { searchHighlight } = this.state;
+    if (!searchHighlight || !searchHighlight.results.length) return null;
+    const results = searchHighlight.results;
+    const newOffset =
+      searchHighlight.focusOffset <= 0
+        ? results.length - 1
+        : searchHighlight.focusOffset - 1;
+    const event = results[newOffset];
+    this.setState({
+      searchHighlight: { ...searchHighlight, focusOffset: newOffset },
+    });
+    return event;
+  };
+
   _replaceInEvents = (
     doReplaceInEvents: (
       inputs: ReplaceInEventsInputs,
@@ -1956,6 +2408,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     doSearchInEvents: (inputs: SearchInEventsInputs, cb: () => void) => void,
     inputs: SearchInEventsInputs
   ) => {
+    this.setState({
+      localSearchText: inputs.searchText || '',
+      localSearchMatchCase: !!inputs.searchFilterParams.matchCase,
+      searchHighlight: null, // Switch from global to local search
+    });
     doSearchInEvents(inputs, () => {
       this.forceUpdate(() => {
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -2071,33 +2528,47 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
    * been scrolled out of the view and so removed from the DOM)
    */
   _ensureFocused = () => {
-    if (!this._containerDiv || !document) return;
+    if (!this._containerDiv) return;
 
     const containerDivElement = this._containerDiv.current;
-    if (document.activeElement === containerDivElement) {
+    if (!containerDivElement) return;
+
+    // Use the ownerDocument of the container element to get the correct
+    // document — important when rendered inside a WindowPortal (external
+    // browser window) where the main window's `document` is different.
+    const ownerDoc = containerDivElement.ownerDocument;
+    if (!ownerDoc) return;
+
+    if (ownerDoc.activeElement === containerDivElement) {
       // Focus is already on the container
       return;
     }
-    if (containerDivElement) {
-      if (
-        document.activeElement !== document.body &&
-        containerDivElement.contains(document.activeElement)
-      ) {
-        // Focus is already on an element of the container
-        return;
-      }
-
-      // Focus is not on an element of the container, we probably lost the focus
-      // after scrolling or removing an element. Give back the focus to the container.
-      containerDivElement.focus();
+    if (
+      ownerDoc.activeElement !== ownerDoc.body &&
+      containerDivElement.contains(ownerDoc.activeElement)
+    ) {
+      // Focus is already on an element of the container
+      return;
     }
+
+    // Focus is not on an element of the container, we probably lost the focus
+    // after scrolling or removing an element. Give back the focus to the container.
+    containerDivElement.focus();
   };
 
   _onEventsSheetBlur = (event: SyntheticFocusEvent<HTMLDivElement>) => {
     const nextFocusedElement = event.relatedTarget;
+    // Use nodeType check instead of `instanceof HTMLElement` because when the
+    // EventsSheet is rendered inside a WindowPortal (external browser window),
+    // the DOM elements belong to a different window context whose HTMLElement
+    // constructor differs from the main window's — making `instanceof` return
+    // false and incorrectly resetting modifier keys (breaking Shift-selection).
     if (
-      nextFocusedElement instanceof HTMLElement &&
+      nextFocusedElement != null &&
+      // $FlowFixMe[prop-missing]
+      nextFocusedElement.nodeType === 1 /* ELEMENT_NODE */ &&
       // If focus is moving to an element still inside the container, do nothing.
+      // $FlowFixMe[incompatible-type]
       event.currentTarget.contains(nextFocusedElement)
     ) {
       return;
@@ -2123,12 +2594,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       tutorials,
       hotReloadPreviewButtonProps,
       windowSize,
+      screenType,
       highlightedAiGeneratedEventIds,
     } = this.props;
     if (!project) return null;
-
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const screenType = useScreenType();
 
     const isFunctionOnlyCallingItself =
       scope.eventsFunctionsExtension &&
@@ -2185,6 +2654,26 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       }
     }
 
+    const initialSearchFilterParams: InitialSearchFilterParams = {
+      initialSearchText: this.state.searchHighlight
+        ? this.state.searchHighlight.text || undefined
+        : undefined,
+      initialMatchCase: this.state.searchHighlight
+        ? this.state.searchHighlight?.searchFilterParams?.matchCase
+        : undefined,
+      initialTab: this.state.searchHighlight
+        ? 'search-in-event-sentences'
+        : undefined,
+      initialSearchInConditions: this.state.searchHighlight?.searchFilterParams
+        ?.searchInConditions,
+      initialSearchInActions: this.state.searchHighlight?.searchFilterParams
+        ?.searchInActions,
+      initialSearchInEventStrings: this.state.searchHighlight
+        ?.searchFilterParams?.searchInEventStrings,
+      initialSearchInInstructionNames: this.state.searchHighlight
+        ?.searchFilterParams?.searchInInstructionNames,
+    };
+
     return (
       <>
         <EventsSearcher
@@ -2203,199 +2692,259 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             replaceInEvents,
             goToPreviousSearchResult,
             goToNextSearchResult,
-          }) => (
-            <div
-              id="events-editor"
-              data-active={isActive ? 'true' : undefined}
-              className="gd-events-sheet"
-              style={styles.container}
-              onKeyDown={this._keyboardShortcuts.onKeyDown}
-              onKeyUp={this._keyboardShortcuts.onKeyUp}
-              onDragOver={this._keyboardShortcuts.onDragOver}
-              onBlur={this._onEventsSheetBlur}
-              ref={this._containerDiv}
-              tabIndex={0}
-            >
-              {isFunctionOnlyCallingItself && (
-                <Line>
-                  <Column expand>
-                    <AlertMessage kind="warning">
-                      <Trans>
-                        This function calls itself (it is "recursive"). Ensure
-                        this is expected and there is a proper condition to stop
-                        it if necessary.
-                      </Trans>
-                    </AlertMessage>
-                  </Column>
-                </Line>
-              )}
-              {this._containerDivLastKnownSize && (
-                <EventsTree
-                  ref={eventsTree => (this._eventsTree = eventsTree)}
-                  key={events.ptr}
-                  indentScale={preferences.values.eventsSheetIndentScale}
-                  onScroll={this._ensureFocused}
-                  events={events}
+          }) => {
+            const hasLocalSearchResults =
+              eventsSearchResultEvents &&
+              eventsSearchResultEvents.length > 0 &&
+              this.state.localSearchText;
+            const effectiveSearchHighlight = this.state.searchHighlight
+              ? this.state.searchHighlight
+              : hasLocalSearchResults
+              ? {
+                  results: eventsSearchResultEvents,
+                  focusOffset: searchFocusOffset ?? 0,
+                  text: this.state.localSearchText,
+                  matchCase: this.state.localSearchMatchCase,
+                }
+              : this.state.navigationHighlightEvent
+              ? {
+                  results: [this.state.navigationHighlightEvent],
+                  focusOffset: 0,
+                  text: '',
+                  matchCase: false,
+                }
+              : null;
+
+            return (
+              <div
+                id="events-editor"
+                data-active={isActive ? 'true' : undefined}
+                className="gd-events-sheet"
+                style={styles.container}
+                onKeyDown={this._keyboardShortcuts.onKeyDown}
+                onKeyUp={this._keyboardShortcuts.onKeyUp}
+                onDragOver={this._keyboardShortcuts.onDragOver}
+                onBlur={this._onEventsSheetBlur}
+                ref={this._containerDiv}
+                tabIndex={0}
+              >
+                {isFunctionOnlyCallingItself && (
+                  <Line>
+                    <Column expand>
+                      <AlertMessage kind="warning">
+                        <Trans>
+                          This function calls itself (it is "recursive"). Ensure
+                          this is expected and there is a proper condition to
+                          stop it if necessary.
+                        </Trans>
+                      </AlertMessage>
+                    </Column>
+                  </Line>
+                )}
+                {this._containerDivLastKnownSize && (
+                  <EventsTree
+                    ref={eventsTree => (this._eventsTree = eventsTree)}
+                    key={events.ptr}
+                    indentScale={preferences.values.eventsSheetIndentScale}
+                    onScroll={this._ensureFocused}
+                    events={events}
+                    project={project}
+                    scope={scope}
+                    globalObjectsContainer={globalObjectsContainer}
+                    objectsContainer={objectsContainer}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    selection={this.state.selection}
+                    onInstructionClick={this.selectInstruction}
+                    onInstructionDoubleClick={this.openInstructionEditor}
+                    onInstructionContextMenu={this.openInstructionContextMenu}
+                    onAddInstructionContextMenu={
+                      this.openAddInstructionContextMenu
+                    }
+                    onAddNewInstruction={this.openInstructionEditor}
+                    onPasteInstructions={
+                      this.pasteInstructionsInInstructionsList
+                    }
+                    onMoveToInstruction={this.moveSelectionToInstruction}
+                    onMoveToInstructionsList={
+                      this.moveSelectionToInstructionsList
+                    }
+                    onParameterClick={this.openParameterEditor}
+                    onVariableDeclarationClick={() => {
+                      // Nothing to do.
+                    }}
+                    onVariableDeclarationDoubleClick={this.openVariablesEditor}
+                    onEventClick={this.selectEvent}
+                    onEventContextMenu={this.openEventContextMenu}
+                    onAddNewEvent={(
+                      eventType: string,
+                      eventsList: gdEventsList
+                    ) => {
+                      this.addNewEvent(eventType, {
+                        eventsList,
+                        indexInList: eventsList.getEventsCount(),
+                      });
+                    }}
+                    onOpenExternalEvents={onOpenExternalEvents}
+                    onOpenLayout={onOpenLayout}
+                    searchResults={
+                      effectiveSearchHighlight
+                        ? effectiveSearchHighlight.results
+                        : null
+                    }
+                    searchFocusOffset={
+                      effectiveSearchHighlight
+                        ? effectiveSearchHighlight.focusOffset
+                        : null
+                    }
+                    onEventMoved={this._onEventMoved}
+                    onEndEditingEvent={this._onEndEditingStringEvent}
+                    showObjectThumbnails={
+                      preferences.values.eventsSheetShowObjectThumbnails
+                    }
+                    screenType={screenType}
+                    windowSize={windowSize}
+                    eventsSheetWidth={this._containerDivLastKnownSize.width}
+                    eventsSheetHeight={this._containerDivLastKnownSize.height}
+                    fontSize={preferences.values.eventsSheetZoomLevel}
+                    preferences={preferences}
+                    tutorials={tutorials}
+                    highlightedSearchText={
+                      effectiveSearchHighlight
+                        ? effectiveSearchHighlight.text || null
+                        : null
+                    }
+                    highlightedSearchMatchCase={
+                      effectiveSearchHighlight
+                        ? effectiveSearchHighlight.matchCase
+                        : false
+                    }
+                    highlightedAiGeneratedEventIds={
+                      highlightedAiGeneratedEventIds
+                    }
+                  />
+                )}
+                {this.state.showSearchPanel && (
+                  <ErrorBoundary
+                    componentTitle={<Trans>Search panel</Trans>}
+                    scope="scene-events-search"
+                    onClose={() => this._closeSearchPanel()}
+                  >
+                    <SearchPanel
+                      ref={searchPanel => (this._searchPanel = searchPanel)}
+                      onSearchInEvents={inputs =>
+                        this._searchInEvents(searchInEvents, inputs)
+                      }
+                      onReplaceInEvents={inputs => {
+                        this._replaceInEvents(replaceInEvents, inputs);
+                      }}
+                      resultsCount={
+                        this.state.searchHighlight
+                          ? this.state.searchHighlight.results.length
+                          : eventsSearchResultEvents
+                          ? eventsSearchResultEvents.length
+                          : null
+                      }
+                      hasEventSelected={hasEventSelected(this.state.selection)}
+                      onGoToPreviousSearchResult={() =>
+                        this._ensureUnfoldedAndScrollTo(
+                          this.state.searchHighlight
+                            ? this._goToPreviousFromGlobalSearch
+                            : goToPreviousSearchResult
+                        )
+                      }
+                      onCloseSearchPanel={() => {
+                        this._closeSearchPanel();
+                      }}
+                      onGoToNextSearchResult={() =>
+                        this._ensureUnfoldedAndScrollTo(
+                          this.state.searchHighlight
+                            ? this._goToNextFromGlobalSearch
+                            : goToNextSearchResult
+                        )
+                      }
+                      searchFocusOffset={
+                        this.state.searchHighlight
+                          ? this.state.searchHighlight.focusOffset
+                          : searchFocusOffset
+                      }
+                      initialSearchFilterParams={initialSearchFilterParams}
+                    />
+                  </ErrorBoundary>
+                )}
+                <InlineParameterEditor
+                  // Remount when switching parameters so stale local state can't
+                  // bleed into the next parameter via React 18 batched renders.
+                  key={`${
+                    this.state.editedParameter.instruction
+                      ? this.state.editedParameter.instruction.ptr
+                      : 'none'
+                  }-${this.state.editedParameter.parameterIndex}`}
+                  open={this.state.inlineEditing}
+                  anchorEl={this.state.inlineEditingAnchorEl}
+                  onRequestClose={() => {
+                    this.closeParameterEditor(
+                      /*shouldCancel=*/ preferences.values
+                        .eventsSheetCancelInlineParameter === 'cancel'
+                    );
+                  }}
+                  onApply={() => {
+                    this.closeParameterEditor(/*shouldCancel=*/ false);
+                  }}
                   project={project}
                   scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
                   projectScopedContainersAccessor={
-                    projectScopedContainersAccessor
+                    editedParameterProjectScopedContainersAccessor
                   }
-                  selection={this.state.selection}
-                  onInstructionClick={this.selectInstruction}
-                  onInstructionDoubleClick={this.openInstructionEditor}
-                  onInstructionContextMenu={this.openInstructionContextMenu}
-                  onAddInstructionContextMenu={
-                    this.openAddInstructionContextMenu
-                  }
-                  onAddNewInstruction={this.openInstructionEditor}
-                  onPasteInstructions={this.pasteInstructionsInInstructionsList}
-                  onMoveToInstruction={this.moveSelectionToInstruction}
-                  onMoveToInstructionsList={
-                    this.moveSelectionToInstructionsList
-                  }
-                  onParameterClick={this.openParameterEditor}
-                  onVariableDeclarationClick={() => {
-                    // Nothing to do.
+                  isCondition={this.state.editedParameter.isCondition}
+                  instruction={this.state.editedParameter.instruction}
+                  parameterIndex={this.state.editedParameter.parameterIndex}
+                  onChange={value => {
+                    const {
+                      instruction,
+                      parameterIndex,
+                    } = this.state.editedParameter;
+                    if (!instruction || !this.state.inlineEditing) {
+                      // Unlikely to ever happen, but maybe a component could
+                      // fire the "onChange" while the inline editor was just
+                      // dismissed.
+                      return;
+                    }
+                    instruction.setParameter(parameterIndex, value);
+
+                    gd.VariableInstructionSwitcher.switchBetweenUnifiedInstructionIfNeeded(
+                      project.getCurrentPlatform(),
+                      editedParameterProjectScopedContainersAccessor.get(),
+                      instruction
+                    );
+
+                    // Ask the component to re-render, so that the new parameter
+                    // set for the instruction in the state
+                    // is taken into account for the InlineParameterEditor.
+                    this.forceUpdate();
+                    if (this._searchPanel)
+                      this._searchPanel.markSearchResultsDirty();
                   }}
-                  onVariableDeclarationDoubleClick={this.openVariablesEditor}
-                  onEventClick={this.selectEvent}
-                  onEventContextMenu={this.openEventContextMenu}
-                  onAddNewEvent={(
-                    eventType: string,
-                    eventsList: gdEventsList
-                  ) => {
-                    this.addNewEvent(eventType, {
-                      eventsList,
-                      indexInList: eventsList.getEventsCount(),
-                    });
-                  }}
-                  onOpenExternalEvents={onOpenExternalEvents}
-                  onOpenLayout={onOpenLayout}
-                  searchResults={
-                    this.state.navigationHighlightEvent
-                      ? [this.state.navigationHighlightEvent]
-                      : eventsSearchResultEvents
-                  }
-                  searchFocusOffset={
-                    this.state.navigationHighlightEvent ? 0 : searchFocusOffset
-                  }
-                  onEventMoved={this._onEventMoved}
-                  onEndEditingEvent={this._onEndEditingStringEvent}
-                  showObjectThumbnails={
-                    preferences.values.eventsSheetShowObjectThumbnails
-                  }
-                  screenType={screenType}
-                  windowSize={windowSize}
-                  eventsSheetWidth={this._containerDivLastKnownSize.width}
-                  eventsSheetHeight={this._containerDivLastKnownSize.height}
-                  fontSize={preferences.values.eventsSheetZoomLevel}
-                  preferences={preferences}
-                  tutorials={tutorials}
-                  highlightedAiGeneratedEventIds={
-                    highlightedAiGeneratedEventIds
-                  }
+                  resourceManagementProps={resourceManagementProps}
                 />
-              )}
-              {this.state.showSearchPanel && (
-                <ErrorBoundary
-                  componentTitle={<Trans>Search panel</Trans>}
-                  scope="scene-events-search"
-                  onClose={() => this._closeSearchPanel()}
-                >
-                  <SearchPanel
-                    ref={searchPanel => (this._searchPanel = searchPanel)}
-                    onSearchInEvents={inputs =>
-                      this._searchInEvents(searchInEvents, inputs)
-                    }
-                    onReplaceInEvents={inputs => {
-                      this._replaceInEvents(replaceInEvents, inputs);
-                    }}
-                    resultsCount={
-                      eventsSearchResultEvents
-                        ? eventsSearchResultEvents.length
-                        : null
-                    }
-                    hasEventSelected={hasEventSelected(this.state.selection)}
-                    onGoToPreviousSearchResult={() =>
-                      this._ensureUnfoldedAndScrollTo(goToPreviousSearchResult)
-                    }
-                    onCloseSearchPanel={() => {
-                      this._closeSearchPanel();
-                    }}
-                    onGoToNextSearchResult={() =>
-                      this._ensureUnfoldedAndScrollTo(goToNextSearchResult)
-                    }
-                    searchFocusOffset={searchFocusOffset}
-                  />
-                </ErrorBoundary>
-              )}
-              <InlineParameterEditor
-                open={this.state.inlineEditing}
-                anchorEl={this.state.inlineEditingAnchorEl}
-                onRequestClose={() => {
-                  this.closeParameterEditor(
-                    /*shouldCancel=*/ preferences.values
-                      .eventsSheetCancelInlineParameter === 'cancel'
-                  );
-                }}
-                onApply={() => {
-                  this.closeParameterEditor(/*shouldCancel=*/ false);
-                }}
-                project={project}
-                scope={scope}
-                globalObjectsContainer={globalObjectsContainer}
-                objectsContainer={objectsContainer}
-                projectScopedContainersAccessor={
-                  editedParameterProjectScopedContainersAccessor
-                }
-                isCondition={this.state.editedParameter.isCondition}
-                instruction={this.state.editedParameter.instruction}
-                parameterIndex={this.state.editedParameter.parameterIndex}
-                onChange={value => {
-                  const {
-                    instruction,
-                    parameterIndex,
-                  } = this.state.editedParameter;
-                  if (!instruction || !this.state.inlineEditing) {
-                    // Unlikely to ever happen, but maybe a component could
-                    // fire the "onChange" while the inline editor was just
-                    // dismissed.
-                    return;
+                <ContextMenu
+                  ref={eventContextMenu =>
+                    (this.eventContextMenu = eventContextMenu)
                   }
-                  instruction.setParameter(parameterIndex, value);
-
-                  gd.VariableInstructionSwitcher.switchBetweenUnifiedInstructionIfNeeded(
-                    project.getCurrentPlatform(),
-                    editedParameterProjectScopedContainersAccessor.get(),
-                    instruction
-                  );
-
-                  // Ask the component to re-render, so that the new parameter
-                  // set for the instruction in the state
-                  // is taken into account for the InlineParameterEditor.
-                  this.forceUpdate();
-                  if (this._searchPanel)
-                    this._searchPanel.markSearchResultsDirty();
-                }}
-                resourceManagementProps={resourceManagementProps}
-              />
-              <ContextMenu
-                ref={eventContextMenu =>
-                  (this.eventContextMenu = eventContextMenu)
-                }
-                buildMenuTemplate={this._buildEventContextMenu}
-              />
-              <ContextMenu
-                ref={instructionContextMenu =>
-                  (this.instructionContextMenu = instructionContextMenu)
-                }
-                buildMenuTemplate={this._buildInstructionContextMenu}
-              />
-            </div>
-          )}
+                  buildMenuTemplate={this._buildEventContextMenu}
+                />
+                <ContextMenu
+                  ref={instructionContextMenu =>
+                    (this.instructionContextMenu = instructionContextMenu)
+                  }
+                  buildMenuTemplate={this._buildInstructionContextMenu}
+                />
+              </div>
+            );
+          }}
         </EventsSearcher>
         {this._renderInstructionEditorDialog()}
         {this.state.analyzedEventsContextResult && (
@@ -2520,7 +3069,15 @@ export type EventsSheetInterface = {|
   updateToolbar: () => void,
   onResourceExternallyChanged: ({| identifier: string |}) => void,
   onEventsModifiedOutsideEditor: (changes: OutOfEditorChanges) => void,
-  scrollToEventPath: (eventPath: Array<number>) => void,
+  scrollToEventPath: (eventPath: EventPath) => void,
+  setGlobalSearchResults: (
+    eventPaths: Array<EventPath>,
+    focusedEventPath: EventPath,
+    searchText: string,
+    searchFilters?: SearchFilterParams
+  ) => void,
+  clearGlobalSearchResults: () => void,
+  selectAllEvents: () => void,
 |};
 
 // EventsSheet is a wrapper so that the component can use multiple
@@ -2532,6 +3089,9 @@ const EventsSheet = (props, ref) => {
     onResourceExternallyChanged,
     onEventsModifiedOutsideEditor,
     scrollToEventPath,
+    setGlobalSearchResults,
+    clearGlobalSearchResults,
+    selectAllEvents,
   }));
 
   const {
@@ -2551,8 +3111,28 @@ const EventsSheet = (props, ref) => {
     addNewAiGeneratedEventIds(changes.newOrChangedAiGeneratedEventIds);
     if (component.current) component.current.onEventsModifiedOutsideEditor();
   };
-  const scrollToEventPath = (eventPath: Array<number>) => {
+  const scrollToEventPath = (eventPath: EventPath) => {
     if (component.current) component.current.scrollToEventPath(eventPath);
+  };
+  const setGlobalSearchResults = (
+    eventPaths: Array<EventPath>,
+    focusedEventPath: EventPath,
+    searchText: string,
+    searchFilters?: SearchFilterParams
+  ) => {
+    if (component.current)
+      component.current.setGlobalSearchResults(
+        eventPaths,
+        focusedEventPath,
+        searchText,
+        searchFilters
+      );
+  };
+  const clearGlobalSearchResults = () => {
+    if (component.current) component.current.clearGlobalSearchResults();
+  };
+  const selectAllEvents = () => {
+    if (component.current) component.current.selectAllEvents();
   };
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -2561,6 +3141,7 @@ const EventsSheet = (props, ref) => {
   const leaderboardsManager = React.useContext(LeaderboardContext);
   const { windowSize } = useResponsiveWindowSize();
   const shortcutMap = useShortcutMap();
+  const screenType = useScreenType();
   return (
     <EventsSheetComponentWithoutHandle
       ref={component}
@@ -2570,6 +3151,7 @@ const EventsSheet = (props, ref) => {
       leaderboardsManager={leaderboardsManager}
       shortcutMap={shortcutMap}
       windowSize={windowSize}
+      screenType={screenType}
       highlightedAiGeneratedEventIds={highlightedAiGeneratedEventIds}
       {...props}
     />

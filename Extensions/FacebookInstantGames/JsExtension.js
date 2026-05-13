@@ -27,6 +27,9 @@ module.exports = {
         'Florian Rival',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Facebook Instant Games: scores, leaderboards, player data, share, ads, in-app purchases.'
+      )
       .setExtensionHelpPath('/publishing/publishing-to-facebook-instant-games')
       .setCategory('Third-party');
     extension

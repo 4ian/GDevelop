@@ -18,6 +18,12 @@ declare class gdJsCodeEvent extends gdBaseEvent {
   setDisabled(disable: boolean): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
+  getScrollTop(): number;
+  setScrollTop(value: number): void;
+  getCursorColumn(): number;
+  setCursorColumn(value: number): void;
+  getCursorLine(): number;
+  setCursorLine(value: number): void;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   delete(): void;

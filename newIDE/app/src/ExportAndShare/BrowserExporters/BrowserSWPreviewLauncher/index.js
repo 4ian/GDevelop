@@ -12,6 +12,7 @@ import {
 import {
   browserPreviewDebuggerServer,
   registerNewPreviewWindow,
+  getExistingPreviewWindowForDebuggerId,
 } from '../BrowserPreview/BrowserPreviewDebuggerServer';
 import Window from '../../../Utils/Window';
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
@@ -136,7 +137,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       previewOptions
     );
 
-    const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+    const debuggerIds = previewOptions.isForInGameEdition
+      ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
+      : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();
     const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
 
     try {
@@ -338,6 +341,19 @@ export default class BrowserSWPreviewLauncher extends React.Component<
             });
           });
         }
+
+        // Bring the preview window(s) to the front so users immediately see
+        // the result of their update.
+        debuggerIds.forEach(debuggerId => {
+          const previewWindow = getExistingPreviewWindowForDebuggerId(
+            debuggerId
+          );
+          if (previewWindow && !previewWindow.closed) {
+            try {
+              previewWindow.focus();
+            } catch (e) {}
+          }
+        });
       } else if (previewWindows) {
         if (previewOptions.isForInGameEdition) {
           setEmbeddedGameFramePreviewLocation({

@@ -307,6 +307,8 @@ namespace gdjs {
       this._eventsBasedObjectDatas = new Map<String, EventsBasedObjectData>();
       this._data = data;
       this._updateSceneAndExtensionsData();
+      gdjs.Variable.useDeprecatedZeroAsDefaultStringVariable =
+        !!data.properties.useDeprecatedZeroAsDefaultStringVariable;
 
       this._sceneResourcesPreloading =
         this._data.properties.sceneResourcesPreloading || 'at-startup';
@@ -366,23 +368,7 @@ namespace gdjs {
       this._playerId = null;
 
       this._embeddedResourcesMappings = new Map();
-      for (const resource of this._data.resources.resources) {
-        if (resource.metadata) {
-          try {
-            const metadata = JSON.parse(resource.metadata);
-            if (metadata?.embeddedResourcesMapping) {
-              this._embeddedResourcesMappings.set(
-                resource.name,
-                metadata.embeddedResourcesMapping
-              );
-            }
-          } catch {
-            logger.error(
-              'Some metadata of resources can not be successfully parsed.'
-            );
-          }
-        }
-      }
+      this._updateEmbeddedResourcesMappings();
 
       if (this.isUsingGDevelopDevelopmentEnvironment()) {
         logger.info(
@@ -401,6 +387,7 @@ namespace gdjs {
         this._inGameEditor.onProjectDataChange(projectData);
       }
       this._data = projectData;
+      this._updateEmbeddedResourcesMappings();
       this._updateSceneAndExtensionsData();
       this._resourcesLoader.setResources(
         projectData.resources.resources,
@@ -428,6 +415,27 @@ namespace gdjs {
               eventsBasedObject
             );
           }
+        }
+      }
+    }
+
+    private _updateEmbeddedResourcesMappings(): void {
+      this._embeddedResourcesMappings.clear();
+      for (const resource of this._data.resources.resources) {
+        if (!resource.metadata) continue;
+
+        try {
+          const metadata = JSON.parse(resource.metadata);
+          if (metadata?.embeddedResourcesMapping) {
+            this._embeddedResourcesMappings.set(
+              resource.name,
+              metadata.embeddedResourcesMapping
+            );
+          }
+        } catch {
+          logger.error(
+            'Some metadata of resources can not be successfully parsed.'
+          );
         }
       }
     }
@@ -904,6 +912,116 @@ namespace gdjs {
      */
     hasJustResumed() {
       return this._hasJustResumed;
+    }
+
+    /**
+     * Preload an object assets in background.
+     */
+    loadObjectOrGroupAssets(objectOrGroupName: string): void {
+      const currentScene = this._sceneStack.getCurrentScene();
+      if (!currentScene) {
+        return;
+      }
+      const objectGroupData = this.getObjectGroupData(
+        currentScene.getName(),
+        objectOrGroupName
+      );
+      if (objectGroupData) {
+        for (const object of objectGroupData.objects) {
+          this._loadObjectAssets(currentScene, object.name);
+        }
+      } else {
+        this._loadObjectAssets(currentScene, objectOrGroupName);
+      }
+    }
+
+    private _loadObjectAssets(currentScene: RuntimeScene, objectName: string) {
+      const objectData = currentScene._objects.get(objectName);
+      if (!objectData) {
+        return;
+      }
+      const usedResources = objectData.usedResources;
+      if (!usedResources) {
+        return;
+      }
+      this._resourcesLoader.loadObjectResources(
+        currentScene.getName(),
+        objectName,
+        usedResources
+      );
+    }
+
+    /**
+     * @returns true when all the resources of the given object are loaded.
+     */
+    areObjectOrGroupAssetsLoaded(objectOrGroupName: string): boolean {
+      const currentScene = this._sceneStack.getCurrentScene();
+      if (!currentScene) {
+        return false;
+      }
+      const objectGroupData = this.getObjectGroupData(
+        currentScene.getName(),
+        objectOrGroupName
+      );
+      if (objectGroupData) {
+        for (const object of objectGroupData.objects) {
+          if (
+            !this._resourcesLoader.areObjectAssetsReady(
+              currentScene.getName(),
+              object.name
+            )
+          ) {
+            return false;
+          }
+        }
+        return true;
+      }
+      return this._resourcesLoader.areObjectAssetsReady(
+        currentScene.getName(),
+        objectOrGroupName
+      );
+    }
+
+    /**
+     * Unload an object assets.
+     */
+    unloadObjectOrGroupAssets(objectOrGroupName: string): void {
+      const currentScene = this._sceneStack.getCurrentScene();
+      if (!currentScene) {
+        return;
+      }
+      const objectGroupData = this.getObjectGroupData(
+        currentScene.getName(),
+        objectOrGroupName
+      );
+      if (objectGroupData) {
+        for (const object of objectGroupData.objects) {
+          this._resourcesLoader.unloadObjectResources(
+            currentScene.getName(),
+            object.name
+          );
+        }
+      } else {
+        this._resourcesLoader.unloadObjectResources(
+          currentScene.getName(),
+          objectOrGroupName
+        );
+      }
+    }
+
+    private getObjectGroupData(
+      sceneName: string,
+      objectGroupName: string
+    ): ObjectGroupData | null {
+      const sceneData = this.getSceneData(sceneName);
+      if (sceneData) {
+        for (const objectGroup of sceneData.objectsGroups) {
+          if (objectGroup.name === objectGroupName) {
+            return objectGroup;
+          }
+        }
+      }
+      return null;
     }
 
     /**

@@ -25,6 +25,9 @@ module.exports = {
         'Matthias Meike',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Access mobile device orientation (alpha/beta/gamma) and motion sensors (acceleration, rotation rate).'
+      )
       .setExtensionHelpPath('/all-features/device-sensors')
       .setCategory('Input');
     extension

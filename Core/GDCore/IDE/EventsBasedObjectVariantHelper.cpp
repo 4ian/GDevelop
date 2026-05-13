@@ -5,6 +5,8 @@
  */
 #include "EventsBasedObjectVariantHelper.h"
 
+#include <algorithm>
+
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/Object.h"
@@ -147,6 +149,31 @@ void EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
     // Copy groups
     for (size_t index = 0; index < defaultObjectGroups.Count(); index++) {
       objectGroups.Insert(defaultObjectGroups.Get(index), index);
+    }
+  }
+}
+
+std::vector<gd::String>
+EventsBasedObjectVariantHelper::FindAllChildrenCustomObjectType(
+    const gd::Project &project,
+    const gd::EventsBasedObject &eventsBasedObject) {
+  std::vector<gd::String> objectTypes;
+  FindAllChildrenCustomObjectType(project, eventsBasedObject, objectTypes);
+  return objectTypes;
+}
+
+void EventsBasedObjectVariantHelper::FindAllChildrenCustomObjectType(
+    const gd::Project &project, const gd::EventsBasedObject &eventsBasedObject,
+    std::vector<gd::String> &objectTypes) {
+  const auto &objects = eventsBasedObject.GetObjects();
+
+  for (size_t i = 0; i < objects.GetObjectsCount(); i++) {
+    const auto &object = objects.GetObject(i);
+    if (std::find(objectTypes.begin(), objectTypes.end(), object.GetType()) ==
+            objectTypes.end() &&
+        project.HasEventsBasedObject(object.GetType())) {
+      objectTypes.push_back(object.GetType());
+      FindAllChildrenCustomObjectType(project, eventsBasedObject, objectTypes);
     }
   }
 }

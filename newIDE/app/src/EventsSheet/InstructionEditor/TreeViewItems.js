@@ -3,6 +3,7 @@ import * as React from 'react';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { mapFor } from '../../Utils/MapFor';
 import getObjectByName from '../../Utils/GetObjectByName';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 
 export interface TreeViewItemContent {
@@ -47,10 +48,14 @@ export const getObjectFolderTreeViewItemId = (
 export const getObjectTreeViewItemId = (
   objectOrGroup: gdObject | gdObjectGroup
 ): string => {
+  const aliveObjectOrGroup = exceptionallyGuardAgainstDeadObject(objectOrGroup);
+  if (!aliveObjectOrGroup) {
+    return `deleted-${objectOrGroup ? objectOrGroup.ptr : 'unknown'}`;
+  }
   // Use the ptr to avoid display bugs in the rare case a user set an object
   // as global although another layout has an object with the same name,
   // and ignored the warning.
-  return `${objectOrGroup.getName()}-${objectOrGroup.ptr}`;
+  return `${aliveObjectOrGroup.getName()}-${aliveObjectOrGroup.ptr}`;
 };
 
 const createTreeViewItem = ({
@@ -395,6 +400,9 @@ export class ObjectFolderTreeViewItem implements TreeViewItem {
   }
 
   getChildren(): ?Array<TreeViewItem> {
+    if (!exceptionallyGuardAgainstDeadObject(this.objectFolderOrObject)) {
+      return [];
+    }
     if (this.objectFolderOrObject.getChildrenCount() === 0) {
       return [];
     }
@@ -424,15 +432,31 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     return this.object;
   }
 
+  _getAliveObject(): ?gdObject {
+    const objectFolderOrObject = exceptionallyGuardAgainstDeadObject(
+      this.object
+    );
+    if (!objectFolderOrObject) return null;
+    const object = exceptionallyGuardAgainstDeadObject(
+      objectFolderOrObject.getObject()
+    );
+    if (!object) return null;
+    return object;
+  }
+
   getName(): string | React.Node {
-    return this.object.getObject().getName();
+    const object = this._getAliveObject();
+    if (!object) return '';
+    return object.getName();
   }
   getDescription(): string | null {
     return null;
   }
 
   getId(): string {
-    return getObjectTreeViewItemId(this.object.getObject());
+    const object = this._getAliveObject();
+    if (!object) return `deleted-${this.object.ptr}`;
+    return getObjectTreeViewItemId(object);
   }
 
   getHtmlId(index: number): ?string {
@@ -440,15 +464,19 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   getDataSet(): ?HTMLDataset {
+    const object = this._getAliveObject();
+    if (!object) return null;
     return {
-      objectName: this.object.getObject().getName(),
+      objectName: object.getName(),
     };
   }
 
   getThumbnail(): ?string {
+    const object = this._getAliveObject();
+    if (!object) return null;
     return this.props.getThumbnail(
       this.props.project,
-      this.object.getObject().getConfiguration()
+      object.getConfiguration()
     );
   }
 }

@@ -155,6 +155,8 @@ const errorHandler = (
       errorMessage: error.message || '',
       errorStack: error.stack || '',
       errorName: error.name || '',
+      // $FlowFixMe[prop-missing] - this is only set by UseAfterFreeError.
+      useAfterFreeContext: error.useAfterFreeContext || undefined,
       IDEVersion: getIDEVersion(),
       IDEVersionWithHash: getIDEVersionWithHash(),
       arch: getArch(),
@@ -224,6 +226,16 @@ export const ErrorFallbackComponent = ({
                 {error.stack.slice(0, 400)}...
               </BackgroundText>
             )}
+            {// $FlowFixMe[prop-missing] - this is only set by UseAfterFreeError.
+            error && error.useAfterFreeContext ? (
+              <BackgroundText allowSelection style={styles.errorMessage}>
+                {(
+                  JSON.stringify(error.useAfterFreeContext, null, 1) ||
+                  'unknown context'
+                ).slice(0, 400)}
+                ...
+              </BackgroundText>
+            ) : null}
             {componentStack && (
               <BackgroundText allowSelection style={styles.errorMessage}>
                 {componentStack.slice(0, 300)}...

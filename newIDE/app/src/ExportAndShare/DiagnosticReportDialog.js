@@ -27,6 +27,7 @@ import Link from '../UI/Link';
 import IconButton from '../UI/IconButton';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
+import type { EventPath } from '../Utils/EventPath';
 
 const gd: libGDevelop = global.gd;
 
@@ -110,8 +111,7 @@ const InvalidParameterRow = ({
       <TableRowColumn style={styles.locationCell}>
         <div style={styles.locationText}>
           <Link href="#" onClick={() => navigateToError(error)}>
-            {error.locationType === 'scene' ? 'scene' : 'external-events'}:{' '}
-            {error.locationName}
+            {`${error.locationType}: ${error.locationName}`}
           </Link>
         </div>
       </TableRowColumn>
@@ -216,14 +216,18 @@ type Props = {|
   project: gdProject,
   wholeProjectDiagnosticReport: gdWholeProjectDiagnosticReport,
   onClose: () => void,
-  onNavigateToLayoutEvent: (
-    layoutName: string,
-    eventPath: Array<number>
-  ) => void,
+  onNavigateToLayoutEvent: (layoutName: string, eventPath: EventPath) => void,
   onNavigateToExternalEventsEvent: (
     externalEventsName: string,
-    eventPath: Array<number>
+    eventPath: EventPath
   ) => void,
+  onNavigateToExtensionEvent: ({|
+    extensionName: string,
+    functionName: string,
+    behaviorName: ?string,
+    objectName: ?string,
+    eventPath: EventPath,
+  |}) => void,
 |};
 
 // $FlowFixMe[missing-local-annot]
@@ -242,18 +246,18 @@ export default function DiagnosticReportDialog({
   onClose,
   onNavigateToLayoutEvent,
   onNavigateToExternalEventsEvent,
+  onNavigateToExtensionEvent,
 }: Props): React.Node {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const preferences = React.useContext(PreferencesContext);
 
   // Scan project for validation errors (missing instructions, invalid parameters)
-  const validationErrors = React.useMemo(
+  const validationErrors = React.useMemo<Array<ValidationError>>(
     () => {
       try {
         return scanProjectForValidationErrors(project);
       } catch (error) {
         console.error('Error scanning project for validation errors:', error);
-        // $FlowFixMe[missing-empty-array-annot]
         return [];
       }
     },
@@ -282,9 +286,26 @@ export default function DiagnosticReportDialog({
         onNavigateToLayoutEvent(error.locationName, error.eventPath);
       } else if (error.locationType === 'external-events') {
         onNavigateToExternalEventsEvent(error.locationName, error.eventPath);
+      } else if (
+        error.locationType === 'extension' &&
+        error.extensionName &&
+        error.functionName
+      ) {
+        onNavigateToExtensionEvent({
+          extensionName: error.extensionName,
+          functionName: error.functionName,
+          behaviorName: error.behaviorName || null,
+          objectName: error.objectName || null,
+          eventPath: error.eventPath,
+        });
       }
     },
-    [onClose, onNavigateToLayoutEvent, onNavigateToExternalEventsEvent]
+    [
+      onClose,
+      onNavigateToLayoutEvent,
+      onNavigateToExternalEventsEvent,
+      onNavigateToExtensionEvent,
+    ]
   );
 
   const renderMissingInstructionName = (type: string) => {

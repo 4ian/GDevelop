@@ -90,6 +90,8 @@ export type ExtensionSummary = {|
   extensionName: string,
   extensionFullName: string,
   description: string,
+  shortDescription: string,
+  dimension: string,
   freeActions: Array<InstructionSummary>,
   freeConditions: Array<InstructionSummary>,
   freeExpressions: Array<ExpressionSummary>,
@@ -163,11 +165,8 @@ const getPropertySummary = (
     };
   }
   if (property.getChoices().size() > 0) {
-    // $FlowFixMe[incompatible-exact]
     propertySummary.choices = mapVector(property.getChoices(), choice => ({
-      // $FlowFixMe[incompatible-use]
       value: choice.getValue(),
-      // $FlowFixMe[incompatible-use]
       label: choice.getLabel(),
     }));
   }
@@ -205,10 +204,7 @@ const getPropertiesSummary = ({
       });
 
   if (propertiesContainer)
-    // $FlowFixMe[incompatible-exact]
     return mapVector(propertiesContainer, namedProperty => {
-      // $FlowFixMe[incompatible-use]
-      // $FlowFixMe[incompatible-type]
       return getPropertySummary(namedProperty.getName(), namedProperty);
     });
 
@@ -425,6 +421,8 @@ export const buildExtensionSummary = ({
     extensionName: extension.getName(),
     extensionFullName: extension.getFullName(),
     description: extension.getDescription(),
+    shortDescription: extension.getShortDescription(),
+    dimension: extension.getDimension(),
     freeActions: generateInstructionsSummaries({
       instructionsMetadata: extension.getAllActions(),
     }),

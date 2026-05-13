@@ -302,6 +302,7 @@ namespace gdjs {
             // resources will be loaded with a 'cache bursting' parameter.
             this._runtimeGame._resourcesLoader.unloadAllResources();
           }
+          this._runtimeGame._resourcesLoader.registerOptionalManagersForHotReload();
           // The editor don't need to hot-reload the current scene because the
           // editor always stays in the initial state.
           this._runtimeGame.setProjectData(newProjectData);
@@ -516,6 +517,7 @@ namespace gdjs {
       }
       // Update project data and re-load assets (sound/image/font/json managers
       // will take care of reloading only what is needed).
+      runtimeGame.getResourceLoader().registerOptionalManagersForHotReload();
       runtimeGame.setProjectData(newProjectData);
       await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
         currentScene.getName(),
@@ -639,12 +641,16 @@ namespace gdjs {
           const oldObjectDataList =
             HotReloader.resolveCustomObjectConfigurations(
               oldProjectData,
-              oldLayoutData ? oldLayoutData.objects : []
+              oldLayoutData
+                ? [...oldProjectData.objects, ...oldLayoutData.objects]
+                : oldProjectData.objects
             );
           const newObjectDataList =
             HotReloader.resolveCustomObjectConfigurations(
               newProjectData,
-              newLayoutData ? newLayoutData.objects : []
+              newLayoutData
+                ? [...newProjectData.objects, ...newLayoutData.objects]
+                : newProjectData.objects
             );
 
           sceneStack._stack.forEach((runtimeScene) => {
@@ -947,11 +953,11 @@ namespace gdjs {
       }
       const oldObjectDataList = HotReloader.resolveCustomObjectConfigurations(
         oldProjectData,
-        oldLayoutData.objects
+        [...oldProjectData.objects, ...oldLayoutData.objects]
       );
       const newObjectDataList = HotReloader.resolveCustomObjectConfigurations(
         newProjectData,
-        newLayoutData.objects
+        [...newProjectData.objects, ...newLayoutData.objects]
       );
 
       // Re-instantiate any gdjs.RuntimeBehavior that was changed.

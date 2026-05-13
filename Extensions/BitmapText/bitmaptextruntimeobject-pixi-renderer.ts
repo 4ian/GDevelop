@@ -50,14 +50,19 @@ namespace gdjs {
     }
 
     onDestroy() {
-      // Mark the font from the object as not used anymore.
+      // Save the font name before destroying the PIXI object.
+      const fontName = this._pixiObject.fontName;
+      // Destroy the PIXI object first, while the font is still available in
+      // PIXI.BitmapFont.available (PIXI.BitmapText.destroy accesses font
+      // properties like distanceFieldType during cleanup).
+      this._pixiObject.destroy();
+      // Then mark the font as not used anymore (which may uninstall it if
+      // no other object references it).
       this._object
         .getInstanceContainer()
         .getGame()
         .getBitmapFontManager()
-        .releaseBitmapFont(this._pixiObject.fontName);
-
-      this._pixiObject.destroy();
+        .releaseBitmapFont(fontName);
     }
 
     getFontSize() {
@@ -75,16 +80,20 @@ namespace gdjs {
           this._object._textureAtlasResourceName
         );
 
-      // Mark the old font as not used anymore
+      const oldFontName = this._pixiObject.fontName;
+
+      // Update the font on the PIXI object first, so that if releasing the
+      // old font uninstalls it, the PIXI object already references the new one.
+      this._pixiObject.fontName = bitmapFont.font;
+      this._pixiObject.fontSize = bitmapFont.size;
+
+      // Mark the old font as not used anymore.
       this._object
         .getInstanceContainer()
         .getGame()
         .getBitmapFontManager()
-        .releaseBitmapFont(this._pixiObject.fontName);
+        .releaseBitmapFont(oldFontName);
 
-      // Update the font used by the object:
-      this._pixiObject.fontName = bitmapFont.font;
-      this._pixiObject.fontSize = bitmapFont.size;
       this.updatePosition();
     }
 

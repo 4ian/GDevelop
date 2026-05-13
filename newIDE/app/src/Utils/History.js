@@ -83,8 +83,7 @@ export const saveToHistory = (
       changeContext,
     },
   ];
-  // $FlowFixMe[missing-empty-array-annot]
-  const newFutureActions = []; // Empty the future actions on save.
+  const newFutureActions: Array<RedoAction> = []; // Empty the future actions on save.
   // If we reach the max size, remove the oldest action.
   if (newPreviousActions.length > history.maxSize) {
     newPreviousActions.splice(0, newPreviousActions.length - history.maxSize);
@@ -94,7 +93,6 @@ export const saveToHistory = (
     ...history,
     currentValue: newCurrentValue,
     previousActions: newPreviousActions,
-    // $FlowFixMe[incompatible-type]
     futureActions: newFutureActions,
   };
 };

@@ -138,7 +138,7 @@ export default class ExportLauncher extends Component<Props, State> {
     payWithCredits?: boolean,
   |}) => Promise<void>;
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     // Fetch limits when the export launcher is opened, to ensure we display the
     // latest limits.
     this.props.authenticatedUser.onRefreshLimits();
@@ -272,6 +272,7 @@ export default class ExportLauncher extends Component<Props, State> {
         project,
         updateStepProgress: this._updateStepProgress,
         exportState: this.state.exportState,
+        i18n,
       };
 
       if (
@@ -443,7 +444,7 @@ export default class ExportLauncher extends Component<Props, State> {
       return exportPipeline.canLaunchBuild(exportState, errored, exportStep);
     };
 
-    const isExporting = !!exportStep && exportStep !== 'done';
+    const isExporting = !!exportStep && exportStep !== 'done' && !errored;
     const isBuildRunning = !!build && build.status === 'pending';
     const isExportingOrWaitingForBuild = isExporting || isBuildRunning;
     const isExportAndBuildCompleteOrErrored =

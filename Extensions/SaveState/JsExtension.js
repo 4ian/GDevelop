@@ -27,6 +27,9 @@ module.exports = {
         'Neyl Mahfouf',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Save/load full game state (objects, variables, sounds, effects). Profile-based filtering.'
+      )
       .setExtensionHelpPath('/all-features/save-state')
       .setCategory('Game mechanic')
       .addInstructionOrExpressionGroupMetadata(_('Save State (experimental)'))

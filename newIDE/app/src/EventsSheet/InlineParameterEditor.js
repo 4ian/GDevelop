@@ -15,6 +15,7 @@ import {
   useSoftKeyboardBottomOffset,
 } from '../UI/MobileSoftKeyboard';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import PortalContainerContext from '../UI/PortalContainerContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -55,6 +56,7 @@ const InlineParameterEditor = ({
   anchorEl,
   resourceManagementProps,
 }: Props): null | React.Node => {
+  const portalContainer = React.useContext(PortalContainerContext);
   const [
     parameterMetadata,
     setParameterMetadata,
@@ -190,6 +192,7 @@ const InlineParameterEditor = ({
         open={true}
         onClose={onApply}
         transitionDuration={0}
+        container={portalContainer}
         PaperProps={{
           style: {
             ...getAvoidSoftKeyboardStyle(softKeyboardBottomOffset),

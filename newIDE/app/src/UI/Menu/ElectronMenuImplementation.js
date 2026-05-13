@@ -28,8 +28,9 @@ export default class ElectronMenuImplementation
   |}) {
     if (!electron) return;
 
-    const { Menu } = remote;
-    const browserWindow = remote.getCurrentWindow();
+    const { Menu, BrowserWindow } = remote;
+    const browserWindow =
+      BrowserWindow.getFocusedWindow() || remote.getCurrentWindow();
     this.menu = Menu.buildFromTemplate(this.menuTemplate);
     this.menu.popup({
       window: browserWindow,

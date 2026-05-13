@@ -124,7 +124,11 @@ public:
 
 private:
   static const gd::String &
-  GetExtensionIconUrl(gd::PlatformExtension &extension);
+  GetExtensionIconUrl(const gd::PlatformExtension &extension);
+
+  static const gd::String &
+  GetEntityIconUrl(const gd::PlatformExtension &extension,
+                     const gd::AbstractEventsBasedEntity &eventsBasedEntity);
 
   /**
    * Declare the dependencies of an extension from an events based extension.

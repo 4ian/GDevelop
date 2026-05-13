@@ -31,6 +31,7 @@ namespace gdjs {
   export const behaviorsTypes = new Hashtable<typeof gdjs.RuntimeBehavior>();
 
   type RuntimeSceneCallback = (runtimeScene: gdjs.RuntimeScene) => void;
+  type InGameEditorCallback = (editor: gdjs.InGameEditor) => void;
   type RuntimeSceneRuntimeObjectCallback = (
     instanceContainer: gdjs.RuntimeInstanceContainer,
     runtimeObject: gdjs.RuntimeObject
@@ -59,6 +60,9 @@ namespace gdjs {
   /** @internal */
   export const callbacksRuntimeScenePostEvents: Array<RuntimeSceneCallback> =
     [];
+
+  /** @internal */
+  export const callbacksInGameEditorPostStep: Array<InGameEditorCallback> = [];
 
   /** @internal */
   export const callbacksRuntimeScenePaused: Array<RuntimeSceneCallback> = [];
@@ -449,6 +453,19 @@ namespace gdjs {
   };
 
   /**
+   * Register a function to be called each time the in-game editor has stepped (i.e: at every frame)
+   * before rendering.
+   *
+   * @param callback The function to be called after in-game editor has stepped and before rendering each frame.
+   * @category Core Engine > Scene
+   */
+  export const registerInGameEditorPostStepCallback = function (
+    callback: InGameEditorCallback
+  ): void {
+    gdjs.callbacksInGameEditorPostStep.push(callback);
+  };
+
+  /**
    * Register a function to be called when a scene is paused.
    * @param callback The function to be called.
    * @category Core Engine > Scene
@@ -557,6 +574,7 @@ namespace gdjs {
     filterArrayInPlace(callbacksRuntimeSceneLoaded);
     filterArrayInPlace(callbacksRuntimeScenePreEvents);
     filterArrayInPlace(callbacksRuntimeScenePostEvents);
+    filterArrayInPlace(callbacksInGameEditorPostStep);
     filterArrayInPlace(callbacksRuntimeScenePaused);
     filterArrayInPlace(callbacksRuntimeSceneResumed);
     filterArrayInPlace(callbacksRuntimeSceneUnloading);

@@ -27,6 +27,10 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Rich text with BBCode markup: bold, italic, colors, sizes, shadows in a single object.'
+      )
+      .setDimension('2D')
       .setExtensionHelpPath('/objects/bbtext')
       .setCategory('Text');
     extension
@@ -554,6 +558,26 @@ module.exports = {
         };
 
         this._pixiObject = new MultiStyleText('', bbTextStyles);
+
+        // Override updateText to catch errors from invalid color values
+        // in BBCode tags (e.g. [color=blues] instead of [color=blue]).
+        // Without this, PixiJS Color.normalize throws "Unable to convert color"
+        // which propagates to _renderScene and crashes the entire editor.
+        const originalUpdateText = this._pixiObject.updateText.bind(
+          this._pixiObject
+        );
+        this._pixiObject.updateText = (...args) => {
+          try {
+            originalUpdateText(...args);
+          } catch (error) {
+            console.warn(
+              'Error rendering BBText (invalid color or style in BBCode):',
+              error
+            );
+            // Mark as not dirty to prevent retrying every frame.
+            this._pixiObject.dirty = false;
+          }
+        };
 
         this._pixiObject.anchor.x = 0.5;
         this._pixiObject.anchor.y = 0.5;

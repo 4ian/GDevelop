@@ -62,6 +62,9 @@ type Props = {|
 
     // Allow to prevent numbers from changing size when they change
     fontVariantNumeric?: 'tabular-nums',
+
+    // Allow to override the font weight
+    fontWeight?: 'bold' | 'normal' | number,
   |},
   tooltip?: string,
 |};

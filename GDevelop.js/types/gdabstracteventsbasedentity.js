@@ -6,6 +6,9 @@ declare class gdAbstractEventsBasedEntity {
   getFullName(): string;
   getDescription(): string;
   isPrivate(): boolean;
+  getPreviewIconUrl(): string;
+  getIconUrl(): string;
+  getHelpPath(): string;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   delete(): void;

@@ -162,6 +162,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       '',
       'MIT'
     );
+    extension.setShortDescription('Fake behavior with two properties');
     const fakeBehavior = new gd.BehaviorJsImplementation();
     // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
@@ -213,7 +214,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       'FakeBehavior', // Default name is the name
       'A fake behavior with two properties.',
       '',
-      'res/function24.png',
+      'res/functions/extension_black.svg',
       'FakeBehavior', // Class name is the name, actually unused
       fakeBehavior,
       new gd.BehaviorsSharedData()
@@ -276,7 +277,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
         'FakeTextBehavior', // Default name is the name
         'A fake behavior for text objects only.',
         '',
-        'res/function24.png',
+        'res/functions/extension_black.svg',
         'FakeTextBehavior', // Class name is the name, actually unused
         fakeBehavior,
         new gd.BehaviorsSharedData()
@@ -347,10 +348,12 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     extension.setExtensionInformation(
       'Button',
       'Fake event-based object',
-      'Fake event-based object',
+      'Fake event-based object (long description)',
       '',
       'MIT'
     );
+    extension.setShortDescription('Fake event-based object');
+    extension.setDimension('2D');
     extension.addObject(
       'PanelSpriteButton',
       'PanelSpriteButton',

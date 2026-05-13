@@ -50,6 +50,7 @@
     "@material-ui/lab": "4.0.0-alpha.56",
     "@supercharge/promise-pool": "^1.6.0",
     "algoliasearch": "3.33.0",
+    "axios": "^0.18.1",
     "blueimp-md5": "^2.10.0",
     "classnames": "2.2.5",
     "date-fns": "2.16.1",
@@ -67,16 +68,13 @@
     "posthog-js": "1.275.2",
     "prop-types": "^15.5.10",
     "qr-creator": "^1.0.0",
-    "react": "16.14.0",
+    "react": "18.2.0",
     "react-color": "2.13.8",
-    "react-dnd": "7.7.0",
-    "react-dnd-html5-backend": "7.7.0",
-    "react-dnd-multi-backend": "3.2.2",
-    "react-dnd-touch-backend": "0.8.3",
-    "react-dom": "16.14.0",
+    "react-dnd": "14.0.5",
+    "react-dnd-touch-backend": "14.1.1",
+    "react-dom": "18.2.0",
     "react-error-boundary": "^1.2.0",
     "react-inner-image-zoom": "^3.0.2",
-    "react-instantsearch-hooks": "^6.41.0",
     "react-json-view": "^1.16.1",
     "react-markdown": "^8.0.6",
     "react-measure": "2.3.0",
@@ -85,7 +83,7 @@
     "react-refresh": "^0.18.0",
     "react-share": "^4.4.0",
     "react-sortable-hoc": "1.5.0",
-    "react-test-renderer": "16.14.0",
+    "react-test-renderer": "18.2.0",
     "react-virtualized": "9.21.1",
     "react-window": "1.8.9",
     "recharts": "^2.10.0",
@@ -96,9 +94,10 @@
     "source-map-explorer": "^2.0.1",
     "three": "0.160.0",
     "url-search-params": "^1.0.2",
-    "wavesurfer.js": "^7.8.6",
+    "wavesurfer.js": "7.12.6",
     "xxhashjs": "^0.2.2",
-    "yaml": "^2.8.2"
+    "yaml": "^2.8.2",
+    "@material-ui/styles": "4.11.5"
   },
   "overrides": {
     "pixi-spine": {
@@ -109,7 +108,12 @@
       "@pixi/mesh": "7.4.2",
       "@pixi/mesh-extras": "7.4.2",
       "@pixi/sprite": "7.4.2"
-    }
+    },
+    "react": "$react",
+    "react-dom": "$react-dom",
+    "react-dnd": "14.0.5",
+    "react-dnd-touch-backend": "14.1.1",
+    "dnd-core": "14.0.1"
   },
   "scripts": {
     "import-resources": "npm run make-version-metadata && npm run import-zipped-external-editors && npm run build-theme-resources && npm run make-service-worker && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-external-libs.js",

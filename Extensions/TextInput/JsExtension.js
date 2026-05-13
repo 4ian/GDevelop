@@ -25,6 +25,9 @@ module.exports = {
         'Florian Rival',
         'MIT'
       )
+      .setShortDescription(
+        'Text input field for players. Placeholder, font, color, disabled state, read-only, focus control.'
+      )
       .setCategory('User interface');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Text Input'))

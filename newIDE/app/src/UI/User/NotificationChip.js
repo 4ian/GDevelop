@@ -13,6 +13,7 @@ import {
   type Notification,
 } from '../../Utils/GDevelopServices/Notification';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
+import TeamInvitationDialog from '../Notification/TeamInvitationDialog';
 
 const styles = {
   notificationListContainer: {
@@ -35,6 +36,11 @@ const NotificationChip = (props: Props): null | React.Node => {
     onRefreshNotifications,
   } = React.useContext(AuthenticatedUserContext);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [pendingTeamInvitation, setPendingTeamInvitation] = React.useState<{|
+    teamId: string,
+    notificationId: string,
+    inviterEmail: string,
+  |} | null>(null);
   const isThereASingleUnseenNotification = React.useMemo<boolean>(
     () =>
       !!notifications &&
@@ -75,6 +81,14 @@ const NotificationChip = (props: Props): null | React.Node => {
     setAnchorEl(null);
   }, []);
 
+  const onOpenTeamInvitationDialog = React.useCallback(
+    (teamId: string, notificationId: string, inviterEmail: string) => {
+      setPendingTeamInvitation({ teamId, notificationId, inviterEmail });
+      setAnchorEl(null);
+    },
+    []
+  );
+
   if (!profile || !notifications) return null;
 
   return (
@@ -83,6 +97,7 @@ const NotificationChip = (props: Props): null | React.Node => {
         size="small"
         onClick={e => {
           setAnchorEl(e.currentTarget);
+          onRefreshNotifications();
         }}
       >
         <Badge
@@ -115,9 +130,21 @@ const NotificationChip = (props: Props): null | React.Node => {
             onMarkNotificationAsSeen={onMarkNotificationAsSeen}
             canMarkAllAsRead={isThereASingleUnseenNotification}
             onCloseNotificationList={onCloseNotificationList}
+            onOpenTeamInvitationDialog={onOpenTeamInvitationDialog}
           />
         </Paper>
       </Popover>
+      {pendingTeamInvitation && (
+        <TeamInvitationDialog
+          teamId={pendingTeamInvitation.teamId}
+          inviterEmail={pendingTeamInvitation.inviterEmail}
+          notificationId={pendingTeamInvitation.notificationId}
+          onClose={() => setPendingTeamInvitation(null)}
+          getAuthorizationHeader={getAuthorizationHeader}
+          userId={profile.id}
+          onRefreshNotifications={onRefreshNotifications}
+        />
+      )}
     </>
   );
 };

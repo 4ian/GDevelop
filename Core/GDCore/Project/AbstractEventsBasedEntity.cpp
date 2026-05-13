@@ -26,10 +26,16 @@ void AbstractEventsBasedEntity::SerializeTo(SerializerElement& element) const {
   if (isPrivate) {
     element.SetBoolAttribute("private", isPrivate);
   }
+  element.SetAttribute("previewIconUrl", previewIconUrl);
+  element.SetAttribute("iconUrl", iconUrl);
+  element.SetAttribute("helpPath", helpPath);
 
   gd::SerializerElement& eventsFunctionsElement =
       element.AddChild("eventsFunctions");
   eventsFunctionsContainer.SerializeEventsFunctionsTo(eventsFunctionsElement);
+eventsFunctionsContainer.SerializeFoldersTo(
+    element.AddChild("eventsFunctionsFolderStructure"));
+  
   propertyDescriptors.SerializeElementsTo(
       "propertyDescriptor", element.AddChild("propertyDescriptors"));
   propertyDescriptors.SerializeFoldersTo(
@@ -42,11 +48,22 @@ void AbstractEventsBasedEntity::UnserializeFrom(
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");
   isPrivate = element.GetBoolAttribute("private");
+  previewIconUrl = element.GetStringAttribute("previewIconUrl");
+  iconUrl = element.GetStringAttribute("iconUrl");
+  helpPath = element.GetStringAttribute("helpPath");
 
   const gd::SerializerElement& eventsFunctionsElement =
       element.GetChild("eventsFunctions");
   eventsFunctionsContainer.UnserializeEventsFunctionsFrom(
       project, eventsFunctionsElement);
+  if (element.HasChild("eventsFunctionsFolderStructure")) {
+    eventsFunctionsContainer.UnserializeFoldersFrom(
+        element.GetChild("eventsFunctionsFolderStructure", 0));
+  }
+  // Compatibility with GD <= 5.6.261
+  eventsFunctionsContainer.AddMissingFunctionsInRootFolder();
+  // end of compatibility code
+
   propertyDescriptors.UnserializeElementsFrom(
       "propertyDescriptor", element.GetChild("propertyDescriptors"));
   if (element.HasChild("propertiesFolderStructure")) {

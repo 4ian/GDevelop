@@ -13,14 +13,14 @@ import {
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import {
-  // $FlowFixMe[import-type-as-value]
-  TreeViewItemContent,
+  type TreeViewItemContent,
   type TreeItemProps,
   extensionObjectsRootFolderId,
 } from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import Add from '../UI/CustomSvgIcons/Add';
+import { expandAllSubfolders } from './EventsFunctionFolderTreeViewItemContent';
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 
@@ -63,8 +63,16 @@ export type EventsBasedObjectProps = {|
     itemContent: ?TreeViewItemContent,
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject,
-    index: number,
+    parentFolder: gdFunctionFolderOrFunction,
   |}) => void,
+  addFolder: (
+    items: Array<gdFunctionFolderOrFunction>,
+    eventsBasedBehavior?: ?gdEventsBasedBehavior,
+    eventsBasedObject?: ?gdEventsBasedObject
+  ) => void,
+  expandFolders: (
+    functionFolderOrFunctionList: Array<gdFunctionFolderOrFunction>
+  ) => void,
   eventsBasedObjectsList: gdEventsBasedObjectsList,
 |};
 
@@ -91,6 +99,10 @@ export class EventsBasedObjectTreeViewItemContent
 
   getEventsFunctionsContainer(): gdEventsFunctionsContainer {
     return this.eventsBasedObject.getEventsFunctions();
+  }
+
+  getFunctionFolderOrFunction(): gdFunctionFolderOrFunction | null {
+    return null;
   }
 
   getEventsFunction(): ?gdEventsFunction {
@@ -168,6 +180,15 @@ export class EventsBasedObjectTreeViewItemContent
         click: () => this.addFunctionAtSelection(),
       },
       {
+        label: i18n._(t`Add a new folder`),
+        click: () =>
+          this.props.addFolder(
+            [this.eventsBasedObject.getEventsFunctions().getRootFolder()],
+            null,
+            this.eventsBasedObject
+          ),
+      },
+      {
         type: 'separator',
       },
       {
@@ -204,6 +225,15 @@ export class EventsBasedObjectTreeViewItemContent
         enabled: Clipboard.has(EVENTS_BASED_OBJECT_CLIPBOARD_KIND),
         click: () => this.paste(),
         accelerator: 'CmdOrCtrl+V',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Expand all sub folders`),
+        click: () =>
+          expandAllSubfolders(
+            this.getEventsFunctionsContainer().getRootFolder(),
+            this.props.expandFolders
+          ),
       },
     ].filter(Boolean);
   }
@@ -268,8 +298,14 @@ export class EventsBasedObjectTreeViewItemContent
     );
   }
 
-  moveAt(destinationIndex: number): void {
+  moveAt(
+    destinationItemContent: TreeViewItemContent,
+    where: 'before' | 'inside' | 'after',
+    animateFolder: (folder: gdFunctionFolderOrFunction) => void
+  ): void {
     const originIndex = this.getIndex();
+    const destinationIndex =
+      destinationItemContent.getIndex() + (where === 'after' ? 1 : 0);
     this.props.eventsBasedObjectsList.move(
       originIndex,
       // When moving the item down, it must not be counted.
@@ -386,22 +422,11 @@ export class EventsBasedObjectTreeViewItemContent
   }
 
   addFunctionAtSelection(): void {
-    const { selectedEventsFunction, selectedEventsBasedObject } = this.props;
-    const eventsFunctionsContainer = this.eventsBasedObject.getEventsFunctions();
-    // When the selected item is inside the object, the new function is
-    // added below it.
-    const index =
-      selectedEventsBasedObject === this.eventsBasedObject &&
-      selectedEventsFunction
-        ? eventsFunctionsContainer.getEventsFunctionPosition(
-            selectedEventsFunction
-          ) + 1
-        : eventsFunctionsContainer.getEventsFunctionsCount();
     this.props.addNewEventsFunction({
       itemContent: this,
       eventsBasedBehavior: null,
       eventsBasedObject: this.eventsBasedObject,
-      index,
+      parentFolder: this.eventsBasedObject.getEventsFunctions().getRootFolder(),
     });
   }
 }

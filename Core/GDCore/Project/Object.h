@@ -14,6 +14,7 @@
 #include "GDCore/Project/EffectsContainer.h"
 #include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/MakeUnique.h"
 #include "GDCore/Vector2.h"
@@ -122,6 +123,22 @@ class GD_CORE_API Object {
   /** \brief Return the type of the object.
    */
   const gd::String& GetType() const { return configuration->GetType(); }
+
+  /**
+   * Set when the object resources must be preloaded: `with-scene`(default),
+   * `manually`.
+   */
+  void SetResourcesPreloading(gd::String resourcesPreloading_) {
+    resourcesPreloading = resourcesPreloading_;
+  }
+
+  /**
+   * Get when the object resources must be preloaded: `with-scene`(default),
+   * `manually`.
+   */
+  const gd::String& GetResourcesPreloading() const {
+    return resourcesPreloading;
+  }
 
   ///@}
 
@@ -243,13 +260,15 @@ class GD_CORE_API Object {
   Object& ResetPersistentUuid();
 
   /**
-   * \brief Remove the persistent UUID - when the object no
-   * longer need to be recognized between serializations.
+   * \brief Return the persistent UUID, used to recognize
+   * the same object between serialization.
    */
-  Object& ClearPersistentUuid();
+  const gd::String& GetPersistentUuid() const;
   ///@}
 
  protected:
+  gd::MemoryTracked _memoryTracked{this, "gdObject"};
+
   gd::String name;          ///< The full name of the object
   gd::String assetStoreId;  ///< The ID of the asset if the object comes from
                             ///< the store.
@@ -264,6 +283,8 @@ class GD_CORE_API Object {
       effectsContainer;  ///< The effects container for the object.
   mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
                                       ///< useful for computing changesets.
+  /** When set to `"manually"`, its resources are not preloaded with the scene. */
+  gd::String resourcesPreloading = "with-scene";
 
   /**
    * Initialize object using another object. Used by copy-ctor and assign-op.

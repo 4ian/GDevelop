@@ -23,6 +23,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
             "game, set background color, or disable input when focus is lost."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Change/pause/stop scenes, check scene start, preload assets, get scene name, quit game.")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
   extension.AddInstructionOrExpressionGroupMetadata(_("Scene"))
       .SetIcon("res/conditions/depart24.png");
@@ -214,6 +215,48 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .SetHelpPath("/all-features/resources-loading")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Scene name"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction(
+          "LoadObjectAssets",
+          _("Preload object"),
+          _("Preload an object resources in background."),
+          _("Preload object _PARAM1_ in background"),
+          "",
+          "res/actions/hourglass_black.svg",
+          "res/actions/hourglass_black.svg")
+      .SetHelpPath("/all-features/resources-loading")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("string", _("Object name"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction(
+          "UnloadObjectAssets",
+          _("Unload object"),
+          _("Unload an object resources. The \"resource preloading\" property must be set to \"preload with an action\" for this action to actually unload resources."),
+          _("Unload object _PARAM1_"),
+          "",
+          "res/actions/hourglass_black.svg",
+          "res/actions/hourglass_black.svg")
+      .SetHelpPath("/all-features/resources-loading")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("string", _("Object name"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition(
+          "AreObjectAssetsLoaded",
+          _("Object preloaded"),
+          _("Check if object resources have finished to load in background."),
+          _("Object _PARAM1_ was preloaded in background"),
+          "",
+          "res/actions/hourglass_black.svg",
+          "res/actions/hourglass_black.svg")
+      .SetHelpPath("/all-features/resources-loading")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("string", _("Object name"))
       .MarkAsAdvanced();
 }
 

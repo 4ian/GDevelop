@@ -50,7 +50,7 @@ export const getAiConfigurationPresetsWithAvailability = ({
 };
 
 export const getDefaultAiConfigurationPresetId = (
-  mode: 'chat' | 'agent',
+  mode: 'chat' | 'agent' | 'orchestrator',
   aiConfigurationPresetsWithAvailability: Array<AiConfigurationPresetWithAvailability>
 ): string => {
   const defaultPresetWithAvailability = aiConfigurationPresetsWithAvailability.find(

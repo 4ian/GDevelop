@@ -38,6 +38,17 @@ declare type ObjectData = {
   behaviors: Array<BehaviorData & any>;
   /** The list of effects. */
   effects: Array<EffectData>;
+  /**
+   * The resources used by this object excluding the one already used by the
+   * scene and/or the project.
+   * This attribute is only set for objects that are preloaded manually.
+   */
+  usedResources?: ResourceReference[];
+};
+
+declare type ObjectGroupData = {
+  name: string;
+  objects: Array<{ name: string }>;
 };
 
 declare type GetNetworkSyncDataOptions = {
@@ -55,6 +66,7 @@ declare type GetNetworkSyncDataOptions = {
   syncAsyncTasks?: boolean;
   syncSceneVisualProps?: boolean;
   syncFullTileMaps?: boolean;
+  syncLinkedObjects?: boolean;
 };
 
 declare type UpdateFromNetworkSyncDataOptions = {
@@ -276,6 +288,7 @@ declare interface InstanceContainerData {
   variables: RootVariableData[];
   instances: InstanceData[];
   objects: ObjectData[];
+  objectsGroups: ObjectGroupData[];
   layers: LayerData[];
 }
 
@@ -322,6 +335,7 @@ declare interface LayoutNetworkSyncData {
   };
   async?: AsyncTasksManagerNetworkSyncData;
   color?: integer;
+  linkedObjects?: Array<[string, string]>;
 }
 
 declare interface SceneStackSceneNetworkSyncData {
@@ -544,6 +558,7 @@ declare interface ProjectPropertiesData {
   currentPlatform: string;
   extensionProperties: Array<ExtensionProperty>;
   useDeprecatedZeroAsDefaultZOrder?: boolean;
+  useDeprecatedZeroAsDefaultStringVariable?: boolean;
   projectUuid?: string;
   sceneResourcesPreloading?: 'at-startup' | 'never';
   sceneResourcesUnloading?: 'at-scene-exit' | 'never';

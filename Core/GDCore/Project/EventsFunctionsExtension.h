@@ -78,6 +78,12 @@ class GD_CORE_API EventsFunctionsExtension {
     return *this;
   }
 
+  const gd::String& GetDimension() const { return dimension; };
+  EventsFunctionsExtension& SetDimension(const gd::String& dimension_) {
+    dimension = dimension_;
+    return *this;
+  }
+
   const gd::String& GetName() const { return name; };
   EventsFunctionsExtension& SetName(const gd::String& name_) {
     name = name_;
@@ -395,6 +401,7 @@ class GD_CORE_API EventsFunctionsExtension {
   gd::String extensionNamespace;
   gd::String shortDescription;
   gd::String description;
+  gd::String dimension;
   gd::String name;
   gd::String fullName;
   gd::String category;

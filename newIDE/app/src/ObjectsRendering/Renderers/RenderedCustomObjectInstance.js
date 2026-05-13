@@ -8,8 +8,7 @@ import ObjectsRenderingService from '../ObjectsRenderingService';
 import {
   getLayoutedRenderedInstance,
   LayoutedInstance,
-  // $FlowFixMe[import-type-as-value]
-  LayoutedParent,
+  type LayoutedParent,
 } from './CustomObjectLayoutingModel';
 import { mapVector } from '../../Utils/MapFor';
 import * as PIXI from 'pixi.js-legacy';
@@ -77,9 +76,7 @@ const getPropertyMappingRules = (
   if (!properties.has('_PropertyMapping')) {
     return [];
   }
-  // $FlowFixMe[incompatible-exact]
   return mapVector(properties.get('_PropertyMapping').getChoices(), choice => {
-    // $FlowFixMe[incompatible-use]
     const mapping = choice.getValue().split('=');
     if (mapping.length < 2) {
       return null;
@@ -100,7 +97,9 @@ const getPropertyMappingRules = (
  * Renderer for gd.CustomObject (the class is not exposed to newIDE)
  */
 export default class RenderedCustomObjectInstance extends Rendered3DInstance
-  implements LayoutedParent<RenderedInstance | Rendered3DInstance> {
+  implements
+    // $FlowFixMe[incompatible-exact]
+    LayoutedParent<RenderedInstance | Rendered3DInstance> {
   _isRenderedIn3D = false;
 
   /** Functor used to render an instance */
@@ -181,7 +180,8 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         | RenderedInstance
         | Rendered3DInstance
         | null = eventBasedObject.isInnerAreaFollowingParentSize()
-        ? getLayoutedRenderedInstance(this, instance)
+        ? // $FlowFixMe[incompatible-exact]
+          getLayoutedRenderedInstance(this, instance)
         : this.getRendererOfInstance(instance);
 
       if (!renderedInstance) return;
@@ -327,6 +327,24 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     }
     return layoutedInstance;
   };
+
+  /**
+   * Tear down child renderers for the given object name so they get recreated
+   * with fresh resources on the next render. Recurse into nested custom
+   * objects so descendants are reset too.
+   */
+  resetInstanceRenderersFor(objectName: string): void {
+    // Iterate over a snapshot since we mutate the map.
+    for (const [ptr, renderedInstance] of Array.from(this.renderedInstances)) {
+      if (renderedInstance.getInstance().getObjectName() === objectName) {
+        renderedInstance.onRemovedFromScene();
+        this.renderedInstances.delete(ptr);
+        this.layoutedInstances.delete(ptr);
+      } else {
+        renderedInstance.resetInstanceRenderersFor(objectName);
+      }
+    }
+  }
 
   /**
    * Remove rendered instances that are not associated to any instance anymore

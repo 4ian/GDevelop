@@ -79,18 +79,14 @@ export default function NewBehaviorDialog({
       allRequiredBehaviorTypes: Array<string> = []
     ): Array<string> => {
       mapVector(
-        // $FlowFixMe[incompatible-exact]
         behaviorMetadata.getRequiredBehaviorTypes(),
         requiredBehaviorType => {
-          // $FlowFixMe[incompatible-type]
           if (allRequiredBehaviorTypes.includes(requiredBehaviorType)) {
             return;
           }
-          // $FlowFixMe[incompatible-type]
           allRequiredBehaviorTypes.push(requiredBehaviorType);
           const requiredBehaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
             project.getCurrentPlatform(),
-            // $FlowFixMe[incompatible-type]
             requiredBehaviorType
           );
           getAllRequiredBehaviorTypes(

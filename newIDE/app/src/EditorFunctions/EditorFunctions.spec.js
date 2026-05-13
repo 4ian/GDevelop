@@ -28,6 +28,11 @@ describe('editorFunctions', () => {
       onOpenLayout: jest.fn(),
       onCreateProject: jest.fn(),
     },
+    relatedAiRequestId: 'fake-ai-request-id',
+    getRelatedAiRequestLastMessages: () => ({
+      lastUserMessage: null,
+      lastAssistantMessages: [],
+    }),
     generateEvents: jest.fn(),
     onInstancesModifiedOutsideEditor: jest.fn(),
     onObjectGroupsModifiedOutsideEditor: jest.fn(),
@@ -41,9 +46,14 @@ describe('editorFunctions', () => {
       objectName,
       objectType,
     }) => {
+      const fakeFoundObjectType = objectType || 'Sprite';
+      const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+        project,
+        fakeFoundObjectType
+      );
       const object = objectsContainer.insertNewObject(
         project,
-        objectType,
+        fakeFoundObjectType,
         objectName,
         objectsContainer.getObjectsCount()
       );
@@ -53,6 +63,7 @@ describe('editorFunctions', () => {
         message: 'Object installed',
         createdObjects: [object],
         assetShortHeader: fakeAssetShortHeader1,
+        isTheFirstOfItsTypeInProject,
       });
     },
     searchAndInstallResources: async () => {
@@ -145,6 +156,7 @@ describe('editorFunctions', () => {
               message: 'Object not found',
               createdObjects: [],
               assetShortHeader: null,
+              isTheFirstOfItsTypeInProject: false,
             });
           },
           args: {
@@ -501,6 +513,104 @@ describe('editorFunctions', () => {
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(
         `"Scene not found: \\"NonExistentScene\\"."`
+      );
+    });
+
+    it('creates a new object via asset_id without object_type', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async ({
+            objectsContainer,
+            objectName,
+            objectType,
+          }) => {
+            // The helper derives the type from the asset itself.
+            const object = objectsContainer.insertNewObject(
+              project,
+              'Sprite',
+              objectName,
+              objectsContainer.getObjectsCount()
+            );
+            return Promise.resolve({
+              status: 'asset-installed',
+              message: 'Object installed',
+              createdObjects: [object],
+              assetShortHeader: fakeAssetShortHeader1,
+              isTheFirstOfItsTypeInProject: false,
+            });
+          },
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyAssetObject',
+            asset_id: fakeAssetShortHeader1.id,
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(testScene.getObjects().hasObjectNamed('MyAssetObject')).toBe(true);
+    });
+
+    it('fails when creating a new object without object_type nor asset_id', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyAssetObject',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Cannot create object \\"MyAssetObject\\": specify either \\"object_type\\" or \\"asset_id\\"."`
+      );
+    });
+
+    it('replaces an existing object without specifying object_type', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Player',
+            replace_existing_object: true,
+            search_terms: 'Spaceship, Blue',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Replaced object \\"Player\\" by an object from the asset store fitting the search, with the same type (\\"Sprite\\")."`
+      );
+    });
+
+    it('fails when object_type conflicts with an existing object type', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'TextObject::Text',
+            object_name: 'Player',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Object with name \\"Player\\" already exists in scene \\"TestScene\\" with type \\"Sprite\\". It cannot be (re)created or replaced as type \\"TextObject::Text\\"."`
       );
     });
   });
@@ -929,7 +1039,7 @@ describe('editorFunctions', () => {
             resultMessage: 'Successfully added explosion events.',
             changes: [
               {
-                operationName: 'add',
+                operationName: 'insert_at_end',
                 operationTargetEvent: null,
                 isEventsJsonValid: true,
                 generatedEvents: JSON.stringify([
@@ -984,6 +1094,109 @@ describe('editorFunctions', () => {
         scene: testScene,
         newOrChangedAiGeneratedEventIds: new Set(['test-ai-event-id']),
       });
+    });
+  });
+
+  describe('add_or_edit_variable', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+
+      // A scene-scoped sprite and a global sprite, to exercise the two
+      // object-variable scope branches.
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+      project.getObjects().insertNewObject(project, 'Sprite', 'GlobalEnemy', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('preserves existing sibling fields when editing one field of a structure', async () => {
+      // Pre-populate a structure with multiple children to ensure none are lost.
+      const variables = project.getVariables();
+      const struct = variables.insertNew('player', 0);
+      struct.castTo('Structure');
+      struct.getChild('hp').setValue(10);
+      struct.getChild('name').setString('Hero');
+      struct.getChild('alive').setBool(true);
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'player.hp',
+          variable_scope: 'global',
+          value: '42',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Properly edited variable \\"player.hp\\"."`
+      );
+      expect(struct.getType()).toBe(gd.Variable.Structure);
+      expect(struct.getChild('hp').getValue()).toBe(42);
+      // Siblings must still be intact (no data loss from cast).
+      expect(struct.hasChild('name')).toBe(true);
+      expect(struct.getChild('name').getString()).toBe('Hero');
+      expect(struct.hasChild('alive')).toBe(true);
+      expect(struct.getChild('alive').getBool()).toBe(true);
+    });
+
+    it('preserves existing array elements when editing one element', async () => {
+      // Pre-populate an array with multiple items to ensure none are lost.
+      const variables = project.getVariables();
+      const array = variables.insertNew('inventory', 0);
+      array.castTo('Array');
+      array.pushNew().setString('Sword');
+      array.pushNew().setString('Shield');
+      array.pushNew().setString('Potion');
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'inventory[1]',
+          variable_scope: 'global',
+          value: 'Magic Shield',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Properly edited variable \\"inventory[1]\\"."`
+      );
+      expect(array.getType()).toBe(gd.Variable.Array);
+      // Other elements must still be intact (no data loss from cast).
+      expect(array.getChildrenCount()).toBe(3);
+      expect(array.getAtIndex(0).getString()).toBe('Sword');
+      expect(array.getAtIndex(1).getString()).toBe('Magic Shield');
+      expect(array.getAtIndex(2).getString()).toBe('Potion');
+    });
+
+    it('sets a structure field inside an array element', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'players[0].name',
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          value: 'Alice',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Properly added variable \\"players[0].name\\" of type \\"String\\"."`
+      );
+      const players = testScene.getVariables().get('players');
+      expect(players.getType()).toBe(gd.Variable.Array);
+      const player0 = players.getAtIndex(0);
+      expect(player0.getType()).toBe(gd.Variable.Structure);
+      expect(player0.getChild('name').getString()).toBe('Alice');
     });
   });
 });

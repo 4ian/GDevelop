@@ -21,6 +21,7 @@ import SemiControlledAutoComplete, {
 } from '../../UI/SemiControlledAutoComplete';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
+import { highlightSearchText } from '../../Utils/HighlightSearchText';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
@@ -95,6 +96,18 @@ export const getRootVariableName = (name: string): string => {
     : name;
 };
 
+const isRootVariableDeclared = (
+  variableName: string,
+  variablesContainers?: Array<gdVariablesContainer>
+) => {
+  return (
+    !variablesContainers ||
+    variablesContainers.some(variablesContainer =>
+      variablesContainer.has(getRootVariableName(variableName))
+    )
+  );
+};
+
 // TODO: the entire VariableField could be reworked to be a "real" GenericExpressionField
 // (of type: "variable" or the legacy: "scenevar", "globalvar" or "objectvar"). This will
 // ensure we 100% validate and can autocomplete what is entered (and we can have also a simpler
@@ -138,12 +151,7 @@ export const quicklyAnalyzeVariableName = (
 
   const rootVariableName = getRootVariableName(name);
   // Check at least the name of the root variable, it's the best we can do.
-  if (
-    variablesContainers &&
-    !variablesContainers.some(variablesContainer =>
-      variablesContainer.has(rootVariableName)
-    )
-  ) {
+  if (!isRootVariableDeclared(rootVariableName, variablesContainers)) {
     // $FlowFixMe[incompatible-type]
     return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
   }
@@ -315,20 +323,17 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
         const fieldCurrentValue = field.current
           ? field.current.getInputValue()
           : value;
-        const isRootVariableDeclared =
-          projectScopedContainersAccessor &&
-          projectScopedContainersAccessor
-            .get()
-            .getVariablesContainersList()
-            .has(getRootVariableName(fieldCurrentValue));
 
         onChange(fieldCurrentValue);
         onOpenDialog({
           variableName: fieldCurrentValue,
-          shouldCreate: !isRootVariableDeclared,
+          shouldCreate: !isRootVariableDeclared(
+            fieldCurrentValue,
+            variablesContainers
+          ),
         });
       },
-      [onChange, onOpenDialog, projectScopedContainersAccessor, value]
+      [onChange, onOpenDialog, value, variablesContainers]
     );
 
     const description = parameterMetadata
@@ -528,6 +533,8 @@ export const renderVariableWithIcon = (
     DeprecatedParameterValue,
     MissingParameterValue,
     projectScopedContainersAccessor,
+    highlightedSearchText,
+    highlightedSearchMatchCase,
   }: ParameterInlineRendererProps,
   tooltip: string,
   getVariableSourceFromIdentifier: (
@@ -570,7 +577,9 @@ export const renderVariableWithIcon = (
             [icon]: true,
           })}
         />
-        {value}
+        {highlightSearchText(value, highlightedSearchText, {
+          matchCase: highlightedSearchMatchCase,
+        })}
       </IconAndNameContainer>
     </span>
   );

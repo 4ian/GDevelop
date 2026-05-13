@@ -26,6 +26,10 @@ module.exports = {
         'Vladyslav Pohorielov',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Spine skeletal animation object. Play animations, mix, set skins, track events.'
+      )
+      .setDimension('2D')
       .setExtensionHelpPath('/objects/spine')
       .setCategory('Advanced');
 

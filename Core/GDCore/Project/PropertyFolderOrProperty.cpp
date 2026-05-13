@@ -268,7 +268,10 @@ void PropertyFolderOrProperty::MovePropertyFolderOrPropertyToAnotherFolder(
 
   propertyFolderOrPropertyPtr->parent = &newParentFolder;
   propertyFolderOrPropertyPtr->SetGroupNameOfAllProperties(
-      newParentFolder.GetGroupName());
+      newParentFolder.IsRootFolder() && propertyFolderOrPropertyPtr->IsFolder()
+          ? propertyFolderOrPropertyPtr->GetFolderName()
+          : newParentFolder.GetGroupName());
+
   newParentFolder.children.insert(newPosition < newParentFolder.children.size()
                                       ? newParentFolder.children.begin() +
                                             newPosition

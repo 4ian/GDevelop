@@ -312,18 +312,13 @@ function InAppTutorialStepDisplayer({
         return undefined;
       }
 
-      const valuePropertyDescriptor = Object.getOwnPropertyDescriptor(
-        elementWithId.constructor.prototype,
-        'value'
-      );
-      if (!valuePropertyDescriptor) return undefined;
-      const valueSetter = valuePropertyDescriptor.set;
-      if (!valueSetter) return undefined;
       return () => {
-        valueSetter.call(elementWithId, valueEquals);
-        // Trigger blur to make sure the value is taken into account
-        // by the React input.
-        elementWithId.dispatchEvent(new Event('blur', { bubbles: true }));
+        // Focus the element, select all existing content, then use
+        // execCommand to insert text. This goes through the browser's
+        // native input path, which React 18 correctly picks up.
+        elementWithId.focus();
+        elementWithId.select();
+        document.execCommand('insertText', false, valueEquals);
       };
     },
     [nextStepTrigger, elementWithId]

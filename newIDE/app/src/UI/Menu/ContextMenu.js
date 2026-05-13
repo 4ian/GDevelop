@@ -12,7 +12,21 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import { Drawer } from '@material-ui/core';
 import { isMobile } from '../../Utils/Platform';
 import { itemAboveBlockingLayerZIndex } from '../../InAppTutorial/BlockingLayerWithHoles';
+import PortalContainerContext from '../PortalContainerContext';
 const electron = optionalRequire('electron');
+
+const getValidPortalContainer = (
+  portalContainer: ?HTMLElement
+): ?HTMLElement => {
+  if (!portalContainer) return undefined;
+
+  const ownerWindow = portalContainer.ownerDocument
+    ? portalContainer.ownerDocument.defaultView
+    : null;
+  if (ownerWindow && ownerWindow.closed) return undefined;
+
+  return portalContainer;
+};
 
 export type ContextMenuInterface = {|
   open: (x: number, y: number, options: any) => void,
@@ -38,9 +52,13 @@ const MaterialUIContextMenu = React.forwardRef<
   const [openMenu, setOpenMenu] = React.useState<boolean>(false);
   const [buildOptions, setBuildOptions] = React.useState<any>({});
   const forceUpdate = useForceUpdate();
+  const portalContainer = getValidPortalContainer(
+    React.useContext(PortalContainerContext)
+  );
 
   const menuImplementation = new MaterialUIMenuImplementation({
     onClose: () => setOpenMenu(false),
+    portalContainer,
   });
 
   // $FlowFixMe[missing-local-annot]
@@ -87,6 +105,7 @@ const MaterialUIContextMenu = React.forwardRef<
         style={{
           zIndex: itemAboveBlockingLayerZIndex,
         }}
+        container={portalContainer}
       >
         {menuImplementation.buildFromTemplate(menuTemplate, forceUpdate)}
       </Drawer>
@@ -100,10 +119,17 @@ const MaterialUIContextMenu = React.forwardRef<
         left: anchorPosition[0],
         top: anchorPosition[1],
       }}
+      // When rendered in a separate window (via WindowPortal), pass the
+      // portalContainer as anchorEl so that MUI's Popover derives the
+      // correct window for viewport-bounds calculations (innerWidth/
+      // innerHeight). Without this, it falls back to the main window.
+      // Positioning is still driven by anchorPosition, not anchorEl.
+      anchorEl={portalContainer || undefined}
       style={{
         zIndex: itemAboveBlockingLayerZIndex,
       }}
       anchorReference={'anchorPosition'}
+      container={portalContainer}
       onClose={(event, reason) => {
         if (reason === 'backdropClick') {
           // Prevent any side effect of a backdrop click that should only

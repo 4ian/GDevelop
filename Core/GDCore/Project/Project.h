@@ -18,6 +18,7 @@
 #include "GDCore/Project/ResourcesContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/Watermark.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/String.h"
 namespace gd {
 class Platform;
@@ -435,6 +436,22 @@ class GD_CORE_API Project {
    */
   void SetUseDeprecatedZeroAsDefaultZOrder(bool enable) {
     useDeprecatedZeroAsDefaultZOrder = enable;
+  }
+
+  /**
+   * \brief Check if the project should use "0" as the default value for
+   * unset string variables (deprecated behavior from before 5.6.267).
+   */
+  bool GetUseDeprecatedZeroAsDefaultStringVariable() const {
+    return useDeprecatedZeroAsDefaultStringVariable;
+  }
+
+  /**
+   * \brief Set if the project should use "0" as the default value for
+   * unset string variables (deprecated behavior from before 5.6.267).
+   */
+  void SetUseDeprecatedZeroAsDefaultStringVariable(bool enable) {
+    useDeprecatedZeroAsDefaultStringVariable = enable;
   }
 
   /**
@@ -979,16 +996,16 @@ class GD_CORE_API Project {
   ResourcesContainer& GetResourcesManager() { return resourcesContainer; }
 
   /**
-   * Set when the scenes must preload their resources: `at-startup`, `never`
-   * (default).
+   * Set when the scenes must preload their resources: `at-startup` (default),
+   * `never`.
    */
   void SetSceneResourcesPreloading(gd::String sceneResourcesPreloading_) {
     sceneResourcesPreloading = sceneResourcesPreloading_;
   }
 
   /**
-   * Get when the scenes must preload their resources: `at-startup`, `never`
-   * (default).
+   * Get when the scenes must preload their resources: `at-startup` (default),
+   * `never`.
    */
   const gd::String& GetSceneResourcesPreloading() const {
     return sceneResourcesPreloading;
@@ -1094,6 +1111,8 @@ class GD_CORE_API Project {
   std::unique_ptr<gd::ObjectConfiguration> CreateObjectConfiguration(
       const gd::String& type) const;
 
+  gd::MemoryTracked _memoryTracked{this, "Project"};
+
   gd::String name;         ///< Game name
   gd::String description;  ///< Game description
   gd::String version;      ///< Game version number (used for some exports)
@@ -1123,6 +1142,11 @@ class GD_CORE_API Project {
               ///< instead of the highest Z order
               ///< found on the layer at the scene
               ///< startup.
+  bool useDeprecatedZeroAsDefaultStringVariable =
+      false;  ///< If true, string variables with
+              ///< no stored value default to "0"
+              ///< at runtime (behavior before
+              ///< 5.6.267).
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
   gd::VariablesContainer variables;  ///< Initial global variables
   gd::ObjectsContainer objectsContainer;

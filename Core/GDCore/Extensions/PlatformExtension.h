@@ -111,6 +111,22 @@ class GD_CORE_API PlatformExtension {
   }
 
   /**
+   * \brief Set a short description for the extension, used by AI/LLM agents.
+   */
+  PlatformExtension& SetShortDescription(const gd::String& shortDescription_) {
+    shortDescription = shortDescription_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the dimension of the extension ("2D", "3D", "2D/3D" or empty).
+   */
+  PlatformExtension& SetDimension(const gd::String& dimension_) {
+    dimension = dimension_;
+    return *this;
+  }
+
+  /**
    * \brief Set the category of the extension.
    */
   PlatformExtension& SetCategory(const gd::String& category_) {
@@ -399,6 +415,16 @@ class GD_CORE_API PlatformExtension {
   const gd::String& GetDescription() const { return informations; }
 
   /**
+   * \brief Return a short description of the extension, used by AI/LLM agents.
+   */
+  const gd::String& GetShortDescription() const { return shortDescription; }
+
+  /**
+   * \brief Return the dimension of the extension ("2D", "3D", "2D/3D" or empty).
+   */
+  const gd::String& GetDimension() const { return dimension; }
+
+  /**
    * \brief Return the name of the extension developer
    */
   const gd::String& GetAuthor() const { return author; }
@@ -685,6 +711,15 @@ static gd::String GetVariantFullType(const gd::String& extensionName,
 
   static gd::String GetObjectNameFromFullObjectType(const gd::String& type);
 
+  /**
+   * \brief Get the instruction name from a full type
+   * (e.g. "MyExtension::DoSomething" -> "DoSomething").
+   *
+   * If no namespace separator is found or the name after the separator is
+   * empty, the full type is returned as-is.
+   */
+  static gd::String GetInstructionNameFromFullType(const gd::String& type);
+
  private:
   /**
    * Set the namespace (the string all actions/conditions/expressions start
@@ -699,6 +734,8 @@ static gd::String GetVariantFullType(const gd::String& extensionName,
                   ///< actions/conditions/expressions/objects/behavior/event.
   gd::String fullname;      ///< Name displayed to users in the editor.
   gd::String informations;  ///< Description displayed to users in the editor.
+  gd::String shortDescription;  ///< Short description for AI/LLM agents.
+  gd::String dimension;  ///< "2D", "3D", "2D/3D" or empty.
   gd::String category;
   gd::String author;   ///< Author displayed to users in the editor.
   gd::String license;  ///< License name displayed to users in the editor.

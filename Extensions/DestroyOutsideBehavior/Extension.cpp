@@ -26,6 +26,8 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
             "removed unless it goes beyond the unseen object grace distance."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Auto-destroy 2D objects when outside camera bounds. Configurable extra margin distance.")
+      .SetDimension("2D")
       .SetCategory("Game mechanic")
       .SetTags("screen")
       .SetExtensionHelpPath("/behaviors/destroyoutside");

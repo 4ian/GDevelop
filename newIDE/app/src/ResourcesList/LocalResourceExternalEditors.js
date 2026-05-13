@@ -20,6 +20,7 @@ import {
   type ItemResult,
 } from '../Utils/BlobDownloader';
 import { type ResourceKind } from './ResourceSource';
+import { triggerOnResourceExternallyChanged } from '../MainFrame/ResourcesWatcher';
 
 const path = optionalRequire('path');
 const fs = optionalRequire('fs');
@@ -243,11 +244,32 @@ const editWithLocalExternalEditor = async ({
     resourceManagementProps.onNewResourcesAdded();
   }
 
+  const modifiedResourceNames = modifiedResources.map(({ resource }) =>
+    resource.getName()
+  );
+
   // Some editors (Piskel) need to have resource names persisted.
   patchExternalEditorMetadataWithResourcesNamesIfNecessary(
-    modifiedResources.map(({ resource }) => resource.getName()),
+    modifiedResourceNames,
     externalEditorOutput.externalEditorData
   );
+
+  // Manually trigger a "resource externally changed" for the resources that were modified.
+  console.log(
+    `External editor triggering resource changed events for resources "${modifiedResourceNames.join(
+      ', '
+    )}".`
+  );
+  modifiedResourceNames.forEach(resourceName => {
+    if (!project.getResourcesManager().hasResource(resourceName)) return;
+    const resource = project.getResourcesManager().getResource(resourceName);
+    const file = resource.getFile();
+    if (!file) return;
+
+    triggerOnResourceExternallyChanged({
+      identifier: file,
+    });
+  });
 
   return {
     resources: modifiedResources.map(({ resource, originalIndex }) => ({

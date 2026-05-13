@@ -5,6 +5,10 @@ declare class gdPlatformExtension {
   setExtensionHelpPath(helpPath: string): gdPlatformExtension;
   setIconUrl(iconUrl: string): gdPlatformExtension;
   setCategory(category: string): gdPlatformExtension;
+  setShortDescription(shortDescription: string): gdPlatformExtension;
+  getShortDescription(): string;
+  setDimension(dimension: string): gdPlatformExtension;
+  getDimension(): string;
   addInstructionOrExpressionGroupMetadata(name: string): gdInstructionOrExpressionGroupMetadata;
   markAsDeprecated(): void;
   getTags(): gdVectorString;

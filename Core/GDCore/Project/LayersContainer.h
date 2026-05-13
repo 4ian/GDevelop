@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "GDCore/Project/Layer.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/String.h"
 
 namespace gd {
@@ -21,6 +22,13 @@ namespace gd {
 class GD_CORE_API LayersContainer {
  public:
   LayersContainer();
+  LayersContainer(const LayersContainer& other) : layers(other.layers) {};
+  LayersContainer& operator=(const LayersContainer& other) {
+    if (this != &other) {
+      layers = other.layers;
+    }
+    return *this;
+  }
 
   /**
    * \brief Return true if the layer called "name" exists.
@@ -104,6 +112,7 @@ class GD_CORE_API LayersContainer {
   static gd::Layer badLayer;  ///< Null object, returned when GetLayer can not
                               ///< find an appropriate layer.
   std::vector<gd::Layer> layers;  ///< Layers
+  gd::MemoryTracked _memoryTracked{this, "LayersContainer"};
 };
 
 }  // namespace gd

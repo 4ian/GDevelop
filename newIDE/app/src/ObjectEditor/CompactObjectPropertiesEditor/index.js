@@ -8,7 +8,7 @@ import VariablesList, {
 } from '../../VariablesList/VariablesList';
 import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import ErrorBoundary from '../../UI/ErrorBoundary';
-import ScrollView from '../../UI/ScrollView';
+import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Column, Line, Spacer, marginsSize } from '../../UI/Grid';
 import { Separator } from '../../CompactPropertiesEditor';
 import Text from '../../UI/Text';
@@ -17,7 +17,7 @@ import IconButton from '../../UI/IconButton';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import { type ObjectEditorTab } from '../../ObjectEditor/ObjectEditorDialog';
-import { CompactBehaviorPropertiesEditor } from './CompactBehaviorPropertiesEditor';
+import CompactBehaviorsEditorService from './CompactBehaviorsEditorService';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import Paper from '../../UI/Paper';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
@@ -35,6 +35,7 @@ import { useManageObjectBehaviors } from '../../BehaviorsEditor';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
 import { mapFor } from '../../Utils/MapFor';
+import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
 import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
 import { ChildObjectPropertiesEditor } from './ChildObjectPropertiesEditor';
@@ -59,6 +60,11 @@ import { CompactEffectsListEditor } from '../../LayersList/CompactLayerPropertie
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
+import {
+  type Field,
+  type FieldChoices,
+} from '../../PropertiesEditor/PropertiesEditorSchema';
 
 const gd: libGDevelop = global.gd;
 
@@ -218,6 +224,38 @@ export const TopLevelCollapsibleSection = ({
   </>
 );
 
+const resourcesPreloadingFieldChoices: Array<FieldChoices> = [
+  {
+    value: 'with-scene',
+    label: t`Preload with the scene`,
+  },
+  {
+    value: 'manually',
+    label: t`Preload with an action`,
+  },
+];
+const getResourcesPreloadingField = ({ i18n }: {| i18n: I18nType |}): Field => {
+  return {
+    name: 'LoadingSettings',
+    title: i18n._(t`Loading`),
+    type: 'column',
+    children: [
+      {
+        name: 'ResourcesPreloading',
+        getLabel: () => i18n._(t`Resources preloading`),
+        valueType: 'string',
+        getChoices: () => resourcesPreloadingFieldChoices,
+        getValue: ({ object }: { object: gdObject }): string =>
+          object.getResourcesPreloading(),
+        setValue: ({ object }: { object: gdObject }, newValue: string) =>
+          object.setResourcesPreloading(newValue),
+        defaultValue: 'with-scene',
+        visibility: 'advanced',
+      },
+    ],
+  };
+};
+
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
@@ -288,6 +326,9 @@ export const CompactObjectPropertiesEditor = ({
   const { showDeleteConfirmation } = useAlertDialog();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
   const object = objects[0];
+  const variablesContainer = exceptionallyGuardAgainstDeadObject(
+    object.getVariables()
+  );
   const objectConfiguration = object.getConfiguration();
 
   // Don't use a memo for this because metadata from custom objects are built
@@ -482,6 +523,20 @@ export const CompactObjectPropertiesEditor = ({
   );
 
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+  const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
+  const scrollKey = objects
+    .map((instance: gdObject) => '' + instance.ptr)
+    .join(';');
+
+  const persistedScrollId = object.getPersistentUuid();
+
+  const onScroll = usePersistedScrollPosition({
+    project,
+    scrollViewRef,
+    scrollKey,
+    persistedScrollId,
+    persistedScrollType: 'object',
+  });
 
   const propertiesSchema = React.useMemo(
     () => {
@@ -489,7 +544,7 @@ export const CompactObjectPropertiesEditor = ({
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
       const properties = objectConfigurationAsGd.getProperties();
-      return propertiesMapToSchema({
+      const schema = propertiesMapToSchema({
         properties,
         defaultValueProperties: customObjectEventsBasedObject
           ? customObjectEventsBasedObject.getPropertyDescriptors()
@@ -507,13 +562,20 @@ export const CompactObjectPropertiesEditor = ({
         object,
         visibility: 'All',
       });
+
+      if (layout && layout.getObjects().hasObjectNamed(object.getName())) {
+        schema.push(getResourcesPreloadingField({ i18n }));
+      }
+      return schema;
     },
     [
       schemaRecomputeTrigger,
       objectConfigurationAsGd,
-      object,
       customObjectEventsBasedObject,
+      object,
+      layout,
       onObjectsModified,
+      i18n,
     ]
   );
 
@@ -523,9 +585,11 @@ export const CompactObjectPropertiesEditor = ({
       scope="scene-editor-object-properties"
     >
       <ScrollView
+        ref={scrollViewRef}
         autoHideScrollbar
         style={styles.scrollView}
-        key={objects.map((instance: gdObject) => '' + instance.ptr).join(';')}
+        key={scrollKey}
+        onScroll={onScroll}
       >
         <Column expand noMargin id="object-properties-editor" noOverflowParent>
           <ColumnStackLayout expand noOverflowParent>
@@ -745,14 +809,15 @@ export const CompactObjectPropertiesEditor = ({
                     gd.JsPlatform.get(),
                     behaviorTypeName
                   );
-
                   const iconUrl = behaviorMetadata.getIconFilename();
-
+                  const CompactBehaviorComponent = CompactBehaviorsEditorService.getEditor(
+                    behaviorTypeName
+                  );
                   return (
                     <CollapsibleSubPanel
                       key={behavior.ptr}
                       renderContent={() => (
-                        <CompactBehaviorPropertiesEditor
+                        <CompactBehaviorComponent
                           project={project}
                           behaviorMetadata={behaviorMetadata}
                           behavior={behavior}
@@ -797,65 +862,67 @@ export const CompactObjectPropertiesEditor = ({
               </ColumnStackLayout>
             )}
           />
-          <TopLevelCollapsibleSection
-            title={<Trans>Object Variables</Trans>}
-            isFolded={isVariablesFolded}
-            toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
-            onOpenFullEditor={() => onEditObject(object, 'variables')}
-            onAdd={
-              isVariableListLocked
-                ? null
-                : () => {
-                    if (variablesListRef.current) {
-                      variablesListRef.current.addVariable();
-                    }
-                    setIsVariablesFolded(false);
-                  }
-            }
-            renderContentAsHiddenWhenFolded={
-              true /* Allows to keep a ref to the variables list for add button to work. */
-            }
-            noContentMargin
-            renderContent={() => (
-              <VariablesList
-                ref={variablesListRef}
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                directlyStoreValueChangesWhileEditing
-                variablesContainer={object.getVariables()}
-                areObjectVariables
-                size="compact"
-                onComputeAllVariableNames={() =>
-                  object && layout
-                    ? EventsRootVariablesFinder.findAllObjectVariables(
-                        project.getCurrentPlatform(),
-                        project,
-                        layout,
-                        object.getName()
-                      )
-                    : []
-                }
-                historyHandler={historyHandler}
-                toolbarIconStyle={styles.icon}
-                compactEmptyPlaceholderText={
-                  <Trans>
-                    There are no{' '}
-                    <Link
-                      href={objectVariablesHelpLink}
-                      onClick={() =>
-                        Window.openExternalURL(objectVariablesHelpLink)
+          {variablesContainer && (
+            <TopLevelCollapsibleSection
+              title={<Trans>Object Variables</Trans>}
+              isFolded={isVariablesFolded}
+              toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
+              onOpenFullEditor={() => onEditObject(object, 'variables')}
+              onAdd={
+                isVariableListLocked
+                  ? null
+                  : () => {
+                      if (variablesListRef.current) {
+                        variablesListRef.current.addVariable();
                       }
-                    >
-                      variables
-                    </Link>{' '}
-                    on this object.
-                  </Trans>
-                }
-                isListLocked={isVariableListLocked}
-              />
-            )}
-          />
+                      setIsVariablesFolded(false);
+                    }
+              }
+              renderContentAsHiddenWhenFolded={
+                true /* Allows to keep a ref to the variables list for add button to work. */
+              }
+              noContentMargin
+              renderContent={() => (
+                <VariablesList
+                  ref={variablesListRef}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
+                  directlyStoreValueChangesWhileEditing
+                  variablesContainer={variablesContainer}
+                  areObjectVariables
+                  size="compact"
+                  onComputeAllVariableNames={() =>
+                    object && layout
+                      ? EventsRootVariablesFinder.findAllObjectVariables(
+                          project.getCurrentPlatform(),
+                          project,
+                          layout,
+                          object.getName()
+                        )
+                      : []
+                  }
+                  historyHandler={historyHandler}
+                  toolbarIconStyle={styles.icon}
+                  compactEmptyPlaceholderText={
+                    <Trans>
+                      There are no{' '}
+                      <Link
+                        href={objectVariablesHelpLink}
+                        onClick={() =>
+                          Window.openExternalURL(objectVariablesHelpLink)
+                        }
+                      >
+                        variables
+                      </Link>{' '}
+                      on this object.
+                    </Trans>
+                  }
+                  isListLocked={isVariableListLocked}
+                />
+              )}
+            />
+          )}
           {objectMetadata &&
             objectMetadata.hasDefaultBehavior(
               'EffectCapability::EffectBehavior'

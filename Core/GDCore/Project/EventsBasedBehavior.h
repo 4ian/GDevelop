@@ -47,7 +47,7 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
   /**
    * \brief Set the internal name of the behavior.
    */
-  EventsBasedBehavior& SetName(const gd::String& name_) {
+  EventsBasedBehavior& SetName(const gd::String& name_) override {
     AbstractEventsBasedEntity::SetName(name_);
     return *this;
   }
@@ -55,8 +55,28 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
   /**
    * \brief Set the name of the behavior, to be displayed in the editor.
    */
-  EventsBasedBehavior& SetFullName(const gd::String& fullName_) {
+  EventsBasedBehavior& SetFullName(const gd::String& fullName_) override {
     AbstractEventsBasedEntity::SetFullName(fullName_);
+    return *this;
+  }
+
+  EventsBasedBehavior &
+  SetPreviewIconUrl(const gd::String &previewIconUrl_) override {
+    AbstractEventsBasedEntity::SetPreviewIconUrl(previewIconUrl_);
+    return *this;
+  }
+
+  EventsBasedBehavior &SetIconUrl(const gd::String &iconUrl_) override {
+    AbstractEventsBasedEntity::SetIconUrl(iconUrl_);
+    return *this;
+  }
+
+  /**
+   * \brief Set the help path relative to the GDevelop
+   * documentation root.
+   */
+  EventsBasedBehavior &SetHelpPath(const gd::String &helpPath_) override {
+    AbstractEventsBasedEntity::SetHelpPath(helpPath_);
     return *this;
   }
 

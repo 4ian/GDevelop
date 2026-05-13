@@ -5,7 +5,7 @@ import { Trans } from '@lingui/macro';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { makeStyles } from '@material-ui/core';
+import { makeStyles, Popper } from '@material-ui/core';
 import {
   AutocompletePaperComponent,
   autocompleteStyles,
@@ -15,6 +15,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { textEllipsisStyle } from './TextEllipsis';
 import Text from './Text';
 import ChevronArrowBottom from './CustomSvgIcons/ChevronArrowBottom';
+import PortalContainerContext from './PortalContainerContext';
 
 const renderItem = (option: AutocompleteOption, state: Object): React.Node => (
   <ListItem dense component={'div'} style={autocompleteStyles.listItem}>
@@ -83,6 +84,7 @@ const SemiControlledMultiAutoComplete: React.ComponentType<{
     const chipStyles = useChipStyles();
     // $FlowFixMe[value-as-type]
     const inputRef = React.useRef<?TextField>(null);
+    const portalContainer = React.useContext(PortalContainerContext);
 
     React.useImperativeHandle(ref, () => ({
       focusInput: () => {
@@ -97,6 +99,13 @@ const SemiControlledMultiAutoComplete: React.ComponentType<{
         {({ i18n }) => (
           <Autocomplete
             multiple
+            PopperComponent={
+              portalContainer
+                ? popperProps => (
+                    <Popper {...popperProps} container={portalContainer} />
+                  )
+                : undefined
+            }
             value={props.value}
             onChange={props.onChange}
             inputValue={props.inputValue}

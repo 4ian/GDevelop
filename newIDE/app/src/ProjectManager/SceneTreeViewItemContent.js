@@ -10,8 +10,11 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-// $FlowFixMe[import-type-as-value]
-import { TreeViewItemContent, type TreeItemProps, scenesRootFolderId } from '.';
+import {
+  type TreeViewItemContent,
+  type TreeItemProps,
+  scenesRootFolderId,
+} from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import Flag from '@material-ui/icons/Flag';
 import { type HTMLDataset } from '../Utils/HTMLDataset';

@@ -170,7 +170,6 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             tileMapTileSelection={tileMapTileSelection}
             onSelectTileMapTile={onSelectTileMapTile}
             historyHandler={historyHandler}
-            isVariableListLocked={isVariableListLocked}
             layout={layout}
             objectsContainer={objectsContainer}
             globalObjectsContainer={globalObjectsContainer}

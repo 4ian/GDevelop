@@ -22,6 +22,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
                                _("Actions/conditions to enable/disable and change parameters of visual effects applied on objects."),
                                "Florian Rival",
                                "Open source (MIT License)")
+      .SetShortDescription("Enable/disable visual effects on objects. Change effect parameters at runtime.")
       .SetExtensionHelpPath("/objects");
   extension.AddInstructionOrExpressionGroupMetadata(_("Effects"))
       .SetIcon("res/actions/effect_black.svg");

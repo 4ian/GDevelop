@@ -77,26 +77,17 @@ const VerticesTable = (props: VerticesTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {/* $FlowFixMe[incompatible-exact] */}
           {mapVector(props.vertices, (vertice, verticeIndex) => (
             <VerticeRow
-              // $FlowFixMe[incompatible-use]
               key={vertice.ptr}
               parentVerticeId={props.vertices.ptr.toString()}
-              // $FlowFixMe[incompatible-use]
               onPointerEnter={() => props.onHoverVertice(vertice.ptr)}
               onPointerLeave={props.onHoverVertice}
-              // $FlowFixMe[incompatible-use]
               selected={props.selectedVerticePtr === vertice.ptr}
-              // $FlowFixMe[incompatible-use]
               onClick={() => props.onClickVertice(vertice.ptr)}
-              // $FlowFixMe[incompatible-use]
               verticeX={vertice.get_x()}
-              // $FlowFixMe[incompatible-use]
               verticeY={vertice.get_y()}
-              // $FlowFixMe[incompatible-type]
               onChangeVerticeX={newValue => updateVerticeX(vertice, newValue)}
-              // $FlowFixMe[incompatible-type]
               onChangeVerticeY={newValue => updateVerticeY(vertice, newValue)}
               onRemove={() => {
                 gd.removeFromVectorVector2f(props.vertices, verticeIndex);
@@ -267,11 +258,9 @@ const PolygonsList = (props: PolygonsListProps): React.Node => {
     <React.Fragment>
       <Column noMargin expand useFullHeight>
         <ScrollView>
-          {/* $FlowFixMe[incompatible-exact] */}
           {mapVector(polygons, (polygon, i) => (
             <PolygonSection
               key={`polygon-${i}`}
-              // $FlowFixMe[incompatible-type]
               polygon={polygon}
               onUpdated={onPolygonsUpdated}
               onRemove={() => onRemovePolygon(i)}

@@ -4,12 +4,9 @@ import {
   applyChildLayouts,
   type ChildLayout,
   ChildInstance,
-  // $FlowFixMe[import-type-as-value]
-  LayoutedParent,
-  // $FlowFixMe[import-type-as-value]
-  ChildRenderedInstance,
-  // $FlowFixMe[import-type-as-value]
-  PropertiesContainer,
+  type LayoutedParent,
+  type ChildRenderedInstance,
+  type PropertiesContainer,
 } from './LegacyCustomObjectLayoutingModel';
 import { mapFor } from '../../Utils/MapFor';
 
@@ -474,6 +471,7 @@ const createCustomObjectConfiguration = (
 };
 
 class MockedChildRenderedInstance implements ChildRenderedInstance {
+  // $FlowFixMe[incompatible-exact]
   _instance: ChildInstance;
   _pixiObject: { height: number };
   defaultWidth: number;

@@ -68,6 +68,7 @@
 #include <GDCore/IDE/VariableInstructionSwitcher.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
 #include <GDCore/Project/Behavior.h>
+#include <GDCore/Project/MemoryTrackedRegistry.h>
 #include <GDCore/Project/CustomObjectConfiguration.h>
 #include <GDCore/Project/Effect.h>
 #include <GDCore/Project/EventsBasedBehavior.h>
@@ -76,6 +77,7 @@
 #include <GDCore/Project/EventsFunctionsExtension.h>
 #include <GDCore/Project/ExternalEvents.h>
 #include <GDCore/Project/ExternalLayout.h>
+#include <GDCore/Project/FunctionFolderOrFunction.h>
 #include <GDCore/Project/InitialInstance.h>
 #include <GDCore/Project/InitialInstancesContainer.h>
 #include <GDCore/Project/Layout.h>
@@ -103,6 +105,7 @@
 #include <GDCore/Serialization/SerializerElement.h>
 #include <GDCore/Serialization/BinarySerializer.h>
 #include <GDCore/IDE/ObjectAssetSerializer.h>
+#include <GDCore/IDE/Events/ExtensionDependencyCache.h>
 #include <GDJS/Events/Builtin/JsCodeEvent.h>
 #include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
 #include <GDJS/Events/CodeGeneration/EventsFunctionsExtensionCodeGenerator.h>
@@ -405,6 +408,17 @@ class ReadOnlyArbitraryEventsWorkerWithContextJS : public ReadOnlyArbitraryEvent
         isCondition,
         (int)&GetProjectScopedContainers());
   }
+
+  virtual void DoOnLaunch(const gd::EventsList &events) {
+    EM_ASM(
+        {
+          var self = Module['getCache'](Module['ReadOnlyArbitraryEventsWorkerWithContextJS'])[$0];
+          if (self.hasOwnProperty('doOnLaunch'))
+            self.doOnLaunch(wrapPointer($1, Module['EventsList']));
+        },
+        (int)this,
+        (int)&events);
+  }
 };
 
 class InitialInstanceJSFunctorWrapper : public gd::InitialInstanceFunctor {
@@ -512,6 +526,7 @@ typedef std::vector<UnfilledRequiredBehaviorPropertyProblem>
     VectorUnfilledRequiredBehaviorPropertyProblem;
 typedef std::vector<const gd::ObjectFolderOrObject*> VectorObjectFolderOrObject;
 typedef std::vector<const gd::PropertyFolderOrProperty*> VectorPropertyFolderOrProperty;
+typedef std::vector<const gd::FunctionFolderOrFunction*> VectorFunctionFolderOrFunction;
 typedef std::vector<gd::Screenshot> VectorScreenshot;
 typedef QuickCustomization::Visibility
     QuickCustomization_Visibility;
@@ -660,7 +675,9 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_RemoveObjectInEvents RemoveObjectInEvents
 #define STATIC_ReplaceStringInEvents ReplaceStringInEvents
 #define STATIC_ExposeProjectEvents ExposeProjectEvents
+#define STATIC_ExposeProjectEventsWithoutExtensions ExposeProjectEventsWithoutExtensions
 #define STATIC_ExposeProjectObjects ExposeProjectObjects
+#define STATIC_ExposeEventsFunctionsExtensionEvents ExposeEventsFunctionsExtensionEvents
 #define STATIC_ExposeWholeProjectResources ExposeWholeProjectResources
 #define STATIC_GetResourceTypes GetResourceTypes
 
@@ -788,6 +805,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_FillAnyVariableBetweenObjects FillAnyVariableBetweenObjects
 #define STATIC_ApplyChangesToVariants ApplyChangesToVariants
 #define STATIC_ComplyVariantsToEventsBasedObject ComplyVariantsToEventsBasedObject
+#define STATIC_FindAllChildrenCustomObjectType FindAllChildrenCustomObjectType
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
 #define STATIC_UpdateExtensionNameInEventsBasedBehavior \
   UpdateExtensionNameInEventsBasedBehavior
@@ -869,6 +887,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 
 #define STATIC_CopyAllResourcesTo CopyAllResourcesTo
 #define STATIC_CopyObjectResourcesTo CopyObjectResourcesTo
+#define STATIC_UnserializeResourceFrom UnserializeResourceFrom
 
 #define STATIC_IsExtensionLifecycleEventsFunction \
   IsExtensionLifecycleEventsFunction
@@ -903,6 +922,19 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_GetLastBinarySnapshotSize GetLastBinarySnapshotSize
 #define STATIC_FreeBinarySnapshot FreeBinarySnapshot
 #define STATIC_DeserializeBinarySnapshot DeserializeBinarySnapshot
+
+// MemoryTrackedRegistry
+#define STATIC_add add
+#define STATIC_remove remove
+#define STATIC_isDead isDead
+#define STATIC_getDeadCount getDeadCount
+#define STATIC_pruneDead pruneDead
+#define STATIC_getAliveCount getAliveCount
+#define STATIC_getAliveCountForClass getAliveCountForClass
+#define STATIC_getDeadCountForClass getDeadCountForClass
+#define STATIC_setCurrentCallContextId setCurrentCallContextId
+#define STATIC_getDeadContextId getDeadContextId
+#define STATIC_getDeadContextTimeMs getDeadContextTimeMs
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

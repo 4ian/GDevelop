@@ -22,7 +22,9 @@ import {
   shouldValidate,
 } from './KeyboardShortcuts/InteractionKeys';
 import { textEllipsisStyle } from './TextEllipsis';
+import Popper from '@material-ui/core/Popper';
 import Paper from './Paper';
+import PortalContainerContext from './PortalContainerContext';
 
 export const AutocompletePaperComponent = (props: any): React.Node => (
   // Use light background so that it's in contrast with background that
@@ -259,6 +261,7 @@ export default (React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
     const [inputValue, setInputValue] = useState((null: string | null));
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const classes = useStyles();
+    const portalContainer = React.useContext(PortalContainerContext);
 
     const focus: FieldFocusFunction = options => {
       const inputElement = input.current;
@@ -306,6 +309,13 @@ export default (React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
           <Autocomplete
             freeSolo
             classes={classes}
+            PopperComponent={
+              portalContainer
+                ? popperProps => (
+                    <Popper {...popperProps} container={portalContainer} />
+                  )
+                : undefined
+            }
             onChange={(
               event: SyntheticKeyboardEvent<HTMLInputElement>,
               option: AutoCompleteOption | null

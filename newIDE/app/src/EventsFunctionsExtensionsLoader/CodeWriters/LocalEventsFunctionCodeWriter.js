@@ -6,6 +6,18 @@ import {
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getUID } from '../../Utils/LocalUserInfo';
 import slugs from 'slugs';
+
+// There is a high chance of FS operations running while an Electron window is closing.
+// We run into "Uncaught illegal access" errors from V8/Chrome/Electron on Electron when these
+// FS operations are running while a BrowserWindow is destroyed (see WindowPortal).
+// These "Uncaught illegal access" have no stacktrace, which seems to indicate a problem
+// deep in Electron or related.
+//
+// We can't risk this.
+//
+// To avoid this, we use `safelyDoFsOperation` which will guard against these happening concurrently.
+import { safelyDoFsOperation } from '../../Utils/ElectronConflictingOperationsMutex';
+
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const fs = optionalRequire('fs');
@@ -43,43 +55,52 @@ export const makeLocalEventsFunctionCodeWriter = ({
       functionCodeNamespace: string,
       code: string
     ): Promise<void> => {
-      return new Promise((resolve, reject) => {
-        const includeFile = getPathFor(functionCodeNamespace);
-        onWriteFile({ includeFile, content: code });
-        fs.writeFile(includeFile, code, err => {
-          if (err) return reject(err);
+      return safelyDoFsOperation(
+        () =>
+          new Promise((resolve, reject) => {
+            const includeFile = getPathFor(functionCodeNamespace);
+            onWriteFile({ includeFile, content: code });
+            fs.writeFile(includeFile, code, err => {
+              if (err) return reject(err);
 
-          resolve();
-        });
-      });
+              resolve();
+            });
+          })
+      );
     },
     writeBehaviorCode: (
       behaviorCodeNamespace: string,
       code: string
     ): Promise<void> => {
-      return new Promise((resolve, reject) => {
-        const includeFile = getPathFor(behaviorCodeNamespace);
-        onWriteFile({ includeFile, content: code });
-        fs.writeFile(includeFile, code, err => {
-          if (err) return reject(err);
+      return safelyDoFsOperation(
+        () =>
+          new Promise((resolve, reject) => {
+            const includeFile = getPathFor(behaviorCodeNamespace);
+            onWriteFile({ includeFile, content: code });
+            fs.writeFile(includeFile, code, err => {
+              if (err) return reject(err);
 
-          resolve();
-        });
-      });
+              resolve();
+            });
+          })
+      );
     },
     writeObjectCode: (
       objectCodeNamespace: string,
       code: string
     ): Promise<void> => {
-      return new Promise((resolve, reject) => {
-        const includeFile = getPathFor(objectCodeNamespace);
-        onWriteFile({ includeFile, content: code });
-        fs.writeFile(includeFile, code, err => {
-          if (err) return reject(err);
+      return safelyDoFsOperation(
+        () =>
+          new Promise((resolve, reject) => {
+            const includeFile = getPathFor(objectCodeNamespace);
+            onWriteFile({ includeFile, content: code });
+            fs.writeFile(includeFile, code, err => {
+              if (err) return reject(err);
 
-          resolve();
-        });
-      });
+              resolve();
+            });
+          })
+      );
     },
   };
 };

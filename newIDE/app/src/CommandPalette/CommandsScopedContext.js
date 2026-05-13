@@ -1,8 +1,7 @@
 // @flow
 import * as React from 'react';
 import {
-  // $FlowFixMe[import-type-as-value]
-  CommandManagerInterface,
+  type CommandManagerInterface,
   type Command,
   type NamedCommand,
 } from './CommandManager';

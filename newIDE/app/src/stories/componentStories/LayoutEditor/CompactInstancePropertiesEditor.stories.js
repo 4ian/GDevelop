@@ -42,7 +42,6 @@ export const InstanceSprite2d = (): React.Node => (
             )}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
-            isVariableListLocked={false}
             canOverrideBehaviorProperties={true}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -75,7 +74,6 @@ export const InstanceCube3d = (): React.Node => (
             )}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
-            isVariableListLocked={false}
             canOverrideBehaviorProperties={true}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -108,7 +106,6 @@ export const InstanceTextInput = (): React.Node => (
             )}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
-            isVariableListLocked={false}
             canOverrideBehaviorProperties={true}
             resourceManagementProps={fakeResourceManagementProps}
           />

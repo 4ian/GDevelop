@@ -154,29 +154,32 @@ const extractErrors = (
   expressionNode.visit(expressionValidator);
   const errors = expressionValidator.getAllErrors();
   const fatalErrors = expressionValidator.getFatalErrors();
+  const deprecationWarnings = expressionValidator.getDeprecationWarnings();
   const hasFatalErrors = fatalErrors.size() > 0;
 
-  // $FlowFixMe[incompatible-type]
-  // $FlowFixMe[incompatible-exact]
   const errorHighlights: Array<Highlight> = mapVector(errors, error => {
-    // $FlowFixMe[incompatible-use]
-    const errorType = error.getType();
-    const isDeprecated =
-      errorType === gd.ExpressionParserError.DeprecatedExpression;
-    // Skip deprecation warnings if the preference is set to 'no'
-    if (isDeprecated && showDeprecatedInstructionWarning === 'no') {
-      return null;
-    }
-    return {
-      // $FlowFixMe[incompatible-use]
+    const highlight: Highlight = {
       begin: error.getStartPosition(),
-      // $FlowFixMe[incompatible-use]
       end: error.getEndPosition() + 1,
-      // $FlowFixMe[incompatible-use]
       message: error.getMessage(),
-      type: isDeprecated ? 'deprecated' : 'error',
+      type: 'error',
     };
-  }).filter(Boolean);
+    return highlight;
+  });
+
+  // Skip deprecation warnings if the preference is set to 'no'
+  if (showDeprecatedInstructionWarning !== 'no') {
+    mapVector(deprecationWarnings, error => {
+      const highlight: Highlight = {
+        begin: error.getStartPosition(),
+        end: error.getEndPosition() + 1,
+        message: error.getMessage(),
+        type: 'deprecated',
+      };
+      errorHighlights.push(highlight);
+    });
+  }
+
   const otherErrorsCount = Math.max(
     0,
     errorHighlights.length - MAX_ERRORS_COUNT
@@ -671,7 +674,12 @@ export default class ExpressionField extends React.Component<Props, State> {
                     />
                   </div>
                   {this._inputElement && this.state.popoverOpen && (
-                    <ClickAwayListener onClickAway={this._handleRequestClose}>
+                    <ClickAwayListener
+                      onClickAway={this._handleRequestClose}
+                      // Needed since React 18 to avoid what seems to be the immediate closing of the popper.
+                      mouseEvent="onMouseDown"
+                      touchEvent="onTouchStart"
+                    >
                       <Popper
                         style={popoverStyle}
                         open={this.state.popoverOpen}

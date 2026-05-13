@@ -25,6 +25,9 @@ module.exports = {
         'Florian Rival',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Authenticate players. Login/logout, get username/user ID, check authentication status.'
+      )
       .setExtensionHelpPath('/all-features/player-authentication')
       .setCategory('Players');
     extension

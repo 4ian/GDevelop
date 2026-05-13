@@ -2660,6 +2660,7 @@ describe('libGD.js', function () {
           true,
           true,
           false,
+          false,
           false
         );
         expect(searchResultEvents1.size()).toBe(0);
@@ -2670,6 +2671,7 @@ describe('libGD.js', function () {
           true,
           true,
           true,
+          false,
           false,
           false
         );
@@ -2686,6 +2688,7 @@ describe('libGD.js', function () {
           true,
           true,
           false,
+          false,
           false
         );
         expect(searchResultEvents1.size()).toBe(1);
@@ -2698,6 +2701,7 @@ describe('libGD.js', function () {
           false,
           true,
           true,
+          false,
           false,
           false
         );
@@ -2713,7 +2717,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents1.size()).toBe(1);
         expect(searchResultEvents1.at(0).getEvent()).toBe(event2);
@@ -2728,7 +2733,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents1.size()).toBe(1);
         expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
@@ -2743,7 +2749,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents1.size()).toBe(1);
         expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
@@ -2758,7 +2765,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents1.size()).toBe(1);
         expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
@@ -2773,7 +2781,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents1.size()).toBe(1);
         expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
@@ -2788,7 +2797,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents1.size()).toBe(1);
         expect(searchResultEvents1.at(0).getEvent()).toBe(event2);
@@ -2802,7 +2812,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents1.size()).toBe(1);
         expect(searchResultEvents1.at(0).getEvent()).toBe(event2);
@@ -2815,7 +2826,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents2.size()).toBe(1);
         expect(searchResultEvents2.at(0).getEvent()).toBe(event2);

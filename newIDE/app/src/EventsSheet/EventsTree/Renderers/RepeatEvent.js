@@ -7,7 +7,7 @@ import {
   largeSelectedArea,
   largeSelectableArea,
   selectableArea,
-  executableEventContainer,
+  conditionsActionsContainer,
   disabledText,
   instructionParameter,
   instructionInvalidParameter,
@@ -123,7 +123,6 @@ export default class RepeatEvent extends React.Component<
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
-          [executableEventContainer]: true,
         })}
       >
         <VariableDeclarationsList
@@ -195,6 +194,9 @@ export default class RepeatEvent extends React.Component<
           leftIndentWidth={this.props.leftIndentWidth}
           windowSize={this.props.windowSize}
           eventsSheetWidth={this.props.eventsSheetWidth}
+          className={classNames({
+            [conditionsActionsContainer]: true,
+          })}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
               platform={this.props.project.getCurrentPlatform()}
@@ -226,6 +228,8 @@ export default class RepeatEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
           renderActionsList={({ className }) => (
@@ -263,6 +267,8 @@ export default class RepeatEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
         />
@@ -285,7 +291,6 @@ export default class RepeatEvent extends React.Component<
               repeatEvent.setRepeatExpressionPlainString(text);
               this.props.onUpdate();
             }}
-            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             isInline
             ref={field => (this._field = field)}

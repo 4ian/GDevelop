@@ -12,4 +12,5 @@ export type BehaviorEditorProps = {|
   object: gdObject,
   resourceManagementProps: ResourceManagementProps,
   onBehaviorUpdated: () => void,
+  isAdvancedSectionInitiallyUncollapsed?: boolean,
 |};

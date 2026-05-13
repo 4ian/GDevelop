@@ -78,6 +78,7 @@ type ProjectProperties = {|
   maxFPS: number,
   isFolderProject: boolean,
   useDeprecatedZeroAsDefaultZOrder: boolean,
+  useDeprecatedZeroAsDefaultStringVariable: boolean,
   desktopIconResourceNames: Array<string>,
   androidIconResourceNames: Array<string>,
   androidWindowSplashScreenAnimatedIconResourceName: string,
@@ -109,6 +110,7 @@ const loadPropertiesFromProject = (project: gdProject): ProjectProperties => {
     maxFPS: project.getMaximumFPS(),
     isFolderProject: project.isFolderProject(),
     useDeprecatedZeroAsDefaultZOrder: project.getUseDeprecatedZeroAsDefaultZOrder(),
+    useDeprecatedZeroAsDefaultStringVariable: project.getUseDeprecatedZeroAsDefaultStringVariable(),
     desktopIconResourceNames: desktopIconSizes.map(size =>
       platformSpecificAssets.get('desktop', `icon-${size}`)
     ),
@@ -153,6 +155,7 @@ function applyPropertiesToProject(
     maxFPS,
     isFolderProject,
     useDeprecatedZeroAsDefaultZOrder,
+    useDeprecatedZeroAsDefaultStringVariable,
     desktopIconResourceNames,
     androidIconResourceNames,
     androidWindowSplashScreenAnimatedIconResourceName,
@@ -185,6 +188,9 @@ function applyPropertiesToProject(
   project.setMaximumFPS(maxFPS);
   project.setFolderProject(isFolderProject);
   project.setUseDeprecatedZeroAsDefaultZOrder(useDeprecatedZeroAsDefaultZOrder);
+  project.setUseDeprecatedZeroAsDefaultStringVariable(
+    useDeprecatedZeroAsDefaultStringVariable
+  );
   project.setSceneResourcesPreloading(sceneResourcesPreloading);
   project.setSceneResourcesUnloading(sceneResourcesUnloading);
 
@@ -270,6 +276,12 @@ const ProjectPropertiesDialog = (props: Props) => {
     useDeprecatedZeroAsDefaultZOrder,
     setUseDeprecatedZeroAsDefaultZOrder,
   ] = React.useState(initialProperties.useDeprecatedZeroAsDefaultZOrder);
+  let [
+    useDeprecatedZeroAsDefaultStringVariable,
+    setUseDeprecatedZeroAsDefaultStringVariable,
+  ] = React.useState(
+    initialProperties.useDeprecatedZeroAsDefaultStringVariable
+  );
   const [
     desktopIconResourceNames,
     setDesktopIconResourceNames,
@@ -362,6 +374,7 @@ const ProjectPropertiesDialog = (props: Props) => {
         maxFPS,
         isFolderProject,
         useDeprecatedZeroAsDefaultZOrder,
+        useDeprecatedZeroAsDefaultStringVariable,
         desktopIconResourceNames,
         androidIconResourceNames,
         androidWindowSplashScreenAnimatedIconResourceName,
@@ -545,6 +558,43 @@ const ProjectPropertiesDialog = (props: Props) => {
                     notifyOfChange();
                   }}
                 />
+                {useDeprecatedZeroAsDefaultStringVariable ? (
+                  <React.Fragment>
+                    <Text size="block-title">
+                      <Trans>Default value of string variables</Trans>
+                    </Text>
+                    <AlertMessage kind="info">
+                      <Trans>
+                        String variables with no value set now default to an
+                        empty string ("") instead of "0". This game was created
+                        before this change, so GDevelop maintains the old
+                        behavior: unset string variables default to "0". It's
+                        recommended that you switch to the new behavior and
+                        update any variables or conditions relying on "0" as a
+                        default.
+                      </Trans>
+                    </AlertMessage>
+                    <RaisedButton
+                      onClick={() => {
+                        const answer = Window.showConfirmDialog(
+                          i18n._(
+                            t`Make sure to verify your events and variables that may rely on string variables defaulting to "0". Do you want to continue (recommended)?`
+                          )
+                        );
+                        if (!answer) return;
+
+                        setUseDeprecatedZeroAsDefaultStringVariable(false);
+                        notifyOfChange();
+                      }}
+                      label={
+                        <Trans>
+                          Switch to empty string ("") as default for string
+                          variables
+                        </Trans>
+                      }
+                    />
+                  </React.Fragment>
+                ) : null}
                 {useDeprecatedZeroAsDefaultZOrder ? (
                   <React.Fragment>
                     <Text size="block-title">

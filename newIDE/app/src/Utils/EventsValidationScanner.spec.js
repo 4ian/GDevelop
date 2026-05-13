@@ -112,6 +112,60 @@ describe('EventsValidationScanner', () => {
       }
     });
 
+    describe('disabled events', () => {
+      it('skips disabled events', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        event.setDisabled(true);
+        const standardEvent = gd.asStandardEvent(event);
+        const invalidAction = new gd.Instruction();
+        invalidAction.setType('Disabled::InvalidAction');
+        standardEvent.getActions().insert(invalidAction, 0);
+        invalidAction.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.instructionType === 'Disabled::InvalidAction'
+        );
+        expect(targetError).toBeUndefined();
+      });
+
+      it('skips sub-events of disabled events', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const parentEvent = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        parentEvent.setDisabled(true);
+
+        const childEvent = parentEvent
+          .getSubEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+        const childStandard = gd.asStandardEvent(childEvent);
+        const invalidAction = new gd.Instruction();
+        invalidAction.setType('DisabledChild::InvalidAction');
+        childStandard.getActions().insert(invalidAction, 0);
+        invalidAction.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.instructionType === 'DisabledChild::InvalidAction'
+        );
+        expect(targetError).toBeUndefined();
+      });
+    });
+
     describe('external events scanning', () => {
       it('detects errors in external events', () => {
         const { project, testExternalEvents1 } = makeTestProject(gd);
@@ -256,6 +310,147 @@ describe('EventsValidationScanner', () => {
         if (targetError) {
           expect(targetError.isCondition).toBe(false);
         }
+      });
+    });
+
+    describe('extension function scanning', () => {
+      it('detects errors in free extension functions', () => {
+        const { project } = makeTestProject(gd);
+        const extension = project.insertNewEventsFunctionsExtension(
+          'TestExtScan',
+          0
+        );
+        extension.setName('TestExtScan');
+        const fn = extension
+          .getEventsFunctions()
+          .insertNewEventsFunction('FreeFunc', 0);
+        const event = fn
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+        const standardEvent = gd.asStandardEvent(event);
+        const invalidAction = new gd.Instruction();
+        invalidAction.setType('ExtFree::InvalidAction');
+        standardEvent.getActions().insert(invalidAction, 0);
+        invalidAction.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.instructionType === 'ExtFree::InvalidAction'
+        );
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.locationType).toBe('extension');
+          expect(targetError.extensionName).toBe('TestExtScan');
+          expect(targetError.functionName).toBe('FreeFunc');
+          expect(targetError.behaviorName).toBeNull();
+          expect(targetError.objectName).toBeNull();
+          expect(targetError.type).toBe('missing-instruction');
+        }
+      });
+
+      it('detects errors in behavior extension functions', () => {
+        const { project } = makeTestProject(gd);
+        const extension = project.insertNewEventsFunctionsExtension(
+          'TestExtBhvScan',
+          0
+        );
+        extension.setName('TestExtBhvScan');
+        const behavior = extension
+          .getEventsBasedBehaviors()
+          .insertNew('TestBehavior', 0);
+        const fn = behavior
+          .getEventsFunctions()
+          .insertNewEventsFunction('BhvFunc', 0);
+        const event = fn
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+        const standardEvent = gd.asStandardEvent(event);
+        const invalidAction = new gd.Instruction();
+        invalidAction.setType('ExtBhv::InvalidAction');
+        standardEvent.getActions().insert(invalidAction, 0);
+        invalidAction.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.instructionType === 'ExtBhv::InvalidAction'
+        );
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.locationType).toBe('extension');
+          expect(targetError.extensionName).toBe('TestExtBhvScan');
+          expect(targetError.functionName).toBe('BhvFunc');
+          expect(targetError.behaviorName).toBe('TestBehavior');
+          expect(targetError.objectName).toBeNull();
+          expect(targetError.type).toBe('missing-instruction');
+        }
+      });
+
+      it('detects errors in object extension functions', () => {
+        const { project } = makeTestProject(gd);
+        const extension = project.insertNewEventsFunctionsExtension(
+          'TestExtObjScan',
+          0
+        );
+        extension.setName('TestExtObjScan');
+        const object = extension
+          .getEventsBasedObjects()
+          .insertNew('TestObject', 0);
+        const fn = object
+          .getEventsFunctions()
+          .insertNewEventsFunction('ObjFunc', 0);
+        const event = fn
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+        const standardEvent = gd.asStandardEvent(event);
+        const invalidAction = new gd.Instruction();
+        invalidAction.setType('ExtObj::InvalidAction');
+        standardEvent.getActions().insert(invalidAction, 0);
+        invalidAction.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.instructionType === 'ExtObj::InvalidAction'
+        );
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.locationType).toBe('extension');
+          expect(targetError.extensionName).toBe('TestExtObjScan');
+          expect(targetError.functionName).toBe('ObjFunc');
+          expect(targetError.behaviorName).toBeNull();
+          expect(targetError.objectName).toBe('TestObject');
+          expect(targetError.type).toBe('missing-instruction');
+        }
+      });
+
+      it('skips store extensions', () => {
+        const { project } = makeTestProject(gd);
+        const extension = project.insertNewEventsFunctionsExtension(
+          'StoreExt',
+          0
+        );
+        extension.setName('StoreExt');
+        extension.setOrigin('gdevelop-extension-store', 'StoreExt');
+        const fn = extension
+          .getEventsFunctions()
+          .insertNewEventsFunction('StoreFunc', 0);
+        const event = fn
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+        const standardEvent = gd.asStandardEvent(event);
+        const invalidAction = new gd.Instruction();
+        invalidAction.setType('Store::InvalidAction');
+        standardEvent.getActions().insert(invalidAction, 0);
+        invalidAction.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.instructionType === 'Store::InvalidAction'
+        );
+        expect(targetError).toBeUndefined();
       });
     });
 
@@ -406,6 +601,35 @@ describe('EventsValidationScanner', () => {
       );
       expect(sceneErrors && sceneErrors.length).toBe(2);
       expect(extEventsErrors && extEventsErrors.length).toBe(1);
+    });
+
+    it('groups extension errors with extension: prefix', () => {
+      const errors = [
+        {
+          type: 'invalid-parameter',
+          isCondition: false,
+          instructionType: 'Action1',
+          instructionSentence: 'Action 1',
+          parameterIndex: 0,
+          parameterValue: '',
+          locationName: 'MyExt / MyFunc',
+          locationType: 'extension',
+          eventPath: [0],
+          extensionName: 'MyExt',
+          functionName: 'MyFunc',
+          behaviorName: null,
+          objectName: null,
+        },
+      ];
+
+      // $FlowFixMe[incompatible-type]
+      const grouped = groupValidationErrors(errors);
+
+      const extErrors = grouped.invalidParameters.get(
+        'extension: MyExt / MyFunc'
+      );
+      expect(extErrors).toBeDefined();
+      expect(extErrors && extErrors.length).toBe(1);
     });
   });
 

@@ -13,6 +13,7 @@ import {
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { doesPathContainDialog } from '../UI/MaterialUISpecificUtil';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import PortalContainerContext from '../UI/PortalContainerContext';
 
 const styles = {
   popover: {
@@ -50,7 +51,40 @@ type Props = {|
 export default function InlinePopover(props: Props): React.Node {
   const startSentinel = React.useRef<?HTMLDivElement>(null);
   const endSentinel = React.useRef<?HTMLDivElement>(null);
+  const popperContentRef = React.useRef<?HTMLElement>(null);
   const { isMobile } = useResponsiveWindowSize();
+  const portalContainer = React.useContext(PortalContainerContext);
+
+  // MUI's ClickAwayListener relies on ownerDocument(findDOMNode(child)).
+  // Because Popper portals its content, findDOMNode returns null and the
+  // listener falls back to the main window's `document`. When the popover
+  // lives in an external window (WindowPortal), clicks in that window
+  // never reach the main document so onClickAway never fires.
+  // Work around this by attaching our own mouseup listener on the
+  // external window's document.
+  const { open, onApply } = props;
+  React.useEffect(
+    () => {
+      if (!portalContainer || !open) return;
+
+      const externalDoc = portalContainer.ownerDocument;
+      if (!externalDoc || externalDoc === document) return;
+
+      const handleMouseUp = (event: MouseEvent) => {
+        const content = popperContentRef.current;
+        if (content && content.contains((event.target: any))) return;
+        if (doesPathContainDialog((event: any).composedPath())) return;
+
+        onApply();
+      };
+
+      externalDoc.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        externalDoc.removeEventListener('mouseup', handleMouseUp);
+      };
+    },
+    [portalContainer, open, onApply]
+  );
 
   return (
     <ClickAwayListener
@@ -73,7 +107,10 @@ export default function InlinePopover(props: Props): React.Node {
         // For a popover, clicking/touching away means validating,
         // as it's very easy to do it and almost the only way to do it on a touch screen.
         // The user can cancel with Escape.
-        if (event instanceof MouseEvent) {
+        // Use event.type instead of `instanceof MouseEvent` because
+        // in a cross-window portal the event's constructor comes from
+        // the child window, not the main window.
+        if (event.type === 'mouseup' || event.type === 'click') {
           // onClickAway is triggered on a "click" (which can actually happen
           // on a touchscreen too!).
           // The click already gave the opportunity to the popover content to
@@ -97,6 +134,7 @@ export default function InlinePopover(props: Props): React.Node {
       <Popper
         open={props.open}
         anchorEl={props.anchorEl}
+        container={portalContainer}
         style={{
           ...styles.popover,
           // On mobile, make it take full screen width, but not too much for large mobile phones.
@@ -149,13 +187,15 @@ export default function InlinePopover(props: Props): React.Node {
           }
         }}
       >
-        <Background>
-          <div tabIndex={0} ref={startSentinel} />
-          <Column expand>
-            <Line>{props.children}</Line>
-          </Column>
-          <div tabIndex={0} ref={endSentinel} />
-        </Background>
+        <div ref={popperContentRef}>
+          <Background>
+            <div tabIndex={0} ref={startSentinel} />
+            <Column expand>
+              <Line>{props.children}</Line>
+            </Column>
+            <div tabIndex={0} ref={endSentinel} />
+          </Background>
+        </div>
       </Popper>
     </ClickAwayListener>
   );

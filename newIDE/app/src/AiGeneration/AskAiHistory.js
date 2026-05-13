@@ -22,7 +22,7 @@ import { AiRequestContext } from './AiRequestContext';
 type Props = {|
   open: boolean,
   onClose: () => void,
-  onSelectAiRequest: (aiRequest: AiRequest) => void,
+  onSelectAiRequest: (aiRequest: AiRequest) => void | Promise<void>,
   selectedAiRequestId: string | null,
 |};
 

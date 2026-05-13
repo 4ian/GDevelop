@@ -64,7 +64,8 @@ export function serializeToObjectAsset(
   project: gdProject,
   object: gdObject,
   objectFullName: string,
-  usedResourceNames: Array<string>
+  usedResourceNames: Array<string>,
+  extensionDependencyCache: gdExtensionDependencyCache
 ): any {
   const usedResourceNamesVector = new gd.VectorString();
   const serializedElement = new gd.SerializerElement();
@@ -73,7 +74,8 @@ export function serializeToObjectAsset(
     object,
     objectFullName,
     serializedElement,
-    usedResourceNamesVector
+    usedResourceNamesVector,
+    extensionDependencyCache
   );
   usedResourceNames.push(...usedResourceNamesVector.toJSArray());
   usedResourceNamesVector.delete();
@@ -108,6 +110,13 @@ export function serializeToJSON(
 }
 
 /**
+ * POSIX / editor convention: text files end with a newline. Use when persisting `.json`.
+ */
+export function addFinalNewline(json: string): string {
+  return json.endsWith('\n') ? json : json + '\n';
+}
+
+/**
  * Tool function to restore a serializable object from a JS object.
  * Most gd.* objects are "serializable", meaning they have a serializeTo
  * and unserializeFrom method.
@@ -130,5 +139,14 @@ export function unserializeFromJSObject(
     // to require the project to be passed as first argument.
     serializable[methodName](optionalProject, serializedElement);
   }
+  serializedElement.delete();
+}
+
+export function unserializeResourceFromJSObject(
+  resource: gdResource,
+  object: Object
+) {
+  const serializedElement = gd.Serializer.fromJSObject(object);
+  gd.ResourcesContainer.unserializeResourceFrom(resource, serializedElement);
   serializedElement.delete();
 }

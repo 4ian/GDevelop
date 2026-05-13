@@ -32,6 +32,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("Camera")
+      .SetShortDescription("Layers, 2D/3D camera position/zoom/rotation, show/hide layers, layer effects, layer time scale.")
+      .SetDimension("2D/3D")
       .SetExtensionHelpPath("/interface/scene-editor/layers-and-cameras");
   extension.AddInstructionOrExpressionGroupMetadata(_("Layers and cameras"))
       .SetIcon("res/conditions/camera24.png");

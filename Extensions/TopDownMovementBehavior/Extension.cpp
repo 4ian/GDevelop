@@ -23,6 +23,10 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
             "events."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          "Move objects in 4/8 directions via keyboard, joystick, or gamepad. "
+          "Speed, acceleration, rotation.")
+      .SetDimension("2D")
       .SetCategory("Movement")
       .SetTags("top-down")
       .SetExtensionHelpPath("/behaviors/topdown");
@@ -130,6 +134,9 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .AddParameter("expression", _("Stick angle (in degrees)"))
+      .SetParameterLongDescription(
+          _("In top-down movement, a stick angle of 0° moves the object to the "
+            "right. 90° moves it down, and -90° moves it up."))
       .AddParameter("expression", _("Stick force (between 0 and 1)"))
       .MarkAsAdvanced()
       .SetFunctionName("SimulateStick");

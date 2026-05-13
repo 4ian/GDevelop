@@ -17,7 +17,6 @@ import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import VariablesList, {
   type HistoryHandler,
-  type VariablesListInterface,
 } from '../../VariablesList/VariablesList';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -30,7 +29,6 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 import TileSetVisualizer, {
   type TileMapTileSelection,
 } from '../TileSetVisualizer';
-import Add from '../../UI/CustomSvgIcons/Add';
 import {
   TopLevelCollapsibleSection,
   CollapsibleSubPanel,
@@ -38,12 +36,14 @@ import {
 } from '../../ObjectEditor/CompactObjectPropertiesEditor';
 import { ColumnStackLayout } from '../../UI/Layout';
 import Link from '../../UI/Link';
-import { CompactBehaviorPropertiesEditor } from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorPropertiesEditor';
 import { IconContainer } from '../../UI/IconContainer';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
+import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
 import EmptyMessage from '../../UI/EmptyMessage';
+import CompactBehaviorsEditorService from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorsEditorService';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -125,7 +125,6 @@ type Props = {|
   historyHandler?: HistoryHandler,
   tileMapTileSelection: ?TileMapTileSelection,
   onSelectTileMapTile: (?TileMapTileSelection) => void,
-  isVariableListLocked: boolean,
   canOverrideBehaviorProperties: boolean,
 |};
 
@@ -147,12 +146,10 @@ export const CompactInstancePropertiesEditor = ({
   projectScopedContainersAccessor,
   tileMapTileSelection,
   onSelectTileMapTile,
-  isVariableListLocked,
   canOverrideBehaviorProperties,
 }: Props): null | React.Node => {
   const forceUpdate = useForceUpdate();
   const instance = instances[0];
-  const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   /**
@@ -162,6 +159,9 @@ export const CompactInstancePropertiesEditor = ({
    * obviously plus instance-wise variables with same name).
    */
   const shouldDisplayVariablesList = instances.length === 1;
+  const variablesContainer = shouldDisplayVariablesList
+    ? exceptionallyGuardAgainstDeadObject(instance.getVariables())
+    : null;
 
   // $FlowFixMe[missing-local-annot]
   const onScrollY = React.useCallback(deltaY => {
@@ -169,6 +169,35 @@ export const CompactInstancePropertiesEditor = ({
       scrollViewRef.current.scrollBy(deltaY);
     }
   }, []);
+
+  const scrollKey = instances
+    .map((instance: gdInitialInstance) => '' + instance.ptr)
+    .join(';');
+
+  const persistedScrollId = React.useMemo(
+    () => {
+      if (!instances.length || !scrollKey) return null;
+
+      const selectedObjectForScroll = getObjectByName(
+        globalObjectsContainer,
+        objectsContainer,
+        instances[0].getObjectName()
+      );
+
+      return selectedObjectForScroll
+        ? selectedObjectForScroll.getPersistentUuid()
+        : null;
+    },
+    [globalObjectsContainer, instances, scrollKey, objectsContainer]
+  );
+
+  const onScroll = usePersistedScrollPosition({
+    project,
+    scrollViewRef,
+    scrollKey,
+    persistedScrollId,
+    persistedScrollType: 'instances-of-object',
+  });
 
   const { object, instanceSchema, allVisibleBehaviors } = React.useMemo<{|
     object?: gdObject,
@@ -318,9 +347,8 @@ export const CompactInstancePropertiesEditor = ({
         ref={scrollViewRef}
         autoHideScrollbar
         style={styles.scrollView}
-        key={instances
-          .map((instance: gdInitialInstance) => '' + instance.ptr)
-          .join(';')}
+        key={scrollKey}
+        onScroll={onScroll}
       >
         <Column expand noMargin id="instance-properties-editor">
           <Column>
@@ -380,6 +408,9 @@ export const CompactInstancePropertiesEditor = ({
                     </Text>
                   )}
                   {allVisibleBehaviors.map(behaviorName => {
+                    if (!object.hasBehaviorNamed(behaviorName)) {
+                      return null;
+                    }
                     const behavior = object.getBehavior(behaviorName);
                     const behaviorTypeName = behavior.getTypeName();
                     const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
@@ -391,9 +422,10 @@ export const CompactInstancePropertiesEditor = ({
                     )
                       ? instance.getBehaviorOverriding(behaviorName)
                       : null;
-
                     const iconUrl = behaviorMetadata.getIconFilename();
-
+                    const CompactBehaviorComponent = CompactBehaviorsEditorService.getEditor(
+                      behaviorTypeName
+                    );
                     return (
                       <StatefulCollapsibleSubPanel
                         key={behavior.ptr}
@@ -411,7 +443,7 @@ export const CompactInstancePropertiesEditor = ({
                                 </Column>
                               )
                             : () => (
-                                <CompactBehaviorPropertiesEditor
+                                <CompactBehaviorComponent
                                   project={project}
                                   behaviorMetadata={behaviorMetadata}
                                   behavior={behavior}
@@ -463,7 +495,7 @@ export const CompactInstancePropertiesEditor = ({
               )}
             />
           ) : null}
-          {object && shouldDisplayVariablesList ? (
+          {object && shouldDisplayVariablesList && variablesContainer ? (
             <>
               <Separator />
               <Column>
@@ -480,29 +512,16 @@ export const CompactInstancePropertiesEditor = ({
                     >
                       <ShareExternal style={styles.icon} />
                     </IconButton>
-                    {isVariableListLocked ? null : (
-                      <IconButton
-                        size="small"
-                        onClick={
-                          variablesListRef.current
-                            ? variablesListRef.current.addVariable
-                            : undefined
-                        }
-                      >
-                        <Add style={styles.icon} />
-                      </IconButton>
-                    )}
                   </Line>
                 </Line>
               </Column>
               <VariablesList
-                ref={variablesListRef}
                 projectScopedContainersAccessor={
                   projectScopedContainersAccessor
                 }
                 directlyStoreValueChangesWhileEditing
                 inheritedVariablesContainer={object.getVariables()}
-                variablesContainer={instance.getVariables()}
+                variablesContainer={variablesContainer}
                 areObjectVariables
                 size="compact"
                 onComputeAllVariableNames={() =>
@@ -520,7 +539,7 @@ export const CompactInstancePropertiesEditor = ({
                 compactEmptyPlaceholderText={
                   <Trans>There are no variables on this instance.</Trans>
                 }
-                isListLocked={isVariableListLocked}
+                isListLocked={true}
               />
             </>
           ) : null}

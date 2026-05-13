@@ -1,4 +1,5 @@
 // @flow
+import { addFinalNewline } from '../../Utils/Serializer';
 
 const downloadStringContentAsFile = async (
   filename: string,
@@ -34,7 +35,7 @@ export default class BrowserEventsFunctionsExtensionWriter {
     try {
       await downloadStringContentAsFile(
         filename,
-        JSON.stringify(serializedObject, null, 2)
+        addFinalNewline(JSON.stringify(serializedObject, null, 2))
       );
     } catch (error) {
       console.error('Unable to write the events function extension:', error);

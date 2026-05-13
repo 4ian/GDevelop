@@ -112,8 +112,7 @@ export const commonProps = {
   editorFunctionCallResults: ([]: Array<empty>),
   increaseQuotaOffering: 'subscribe',
   onProcessFunctionCalls: async () => {},
-  setAutoProcessFunctionCalls: () => {},
-  isAutoProcessingFunctionCalls: false,
+  onStop: async () => {},
   onStartOrOpenChat: () => {},
   aiRequestMode: 'agent',
   saveProject: async () => {},
@@ -317,7 +316,6 @@ export const ReadyAiRequestWithWorkingFunctionCall = (): React.Node => (
         call_id: fakeFunctionCallId,
       },
     ]}
-    isAutoProcessingFunctionCalls={true}
   />
 );
 export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = (): React.Node => (
@@ -344,7 +342,6 @@ export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = (): Rea
         },
       },
     ]}
-    isAutoProcessingFunctionCalls={true}
   />
 );
 
@@ -371,7 +368,6 @@ export const WorkingAiRequestWithFinishedFunctionCall = (): React.Node => (
         },
       },
     ]}
-    isAutoProcessingFunctionCalls={true}
   />
 );
 
@@ -394,7 +390,6 @@ export const ReadyAiRequestWithIgnoredFunctionCall = (): React.Node => (
         call_id: fakeFunctionCallId,
       },
     ]}
-    isAutoProcessingFunctionCalls={true}
   />
 );
 
@@ -421,7 +416,6 @@ export const ReadyAiRequestWithFailedFunctionCall = (): React.Node => (
         },
       },
     ]}
-    isAutoProcessingFunctionCalls={true}
   />
 );
 
@@ -438,7 +432,6 @@ export const ReadyAiRequestWithFunctionCallAndOutput = (): React.Node => (
       output: fakeOutputWithFunctionCallAndOutput,
       error: null,
     }}
-    isAutoProcessingFunctionCalls={true}
   />
 );
 
@@ -465,7 +458,6 @@ export const ReadyAiRequestWithFunctionCallWithSameCallId = (): React.Node => (
         },
       },
     ]}
-    isAutoProcessingFunctionCalls={true}
   />
 );
 
@@ -476,16 +468,12 @@ export const ReadyAiRequestWithFailedAndIgnoredFunctionCallOutputs = (): React.N
 );
 
 export const LongReadyAiRequest = (): React.Node => (
-  <WrappedChatComponent
-    aiRequest={agentAiRequest}
-    isAutoProcessingFunctionCalls={true}
-  />
+  <WrappedChatComponent aiRequest={agentAiRequest} />
 );
 
 export const LongReadyAiRequestForAnotherProject = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{ ...agentAiRequest, gameId: 'another-project-uuid' }}
-    isAutoProcessingFunctionCalls={true}
   />
 );
 
@@ -517,7 +505,6 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): React.Node => 
     <WrappedChatComponent
       aiRequest={agentAiRequest}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...defaultAuthenticatedUserWithNoSubscription,
         limits: {
@@ -551,7 +538,6 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscrip
     <WrappedChatComponent
       aiRequest={agentAiRequest}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...defaultAuthenticatedUserWithNoSubscription,
         limits: {
@@ -585,7 +571,6 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilver
     <WrappedChatComponent
       aiRequest={agentAiRequest}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...fakeSilverAuthenticatedUser,
         limits: {
@@ -619,7 +604,6 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartu
     <WrappedChatComponent
       aiRequest={agentAiRequest}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...fakeStartupAuthenticatedUser,
         limits: {
@@ -653,7 +637,6 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): React.Node 
     <WrappedChatComponent
       aiRequest={agentAiRequest}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...defaultAuthenticatedUserWithNoSubscription,
         limits: {
@@ -687,7 +670,6 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubsc
     <WrappedChatComponent
       aiRequest={agentAiRequest}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...defaultAuthenticatedUserWithNoSubscription,
         limits: {
@@ -721,7 +703,6 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSil
     <WrappedChatComponent
       aiRequest={agentAiRequest}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...fakeSilverAuthenticatedUser,
         limits: {
@@ -755,7 +736,6 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSta
     <WrappedChatComponent
       aiRequest={agentAiRequest}
       quota={quota}
-      isAutoProcessingFunctionCalls={true}
       authenticatedUser={{
         ...fakeStartupAuthenticatedUser,
         limits: {

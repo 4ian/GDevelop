@@ -152,6 +152,8 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/A_RuntimeObject3DRenderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/Cube3DRuntimeObject.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/Cube3DRuntimeObjectPixiRenderer.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/3D/CustomRuntimeObject3D.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/3D/CustomRuntimeObject3DRenderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TopDownMovementBehavior/topdownmovementruntimebehavior.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TweenBehavior/TweenManager.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TweenBehavior/tweentools.js',

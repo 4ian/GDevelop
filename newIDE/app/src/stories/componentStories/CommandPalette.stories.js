@@ -7,7 +7,6 @@ import CommandPalette from '../../CommandPalette/CommandPalette';
 import AutocompletePicker from '../../CommandPalette/CommandPalette/AutocompletePicker';
 import {
   type NamedCommand,
-  type GoToWikiCommand,
   type CommandOption,
 } from '../../CommandPalette/CommandManager';
 import paperDecorator from '../PaperDecorator';
@@ -37,16 +36,7 @@ export const Default = (): React.Node => (
               name: 'EDIT_OBJECT',
               handler: () => {},
             },
-            {
-              hit: {
-                content: 'Everything is an object in GDevelop',
-                hierarchy: { lvl0: 'Scene editor', lvl1: 'Objects' },
-                objectID: 'everyting-is-an-object',
-                url: 'https://wiki.gdevelop.io/gdevelop5/objects',
-              },
-              handler: action('Open wiki command'),
-            },
-          ]: Array<NamedCommand | GoToWikiCommand>)
+          ]: Array<NamedCommand>)
         }
         onClose={() => {}}
         onSelect={action('Open command')}

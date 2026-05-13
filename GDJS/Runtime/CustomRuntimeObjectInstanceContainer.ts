@@ -394,11 +394,27 @@ namespace gdjs {
     }
 
     getViewportOriginX(): float {
-      return this._customObject.getUnscaledCenterX();
+      // While the viewport origin is at the center of the custom object,
+      // we don't use `getUnscaledCenterX` because the center could be
+      // a custom center, set at any location. The viewport origin is like
+      // a camera: the center is always the center of the object bounds.
+      return (
+        (this._customObject.getInnerAreaMinX() +
+          this._customObject.getInnerAreaMaxX()) /
+        2
+      );
     }
 
     getViewportOriginY(): float {
-      return this._customObject.getUnscaledCenterY();
+      // While the viewport origin is at the center of the custom object,
+      // we don't use `getUnscaledCenterY` because the center could be
+      // a custom center, set at any location. The viewport origin is like
+      // a camera: the center is always the center of the object bounds.
+      return (
+        (this._customObject.getInnerAreaMinY() +
+          this._customObject.getInnerAreaMaxY()) /
+        2
+      );
     }
 
     onChildrenLocationChanged(): void {

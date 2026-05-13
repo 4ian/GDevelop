@@ -49,6 +49,9 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
   const gd::InstructionsList& GetActions() const { return actions; };
   gd::InstructionsList& GetActions() { return actions; };
 
+  virtual gd::InstructionsList* GetInstructionList(const gd::String& label) override;
+  virtual const gd::InstructionsList* GetInstructionList(const gd::String& label) const override;
+
   const gd::String& GetObjectToPick() const {
     return objectsToPick.GetPlainString();
   };
@@ -58,6 +61,25 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
 
   const gd::String& GetLoopIndexVariableName() const { return loopIndexVariableName; }
   void SetLoopIndexVariableName(const gd::String& name) { loopIndexVariableName = name; }
+
+  const gd::String& GetOrderBy() const {
+    return orderBy.GetPlainString();
+  };
+  void SetOrderBy(gd::String orderBy_) {
+    orderBy = gd::Expression(orderBy_);
+  };
+  const gd::Expression& GetOrderByExpression() const { return orderBy; };
+
+  const gd::String& GetOrder() const { return order; }
+  void SetOrder(const gd::String& order_) { order = order_; }
+
+  const gd::String& GetLimit() const {
+    return limit.GetPlainString();
+  };
+  void SetLimit(gd::String limit_) {
+    limit = gd::Expression(limit_);
+  };
+  const gd::Expression& GetLimitExpression() const { return limit; };
 
   virtual std::vector<const gd::InstructionsList*> GetAllConditionsVectors()
       const;
@@ -81,6 +103,9 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
   gd::EventsList events;
   VariablesContainer variables;
   gd::String loopIndexVariableName;
+  gd::Expression orderBy;
+  gd::String order;
+  gd::Expression limit;
 };
 
 }  // namespace gd

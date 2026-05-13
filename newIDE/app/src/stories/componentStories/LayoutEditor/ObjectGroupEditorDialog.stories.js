@@ -28,6 +28,7 @@ export const Default = (): React.Node => (
     onObjectGroupAdded={action('onObjectGroupAdded')}
     isVariableListLocked={false}
     isObjectListLocked={false}
+    getValidatedObjectOrGroupName={newName => newName}
   />
 );
 
@@ -46,6 +47,7 @@ export const WithLongObjectNames = (): React.Node => (
     onObjectGroupAdded={action('onObjectGroupAdded')}
     isVariableListLocked={false}
     isObjectListLocked={false}
+    getValidatedObjectOrGroupName={newName => newName}
   />
 );
 
@@ -64,5 +66,6 @@ export const Empty = (): React.Node => (
     onObjectGroupAdded={action('onObjectGroupAdded')}
     isVariableListLocked={false}
     isObjectListLocked={false}
+    getValidatedObjectOrGroupName={newName => newName}
   />
 );

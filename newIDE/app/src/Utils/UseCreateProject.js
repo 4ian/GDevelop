@@ -13,7 +13,7 @@ import {
   type NewProjectSetup,
   type ExampleProjectSetup,
 } from '../ProjectCreation/NewProjectSetupDialog';
-import { type State } from '../MainFrame';
+import { type State } from '../MainFrame/MainFrameState';
 import {
   type StorageProvider,
   type StorageProviderOperations,
@@ -48,6 +48,7 @@ type Props = {|
     project: gdProject,
     editorTabs: EditorTabsState,
     oldProjectId: string,
+    fileMetadata: ?FileMetadata,
     options: {
       openAllScenes: boolean,
       openQuickCustomizationDialog: boolean,
@@ -75,7 +76,7 @@ type Props = {|
 /**
  * Helper for Mainframe to create a new project.
  */
-type _UseCreateProjectReturnType = {
+export type UseCreateProjectReturnType = {
   createEmptyProject: (
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
@@ -112,7 +113,7 @@ const useCreateProject = ({
   onProjectSaved,
   ensureResourcesAreMoved,
   onGameRegistered,
-}: Props): _UseCreateProjectReturnType => {
+}: Props): UseCreateProjectReturnType => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const profile = authenticatedUser.profile;
   const unsavedChanges = React.useContext(UnsavedChangesContext);
@@ -131,6 +132,9 @@ const useCreateProject = ({
     project.setVersion('1.0.0');
     project.getAuthorIds().clear();
     project.setAuthor('');
+    // Assume all projects created from examples/templates are new projects
+    // and should use current defaults, regardless of the example's gdVersion.
+    project.setUseDeprecatedZeroAsDefaultStringVariable(false);
     if (newProjectSetup.width && newProjectSetup.height) {
       project.setGameResolutionSize(
         newProjectSetup.width,
@@ -231,6 +235,7 @@ const useCreateProject = ({
 
         const { onSaveProjectAs } = destinationStorageProviderOperations;
 
+        let updatedFileMetadata: ?FileMetadata = state.currentFileMetadata;
         if (onSaveProjectAs) {
           const { wasSaved, fileMetadata } = await onSaveProjectAs(
             currentProject,
@@ -274,6 +279,7 @@ const useCreateProject = ({
             return { createdProject: null };
           }
 
+          updatedFileMetadata = fileMetadata;
           onProjectSaved(fileMetadata);
           unsavedChanges.sealUnsavedChanges();
           if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
@@ -297,6 +303,7 @@ const useCreateProject = ({
           project: currentProject,
           editorTabs,
           oldProjectId,
+          fileMetadata: updatedFileMetadata,
           options: {
             openAllScenes: !!options && options.openAllScenes,
             openQuickCustomizationDialog: !!newProjectSetup.openQuickCustomizationDialog,

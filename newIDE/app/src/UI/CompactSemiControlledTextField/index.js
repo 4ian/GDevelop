@@ -16,6 +16,7 @@ type Props = {|
   leftIconTooltip?: React.Node,
   renderEndAdornmentOnHover?: (className: string) => React.Node,
   onClickEndAdornment?: () => void,
+  onFocus?: () => void,
 
   errorText?: React.Node,
 |};
@@ -23,6 +24,7 @@ type Props = {|
 const CompactSemiControlledTextField = ({
   value,
   onChange,
+  onFocus,
   errorText,
   commitOnBlur,
   ...otherProps
@@ -38,6 +40,9 @@ const CompactSemiControlledTextField = ({
         onFocus={event => {
           setFocused(true);
           setText(value);
+          if (onFocus) {
+            onFocus();
+          }
         }}
         onChange={newValue => {
           setText(newValue);

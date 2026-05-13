@@ -372,14 +372,17 @@ jobs:
           # setuptools will make distutils available again (but we should migrate our packages probably).
           command: |
             pip install setuptools
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
             cd newIDE
 
             npm -v
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
             $Env:REQUIRES_EXACT_LIBGD_JS_VERSION = "true"
 
             npm install
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
             cd ..
 

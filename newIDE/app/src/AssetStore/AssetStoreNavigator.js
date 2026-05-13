@@ -274,8 +274,7 @@ export const AssetStoreNavigatorStateProvider = (
                   node: { name: tag, allChildrenTags: [], children: [] },
                   parentNodes: [],
                 },
-                // $FlowFixMe[underconstrained-implicit-instantiation]
-                chosenFilters: new Set(),
+                chosenFilters: new Set<string>(),
                 addFilter: () => {},
                 removeFilter: () => {},
                 setChosenCategory: () => {},
@@ -354,8 +353,7 @@ export const AssetStoreNavigatorStateProvider = (
                     },
                     parentNodes: [],
                   },
-                  // $FlowFixMe[underconstrained-implicit-instantiation]
-                  chosenFilters: new Set(),
+                  chosenFilters: new Set<string>(),
                   addFilter: () => {},
                   removeFilter: () => {},
                   setChosenCategory: () => {},

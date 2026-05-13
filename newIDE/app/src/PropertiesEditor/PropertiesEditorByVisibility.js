@@ -45,6 +45,7 @@ type Props = {|
   object?: ?gdObject,
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   resourceManagementProps?: ?ResourceManagementProps,
+  isAdvancedSectionInitiallyUncollapsed?: boolean,
 |};
 
 const PropertiesEditorByVisibility = ({
@@ -58,6 +59,7 @@ const PropertiesEditorByVisibility = ({
   projectScopedContainersAccessor,
   resourceManagementProps,
   placeholder,
+  isAdvancedSectionInitiallyUncollapsed,
 }: Props): ?(false | 0 | '' | React$Portal | React.Node) => {
   const [
     shouldShowDeprecatedProperties,
@@ -92,8 +94,11 @@ const PropertiesEditorByVisibility = ({
   );
 
   const areAdvancedPropertiesExpandedByDefault = React.useMemo(
-    () => isAnyPropertyModified(advancedPropertiesSchema, instances),
-    [instances, advancedPropertiesSchema]
+    () =>
+      isAdvancedSectionInitiallyUncollapsed === undefined
+        ? isAnyPropertyModified(advancedPropertiesSchema, instances)
+        : isAdvancedSectionInitiallyUncollapsed,
+    [isAdvancedSectionInitiallyUncollapsed, advancedPropertiesSchema, instances]
   );
 
   return hasAnyProperty ? (

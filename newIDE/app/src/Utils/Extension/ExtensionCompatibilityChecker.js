@@ -1,6 +1,7 @@
 // @flow
 import semverSatisfies from 'semver/functions/satisfies';
 import semverGreaterThan from 'semver/functions/gt';
+import semverValid from 'semver/functions/valid';
 import {
   type ExtensionShortHeader,
   type BehaviorShortHeader,
@@ -31,7 +32,12 @@ export const getBreakingChanges = (
   }
   const breakingChanges = [];
   for (const { version, breaking } of extension.changelog) {
-    if (breaking && semverGreaterThan(version, installedVersion)) {
+    if (
+      breaking &&
+      (!semverValid(version) ||
+        !semverValid(installedVersion) ||
+        semverGreaterThan(version, installedVersion))
+    ) {
       breakingChanges.push({ version, changes: breaking });
     }
   }

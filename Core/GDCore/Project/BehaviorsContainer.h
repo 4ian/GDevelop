@@ -11,6 +11,7 @@
 
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EffectsContainer.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
@@ -153,6 +154,9 @@ protected:
    * behaviors and it must be a deep copy.
    */
   void Init(const gd::BehaviorsContainer &behaviorsContainer);
+
+private:
+  gd::MemoryTracked _memoryTracked{this, "BehaviorsContainer"};
 };
 
 } // namespace gd

@@ -351,6 +351,11 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'DraggableBehavior::Draggable',
     'Draggable'
   );
+  spriteObjectWithBehaviors.addNewBehavior(
+    project,
+    'AnchorBehavior::AnchorBehavior',
+    'Anchor'
+  );
 
   const group1 = new gd.ObjectGroup();
   group1.setName('GroupOfSprites');

@@ -49,7 +49,10 @@ public:
   std::set<gd::String>& GetAllAtlases() { return GetAll("atlas"); };
   std::set<gd::String>& GetAllSpines() { return GetAll("spine"); };
   std::set<gd::String>& GetAll(const gd::String& resourceType) {
-    if (resourceType == "image") return allImages;
+    // When adding a new resource type don't forget to update
+    // gd::ResourcesInUseHelper::resourceTypes
+    if (resourceType == "image")
+      return allImages;
     if (resourceType == "audio") return allAudios;
     if (resourceType == "font") return allFonts;
     if (resourceType == "json") return allJsons;

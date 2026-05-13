@@ -20,6 +20,7 @@ import AddIcon from '../../UI/CustomSvgIcons/Add';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import newNameGenerator from '../../Utils/NewNameGenerator';
+import Container from '@material-ui/core/Container';
 
 type Props = {|
   project: gdProject,
@@ -163,86 +164,104 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
     return (
       <Background>
         <ScrollView ref={scrollView}>
-          <ColumnStackLayout expand useFullHeight noOverflowParent>
-            {eventsBasedBehavior ? (
-              <EventsBasedBehaviorEditor
-                project={project}
-                eventsFunctionsExtension={eventsFunctionsExtension}
-                eventsBasedBehavior={eventsBasedBehavior}
-                unsavedChanges={unsavedChanges}
-                onConfigurationUpdated={onConfigurationUpdated}
-              />
-            ) : eventsBasedObject ? (
-              <EventsBasedObjectEditor
-                eventsFunctionsExtension={eventsFunctionsExtension}
-                eventsBasedObject={eventsBasedObject}
-                unsavedChanges={unsavedChanges}
-                onOpenCustomObjectEditor={onOpenCustomObjectEditor}
-                onEventsBasedObjectChildrenEdited={
-                  onEventsBasedObjectChildrenEdited
-                }
-              />
-            ) : null}
-            <Text size="block-title">
-              {eventsBasedObject ? (
-                <Trans>Object properties</Trans>
-              ) : (
-                <Trans>Behavior properties</Trans>
-              )}
-            </Text>
-            {eventsBasedEntity && (
-              <EventsBasedBehaviorPropertiesEditor
-                ref={propertiesEditor}
-                project={project}
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                extension={eventsFunctionsExtension}
-                eventsBasedBehavior={eventsBasedBehavior}
-                eventsBasedObject={eventsBasedObject}
-                properties={eventsBasedEntity.getPropertyDescriptors()}
-                behaviorObjectType={
-                  eventsBasedBehavior ? eventsBasedBehavior.getObjectType() : ''
-                }
-                onRenameProperty={onRenameProperty}
-                onPropertiesUpdated={_onPropertiesUpdated}
-                onFocusProperty={propertyName =>
-                  onFocusProperty(propertyName, false)
-                }
-                onPropertyTypeChanged={onPropertyTypeChanged}
-                onEventsFunctionsAdded={onEventsFunctionsAdded}
-              />
-            )}
-            {eventsBasedBehavior && (
-              <Text size="block-title">
-                <Trans>Scene properties</Trans>
-              </Text>
-            )}
-            {eventsBasedBehavior && (
-              <EventsBasedBehaviorPropertiesEditor
-                ref={scenePropertiesEditor}
-                isSharedProperties
-                project={project}
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                extension={eventsFunctionsExtension}
-                eventsBasedBehavior={eventsBasedBehavior}
-                eventsBasedObject={null}
-                properties={eventsBasedBehavior.getSharedPropertyDescriptors()}
-                behaviorObjectType={
-                  eventsBasedBehavior ? eventsBasedBehavior.getObjectType() : ''
-                }
-                onRenameProperty={onRenameSharedProperty}
-                onPropertiesUpdated={_onPropertiesUpdated}
-                onFocusProperty={propertyName =>
-                  onFocusProperty(propertyName, true)
-                }
-                onPropertyTypeChanged={onPropertyTypeChanged}
-                onEventsFunctionsAdded={onEventsFunctionsAdded}
-              />
-            )}
-          </ColumnStackLayout>
+          <Column
+            noMargin
+            expand
+            useFullHeight
+            noOverflowParent
+            justifyContent="center"
+          >
+            <Container
+              style={{
+                maxWidth: '800px',
+              }}
+            >
+              <ColumnStackLayout expand useFullHeight noOverflowParent>
+                {eventsBasedBehavior ? (
+                  <EventsBasedBehaviorEditor
+                    project={project}
+                    eventsFunctionsExtension={eventsFunctionsExtension}
+                    eventsBasedBehavior={eventsBasedBehavior}
+                    unsavedChanges={unsavedChanges}
+                    onConfigurationUpdated={onConfigurationUpdated}
+                  />
+                ) : eventsBasedObject ? (
+                  <EventsBasedObjectEditor
+                    eventsFunctionsExtension={eventsFunctionsExtension}
+                    eventsBasedObject={eventsBasedObject}
+                    unsavedChanges={unsavedChanges}
+                    onOpenCustomObjectEditor={onOpenCustomObjectEditor}
+                    onEventsBasedObjectChildrenEdited={
+                      onEventsBasedObjectChildrenEdited
+                    }
+                  />
+                ) : null}
+                <Text size="block-title">
+                  {eventsBasedObject ? (
+                    <Trans>Object properties</Trans>
+                  ) : (
+                    <Trans>Behavior properties</Trans>
+                  )}
+                </Text>
+                {eventsBasedEntity && (
+                  <EventsBasedBehaviorPropertiesEditor
+                    ref={propertiesEditor}
+                    project={project}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    extension={eventsFunctionsExtension}
+                    eventsBasedBehavior={eventsBasedBehavior}
+                    eventsBasedObject={eventsBasedObject}
+                    properties={eventsBasedEntity.getPropertyDescriptors()}
+                    behaviorObjectType={
+                      eventsBasedBehavior
+                        ? eventsBasedBehavior.getObjectType()
+                        : ''
+                    }
+                    onRenameProperty={onRenameProperty}
+                    onPropertiesUpdated={_onPropertiesUpdated}
+                    onFocusProperty={propertyName =>
+                      onFocusProperty(propertyName, false)
+                    }
+                    onPropertyTypeChanged={onPropertyTypeChanged}
+                    onEventsFunctionsAdded={onEventsFunctionsAdded}
+                  />
+                )}
+                {eventsBasedBehavior && (
+                  <Text size="block-title">
+                    <Trans>Scene properties</Trans>
+                  </Text>
+                )}
+                {eventsBasedBehavior && (
+                  <EventsBasedBehaviorPropertiesEditor
+                    ref={scenePropertiesEditor}
+                    isSharedProperties
+                    project={project}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    extension={eventsFunctionsExtension}
+                    eventsBasedBehavior={eventsBasedBehavior}
+                    eventsBasedObject={null}
+                    properties={eventsBasedBehavior.getSharedPropertyDescriptors()}
+                    behaviorObjectType={
+                      eventsBasedBehavior
+                        ? eventsBasedBehavior.getObjectType()
+                        : ''
+                    }
+                    onRenameProperty={onRenameSharedProperty}
+                    onPropertiesUpdated={_onPropertiesUpdated}
+                    onFocusProperty={propertyName =>
+                      onFocusProperty(propertyName, true)
+                    }
+                    onPropertyTypeChanged={onPropertyTypeChanged}
+                    onEventsFunctionsAdded={onEventsFunctionsAdded}
+                  />
+                )}
+              </ColumnStackLayout>
+            </Container>
+          </Column>
         </ScrollView>
         {windowSize === 'small' && (
           <Column>

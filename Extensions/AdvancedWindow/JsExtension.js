@@ -27,6 +27,9 @@ module.exports = {
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
+      .setShortDescription(
+        'Window focus, position, size, always-on-top, minimize/maximize, content protection. Desktop only.'
+      )
       .setCategory('User interface');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Advanced window management'))

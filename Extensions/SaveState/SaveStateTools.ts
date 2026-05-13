@@ -218,6 +218,7 @@ namespace gdjs {
         syncAsyncTasks: true,
         syncSceneVisualProps: true,
         syncFullTileMaps: true,
+        syncLinkedObjects: true,
       };
 
       const shouldPersistGameData = checkIfIsPersistedInProfiles(

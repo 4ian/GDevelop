@@ -17,8 +17,7 @@ import { EXTENSIONS_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 const emptySearchText = '';
 
-// $FlowFixMe[underconstrained-implicit-instantiation]
-const noExcludedTiers = new Set();
+const noExcludedTiers = new Set<string>();
 const excludedExperimentalTiers = new Set(['experimental']);
 
 type ExtensionStoreState = {|
@@ -187,8 +186,7 @@ export const ExtensionStoreStateProvider = ({
 
   const allCategories = React.useMemo(
     () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      const categoriesSet = new Set();
+      const categoriesSet = new Set<string>();
       for (const name in translatedExtensionShortHeadersByName) {
         categoriesSet.add(translatedExtensionShortHeadersByName[name].category);
       }
@@ -200,10 +198,9 @@ export const ExtensionStoreStateProvider = ({
     [translatedExtensionShortHeadersByName]
   );
 
-  const filters = React.useMemo(
+  const filters: Filters = React.useMemo(
     () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      const tagsSet = new Set();
+      const tagsSet = new Set<string>();
       for (const name in translatedExtensionShortHeadersByName) {
         translatedExtensionShortHeadersByName[name].tags.forEach(tag =>
           tagsSet.add(tag)
@@ -215,7 +212,6 @@ export const ExtensionStoreStateProvider = ({
       return {
         allTags: sortedTags,
         defaultTags: sortedTags,
-        // $FlowFixMe[missing-empty-array-annot]
         tagsTree: [],
       };
     },

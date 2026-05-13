@@ -3,8 +3,11 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
-// $FlowFixMe[import-type-as-value]
-import { TreeViewItemContent, type TreeItemProps, layersRootFolderId } from '.';
+import {
+  type TreeViewItemContent,
+  type TreeItemProps,
+  layersRootFolderId,
+} from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
@@ -149,7 +152,7 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
     return [
       {
         label: i18n._(t`Rename`),
-        click: () => this.props.editName(this.layer.getName()),
+        click: () => this.props.editName(this.getId()),
         accelerator: 'F2',
         enabled: !this._isBaseLayer(),
       },

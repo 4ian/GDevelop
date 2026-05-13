@@ -23,6 +23,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
             "be resized (i.e: most objects)."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Read/change width and height of resizable objects.")
       .SetExtensionHelpPath("/objects");
   extension.AddInstructionOrExpressionGroupMetadata(_("Size")).SetIcon(
       "res/actions/scale24_black.png");

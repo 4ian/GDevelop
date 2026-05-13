@@ -1,6 +1,5 @@
 // @flow
-// $FlowFixMe[import-type-as-value]
-import { SearchFilter } from '../../UI/Search/UseSearchItem';
+import { type SearchFilter } from '../../UI/Search/UseSearchItem';
 import {
   type AudioResourceV2,
   type FontResourceV2,

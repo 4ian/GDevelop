@@ -248,8 +248,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
       const canHaveChildren = Array.isArray(children);
       const collapsed = !forceAllOpened && !openedNodeIds.includes(id);
       const openedDuringSearch = openedDuringSearchNodeIds.includes(id);
-      // $FlowFixMe[missing-empty-array-annot]
-      let flattenedChildren = [];
+      let flattenedChildren: Array<FlattenedNode<Item>> = [];
       /*
        * Compute children nodes flattening if:
        * - node has children;

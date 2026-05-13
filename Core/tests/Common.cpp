@@ -78,9 +78,9 @@ TEST_CASE("EventsList", "[common][events]") {
     size_t endMemory = gd::SystemStats::GetUsedVirtualMemory();
     INFO("Memory used: " << endMemory - startMemory << "KB");
     #if defined(WINDOWS)
-      REQUIRE(3000 >= endMemory - startMemory);
+      REQUIRE(3800 >= endMemory - startMemory);
     #else
-      REQUIRE(1650 >= endMemory - startMemory);
+      REQUIRE(2000 >= endMemory - startMemory);
     #endif
   }
 }

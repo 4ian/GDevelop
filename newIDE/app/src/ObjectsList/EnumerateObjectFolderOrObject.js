@@ -2,6 +2,11 @@
 
 import { mapFor } from '../Utils/MapFor';
 
+type EnumearatedObjectFolderOrObject = {|
+  path: string,
+  folder: gdObjectFolderOrObject,
+|};
+
 export type ObjectFolderOrObjectWithContext = {|
   objectFolderOrObject: gdObjectFolderOrObject,
   global: boolean,
@@ -17,7 +22,7 @@ export const getObjectFolderOrObjectUnifiedName = (
 const recursivelyEnumerateFoldersInFolder = (
   folder: gdObjectFolderOrObject,
   prefix: string,
-  result: {| path: string, folder: gdObjectFolderOrObject |}[]
+  result: Array<EnumearatedObjectFolderOrObject>
 ) => {
   mapFor(0, folder.getChildrenCount(), i => {
     const child = folder.getChildAt(i);
@@ -50,37 +55,28 @@ const recursivelyEnumerateObjectsInFolder = (
 
 export const enumerateObjectsInFolder = (
   folder: gdObjectFolderOrObject
-): gdObject[] => {
+): Array<gdObject> => {
   if (!folder.isFolder()) return [];
-  // $FlowFixMe[missing-empty-array-annot]
-  const result = [];
-  // $FlowFixMe[incompatible-type]
+  const result: Array<gdObject> = [];
   recursivelyEnumerateObjectsInFolder(folder, result);
-  // $FlowFixMe[incompatible-type]
   return result;
 };
 
 export const enumerateFoldersInFolder = (
   folder: gdObjectFolderOrObject
-): {| path: string, folder: gdObjectFolderOrObject |}[] => {
+): Array<EnumearatedObjectFolderOrObject> => {
   if (!folder.isFolder()) return [];
-  // $FlowFixMe[missing-empty-array-annot]
-  const result = [];
-  // $FlowFixMe[incompatible-type]
+  const result: Array<EnumearatedObjectFolderOrObject> = [];
   recursivelyEnumerateFoldersInFolder(folder, '', result);
-  // $FlowFixMe[incompatible-type]
   return result;
 };
 
 export const enumerateFoldersInContainer = (
   container: gdObjectsContainer
-): {| path: string, folder: gdObjectFolderOrObject |}[] => {
+): Array<EnumearatedObjectFolderOrObject> => {
   const rootFolder = container.getRootFolder();
-  // $FlowFixMe[missing-empty-array-annot]
-  const result = [];
-  // $FlowFixMe[incompatible-type]
+  const result: Array<EnumearatedObjectFolderOrObject> = [];
   recursivelyEnumerateFoldersInFolder(rootFolder, '', result);
-  // $FlowFixMe[incompatible-type]
   return result;
 };
 

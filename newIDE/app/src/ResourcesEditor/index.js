@@ -2,6 +2,7 @@
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 import ResourcesList, { type ResourcesListInterface } from '../ResourcesList';
 import ResourcePropertiesEditor, {
   type ResourcePropertiesEditorInterface,
@@ -10,7 +11,7 @@ import Toolbar from './Toolbar';
 import EditorMosaic, { type EditorMosaicInterface } from '../UI/EditorMosaic';
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire';
-import Window from '../Utils/Window';
+import AlertContext, { type ConfirmState } from '../UI/Alert/AlertContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import {
   type ResourceManagementProps,
@@ -68,6 +69,7 @@ const initialMosaicEditorNodes = {
 };
 
 export default class ResourcesEditor extends React.Component<Props, State> {
+  static contextType: React.Context<ConfirmState> = AlertContext;
   // $FlowFixMe[missing-local-annot]
   static defaultProps = {
     setToolbar: () => {},
@@ -122,13 +124,18 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     );
   };
 
-  deleteResource = (resource: ?gdResource) => {
+  deleteResource = async (resource: ?gdResource) => {
     const { project, onDeleteResource } = this.props;
     if (!resource) return;
 
-    const answer = Window.showConfirmDialog(
-      "Are you sure you want to remove this resource? This can't be undone."
-    );
+    const context: ConfirmState = this.context;
+    const answer = await new Promise(resolve => {
+      context.showConfirmDialog({
+        title: t`Remove resource`,
+        message: t`Are you sure you want to remove this resource? This can't be undone.`,
+        callback: resolve,
+      });
+    });
     if (!answer) return;
 
     const resourcesManager = project.getResourcesManager();
@@ -300,21 +307,26 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         type: 'secondary',
         title: t`Properties`,
         renderEditor: () => (
-          <ResourcePropertiesEditor
-            key={selectedResource ? selectedResource.ptr : undefined}
-            resources={selectedResource ? [selectedResource] : []}
-            project={project}
-            resourcesLoader={this.resourcesLoader}
-            ref={propertiesEditor =>
-              (this._propertiesEditor = propertiesEditor)
-            }
-            onResourcePathUpdated={() => {
-              if (this._resourcesList) {
-                this._resourcesList.checkMissingPaths();
-              }
-            }}
-            resourceManagementProps={resourceManagementProps}
-          />
+          <I18n>
+            {({ i18n }) => (
+              <ResourcePropertiesEditor
+                key={selectedResource ? selectedResource.ptr : undefined}
+                resources={selectedResource ? [selectedResource] : []}
+                project={project}
+                resourcesLoader={this.resourcesLoader}
+                ref={propertiesEditor =>
+                  (this._propertiesEditor = propertiesEditor)
+                }
+                onResourcePathUpdated={() => {
+                  if (this._resourcesList) {
+                    this._resourcesList.checkMissingPaths();
+                  }
+                }}
+                resourceManagementProps={resourceManagementProps}
+                i18n={i18n}
+              />
+            )}
+          </I18n>
         ),
       },
       'resources-list': {

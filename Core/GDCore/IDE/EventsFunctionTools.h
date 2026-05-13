@@ -81,6 +81,11 @@ class GD_CORE_API EventsFunctionTools {
       const PropertiesContainer &properties,
       gd::VariablesContainer &outputVariablesContainer);
 
+  static void PropertiesToVariablesContainer(
+      const PropertiesContainer &properties,
+      const PropertiesContainer &sharedProperties,
+      gd::VariablesContainer &outputVariablesContainer);
+
   static void ParametersToResourcesContainer(
       const ParameterMetadataContainer &parameters,
       gd::ResourcesContainer &outputResourcesContainer);
@@ -88,5 +93,10 @@ class GD_CORE_API EventsFunctionTools {
   static void PropertiesToResourcesContainer(
       const PropertiesContainer &properties,
       gd::ResourcesContainer &outputResourcesContainer);
+
+private:
+  static void AddPropertiesToVariablesContainer(
+      const PropertiesContainer &properties,
+      gd::VariablesContainer &outputVariablesContainer);
 };
 }  // namespace gd

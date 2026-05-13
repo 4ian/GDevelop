@@ -22,6 +22,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
                                _("Actions and conditions for objects having animations (sprite, 3D models...)."),
                                "Florian Rival",
                                "Open source (MIT License)")
+      .SetShortDescription("Play/pause/set animations by name or index. Speed, frame, loop, finished checks.")
       .SetExtensionHelpPath("/objects");
   extension.AddInstructionOrExpressionGroupMetadata(_("Objects with animations"))
       .SetIcon("res/actions/animation24.png");

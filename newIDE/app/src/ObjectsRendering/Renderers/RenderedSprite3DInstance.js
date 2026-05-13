@@ -21,8 +21,7 @@ const getTransparentMaterial = () => {
   return transparentMaterial;
 };
 
-// $FlowFixMe[missing-empty-array-annot]
-const vertexColors = [];
+const vertexColors: Array<number> = [];
 
 /**
  * Renderer for gd.SpriteObject
@@ -72,7 +71,6 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
     const geometry = new THREE.PlaneGeometry(1, -1);
     // Set a white tint.
     vertexColors.length = geometry.attributes.position.count * 3;
-    // $FlowFixMe[incompatible-type]
     vertexColors.fill(1);
     geometry.setAttribute(
       'color',

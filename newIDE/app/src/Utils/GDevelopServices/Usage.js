@@ -63,7 +63,7 @@ export type Subscription = {|
 
 type AiCapability = {
   availablePresets: Array<{
-    mode: 'chat' | 'agent',
+    mode: 'chat' | 'agent' | 'orchestrator',
     name: string,
     id: string,
     disabled?: boolean,

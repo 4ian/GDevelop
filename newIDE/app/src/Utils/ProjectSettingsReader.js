@@ -3,6 +3,7 @@ import optionalRequire from './OptionalRequire';
 import YAML from 'yaml';
 import { SafeExtractor } from './SafeExtractor';
 import { type ToolbarButtonConfig } from '../MainFrame/CustomToolbarButton';
+import type { ToolbarButtonHooksNames } from '../MainFrame/CustomToolbarButton';
 
 const fs = optionalRequire('fs');
 const fsPromises = fs ? fs.promises : null;
@@ -11,6 +12,7 @@ const path = optionalRequire('path');
 export type ParsedProjectSettings = {
   preferences?: { [string]: boolean | string | number },
   toolbarButtons?: Array<ToolbarButtonConfig>,
+  shortcuts?: { [string]: string },
 };
 
 const SETTINGS_FILE_NAME = 'gdevelop-settings.yaml';
@@ -21,6 +23,59 @@ const SAFE_SCRIPT_NAME_PATTERN = /^[a-zA-Z0-9_:-]+$/;
 export const getProjectDirectory = (projectFilePath: string): string | null => {
   if (!path) return null;
   return path.dirname(projectFilePath);
+};
+
+/**
+ * Parses raw toolbar button entries from YAML into validated ToolbarButtonConfig objects.
+ * Exported for unit testing; file system is not needed.
+ */
+export const parseToolbarButtons = (
+  rawToolbarButtons: Array<mixed>,
+  availableScripts: { [string]: string }
+): Array<ToolbarButtonConfig> => {
+  const availableHooks: ToolbarButtonHooksNames[] = [
+    'onEditorReady',
+    'onPreviewStart',
+    'onPreviewEnd',
+  ];
+  const toolbarButtons: Array<ToolbarButtonConfig> = [];
+
+  for (const rawButton of rawToolbarButtons) {
+    const name = SafeExtractor.extractStringProperty(rawButton, 'name');
+    const icon = SafeExtractor.extractStringProperty(rawButton, 'icon');
+    const npmScript = SafeExtractor.extractStringProperty(
+      rawButton,
+      'npmScript'
+    );
+    const hook = SafeExtractor.extractStringProperty(rawButton, 'hook');
+
+    if (name && icon && npmScript) {
+      if (!SAFE_SCRIPT_NAME_PATTERN.test(npmScript)) {
+        console.warn(
+          `[ProjectSettingsReader] Skipping button "${name}": invalid script name "${npmScript}"`
+        );
+        continue;
+      }
+      if (!availableScripts[npmScript]) {
+        console.warn(
+          `[ProjectSettingsReader] Skipping button "${name}": script "${npmScript}" not found in package.json`
+        );
+        continue;
+      }
+      const toolbarButtonConfig: ToolbarButtonConfig = {
+        name,
+        icon,
+        npmScript,
+      };
+      const matchedHook = hook && availableHooks.find(h => h === hook);
+      if (matchedHook) {
+        toolbarButtonConfig.hook = matchedHook;
+      }
+      toolbarButtons.push(toolbarButtonConfig);
+    }
+  }
+
+  return toolbarButtons;
 };
 
 /**
@@ -100,28 +155,24 @@ export const readProjectSettings = async (
 
       // Only process buttons if we have a valid package.json with scripts
       if (Object.keys(availableScripts).length > 0) {
-        for (const rawButton of rawToolbarButtons) {
-          const name = SafeExtractor.extractStringProperty(rawButton, 'name');
-          const icon = SafeExtractor.extractStringProperty(rawButton, 'icon');
-          const npmScript = SafeExtractor.extractStringProperty(
-            rawButton,
-            'npmScript'
-          );
-          if (name && icon && npmScript) {
-            if (!SAFE_SCRIPT_NAME_PATTERN.test(npmScript)) {
-              console.warn(
-                `[ProjectSettingsReader] Skipping button "${name}": invalid script name "${npmScript}"`
-              );
-              continue;
-            }
-            if (!availableScripts[npmScript]) {
-              console.warn(
-                `[ProjectSettingsReader] Skipping button "${name}": script "${npmScript}" not found in package.json`
-              );
-              continue;
-            }
-            toolbarButtons.push({ name, icon, npmScript });
-          }
+        toolbarButtons = parseToolbarButtons(
+          rawToolbarButtons,
+          availableScripts
+        );
+      }
+    }
+
+    // Parse shortcuts section
+    const rawShortcuts = SafeExtractor.extractObjectProperty(
+      parsed,
+      'shortcuts'
+    );
+    const shortcuts: { [string]: string } = {};
+    if (rawShortcuts) {
+      for (const key of Object.keys(rawShortcuts)) {
+        const value = SafeExtractor.extractStringProperty(rawShortcuts, key);
+        if (value !== null) {
+          shortcuts[key] = value;
         }
       }
     }
@@ -129,7 +180,9 @@ export const readProjectSettings = async (
     console.info(
       `[ProjectSettingsReader] Loaded: ${
         Object.keys(preferences).length
-      } preferences, ${toolbarButtons.length} buttons`
+      } preferences, ${toolbarButtons.length} buttons, ${
+        Object.keys(shortcuts).length
+      } shortcuts`
     );
 
     const result: ParsedProjectSettings = {};
@@ -138,6 +191,9 @@ export const readProjectSettings = async (
     }
     if (toolbarButtons.length > 0) {
       result.toolbarButtons = toolbarButtons;
+    }
+    if (Object.keys(shortcuts).length > 0) {
+      result.shortcuts = shortcuts;
     }
     return result;
   } catch (error) {

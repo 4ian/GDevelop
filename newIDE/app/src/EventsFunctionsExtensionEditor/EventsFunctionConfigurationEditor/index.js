@@ -1,11 +1,12 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import ObjectGroupsListWithObjectGroupEditor from '../../ObjectGroupsList/ObjectGroupsListWithObjectGroupEditor';
 import { Tabs } from '../../UI/Tabs';
-import { EventsFunctionParametersEditor } from './EventsFunctionParametersEditor';
-import { EventsFunctionPropertiesEditor } from './EventsFunctionPropertiesEditor';
+import { CompactEventsFunctionParametersEditor } from './CompactEventsFunctionParametersEditor';
+import { CompactEventsFunctionPropertiesEditor } from './CompactEventsFunctionPropertiesEditor';
 import { Column, Line } from '../../UI/Grid';
 import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
@@ -28,7 +29,6 @@ type Props = {|
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
   onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
-  renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,
   onMoveFreeEventsParameter?: (
@@ -152,7 +152,6 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       onParametersOrGroupsUpdated,
       freezeParameters,
       helpPagePath,
-      renderConfigurationHeader,
       onMoveFreeEventsParameter,
       onMoveBehaviorEventsParameter,
       onMoveObjectEventsParameter,
@@ -167,83 +166,96 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       eventsFunction.getObjectGroups().count() > 0;
 
     return (
-      <Column expand useFullHeight noOverflowParent>
-        {hasLegacyFunctionObjectGroups ? (
-          <Line>
-            <Column noMargin expand noOverflowParent>
-              <Tabs
-                value={this.state.currentTab}
-                onChange={this._chooseTab}
-                options={[
-                  {
-                    value: ('config': TabNames),
-                    label: <Trans>Configuration</Trans>,
-                  },
-                  {
-                    value: ('groups': TabNames),
-                    label: <Trans>Object groups</Trans>,
-                  },
-                ]}
+      <I18n>
+        {({ i18n }) => (
+          <Column expand useFullHeight noOverflowParent>
+            {hasLegacyFunctionObjectGroups ? (
+              <Line>
+                <Column noMargin expand noOverflowParent>
+                  <Tabs
+                    value={this.state.currentTab}
+                    onChange={this._chooseTab}
+                    options={[
+                      {
+                        value: ('config': TabNames),
+                        label: <Trans>Configuration</Trans>,
+                      },
+                      {
+                        value: ('groups': TabNames),
+                        label: <Trans>Object groups</Trans>,
+                      },
+                    ]}
+                  />
+                </Column>
+              </Line>
+            ) : null}
+            {this.state.currentTab === 'config' ? (
+              <CompactEventsFunctionParametersEditor
+                project={project}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
+                eventsFunction={eventsFunction}
+                eventsBasedBehavior={eventsBasedBehavior}
+                eventsBasedObject={eventsBasedObject}
+                eventsFunctionsContainer={eventsFunctionsContainer}
+                eventsFunctionsExtension={eventsFunctionsExtension}
+                onParametersUpdated={onParametersOrGroupsUpdated}
+                helpPagePath={helpPagePath}
+                freezeParameters={freezeParameters}
+                onMoveFreeEventsParameter={onMoveFreeEventsParameter}
+                onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
+                onMoveObjectEventsParameter={onMoveObjectEventsParameter}
+                onFunctionParameterWillBeRenamed={
+                  onFunctionParameterWillBeRenamed
+                }
+                onFunctionParameterTypeChanged={onFunctionParameterTypeChanged}
+                key={eventsFunction ? eventsFunction.ptr : null}
+              >
+                <CompactEventsFunctionPropertiesEditor
+                  project={project}
+                  eventsFunction={eventsFunction}
+                  eventsBasedBehavior={eventsBasedBehavior}
+                  eventsBasedObject={eventsBasedObject}
+                  eventsFunctionsContainer={eventsFunctionsContainer}
+                  eventsFunctionsExtension={eventsFunctionsExtension}
+                  helpPagePath={helpPagePath}
+                  onConfigurationUpdated={extensionItemConfigurationAttribute => {
+                    onConfigurationUpdated &&
+                      onConfigurationUpdated(
+                        extensionItemConfigurationAttribute
+                      );
+                    // A function configuration change may impact the parameters.
+                    this.forceUpdate();
+                  }}
+                  freezeEventsFunctionType={freezeEventsFunctionType}
+                  getFunctionGroupNames={getFunctionGroupNames}
+                />
+              </CompactEventsFunctionParametersEditor>
+            ) : null}
+            {this.state.currentTab === 'groups' ? (
+              <ObjectGroupsListWithObjectGroupEditor
+                project={project}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
+                globalObjectsContainer={globalObjectsContainer}
+                objectsContainer={objectsContainer}
+                globalObjectGroups={null}
+                objectGroups={eventsFunction.getObjectGroups()}
+                getValidatedObjectOrGroupName={
+                  this._getValidatedObjectOrGroupName
+                }
+                onRenameGroup={this._onRenameGroup}
+                onDeleteGroup={this._onDeleteGroup}
+                onGroupsUpdated={onParametersOrGroupsUpdated}
+                canSetAsGlobalGroup={false}
+                unsavedChanges={this.props.unsavedChanges}
               />
-            </Column>
-          </Line>
-        ) : null}
-        {this.state.currentTab === 'config' ? (
-          <EventsFunctionParametersEditor
-            project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            eventsFunction={eventsFunction}
-            eventsBasedBehavior={eventsBasedBehavior}
-            eventsBasedObject={eventsBasedObject}
-            eventsFunctionsContainer={eventsFunctionsContainer}
-            eventsFunctionsExtension={eventsFunctionsExtension}
-            onParametersUpdated={onParametersOrGroupsUpdated}
-            helpPagePath={helpPagePath}
-            freezeParameters={freezeParameters}
-            onMoveFreeEventsParameter={onMoveFreeEventsParameter}
-            onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
-            onMoveObjectEventsParameter={onMoveObjectEventsParameter}
-            onFunctionParameterWillBeRenamed={onFunctionParameterWillBeRenamed}
-            onFunctionParameterTypeChanged={onFunctionParameterTypeChanged}
-            key={eventsFunction ? eventsFunction.ptr : null}
-          >
-            <EventsFunctionPropertiesEditor
-              project={project}
-              eventsFunction={eventsFunction}
-              eventsBasedBehavior={eventsBasedBehavior}
-              eventsBasedObject={eventsBasedObject}
-              eventsFunctionsContainer={eventsFunctionsContainer}
-              eventsFunctionsExtension={eventsFunctionsExtension}
-              helpPagePath={helpPagePath}
-              onConfigurationUpdated={extensionItemConfigurationAttribute => {
-                onConfigurationUpdated &&
-                  onConfigurationUpdated(extensionItemConfigurationAttribute);
-                // A function configuration change may impact the parameters.
-                this.forceUpdate();
-              }}
-              renderConfigurationHeader={renderConfigurationHeader}
-              freezeEventsFunctionType={freezeEventsFunctionType}
-              getFunctionGroupNames={getFunctionGroupNames}
-            />
-          </EventsFunctionParametersEditor>
-        ) : null}
-        {this.state.currentTab === 'groups' ? (
-          <ObjectGroupsListWithObjectGroupEditor
-            project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            globalObjectsContainer={globalObjectsContainer}
-            objectsContainer={objectsContainer}
-            globalObjectGroups={null}
-            objectGroups={eventsFunction.getObjectGroups()}
-            getValidatedObjectOrGroupName={this._getValidatedObjectOrGroupName}
-            onRenameGroup={this._onRenameGroup}
-            onDeleteGroup={this._onDeleteGroup}
-            onGroupsUpdated={onParametersOrGroupsUpdated}
-            canSetAsGlobalGroup={false}
-            unsavedChanges={this.props.unsavedChanges}
-          />
-        ) : null}
-      </Column>
+            ) : null}
+          </Column>
+        )}
+      </I18n>
     );
   }
 }

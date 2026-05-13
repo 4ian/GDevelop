@@ -14,21 +14,13 @@ import TextField from '@material-ui/core/TextField';
 import ChevronRightIcon from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import filterOptions from './FilterOptions';
-import {
-  type NamedCommand,
-  type CommandOption,
-  type GoToWikiCommand,
-} from '../CommandManager';
+import { type NamedCommand, type CommandOption } from '../CommandManager';
 import commandsList, { commandAreas } from '../CommandsList';
 import { getShortcutDisplayName } from '../../KeyboardShortcuts';
-import Book from '../../UI/CustomSvgIcons/Book';
-import {
-  getHierarchyAsArray,
-  getHitLastHierarchyLevel,
-  type AlgoliaSearchHit as AlgoliaSearchHitType,
-} from '../../Utils/AlgoliaSearch';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
+import PortalContainerContext from '../../UI/PortalContainerContext';
+import { Popper } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   listItemContainer: {
@@ -36,12 +28,6 @@ const useStyles = makeStyles(theme => ({
   },
   rootSmallPadding: {
     paddingLeft: 0,
-  },
-  wikiPrimaryTextHierarchy: {
-    color: theme.palette.text.secondary,
-  },
-  wikiSecondaryText: {
-    color: theme.palette.text.primary,
   },
 }));
 
@@ -51,32 +37,7 @@ const styles = {
   },
 };
 
-type Item = NamedCommand | CommandOption | GoToWikiCommand;
-
-const HitPrimaryText = (
-  hit: any,
-  { removeLastLevel }: {| removeLastLevel: boolean |}
-) => {
-  const classes = useStyles();
-
-  let hierarchyArray = getHierarchyAsArray(hit.hierarchy);
-
-  hierarchyArray = hierarchyArray.slice(
-    0,
-    hierarchyArray.length - (removeLastLevel ? 1 : 0)
-  );
-
-  const lastElement = hierarchyArray.pop();
-
-  return (
-    <>
-      <span className={classes.wikiPrimaryTextHierarchy}>
-        {hierarchyArray.map(item => `${item} > `)}
-      </span>{' '}
-      <span>{lastElement}</span>
-    </>
-  );
-};
+type Item = NamedCommand | CommandOption;
 
 type Props<T> = {|
   onClose: () => void,
@@ -87,53 +48,15 @@ type Props<T> = {|
   i18n: I18nType,
 |};
 
-type AlgoliaSearchHitItemProps = {| hit: AlgoliaSearchHitType |};
-
-export const AlgoliaSearchHit = ({
-  hit,
-}: AlgoliaSearchHitItemProps): React.Node => {
-  const { isMobile } = useResponsiveWindowSize();
-  const classes = useStyles();
-  let secondaryText;
-  let removeLastLevel = false;
-  if (hit.content) {
-    secondaryText = hit.content;
-  } else {
-    removeLastLevel = true;
-    secondaryText = getHitLastHierarchyLevel(hit);
-  }
-  const primaryText = HitPrimaryText(hit, { removeLastLevel });
-  return (
-    <ListItem
-      dense
-      component="div"
-      ContainerComponent="div"
-      classes={{
-        container: classes.listItemContainer,
-        root: isMobile ? classes.rootSmallPadding : null,
-      }}
-    >
-      <ListItemIcon>
-        <Book />
-      </ListItemIcon>
-      <ListItemText
-        primary={primaryText}
-        secondary={
-          <span className={classes.wikiSecondaryText}>{secondaryText}</span>
-        }
-      />
-    </ListItem>
-  );
-};
-
 const AutocompletePicker = (
-  props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>
+  props: Props<NamedCommand> | Props<CommandOption>
 ): React.Node => {
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const shouldAutofocusInput = useShouldAutofocusInput();
   const [open, setOpen] = React.useState(true);
   const shortcutMap = useShortcutMap();
   const classes = useStyles();
+  const portalContainer = React.useContext(PortalContainerContext);
 
   // $FlowFixMe[missing-local-annot]
   const handleClose = (_, reason) => {
@@ -185,9 +108,6 @@ const AutocompletePicker = (
 
   const renderOption = React.useCallback(
     (item: Item) => {
-      if (item.hit) {
-        return <AlgoliaSearchHit hit={item.hit} />;
-      }
       return (
         <ListItem
           dense
@@ -217,6 +137,13 @@ const AutocompletePicker = (
   return (
     <Autocomplete
       open={open}
+      PopperComponent={
+        portalContainer
+          ? popperProps => (
+              <Popper {...popperProps} container={portalContainer} />
+            )
+          : undefined
+      }
       onClose={handleClose}
       onOpen={() => setOpen(true)}
       options={props.items}

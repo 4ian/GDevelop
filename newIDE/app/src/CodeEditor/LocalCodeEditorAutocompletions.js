@@ -30,7 +30,9 @@ export const setupAutocompletions = (monaco: any) => {
           .lstatSync(path.join(folderPath, filename))
           .isDirectory();
         if (
-          (filename.endsWith('.ts') || filename.endsWith('.js')) &&
+          (filename.endsWith('.ts') ||
+            filename.endsWith('.js') ||
+            filename.endsWith('.tsx')) &&
           !excludedFiles.includes(filename) &&
           // Dialogue tree uses a folder called `bondage.js` that should not be read as a file.
           !isDirectory
@@ -112,6 +114,7 @@ export const setupAutocompletions = (monaco: any) => {
     );
     const extensionsPath = path.join(runtimePath, 'Extensions');
     const eventToolsPath = path.join(runtimePath, 'events-tools');
+    const inGameEditorPath = path.join(runtimePath, 'InGameEditor');
     const threeTypesPath = path.join(runtimeTypesPath, 'three');
     const pixiTypesPath = path.join(runtimeTypesPath, 'pixi');
 
@@ -122,6 +125,7 @@ export const setupAutocompletions = (monaco: any) => {
     importAllJsFilesFromFolder(runtimeHowlerSoundManagerPath);
     importAllJsFilesFromFolder(runtimeFontfaceobserverFontManagerPath);
     importAllJsFilesFromFolder(eventToolsPath);
+    importAllJsFilesFromFolder(inGameEditorPath);
     importAllJsFilesFromFolderRecursively(threeTypesPath);
     importAllJsFilesFromFolderRecursively(pixiTypesPath);
 

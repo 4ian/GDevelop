@@ -179,14 +179,10 @@ const Cube3DEditor = ({
             onChangeProperty('facesOrientation', newValue);
           }}
         >
-          {/* $FlowFixMe[incompatible-exact] */}
           {mapVector(facesOrientationChoices, choice => (
             <SelectOption
-              // $FlowFixMe[incompatible-use]
               label={choice.getLabel()}
-              // $FlowFixMe[incompatible-use]
               value={choice.getValue()}
-              // $FlowFixMe[incompatible-use]
               key={choice.getValue()}
             />
           ))}
@@ -205,14 +201,10 @@ const Cube3DEditor = ({
             onChangeProperty('backFaceUpThroughWhichAxisRotation', newValue);
           }}
         >
-          {/* $FlowFixMe[incompatible-exact] */}
           {mapVector(backFaceUpThroughWhichAxisRotationChoices, choice => (
             <SelectOption
-              // $FlowFixMe[incompatible-use]
               label={choice.getLabel()}
-              // $FlowFixMe[incompatible-use]
               value={choice.getValue()}
-              // $FlowFixMe[incompatible-use]
               key={choice.getValue()}
             />
           ))}

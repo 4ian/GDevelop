@@ -5,6 +5,9 @@ declare class gdEventsBasedObject extends gdAbstractEventsBasedEntity {
   setFullName(fullName: string): gdEventsBasedObject;
   setDescription(description: string): gdEventsBasedObject;
   setPrivate(isPrivate: boolean): gdEventsBasedObject;
+  setPreviewIconUrl(previewIconUrl: string): gdEventsBasedObject;
+  setIconUrl(iconUrl: string): gdEventsBasedObject;
+  setHelpPath(helpPath: string): gdEventsBasedObject;
   setDefaultName(defaultName: string): gdEventsBasedObject;
   setAssetStoreTag(assetStoreTag: string): gdEventsBasedObject;
   getDefaultName(): string;

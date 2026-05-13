@@ -69,10 +69,10 @@ const StudentCreationCard = ({
     >
       <ColumnStackLayout>
         <Text size="block-title" noMargin>
-          <Trans>You don't have any students yet.</Trans>
+          <Trans>How many students do you want to create?</Trans>
         </Text>
         <Text noMargin>
-          <Trans>Start by creating their accounts</Trans>
+          <Trans>Seats left: {availableSeats}</Trans>
         </Text>
         {isCreatingMembers ? (
           <LineStackLayout alignItems="center">

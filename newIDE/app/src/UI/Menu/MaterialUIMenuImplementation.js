@@ -46,8 +46,21 @@ const styles = {
   },
 };
 
+// MenuItem whose `dense` prop adapts to the current screen type.
+// Defined as a function component so useScreenType() can be called properly.
+const DenseMenuItem = React.forwardRef<any, any>((props, ref) => {
+  const screenType = useScreenType();
+  return (
+    <MenuItem
+      dense={!!electron || screenType !== 'touch'}
+      ref={ref}
+      {...props}
+    />
+  );
+});
+
 // $FlowFixMe[missing-local-annot]
-const SubMenuItem = ({ item, buildFromTemplate }) => {
+const SubMenuItem = ({ item, buildFromTemplate, portalContainer }) => {
   // The invisible backdrop behind the submenu is either:
   // - not clickable, when using a mouse (it's like it does not exist).
   // - clickable, when on a touchscreen or using a pen. This is to allow closing the submenu
@@ -132,8 +145,6 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
     }, 75);
   }
 
-  // This is not a real hook.
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const isTouchscreen = useScreenType() === 'touch';
 
   return (
@@ -158,6 +169,7 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
         anchorEl={anchorElement}
         onClose={handleClose}
         TransitionComponent={Fade}
+        container={portalContainer}
         MenuListProps={{
           onPointerEnter: handleHover,
           onPointerLeave: handleLeave,
@@ -209,17 +221,23 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
 export default class MaterialUIMenuImplementation
   implements ContextMenuImplementation {
   _onClose: () => void;
-  constructor({ onClose }: {| onClose: () => void |}) {
+  _portalContainer: ?HTMLElement;
+  constructor({
+    onClose,
+    portalContainer,
+  }: {|
+    onClose: () => void,
+    portalContainer?: ?HTMLElement,
+  |}) {
     this._onClose = onClose;
+    this._portalContainer = portalContainer;
   }
 
   buildFromTemplate(
     template: Array<MenuItemTemplate>,
     forceUpdate?: () => void
   ): any {
-    // This is not a real hook.
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const isTouchscreen = useScreenType() === 'touch';
+    const portalContainer = this._portalContainer;
 
     return template
       .map((item, id) => {
@@ -233,8 +251,7 @@ export default class MaterialUIMenuImplementation
           return <Divider key={'separator' + id} style={styles.divider} />;
         } else if (item.type === 'checkbox') {
           return (
-            <MenuItem
-              dense={!!electron || !isTouchscreen}
+            <DenseMenuItem
               key={'checkbox' + item.label}
               checked={
                 // $FlowFixMe[incompatible-type] - existence should be inferred by Flow.
@@ -272,13 +289,14 @@ export default class MaterialUIMenuImplementation
                 )}
               </ListItemIcon>
               <ListItemText primary={item.label} />
-            </MenuItem>
+            </DenseMenuItem>
           );
         } else if (item.submenu) {
           return (
             <SubMenuItem
               key={'submenu' + item.label}
               item={item}
+              portalContainer={portalContainer}
               buildFromTemplate={template =>
                 this.buildFromTemplate(template, forceUpdate)
               }
@@ -286,8 +304,7 @@ export default class MaterialUIMenuImplementation
           );
         } else {
           return (
-            <MenuItem
-              dense={!!electron || !isTouchscreen}
+            <DenseMenuItem
               key={'item' + item.label}
               disabled={item.enabled === false}
               onClick={e => {
@@ -311,7 +328,7 @@ export default class MaterialUIMenuImplementation
                   <span style={styles.accelerator}>{accelerator}</span>
                 </div>
               )}
-            </MenuItem>
+            </DenseMenuItem>
           );
         }
       })

@@ -17,8 +17,7 @@ import {
   listListedPrivateAssetPacks,
   type PrivateAssetPackListingData,
 } from '../Utils/GDevelopServices/Shop';
-// $FlowFixMe[import-type-as-value]
-import { useSearchItem, SearchFilter } from '../UI/Search/UseSearchItem';
+import { useSearchItem, type SearchFilter } from '../UI/Search/UseSearchItem';
 import {
   TagAssetStoreSearchFilter,
   AnimatedAssetStoreSearchFilter,
@@ -481,8 +480,10 @@ export const AssetStoreStateProvider = ({
     assetSearchFilters
   );
 
+  // $FlowFixMe[incompatible-type] - this filter works for both public and private packs
   const publicAssetPacksSearchResults: ?Array<PublicAssetPack> = useSearchItem(
     publicAssetPacksByTag,
+    // $FlowFixMe[incompatible-type] - this filter works for both public and private packs
     getPublicAssetPackSearchTerms,
     searchText,
     chosenCategory,
@@ -491,8 +492,10 @@ export const AssetStoreStateProvider = ({
     assetPackSearchFilters
   );
 
+  // $FlowFixMe[incompatible-type] - this filter works for both public and private packs
   const privateAssetPackListingDatasSearchResults: ?Array<PrivateAssetPackListingData> = useSearchItem(
     privateAssetPackListingDatasById,
+    // $FlowFixMe[incompatible-type] - this filter works for both public and private packs
     getPrivateAssetPackListingDataSearchTerms,
     searchText,
     chosenCategory,

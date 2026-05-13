@@ -64,9 +64,8 @@ export const EditStudentDialog = ({
           disabled={isSaving}
           id="close-button"
         />,
-        <LeftLoader isLoading={isSaving}>
+        <LeftLoader isLoading={isSaving} key="apply-loader">
           <DialogPrimaryButton
-            key="apply"
             primary
             label={<Trans>Apply</Trans>}
             onClick={triggerApply}

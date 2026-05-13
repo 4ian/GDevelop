@@ -133,9 +133,13 @@ const SearchBar: React.ComponentType<{
       () => {
         // The value given by the parent has priority: if it changes,
         // the search bar must display it.
-        setValue(parentValue);
+        // Skip the sync when focused to avoid overwriting in-progress typing:
+        // the debounce makes parentValue lag behind, which would drop characters.
+        if (!isInputFocused) {
+          setValue(parentValue);
+        }
       },
-      [parentValue]
+      [parentValue, isInputFocused]
     );
 
     const shouldAutofocusSearchbar = useShouldAutofocusInput();

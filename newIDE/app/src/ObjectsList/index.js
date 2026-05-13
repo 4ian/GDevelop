@@ -7,7 +7,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
-import SearchBar from '../UI/SearchBar';
+import CompactSearchBar from '../UI/CompactSearchBar';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
 import AssetSwappingDialog from '../AssetStore/AssetSwappingDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -56,6 +56,7 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { EventsScope } from '../InstructionOrExpression/EventsScope';
 import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -109,9 +110,14 @@ export const getLabelsForObjectsAndGroupsLists = (
 export const getTreeViewItemIdFromObjectFolderOrObject = (
   objectFolderOrObject: gdObjectFolderOrObject
 ): string => {
-  return objectFolderOrObject.isFolder()
-    ? getObjectFolderTreeViewItemId(objectFolderOrObject)
-    : getObjectTreeViewItemId(objectFolderOrObject.getObject());
+  if (objectFolderOrObject.isFolder()) {
+    return getObjectFolderTreeViewItemId(objectFolderOrObject);
+  }
+  const object = exceptionallyGuardAgainstDeadObject(
+    objectFolderOrObject.getObject()
+  );
+  if (!object) return `deleted-${objectFolderOrObject.ptr}`;
+  return getObjectTreeViewItemId(object);
 };
 
 export interface TreeViewItemContent {
@@ -245,6 +251,9 @@ class ObjectFolderTreeViewItem implements TreeViewItem {
   }
 
   getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+    if (!exceptionallyGuardAgainstDeadObject(this.objectFolderOrObject))
+      return this.placeholder ? [this.placeholder] : [];
+
     if (this.objectFolderOrObject.getChildrenCount() === 0) {
       return this.placeholder ? [this.placeholder] : [];
     }
@@ -486,6 +495,7 @@ type Props = {|
     variantName: string
   ) => void,
   onExportAssets: () => void,
+  onImportAssets: () => void,
   onObjectCreated: (
     objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean
@@ -537,6 +547,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onOpenEventBasedObjectEditor,
       onOpenEventBasedObjectVariantEditor,
       onExportAssets,
+      onImportAssets,
       onObjectCreated,
       onObjectEdited,
       onObjectFolderOrObjectWithContextSelected,
@@ -1238,6 +1249,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                   label: i18n._(t`Export as assets`),
                   click: () => onExportAssets(),
                 },
+                {
+                  label: i18n._(t`Import assets`),
+                  click: () => onImportAssets(),
+                },
               ]
             ),
             placeholder: new PlaceHolderTreeViewItem(
@@ -1258,13 +1273,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectTreeViewItemProps,
         objectFolderTreeViewItemProps,
         objectsRootFolder,
+        isEntirelyEmpty,
         isListLocked,
         addFolder,
         expandFolders,
         onAddNewObject,
         selectedObjectFolderOrObjectsWithContext,
         onExportAssets,
-        isEntirelyEmpty,
+        onImportAssets,
       ]
     );
 
@@ -1547,10 +1563,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     return (
       <Background maxWidth>
         <LineStackLayout>
-          <Column expand>
-            <SearchBar
+          <Column expand noOverflowParent>
+            <CompactSearchBar
               value={searchText}
-              onRequestSearch={() => {}}
               onChange={setSearchText}
               placeholder={t`Search objects`}
             />

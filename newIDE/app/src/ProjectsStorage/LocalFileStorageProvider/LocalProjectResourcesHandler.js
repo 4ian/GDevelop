@@ -85,7 +85,7 @@ export const scanForNewResources = async ({
   ];
 
   try {
-    const allFiles = await new Promise((resolve, reject) => {
+    const allFiles: Array<string> = await new Promise((resolve, reject) => {
       glob(
         projectPath + '/**/*.{' + allExtensions.join(',') + '}',
         (error, files) => {
@@ -96,8 +96,6 @@ export const scanForNewResources = async ({
     });
 
     const filesToCheck = new gd.VectorString();
-    // $FlowFixMe[missing-local-annot]
-    // $FlowFixMe[incompatible-use]
     allFiles.forEach(filePath =>
       filesToCheck.push_back(path.relative(projectPath, filePath))
     );
@@ -106,7 +104,6 @@ export const scanForNewResources = async ({
       .findFilesNotInResources(filesToCheck);
     filesToCheck.delete();
 
-    // $FlowFixMe[incompatible-exact]
     mapVector(filePathsNotInResources, (relativeFilePath: string) => {
       const resourceName = newNameGenerator(relativeFilePath, name =>
         resourcesManager.hasResource(name)

@@ -1,5 +1,6 @@
 // @flow
 import optionalRequire from '../../Utils/OptionalRequire';
+import { addFinalNewline } from '../../Utils/Serializer';
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');
@@ -9,7 +10,7 @@ const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
   if (!fs) return Promise.reject(new Error('Filesystem is not supported.'));
 
   try {
-    const content = JSON.stringify(object, null, 2);
+    const content = addFinalNewline(JSON.stringify(object, null, 2));
     return fs.ensureDir(path.dirname(filepath)).then(
       () =>
         new Promise((resolve, reject) => {

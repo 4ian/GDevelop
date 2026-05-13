@@ -216,6 +216,42 @@ TEST_CASE("ObjectSerialization", "[common]") {
     CheckCustomObjectConfiguration(readProject);
   }
 
+  SECTION(
+      "Save and load a project with an objects folder structure containing "
+      "missing object references") {
+    gd::Platform platform;
+    gd::Project writtenProject;
+    SetupProjectWithSprite(writtenProject, platform);
+
+    SerializerElement projectElement;
+    writtenProject.SerializeTo(projectElement);
+    auto& layoutsElement = projectElement.GetChild("layouts");
+    layoutsElement.ConsiderAsArrayOf("layout");
+    auto& layoutElement = layoutsElement.GetChild(0);
+
+    auto& objectsFolderStructureElement =
+        layoutElement.GetChild("objectsFolderStructure");
+    auto& rootChildrenElement = objectsFolderStructureElement.GetChild("children");
+    rootChildrenElement.ConsiderAsArrayOf("objectFolderOrObject");
+
+    auto& folderElement = rootChildrenElement.AddChild("objectFolderOrObject");
+    folderElement.SetAttribute("folderName", "Background");
+    auto& folderChildrenElement = folderElement.AddChild("children");
+    folderChildrenElement.ConsiderAsArrayOf("objectFolderOrObject");
+    auto& invalidObjectElement =
+        folderChildrenElement.AddChild("objectFolderOrObject");
+    invalidObjectElement.SetAttribute("objectName", "DoesNotExist");
+
+    gd::Project readProject;
+    readProject.AddPlatform(platform);
+    readProject.UnserializeFrom(projectElement);
+
+    auto& readLayout = readProject.GetLayout("Scene");
+    auto& rootFolder = readLayout.GetObjects().GetRootFolder();
+    REQUIRE(rootFolder.HasObjectNamed("MyObject"));
+    REQUIRE(!rootFolder.HasObjectNamed("DoesNotExist"));
+  }
+
   SECTION("Clone a custom object") {
     gd::Platform platform;
     gd::Project project;

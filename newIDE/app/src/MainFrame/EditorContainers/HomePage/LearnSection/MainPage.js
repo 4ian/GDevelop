@@ -92,10 +92,10 @@ const MainPage = ({
   onSelectPrivateGameTemplateListingData,
   onSelectExampleShortHeader,
 }: Props): React.Node => {
-  const { limits } = React.useContext(AuthenticatedUserContext);
-  const {
-    palette: { type: paletteType },
-  } = React.useContext(GDevelopThemeContext);
+  const { limits, subscription } = React.useContext(AuthenticatedUserContext);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const paletteType = gdevelopTheme.palette.type;
+  const paperDarkBackgroundColor = gdevelopTheme.paper.backgroundColor.dark;
 
   const { listedCourses } = React.useContext(CourseStoreContext);
   const {
@@ -109,6 +109,10 @@ const MainPage = ({
     !!limits &&
     !!limits.capabilities.classrooms &&
     limits.capabilities.classrooms.hidePremiumProducts;
+  const isStudentAccount =
+    !!subscription &&
+    !!subscription.benefitsFromEducationPlan &&
+    !subscription.isTeacher;
 
   const displayedCourses = React.useMemo(
     () => {
@@ -192,8 +196,8 @@ const MainPage = ({
             backgroundSize: isMobile && !isLandscape ? 'contain' : 'auto',
             backgroundImage: `url('res/premium/premium_dialog_background.png'),${
               paletteType === 'dark'
-                ? 'linear-gradient(180deg, #322659 0px, #3F2458 20px, #1D1D26 200px, #1D1D26 100%)'
-                : 'linear-gradient(180deg, #CBBAFF 0px, #DEBBFF 20px, #F5F5F7 200px, #F5F5F7 100%)'
+                ? `linear-gradient(180deg, #322659 0px, #3F2458 20px, ${paperDarkBackgroundColor} 200px, ${paperDarkBackgroundColor} 100%)`
+                : `linear-gradient(180deg, #CBBAFF 0px, #DEBBFF 20px, ${paperDarkBackgroundColor} 200px, ${paperDarkBackgroundColor} 100%)`
             }`,
           }}
         >
@@ -389,34 +393,39 @@ const MainPage = ({
                   cellHeight="auto"
                   spacing={ITEMS_SPACING * 2}
                 >
-                  <GridListTile cols={1} style={{ background: 'transparent' }}>
-                    <Paper
-                      background="light"
-                      style={{ display: 'flex', height: '100%' }}
+                  {!isStudentAccount && (
+                    <GridListTile
+                      cols={1}
+                      style={{ background: 'transparent' }}
                     >
-                      <Column expand>
-                        <Line expand alignItems="flex-start">
-                          <Help />
-                          <ColumnStackLayout expand alignItems="flex-start">
-                            <Text noMargin size="block-title" align="left">
-                              <Trans>Blocked on GDevelop?</Trans>
-                            </Text>
-                            <RaisedButton
-                              size="large"
-                              color="success"
-                              label={<Trans>Ask the AI</Trans>}
-                              rightIcon={<ArrowRight />}
-                              onClick={() =>
-                                onOpenAskAi({
-                                  aiRequestId: null,
-                                })
-                              }
-                            />
-                          </ColumnStackLayout>
-                        </Line>
-                      </Column>
-                    </Paper>
-                  </GridListTile>
+                      <Paper
+                        background="light"
+                        style={{ display: 'flex', height: '100%' }}
+                      >
+                        <Column expand>
+                          <Line expand alignItems="flex-start">
+                            <Help />
+                            <ColumnStackLayout expand alignItems="flex-start">
+                              <Text noMargin size="block-title" align="left">
+                                <Trans>Blocked on GDevelop?</Trans>
+                              </Text>
+                              <RaisedButton
+                                size="large"
+                                color="success"
+                                label={<Trans>Ask the AI</Trans>}
+                                rightIcon={<ArrowRight />}
+                                onClick={() =>
+                                  onOpenAskAi({
+                                    aiRequestId: null,
+                                  })
+                                }
+                              />
+                            </ColumnStackLayout>
+                          </Line>
+                        </Column>
+                      </Paper>
+                    </GridListTile>
+                  )}
                   {helpItems.map((helpItem, index) => (
                     <GridListTile key={index}>
                       <CardWidget

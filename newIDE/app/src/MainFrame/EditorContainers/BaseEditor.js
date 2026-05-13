@@ -23,6 +23,7 @@ import { type GamesPlatformFrameTools } from './HomePage/PlaySection/UseGamesPla
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type CreateProjectResult } from '../../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
+import type { NavigateToEventFromGlobalSearchParams } from '../../Utils/Search';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -111,7 +112,16 @@ export type RenderEditorContainerProps = {|
     gdEventsBasedObject,
     variantName: string
   ) => void,
+  onOpenEventsFunctionsExtension: (
+    extensionName: string,
+    initiallyFocusedFunctionName?: ?string,
+    initiallyFocusedBehaviorName?: ?string,
+    initiallyFocusedObjectName?: ?string
+  ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
+  onNavigateToEventFromGlobalSearch: (
+    params: NavigateToEventFromGlobalSearchParams
+  ) => void,
   onOpenAskAi: (?OpenAskAiOptions) => void,
   onCloseAskAi: () => void,
 

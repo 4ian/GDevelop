@@ -272,6 +272,10 @@ describe('SimplifiedProject', () => {
               Object {
                 "behaviors": Array [
                   Object {
+                    "behaviorName": "Anchor",
+                    "behaviorType": "AnchorBehavior::AnchorBehavior",
+                  },
+                  Object {
                     "behaviorName": "Animation",
                     "behaviorType": "AnimatableCapability::AnimatableBehavior",
                   },
@@ -441,6 +445,10 @@ describe('SimplifiedProject', () => {
               },
               Object {
                 "behaviors": Array [
+                  Object {
+                    "behaviorName": "Anchor",
+                    "behaviorType": "AnchorBehavior::AnchorBehavior",
+                  },
                   Object {
                     "behaviorName": "Animation",
                     "behaviorType": "AnimatableCapability::AnimatableBehavior",
@@ -1077,6 +1085,7 @@ describe('SimplifiedProject', () => {
               },
             },
             "description": "A fake extension with a fake behavior containing 2 properties.",
+            "dimension": "",
             "effects": Object {},
             "extensionFullName": "Fake extension with a fake behavior",
             "extensionName": "FakeBehavior",
@@ -1084,6 +1093,7 @@ describe('SimplifiedProject', () => {
             "freeConditions": Array [],
             "freeExpressions": Array [],
             "objects": Object {},
+            "shortDescription": "Fake behavior with two properties",
           },
         ],
       }
@@ -1109,7 +1119,8 @@ describe('SimplifiedProject', () => {
     expect(buttonExtensionSummary).toMatchInlineSnapshot(`
       Object {
         "behaviors": Object {},
-        "description": "Fake event-based object",
+        "description": "Fake event-based object (long description)",
+        "dimension": "2D",
         "effects": Object {},
         "extensionFullName": "Fake event-based object",
         "extensionName": "Button",
@@ -1165,6 +1176,7 @@ describe('SimplifiedProject', () => {
             ],
           },
         },
+        "shortDescription": "Fake event-based object",
       }
     `);
 

@@ -13,10 +13,8 @@ import {
 import { EXAMPLES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 const defaultSearchText = '';
-// $FlowFixMe[underconstrained-implicit-instantiation]
-const excludedTiers = new Set(); // No tiers for examples.
-// $FlowFixMe[missing-empty-array-annot]
-const firstExampleIds = [];
+const excludedTiers = new Set<string>(); // No tiers for examples.
+const firstExampleIds: Array<string> = [];
 
 type ExampleStoreState = {|
   exampleFilters: ?Filters,
@@ -142,7 +140,6 @@ export const ExampleStoreStateProvider = ({
     chosenCategory,
     chosenFilters,
     excludedTiers,
-    // $FlowFixMe[incompatible-type]
     defaultFirstSearchItemIds: firstExampleIds,
     shuffleResults: false,
   });

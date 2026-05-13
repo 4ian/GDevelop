@@ -217,6 +217,7 @@ export type HomePageEditorInterface = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  selectAllInsideEditor: () => void,
 |};
 
 export const HomePage: React.ComponentType<Props> = React.memo<Props>(
@@ -375,7 +376,10 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
           if (!requestedTab) return;
 
           setActiveTab(requestedTab);
-          if (requestedTab === 'shop') {
+          if (requestedTab === 'create' && routeArguments['new-project']) {
+            onOpenNewProjectSetupDialog();
+            removeRouteArguments(['new-project']);
+          } else if (requestedTab === 'shop') {
             if (routeArguments['asset-pack']) {
               setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
             }
@@ -448,6 +452,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
           setInitialBundleCategoryForShop,
           games,
           areCoursesFetched,
+          onOpenNewProjectSetupDialog,
         ]
       );
 
@@ -556,6 +561,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
         onInstancesModifiedOutsideEditor: noop,
         onObjectsModifiedOutsideEditor: noop,
         onObjectGroupsModifiedOutsideEditor: noop,
+        selectAllInsideEditor: noop,
       }));
 
       // As the homepage is never unmounted, we need to ensure the games platform

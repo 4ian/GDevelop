@@ -4,10 +4,19 @@
  * reserved. This project is released under the MIT License.
  */
 #include "AllBuiltinExtensions.h"
+#include "GDCore/String.h"
 #include "GDCore/Tools/Localization.h"
 
 using namespace std;
 namespace gd {
+
+namespace {
+const gd::String sceneTimerHint =
+    "Scene timers must be started (e.g. with the \"Start (or reset) a "
+    "scene timer\" action) before being used. They are scene-wide and "
+    "should not be (re)started at each frame, otherwise they keep "
+    "restarting.";
+}  // namespace
 
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
     gd::PlatformExtension& extension) {
@@ -23,6 +32,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           "the last frame or timer elapsed time.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Scene timers (start/pause/reset), time scale (slow motion), wait action, delta time, timestamp.")
       .SetExtensionHelpPath("/all-features/timers-and-time");
   extension.AddInstructionOrExpressionGroupMetadata(_("Timers and time"))
       .SetIcon("res/conditions/timer24.png");
@@ -40,6 +50,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Time in seconds"))
       .AddParameter("identifier", _("Timer's name"), "sceneTimer")
+      .SetParameterHint(sceneTimerHint)
       .SetHidden();
 
   extension
@@ -56,6 +67,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     "res/conditions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("identifier", _("Timer's name"), "sceneTimer")
+      .SetParameterHint(sceneTimerHint)
       .AddParameter("relationalOperator", _("Sign of the test"), "time")
       .AddParameter("expression", _("Time in seconds"))
       .SetManipulatedType("number");
@@ -87,6 +99,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     "res/conditions/timerPaused.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("identifier", _("Timer's name"), "sceneTimer")
+      .SetParameterHint(sceneTimerHint)
       .MarkAsAdvanced();
 
   extension
@@ -101,7 +114,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           "res/actions/timer24.png",
           "res/actions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("identifier", _("Timer's name"), "sceneTimer");
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer")
+      .SetParameterHint(sceneTimerHint);
 
   extension
       .AddAction("PauseTimer",
@@ -114,6 +128,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/actions/pauseTimer.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("identifier", _("Timer's name"), "sceneTimer")
+      .SetParameterHint(sceneTimerHint)
       .MarkAsAdvanced();
 
   extension
@@ -127,6 +142,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/actions/unPauseTimer.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("identifier", _("Timer's name"), "sceneTimer")
+      .SetParameterHint(sceneTimerHint)
       .MarkAsAdvanced();
 
   extension
@@ -140,6 +156,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/actions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("identifier", _("Timer's name"), "sceneTimer")
+      .SetParameterHint(sceneTimerHint)
       .MarkAsAdvanced();
 
   extension
@@ -199,7 +216,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                      "",
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("identifier", _("Timer's name"), "sceneTimer");
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer")
+      .SetParameterHint(sceneTimerHint);
 
   extension
       .AddExpression(

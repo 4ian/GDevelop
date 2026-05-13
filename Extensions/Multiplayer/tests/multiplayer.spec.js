@@ -2613,6 +2613,65 @@ describe('Multiplayer', () => {
     });
   });
 
+  describe('Player ping', () => {
+    it('updates player pings on non-host clients after receiving heartbeats from the host', async () => {
+      const {
+        switchToPeer,
+        initiateGameWithPlayers,
+        markAllPeerMessagesAsProcessed,
+      } = createMultiplayerManagersMock();
+
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+
+      initiateGameWithPlayers(allConnectedPlayers);
+      const runtimeScene = makeTestRuntimeSceneWithNetworkId();
+
+      // Heartbeats are sent every second, so wait for the interval to pass.
+      await delay(1100);
+
+      // Host sends heartbeat; non-host receives and responds immediately.
+      switchToPeer({ playerNumber: 1, allConnectedPlayers });
+      runtimeScene.renderAndStep(1000 / 60);
+
+      switchToPeer({ playerNumber: 2, allConnectedPlayers });
+      runtimeScene.renderAndStep(1000 / 60);
+
+      // Wait so the host measures a non-trivial RTT for player 2.
+      await delay(20);
+
+      // Host processes the response and updates player 2's ping.
+      switchToPeer({ playerNumber: 1, allConnectedPlayers });
+      runtimeScene.renderAndStep(1000 / 60);
+
+      // Record the ping the host computed for player 2 (RTT >= 20ms, so ping > 0).
+      const hostPingForP2 = gdjs.multiplayerMessageManager.getPlayerPing(2);
+      expect(hostPingForP2 > 0).to.be(true);
+
+      // Clear all accumulated messages so that the second heartbeat cycle starts clean,
+      // avoiding stale messages being reprocessed across frames.
+      markAllPeerMessagesAsProcessed();
+
+      // Wait for the next heartbeat interval so the host can broadcast the updated pings.
+      await delay(1100);
+
+      // Host broadcasts the updated pings to all non-host players.
+      switchToPeer({ playerNumber: 1, allConnectedPlayers });
+      runtimeScene.renderAndStep(1000 / 60);
+
+      // Non-host receives the updated heartbeat.
+      switchToPeer({ playerNumber: 2, allConnectedPlayers });
+      runtimeScene.renderAndStep(1000 / 60);
+
+      // Non-host should now reflect the same ping value the host computed, not
+      // the stale value from the initial setup.
+      const nonHostPingForP2 = gdjs.multiplayerMessageManager.getPlayerPing(2);
+      expect(nonHostPingForP2).to.be(hostPingForP2);
+    });
+  });
+
   describe('Player joins and leaves', () => {
     it('detects a player leaving and send it to other players', async () => {
       const { switchToPeer, initiateGameWithPlayers } =

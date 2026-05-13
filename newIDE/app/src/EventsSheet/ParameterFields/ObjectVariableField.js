@@ -163,8 +163,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     );
 
     const onComputeAllVariableNames = React.useCallback(
-      () => {
-        // $FlowFixMe[missing-empty-array-annot]
+      (): Array<string> => {
         if (!project || !layout || !objectName) return [];
 
         return EventsRootVariablesFinder.findAllObjectVariables(

@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import {
   largeSelectedArea,
   largeSelectableArea,
-  executableEventContainer,
+  conditionsActionsContainer,
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
@@ -51,7 +51,7 @@ export default class StandardEvent extends React.Component<
           windowSize={this.props.windowSize}
           eventsSheetWidth={this.props.eventsSheetWidth}
           className={classNames({
-            [executableEventContainer]: true,
+            [conditionsActionsContainer]: true,
           })}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
@@ -84,6 +84,8 @@ export default class StandardEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
           renderActionsList={({ className }) => (
@@ -121,6 +123,8 @@ export default class StandardEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
         />

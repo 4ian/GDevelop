@@ -17,13 +17,17 @@
 module.exports = {
   createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      'MyDummyExtension',
-      _('My Dummy Extension'),
-      _('An example of a declaration of an extension'),
-      'Florian Rival',
-      'MIT'
-    );
+    extension
+      .setExtensionInformation(
+        'MyDummyExtension',
+        _('My Dummy Extension'),
+        _('An example of a declaration of an extension'),
+        'Florian Rival',
+        'MIT'
+      )
+      .setShortDescription(
+        'Example/dummy extension for testing extension declaration patterns.'
+      );
     extension
       .addInstructionOrExpressionGroupMetadata(_('My Dummy Extension'))
       .setIcon('CppPlatform/Extensions/topdownmovementicon.png');

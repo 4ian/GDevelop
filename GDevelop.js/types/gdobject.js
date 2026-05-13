@@ -8,6 +8,8 @@ declare class gdObject {
   getAssetStoreId(): string;
   setType(type: string): void;
   getType(): string;
+  setResourcesPreloading(value: string): void;
+  getResourcesPreloading(): string;
   getConfiguration(): gdObjectConfiguration;
   getVariables(): gdVariablesContainer;
   getEffects(): gdEffectsContainer;
@@ -20,7 +22,7 @@ declare class gdObject {
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   resetPersistentUuid(): gdObject;
-  clearPersistentUuid(): gdObject;
+  getPersistentUuid(): string;
   delete(): void;
   ptr: number;
 };

@@ -88,8 +88,7 @@ const AnimationPreview = ({
   const isLoopingRef = React.useRef(isLooping);
   const animationNameRef = React.useRef(animationName);
   const imagesLoadedArray = React.useRef(
-    // $FlowFixMe[underconstrained-implicit-instantiation]
-    new Array(resourceNames.length).fill(false)
+    new Array<boolean>(resourceNames.length).fill(false)
   );
   const loaderTimeout = React.useRef<?TimeoutID>(null);
 

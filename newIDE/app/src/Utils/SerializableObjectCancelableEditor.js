@@ -3,6 +3,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { exceptionallyGuardAgainstDeadObject } from './IsNullPtr';
 const gd = global.gd;
 
 type Props = {|
@@ -53,6 +54,10 @@ export const useSerializableObjectCancelableEditor = ({
         serializedElementRef.current.delete();
         serializedElementRef.current = null;
       }
+
+      // Guard against the C++ object having been destroyed before this
+      // effect fires (in case the parent points to a destroyed object).
+      if (!exceptionallyGuardAgainstDeadObject(serializableObject)) return;
 
       if (resetThenClearPersistentUuid)
         serializableObject.resetPersistentUuid();
@@ -200,6 +205,11 @@ export const useSerializableObjectsCancelableEditor = ({
           serializedElements.delete(id);
         }
       }
+
+      // Guard against the C++ objects having been destroyed before this
+      // effect fires (in case the parent points to a destroyed object).
+      if (!exceptionallyGuardAgainstDeadObject(serializableObject)) continue;
+
       if (resetThenClearPersistentUuid) {
         serializableObject.resetPersistentUuid();
       }

@@ -201,8 +201,7 @@ class LocalFileSystem {
     ext = ext.toUpperCase();
     var output = new gd.VectorString();
     try {
-      // $FlowFixMe[missing-empty-array-annot]
-      var files = [];
+      var files: Array<string> = [];
       if (fs.existsSync(path)) {
         files = fs.readdirSync(path);
         files.forEach(function(file) {

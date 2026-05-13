@@ -5,8 +5,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
-// $FlowFixMe[import-type-as-value]
-import { TreeViewItemContent } from '.';
+import { type TreeViewItemContent } from '.';
 import {
   enumerateFoldersInContainer,
   enumerateFoldersInFolder,
@@ -21,6 +20,7 @@ import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCu
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -140,10 +140,12 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   getName(): string | React.Node {
+    if (!exceptionallyGuardAgainstDeadObject(this.objectFolder)) return '';
     return this.objectFolder.getFolderName();
   }
 
   getId(): string {
+    // getObjectFolderTreeViewItemId only uses .ptr, so it's safe even if dead.
     return getObjectFolderTreeViewItemId(this.objectFolder);
   }
 
@@ -152,6 +154,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   getDataSet(): ?HTMLDataset {
+    if (!exceptionallyGuardAgainstDeadObject(this.objectFolder)) return null;
     return {
       folderName: this.objectFolder.getFolderName(),
       global: this._isGlobal.toString(),
@@ -165,13 +168,14 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   onClick(): void {}
 
   rename(newName: string): void {
-    if (this.getName() === newName) {
+    const safeNewName = newName.replaceAll('/', '-');
+    if (this.getName() === safeNewName) {
       return;
     }
 
     this.props.onRenameObjectFolderOrObjectWithContextFinish(
       { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
-      newName,
+      safeNewName,
       doRename => {
         if (!doRename) return;
 

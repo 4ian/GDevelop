@@ -1,6 +1,7 @@
 // @flow
 import { mapVector } from '../Utils/MapFor';
 import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 const gd: libGDevelop = global.gd;
 
 export const cleanNonExistingObjectFolderOrObjectWithContexts = (
@@ -11,30 +12,37 @@ export const cleanNonExistingObjectFolderOrObjectWithContexts = (
   const allObjectFolderOrObjectPtrs = new Set<number>();
   if (objectsContainer)
     mapVector(
-      // $FlowFixMe[incompatible-exact]
       objectsContainer.getAllObjectFolderOrObjects(),
       objectFolderOrObject => {
         // $FlowFixMe[incompatible-type]
+        // $FlowFixMe[incompatible-exact]
         allObjectFolderOrObjectPtrs.add(gd.getPointer(objectFolderOrObject));
       }
     );
   if (globalObjectsContainer)
     mapVector(
-      // $FlowFixMe[incompatible-exact]
       globalObjectsContainer.getAllObjectFolderOrObjects(),
       objectFolderOrObject => {
         // $FlowFixMe[incompatible-type]
+        // $FlowFixMe[incompatible-exact]
         allObjectFolderOrObjectPtrs.add(gd.getPointer(objectFolderOrObject));
       }
     );
 
-  return objectFolderOrObjectWithContexts.filter(
-    objectFolderOrObjectWithContext =>
+  return objectFolderOrObjectWithContexts
+    .filter(objectFolderOrObjectWithContext =>
       allObjectFolderOrObjectPtrs.has(
         // $FlowFixMe[incompatible-exact]
         gd.getPointer(objectFolderOrObjectWithContext.objectFolderOrObject)
       )
-  );
+    )
+    .filter(objectFolderOrObjectWithContext => {
+      // In theory at this point all the objectFolderOrObject should be valid,
+      // but to be safe we explicitly check if they are dead.
+      return !!exceptionallyGuardAgainstDeadObject(
+        objectFolderOrObjectWithContext.objectFolderOrObject
+      );
+    });
 };
 
 export const getObjectFolderOrObjectWithContextFromObjectName = (
@@ -42,16 +50,13 @@ export const getObjectFolderOrObjectWithContextFromObjectName = (
   objectsContainer: gdObjectsContainer,
   objectName: string
 ): ObjectFolderOrObjectWithContext | null => {
-  let foundObjectFolderObjectWithContext = null;
+  let foundObjectFolderObjectWithContext: ObjectFolderOrObjectWithContext | null = null;
   if (globalObjectsContainer)
     mapVector(
-      // $FlowFixMe[incompatible-exact]
       globalObjectsContainer.getAllObjectFolderOrObjects(),
       objectFolderOrObject => {
         if (
-          // $FlowFixMe[incompatible-use]
           !objectFolderOrObject.isFolder() &&
-          // $FlowFixMe[incompatible-use]
           objectFolderOrObject.getObject().getName() === objectName
         ) {
           foundObjectFolderObjectWithContext = {
@@ -63,13 +68,10 @@ export const getObjectFolderOrObjectWithContextFromObjectName = (
     );
   if (objectsContainer)
     mapVector(
-      // $FlowFixMe[incompatible-exact]
       objectsContainer.getAllObjectFolderOrObjects(),
       objectFolderOrObject => {
         if (
-          // $FlowFixMe[incompatible-use]
           !objectFolderOrObject.isFolder() &&
-          // $FlowFixMe[incompatible-use]
           objectFolderOrObject.getObject().getName() === objectName
         ) {
           foundObjectFolderObjectWithContext = {
@@ -80,6 +82,5 @@ export const getObjectFolderOrObjectWithContextFromObjectName = (
       }
     );
 
-  // $FlowFixMe[incompatible-type]
   return foundObjectFolderObjectWithContext;
 };

@@ -160,14 +160,12 @@ const generateEventsFunctionExtension = (
   return Promise.all(
     // Generate all behaviors and their functions
     mapVector(
-      // $FlowFixMe[incompatible-exact]
       eventsFunctionsExtension.getEventsBasedBehaviors(),
       eventsBasedBehavior => {
         return generateBehavior(
           project,
           extension,
           eventsFunctionsExtension,
-          // $FlowFixMe[incompatible-type]
           eventsBasedBehavior,
           options,
           codeGenerationContext
@@ -179,14 +177,12 @@ const generateEventsFunctionExtension = (
       // Generate all objects and their functions
       Promise.all(
         mapVector(
-          // $FlowFixMe[incompatible-exact]
           eventsFunctionsExtension.getEventsBasedObjects(),
           eventsBasedObject => {
             return generateObject(
               project,
               extension,
               eventsFunctionsExtension,
-              // $FlowFixMe[incompatible-type]
               eventsBasedObject,
               options,
               codeGenerationContext
@@ -254,7 +250,6 @@ const generateEventsFunctionExtensionMetadata = (
 
   // Generate all behaviors and their functions
   mapVector(
-    // $FlowFixMe[incompatible-exact]
     eventsFunctionsExtension.getEventsBasedBehaviors(),
     eventsBasedBehavior => {
       const behaviorMethodMangledNames = new gd.MapStringString();
@@ -262,7 +257,6 @@ const generateEventsFunctionExtensionMetadata = (
         project,
         extension,
         eventsFunctionsExtension,
-        // $FlowFixMe[incompatible-type]
         eventsBasedBehavior,
         options,
         codeGenerationContext,
@@ -274,7 +268,6 @@ const generateEventsFunctionExtensionMetadata = (
   );
   // Generate all objects and their functions
   mapVector(
-    // $FlowFixMe[incompatible-exact]
     eventsFunctionsExtension.getEventsBasedObjects(),
     eventsBasedObject => {
       const objectMethodMangledNames = new gd.MapStringString();
@@ -282,7 +275,6 @@ const generateEventsFunctionExtensionMetadata = (
         project,
         extension,
         eventsFunctionsExtension,
-        // $FlowFixMe[incompatible-type]
         eventsBasedObject,
         options,
         codeGenerationContext,

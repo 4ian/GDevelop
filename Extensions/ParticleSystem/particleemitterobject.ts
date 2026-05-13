@@ -847,8 +847,13 @@ namespace gdjs {
       const oldLength = this.getParticleGravityLength();
       if (oldLength !== length) {
         this._gravityDirty = true;
-        this.gravityX *= length / oldLength;
-        this.gravityY *= length / oldLength;
+        if (oldLength === 0) {
+          this.gravityX = 0;
+          this.gravityY = length;
+        } else {
+          this.gravityX *= length / oldLength;
+          this.gravityY *= length / oldLength;
+        }
       }
     }
 

@@ -2211,7 +2211,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     gd::VariablesContainer groupVariables =
         gd::ObjectVariableHelper::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
-    
+
     REQUIRE(groupVariables.Count() == 1);
     REQUIRE(groupVariables.Has("MyGroupVariable"));
     REQUIRE(groupVariables.Get("MyGroupVariable").GetValue() == 123);
@@ -2243,7 +2243,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     gd::VariablesContainer groupVariables =
         gd::ObjectVariableHelper::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
-    
+
     REQUIRE(groupVariables.Count() == 1);
     REQUIRE(groupVariables.Has("MyGroupVariable"));
     REQUIRE(groupVariables.Get("MyGroupVariable").GetValue() == 123);
@@ -2263,7 +2263,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     gd::VariablesContainer groupVariables =
         gd::ObjectVariableHelper::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
-    
+
     REQUIRE(groupVariables.Count() == 0);
   }
 
@@ -2284,7 +2284,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     gd::VariablesContainer groupVariables =
         gd::ObjectVariableHelper::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
-    
+
     REQUIRE(groupVariables.Count() == 0);
   }
 
@@ -2356,7 +2356,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     gd::VariablesContainer groupVariables =
         gd::ObjectVariableHelper::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
-    
+
     REQUIRE(groupVariables.Has("MyGroupVariable"));
     REQUIRE(groupVariables.Get("MyGroupVariable").HasMixedValues());
 
@@ -2403,7 +2403,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     gd::VariablesContainer groupVariables =
         gd::ObjectVariableHelper::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
-    
+
     REQUIRE(groupVariables.Has("MyGroupVariable"));
     REQUIRE(groupVariables.Get("MyGroupVariable").HasMixedValues());
 
@@ -2452,7 +2452,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     gd::VariablesContainer groupVariables =
         gd::ObjectVariableHelper::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
-    
+
     REQUIRE(groupVariables.Has("MyGroupVariable"));
     REQUIRE(groupVariables.Get("MyGroupVariable").HasMixedValues());
 
@@ -3163,7 +3163,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
         project, project.GetObjects(), scene.GetObjects(),
         scene.GetInitialInstances(), groupVariables, group, changeset,
         originalSerializedVariables);
-        
+
     // The variable kept its original value.
     REQUIRE(object.GetVariables().Count() == 1);
     REQUIRE(object.GetVariables().Get("MyRenamedGroupVariable").GetValue() == 111);
@@ -3350,5 +3350,38 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
             "MyGroupVariable");
     REQUIRE(event.GetActions()[0].GetParameter(3).GetPlainString() ==
             "OutsideObject.MyGroupVariable");
+  }
+
+  SECTION("No change with missing variable UUIDs") {
+    gd::VariablesContainer variables;
+    variables.InsertNew("SlotID", 0).SetValue(1);
+    variables.InsertNew("Cooldown", 1).SetValue(2);
+
+    // Simulate old projects where variables can be missing UUIDs,
+    // or a bug in the editor that would wipe out UUIDs.
+    variables.ClearPersistentUuid();
+
+    gd::SerializerElement originalSerializedVariables;
+    variables.SerializeTo(originalSerializedVariables);
+
+    gd::VariablesContainer editedVariables;
+    editedVariables.UnserializeFrom(originalSerializedVariables);
+
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, editedVariables);
+
+    // Debug output if needed:
+    // for (const auto &addedVariableName : changeset.addedVariableNames) {
+    //     std::cout << "Added variable: " << addedVariableName << std::endl;
+    // }
+
+    REQUIRE(changeset.addedVariableNames.count("Cooldown") == 1);
+    REQUIRE(changeset.addedVariableNames.count("SlotID") == 1);
+    REQUIRE(changeset.removedVariableNames.empty());
+    REQUIRE(changeset.oldToNewVariableNames.empty());
+    REQUIRE(changeset.typeChangedVariableNames.empty());
+    REQUIRE(changeset.valueChangedVariableNames.empty());
+    REQUIRE(changeset.modifiedVariables.empty());
   }
 }

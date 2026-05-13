@@ -22,7 +22,7 @@ using namespace std;
 Model3DObjectConfiguration::Model3DObjectConfiguration()
     : width(100), height(100), depth(100), rotationX(90), rotationY(0),
       rotationZ(90), modelResourceName(""), materialType("StandardWithoutMetalness"),
-      originLocation("ModelOrigin"), centerLocation("ModelOrigin"),
+      originLocation("ModelOrigin"), centerLocation("CenteredOnZ"),
       keepAspectRatio(true), crossfadeDuration(0.1f), isCastingShadow(true), isReceivingShadow(true) {}
 
 bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
@@ -89,6 +89,8 @@ bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
       centerLocation = "ModelOrigin";
     else if (normalizedValue == "objectcenter")
       centerLocation = "ObjectCenter";
+    else if (normalizedValue == "centeredonz")
+      centerLocation = "CenteredOnZ";
     else if (normalizedValue == "bottomcenterz")
       centerLocation = "BottomCenterZ";
     else if (normalizedValue == "bottomcentery")
@@ -206,6 +208,7 @@ Model3DObjectConfiguration::GetProperties() const {
       .SetType("choice")
       .AddChoice("ModelOrigin", _("Model origin"))
       .AddChoice("ObjectCenter", _("Object center"))
+      .AddChoice("CenteredOnZ", _("Centered on Z only"))
       .AddChoice("BottomCenterZ", _("Bottom center (Z)"))
       .AddChoice("BottomCenterY", _("Bottom center (Y)"))
       .SetLabel(_("Center point"))

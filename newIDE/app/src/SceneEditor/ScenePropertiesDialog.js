@@ -176,8 +176,7 @@ const ScenePropertiesDialog = ({
       });
       const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
       // TODO Make this a functional component to use PreferencesContext
-      // $FlowFixMe[missing-empty-array-annot]
-      const enabledTutorialIds = [];
+      const enabledTutorialIds: Array<string> = [];
       const iconUrl = behaviorMetadata.getIconFilename();
 
       return (

@@ -21,6 +21,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
           "JSON string.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Convert number<->string, degrees<->radians, variable<->JSON.")
       .SetExtensionHelpPath("/all-features/common-conversions");
   extension.AddInstructionOrExpressionGroupMetadata(_("Conversion"))
       .SetIcon("res/conditions/toujours24_black.png");

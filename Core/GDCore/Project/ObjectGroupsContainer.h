@@ -10,6 +10,7 @@
 #include <memory>
 #include <vector>
 
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/String.h"
 namespace gd {
@@ -189,6 +190,7 @@ class GD_CORE_API ObjectGroupsContainer {
  private:
   std::vector<std::unique_ptr<gd::ObjectGroup>> objectGroups;
   static ObjectGroup badGroup;
+  gd::MemoryTracked _memoryTracked{this, "ObjectGroupsContainer"};
 };
 
 }  // namespace gd

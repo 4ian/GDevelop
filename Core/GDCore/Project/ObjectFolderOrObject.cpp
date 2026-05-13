@@ -118,6 +118,16 @@ ObjectFolderOrObject& ObjectFolderOrObject::InsertNewFolder(
   return newFolder;
 };
 
+ObjectFolderOrObject& ObjectFolderOrObject::GetOrCreateFolderChild(
+    const gd::String& name) {
+  for (std::size_t j = 0; j < children.size(); j++) {
+    if (children[j]->IsFolder()) {
+      if (children[j]->GetFolderName() == name) return *children[j];
+    };
+  }
+  return InsertNewFolder(name, children.size());
+}
+
 void ObjectFolderOrObject::RemoveRecursivelyObjectNamed(
     const gd::String& name) {
   if (IsFolder()) {
@@ -253,6 +263,12 @@ void ObjectFolderOrObject::UnserializeFrom(
             make_unique<ObjectFolderOrObject>();
         childObjectFolderOrObject->UnserializeFrom(
             project, childrenElements.GetChild(i), objectsContainer);
+        if (!childObjectFolderOrObject->IsFolder() &&
+            childObjectFolderOrObject->object == nullptr) {
+          // Ignore invalid references to missing objects, that can happen
+          // after manual edits or merges.
+          continue;
+        }
         childObjectFolderOrObject->parent = this;
         children.push_back(std::move(childObjectFolderOrObject));
       }

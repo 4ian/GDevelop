@@ -1,0 +1,84 @@
+diff --git a/node_modules/react-monaco-editor/lib/editor.js b/node_modules/react-monaco-editor/lib/editor.js
+index 8e6ae66..87205ba 100644
+--- a/node_modules/react-monaco-editor/lib/editor.js
++++ b/node_modules/react-monaco-editor/lib/editor.js
+@@ -107,6 +107,13 @@ var MonacoEditor = function (_React$Component) {
+         }
+       });
+     }
++  }, {
++    key: 'editorWillUnmount',
++    value: function editorWillUnmount(editor) {
++      var editorWillUnmount = this.props.editorWillUnmount;
++
++      editorWillUnmount(editor, monaco);
++    }
+   }, {
+     key: 'initMonaco',
+     value: function initMonaco() {
+@@ -134,6 +141,7 @@ var MonacoEditor = function (_React$Component) {
+     key: 'destroyMonaco',
+     value: function destroyMonaco() {
+       if (typeof this.editor !== 'undefined') {
++        this.editorWillUnmount(this.editor);
+         this.editor.dispose();
+       }
+     }
+@@ -168,6 +176,7 @@ MonacoEditor.propTypes = {
+   options: _propTypes2.default.object,
+   editorDidMount: _propTypes2.default.func,
+   editorWillMount: _propTypes2.default.func,
++  editorWillUnmount: _propTypes2.default.func,
+   onChange: _propTypes2.default.func
+ };
+ 
+@@ -181,6 +190,7 @@ MonacoEditor.defaultProps = {
+   options: {},
+   editorDidMount: noop,
+   editorWillMount: noop,
++  editorWillUnmount: noop,
+   onChange: noop
+ };
+ 
+diff --git a/node_modules/react-monaco-editor/src/editor.js b/node_modules/react-monaco-editor/src/editor.js
+index 90ab4de..589dc40 100644
+--- a/node_modules/react-monaco-editor/src/editor.js
++++ b/node_modules/react-monaco-editor/src/editor.js
+@@ -64,6 +64,13 @@ class MonacoEditor extends React.Component {
+     });
+   }
+ 
++  // This is a backport from react-monaco-editor0.47.0 of https://github.com/react-monaco-editor/react-monaco-editor/pull/482
++  // Starting from react-monaco-editor0.21.0 no language is registered for some reason.
++  editorWillUnmount(editor) {
++    const { editorWillUnmount } = this.props;
++    editorWillUnmount(editor, monaco);
++  }
++
+   initMonaco() {
+     const value = this.props.value !== null ? this.props.value : this.props.defaultValue;
+     const { language, theme, options } = this.props;
+@@ -85,6 +92,7 @@ class MonacoEditor extends React.Component {
+ 
+   destroyMonaco() {
+     if (typeof this.editor !== 'undefined') {
++      this.editorWillUnmount(this.editor);
+       this.editor.dispose();
+     }
+   }
+@@ -116,6 +124,7 @@ MonacoEditor.propTypes = {
+   options: PropTypes.object,
+   editorDidMount: PropTypes.func,
+   editorWillMount: PropTypes.func,
++  editorWillUnmount: PropTypes.func,
+   onChange: PropTypes.func
+ };
+ 
+@@ -129,6 +138,7 @@ MonacoEditor.defaultProps = {
+   options: {},
+   editorDidMount: noop,
+   editorWillMount: noop,
++  editorWillUnmount: noop,
+   onChange: noop
+ };
+ 

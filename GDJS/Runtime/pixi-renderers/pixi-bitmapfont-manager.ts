@@ -15,6 +15,30 @@ namespace gdjs {
   const uninstallCacheSize = 5;
 
   /**
+   * Workaround: PIXI.BitmapFont keeps a direct reference to the texture it
+   * was installed with (`pageTextures`). When a resource is reloaded (e.g.
+   * during hot-reload after the image file changes on disk), the image manager
+   * creates a new PIXI.Texture but the existing BitmapFont still points to the
+   * old one. Ideally bitmap font resources would declare their image dependency
+   * via `embeddedResourcesMapping` so that resource unloading can cascade the
+   * invalidation automatically. Until then, we detect stale textures here.
+   */
+  const isBitmapFontTextureStale = (
+    bitmapFont: PIXI.BitmapFont,
+    currentTexture: PIXI.Texture
+  ): boolean => {
+    const pageTextures = bitmapFont.pageTextures;
+    return (
+      pageTextures &&
+      Object.values(pageTextures).some(
+        (tex: PIXI.Texture) =>
+          (tex.baseTexture && tex.baseTexture.destroyed) ||
+          tex.baseTexture !== currentTexture.baseTexture
+      )
+    );
+  };
+
+  /**
    * We patch the installed font to use a name that is unique for each font data and texture,
    * to avoid conflicts between different font files using the same font name (by default, the
    * font name used by Pixi is the one inside the font data, but this name is not necessarily unique.
@@ -176,7 +200,9 @@ namespace gdjs {
           const oldestUnloadedPixiBitmapFontName =
             this._pixiBitmapFontsToUninstall.shift() as string;
 
-          PIXI.BitmapFont.uninstall(oldestUnloadedPixiBitmapFontName);
+          if (PIXI.BitmapFont.available[oldestUnloadedPixiBitmapFontName]) {
+            PIXI.BitmapFont.uninstall(oldestUnloadedPixiBitmapFontName);
+          }
           logger.log(
             'Bitmap Text',
             'Uninstalled BitmapFont "' +
@@ -200,8 +226,18 @@ namespace gdjs {
       const bitmapFontInstallKey =
         bitmapFontResourceName + '@' + textureAtlasResourceName;
 
+      if (
+        PIXI.BitmapFont.available[bitmapFontInstallKey] &&
+        isBitmapFontTextureStale(
+          PIXI.BitmapFont.available[bitmapFontInstallKey],
+          this._imageManager.getPIXITexture(textureAtlasResourceName)
+        )
+      ) {
+        // Texture was replaced, reinstall the font with the current texture.
+        PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+      }
+
       if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
-        // Return the existing BitmapFont that is already in memory and already installed.
         this._markBitmapFontAsUsed(bitmapFontInstallKey);
         return PIXI.BitmapFont.available[bitmapFontInstallKey];
       }
@@ -327,12 +363,11 @@ namespace gdjs {
     unloadResource(resourceData: ResourceData): void {
       this._loadedFontsData.delete(resourceData);
 
-      for (const bitmapFontInstallKey in this._pixiBitmapFontsInUse) {
-        if (bitmapFontInstallKey.startsWith(resourceData.name + '@')) {
-          PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
-          delete this._pixiBitmapFontsInUse[bitmapFontInstallKey];
-        }
-      }
+      // Don't eagerly uninstall fonts that are still in use by active objects.
+      // Uninstalling them here would cause PIXI.BitmapText.destroy to crash
+      // (accessing distanceFieldType on undefined) when those objects are
+      // later destroyed during hot-reload. The owning objects will release
+      // the fonts themselves via releaseBitmapFont when they are destroyed.
 
       for (
         let index = 0;
@@ -342,7 +377,9 @@ namespace gdjs {
         const bitmapFontInstallKey = this._pixiBitmapFontsToUninstall[index];
 
         if (bitmapFontInstallKey.startsWith(resourceData.name + '@')) {
-          PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+          if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
+            PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+          }
           this._pixiBitmapFontsToUninstall.splice(index, 1);
           index--;
         }

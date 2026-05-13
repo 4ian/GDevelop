@@ -65,6 +65,9 @@ module.exports = {
         'Matthias Meike, Florian Rival',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Smoothly animate position, scale, rotation, opacity, color, variables over time. Easing functions.'
+      )
       .setCategory('Visual effect')
       .setTags('tween, interpolation, smooth')
       .setExtensionHelpPath('/behaviors/tween');
@@ -1677,6 +1680,9 @@ module.exports = {
         _('Visibility'),
         'JsPlatform/Extensions/tween_behavior24.png',
         'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .setHint(
+        "Tweening opacity only works on 2D objects, it has no effect/won't run on 3D objects."
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)

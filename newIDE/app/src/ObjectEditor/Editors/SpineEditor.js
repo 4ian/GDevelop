@@ -140,12 +140,11 @@ const SpineEditor = ({
     [project, spineResourceName, setSourceSelectOptions]
   );
 
-  const skinsSelectOptionsList = React.useMemo(
+  const skinsSelectOptionsList: Array<string> = React.useMemo(
     () => {
       if (spineData.skeleton && spineData.skeleton.skins) {
         return spineData.skeleton.skins.map(skin => skin.name);
       } else {
-        // $FlowFixMe[missing-empty-array-annot]
         return [];
       }
     },

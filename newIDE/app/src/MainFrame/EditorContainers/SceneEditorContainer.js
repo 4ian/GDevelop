@@ -161,6 +161,10 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     // No thing to be done.
   }
 
+  selectAllInsideEditor() {
+    // No thing to be done.
+  }
+
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
     if (changes.scene !== this.getLayout()) {
       return;
@@ -292,8 +296,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         // It's only used to refresh events-based object variants.
         onObjectGroupEdited={() => {}}
         onObjectGroupsDeleted={() => {}}
-        // Nothing to do as scenes are not events-based objects.
-        onEventsBasedObjectChildrenEdited={() => {}}
+        onEventsBasedObjectChildrenEdited={
+          this.props.onEventsBasedObjectChildrenEdited
+        }
       />
     );
   }

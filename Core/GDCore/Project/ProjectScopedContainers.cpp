@@ -25,6 +25,8 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(
       ResourcesContainersList::MakeNewResourcesContainersListForProject(
           project));
 
+  projectScopedContainers.scopeSceneName = layout.GetName();
+
   return projectScopedContainers;
 }
 
@@ -91,6 +93,9 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForFreeEventsFunction(
   projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
       eventsFunctionsExtension.GetEventsFunctions()));
 
+  projectScopedContainers.scopeExtensionName = eventsFunctionsExtension.GetName();
+  projectScopedContainers.scopeFunctionName = eventsFunction.GetName();
+
   return projectScopedContainers;
 };
 
@@ -134,6 +139,10 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForBehaviorEventsFunction
   projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
       eventsBasedBehavior.GetEventsFunctions()));
 
+  projectScopedContainers.scopeExtensionName = eventsFunctionsExtension.GetName();
+  projectScopedContainers.scopeFunctionName = eventsFunction.GetName();
+  projectScopedContainers.scopeBehaviorName = eventsBasedBehavior.GetName();
+
   return projectScopedContainers;
 }
 
@@ -173,6 +182,10 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForObjectEventsFunction(
       eventsBasedObject.GetPropertyDescriptors());
   projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
       eventsBasedObject.GetEventsFunctions()));
+
+  projectScopedContainers.scopeExtensionName = eventsFunctionsExtension.GetName();
+  projectScopedContainers.scopeFunctionName = eventsFunction.GetName();
+  projectScopedContainers.scopeObjectName = eventsBasedObject.GetName();
 
   return projectScopedContainers;
 }

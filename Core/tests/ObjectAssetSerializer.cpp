@@ -16,6 +16,7 @@
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "GDCore/Extensions/Platform.h"
+#include "GDCore/IDE/Events/ExtensionDependencyCache.h"
 #include "GDCore/Project/CustomObjectConfiguration.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/Layout.h"
@@ -76,8 +77,10 @@ TEST_CASE("ObjectAssetSerializer", "[common]") {
 
     SerializerElement assetElement;
     std::vector<gd::String> usedResourceNames;
+    ExtensionDependencyCache extensionDependencyCache;
     ObjectAssetSerializer::SerializeTo(project, object, "My Object",
-                                       assetElement, usedResourceNames);
+                                       assetElement, usedResourceNames,
+                                       extensionDependencyCache);
 
     // This list is used to copy resource files.
     REQUIRE(usedResourceNames.size() == 1);
@@ -203,8 +206,10 @@ TEST_CASE("ObjectAssetSerializer", "[common]") {
 
     SerializerElement assetElement;
     std::vector<gd::String> usedResourceNames;
+    ExtensionDependencyCache extensionDependencyCache;
     ObjectAssetSerializer::SerializeTo(project, object, "My Object",
-                                       assetElement, usedResourceNames);
+                                       assetElement, usedResourceNames,
+                                       extensionDependencyCache);
 
     // This list is used to copy resource files.
     REQUIRE(usedResourceNames.size() == 1);

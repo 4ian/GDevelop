@@ -21,6 +21,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
           "avoiding obstacles on the way.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("A* pathfinding: compute paths avoiding obstacles. Configurable speed, grid, diagonals.")
+      .SetDimension("2D")
       .SetCategory("Movement")
       .SetTags("pathfinding, obstacle, collision")
       .SetExtensionHelpPath("/behaviors/pathfinding");

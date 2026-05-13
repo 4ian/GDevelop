@@ -3,7 +3,7 @@ namespace gdjs {
   const logger = new gdjs.Logger('Dummy effect');
 
   const DummyPixiFilter = function () {
-    var vertexShader = null;
+    var vertexShader = undefined;
     var fragmentShader = [
       'precision mediump float;',
       '',

@@ -562,7 +562,8 @@ namespace gdjs {
             sound.play();
           }
         }
-      } catch (error) {
+      } catch (e) {
+        const error = e as Error;
         if (
           error.message &&
           typeof error.message === 'string' &&

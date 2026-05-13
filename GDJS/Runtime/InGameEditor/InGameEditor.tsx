@@ -626,7 +626,7 @@ namespace gdjs {
   class ObjectMover {
     private editor: InGameEditor;
     private _changeHappened = false;
-    private startTime = 0;
+    private _isMoving = false;
 
     constructor(editor: InGameEditor) {
       this.editor = editor;
@@ -648,15 +648,17 @@ namespace gdjs {
     > = new Map();
 
     startMove() {
+      if (this._isMoving) return;
+      this._isMoving = true;
       this._changeHappened = false;
       this._objectInitialPositions.clear();
-      this.startTime = Date.now();
     }
 
     endMove(): boolean {
       const changeHappened = this._changeHappened;
       this._objectInitialPositions.clear();
       this._changeHappened = false;
+      this._isMoving = false;
       return changeHappened;
     }
 
@@ -674,10 +676,6 @@ namespace gdjs {
         scaleZ: float;
       }
     ) {
-      if (Date.now() - this.startTime < 150) {
-        // Avoid miss-clicks gizmo dragging point to change object positions.
-        return;
-      }
       selectedObjects.forEach((object) => {
         if (this.editor.isInstanceLocked(object)) {
           return;
@@ -2403,6 +2401,15 @@ namespace gdjs {
                 !dummyThreeObject.position.equals(initialDummyPosition) ||
                 !dummyThreeObject.rotation.equals(initialDummyRotation) ||
                 !dummyThreeObject.scale.equals(initialDummyScale);
+
+              // Apply the movement to the selected objects right away,
+              // in the same tick as the gizmo update, so the object
+              // follows the gizmo without any visible delay.
+              this._objectMover.startMove();
+              this._objectMover.move(
+                this._selection.getSelectedObjects(),
+                this._selectionControlsMovementTotalDelta
+              );
             });
 
             this._selectionControls = {

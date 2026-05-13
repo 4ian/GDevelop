@@ -173,6 +173,7 @@ const ScenePropertiesDialog = ({
         onUpdateProperty: (sharedDataContent, name, value) => {
           behaviorSharedData.updateProperty(name, value);
         },
+        layersContainer: layout.getLayers(),
       });
       const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
       // TODO Make this a functional component to use PreferencesContext
@@ -243,6 +244,7 @@ const ScenePropertiesDialog = ({
                     projectScopedContainersAccessor={
                       projectScopedContainersAccessor
                     }
+                    layersContainer={layout.getLayers()}
                   />
                 </Line>
               </Column>

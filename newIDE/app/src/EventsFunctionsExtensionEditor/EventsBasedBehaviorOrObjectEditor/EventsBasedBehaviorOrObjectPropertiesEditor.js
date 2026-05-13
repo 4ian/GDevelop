@@ -36,6 +36,7 @@ import AdvancedIcon from '../../UI/CustomSvgIcons/AddCircle';
 import BehaviorIcon from '../../UI/CustomSvgIcons/Behavior';
 import SceneIcon from '../../UI/CustomSvgIcons/Scene';
 import ResourceIcon from '../../UI/CustomSvgIcons/ProjectResources';
+import LayerIcon from '../../UI/CustomSvgIcons/Layers';
 import VariableStringIcon from '../../VariablesList/Icons/VariableStringIcon';
 import VariableNumberIcon from '../../VariablesList/Icons/VariableNumberIcon';
 import VariableBooleanIcon from '../../VariablesList/Icons/VariableBooleanIcon';
@@ -80,6 +81,9 @@ const renderValueTypeIcon = (type: string, className: string): React.Node => {
 
     case 'Resource':
       return <ResourceIcon className={className} />;
+
+    case 'Layer':
+      return <LayerIcon className={className} />;
 
     default:
       return null;
@@ -508,6 +512,12 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
                                       value="Resource"
                                       label={t`Resource`}
                                     />
+                                    {eventsBasedBehavior && (
+                                      <SelectOption
+                                        value="Layer"
+                                        label={t`Layer (text)`}
+                                      />
+                                    )}
                                     {eventsBasedBehavior &&
                                       !isSharedProperties && (
                                         <SelectOption
@@ -576,7 +586,8 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
                                 property.getType() === 'Number' ||
                                 property.getType() === 'ObjectAnimationName' ||
                                 property.getType() === 'KeyboardKey' ||
-                                property.getType() === 'MultilineString') && (
+                                property.getType() === 'MultilineString' ||
+                                property.getType() === 'Layer') && (
                                 <CompactPropertiesEditorRowField
                                   label={i18n._(t`Default value`)}
                                   field={

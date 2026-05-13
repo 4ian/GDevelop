@@ -2869,6 +2869,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       eventsFunctionsExtension,
       eventsBasedObject,
       eventsBasedObjectVariant,
+      layersContainer,
       initialInstances,
       resourceManagementProps,
       isActive,
@@ -3093,6 +3094,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                         layout={layout}
                         eventsFunctionsExtension={eventsFunctionsExtension}
                         eventsBasedObject={eventsBasedObject}
+                        layersContainer={layersContainer}
                         projectScopedContainersAccessor={
                           projectScopedContainersAccessor
                         }

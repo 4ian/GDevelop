@@ -177,6 +177,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
             resource.updateProperty(name, value);
             forceUpdate();
           },
+          layersContainer: null,
         });
 
         return (

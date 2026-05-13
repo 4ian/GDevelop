@@ -296,7 +296,7 @@ getLocales()
   .then(locales => {
     // Launch "lingui compile" for transforming .PO files into
     // js files ready to be used with @lingui/react newIDE translations
-    shell.exec('node node_modules/.bin/lingui compile', {
+    shell.exec('npx lingui compile', {
       cwd: newIdeAppPath,
     });
 

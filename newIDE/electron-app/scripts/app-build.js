@@ -3,9 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const args = require('minimist')(process.argv.slice(2));
 
-// Sanity check electron-builder installation
-if (!shell.test('-f', './node_modules/.bin/electron-builder')) {
-  shell.echo('⚠️ Please run npm install in electron-app folder');
+if (!shell.which('npx')) {
+  shell.echo('⚠️ npx is not available. Please install Node.js/npm.');
   shell.exit(1);
 }
 

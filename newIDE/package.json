@@ -18,6 +18,10 @@
     "format": "npm run format --workspaces --if-present",
     "check-format": "npm run check-format --workspaces --if-present"
   },
+  "overrides": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
   "devDependencies": {
     "adm-zip": "^0.5.10",
     "axios": "1.13.5",

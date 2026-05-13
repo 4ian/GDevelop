@@ -611,6 +611,7 @@ const EditorTabsPane: React.ComponentType<{
           title={'Ask AI'}
           id={paneIdentifier + '-top-bar'}
           onClose={() => onSetPaneDrawerState(paneIdentifier, 'closed')}
+          disableSafeAreaTopMargin
         />
       ) : (
         <TabsTitlebar

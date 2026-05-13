@@ -43,6 +43,7 @@ import { type GDevelopTheme } from '../UI/Theme';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import LightbulbIconOn from '../UI/CustomSvgIcons/LightbulbOn';
 import LightbulbIconOff from '../UI/CustomSvgIcons/LightbulbOff';
+import DebugIcon from '../UI/CustomSvgIcons/Debug';
 import { mapReverseFor } from '../Utils/MapFor';
 import { addDefaultLightToLayer } from '../ProjectCreation/CreateProject';
 
@@ -266,6 +267,8 @@ type Props = {|
   onLayerRenamed: () => void,
   onCreateLayer: () => void,
   onLayersVisibilityInEditorChanged: () => void,
+  areCollisionsShownInEditor: boolean,
+  onToggleCollisionsShownInEditor: () => void,
   onBackgroundColorChanged: () => void,
   gameEditorMode: 'embedded-game' | 'instances-editor',
 
@@ -296,6 +299,8 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
       onLayerRenamed,
       onCreateLayer,
       onLayersVisibilityInEditorChanged,
+      areCollisionsShownInEditor,
+      onToggleCollisionsShownInEditor,
       onBackgroundColorChanged,
       gameEditorMode,
       hotReloadPreviewButtonProps,
@@ -617,6 +622,16 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                       id: 'show-effects-button',
                     }
                   : null,
+                gameEditorMode === 'embedded-game'
+                  ? {
+                      icon: <DebugIcon />,
+                      label: areCollisionsShownInEditor
+                        ? i18n._(t`Hide 3D collision shapes in the editor`)
+                        : i18n._(t`Show 3D collision shapes in the editor`),
+                      click: onToggleCollisionsShownInEditor,
+                      id: 'show-3d-collisions-button',
+                    }
+                  : null,
                 {
                   icon: <Add />,
                   label: i18n._(t`Add a layer`),
@@ -688,6 +703,8 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         addLayer,
         layout,
         onLayersVisibilityInEditorChanged,
+        areCollisionsShownInEditor,
+        onToggleCollisionsShownInEditor,
         forceUpdate,
         isLightingLayerPresent,
         addLightingLayer,

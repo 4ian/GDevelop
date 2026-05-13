@@ -37,7 +37,7 @@ namespace gdjs {
    * and make impossible to finely tune in which order scenes are actually
    * downloaded.
    */
-  class LoadingTask {
+  export class LoadingTask {
     identifier: string;
     private onProgressCallbacks: Array<(count: number, total: number) => void>;
     private onFinishCallbacks: Array<() => void>;
@@ -934,7 +934,7 @@ namespace gdjs {
    * Give `ResourceLoadingQueue` access to private members of `ResourceManager`
    * without exposing them outside.
    */
-  class PrivateResourceManager {
+  export class PrivateResourceManager {
     private resourceLoader: ResourceLoader;
 
     /**
@@ -1003,7 +1003,7 @@ namespace gdjs {
     newTaskState: LoadingTaskState | null
   ) => Set<string>;
 
-  class ResourceLoadingQueue {
+  export class ResourceLoadingQueue {
     private resourceLoader: PrivateResourceManager;
     private name: string;
     /**

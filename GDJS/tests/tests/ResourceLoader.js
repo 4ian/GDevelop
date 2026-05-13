@@ -491,7 +491,7 @@ describe('gdjs.ResourceLoader', () => {
     await loadObject1AndCheck(runtimeGame, mockedResourceManager);
   });
 
-  it('can unload a scene with its objects that where manually loaded', async () => {
+  it('can unload a scene with its objects that were manually loaded', async () => {
     const mockedResourceManager = new gdjs.MockedResourceManager();
     const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithThreeScenes);
     const resourceLoader = runtimeGame.getResourceLoader();

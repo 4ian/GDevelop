@@ -449,6 +449,7 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
         },
         object,
         visibility: 'All',
+        layersContainer: null,
       }),
     [customObjectConfiguration, customObjectEventsBasedObject, object]
   );

@@ -19,6 +19,7 @@ const CompactAnchorBehaviorEditor = ({
   project,
   behavior,
   object,
+  layersContainer,
   behaviorMetadata,
   behaviorOverriding,
   initialInstance,
@@ -60,6 +61,7 @@ const CompactAnchorBehaviorEditor = ({
       <CompactBehaviorPropertiesEditor
         project={project}
         object={object}
+        layersContainer={layersContainer}
         behavior={behavior}
         behaviorMetadata={behaviorMetadata}
         behaviorOverriding={behaviorOverriding}

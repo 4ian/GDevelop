@@ -14,11 +14,12 @@ type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  layersContainer: gdLayersContainer,
 |};
 
 export default class BehaviorSharedPropertiesEditor extends React.Component<Props> {
   render(): any {
-    const { behaviorSharedData } = this.props;
+    const { behaviorSharedData, layersContainer } = this.props;
 
     const propertiesSchema = propertiesMapToSchema({
       properties: behaviorSharedData.getProperties(),
@@ -31,6 +32,7 @@ export default class BehaviorSharedPropertiesEditor extends React.Component<Prop
       onUpdateProperty: (behavior, name, value) => {
         behavior.updateProperty(name, value);
       },
+      layersContainer,
     });
 
     return (

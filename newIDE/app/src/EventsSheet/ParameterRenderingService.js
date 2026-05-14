@@ -83,10 +83,21 @@ import TilemapResourceField from './ParameterFields/TilemapResourceField';
 import TilesetResourceField from './ParameterFields/TilesetResourceField';
 import Model3DResourceField from './ParameterFields/Model3DResourceField';
 import AtlasResourceField from './ParameterFields/AtlasResourceField';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+} from './ParameterFields/ParameterFieldCommons';
 
 const gd: libGDevelop = global.gd;
 
-const components = {
+export type ParameterField = React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>;
+
+const components: {
+  [string]: ParameterField,
+} = {
   default: DefaultField,
   mouse: MouseField,
   mouseButton: MouseButtonField,
@@ -208,7 +219,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
 
 const ParameterRenderingService = {
   components,
-  getParameterComponent: (rawType: string): any => {
+  getParameterComponent: (rawType: string): ParameterField => {
     const fieldType = gd.ParameterMetadata.isObject(rawType)
       ? 'object'
       : rawType;

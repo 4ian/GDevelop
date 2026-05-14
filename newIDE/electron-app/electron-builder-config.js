@@ -39,10 +39,10 @@ const config = {
     category: 'public.app-category.developer-tools',
     hardenedRuntime: true,
     entitlements: './build/entitlements.mac.inherit.plist',
-    target: [
-      { target: 'default', arch: ['universal'] },
-      { target: 'zip', arch: ['universal'] },
-    ],
+    target: {
+      target: 'default',
+      arch: ['universal'],
+    },
     mergeASARs: false,
     x64ArchFiles:
       'Contents/Resources/app.asar.unpacked/node_modules/steamworks.js/dist/osx/steamworksjs.darwin-*.node',

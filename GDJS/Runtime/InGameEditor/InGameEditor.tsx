@@ -2274,9 +2274,13 @@ namespace gdjs {
             const initialDummyPosition = new THREE.Vector3();
             const initialDummyRotation = new THREE.Euler();
             const initialDummyScale = new THREE.Vector3();
+            let xyzClickCursorX: float | null = null;
+            let xyzClickCursorY: float | null = null;
             threeTransformControls.addEventListener('change', (e) => {
               if (!threeTransformControls.dragging) {
                 this._selectionControlsMovementTotalDelta = null;
+                xyzClickCursorX = null;
+                xyzClickCursorY = null;
 
                 this._updateDummyLocation(
                   dummyThreeObject,
@@ -2294,6 +2298,27 @@ namespace gdjs {
                 initialDummyRotation.copy(dummyThreeObject.rotation);
                 initialDummyScale.copy(dummyThreeObject.scale);
                 return;
+              }
+
+              // Avoid moving the object on an XYZ-handle click without drag.
+              if (
+                this._transformControlsMode === 'translate' &&
+                threeTransformControls.axis === 'XYZ'
+              ) {
+                const inputManager = this._runtimeGame.getInputManager();
+                const cursorX = inputManager.getCursorX();
+                const cursorY = inputManager.getCursorY();
+                if (xyzClickCursorX === null) {
+                  xyzClickCursorX = cursorX;
+                  xyzClickCursorY = cursorY;
+                }
+                if (
+                  cursorX === xyzClickCursorX &&
+                  cursorY === xyzClickCursorY
+                ) {
+                  initialDummyPosition.copy(dummyThreeObject.position);
+                  return;
+                }
               }
 
               let translationX =

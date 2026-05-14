@@ -90,7 +90,7 @@ import {
 
 const gd: libGDevelop = global.gd;
 
-type ParameterField = React.ComponentType<{
+export type ParameterField = React.ComponentType<{
   ...ParameterFieldProps,
   +ref?: React.RefSetter<ParameterFieldInterface>,
 }>;

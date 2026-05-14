@@ -6,7 +6,7 @@
 namespace gdjs {
   const logger = new gdjs.Logger('ResourceLoader');
   // TODO add a condition before each log to avoid building the message for nothing.
-  const debugLogger = new gdjs.Logger('ResourceLoader - debug').enable(true);
+  const debugLogger = new gdjs.Logger('ResourceLoader - debug').enable(false);
 
   const addSearchParameterToUrl = (
     url: string,
@@ -773,8 +773,8 @@ namespace gdjs {
       );
       // Also add the resources manually loaded for objects during the current scene.
       // TODO Abort loading task to avoid to leave resources from an object that is currently loading.
-      const unloadedSceneObjectResourceLoadingQueue = newSceneName
-        ? this.getObjectResourceLoadingQueue(newSceneName)
+      const unloadedSceneObjectResourceLoadingQueue = unloadedSceneName
+        ? this.getObjectResourceLoadingQueue(unloadedSceneName)
         : null;
       if (unloadedSceneObjectResourceLoadingQueue) {
         for (const objectLoadingState of unloadedSceneObjectResourceLoadingQueue.loadingStates.values()) {

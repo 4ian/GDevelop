@@ -186,6 +186,10 @@ const InstructionEditorDialog = ({
     }
   };
 
+  /**
+   * Check if an object is coming from the scene (or the custom object),
+   * the opposite being an object coming from the parameter of a function.
+   */
   const isSceneObject = React.useCallback(
     (objectName: string) => {
       if (scope.layout) {
@@ -206,6 +210,7 @@ const InstructionEditorDialog = ({
       if (!chosenObject) return;
 
       if (scope.layout) {
+        // This is an object of the scene.
         const wasBehaviorAdded = addBehaviorToObject(
           project,
           chosenObject,
@@ -231,6 +236,7 @@ const InstructionEditorDialog = ({
         );
 
         if (objectsContainerSourceType === gd.ObjectsContainer.Object) {
+          // This is a child object in a custom object.
           const wasBehaviorAdded = addBehaviorToObject(
             project,
             chosenObject,
@@ -248,9 +254,11 @@ const InstructionEditorDialog = ({
         } else if (
           objectsContainerSourceType === gd.ObjectsContainer.Function
         ) {
+          // This is an object coming from the parameter of a function.
           const { eventsFunction, eventsBasedBehavior } = scope;
           if (eventsFunction) {
             if (eventsBasedBehavior && chosenObject.getName() === 'Object') {
+              // This is the object the custom behavior is attached to.
               const properties = eventsBasedBehavior.getPropertyDescriptors();
               const property = properties.insertNew('NewBehavior', 0);
               property.setType('Behavior');
@@ -262,6 +270,7 @@ const InstructionEditorDialog = ({
               );
               setNewBehaviorDialogOpen(false);
             } else {
+              // This is an object coming from the parameter of a function.
               const parameters = eventsFunction.getParameters();
               const objectParameterIndex = parameters.getParameterPosition(
                 parameters.getParameter(chosenObject.getName())

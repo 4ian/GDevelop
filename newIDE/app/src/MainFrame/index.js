@@ -75,6 +75,8 @@ import {
   type ObjectGroupsOutsideEditorChanges,
 } from './EditorContainers/BaseEditor';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
+import { exportLocalHtml5Headless } from '../ExportAndShare/Headless/ExportLocalHtml5Headless';
+import { useCliCommandRunner } from './CliCommandRunner';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
@@ -931,7 +933,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     // We use the current storage provider, as it's supposed to be able to open
     // the initial file metadata. Indeed, it's the responsibility of the `ProjectStorageProviders`
     // to set the initial storage provider if an initial file metadata is set.
-    const state = await openFromFileMetadata(initialFileMetadataToOpen);
+    const state = await openFromFileMetadata(initialFileMetadataToOpen, {
+      ignoreAutoSave: Window.isRunningCommandFromCli(),
+    });
     if (state)
       openSceneOrProjectManager({
         currentProject: state.currentProject,
@@ -1181,6 +1185,13 @@ const MainFrame = (props: Props): React.MixedElement => {
       ResourcesLoader.burstAllUrlsCache();
       PixiResourcesLoader.burstCache();
 
+      // Set the on-disk path before exposing the project via state so that
+      // consumers (like the CLI command dispatcher) can call getProjectFile()
+      // immediately after the re-render triggered by setState.
+      if (updatedFileMetadata) {
+        project.setProjectFile(updatedFileMetadata.fileIdentifier);
+      }
+
       const state = await setState(state => ({
         ...state,
         currentProject: project,
@@ -1194,8 +1205,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       );
 
       if (updatedFileMetadata) {
-        project.setProjectFile(updatedFileMetadata.fileIdentifier);
-
         const storageProvider = getStorageProvider();
         const storageProviderOperations = getStorageProviderOperations(
           storageProvider
@@ -4908,6 +4917,15 @@ const MainFrame = (props: Props): React.MixedElement => {
     onExportGame: () => {
       openShareDialog('publish');
     },
+    onExportHtml5External: async () => {
+      const project = state.currentProject;
+      if (!project) return;
+      try {
+        await exportLocalHtml5Headless({ project, i18n });
+      } catch (error) {
+        console.error('Headless HTML5 export failed:', error);
+      }
+    },
     onInviteCollaborators: () => {
       openShareDialog('invite');
     },
@@ -4922,6 +4940,12 @@ const MainFrame = (props: Props): React.MixedElement => {
     onRestartInGameEditor,
     onOpenGlobalSearch: openGlobalSearch,
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
+  });
+
+  useCliCommandRunner({
+    project: state.currentProject,
+    i18n,
+    commandPaletteRef,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -5442,7 +5466,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         language={props.i18n.language}
         hasUnsavedChanges={hasUnsavedChanges}
       />
-      <ChangelogDialogContainer />
+      {!Window.isRunningCommandFromCli() && <ChangelogDialogContainer />}
       {selectedInAppTutorialInfo && (
         <StartInAppTutorialDialog
           open

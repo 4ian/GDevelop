@@ -123,8 +123,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       this._characterSize = textObjectConfiguration.getCharacterSize();
       this._lineHeight = textObjectConfiguration.getLineHeight();
       this._textAlignment = textObjectConfiguration.getTextAlignment();
-      this._verticalTextAlignment =
-        textObjectConfiguration.getVerticalTextAlignment();
+      this._verticalTextAlignment = textObjectConfiguration.getVerticalTextAlignment();
       this._color = textObjectConfiguration.getColor();
 
       this._isOutlineEnabled = textObjectConfiguration.isOutlineEnabled();
@@ -150,14 +149,14 @@ export default class RenderedTextInstance extends RenderedInstance {
         this._project,
         textObjectConfiguration.getFontName()
       )
-        .then((fontFamily) => {
+        .then(fontFamily => {
           if (this._wasDestroyed) return;
 
           // Once the font is loaded, we can use the given fontFamily.
           this._fontFamily = fontFamily;
           this._styleFontDirty = true;
         })
-        .catch((err) => {
+        .catch(err => {
           // Ignore errors
           console.warn(
             'Unable to load font family for RenderedTextInstance',
@@ -207,8 +206,8 @@ export default class RenderedTextInstance extends RenderedInstance {
         this._textAlignment === 'right'
           ? 1
           : this._textAlignment === 'center'
-            ? 0.5
-            : 0;
+          ? 0.5
+          : 0;
 
       const width = this.getCustomWidth();
       const leftOffset = (width - renderedWidth) * alignmentX;
@@ -254,8 +253,8 @@ export default class RenderedTextInstance extends RenderedInstance {
     return this._verticalTextAlignment === 'bottom'
       ? height
       : this._verticalTextAlignment === 'center'
-        ? height / 2
-        : 0;
+      ? height / 2
+      : 0;
   }
 
   getCenterX(): number {

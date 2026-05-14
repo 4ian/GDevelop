@@ -55,6 +55,10 @@ const artifactsToDownload = {
     url: `${pathToArtifacts}/GDevelop 5 ${version}.appx`,
     outputFilename: `GDevelop 5 ${version}.appx`,
   },
+  'Windows portable zip': {
+    url: `${pathToArtifacts}/GDevelop 5-${version}-win.zip`,
+    outputFilename: `GDevelop-5-${version}-win.zip`,
+  },
   'Windows auto-update file': {
     url: `${pathToArtifacts}/latest.yml`,
     outputFilename: 'latest.yml',
@@ -84,6 +88,10 @@ const artifactsToDownload = {
   'Linux AppImage (arm64)': {
     url: `${pathToArtifacts}/GDevelop 5-${version}-arm64.AppImage`,
     outputFilename: `GDevelop-5-${version}-arm64.AppImage`,
+  },
+  'Linux portable zip': {
+    url: `${pathToArtifacts}/GDevelop 5-${version}.zip`,
+    outputFilename: `GDevelop-5-${version}-linux.zip`,
   },
   'Linux auto-update file (amd64)': {
     url: `${pathToArtifacts}/latest-linux.yml`,

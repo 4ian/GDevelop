@@ -19,6 +19,7 @@ export type CommandName =
   | 'CLOSE_PROJECT'
   | 'RELOAD_PROJECT'
   | 'EXPORT_GAME'
+  | 'EXPORT_HTML5_EXTERNAL'
   | 'INVITE_COLLABORATORS'
   | 'OPEN_RECENT_PROJECT'
   | 'OPEN_COMMAND_PALETTE'
@@ -160,6 +161,11 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'PROJECT',
     displayText: t`Export game`,
     handledByElectron: true,
+  },
+  EXPORT_HTML5_EXTERNAL: {
+    area: 'PROJECT',
+    displayText: t`Export HTML5 (external websites)`,
+    noShortcut: true,
   },
   INVITE_COLLABORATORS: {
     area: 'PROJECT',

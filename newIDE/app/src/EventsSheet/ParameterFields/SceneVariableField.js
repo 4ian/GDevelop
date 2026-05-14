@@ -4,9 +4,9 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import VariableField, {
   renderVariableWithIcon,
   type VariableFieldInterface,
-  type VariableDialogOpeningProps,
 } from './VariableField';
 import SceneVariablesDialog from '../../VariablesList/SceneVariablesDialog';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
@@ -97,6 +97,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               : undefined
           }
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
+          editEventsFunctionParameter={null}
         />
         {editorOpen && layout && project && (
           <SceneVariablesDialog
@@ -105,10 +106,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             open
             onCancel={() => setEditorOpen(null)}
             onApply={onVariableEditorApply}
-            initiallySelectedVariableName={editorOpen.variableName}
-            shouldCreateInitiallySelectedVariable={
-              editorOpen.shouldCreate || false
-            }
+            initiallySelectedVariable={editorOpen}
             hotReloadPreviewButtonProps={null}
             isListLocked={false}
           />
@@ -120,8 +118,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             onCancel={() => setEditorOpen(null)}
             onApply={onVariableEditorApply}
             isGlobalTabInitiallyOpen={false}
-            initiallySelectedVariableName={editorOpen.variableName}
-            shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+            initiallySelectedVariable={editorOpen}
             hotReloadPreviewButtonProps={null}
             isListLocked={false}
           />

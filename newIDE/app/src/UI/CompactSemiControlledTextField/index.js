@@ -1,7 +1,9 @@
 // @flow
 
 import * as React from 'react';
-import CompactTextField from '../CompactTextField';
+import CompactTextField, {
+  type CompactTextFieldInterface,
+} from '../CompactTextField';
 import classes from './CompactSemiControlledTextField.module.css';
 
 type Props = {|
@@ -21,45 +23,60 @@ type Props = {|
   errorText?: React.Node,
 |};
 
-const CompactSemiControlledTextField = ({
-  value,
-  onChange,
-  onFocus,
-  errorText,
-  commitOnBlur,
-  ...otherProps
-}: Props): React.MixedElement => {
-  const [focused, setFocused] = React.useState<boolean>(false);
-  const [text, setText] = React.useState<string>('');
+const CompactSemiControlledTextField: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<CompactTextFieldInterface>,
+}> = React.forwardRef<Props, CompactTextFieldInterface>(
+  (
+    { value, onChange, onFocus, errorText, commitOnBlur, ...otherProps },
+    ref
+  ) => {
+    const [focused, setFocused] = React.useState<boolean>(false);
+    const [text, setText] = React.useState<string>('');
 
-  return (
-    <div className={classes.container}>
-      <CompactTextField
-        type="text"
-        value={focused ? text : value}
-        onFocus={event => {
-          setFocused(true);
-          setText(value);
-          if (onFocus) {
-            onFocus();
-          }
-        }}
-        onChange={newValue => {
-          setText(newValue);
-          if (!commitOnBlur) onChange(newValue);
-        }}
-        onBlur={event => {
-          if (value !== event.currentTarget.value) {
-            onChange(event.currentTarget.value);
-          }
-          setFocused(false);
-          setText('');
-        }}
-        {...otherProps}
-      />
-      {errorText && <div className={classes.error}>{errorText}</div>}
-    </div>
-  );
-};
+    const inputRef = React.useRef<?CompactTextFieldInterface>(null);
+    React.useImperativeHandle(ref, () => ({
+      blur: () => {
+        if (inputRef.current) inputRef.current.blur();
+      },
+      focus: () => {
+        if (inputRef.current) inputRef.current.focus();
+      },
+      select: () => {
+        if (inputRef.current) inputRef.current.select();
+      },
+    }));
+
+    return (
+      <div className={classes.container}>
+        <CompactTextField
+          ref={inputRef}
+          type="text"
+          value={focused ? text : value}
+          onFocus={event => {
+            setFocused(true);
+            setText(value);
+            if (onFocus) {
+              onFocus();
+            }
+          }}
+          onChange={newValue => {
+            setText(newValue);
+            if (!commitOnBlur) onChange(newValue);
+          }}
+          onBlur={event => {
+            if (value !== event.currentTarget.value) {
+              onChange(event.currentTarget.value);
+            }
+            setFocused(false);
+            setText('');
+          }}
+          {...otherProps}
+        />
+        {errorText && <div className={classes.error}>{errorText}</div>}
+      </div>
+    );
+  }
+);
 
 export default CompactSemiControlledTextField;

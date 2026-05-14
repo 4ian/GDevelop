@@ -18,6 +18,7 @@ import {
 } from '../UI/MobileSoftKeyboard';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import PortalContainerContext from '../UI/PortalContainerContext';
+import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -40,6 +41,7 @@ type Props = {|
   anchorEl: ?any,
 
   resourceManagementProps: ResourceManagementProps,
+  editEventsFunctionParameter: VariableDialogOpeningProps => void,
 |};
 
 const InlineParameterEditor = ({
@@ -57,6 +59,7 @@ const InlineParameterEditor = ({
   parameterIndex,
   anchorEl,
   resourceManagementProps,
+  editEventsFunctionParameter,
 }: Props): null | React.Node => {
   const portalContainer = React.useContext(PortalContainerContext);
   const [
@@ -187,6 +190,7 @@ const InlineParameterEditor = ({
       parameterRenderingService={ParameterRenderingService}
       isInline
       resourceManagementProps={resourceManagementProps}
+      editEventsFunctionParameter={editEventsFunctionParameter}
     />
   );
 

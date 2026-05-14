@@ -45,6 +45,8 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 import CompactPropertiesEditorRowField from '../../CompactPropertiesEditor/CompactPropertiesEditorRowField';
 import { CompactTextAreaField } from '../../UI/CompactTextAreaField';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
+import NewBehaviorDialog from '../../BehaviorsEditor/NewBehaviorDialog';
+import { getLastObjectParameter } from '../../EventsSheet/ParameterFields/ParameterMetadataTools.js';
 
 const gd: libGDevelop = global.gd;
 
@@ -106,21 +108,22 @@ export const fillBehaviorParameter = (
   eventsFunction: gdEventsFunction,
   parameter: gdParameterMetadata
 ) => {
-  const valueTypeMetadata = parameter.getValueTypeMetadata();
-  if (parameter.getValueTypeMetadata().isBehavior()) {
-    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-      projectScopedContainersAccessor.getScope().project.getCurrentPlatform(),
-      valueTypeMetadata.getExtraInfo()
-    );
-    const projectScopedContainers = projectScopedContainersAccessor.get();
-    const validatedNewName = getValidatedParameterName(
-      eventsFunction.getParameters(),
-      projectScopedContainers,
-      behaviorMetadata.getDefaultName()
-    );
-    parameter.setName(validatedNewName);
-    parameter.setDescription(behaviorMetadata.getFullName());
+  if (!parameter.getValueTypeMetadata().isBehavior()) {
+    return;
   }
+  const valueTypeMetadata = parameter.getValueTypeMetadata();
+  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+    projectScopedContainersAccessor.getScope().project.getCurrentPlatform(),
+    valueTypeMetadata.getExtraInfo()
+  );
+  const projectScopedContainers = projectScopedContainersAccessor.get();
+  const validatedNewName = getValidatedParameterName(
+    eventsFunction.getParameters(),
+    projectScopedContainers,
+    behaviorMetadata.getDefaultName()
+  );
+  parameter.setName(validatedNewName);
+  parameter.setDescription(behaviorMetadata.getFullName());
 };
 
 export type CompactEventsFunctionParametersEditorInterface = {
@@ -168,6 +171,8 @@ type Props = {|
     eventsFunction: gdEventsFunction,
     parameterName: string
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 const CompactEventsFunctionParametersEditor: React.ComponentType<{
@@ -192,6 +197,8 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       onFunctionParameterWillBeRenamed,
       children,
       onFunctionParameterTypeChanged,
+      onWillInstallExtension,
+      onExtensionInstalled,
     },
     ref
   ) => {
@@ -200,6 +207,10 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       justAddedParameterName,
       setJustAddedParameterName,
     ] = React.useState<?string>(null);
+    const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState<{
+      objectParameter: gdParameterMetadata | null,
+      behaviorParameter: gdParameterMetadata,
+    } | null>(null);
     const justAddedParameterElement = React.useRef<?any>(null);
     const parameterNameFieldRefs = React.useRef(
       new Map<string, CompactTextFieldInterface | null>()
@@ -920,6 +931,15 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                                             i
                                           )
                                         }
+                                        onOpenBehaviorTypeDialog={() => {
+                                          setNewBehaviorDialogOpen({
+                                            behaviorParameter: parameter,
+                                            objectParameter: getLastObjectParameter(
+                                              parameters,
+                                              i
+                                            ),
+                                          });
+                                        }}
                                       />
                                       {isParameterDescriptionShown(i) && (
                                         <CompactPropertiesEditorRowField
@@ -1041,6 +1061,40 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                   </Column>
                 </Line>
               </ScrollView>
+            )}
+            {newBehaviorDialogOpen && (
+              <NewBehaviorDialog
+                project={project}
+                eventsFunctionsExtension={eventsFunctionsExtension}
+                open={!!newBehaviorDialogOpen}
+                objectType={
+                  newBehaviorDialogOpen.objectParameter
+                    ? newBehaviorDialogOpen.objectParameter
+                        .getValueTypeMetadata()
+                        .getExtraInfo()
+                    : ''
+                }
+                // It doesn't matter if there is 2 parameters with the same
+                // behavior for an object at some point.
+                objectBehaviorsTypes={[]}
+                isChildObject={false}
+                onClose={() => setNewBehaviorDialogOpen(null)}
+                onChoose={type => {
+                  const parameter = newBehaviorDialogOpen.behaviorParameter;
+                  const valueTypeMetadata = parameter.getValueTypeMetadata();
+                  valueTypeMetadata.setExtraInfo(type);
+                  fillBehaviorParameter(
+                    projectScopedContainersAccessor,
+                    eventsFunction,
+                    parameter
+                  );
+                  onParametersUpdated();
+                  setNewBehaviorDialogOpen(null);
+                }}
+                onWillInstallExtension={onWillInstallExtension}
+                onExtensionInstalled={onExtensionInstalled}
+                shouldShowCapabilityBehaviors={true}
+              />
             )}
           </Column>
         )}

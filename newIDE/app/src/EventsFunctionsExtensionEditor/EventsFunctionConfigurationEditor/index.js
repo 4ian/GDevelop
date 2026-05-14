@@ -70,6 +70,8 @@ type Props = {|
   ) => void,
   unsavedChanges?: ?UnsavedChanges,
   getFunctionGroupNames?: () => string[],
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 type TabNames = 'config' | 'parameters' | 'groups';
@@ -101,6 +103,8 @@ const EventsFunctionConfigurationEditor: React.ComponentType<{
       onFunctionParameterTypeChanged,
       unsavedChanges,
       getFunctionGroupNames,
+      onWillInstallExtension,
+      onExtensionInstalled,
     },
     ref
   ) => {
@@ -216,6 +220,8 @@ const EventsFunctionConfigurationEditor: React.ComponentType<{
                   onFunctionParameterWillBeRenamed
                 }
                 onFunctionParameterTypeChanged={onFunctionParameterTypeChanged}
+                onWillInstallExtension={onWillInstallExtension}
+                onExtensionInstalled={onExtensionInstalled}
                 key={eventsFunction ? eventsFunction.ptr : null}
               >
                 <CompactEventsFunctionPropertiesEditor

@@ -40,6 +40,7 @@ import LayerIcon from '../../UI/CustomSvgIcons/Layers';
 import VariableStringIcon from '../../VariablesList/Icons/VariableStringIcon';
 import VariableNumberIcon from '../../VariablesList/Icons/VariableNumberIcon';
 import VariableBooleanIcon from '../../VariablesList/Icons/VariableBooleanIcon';
+import NewBehaviorDialog from '../../BehaviorsEditor/NewBehaviorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -141,6 +142,8 @@ type Props = {|
   onPropertyTypeChanged: (propertyName: string) => void,
   onEventsFunctionsAdded: () => void,
   behaviorObjectType: string,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 // Those names are used internally by GDevelop.
@@ -173,15 +176,18 @@ const getChoicesArray = (
   }));
 };
 
-export type EventsBasedBehaviorPropertiesEditorInterface = {|
+export type EventsBasedBehaviorOrObjectPropertiesEditorInterface = {|
   forceUpdate: () => void,
   getPropertyEditorRef: (propertyName: string) => React.ElementRef<any>,
 |};
 
-export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
+export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
   ...Props,
-  +ref?: React.RefSetter<EventsBasedBehaviorPropertiesEditorInterface>,
-}> = React.forwardRef<Props, EventsBasedBehaviorPropertiesEditorInterface>(
+  +ref?: React.RefSetter<EventsBasedBehaviorOrObjectPropertiesEditorInterface>,
+}> = React.forwardRef<
+  Props,
+  EventsBasedBehaviorOrObjectPropertiesEditorInterface
+>(
   (
     {
       project,
@@ -197,6 +203,8 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
       onPropertyTypeChanged,
       onEventsFunctionsAdded,
       behaviorObjectType,
+      onWillInstallExtension,
+      onExtensionInstalled,
     }: Props,
     ref
   ) => {
@@ -207,6 +215,10 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
       getPropertyEditorRef: (propertyName: string) =>
         propertyRefs ? propertyRefs.current.get(propertyName) : null,
     }));
+
+    const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState<{
+      behaviorProperty: gdNamedPropertyDescriptor,
+    } | null>(null);
 
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
@@ -716,6 +728,11 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
                                   onFocus={() =>
                                     onFocusProperty(property.getName())
                                   }
+                                  onOpenBehaviorTypeDialog={() => {
+                                    setNewBehaviorDialogOpen({
+                                      behaviorProperty: property,
+                                    });
+                                  }}
                                   disabled={false}
                                 />
                               )}
@@ -836,6 +853,34 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
                       );
                     }
                   }
+                )}
+                {newBehaviorDialogOpen && eventsBasedBehavior && (
+                  <NewBehaviorDialog
+                    project={project}
+                    eventsFunctionsExtension={extension}
+                    open={!!newBehaviorDialogOpen}
+                    objectType={eventsBasedBehavior.getObjectType()}
+                    // It doesn't matter if there is 2 parameters with the same
+                    // behavior for an object at some point.
+                    objectBehaviorsTypes={[]}
+                    isChildObject={false}
+                    onClose={() => setNewBehaviorDialogOpen(null)}
+                    onChoose={type => {
+                      const property = newBehaviorDialogOpen.behaviorProperty;
+                      fillBehaviorProperty(
+                        projectScopedContainersAccessor,
+                        eventsBasedBehavior,
+                        property,
+                        type
+                      );
+                      forceUpdate();
+                      onPropertiesUpdated();
+                      setNewBehaviorDialogOpen(null);
+                    }}
+                    onWillInstallExtension={onWillInstallExtension}
+                    onExtensionInstalled={onExtensionInstalled}
+                    shouldShowCapabilityBehaviors={true}
+                  />
                 )}
               </Column>
             ) : (

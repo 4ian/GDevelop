@@ -335,6 +335,12 @@ export default class EventsFunctionExtractorDialog extends React.Component<
               onFunctionParameterTypeChanged={() => {
                 // Won't happen as the editor is freezed.
               }}
+              onWillInstallExtension={() => {
+                // Won't happen as the editor is freezed.
+              }}
+              onExtensionInstalled={() => {
+                // Won't happen as the editor is freezed.
+              }}
               freezeParameters
             />
           )}

@@ -156,7 +156,10 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      if (this._object.isWrapping() && this.getWidth() !== 0) {
+      const renderedWidth = this.getWidth();
+      const centerX = this._object.getCenterX();
+
+      if (this._object.isWrapping() && renderedWidth !== 0) {
         const alignmentX =
           this._object._textAlign === 'right'
             ? 1
@@ -165,27 +168,23 @@ namespace gdjs {
               : 0;
 
         const width = this._object.getWrappingWidth();
-        const renderedWidth = this.getWidth();
+        const leftOffset = (width - renderedWidth) * alignmentX;
 
-        // A vector from the custom size center to the renderer center.
-        const centerToCenterX = (width - renderedWidth) * (alignmentX - 0.5);
-
-        this._pixiObject.position.x = this._object.x + width / 2;
-        this._pixiObject.anchor.x = 0.5 - centerToCenterX / renderedWidth;
+        this._pixiObject.position.x = this._object.getDrawableX() + centerX;
+        this._pixiObject.anchor.x = (centerX - leftOffset) / renderedWidth;
+      } else if (renderedWidth !== 0) {
+        this._pixiObject.position.x = this._object.getDrawableX() + centerX;
+        this._pixiObject.anchor.x = centerX / renderedWidth;
       } else {
-        this._pixiObject.position.x = this._object.x + this.getWidth() / 2;
-        this._pixiObject.anchor.x = 0.5;
+        this._pixiObject.position.x = this._object.getDrawableX() + centerX;
+        this._pixiObject.anchor.x = 0;
       }
 
-      const alignmentY =
-        this._object._verticalTextAlignment === 'bottom'
-          ? 1
-          : this._object._verticalTextAlignment === 'center'
-            ? 0.5
-            : 0;
-      this._pixiObject.position.y =
-        this._object.y + this.getHeight() * (0.5 - alignmentY);
-      this._pixiObject.anchor.y = 0.5;
+      const renderedHeight = this.getHeight();
+      const centerY = this._object.getCenterY();
+      this._pixiObject.position.y = this._object.getDrawableY() + centerY;
+      this._pixiObject.anchor.y =
+        renderedHeight !== 0 ? centerY / renderedHeight : 0;
     }
 
     updateAngle(): void {

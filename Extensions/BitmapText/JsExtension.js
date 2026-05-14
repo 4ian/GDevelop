@@ -789,7 +789,9 @@ module.exports = {
           this._pixiObject.dirty = true;
         }
 
-        if (this._instance.hasCustomSize() && this.getDefaultWidth() !== 0) {
+        const renderedWidth = this.getDefaultWidth();
+        const centerX = this.getCenterX();
+        if (this._instance.hasCustomSize() && renderedWidth !== 0) {
           const alignmentX =
             object.content.align === 'right'
               ? 1
@@ -798,27 +800,22 @@ module.exports = {
                 : 0;
 
           const width = this.getCustomWidth();
-          const renderedWidth = this.getDefaultWidth();
+          const leftOffset = (width - renderedWidth) * alignmentX;
 
-          // A vector from the custom size center to the renderer center.
-          const centerToCenterX = (width - renderedWidth) * (alignmentX - 0.5);
-
-          this._pixiObject.position.x = this._instance.getX() + width / 2;
-          this._pixiObject.anchor.x = 0.5 - centerToCenterX / renderedWidth;
+          this._pixiObject.position.x = this._instance.getX();
+          this._pixiObject.anchor.x = (centerX - leftOffset) / renderedWidth;
+        } else if (renderedWidth !== 0) {
+          this._pixiObject.position.x = this._instance.getX();
+          this._pixiObject.anchor.x = centerX / renderedWidth;
         } else {
-          this._pixiObject.position.x =
-            this._instance.getX() + this.getDefaultWidth() / 2;
-          this._pixiObject.anchor.x = 0.5;
+          this._pixiObject.position.x = this._instance.getX();
+          this._pixiObject.anchor.x = 0;
         }
-        const alignmentY =
-          object.content.verticalTextAlignment === 'bottom'
-            ? 1
-            : object.content.verticalTextAlignment === 'center'
-              ? 0.5
-              : 0;
-        this._pixiObject.position.y =
-          this._instance.getY() + this.getDefaultHeight() * (0.5 - alignmentY);
-        this._pixiObject.anchor.y = 0.5;
+        const renderedHeight = this.getDefaultHeight();
+        const centerY = this.getCenterY();
+        this._pixiObject.position.y = this._instance.getY();
+        this._pixiObject.anchor.y =
+          renderedHeight !== 0 ? centerY / renderedHeight : 0;
 
         this._pixiObject.rotation = RenderedInstance.toRad(
           this._instance.getAngle()
@@ -866,6 +863,14 @@ module.exports = {
           : object.content.verticalTextAlignment === 'center'
             ? height / 2
             : 0;
+      }
+
+      getCenterX() {
+        return 0;
+      }
+
+      getCenterY() {
+        return this.getOriginY();
       }
     }
 

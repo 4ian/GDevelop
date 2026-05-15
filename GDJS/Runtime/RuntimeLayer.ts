@@ -281,7 +281,16 @@ namespace gdjs {
      * @returns the scene the layer belongs to directly or indirectly
      */
     getRuntimeScene(): gdjs.RuntimeScene {
+      // TODO Check that method is not wrongly called instead of `getInstanceContainer`.
       return this._runtimeScene.getScene();
+    }
+
+    /**
+     * Returns the scene the layer directly belongs
+     * @returns the scene the layer directly belongs
+     */
+    getInstanceContainer(): gdjs.RuntimeInstanceContainer {
+      return this._runtimeScene;
     }
 
     /**

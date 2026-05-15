@@ -981,7 +981,11 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                           onClick={() => {
                             pasteParametersAtTheEnd();
                           }}
-                          disabled={!isClipboardContainingParameters}
+                          disabled={
+                            !isClipboardContainingParameters ||
+                            eventsFunction.getFunctionType() ===
+                              gd.EventsFunction.ActionWithOperator
+                          }
                         />
                       </LineStackLayout>
                       <LineStackLayout justifyContent="flex-end" expand>
@@ -990,6 +994,12 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                           label={<Trans>Add</Trans>}
                           onClick={() => addParameter()}
                           icon={<Add />}
+                          // Parameters of ActionWithOperator functions come
+                          // from their associated getter.
+                          disabled={
+                            eventsFunction.getFunctionType() ===
+                            gd.EventsFunction.ActionWithOperator
+                          }
                         />
                       </LineStackLayout>
                     </Line>

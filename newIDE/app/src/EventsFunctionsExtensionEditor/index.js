@@ -1489,6 +1489,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     onFunctionParameterTypeChanged={
                       this._onFunctionParameterChangedOfType
                     }
+                    onWillInstallExtension={this.props.onWillInstallExtension}
+                    onExtensionInstalled={this.props.onExtensionInstalled}
                     unsavedChanges={this.props.unsavedChanges}
                     getFunctionGroupNames={this._getFunctionGroupNames}
                   />
@@ -1675,6 +1677,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               onConfigurationUpdated={this._onConfigurationUpdated}
               onOpenCustomObjectEditor={() => {}}
               onEventsBasedObjectChildrenEdited={() => {}}
+              onWillInstallExtension={this.props.onWillInstallExtension}
+              onExtensionInstalled={this.props.onExtensionInstalled}
             />
           ) : selectedEventsBasedObject &&
             this._projectScopedContainersAccessor ? (
@@ -1727,6 +1731,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               onEventsBasedObjectChildrenEdited={
                 this.props.onEventsBasedObjectChildrenEdited
               }
+              onWillInstallExtension={this.props.onWillInstallExtension}
+              onExtensionInstalled={this.props.onExtensionInstalled}
             />
           ) : (
             <Background>

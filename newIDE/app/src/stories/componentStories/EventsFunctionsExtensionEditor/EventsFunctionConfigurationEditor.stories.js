@@ -36,6 +36,8 @@ export const DefaultFreeFunction = (): React.Node => (
         'onFunctionParameterWillBeRenamed'
       )}
       onFunctionParameterTypeChanged={action('onFunctionParameterTypeChanged')}
+      onExtensionInstalled={action('onExtensionInstalled')}
+      onWillInstallExtension={action('onWillInstallExtension')}
     />
   </FixedHeightFlexContainer>
 );
@@ -60,6 +62,8 @@ export const DefaultBehaviorFunction = (): React.Node => (
         'onFunctionParameterWillBeRenamed'
       )}
       onFunctionParameterTypeChanged={action('onFunctionParameterTypeChanged')}
+      onExtensionInstalled={action('onExtensionInstalled')}
+      onWillInstallExtension={action('onWillInstallExtension')}
     />
   </FixedHeightFlexContainer>
 );
@@ -84,6 +88,8 @@ export const DefaultBehaviorLifecycleFunction = (): React.Node => (
         'onFunctionParameterWillBeRenamed'
       )}
       onFunctionParameterTypeChanged={action('onFunctionParameterTypeChanged')}
+      onExtensionInstalled={action('onExtensionInstalled')}
+      onWillInstallExtension={action('onWillInstallExtension')}
     />
   </FixedHeightFlexContainer>
 );
@@ -108,6 +114,8 @@ export const DefaultObjectFunction = (): React.Node => (
         'onFunctionParameterWillBeRenamed'
       )}
       onFunctionParameterTypeChanged={action('onFunctionParameterTypeChanged')}
+      onExtensionInstalled={action('onExtensionInstalled')}
+      onWillInstallExtension={action('onWillInstallExtension')}
     />
   </FixedHeightFlexContainer>
 );

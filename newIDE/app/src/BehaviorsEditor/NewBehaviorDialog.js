@@ -41,6 +41,7 @@ type Props = {|
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   shouldShowCapabilityBehaviors: boolean,
+  title?: React.Node,
 |};
 
 export default function NewBehaviorDialog({
@@ -55,6 +56,7 @@ export default function NewBehaviorDialog({
   onWillInstallExtension,
   onExtensionInstalled,
   shouldShowCapabilityBehaviors,
+  title,
 }: Props): null | React.Node {
   const [isInstalling, setIsInstalling] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -255,7 +257,7 @@ export default function NewBehaviorDialog({
     <I18n>
       {({ i18n }) => (
         <Dialog
-          title={<Trans>Add a new behavior to the object</Trans>}
+          title={title || <Trans>Add a new behavior to the object</Trans>}
           actions={[
             <FlatButton
               key="close"

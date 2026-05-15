@@ -191,14 +191,14 @@ const InstructionEditorDialog = ({
    * the opposite being an object coming from the parameter of a function.
    */
   const isSceneObject = React.useCallback(
-    (objectName: string) => {
+    (object: gdObject) => {
       if (scope.layout) {
         return true;
       }
       const projectScopedContainers = projectScopedContainersAccessor.get();
       const objectsContainersList = projectScopedContainers.getObjectsContainersList();
       const objectsContainerSourceType = objectsContainersList.getObjectsContainerSourceType(
-        objectName
+        object.getName()
       );
       return objectsContainerSourceType === gd.ObjectsContainer.Object;
     },
@@ -549,7 +549,9 @@ const InstructionEditorDialog = ({
           open={newBehaviorDialogOpen}
           objectType={chosenObject.getType()}
           objectBehaviorsTypes={listObjectBehaviorsTypes(chosenObject)}
-          isChildObject={!scope.layout}
+          isChildObject={
+            !!scope.eventsBasedObject && isSceneObject(chosenObject)
+          }
           onClose={() => setNewBehaviorDialogOpen(false)}
           onChoose={addBehavior}
           onWillInstallExtension={onWillInstallExtension}
@@ -559,7 +561,7 @@ const InstructionEditorDialog = ({
             onExtensionInstalled(extensionName);
           }}
           shouldShowCapabilityBehaviors={
-            chosenObject && !isSceneObject(chosenObject.getName())
+            chosenObject && !isSceneObject(chosenObject)
           }
         />
       )}

@@ -1064,6 +1064,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
             )}
             {newBehaviorDialogOpen && (
               <NewBehaviorDialog
+                title={<Trans>Select a behavior</Trans>}
                 project={project}
                 eventsFunctionsExtension={eventsFunctionsExtension}
                 open={!!newBehaviorDialogOpen}
@@ -1074,8 +1075,8 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                         .getExtraInfo()
                     : ''
                 }
-                // It doesn't matter if there is 2 parameters with the same
-                // behavior for an object at some point.
+                // It doesn't matter if there are 2 parameters with the
+                // same behavior for an object at some point.
                 objectBehaviorsTypes={[]}
                 isChildObject={false}
                 onClose={() => setNewBehaviorDialogOpen(null)}

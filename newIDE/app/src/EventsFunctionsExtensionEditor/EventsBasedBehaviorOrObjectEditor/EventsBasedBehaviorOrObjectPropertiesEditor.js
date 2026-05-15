@@ -856,12 +856,13 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                 )}
                 {newBehaviorDialogOpen && eventsBasedBehavior && (
                   <NewBehaviorDialog
+                    title={<Trans>Select a behavior</Trans>}
                     project={project}
                     eventsFunctionsExtension={extension}
                     open={!!newBehaviorDialogOpen}
                     objectType={eventsBasedBehavior.getObjectType()}
-                    // It doesn't matter if there is 2 parameters with the same
-                    // behavior for an object at some point.
+                    // It doesn't matter if there are 2 parameters with the
+                    // same behavior for an object at some point.
                     objectBehaviorsTypes={[]}
                     isChildObject={false}
                     onClose={() => setNewBehaviorDialogOpen(null)}

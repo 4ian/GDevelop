@@ -917,26 +917,32 @@ namespace gdjs {
     /**
      * Preload an object assets in background.
      */
-    loadObjectOrGroupAssets(objectOrGroupName: string): void {
+    loadObjectOrGroupAssets(
+      objectOrGroupName: string,
+      sceneName?: string
+    ): void {
       const currentScene = this._sceneStack.getCurrentScene();
       if (!currentScene) {
         return;
       }
+      if (!sceneName) {
+        sceneName = currentScene.getName();
+      }
       const objectGroupData = this.getObjectGroupData(
-        currentScene.getName(),
+        sceneName,
         objectOrGroupName
       );
       if (objectGroupData) {
         for (const object of objectGroupData.objects) {
-          this._loadObjectAssets(currentScene, object.name);
+          this._loadObjectAssets(sceneName, object.name);
         }
       } else {
-        this._loadObjectAssets(currentScene, objectOrGroupName);
+        this._loadObjectAssets(sceneName, objectOrGroupName);
       }
     }
 
-    private _loadObjectAssets(currentScene: RuntimeScene, objectName: string) {
-      const objectData = currentScene._objects.get(objectName);
+    private _loadObjectAssets(sceneName: string, objectName: string) {
+      const objectData = this.getObjectData(sceneName, objectName);
       if (!objectData) {
         return;
       }
@@ -945,7 +951,7 @@ namespace gdjs {
         return;
       }
       this._resourcesLoader.loadObjectResources(
-        currentScene.getName(),
+        sceneName,
         objectName,
         usedResources
       );
@@ -954,22 +960,25 @@ namespace gdjs {
     /**
      * @returns true when all the resources of the given object are loaded.
      */
-    areObjectOrGroupAssetsLoaded(objectOrGroupName: string): boolean {
+    areObjectOrGroupAssetsLoaded(
+      objectOrGroupName: string,
+      sceneName?: string
+    ): boolean {
       const currentScene = this._sceneStack.getCurrentScene();
       if (!currentScene) {
         return false;
       }
+      if (!sceneName) {
+        sceneName = currentScene.getName();
+      }
       const objectGroupData = this.getObjectGroupData(
-        currentScene.getName(),
+        sceneName,
         objectOrGroupName
       );
       if (objectGroupData) {
         for (const object of objectGroupData.objects) {
           if (
-            !this._resourcesLoader.areObjectAssetsReady(
-              currentScene.getName(),
-              object.name
-            )
+            !this._resourcesLoader.areObjectAssetsReady(sceneName, object.name)
           ) {
             return false;
           }
@@ -977,7 +986,7 @@ namespace gdjs {
         return true;
       }
       return this._resourcesLoader.areObjectAssetsReady(
-        currentScene.getName(),
+        sceneName,
         objectOrGroupName
       );
     }
@@ -985,28 +994,46 @@ namespace gdjs {
     /**
      * Unload an object assets.
      */
-    unloadObjectOrGroupAssets(objectOrGroupName: string): void {
+    unloadObjectOrGroupAssets(
+      objectOrGroupName: string,
+      sceneName?: string
+    ): void {
       const currentScene = this._sceneStack.getCurrentScene();
       if (!currentScene) {
         return;
       }
+      if (!sceneName) {
+        sceneName = currentScene.getName();
+      }
       const objectGroupData = this.getObjectGroupData(
-        currentScene.getName(),
+        sceneName,
         objectOrGroupName
       );
       if (objectGroupData) {
         for (const object of objectGroupData.objects) {
-          this._resourcesLoader.unloadObjectResources(
-            currentScene.getName(),
-            object.name
-          );
+          this._resourcesLoader.unloadObjectResources(sceneName, object.name);
         }
       } else {
         this._resourcesLoader.unloadObjectResources(
-          currentScene.getName(),
+          sceneName,
           objectOrGroupName
         );
       }
+    }
+
+    private getObjectData(
+      sceneName: string,
+      objectName: string
+    ): ObjectData | null {
+      const sceneData = this.getSceneData(sceneName);
+      if (sceneData) {
+        for (const objectData of sceneData.objects) {
+          if (objectData.name === objectName) {
+            return objectData;
+          }
+        }
+      }
+      return null;
     }
 
     private getObjectGroupData(
@@ -1015,9 +1042,9 @@ namespace gdjs {
     ): ObjectGroupData | null {
       const sceneData = this.getSceneData(sceneName);
       if (sceneData) {
-        for (const objectGroup of sceneData.objectsGroups) {
-          if (objectGroup.name === objectGroupName) {
-            return objectGroup;
+        for (const objectGroupData of sceneData.objectsGroups) {
+          if (objectGroupData.name === objectGroupName) {
+            return objectGroupData;
           }
         }
       }
@@ -1130,7 +1157,8 @@ namespace gdjs {
           gdjs.getAllAsynchronouslyLoadingLibraryPromise(),
         ]);
       } catch (e) {
-        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
+        if (this._debuggerClient)
+          this._debuggerClient.onUncaughtException(e as Error);
 
         throw e;
       }
@@ -1361,7 +1389,7 @@ namespace gdjs {
             return true;
           } catch (e) {
             if (this._debuggerClient)
-              this._debuggerClient.onUncaughtException(e);
+              this._debuggerClient.onUncaughtException(e as Error);
 
             throw e;
           }
@@ -1373,7 +1401,8 @@ namespace gdjs {
           this._captureManager.setupCaptureOptions(this._isPreview);
         }
       } catch (e) {
-        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
+        if (this._debuggerClient)
+          this._debuggerClient.onUncaughtException(e as Error);
 
         throw e;
       }

@@ -306,6 +306,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
+  selectAllEvents = () => {
+    if (this.editor) {
+      this.editor.selectAllEvents();
+    }
+  };
+
   selectEventsFunctionByName = (
     functionName: string,
     behaviorName: ?string,

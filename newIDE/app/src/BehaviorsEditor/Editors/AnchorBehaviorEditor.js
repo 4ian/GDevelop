@@ -299,6 +299,7 @@ const AnchorBehaviorEditor = ({
   project,
   behavior,
   object,
+  layersContainer,
   onBehaviorUpdated,
   resourceManagementProps,
   projectScopedContainersAccessor,
@@ -351,6 +352,7 @@ const AnchorBehaviorEditor = ({
         project={project}
         object={object}
         behavior={behavior}
+        layersContainer={layersContainer}
         onBehaviorUpdated={_onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         projectScopedContainersAccessor={projectScopedContainersAccessor}

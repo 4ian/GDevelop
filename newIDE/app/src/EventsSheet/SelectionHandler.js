@@ -48,11 +48,7 @@ export type SelectionState = {|
   selectedEvents: Array<EventContext>,
 |};
 
-export const getInitialSelection = (): {
-  selectedEvents: Array<empty>,
-  selectedInstructions: Array<empty>,
-  selectedInstructionsLists: Array<empty>,
-} => {
+export const getInitialSelection = (): SelectionState => {
   return {
     selectedInstructions: [],
     selectedEvents: [],
@@ -293,12 +289,32 @@ export const selectEvent = (
   multiSelection: boolean = false
 ): SelectionState => {
   const event = eventContext.event;
-  if (isEventSelected(selection, event)) return selection;
+  const alreadySelected = isEventSelected(selection, event);
+
+  if (multiSelection && alreadySelected) {
+    return {
+      ...selection,
+      selectedEvents: selection.selectedEvents.filter(
+        selectedEventContext => selectedEventContext.event.ptr !== event.ptr
+      ),
+    };
+  }
+
+  if (alreadySelected) return selection;
 
   const existingSelection = multiSelection ? selection : clearSelection();
   return {
     ...existingSelection,
     selectedEvents: [...existingSelection.selectedEvents, eventContext],
+  };
+};
+
+export const selectEvents = (
+  eventContexts: Array<EventContext>
+): SelectionState => {
+  return {
+    ...clearSelection(),
+    selectedEvents: eventContexts,
   };
 };
 
@@ -342,11 +358,7 @@ export const selectInstructionsList = (
 
 export const selectEventsAfterHistoryChange = (
   eventContexts: Array<EventContext>
-): {
-  selectedEvents: Array<empty>,
-  selectedInstructions: Array<empty>,
-  selectedInstructionsLists: Array<empty>,
-} => {
+): SelectionState => {
   let newSelection = getInitialSelection();
 
   eventContexts.forEach(eventContext => {

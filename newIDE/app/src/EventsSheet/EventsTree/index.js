@@ -74,6 +74,10 @@ const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
 
 const defaultIndentWidth = 22;
 const smallIndentWidth = 11;
+// Placeholder height for events whose real height is not yet measured.
+// Prevents all events from collapsing to 1px at startup, which would cause
+// the virtualized list to render all of them at once.
+const defaultEventHeight = 100;
 
 const styles = {
   container: { flex: 1, position: 'relative' },
@@ -180,8 +184,10 @@ const EventContainer = (props: EventsContainerProps) => {
   React.useLayoutEffect(() => {
     const container = containerRef.current;
     const height = container ? container.offsetHeight : 0;
-    if (height === 0) {
-      // An empty height means that the event is hidden, when navigating outside of the events sheet tab for example.
+    const width = container ? container.offsetWidth : 0;
+    if (height === 0 || width === 0) {
+      // An empty height or width means the event is hidden (e.g. navigating outside
+      // the events sheet tab), or the container hasn't been sized yet.
       // Don't store the height in this case.
       return;
     }
@@ -204,7 +210,10 @@ const EventContainer = (props: EventsContainerProps) => {
     [onEventContextMenu]
   );
 
-  const { isPressingRef, contextMenuProps } = useLongTouch(
+  const {
+    isPressingRef,
+    contextMenuProps: longTouchForContextMenuProps,
+  } = useLongTouch(
     React.useCallback(
       (domEvent: any) => {
         onEventContextMenu(domEvent.clientX, domEvent.clientY);
@@ -263,7 +272,7 @@ const EventContainer = (props: EventsContainerProps) => {
             ref={containerRef}
             onClick={props.onEventClick}
             onContextMenu={_onEventContextMenu}
-            {...contextMenuProps}
+            {...longTouchForContextMenuProps}
           >
             {!!EventComponent && (
               <div style={styles.eventComponentContainer}>
@@ -449,6 +458,11 @@ export type EventsTreeInterface = {|
     rowIndexes: Array<number>
   ) => Array<EventContext>,
   scrollToRow: (row: number) => void,
+  scrollToInstruction: (
+    rowIndex: number,
+    listLabel: string,
+    instructionIndex: number
+  ) => void,
   getEventRow: (event: gdBaseEvent) => number,
   unfoldForEvent: (event: gdBaseEvent) => void,
 |};
@@ -471,6 +485,13 @@ const EventsTree: React.ComponentType<{
   const _list = React.useRef<?any>(null);
   const eventsHeightsCache = React.useMemo(() => new EventHeightsCache(), []);
 
+  React.useLayoutEffect(
+    () => {
+      eventsHeightsCache.setOnHeightsChanged(forceUpdate);
+      return () => eventsHeightsCache.setOnHeightsChanged(null);
+    },
+    [eventsHeightsCache, forceUpdate]
+  );
   const temporaryUnfoldedNodes = React.useRef<Array<SortableTreeNode>>([]);
   const _hoverTimerId = React.useRef<?TimeoutID>(null);
 
@@ -514,8 +535,28 @@ const EventsTree: React.ComponentType<{
 
   const scrollToRow = React.useCallback((row: number) => {
     if (row === -1) return;
-    if (!_list.current) return;
-    _list.current.scrollToRow(row);
+    const list = _list.current;
+    if (!list) return;
+
+    // If the target row is already fully visible in the DOM, skip the scroll.
+    // React-window's scrollToItem uses summed item heights which can be
+    // inaccurate for non-visible rows, causing unnecessary jumps.
+    const container = list.container;
+    if (container) {
+      const element = container.querySelector(`[data-row-index="${row}"]`);
+      if (element) {
+        const containerRect = container.getBoundingClientRect();
+        const elementRect = element.getBoundingClientRect();
+        if (
+          elementRect.top >= containerRect.top &&
+          elementRect.bottom <= containerRect.bottom
+        ) {
+          return;
+        }
+      }
+    }
+
+    list.scrollToRow(row);
   }, []);
 
   /**
@@ -578,12 +619,104 @@ const EventsTree: React.ComponentType<{
     [draggedNode, _restoreFoldedNodes, forceUpdate]
   );
 
+  // Position-based height snapshot. Used as a fallback in _getRowHeight when
+  // the ptr-based cache has no entry (e.g. right after undo/redo, which
+  // deserializes all events with fresh pointers). Merged rather than replaced
+  // so off-screen events keep their last known height instead of collapsing to
+  // defaultEventHeight.
+  const heightsByRowIndex = React.useRef<{ [number]: number }>({});
+
   const eventPtrToRowIndex = React.useRef<{ [key: string]: number }>({});
   const getEventRow = React.useCallback(
     (searchedEvent: gdBaseEvent) => {
-      return eventPtrToRowIndex.current['' + searchedEvent.ptr] || -1;
+      const key = '' + searchedEvent.ptr;
+      const rowIndex = eventPtrToRowIndex.current[key];
+      return rowIndex === undefined ? -1 : rowIndex;
     },
     [eventPtrToRowIndex]
+  );
+
+  const scrollToInstruction = React.useCallback(
+    (rowIndex: number, listLabel: string, instructionIndex: number) => {
+      // Do NOT call scrollToRow here unconditionally. For tall event rows (many
+      // actions), scrollToRow snaps the row's top edge to the viewport top even
+      // when the target instruction is already visible. We only fall back to it
+      // inside tryScrollToElement if the DOM element isn't found (row not yet
+      // rendered by the virtual list).
+
+      const tryScrollToElement = ({
+        retriesLeft,
+        didScrollToRow,
+      }: {
+        retriesLeft: number,
+        didScrollToRow: boolean,
+      }) => {
+        requestAnimationFrame(() => {
+          const list = _list.current;
+          if (!list || !list.container) return;
+
+          // Search by rowIndex (position-based, stable across undo/redo) rather
+          // than by event.ptr which changes after every deserialization.
+          let relativeNodePath = null;
+          const findNode = (nodes: Array<SortableTreeNode>): boolean => {
+            for (const node of nodes) {
+              if (node.rowIndex === rowIndex) {
+                relativeNodePath = node.relativeNodePath;
+                return true;
+              }
+              if (node.children.length > 0 && findNode(node.children))
+                return true;
+            }
+            return false;
+          };
+          findNode(treeDataRoot.current);
+          if (!relativeNodePath) return;
+
+          // For WhileEvent's loop-guard list the idPrefix gets a '-while' suffix
+          // (set in WhileEvent.js) to avoid colliding with the body conditions.
+          const listIdPrefix =
+            listLabel === 'whileConditions'
+              ? `event-${relativeNodePath.join('-')}-while`
+              : `event-${relativeNodePath.join('-')}`;
+          const type = listLabel === 'actions' ? 'action' : 'condition';
+          const doc = list.container.ownerDocument;
+
+          // Try the exact index first, then one below (covers undo of add where
+          // the instruction at instructionIndex was removed).
+          const element =
+            doc.getElementById(`${listIdPrefix}-${type}-${instructionIndex}`) ||
+            (instructionIndex > 0
+              ? doc.getElementById(
+                  `${listIdPrefix}-${type}-${instructionIndex - 1}`
+                )
+              : null);
+
+          if (element) {
+            const containerRect = list.container.getBoundingClientRect();
+            const elementRect = element.getBoundingClientRect();
+            const alreadyVisible =
+              elementRect.top >= containerRect.top &&
+              elementRect.bottom <= containerRect.bottom;
+            if (!alreadyVisible) {
+              element.scrollIntoView({ block: 'nearest' });
+            }
+          } else if (!didScrollToRow) {
+            // Element not in DOM — the row may not be rendered by the virtual
+            // list yet. Scroll to the row first, then retry.
+            scrollToRow(rowIndex);
+            tryScrollToElement({ retriesLeft, didScrollToRow: true });
+          } else if (retriesLeft > 0) {
+            tryScrollToElement({
+              retriesLeft: retriesLeft - 1,
+              didScrollToRow: true,
+            });
+          }
+        });
+      };
+
+      tryScrollToElement({ retriesLeft: 2, didScrollToRow: false });
+    },
+    [scrollToRow]
   );
 
   const temporaryUnfoldNode = React.useCallback(
@@ -622,7 +755,11 @@ const EventsTree: React.ComponentType<{
     }
 
     const height = eventsHeightsCache.getEventHeight(node.event);
-    return height;
+    if (height > 0) return height;
+    // Fall back to the last known height for this row position. This avoids a
+    // visible collapse to defaultEventHeight after undo/redo, which replaces all
+    // event pointers via deserialization and empties the ptr-based cache.
+    return heightsByRowIndex.current[node.rowIndex] || defaultEventHeight;
   };
 
   const {
@@ -1038,6 +1175,7 @@ const EventsTree: React.ComponentType<{
     unfoldToLevel,
     getEventContextAtRowIndexes,
     scrollToRow,
+    scrollToInstruction,
     getEventRow,
     unfoldForEvent,
   }));
@@ -1094,11 +1232,28 @@ const EventsTree: React.ComponentType<{
   );
 
   React.useLayoutEffect(() => {
-    // Recompute the row heights of the tree at each render, because there
-    // is no guarantee that events heights have not changed (resizing, change in event...).
+    // Recompute row heights on every render. This is needed for any change
+    // that affects which event is at which row (deletion, fold/unfold, move)
+    // — not just changes to individual event heights. Scroll-triggered
+    // re-renders (isScrolledTop / isScrolledBottom state flips) are infrequent
+    // and recalculate the same heights, so the extra work is negligible.
     if (_list.current) {
       _list.current.recomputeRowHeights();
     }
+    // Merge newly measured heights into the position-based snapshot so that the
+    // next render after an undo/redo (which replaces all ptrs) can use them as
+    // fallback heights instead of collapsing to defaultEventHeight.
+    const flatData = getFlatDataFromTree({
+      treeData: treeDataRoot.current,
+      getNodeKey,
+      ignoreCollapsed: true,
+    });
+    flatData.forEach(entry => {
+      if (entry.node.event) {
+        const h = eventsHeightsCache.getEventHeight(entry.node.event);
+        if (h > 0) heightsByRowIndex.current[entry.node.rowIndex] = h;
+      }
+    });
   });
 
   return (
@@ -1151,6 +1306,7 @@ const EventsTree: React.ComponentType<{
             : null
         }
         className={props.searchResults ? eventsTreeWithSearchResults : ''}
+        eventsSheetWidth={props.eventsSheetWidth}
         reactVirtualizedListProps={{
           ref: list => {
             _list.current = list;
@@ -1166,7 +1322,11 @@ const EventsTree: React.ComponentType<{
               event.clientHeight + event.scrollTop >= event.scrollHeight
             );
           },
-          scrollToAlignment: 'center',
+          // 'smart': no-op if the row is already visible; centers it only when
+          // it is more than one viewport away. This prevents undo of an in-view
+          // edit from jumping the viewport due to accumulated height-estimate
+          // errors in never-scrolled-to rows.
+          scrollToAlignment: 'smart',
         }}
       />
     </div>

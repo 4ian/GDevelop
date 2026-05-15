@@ -1,7 +1,9 @@
 // @flow
 import * as React from 'react';
 import InlinePopover from './InlinePopover';
-import ParameterRenderingService from './ParameterRenderingService';
+import ParameterRenderingService, {
+  type ParameterField,
+} from './ParameterRenderingService';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope';
 import { setupInstructionParameters } from '../InstructionOrExpression/SetupInstructionParameters';
@@ -65,7 +67,10 @@ const InlineParameterEditor = ({
     instructionMetadata,
     setInstructionMetadata,
   ] = React.useState<?gdInstructionMetadata>(null);
-  const [ParameterComponent, setParameterComponent] = React.useState(null);
+  const [
+    ParameterComponent,
+    setParameterComponent,
+  ] = React.useState<ParameterField | null>(null);
   const field = React.useRef<?ParameterFieldInterface>(null);
 
   const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();

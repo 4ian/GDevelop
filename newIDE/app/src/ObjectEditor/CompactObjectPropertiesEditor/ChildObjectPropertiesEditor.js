@@ -68,6 +68,7 @@ export const ChildObjectPropertiesEditor = ({
         onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
           objectConfiguration.updateProperty(name, value),
         visibility: 'All',
+        layersContainer: null,
       });
     },
     [schemaRecomputeTrigger, childObjectConfigurationAsGd]

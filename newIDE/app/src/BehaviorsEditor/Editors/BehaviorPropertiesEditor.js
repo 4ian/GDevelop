@@ -15,6 +15,7 @@ const BehaviorPropertiesEditor = ({
   project,
   behavior,
   object,
+  layersContainer,
   onBehaviorUpdated,
   resourceManagementProps,
   projectScopedContainersAccessor,
@@ -39,9 +40,10 @@ const BehaviorPropertiesEditor = ({
           instance.updateProperty(name, value);
         },
         object,
+        layersContainer,
         visibility: 'All',
       }),
-    [behavior, behaviorMetadata, object]
+    [behavior, behaviorMetadata, layersContainer, object]
   );
 
   return (

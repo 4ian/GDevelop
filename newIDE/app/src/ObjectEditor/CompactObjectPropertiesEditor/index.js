@@ -560,6 +560,7 @@ export const CompactObjectPropertiesEditor = ({
           onObjectsModified([object]);
         },
         object,
+        layersContainer,
         visibility: 'All',
       });
 
@@ -573,6 +574,7 @@ export const CompactObjectPropertiesEditor = ({
       objectConfigurationAsGd,
       customObjectEventsBasedObject,
       object,
+      layersContainer,
       layout,
       onObjectsModified,
       i18n,
@@ -824,6 +826,7 @@ export const CompactObjectPropertiesEditor = ({
                           behaviorOverriding={null}
                           initialInstance={null}
                           object={object}
+                          layersContainer={layersContainer}
                           onBehaviorUpdated={() => {}}
                           resourceManagementProps={resourceManagementProps}
                           onOpenFullEditor={() =>

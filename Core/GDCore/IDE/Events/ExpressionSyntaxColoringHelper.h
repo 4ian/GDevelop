@@ -259,14 +259,39 @@ protected:
     // No coloration
   }
   void OnVisitFunctionCallNode(FunctionCallNode &node) override {
+    auto type = gd::ExpressionTypeFinder::GetType(
+        platform, projectScopedContainers, rootType, node);
+    auto functionColorationKind =
+        gd::ParameterMetadata::IsExpression("number", type)
+            ? gd::ExpressionColorationDescription::ColorationKind::Number
+            : gd::ExpressionColorationDescription::ColorationKind::String;
+
     if (node.objectNameLocation.IsValid()) {
       AddColoration(gd::ExpressionColorationDescription::ColorationKind::Object,
                     node.objectNameLocation.GetStartPosition(),
                     node.objectNameLocation.GetEndPosition());
+      AddColoration(functionColorationKind,
+                    node.objectNameLocation.GetEndPosition(),
+                    node.openingParenthesisLocation.GetEndPosition());
+    } else {
+      AddColoration(functionColorationKind, node.location.GetStartPosition(),
+                    node.openingParenthesisLocation.GetEndPosition());
     }
+    auto previousParameterEndPosition =
+        node.openingParenthesisLocation.GetEndPosition();
     for (auto &&parameter : node.parameters) {
+      if (previousParameterEndPosition <
+          parameter->location.GetStartPosition()) {
+        // Handle commas
+        AddColoration(functionColorationKind, previousParameterEndPosition,
+                      parameter->location.GetStartPosition());
+      }
       parameter->Visit(*this);
+      previousParameterEndPosition = parameter->location.GetEndPosition();
     }
+    AddColoration(functionColorationKind,
+                  node.closingParenthesisLocation.GetStartPosition(),
+                  node.location.GetEndPosition());
   }
   void OnVisitEmptyNode(EmptyNode &node) override {}
 

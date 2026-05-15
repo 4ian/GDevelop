@@ -90,6 +90,7 @@ TEST_CASE("ExpressionSyntaxColoringHelper", "[common][events]") {
     // clang-format off
     std::vector<gd::String> expectedCompletions{
         "Object [0 8[",
+        "Number [8 21[",
     };
     // clang-format on
     REQUIRE(getColorationsFor("number", "MyObject.MyFunction()") ==
@@ -98,8 +99,9 @@ TEST_CASE("ExpressionSyntaxColoringHelper", "[common][events]") {
   SECTION("Can colorize function parameters") {
     // clang-format off
     std::vector<gd::String> expectedCompletions{
+        "Number [0 14[",
         "String [14 23[",
-        "Number [25 26[",
+        "Number [23 27[",
     };
     // clang-format on
     REQUIRE(getColorationsFor("number", "CameraCenterX(\"MyLayer\", 0)") ==

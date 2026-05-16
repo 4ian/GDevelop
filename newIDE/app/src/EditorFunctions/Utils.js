@@ -4,14 +4,18 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 const gd: libGDevelop = global.gd;
 
 export type ObjectSizeInfo = {|
-  width: number,
-  height: number,
+  // `width`/`height`/`centerX`/`centerY` are `null` when the object has no
+  // intrinsic size (e.g. TextObject, where width/height depend on the rendered
+  // text and must be defined per-instance via `customSize`). The instance
+  // position is still meaningful in that case — it is the object's origin.
+  width: number | null,
+  height: number | null,
   depth: number | null,
   originX: number,
   originY: number,
   originZ: number | null,
-  centerX: number,
-  centerY: number,
+  centerX: number | null,
+  centerY: number | null,
   centerZ: number | null,
 |};
 
@@ -123,6 +127,24 @@ export const getObjectSizeInfo = (
       originZ: null,
       centerX: width / 2,
       centerY: height / 2,
+      centerZ: null,
+    };
+  }
+
+  if (objectType === 'TextObject::Text') {
+    // TextObject has no intrinsic size: width/height depend on the rendered
+    // text and the font, and the engine cannot know them without rendering.
+    // Origin is the top-left of the object — instances should set their own
+    // width/height (via `customSize`) to define a box the text lives in.
+    return {
+      width: null,
+      height: null,
+      depth: null,
+      originX: 0,
+      originY: 0,
+      originZ: null,
+      centerX: null,
+      centerY: null,
       centerZ: null,
     };
   }
@@ -243,4 +265,29 @@ export const getObjectSizeInfo = (
   }
 
   return null;
+};
+
+/**
+ * Build hint strings for an `objectSizeInfo` map, intended to be surfaced to
+ * the AI as a `hints` field on the tool result. The goal is to make the LLM
+ * stop assuming "X,Y is the center" for objects whose size is not known
+ * intrinsically (typically TextObject): when width/height is null, the
+ * instance position is the object's origin (top-left for these objects), and
+ * the instance MUST define its own width/height to have a well-defined box.
+ */
+export const getObjectSizeInfoHints = (objectSizeInfoByName: {
+  [string]: ObjectSizeInfo | null,
+}): Array<string> => {
+  const hints: Array<string> = [];
+  for (const objectName in objectSizeInfoByName) {
+    const info = objectSizeInfoByName[objectName];
+    if (!info) continue;
+    // `depth` being null is normal for 2D objects — don't warn about that.
+    if (info.width === null || info.height === null) {
+      hints.push(
+        `Object "${objectName}" has no intrinsic size (width/height are null in objectSizeInfo). Its instance position (X, Y) is the top-left of its origin; the instance should define its own width and height (e.g. via \`instances_size\` in put_2d_instances) so the box and any centered/aligned content is well-defined. Do not assume X, Y is the center of the rendered object.`
+      );
+    }
+  }
+  return hints;
 };

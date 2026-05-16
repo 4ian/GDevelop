@@ -39,7 +39,11 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
-import { getObjectSizeInfo, type ObjectSizeInfo } from './Utils';
+import {
+  getObjectSizeInfo,
+  getObjectSizeInfoHints,
+  type ObjectSizeInfo,
+} from './Utils';
 
 const gd: libGDevelop = global.gd;
 
@@ -125,6 +129,11 @@ export type EditorFunctionGenericOutput = {|
 
   // Default size, origin and center of the object(s) being operated on, keyed by object name:
   objectSizeInfo?: { [string]: ObjectSizeInfo | null },
+
+  // Automated hints/warnings derived from the tool call (currently from
+  // `objectSizeInfo` — surfaced when an object has no intrinsic size so the
+  // LLM does not assume X,Y is the center of the rendered object).
+  hints?: Array<string>,
 
   // Set to true when the function call was aborted mid-execution (e.g. the AI
   // request was suspended while event generation was still polling).
@@ -328,6 +337,24 @@ const makeGenericFailure = (message: string): EditorFunctionGenericOutput => ({
   success: false,
   message,
 });
+
+/**
+ * Attach an `objectSizeInfo` map to a tool result, alongside automated `hints`
+ * derived from it. Hints surface when an object has no intrinsic size (null
+ * width/height in objectSizeInfo) so the LLM does not assume X,Y is the
+ * center of the rendered object.
+ */
+const withObjectSizeInfo = (
+  output: EditorFunctionGenericOutput,
+  objectSizeInfoByName: { [string]: ObjectSizeInfo | null }
+): EditorFunctionGenericOutput => {
+  output.objectSizeInfo = objectSizeInfoByName;
+  const hints = getObjectSizeInfoHints(objectSizeInfoByName);
+  if (hints.length > 0) {
+    output.hints = output.hints ? [...output.hints, ...hints] : hints;
+  }
+  return output;
+};
 
 const makeGenericSuccess = (message: string): EditorFunctionGenericOutput => ({
   success: true,
@@ -867,16 +894,15 @@ const createOrReplaceObject: EditorFunction = {
                 `Created (from the asset store) object "${object.getName()}" of type "${object.getType()}" in scene "${scene_name}".`,
                 getPropertiesText(object),
               ].join(' '),
-              objectSizeInfo: {
-                [object.getName()]: getObjectSizeInfo(
-                  object,
-                  project,
-                  PixiResourcesLoader,
-                  assetShortHeader
-                ),
-              },
             };
-            return result;
+            return withObjectSizeInfo(result, {
+              [object.getName()]: getObjectSizeInfo(
+                object,
+                project,
+                PixiResourcesLoader,
+                assetShortHeader
+              ),
+            });
           }
 
           return makeGenericSuccess(
@@ -959,14 +985,13 @@ const createOrReplaceObject: EditorFunction = {
           getPropertiesText(object),
         ].join(' '),
       };
-      scratchResult.objectSizeInfo = {
+      return withObjectSizeInfo(scratchResult, {
         [targetObjectName]: getObjectSizeInfo(
           object,
           project,
           PixiResourcesLoader
         ),
-      };
-      return scratchResult;
+      });
     };
 
     const replaceExistingObject = async () => {
@@ -1314,10 +1339,10 @@ const inspectObjectProperties: EditorFunction = {
       objectPropertiesDeduplicationKey: [scene_name, object_name]
         .filter(Boolean)
         .join('-'),
-      objectSizeInfo: {
-        [object_name]: getObjectSizeInfo(object, project, PixiResourcesLoader),
-      },
     };
+    withObjectSizeInfo(output, {
+      [object_name]: getObjectSizeInfo(object, project, PixiResourcesLoader),
+    });
     if (animationNames.length > 0) {
       output.animationNames = animationNames.join(', ');
     }
@@ -2713,7 +2738,7 @@ const put2dInstances: EditorFunction = {
           .join(' '),
       };
       if (object_name && objectSizeInfo)
-        eraseResult.objectSizeInfo = { [object_name]: objectSizeInfo };
+        withObjectSizeInfo(eraseResult, { [object_name]: objectSizeInfo });
       return eraseResult;
     } else {
       const brushPosition: Array<number> = brush_position
@@ -3035,7 +3060,7 @@ const put2dInstances: EditorFunction = {
         message: changes.join(' '),
       };
       if (object_name && objectSizeInfo)
-        put2dResult.objectSizeInfo = { [object_name]: objectSizeInfo };
+        withObjectSizeInfo(put2dResult, { [object_name]: objectSizeInfo });
       return put2dResult;
     }
   },
@@ -3285,7 +3310,7 @@ const put3dInstances: EditorFunction = {
           .join(' '),
       };
       if (object_name && objectSizeInfo)
-        eraseResult.objectSizeInfo = { [object_name]: objectSizeInfo };
+        withObjectSizeInfo(eraseResult, { [object_name]: objectSizeInfo });
       return eraseResult;
     } else {
       const brushPosition: Array<number> = brush_position
@@ -3562,7 +3587,7 @@ const put3dInstances: EditorFunction = {
         message: changes.join(' '),
       };
       if (object_name && objectSizeInfo)
-        put3dResult.objectSizeInfo = { [object_name]: objectSizeInfo };
+        withObjectSizeInfo(put3dResult, { [object_name]: objectSizeInfo });
       return put3dResult;
     }
   },

@@ -473,23 +473,63 @@ describe('getObjectSizeInfoHints', () => {
     expect(getObjectSizeInfoHints({ Mystery: null })).toEqual([]);
   });
 
-  it('returns a hint when an object has null width/height (e.g. TextObject)', () => {
-    const hints = getObjectSizeInfoHints({
-      Title: {
-        width: null,
-        height: null,
-        depth: null,
-        originX: 0,
-        originY: 0,
-        originZ: null,
-        centerX: null,
-        centerY: null,
-        centerZ: null,
-      },
-    });
-    expect(hints).toHaveLength(1);
-    expect(hints[0]).toMatch(/Title/);
-    expect(hints[0]).toMatch(/no intrinsic size/);
-    expect(hints[0]).toMatch(/instances_size/);
+  it('returns a structured no-intrinsic-size hint when an object has null width/height (e.g. TextObject)', () => {
+    expect(
+      getObjectSizeInfoHints({
+        Title: {
+          width: null,
+          height: null,
+          depth: null,
+          originX: 0,
+          originY: 0,
+          originZ: null,
+          centerX: null,
+          centerY: null,
+          centerZ: null,
+        },
+      })
+    ).toEqual([{ code: 'no-intrinsic-size', objectNames: ['Title'] }]);
+  });
+
+  it('groups all unsized objects into a single hint entry (so the wrap-up can merge them)', () => {
+    expect(
+      getObjectSizeInfoHints({
+        Title: {
+          width: null,
+          height: null,
+          depth: null,
+          originX: 0,
+          originY: 0,
+          originZ: null,
+          centerX: null,
+          centerY: null,
+          centerZ: null,
+        },
+        Subtitle: {
+          width: null,
+          height: null,
+          depth: null,
+          originX: 0,
+          originY: 0,
+          originZ: null,
+          centerX: null,
+          centerY: null,
+          centerZ: null,
+        },
+        Player: {
+          width: 64,
+          height: 64,
+          depth: null,
+          originX: 0,
+          originY: 0,
+          originZ: null,
+          centerX: 32,
+          centerY: 32,
+          centerZ: null,
+        },
+      })
+    ).toEqual([
+      { code: 'no-intrinsic-size', objectNames: ['Title', 'Subtitle'] },
+    ]);
   });
 });

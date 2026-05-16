@@ -268,26 +268,42 @@ export const getObjectSizeInfo = (
 };
 
 /**
- * Build hint strings for an `objectSizeInfo` map, intended to be surfaced to
- * the AI as a `hints` field on the tool result. The goal is to make the LLM
- * stop assuming "X,Y is the center" for objects whose size is not known
- * intrinsically (typically TextObject): when width/height is null, the
- * instance position is the object's origin (top-left for these objects), and
- * the instance MUST define its own width/height to have a well-defined box.
+ * A structured hint surfaced to the AI as the `hints` field on a tool result.
+ *
+ * Hints are kept STRUCTURED (a stable `code` and a list of objects the hint
+ * applies to) instead of free text so they can be merged across many tool
+ * calls when the sub-agent's work is reported back to the orchestrator: hints
+ * with the same `code` collapse into one, with their `objectNames` unioned.
+ *
+ * Codes currently in use:
+ * - `no-intrinsic-size`: the listed objects have no intrinsic width/height
+ *   (e.g. TextObject). Their instance position is the top-left of their
+ *   origin; instances must define their own width/height (`instances_size`)
+ *   for the rendered box to be predictable. Do NOT assume X,Y is the center.
+ */
+export type HintEntry = {|
+  code: 'no-intrinsic-size',
+  objectNames: Array<string>,
+|};
+
+/**
+ * Build structured hints for an `objectSizeInfo` map.
+ *
+ * Returns at most one `no-intrinsic-size` entry per call, listing all objects
+ * whose width/height is null. `depth` being null is normal for 2D objects —
+ * not a hint trigger.
  */
 export const getObjectSizeInfoHints = (objectSizeInfoByName: {
   [string]: ObjectSizeInfo | null,
-}): Array<string> => {
-  const hints: Array<string> = [];
+}): Array<HintEntry> => {
+  const objectNames: Array<string> = [];
   for (const objectName in objectSizeInfoByName) {
     const info = objectSizeInfoByName[objectName];
     if (!info) continue;
-    // `depth` being null is normal for 2D objects — don't warn about that.
     if (info.width === null || info.height === null) {
-      hints.push(
-        `Object "${objectName}" has no intrinsic size (width/height are null in objectSizeInfo). Its instance position (X, Y) is the top-left of its origin; the instance should define its own width and height (e.g. via \`instances_size\` in put_2d_instances) so the box and any centered/aligned content is well-defined. Do not assume X, Y is the center of the rendered object.`
-      );
+      objectNames.push(objectName);
     }
   }
-  return hints;
+  if (objectNames.length === 0) return [];
+  return [{ code: 'no-intrinsic-size', objectNames }];
 };

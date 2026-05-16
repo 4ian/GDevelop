@@ -3,7 +3,7 @@ import SvgIcon from '@material-ui/core/SvgIcon';
 
 export default React.memo(props => (
   <SvgIcon {...props} width="24" height="24" viewBox="0 0 24 24" fill="none">
-    <g clip-path="url(#paint0_angular_2820_99_clip_path)">
+    <g clipPath="url(#paint0_angular_2820_99_clip_path)">
       <g transform="matrix(-0.007 0.0042 -0.00411642 -0.00725834 13.7833 12)">
         <foreignObject
           x="-1422.46"

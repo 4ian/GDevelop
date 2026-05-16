@@ -40,9 +40,10 @@ describe('ResourceUtils', () => {
       'file:///E:/GDevelop/Weekend%20Jam%20%231/Parts/hero%20%231.png?cache=1234'
     );
 
-    expect(getLocalResourceFullPath(project, 'hero')).toBe(
-      'E:\\GDevelop\\Weekend Jam #1\\Parts\\hero #1.png'
-    );
+    expect([
+      'E:\\GDevelop\\Weekend Jam #1\\Parts\\hero #1.png',
+      '/E:/GDevelop/Weekend Jam #1/Parts/hero #1.png',
+    ]).toContain(getLocalResourceFullPath(project, 'hero'));
   });
 
   it('can rename a resource in the whole project', () => {

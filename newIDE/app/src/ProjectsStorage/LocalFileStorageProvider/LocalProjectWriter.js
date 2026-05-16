@@ -143,10 +143,10 @@ const writeProjectFiles = async ({
   if (projectEditorSettings) {
     await writeAndCheckFormattedJSONFile(
       projectEditorSettings,
-      getProjectEditorSettingsFilePath(projectPath)
+      getProjectEditorSettingsFilePath(filePath)
     );
   } else {
-    await fs.remove(getProjectEditorSettingsFilePath(projectPath));
+    await fs.remove(getProjectEditorSettingsFilePath(filePath));
   }
 
   if (project.isFolderProject()) {

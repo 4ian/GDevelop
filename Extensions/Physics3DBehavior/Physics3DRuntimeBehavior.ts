@@ -1364,6 +1364,52 @@ namespace gdjs {
       return this.bodyType === 'Kinematic';
     }
 
+    setBodyType(bodyType: string): void {
+      if (
+        bodyType !== 'Static' &&
+        bodyType !== 'Dynamic' &&
+        bodyType !== 'Kinematic'
+      ) {
+        return;
+      }
+
+      if (this.bodyType === bodyType) {
+        return;
+      }
+
+      this.bodyType = bodyType;
+
+      if (this._body === null) {
+        if (!this._createBody()) return;
+      }
+
+      if (this._body === null) {
+        return;
+      }
+      const body = this._body!;
+      const bodyInterface = this._sharedData.bodyInterface;
+      let motionType: Jolt.EMotionType;
+      switch (this.bodyType) {
+        case 'Static':
+          motionType = Jolt.EMotionType_Static;
+          break;
+        case 'Kinematic':
+          motionType = Jolt.EMotionType_Kinematic;
+          break;
+        case 'Dynamic':
+        default:
+          motionType = Jolt.EMotionType_Dynamic;
+          break;
+      }
+
+      bodyInterface.SetMotionType(
+        body.GetID(),
+        motionType,
+        Jolt.EActivation_Activate
+      );
+      bodyInterface.SetObjectLayer(body.GetID(), this.getBodyLayer());
+    }
+
     isBullet(): boolean {
       return this.bullet;
     }

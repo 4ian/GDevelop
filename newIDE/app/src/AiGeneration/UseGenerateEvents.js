@@ -6,6 +6,7 @@ import { delay } from '../Utils/Delay';
 import {
   getAiGeneratedEvent,
   createAiGeneratedEvent,
+  isLocalAiRequestId,
 } from '../Utils/GDevelopServices/Generation';
 
 import { type EventsGenerationResult } from '../EditorFunctions';
@@ -79,6 +80,7 @@ export const useGenerateEvents = ({
           simplifiedProjectJson,
           projectSpecificExtensionsSummaryJson,
           eventsJson: existingEventsJson,
+          shouldUpload: !isLocalAiRequestId(relatedAiRequestId),
         });
 
         const createResult = await retryIfFailed(

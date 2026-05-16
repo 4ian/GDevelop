@@ -1997,6 +1997,11 @@ const addMessageToLocalChatAiRequest = async ({
     }),
     allowTextOnlyResponse: functionCallOutputs.length > 0,
   });
+  const latestAiRequest = localAiRequestsInMemory[aiRequestId];
+  if (latestAiRequest && latestAiRequest.status === 'suspended') {
+    return latestAiRequest;
+  }
+
   const nextOutput = [
     ...(existingAiRequest.output || []),
     ...functionCallOutputs,
@@ -2623,6 +2628,23 @@ export const suspendAiRequest = async (
   getAuthorizationHeader: () => Promise<string>,
   { userId, aiRequestId }: {| userId: string, aiRequestId: string |}
 ): Promise<AiRequest> => {
+  if (isLocalAiRequestId(aiRequestId)) {
+    const localAiRequest = localAiRequestsInMemory[aiRequestId];
+    if (!localAiRequest) {
+      throw new Error(
+        'This Custom Model chat is no longer available. Start a new Custom Model chat.'
+      );
+    }
+
+    const suspendedAiRequest: AiRequest = {
+      ...localAiRequest,
+      status: 'suspended',
+      updatedAt: new Date().toISOString(),
+    };
+    localAiRequestsInMemory[aiRequestId] = suspendedAiRequest;
+    return suspendedAiRequest;
+  }
+
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/suspend`,
@@ -3420,6 +3442,54 @@ export const forkAiRequest = async (
     upToMessageId?: string,
   |}
 ): Promise<AiRequest> => {
+  if (isLocalAiRequestId(aiRequestId)) {
+    const localAiRequest = localAiRequestsInMemory[aiRequestId];
+    if (!localAiRequest) {
+      throw new Error(
+        'This Custom Model chat is no longer available. Start a new Custom Model chat.'
+      );
+    }
+
+    const output = localAiRequest.output || [];
+    let forkedOutput = output;
+    let forkedAfterMessageId: string | null = null;
+    if (upToMessageId) {
+      const messageIndex = output.findIndex(
+        message => message.messageId === upToMessageId
+      );
+      if (messageIndex === -1) {
+        throw new Error(
+          'This Custom Model chat message is no longer available. Start a new Custom Model chat.'
+        );
+      }
+
+      forkedOutput = output.slice(0, messageIndex + 1);
+      forkedAfterMessageId = upToMessageId;
+    }
+
+    const now = new Date().toISOString();
+    const forkedAiRequest: AiRequest = {
+      ...localAiRequest,
+      id: createLocalAiRequestId(),
+      createdAt: now,
+      updatedAt: now,
+      status: 'ready',
+      output: forkedOutput,
+      forkedFromAiRequestId: localAiRequest.id,
+      forkedAfterOriginalMessageId: forkedAfterMessageId,
+      forkedAfterNewMessageId: forkedAfterMessageId,
+    };
+    localAiRequestsInMemory[forkedAiRequest.id] = forkedAiRequest;
+    const providerConfiguration =
+      localAiRequestProviderConfigurationsInMemory[aiRequestId];
+    if (providerConfiguration) {
+      localAiRequestProviderConfigurationsInMemory[
+        forkedAiRequest.id
+      ] = providerConfiguration;
+    }
+    return forkedAiRequest;
+  }
+
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/fork`,

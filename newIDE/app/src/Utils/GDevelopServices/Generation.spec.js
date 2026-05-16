@@ -9,6 +9,7 @@ import {
   createAiGeneratedEvent,
   createAiRequest,
   deleteAiProviderConfiguration,
+  forkAiRequest,
   getAiGeneratedEvent,
   getAiRequest,
   getAiRequestWithPreservedAiConfiguration,
@@ -18,6 +19,7 @@ import {
   isLocalAiProviderBaseUrl,
   isAiProviderUnavailableError,
   listAiProviderConfigurations,
+  suspendAiRequest,
   testAiProviderConfiguration,
   updateAiRequestMessage,
   updateAiProviderConfiguration,
@@ -370,6 +372,228 @@ describe('Generation service', () => {
       expect(getAuthorizationHeaderThatShouldNotRun).not.toHaveBeenCalled();
       expect(mock.history.post).toHaveLength(0);
       expect(providerMock.history.post).toHaveLength(1);
+
+      await deleteAiProviderConfiguration(getAuthorizationHeader, {
+        userId: 'user-1',
+        providerConfigurationId: configuration.id,
+      });
+    });
+
+    it('suspends local custom provider requests without calling the backend', async () => {
+      const getAuthorizationHeaderThatShouldNotRun = (jest.fn(async () => {
+        throw new Error(
+          'Local Custom Model requests should not request authorization.'
+        );
+      }): any);
+      const configuration = await createAiProviderConfiguration(
+        getAuthorizationHeaderThatShouldNotRun,
+        {
+          userId: 'user-1',
+          configuration: localProviderPayload,
+        }
+      );
+      let resolveSecondReply: any = null;
+      let resolveSecondReplyStarted: any = null;
+      const secondReplyStarted = new Promise(resolve => {
+        resolveSecondReplyStarted = resolve;
+      });
+
+      providerMock
+        .onPost('http://127.0.0.1:18080/chat/completions')
+        .replyOnce(() => [
+          200,
+          {
+            choices: [{ message: { content: 'first answer' } }],
+          },
+        ])
+        .onPost('http://127.0.0.1:18080/chat/completions')
+        .replyOnce(
+          () =>
+            new Promise(resolve => {
+              resolveSecondReply = resolve;
+              resolveSecondReplyStarted();
+            })
+        );
+
+      const aiRequest = await createAiRequest(
+        getAuthorizationHeaderThatShouldNotRun,
+        {
+          ...baseAiRequestArgs,
+          aiConfiguration: {
+            presetId: 'default',
+            providerConfigurationId: configuration.id,
+          },
+        }
+      );
+      const addMessagePromise = addMessageToAiRequest(
+        getAuthorizationHeaderThatShouldNotRun,
+        {
+          userId: 'user-1',
+          aiRequestId: aiRequest.id,
+          userMessage: 'Second message',
+          gameId: undefined,
+          functionCallOutputs: [],
+          payWithCredits: false,
+          gameProjectJson: null,
+          gameProjectJsonUserRelativeKey: null,
+          projectSpecificExtensionsSummaryJson: null,
+          projectSpecificExtensionsSummaryJsonUserRelativeKey: null,
+          aiConfiguration: aiRequest.aiConfiguration,
+        }
+      );
+      await secondReplyStarted;
+
+      const suspendedRequest = await suspendAiRequest(
+        getAuthorizationHeaderThatShouldNotRun,
+        {
+          userId: 'user-1',
+          aiRequestId: aiRequest.id,
+        }
+      );
+      expect(suspendedRequest.status).toBe('suspended');
+      expect(mock.history.post).toHaveLength(0);
+
+      resolveSecondReply([
+        200,
+        {
+          choices: [{ message: { content: 'late answer' } }],
+        },
+      ]);
+      const resolvedRequest = await addMessagePromise;
+
+      expect(resolvedRequest.status).toBe('suspended');
+      expect(resolvedRequest.output).toHaveLength(
+        (aiRequest.output || []).length
+      );
+      expect(JSON.stringify(resolvedRequest.output)).not.toContain(
+        'Second message'
+      );
+      expect(getAuthorizationHeaderThatShouldNotRun).not.toHaveBeenCalled();
+
+      await deleteAiProviderConfiguration(getAuthorizationHeader, {
+        userId: 'user-1',
+        providerConfigurationId: configuration.id,
+      });
+    });
+
+    it('forks local custom provider requests by trimming messages', async () => {
+      const getAuthorizationHeaderThatShouldNotRun = (jest.fn(async () => {
+        throw new Error(
+          'Local Custom Model requests should not request authorization.'
+        );
+      }): any);
+      const configuration = await createAiProviderConfiguration(
+        getAuthorizationHeaderThatShouldNotRun,
+        {
+          userId: 'user-1',
+          configuration: localProviderPayload,
+        }
+      );
+
+      providerMock
+        .onPost('http://127.0.0.1:18080/chat/completions')
+        .replyOnce(() => [
+          200,
+          {
+            choices: [{ message: { content: 'first answer' } }],
+          },
+        ])
+        .onPost('http://127.0.0.1:18080/chat/completions')
+        .replyOnce(config => {
+          const data = JSON.parse(config.data);
+          expect(JSON.stringify(data.messages)).toContain('Second message');
+          return [
+            200,
+            {
+              choices: [{ message: { content: 'second answer' } }],
+            },
+          ];
+        })
+        .onPost('http://127.0.0.1:18080/chat/completions')
+        .replyOnce(config => {
+          const data = JSON.parse(config.data);
+          const messages = JSON.stringify(data.messages);
+          expect(messages).toContain('Build a platformer');
+          expect(messages).toContain('Follow up after restore');
+          expect(messages).not.toContain('Second message');
+          return [
+            200,
+            {
+              choices: [{ message: { content: 'fork answer' } }],
+            },
+          ];
+        });
+
+      const aiRequest = await createAiRequest(
+        getAuthorizationHeaderThatShouldNotRun,
+        {
+          ...baseAiRequestArgs,
+          aiConfiguration: {
+            presetId: 'default',
+            providerConfigurationId: configuration.id,
+          },
+        }
+      );
+      const aiRequestWithSecondMessage = await addMessageToAiRequest(
+        getAuthorizationHeaderThatShouldNotRun,
+        {
+          userId: 'user-1',
+          aiRequestId: aiRequest.id,
+          userMessage: 'Second message',
+          gameId: undefined,
+          functionCallOutputs: [],
+          payWithCredits: false,
+          gameProjectJson: null,
+          gameProjectJsonUserRelativeKey: null,
+          projectSpecificExtensionsSummaryJson: null,
+          projectSpecificExtensionsSummaryJsonUserRelativeKey: null,
+          aiConfiguration: aiRequest.aiConfiguration,
+        }
+      );
+      const firstAssistantMessage =
+        aiRequest.output && aiRequest.output.length > 1
+          ? aiRequest.output[1]
+          : null;
+      if (!firstAssistantMessage || !firstAssistantMessage.messageId) {
+        throw new Error('Expected the first local assistant message to exist.');
+      }
+
+      const forkedRequest = await forkAiRequest(
+        getAuthorizationHeaderThatShouldNotRun,
+        {
+          userId: 'user-1',
+          aiRequestId: aiRequestWithSecondMessage.id,
+          upToMessageId: firstAssistantMessage.messageId,
+        }
+      );
+
+      expect(forkedRequest.id).not.toBe(aiRequest.id);
+      expect(forkedRequest.id).toContain('local-custom-provider-ai-request-');
+      expect(forkedRequest.forkedFromAiRequestId).toBe(aiRequest.id);
+      expect(forkedRequest.forkedAfterOriginalMessageId).toBe(
+        firstAssistantMessage.messageId
+      );
+      expect(forkedRequest.forkedAfterNewMessageId).toBe(
+        firstAssistantMessage.messageId
+      );
+      expect(forkedRequest.output).toHaveLength(2);
+
+      await addMessageToAiRequest(getAuthorizationHeaderThatShouldNotRun, {
+        userId: 'user-1',
+        aiRequestId: forkedRequest.id,
+        userMessage: 'Follow up after restore',
+        gameId: undefined,
+        functionCallOutputs: [],
+        payWithCredits: false,
+        gameProjectJson: null,
+        gameProjectJsonUserRelativeKey: null,
+        projectSpecificExtensionsSummaryJson: null,
+        projectSpecificExtensionsSummaryJsonUserRelativeKey: null,
+        aiConfiguration: forkedRequest.aiConfiguration,
+      });
+
+      expect(mock.history.post).toHaveLength(0);
+      expect(getAuthorizationHeaderThatShouldNotRun).not.toHaveBeenCalled();
 
       await deleteAiProviderConfiguration(getAuthorizationHeader, {
         userId: 'user-1',

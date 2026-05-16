@@ -19,7 +19,6 @@ import {
 import PreferencesContext, {
   initialPreferences,
 } from '../../../../MainFrame/Preferences/PreferencesContext';
-import FixedWidthFlexContainer from '../../../FixedWidthFlexContainer';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/AiRequestChat/Form',
@@ -118,38 +117,32 @@ const WrappedChatComponent = (allProps: any) => {
   );
   return (
     <FixedHeightFlexContainer height={800}>
-      <FixedWidthFlexContainer width={600}>
-        <PreferencesContext.Provider
+      <PreferencesContext.Provider
+        // $FlowFixMe[incompatible-type]
+        value={{
+          ...initialPreferences,
           // $FlowFixMe[incompatible-type]
-          value={{
-            ...initialPreferences,
-            // $FlowFixMe[incompatible-type]
-            values: {
-              ...initialPreferences.values,
-              automaticallyUseCreditsForAiRequests: automaticallyUseCredits,
-            },
-            setAutomaticallyUseCreditsForAiRequests: (value: boolean) => {
-              setAutomaticallyUseCredits(value);
-            },
-          }}
-        >
-          <AuthenticatedUserContext.Provider value={authenticatedUserToUse}>
-            <SubscriptionProvider>
-              <CreditsPackageStoreStateProvider>
-                <I18n>
-                  {({ i18n }) => (
-                    <AiRequestChat
-                      i18n={i18n}
-                      {...commonProps}
-                      {...chatProps}
-                    />
-                  )}
-                </I18n>
-              </CreditsPackageStoreStateProvider>
-            </SubscriptionProvider>
-          </AuthenticatedUserContext.Provider>
-        </PreferencesContext.Provider>
-      </FixedWidthFlexContainer>
+          values: {
+            ...initialPreferences.values,
+            automaticallyUseCreditsForAiRequests: automaticallyUseCredits,
+          },
+          setAutomaticallyUseCreditsForAiRequests: (value: boolean) => {
+            setAutomaticallyUseCredits(value);
+          },
+        }}
+      >
+        <AuthenticatedUserContext.Provider value={authenticatedUserToUse}>
+          <SubscriptionProvider>
+            <CreditsPackageStoreStateProvider>
+              <I18n>
+                {({ i18n }) => (
+                  <AiRequestChat i18n={i18n} {...commonProps} {...chatProps} />
+                )}
+              </I18n>
+            </CreditsPackageStoreStateProvider>
+          </SubscriptionProvider>
+        </AuthenticatedUserContext.Provider>
+      </PreferencesContext.Provider>
     </FixedHeightFlexContainer>
   );
 };

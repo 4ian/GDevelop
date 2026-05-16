@@ -10,6 +10,9 @@ import {
   type AiRequest,
   type AiRequestMessage,
   type AiRequestMessageAssistantFunctionCall,
+  type AiProviderConfiguration,
+  type AiRequestCustomProviderSupport,
+  isAiProviderUnavailableError,
 } from '../../Utils/GDevelopServices/Generation';
 import RaisedButton from '../../UI/RaisedButton';
 import { CompactTextAreaFieldWithControls } from '../../UI/CompactTextAreaFieldWithControls';
@@ -45,6 +48,7 @@ import {
 } from '../AiConfiguration';
 import { AiConfigurationPresetSelector } from './AiConfigurationPresetSelector';
 import { AiRequestContext } from '../AiRequestContext';
+import { getAiProviderConfigurationFromSelectionId } from '../AiProviderConfigurations';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useStickyVisibility } from './UseStickyVisibility';
 import CircledInfo from '../../UI/CustomSvgIcons/CircledInfo';
@@ -62,6 +66,24 @@ import Stop from '../../UI/CustomSvgIcons/Stop';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 15;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 20;
+const CUSTOM_AI_CONFIGURATION_PRESET_ID = 'custom-model';
+
+const getSendErrorMessage = (error: any): string | null => {
+  const responseMessage =
+    error &&
+    error.response &&
+    error.response.data &&
+    typeof error.response.data.message === 'string'
+      ? error.response.data.message
+      : null;
+  if (responseMessage) return responseMessage;
+
+  if (error && error.response && error.response.data) {
+    return JSON.stringify(error.response.data);
+  }
+
+  return error instanceof Error && error.message ? error.message : null;
+};
 
 const styles = {
   chatScrollView: {
@@ -320,6 +342,7 @@ type Props = {|
     mode: 'chat' | 'agent' | 'orchestrator',
     userRequest: string,
     aiConfigurationPresetId: string,
+    aiProviderConfigurationId?: string | null,
   |}) => void,
   onSendUserMessage: ({|
     userMessage: string,
@@ -366,6 +389,8 @@ type Props = {|
     message: AiRequestMessage,
     aiRequest: AiRequest,
   |}) => Promise<void>,
+  aiProviderConfigurations?: Array<AiProviderConfiguration>,
+  customProviderSupport?: AiRequestCustomProviderSupport | null,
 |};
 
 export type AiRequestChatInterface = {|
@@ -405,6 +430,8 @@ export const AiRequestChat: React.ComponentType<{
       savingProjectForMessageId,
       forkingState,
       onRestore,
+      aiProviderConfigurations = [],
+      customProviderSupport = null,
     }: Props,
     ref
   ) => {
@@ -419,7 +446,10 @@ export const AiRequestChat: React.ComponentType<{
         (hasOpenedProject ? 'chat' : 'orchestrator')
     );
     const {
-      values: { automaticallyUseCreditsForAiRequests },
+      values: {
+        automaticallyUseCreditsForAiRequests,
+        aiProviderSettingsSelectionId,
+      },
       setAutomaticallyUseCreditsForAiRequests,
     } = React.useContext(PreferencesContext);
     const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
@@ -442,12 +472,38 @@ export const AiRequestChat: React.ComponentType<{
       aiConfigurationPresetId,
       setAiConfigurationPresetId,
     ] = React.useState<string | null>(null);
+    const settingsAiProviderConfiguration = React.useMemo(
+      () =>
+        getAiProviderConfigurationFromSelectionId({
+          selectionId: aiProviderSettingsSelectionId,
+          aiProviderConfigurations,
+          customProviderSupport,
+        }),
+      [
+        aiProviderSettingsSelectionId,
+        aiProviderConfigurations,
+        customProviderSupport,
+      ]
+    );
+    const isCustomAiProviderSupported =
+      !!customProviderSupport &&
+      customProviderSupport.enabled &&
+      customProviderSupport.openAiCompatible;
+    const isCustomAiProviderSelected =
+      aiConfigurationPresetId === CUSTOM_AI_CONFIGURATION_PRESET_ID;
 
     React.useEffect(
       () => {
         if (!aiConfigurationPresetsWithAvailability.length) return;
 
         if (!aiConfigurationPresetId) return;
+
+        if (aiConfigurationPresetId === CUSTOM_AI_CONFIGURATION_PRESET_ID) {
+          if (settingsAiProviderConfiguration) return;
+
+          setAiConfigurationPresetId(null);
+          return;
+        }
 
         if (
           aiConfigurationPresetsWithAvailability.find(
@@ -469,6 +525,7 @@ export const AiRequestChat: React.ComponentType<{
         selectedMode,
         aiConfigurationPresetsWithAvailability,
         aiConfigurationPresetId,
+        settingsAiProviderConfiguration,
       ]
     );
 
@@ -566,11 +623,23 @@ export const AiRequestChat: React.ComponentType<{
 
     const { isMobile } = useResponsiveWindowSize();
 
+    const lastSendErrorMessage = lastSendError
+      ? getSendErrorMessage(lastSendError)
+      : null;
     const errorText = lastSendError ? (
-      <Text size="body-small" color="error">
-        <Trans>
-          An error happened when sending your request, please try again.
-        </Trans>
+      <Text size="body-small" color="error" noMargin>
+        {isAiProviderUnavailableError(lastSendError) ? (
+          <Trans>
+            This AI provider is not available. Check it in preferences or choose
+            GDevelop AI.
+          </Trans>
+        ) : lastSendErrorMessage ? (
+          lastSendErrorMessage
+        ) : (
+          <Trans>
+            An error happened when sending your request, please try again.
+          </Trans>
+        )}
       </Text>
     ) : null;
 
@@ -580,21 +649,43 @@ export const AiRequestChat: React.ComponentType<{
       value: !!isRefreshingLimits,
     });
 
-    const priceAndRequestsText = getPriceAndRequestsTextAndTooltip({
-      quota,
-      price,
-      availableCredits,
-      selectedMode,
-      automaticallyUseCreditsForAiRequests,
-      isRefreshingLimits: isRefreshingLimitsStable,
-    });
-
-    const chosenOrDefaultAiConfigurationPresetId =
-      aiConfigurationPresetId ||
-      getDefaultAiConfigurationPresetId(
+    const existingAiProviderConfigurationId =
+      (aiRequest &&
+        aiRequest.aiConfiguration &&
+        aiRequest.aiConfiguration.providerConfigurationId) ||
+      null;
+    const selectedAiProviderConfigurationId =
+      isCustomAiProviderSelected && settingsAiProviderConfiguration
+        ? settingsAiProviderConfiguration.id
+        : '';
+    const isUsingCustomAiProvider = aiRequest
+      ? !!existingAiProviderConfigurationId
+      : !!selectedAiProviderConfigurationId;
+    const priceAndRequestsText = isUsingCustomAiProvider ? (
+      <Text size="body-small" color="secondary" noMargin>
+        <Trans>Your AI provider may bill this request.</Trans>
+      </Text>
+    ) : (
+      getPriceAndRequestsTextAndTooltip({
+        quota,
+        price,
+        availableCredits,
         selectedMode,
-        aiConfigurationPresetsWithAvailability
-      );
+        automaticallyUseCreditsForAiRequests,
+        isRefreshingLimits: isRefreshingLimitsStable,
+      })
+    );
+
+    const defaultAiConfigurationPresetId = getDefaultAiConfigurationPresetId(
+      selectedMode,
+      aiConfigurationPresetsWithAvailability
+    );
+    const chosenOrDefaultAiConfigurationPresetId = isCustomAiProviderSelected
+      ? CUSTOM_AI_CONFIGURATION_PRESET_ID
+      : aiConfigurationPresetId || defaultAiConfigurationPresetId;
+    const onChooseAiConfigurationPreset = React.useCallback((value: string) => {
+      setAiConfigurationPresetId(value);
+    }, []);
     const hasFunctionsCallsToProcess =
       aiRequest &&
       getFunctionCallsToProcess({
@@ -622,6 +713,7 @@ export const AiRequestChat: React.ComponentType<{
     const doesNotHaveEnoughCreditsToContinue =
       !!price && availableCredits < price.priceInCredits;
     const cannotContinue =
+      !isUsingCustomAiProvider &&
       !!quota &&
       quota.limitReached &&
       (!automaticallyUseCreditsForAiRequests ||
@@ -683,7 +775,10 @@ export const AiRequestChat: React.ComponentType<{
 
         onStartNewAiRequest({
           userRequest: userRequestTextPerAiRequestId[''],
-          aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
+          aiConfigurationPresetId: isCustomAiProviderSelected
+            ? defaultAiConfigurationPresetId
+            : chosenOrDefaultAiConfigurationPresetId,
+          aiProviderConfigurationId: selectedAiProviderConfigurationId || null,
           mode: selectedMode,
         });
       },
@@ -691,6 +786,9 @@ export const AiRequestChat: React.ComponentType<{
         onStartNewAiRequest,
         userRequestTextPerAiRequestId,
         chosenOrDefaultAiConfigurationPresetId,
+        defaultAiConfigurationPresetId,
+        isCustomAiProviderSelected,
+        selectedAiProviderConfigurationId,
         scrollToBottom,
         cannotContinue,
         hasOpenedProject,
@@ -822,13 +920,22 @@ export const AiRequestChat: React.ComponentType<{
                               chosenOrDefaultAiConfigurationPresetId
                             }
                             setAiConfigurationPresetId={
-                              setAiConfigurationPresetId
+                              onChooseAiConfigurationPreset
                             }
                             aiConfigurationPresetsWithAvailability={
                               aiConfigurationPresetsWithAvailability
                             }
                             aiRequestMode={selectedMode}
                             disabled={isWorking}
+                            customAiConfigurationPresetId={
+                              CUSTOM_AI_CONFIGURATION_PRESET_ID
+                            }
+                            showCustomAiConfigurationPreset={
+                              isCustomAiProviderSupported
+                            }
+                            disableCustomAiConfigurationPreset={
+                              !settingsAiProviderConfiguration
+                            }
                           />
                           <RaisedButton
                             color="primary"
@@ -1171,40 +1278,43 @@ export const AiRequestChat: React.ComponentType<{
               justifyContent="space-between"
             >
               <Column noMargin>
-                <CompactSelectField
-                  disabled={isWorking}
-                  value={selectedMode}
-                  onChange={value => {
-                    if (
-                      value !== 'chat' &&
-                      value !== 'agent' &&
-                      value !== 'orchestrator'
-                    ) {
-                      return;
+                {/* $FlowFixMe[constant-condition] */}
+                {!standAloneForm && (
+                  <CompactSelectField
+                    disabled={isWorking || isForAnotherProject}
+                    value={selectedMode}
+                    onChange={value => {
+                      if (
+                        value !== 'chat' &&
+                        value !== 'agent' &&
+                        value !== 'orchestrator'
+                      ) {
+                        return;
+                      }
+                      setSelectedMode(value);
+                    }}
+                    renderOptionIcon={className =>
+                      selectedMode === 'chat' ? (
+                        <HelpQuestion className={className} />
+                      ) : (
+                        <Hammer className={className} />
+                      )
                     }
-                    setSelectedMode(value);
-                  }}
-                  renderOptionIcon={className =>
-                    selectedMode === 'chat' ? (
-                      <HelpQuestion className={className} />
-                    ) : (
-                      <Hammer className={className} />
-                    )
-                  }
-                  rounded
-                >
-                  <SelectOption key="chat" value="chat" label={t`Ask`} />
-                  <SelectOption
-                    key="agent"
-                    value="agent"
-                    label={t`Simple change`}
-                  />
-                  <SelectOption
-                    key="orchestrator"
-                    value="orchestrator"
-                    label={t`Build`}
-                  />
-                </CompactSelectField>
+                    rounded
+                  >
+                    <SelectOption key="chat" value="chat" label={t`Ask`} />
+                    <SelectOption
+                      key="agent"
+                      value="agent"
+                      label={t`Simple change`}
+                    />
+                    <SelectOption
+                      key="orchestrator"
+                      value="orchestrator"
+                      label={t`Build`}
+                    />
+                  </CompactSelectField>
+                )}
               </Column>
               <Column noMargin>
                 {isForAnotherProjectText || errorText || priceAndRequestsText}

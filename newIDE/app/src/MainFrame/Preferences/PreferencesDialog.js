@@ -27,6 +27,7 @@ import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import AlertMessage from '../../UI/AlertMessage';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import CompactSelectField from '../../UI/CompactSelectField';
+import { AiProvidersPreferences } from './AiProvidersPreferences';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -538,6 +539,10 @@ const PreferencesDialog = ({
                   </Trans>
                 </AlertMessage>
               )}
+              <Text size="sub-title">
+                <Trans>AI Providers</Trans>
+              </Text>
+              <AiProvidersPreferences />
               <Text size="sub-title">
                 <Trans>Other</Trans>
               </Text>

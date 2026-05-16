@@ -2,11 +2,16 @@
 import * as React from 'react';
 import {
   getAiRequest,
+  getAiRequestWithPreservedAiConfiguration,
   getPartialAiRequest,
   fetchAiSettings,
+  getAiRequestCustomProviderSupport,
   type AiRequest,
+  type AiProviderConfiguration,
+  type AiRequestCustomProviderSupport,
   type AiSettings,
   getAiRequests,
+  listAiProviderConfigurations,
 } from '../Utils/GDevelopServices/Generation';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { type EditorFunctionCallResult } from '../EditorFunctions';
@@ -16,6 +21,7 @@ import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInterval } from '../Utils/UseInterval';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import { shouldFetchAiProviderConfigurations } from './AiProviderConfigurations';
 
 type EditorFunctionCallResultsStorage = {|
   getEditorFunctionCallResults: (
@@ -130,6 +136,13 @@ type AiRequestSendState = {|
   lastSendError: ?Error,
 |};
 
+type AiProviderConfigurationState = {|
+  aiProviderConfigurations: Array<AiProviderConfiguration>,
+  customProviderSupport: AiRequestCustomProviderSupport | null,
+  isLoading: boolean,
+  fetchAiProviderConfigurations: () => Promise<void>,
+|};
+
 type PaginationState = {|
   aiRequests: { [aiRequestId: string]: AiRequest },
   nextPageUri: ?Object,
@@ -240,7 +253,11 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
           ...prevState,
           aiRequests: {
             ...(prevState.aiRequests || {}),
-            [aiRequestId]: newAiRequest,
+            [aiRequestId]: getAiRequestWithPreservedAiConfiguration({
+              aiRequest: newAiRequest,
+              aiConfiguration:
+                currentAiRequest && currentAiRequest.aiConfiguration,
+            }),
           },
         };
       });
@@ -460,6 +477,7 @@ type AiRequestContextState = {|
   selectedAiRequestId: string | null,
   setSelectedAiRequestId: (aiRequestId: string | null) => void,
   selectedAiRequest: AiRequest | null,
+  aiProviderConfigurationState: AiProviderConfigurationState,
 |};
 
 export const initialAiRequestContextState: AiRequestContextState = {
@@ -494,6 +512,12 @@ export const initialAiRequestContextState: AiRequestContextState = {
   selectedAiRequestId: null,
   setSelectedAiRequestId: () => {},
   selectedAiRequest: null,
+  aiProviderConfigurationState: {
+    aiProviderConfigurations: [],
+    customProviderSupport: null,
+    isLoading: false,
+    fetchAiProviderConfigurations: async () => {},
+  },
 };
 export const AiRequestContext: React.Context<AiRequestContextState> = React.createContext<AiRequestContextState>(
   initialAiRequestContextState
@@ -669,6 +693,70 @@ export const AiRequestProvider = ({
     [getAiSettings]
   );
 
+  const customProviderSupport = getAiRequestCustomProviderSupport({
+    aiSettings: getAiSettings(),
+    enableDevelopmentFallback: Window.isDev(),
+  });
+  const [
+    aiProviderConfigurations,
+    setAiProviderConfigurations,
+  ] = React.useState<Array<AiProviderConfiguration>>([]);
+  const [
+    isLoadingAiProviderConfigurations,
+    setIsLoadingAiProviderConfigurations,
+  ] = React.useState<boolean>(false);
+
+  const fetchAiProviderConfigurations = React.useCallback(
+    async () => {
+      if (
+        !profile ||
+        !shouldFetchAiProviderConfigurations({
+          hasAuthenticatedUser: !!profile,
+          customProviderSupport,
+        })
+      ) {
+        setAiProviderConfigurations([]);
+        return;
+      }
+
+      setIsLoadingAiProviderConfigurations(true);
+      try {
+        const configurations = await listAiProviderConfigurations(
+          getAuthorizationHeader,
+          { userId: profile.id }
+        );
+        setAiProviderConfigurations(configurations);
+      } catch (error) {
+        console.error('Error fetching AI provider configurations:', error);
+      } finally {
+        setIsLoadingAiProviderConfigurations(false);
+      }
+    },
+    [customProviderSupport, getAuthorizationHeader, profile]
+  );
+
+  React.useEffect(
+    () => {
+      fetchAiProviderConfigurations();
+    },
+    [fetchAiProviderConfigurations]
+  );
+
+  const aiProviderConfigurationState = React.useMemo(
+    (): AiProviderConfigurationState => ({
+      aiProviderConfigurations,
+      customProviderSupport,
+      isLoading: isLoadingAiProviderConfigurations,
+      fetchAiProviderConfigurations,
+    }),
+    [
+      aiProviderConfigurations,
+      customProviderSupport,
+      isLoadingAiProviderConfigurations,
+      fetchAiProviderConfigurations,
+    ]
+  );
+
   const state = React.useMemo(
     (): AiRequestContextState => ({
       aiRequestStorage,
@@ -680,6 +768,7 @@ export const AiRequestProvider = ({
       selectedAiRequestId,
       setSelectedAiRequestId,
       selectedAiRequest,
+      aiProviderConfigurationState,
     }),
     [
       aiRequestStorage,
@@ -691,6 +780,7 @@ export const AiRequestProvider = ({
       selectedAiRequestId,
       setSelectedAiRequestId,
       selectedAiRequest,
+      aiProviderConfigurationState,
     ]
   );
 

@@ -4,6 +4,12 @@ import {
   renameResourcesInProject,
   updateResourceJsonMetadata,
 } from './ResourceUtils';
+jest.mock('../ResourcesLoader', () => ({
+  __esModule: true,
+  default: {
+    getResourceFullUrl: jest.fn(),
+  },
+}));
 const gd: libGDevelop = global.gd;
 
 const addNewAnimationWithImageToSpriteObject = (

@@ -131,6 +131,7 @@ export class SafeExtractor {
         const num = Number(str.trim());
         return Number.isFinite(num) ? num : null;
       });
+    if (array.length < 2) return null;
 
     if (array[0] === null || array[1] === null) return null;
 
@@ -150,6 +151,7 @@ export class SafeExtractor {
         const num = Number(str.trim());
         return Number.isFinite(num) ? num : null;
       });
+    if (array.length < 3) return null;
 
     if (array[0] === null || array[1] === null || array[2] === null)
       return null;

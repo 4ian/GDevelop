@@ -58,9 +58,9 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
 
     if (!branch) {
       shell.echo(
-        `⚠️ Can't find the branch of the associated commit - if you're in detached HEAD, you need to be on a branch instead.`
+        `⚠️ Can't find the branch of the associated commit - defaulting to master.`
       );
-      return 'unknown-branch';
+      return 'master';
     }
 
     return branch;

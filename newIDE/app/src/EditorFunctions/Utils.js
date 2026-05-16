@@ -282,13 +282,13 @@ export const getObjectSizeInfo = (
  *   rendered box to be predictable.
  */
 export type HintEntry = {|
-  code: 'no-intrinsic-size',
+  code: string,
   message: string,
   objectNames: Array<string>,
 |};
 
 const NO_INTRINSIC_SIZE_MESSAGE =
-  'These objects have no intrinsic size: their width/height is null in `objectSizeInfo`. The instance position (X, Y) is the top-left of their origin; instances should define their own width and height (e.g. via `instances_size` in `put_2d_instances`) so the rendered box and any alignment is well-defined. Do not assume X, Y is the center.';
+  'These objects have no intrinsic size (width/height = null in `objectSizeInfo`). Instances should define their own width and height (e.g. via `instances_size` in `put_2d_instances`). Also check origin X;Y (if 0;0, it means the origin is the top-left).';
 
 /**
  * Build structured hints for an `objectSizeInfo` map.

@@ -131,11 +131,7 @@ export type EditorFunctionGenericOutput = {|
   // Default size, origin and center of the object(s) being operated on, keyed by object name:
   objectSizeInfo?: { [string]: ObjectSizeInfo | null },
 
-  // Automated, STRUCTURED hints derived from the tool call (currently from
-  // `objectSizeInfo` — surfaced when an object has no intrinsic size so the
-  // LLM does not assume X,Y is the center of the rendered object). Kept
-  // structured so the wrap-up summarizer can merge them across calls before
-  // surfacing them to the orchestrator. See `HintEntry` in `./Utils`.
+  // Structured hints surfaced to the AI — see `HintEntry` in `./Utils`.
   hints?: Array<HintEntry>,
 
   // Set to true when the function call was aborted mid-execution (e.g. the AI

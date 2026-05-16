@@ -866,6 +866,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         [onSendMessage]
       );
 
+      /**
+       * Collect all AI requests to process: the selected request, and all sub-agent requests.
+       */
       const aiRequestsToProcess = React.useMemo(
         () => {
           const result = [];

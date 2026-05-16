@@ -43,9 +43,6 @@ type Props = {|
   functionCall: AiRequestMessageAssistantFunctionCall,
   editorFunctionCallResult: ?EditorFunctionCallResult,
   existingFunctionCallOutput: ?AiRequestFunctionCallOutput,
-  onProcessFunctionCalls: (
-    functionCalls: Array<AiRequestMessageAssistantFunctionCall>
-  ) => Promise<void>,
   editorCallbacks: EditorCallbacks,
 |};
 
@@ -64,7 +61,6 @@ const EditorFunctionCallRow = ({
   functionCall,
   editorFunctionCallResult,
   existingFunctionCallOutput,
-  onProcessFunctionCalls,
   editorCallbacks,
 }: Props) => {
   const [showDetails, setShowDetails] = React.useState(false);
@@ -272,7 +268,6 @@ const SubAgentFunctionCallRow = ({
   project,
   functionCall,
   existingFunctionCallOutput,
-  onProcessFunctionCalls,
   editorCallbacks,
 }: Props) => {
   const [showDetails, setShowDetails] = React.useState(true);
@@ -468,7 +463,6 @@ const SubAgentFunctionCallRow = ({
               <EditorFunctionCallRow
                 project={project}
                 key={item.key}
-                onProcessFunctionCalls={onProcessFunctionCalls}
                 functionCall={item.messageContent}
                 editorFunctionCallResult={item.editorFunctionCallResult}
                 existingFunctionCallOutput={item.existingFunctionCallOutput}

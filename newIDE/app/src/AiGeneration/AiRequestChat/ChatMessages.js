@@ -987,7 +987,6 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                           <FunctionCallRow
                             project={project}
                             key={key}
-                            onProcessFunctionCalls={onProcessFunctionCalls}
                             functionCall={messageContent}
                             editorFunctionCallResult={editorFunctionCallResult}
                             existingFunctionCallOutput={
@@ -1079,9 +1078,6 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                                 <FunctionCallRow
                                   project={project}
                                   key={functionCallKey}
-                                  onProcessFunctionCalls={
-                                    onProcessFunctionCalls
-                                  }
                                   functionCall={functionCallMessageContent}
                                   editorFunctionCallResult={
                                     editorFunctionCallResult

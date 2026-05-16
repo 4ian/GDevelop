@@ -180,7 +180,6 @@ const TaskRow = ({
                       functionCall={messageContent}
                       existingFunctionCallOutput={existingFunctionCallOutput}
                       editorFunctionCallResult={editorFunctionCallResult}
-                      onProcessFunctionCalls={onProcessFunctionCalls}
                       editorCallbacks={editorCallbacks}
                     />
                   )

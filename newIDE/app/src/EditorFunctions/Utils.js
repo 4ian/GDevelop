@@ -270,21 +270,25 @@ export const getObjectSizeInfo = (
 /**
  * A structured hint surfaced to the AI as the `hints` field on a tool result.
  *
- * Hints are kept STRUCTURED (a stable `code` and a list of objects the hint
- * applies to) instead of free text so they can be merged across many tool
- * calls when the sub-agent's work is reported back to the orchestrator: hints
- * with the same `code` collapse into one, with their `objectNames` unioned.
+ * Hints are kept STRUCTURED (a stable `code` plus a human-readable `message`
+ * and the list of objects the hint applies to) so they can be merged across
+ * many tool calls when the sub-agent's work is reported back to the
+ * orchestrator: hints with the same `code` collapse into one, with their
+ * `objectNames` unioned and their `message`s deduplicated.
  *
  * Codes currently in use:
  * - `no-intrinsic-size`: the listed objects have no intrinsic width/height
- *   (e.g. TextObject). Their instance position is the top-left of their
- *   origin; instances must define their own width/height (`instances_size`)
- *   for the rendered box to be predictable. Do NOT assume X,Y is the center.
+ *   (e.g. TextObject). Instances must define their own width/height for the
+ *   rendered box to be predictable.
  */
 export type HintEntry = {|
   code: 'no-intrinsic-size',
+  message: string,
   objectNames: Array<string>,
 |};
+
+const NO_INTRINSIC_SIZE_MESSAGE =
+  'These objects have no intrinsic size: their width/height is null in `objectSizeInfo`. The instance position (X, Y) is the top-left of their origin; instances should define their own width and height (e.g. via `instances_size` in `put_2d_instances`) so the rendered box and any alignment is well-defined. Do not assume X, Y is the center.';
 
 /**
  * Build structured hints for an `objectSizeInfo` map.
@@ -305,5 +309,11 @@ export const getObjectSizeInfoHints = (objectSizeInfoByName: {
     }
   }
   if (objectNames.length === 0) return [];
-  return [{ code: 'no-intrinsic-size', objectNames }];
+  return [
+    {
+      code: 'no-intrinsic-size',
+      message: NO_INTRINSIC_SIZE_MESSAGE,
+      objectNames,
+    },
+  ];
 };

@@ -2,9 +2,25 @@
 import {
   applyProjectEditorSettings,
   extractProjectEditorSettings,
+  getProjectEditorSettingsFilePath,
 } from './LocalEditorSettingsStorage';
+// $FlowFixMe[cannot-resolve-module]
+import path from 'path';
 
 describe('LocalEditorSettingsStorage', () => {
+  it('stores settings separately for projects in the same folder', () => {
+    expect(
+      getProjectEditorSettingsFilePath('C:/Projects/game.json')
+    ).toBe(
+      path.join('C:/Projects', '.gdevelop', 'game.editor-settings.json')
+    );
+    expect(
+      getProjectEditorSettingsFilePath('C:/Projects/prototype.json')
+    ).toBe(
+      path.join('C:/Projects', '.gdevelop', 'prototype.editor-settings.json')
+    );
+  });
+
   it('extracts editor settings from project content and applies them back', () => {
     const serializedProjectObject: any = {
       layouts: [

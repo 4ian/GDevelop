@@ -4,7 +4,7 @@ import optionalRequire from '../../Utils/OptionalRequire';
 const path = optionalRequire('path');
 
 export const editorSettingsDirectoryName = '.gdevelop';
-export const editorSettingsFileName = 'editor-settings.json';
+export const editorSettingsFileSuffix = '.editor-settings.json';
 
 export type ProjectEditorSettings = {|
   layoutSettings: { [layoutName: string]: Object },
@@ -14,17 +14,15 @@ export type ProjectEditorSettings = {|
   },
 |};
 
-export const getProjectEditorSettingsFilePath = (
-  projectPath: string
-): string => {
+export const getProjectEditorSettingsFilePath = (filePath: string): string => {
   if (!path) {
     throw new Error('Filesystem paths are not supported.');
   }
 
   return path.join(
-    projectPath,
+    path.dirname(filePath),
     editorSettingsDirectoryName,
-    editorSettingsFileName
+    path.basename(filePath, path.extname(filePath)) + editorSettingsFileSuffix
   );
 };
 
@@ -35,7 +33,7 @@ const makeProjectEditorSettings = (): ProjectEditorSettings => ({
 });
 
 const hasOwn = (object: Object, propertyName: string): boolean =>
-  Object.keys(object).indexOf(propertyName) !== -1;
+  Object.prototype.hasOwnProperty.call(object, propertyName);
 
 const isEmpty = (object: Object): boolean => Object.keys(object).length === 0;
 
@@ -70,8 +68,9 @@ export const extractProjectEditorSettings = (
         typeof externalLayout.name === 'string' &&
         hasOwn(externalLayout, 'editionSettings')
       ) {
-        projectEditorSettings.externalLayoutSettings[externalLayout.name] =
-          externalLayout.editionSettings;
+        projectEditorSettings.externalLayoutSettings[
+          externalLayout.name
+        ] = externalLayout.editionSettings;
         delete externalLayout.editionSettings;
       }
     });
@@ -88,7 +87,10 @@ export const extractProjectEditorSettings = (
       }
 
       extension.eventsBasedObjects.forEach(eventsBasedObject => {
-        if (!eventsBasedObject || typeof eventsBasedObject.name !== 'string') {
+        if (
+          !eventsBasedObject ||
+          typeof eventsBasedObject.name !== 'string'
+        ) {
           return;
         }
 
@@ -168,7 +170,9 @@ export const applyProjectEditorSettings = (
     });
   }
 
-  const { eventsBasedObjectVariantSettings } = projectEditorSettings;
+  const {
+    eventsBasedObjectVariantSettings,
+  } = projectEditorSettings;
   if (
     eventsBasedObjectVariantSettings &&
     Array.isArray(serializedProjectObject.eventsFunctionsExtensions)
@@ -183,7 +187,10 @@ export const applyProjectEditorSettings = (
       }
 
       extension.eventsBasedObjects.forEach(eventsBasedObject => {
-        if (!eventsBasedObject || typeof eventsBasedObject.name !== 'string') {
+        if (
+          !eventsBasedObject ||
+          typeof eventsBasedObject.name !== 'string'
+        ) {
           return;
         }
 

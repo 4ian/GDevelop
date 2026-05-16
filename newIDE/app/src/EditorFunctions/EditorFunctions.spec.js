@@ -1095,6 +1095,126 @@ describe('editorFunctions', () => {
         newOrChangedAiGeneratedEventIds: new Set(['test-ai-event-id']),
       });
     });
+
+    it('asks a local Custom Model to repair generated events that cannot be applied', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const generateEvents = jest
+        .fn()
+        .mockResolvedValueOnce({
+          generationCompleted: true,
+          aiGeneratedEvent: {
+            id: 'local-custom-provider-ai-generated-event-first',
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z',
+            userId: 'test-user',
+            status: 'ready',
+            partialGameProjectJson: '{}',
+            eventsDescription: 'Add a basic event',
+            extensionNamesList: '',
+            objectsList: 'Player',
+            existingEventsAsText: '',
+            existingEventsJson: null,
+            existingEventsJsonUserRelativeKey: null,
+            resultMessage: 'Generated an unsupported operation.',
+            changes: [
+              {
+                operationName: 'unknown_operation',
+                operationTargetEvent: null,
+                isEventsJsonValid: true,
+                generatedEvents: '[]',
+                areEventsValid: true,
+                extensionNames: [],
+                diagnosticLines: [],
+                undeclaredVariables: [],
+                undeclaredObjectVariables: {},
+                missingObjectBehaviors: {},
+                missingResources: [],
+              },
+            ],
+            error: null,
+            stats: null,
+          },
+        })
+        .mockImplementationOnce(options => {
+          expect(options.repairInstructions).toContain(
+            'could not be applied by GDevelop'
+          );
+          expect(options.repairInstructions).toContain(
+            'missing operationTargetEvent'
+          );
+          return Promise.resolve({
+            generationCompleted: true,
+            aiGeneratedEvent: {
+              id: 'local-custom-provider-ai-generated-event-second',
+              createdAt: '2024-01-01T00:00:00Z',
+              updatedAt: '2024-01-01T00:00:00Z',
+              userId: 'test-user',
+              status: 'ready',
+              partialGameProjectJson: '{}',
+              eventsDescription: 'Add a basic event',
+              extensionNamesList: '',
+              objectsList: 'Player',
+              existingEventsAsText: '',
+              existingEventsJson: null,
+              existingEventsJsonUserRelativeKey: null,
+              resultMessage: 'Repaired event added.',
+              changes: [
+                {
+                  operationName: 'insert_at_end',
+                  operationTargetEvent: null,
+                  isEventsJsonValid: true,
+                  generatedEvents: JSON.stringify([
+                    {
+                      type: 'BuiltinCommonInstructions::Standard',
+                      conditions: [],
+                      actions: [],
+                    },
+                  ]),
+                  areEventsValid: true,
+                  extensionNames: [],
+                  diagnosticLines: [],
+                  undeclaredVariables: [],
+                  undeclaredObjectVariables: {},
+                  missingObjectBehaviors: {},
+                  missingResources: [],
+                },
+              ],
+              error: null,
+              stats: null,
+            },
+          });
+        });
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onSceneEventsModifiedOutsideEditor = jest.fn();
+
+      const result = await editorFunctions.add_scene_events.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          events_description: 'Add a basic event',
+          extension_names_list: '',
+          objects_list: 'Player',
+        },
+        generateEvents,
+        onSceneEventsModifiedOutsideEditor,
+        // $FlowFixMe[underconstrained-implicit-instantiation]
+        searchAndInstallResources: jest.fn().mockResolvedValue({ results: [] }),
+      });
+
+      expect(generateEvents).toHaveBeenCalledTimes(2);
+      expect(result).toEqual({
+        success: true,
+        message: 'Repaired event added.',
+        aiGeneratedEventId: 'local-custom-provider-ai-generated-event-second',
+        newlyAddedResources: [],
+      });
+      expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        newOrChangedAiGeneratedEventIds: new Set([
+          'local-custom-provider-ai-generated-event-second',
+        ]),
+      });
+    });
   });
 
   describe('add_or_edit_variable', () => {

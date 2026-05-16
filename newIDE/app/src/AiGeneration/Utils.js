@@ -13,6 +13,7 @@ import {
   type AiRequest,
   type AiRequestMessage,
   type AiRequestMessageAssistantFunctionCall,
+  isLocalAiRequestId,
   updateAiRequestMessage,
 } from '../Utils/GDevelopServices/Generation';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -98,7 +99,7 @@ export const useProcessFunctionCalls = ({
   editorCallbacks,
   selectedAiRequest,
   onSendEditorFunctionCallResults,
-  getEditorFunctionCallResults,
+  editorFunctionCallResults,
   addEditorFunctionCallResults,
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
@@ -113,6 +114,7 @@ export const useProcessFunctionCalls = ({
   resourceManagementProps: ResourceManagementProps,
   editorCallbacks: EditorCallbacks,
   selectedAiRequest: ?AiRequest,
+  editorFunctionCallResults: Array<EditorFunctionCallResult> | null,
   onSendEditorFunctionCallResults: (
     editorFunctionCallResults: Array<EditorFunctionCallResult>,
     options: {|
@@ -120,7 +122,6 @@ export const useProcessFunctionCalls = ({
       createdProject?: ?gdProject,
     |}
   ) => Promise<void>,
-  getEditorFunctionCallResults: string => Array<EditorFunctionCallResult> | null,
   addEditorFunctionCallResults: (
     string,
     Array<EditorFunctionCallResult>
@@ -294,12 +295,10 @@ export const useProcessFunctionCalls = ({
       selectedAiRequest
         ? getFunctionCallsToProcess({
             aiRequest: selectedAiRequest,
-            editorFunctionCallResults: getEditorFunctionCallResults(
-              selectedAiRequest.id
-            ),
+            editorFunctionCallResults,
           })
         : [],
-    [selectedAiRequest, getEditorFunctionCallResults]
+    [selectedAiRequest, editorFunctionCallResults]
   );
 
   React.useEffect(
@@ -407,6 +406,7 @@ export const useAiRequestState = ({
           !selectedAiRequest ||
           (selectedAiRequest.mode !== 'agent' &&
             selectedAiRequest.mode !== 'orchestrator') ||
+          isLocalAiRequestId(selectedAiRequest.id) ||
           isSendingAiRequest(selectedAiRequest.id) ||
           !selectedAiRequest.output ||
           selectedAiRequest.output.length === 0 ||
@@ -641,6 +641,7 @@ export const useAiRequestState = ({
           !selectedAiRequest ||
           (selectedAiRequest.mode !== 'agent' &&
             selectedAiRequest.mode !== 'orchestrator') ||
+          isLocalAiRequestId(selectedAiRequest.id) ||
           isSendingAiRequest(selectedAiRequest.id) ||
           !selectedAiRequest.output ||
           selectedAiRequest.output.length === 0 ||
@@ -906,4 +907,5 @@ export type NewAiRequestOptions = {|
   mode: 'chat' | 'agent' | 'orchestrator',
   userRequest: string,
   aiConfigurationPresetId: string,
+  aiProviderConfigurationId?: string | null,
 |};

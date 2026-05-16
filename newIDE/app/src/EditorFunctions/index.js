@@ -8,7 +8,10 @@ import {
   serializeToJSON,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
+import {
+  isLocalAiGeneratedEventId,
+  type AiGeneratedEvent,
+} from '../Utils/GDevelopServices/Generation';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import {
   addMissingObjectBehaviors,
@@ -154,6 +157,7 @@ export type EventsGenerationOptions = {|
   placementHint: string,
   relatedAiRequestId: string,
   estimatedComplexity: number | null,
+  repairInstructions?: string | null,
 |};
 
 export type AssetSearchAndInstallResult = {|
@@ -3807,219 +3811,245 @@ const addSceneEvents: EditorFunction = {
         ? serializeToJSON(currentSceneEvents)
         : null;
 
-    try {
-      const eventsGenerationResult: EventsGenerationResult = await generateEvents(
-        {
-          sceneName,
-          eventsDescription,
-          extensionNamesList,
-          objectsList,
-          existingEventsAsText,
-          existingEventsJson,
-          placementHint,
-          relatedAiRequestId,
-          estimatedComplexity,
-        }
-      );
+    let hasRetriedLocalEventRepair = false;
+    let repairInstructions: string | null = null;
 
-      if (eventsGenerationResult.generationAborted) {
-        return { success: false, aborted: true };
-      }
-
-      if (!eventsGenerationResult.generationCompleted) {
-        return makeGenericFailure(
-          `Infrastructure error when launching or completing events generation (${
-            eventsGenerationResult.errorMessage
-          }). Consider trying again or a different approach.`
-        );
-      }
-
-      const aiGeneratedEvent = eventsGenerationResult.aiGeneratedEvent;
-
-      const makeAiGeneratedEventFailure = (
-        message: string,
-        details?: {|
-          generatedEventsErrorDiagnostics: string,
-        |}
-      ) => {
-        return {
-          success: false,
-          message,
-          aiGeneratedEventId: aiGeneratedEvent.id,
-          ...details,
-        };
-      };
-
-      if (aiGeneratedEvent.error) {
-        // $FlowFixMe[incompatible-type]
-        return makeAiGeneratedEventFailure(
-          `Infrastructure error when generating events (${
-            aiGeneratedEvent.error.message
-          }). Consider trying again or a different approach.`
-        );
-      }
-
-      const changes = aiGeneratedEvent.changes;
-      if (!changes || changes.length === 0) {
-        const resultMessage =
-          aiGeneratedEvent.resultMessage ||
-          'No generated events found and no other information was given.';
-        // $FlowFixMe[incompatible-type]
-        return makeAiGeneratedEventFailure(
-          `Error when generating events: ${resultMessage}\nConsider trying again or a different approach.`
-        );
-      }
-
-      if (
-        changes.some(change => change.isEventsJsonValid === false) ||
-        changes.some(change => change.areEventsValid === false)
-      ) {
-        const resultMessage =
-          aiGeneratedEvent.resultMessage ||
-          'This probably means what you asked for is not possible or does not work like this.';
-        // $FlowFixMe[incompatible-type]
-        return makeAiGeneratedEventFailure(
-          `Generated events are not valid: ${resultMessage}\nRead also the attached diagnostics to try to understand what went wrong and either try again differently or consider a different approach.`,
+    for (;;) {
+      try {
+        const eventsGenerationResult: EventsGenerationResult = await generateEvents(
           {
-            generatedEventsErrorDiagnostics: changes
-              .map(change => change.diagnosticLines.join('\n'))
-              .join('\n\n'),
+            sceneName,
+            eventsDescription,
+            extensionNamesList,
+            objectsList,
+            existingEventsAsText,
+            existingEventsJson,
+            placementHint,
+            relatedAiRequestId,
+            estimatedComplexity,
+            repairInstructions,
           }
         );
-      }
 
-      try {
-        const extensionNames = new Set<string>();
-        for (const change of changes) {
-          for (const extensionName of change.extensionNames || []) {
-            extensionNames.add(extensionName);
-          }
+        if (eventsGenerationResult.generationAborted) {
+          return { success: false, aborted: true };
         }
-        for (const extensionName of extensionNames) {
-          await ensureExtensionInstalled({
-            extensionName,
-            onWillInstallExtension,
-            onExtensionInstalled,
-          });
-        }
-      } catch (e) {
-        // $FlowFixMe[incompatible-type]
-        return makeAiGeneratedEventFailure(
-          `Error when installing extensions: ${
-            e.message
-          }. Consider trying again or a different approach.`
-        );
-      }
-      try {
-        for (const change of changes) {
-          addUndeclaredVariables({
-            project,
-            scene,
-            undeclaredVariables: change.undeclaredVariables,
-          });
 
-          const objectNamesWithUndeclaredVariables = Object.keys(
-            change.undeclaredObjectVariables
+        if (!eventsGenerationResult.generationCompleted) {
+          return makeGenericFailure(
+            `Infrastructure error when launching or completing events generation (${
+              eventsGenerationResult.errorMessage
+            }). Consider trying again or a different approach.`
           );
-          for (const objectName of objectNamesWithUndeclaredVariables) {
-            const undeclaredVariables =
-              change.undeclaredObjectVariables[objectName];
-            addObjectUndeclaredVariables({
-              project,
-              scene,
-              objectName,
-              undeclaredVariables,
-            });
-          }
-
-          const objectNamesWithMissingBehavior = Object.keys(
-            change.missingObjectBehaviors
-          );
-          for (const objectName of objectNamesWithMissingBehavior) {
-            const missingBehaviors = change.missingObjectBehaviors[objectName];
-            addMissingObjectBehaviors({
-              project,
-              scene,
-              objectName,
-              missingBehaviors,
-            });
-          }
         }
 
-        const { applied, errors } = applyEventsChanges(
-          project,
-          currentSceneEvents,
-          changes,
-          aiGeneratedEvent.id
-        );
+        const aiGeneratedEvent = eventsGenerationResult.aiGeneratedEvent;
 
-        if (applied === 0) {
+        const makeAiGeneratedEventFailure = (
+          message: string,
+          details?: {|
+            generatedEventsErrorDiagnostics: string,
+          |}
+        ) => {
           return {
             success: false,
-            message: `Changes were properly generated, but could not be applied. Event generation output is:
+            message,
+            aiGeneratedEventId: aiGeneratedEvent.id,
+            ...details,
+          };
+        };
+
+        if (aiGeneratedEvent.error) {
+          // $FlowFixMe[incompatible-type]
+          return makeAiGeneratedEventFailure(
+            `Infrastructure error when generating events (${
+              aiGeneratedEvent.error.message
+            }). Consider trying again or a different approach.`
+          );
+        }
+
+        const changes = aiGeneratedEvent.changes;
+        if (!changes || changes.length === 0) {
+          const resultMessage =
+            aiGeneratedEvent.resultMessage ||
+            'No generated events found and no other information was given.';
+          // $FlowFixMe[incompatible-type]
+          return makeAiGeneratedEventFailure(
+            `Error when generating events: ${resultMessage}\nConsider trying again or a different approach.`
+          );
+        }
+
+        if (
+          changes.some(change => change.isEventsJsonValid === false) ||
+          changes.some(change => change.areEventsValid === false)
+        ) {
+          const resultMessage =
+            aiGeneratedEvent.resultMessage ||
+            'This probably means what you asked for is not possible or does not work like this.';
+          // $FlowFixMe[incompatible-type]
+          return makeAiGeneratedEventFailure(
+            `Generated events are not valid: ${resultMessage}\nRead also the attached diagnostics to try to understand what went wrong and either try again differently or consider a different approach.`,
+            {
+              generatedEventsErrorDiagnostics: changes
+                .map(change => change.diagnosticLines.join('\n'))
+                .join('\n\n'),
+            }
+          );
+        }
+
+        try {
+          const extensionNames = new Set<string>();
+          for (const change of changes) {
+            for (const extensionName of change.extensionNames || []) {
+              extensionNames.add(extensionName);
+            }
+          }
+          for (const extensionName of extensionNames) {
+            await ensureExtensionInstalled({
+              extensionName,
+              onWillInstallExtension,
+              onExtensionInstalled,
+            });
+          }
+        } catch (e) {
+          // $FlowFixMe[incompatible-type]
+          return makeAiGeneratedEventFailure(
+            `Error when installing extensions: ${
+              e.message
+            }. Consider trying again or a different approach.`
+          );
+        }
+        try {
+          for (const change of changes) {
+            addUndeclaredVariables({
+              project,
+              scene,
+              undeclaredVariables: change.undeclaredVariables,
+            });
+
+            const objectNamesWithUndeclaredVariables = Object.keys(
+              change.undeclaredObjectVariables
+            );
+            for (const objectName of objectNamesWithUndeclaredVariables) {
+              const undeclaredVariables =
+                change.undeclaredObjectVariables[objectName];
+              addObjectUndeclaredVariables({
+                project,
+                scene,
+                objectName,
+                undeclaredVariables,
+              });
+            }
+
+            const objectNamesWithMissingBehavior = Object.keys(
+              change.missingObjectBehaviors
+            );
+            for (const objectName of objectNamesWithMissingBehavior) {
+              const missingBehaviors =
+                change.missingObjectBehaviors[objectName];
+              addMissingObjectBehaviors({
+                project,
+                scene,
+                objectName,
+                missingBehaviors,
+              });
+            }
+          }
+
+          const { applied, errors } = applyEventsChanges(
+            project,
+            currentSceneEvents,
+            changes,
+            aiGeneratedEvent.id
+          );
+
+          if (applied === 0) {
+            const applyErrorMessage =
+              errors.length > 0
+                ? errors.join('\n')
+                : 'GDevelop could not apply the generated event changes.';
+            if (
+              !hasRetriedLocalEventRepair &&
+              isLocalAiGeneratedEventId(aiGeneratedEvent.id)
+            ) {
+              hasRetriedLocalEventRepair = true;
+              repairInstructions = [
+                'The previously generated event changes could not be applied by GDevelop.',
+                `Apply error:\n${applyErrorMessage}`,
+                `Previous generation output:\n${aiGeneratedEvent.resultMessage ||
+                  '(no generation output was given)'}`,
+                'Return corrected JSON only, using the same {"resultMessage":"...","changes":[AiGeneratedEventChange]} shape.',
+              ].join('\n\n');
+              continue;
+            }
+
+            return {
+              success: false,
+              message: `Changes were properly generated, but could not be applied. Event generation output is:
 
 ${aiGeneratedEvent.resultMessage || '(no generation output was given)'}].
 
 No changes were done on the project, see attached errors.`,
-            errors,
-          };
-        }
+              errors,
+            };
+          }
 
-        onSceneEventsModifiedOutsideEditor({
-          scene,
-          newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
-        });
+          onSceneEventsModifiedOutsideEditor({
+            scene,
+            newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
+          });
 
-        // Search and install missing resources if any
-        const allMissingResources = changes.flatMap(
-          change => change.missingResources || []
-        );
-        const {
-          results: newlyAddedResources,
-        } = await searchAndInstallResources({
-          resources: allMissingResources,
-        });
+          // Search and install missing resources if any
+          const allMissingResources = changes.flatMap(
+            change => change.missingResources || []
+          );
+          const {
+            results: newlyAddedResources,
+          } = await searchAndInstallResources({
+            resources: allMissingResources,
+          });
 
-        const resultMessage =
-          errors.length > 0
-            ? `Changes were properly generated, but some errors happened when applying some of them in the project. Generation output is:
+          const resultMessage =
+            errors.length > 0
+              ? `Changes were properly generated, but some errors happened when applying some of them in the project. Generation output is:
 
 ${aiGeneratedEvent.resultMessage || '(no generation output was given)'}].
 
 See attached errors that happened when some changes were applied in the project. Verify the content of events if necessary to be sure what was done.`
-            : aiGeneratedEvent.resultMessage ||
-              'Properly modified or added new event(s).';
-        return {
-          success: true,
-          message: resultMessage,
-          aiGeneratedEventId: aiGeneratedEvent.id,
-          newlyAddedResources,
-          ...(errors.length > 0 ? { errors } : undefined),
-        };
+              : aiGeneratedEvent.resultMessage ||
+                'Properly modified or added new event(s).';
+          return {
+            success: true,
+            message: resultMessage,
+            aiGeneratedEventId: aiGeneratedEvent.id,
+            newlyAddedResources,
+            ...(errors.length > 0 ? { errors } : undefined),
+          };
+        } catch (error) {
+          console.error(
+            `Unexpected error when adding events from an AI Generated Event (id: ${
+              aiGeneratedEvent.id
+            }):`,
+            error
+          );
+          // $FlowFixMe[incompatible-type]
+          return makeAiGeneratedEventFailure(
+            `An unexpected error happened in the GDevelop editor while adding generated events: ${
+              error.message
+            }. Consider a different approach.`
+          );
+        }
       } catch (error) {
         console.error(
-          `Unexpected error when adding events from an AI Generated Event (id: ${
-            aiGeneratedEvent.id
-          }):`,
+          'Unexpected error when creating AI Generated Event:',
           error
         );
-        // $FlowFixMe[incompatible-type]
-        return makeAiGeneratedEventFailure(
-          `An unexpected error happened in the GDevelop editor while adding generated events: ${
+        return makeGenericFailure(
+          `An unexpected error happened in the GDevelop editor while creating generated events: ${
             error.message
           }. Consider a different approach.`
         );
       }
-    } catch (error) {
-      console.error(
-        'Unexpected error when creating AI Generated Event:',
-        error
-      );
-      return makeGenericFailure(
-        `An unexpected error happened in the GDevelop editor while creating generated events: ${
-          error.message
-        }. Consider a different approach.`
-      );
     }
   },
   modifiesProject: true,

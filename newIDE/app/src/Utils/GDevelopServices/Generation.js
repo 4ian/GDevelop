@@ -1400,6 +1400,45 @@ const addAiRequestMessageToOpenAiCompatibleMessages = (
   }
 };
 
+const getOpenAiCompatibleToolCallPlainText = (
+  toolCall: OpenAiCompatibleToolCall
+): string =>
+  `${toolCall.function.name}(${toolCall.function.arguments || '{}'})`;
+
+const getOpenAiCompatibleMessagesWithoutToolRoles = (
+  messages: Array<OpenAiCompatibleMessage>
+): Array<OpenAiCompatibleMessage> =>
+  messages.map(message => {
+    if (message.role === 'tool') {
+      return {
+        role: 'user',
+        content: [
+          message.tool_call_id
+            ? `Tool result for ${message.tool_call_id}:`
+            : 'Tool result:',
+          message.content || '',
+        ].join('\n'),
+      };
+    }
+
+    if (message.role === 'assistant' && message.tool_calls) {
+      return {
+        role: 'assistant',
+        content: [
+          message.content || '',
+          'Tool calls:',
+          message.tool_calls
+            .map(getOpenAiCompatibleToolCallPlainText)
+            .join('\n'),
+        ]
+          .filter(Boolean)
+          .join('\n'),
+      };
+    }
+
+    return message;
+  });
+
 const getOpenAiCompatibleMessagesFromAiRequest = ({
   aiRequest,
   userMessage,
@@ -1528,9 +1567,12 @@ const getOpenAiCompatibleChatCompletionBody = ({
   const compatibility = getOpenAiCompatibleProviderCompatibility(
     providerConfiguration
   );
+  const messagesForProvider = compatibility.unsupportedTools
+    ? getOpenAiCompatibleMessagesWithoutToolRoles(messages)
+    : messages;
   const body: any = {
     model: providerConfiguration.model,
-    messages,
+    messages: messagesForProvider,
   };
   if (
     typeof providerConfiguration.temperature === 'number' &&
@@ -1901,6 +1943,7 @@ const createLocalChatAiRequest = async ({
   projectVersionIdBeforeMessage,
   mode,
   toolsVersion,
+  onLocalAiRequestCreated,
 }: {|
   userId: string,
   userRequest: string,
@@ -1912,26 +1955,17 @@ const createLocalChatAiRequest = async ({
   projectVersionIdBeforeMessage?: string | null,
   mode: 'chat' | 'agent' | 'orchestrator',
   toolsVersion: string,
+  onLocalAiRequestCreated?: AiRequest => void,
 |}): Promise<AiRequest> => {
   const now = new Date().toISOString();
-  const assistantResult = await getOpenAiCompatibleChatCompletionResult({
-    providerConfiguration,
-    mode,
-    messages: getOpenAiCompatibleMessagesFromAiRequest({
-      userMessage: userRequest,
-      gameProjectJson,
-      projectSpecificExtensionsSummaryJson,
-      mode,
-    }),
-  });
   const aiRequestId = createLocalAiRequestId();
-  const aiRequest: AiRequest = {
+  const workingAiRequest: AiRequest = {
     id: aiRequestId,
     createdAt: now,
     updatedAt: now,
     userId,
     gameId,
-    status: 'ready',
+    status: 'working',
     mode,
     aiConfiguration: getPublicAiConfiguration(aiConfiguration),
     toolsVersion,
@@ -1942,6 +1976,60 @@ const createLocalChatAiRequest = async ({
         text: userRequest,
         projectVersionIdBeforeMessage,
       }),
+    ],
+    lastUserMessagePriceInCredits: 0,
+    totalPriceInCredits: 0,
+  };
+
+  localAiRequestsInMemory[workingAiRequest.id] = workingAiRequest;
+  localAiRequestProviderConfigurationsInMemory[
+    workingAiRequest.id
+  ] = providerConfiguration;
+  if (onLocalAiRequestCreated) onLocalAiRequestCreated(workingAiRequest);
+
+  let assistantResult: OpenAiCompatibleAssistantResult;
+  try {
+    assistantResult = await getOpenAiCompatibleChatCompletionResult({
+      providerConfiguration,
+      mode,
+      messages: getOpenAiCompatibleMessagesFromAiRequest({
+        userMessage: userRequest,
+        gameProjectJson,
+        projectSpecificExtensionsSummaryJson,
+        mode,
+      }),
+    });
+  } catch (error) {
+    const latestAiRequest = localAiRequestsInMemory[workingAiRequest.id];
+    if (latestAiRequest && latestAiRequest.status !== 'suspended') {
+      localAiRequestsInMemory[workingAiRequest.id] = {
+        ...latestAiRequest,
+        updatedAt: new Date().toISOString(),
+        status: 'error',
+        error: {
+          code: 'ai-request/local-provider-error',
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Custom Model request failed.',
+        },
+      };
+    }
+    throw error;
+  }
+
+  const latestAiRequest = localAiRequestsInMemory[workingAiRequest.id];
+  if (latestAiRequest && latestAiRequest.status === 'suspended') {
+    return latestAiRequest;
+  }
+
+  const aiRequest: AiRequest = {
+    ...(latestAiRequest || workingAiRequest),
+    updatedAt: new Date().toISOString(),
+    status: 'ready',
+    error: null,
+    output: [
+      ...((latestAiRequest || workingAiRequest).output || []),
       createAssistantAiRequestMessage(assistantResult),
     ],
     lastUserMessagePriceInCredits: 0,
@@ -2165,11 +2253,55 @@ export const updateAiProviderConfiguration = async (
   |}
 ): Promise<AiProviderConfiguration> => {
   if (isLocalAiProviderConfigurationId(providerConfigurationId)) {
-    return saveLocalAiProviderConfiguration(
+    if (isLocalAiProviderBaseUrl(configuration.baseUrl)) {
+      return saveLocalAiProviderConfiguration(
+        userId,
+        providerConfigurationId,
+        configuration
+      );
+    }
+
+    const localConfiguration = getLocalAiProviderConfigurationPayload(
       userId,
-      providerConfigurationId,
-      configuration
+      providerConfigurationId
     );
+    const configurationWithApiKey: AiProviderConfigurationWritePayload = {
+      ...configuration,
+    };
+    const apiKey =
+      configuration.apiKey ||
+      (localConfiguration ? localConfiguration.apiKey : null);
+    if (apiKey) configurationWithApiKey.apiKey = apiKey;
+    const authorizationHeader = await getAuthorizationHeader();
+    try {
+      const response = await apiClient.post(
+        '/ai-provider-configuration',
+        configurationWithApiKey,
+        {
+          params: {
+            userId,
+          },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      );
+      const savedConfiguration = ensureObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/ai-provider-configuration of Generation API',
+      });
+      deleteLocalAiProviderConfiguration(userId, providerConfigurationId);
+      return savedConfiguration;
+    } catch (error) {
+      if (!isAiProviderConfigurationRouteUnavailableError(error)) throw error;
+
+      return saveLocalAiProviderConfiguration(
+        userId,
+        providerConfigurationId,
+        configurationWithApiKey
+      );
+    }
   }
   if (isLocalAiProviderBaseUrl(configuration.baseUrl)) {
     return createLocalAiProviderConfiguration(userId, configuration);
@@ -2410,6 +2542,7 @@ export const createAiRequest = async (
     fileMetadata,
     storageProviderName,
     toolsVersion,
+    onLocalAiRequestCreated,
   }: {|
     userId: string,
     userRequest: string,
@@ -2430,6 +2563,7 @@ export const createAiRequest = async (
     },
     storageProviderName: ?string,
     toolsVersion: string,
+    onLocalAiRequestCreated?: AiRequest => void,
   |}
 ): Promise<AiRequest> => {
   const aiConfigurationWithLocalProvider = getAiConfigurationWithLocalProvider(
@@ -2461,6 +2595,7 @@ export const createAiRequest = async (
       projectVersionIdBeforeMessage,
       mode,
       toolsVersion,
+      onLocalAiRequestCreated,
     });
   }
 

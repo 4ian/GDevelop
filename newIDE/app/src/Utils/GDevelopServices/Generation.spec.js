@@ -476,6 +476,92 @@ describe('Generation service', () => {
       });
     });
 
+    it('stores a working local custom provider request before the first provider response', async () => {
+      const getAuthorizationHeaderThatShouldNotRun = (jest.fn(async () => {
+        throw new Error(
+          'Local Custom Model requests should not request authorization.'
+        );
+      }): any);
+      const configuration = await createAiProviderConfiguration(
+        getAuthorizationHeaderThatShouldNotRun,
+        {
+          userId: 'user-1',
+          configuration: localProviderPayload,
+        }
+      );
+
+      let resolveReply: any = null;
+      let createdLocalRequest: any = null;
+      const firstReplyStarted = new Promise(resolve => {
+        providerMock
+          .onPost('http://127.0.0.1:18080/chat/completions')
+          .replyOnce(
+            () =>
+              new Promise(providerResolve => {
+                resolveReply = providerResolve;
+                resolve();
+              })
+          );
+      });
+
+      const createRequestPromise = createAiRequest(
+        getAuthorizationHeaderThatShouldNotRun,
+        {
+          ...baseAiRequestArgs,
+          aiConfiguration: {
+            presetId: 'default',
+            providerConfigurationId: configuration.id,
+          },
+          onLocalAiRequestCreated: aiRequest => {
+            createdLocalRequest = aiRequest;
+          },
+        }
+      );
+      await firstReplyStarted;
+
+      expect(createdLocalRequest).toEqual(
+        expect.objectContaining({
+          id: expect.stringContaining('local-custom-provider-ai-request-'),
+          status: 'working',
+        })
+      );
+      await expect(
+        getAiRequest(getAuthorizationHeaderThatShouldNotRun, {
+          userId: 'user-1',
+          aiRequestId: createdLocalRequest.id,
+        })
+      ).resolves.toEqual(expect.objectContaining({ status: 'working' }));
+
+      const suspendedRequest = await suspendAiRequest(
+        getAuthorizationHeaderThatShouldNotRun,
+        {
+          userId: 'user-1',
+          aiRequestId: createdLocalRequest.id,
+        }
+      );
+      expect(suspendedRequest.status).toBe('suspended');
+
+      resolveReply([
+        200,
+        {
+          choices: [{ message: { content: 'late answer' } }],
+        },
+      ]);
+      const resolvedRequest = await createRequestPromise;
+
+      expect(resolvedRequest.status).toBe('suspended');
+      expect(resolvedRequest.output).toHaveLength(1);
+      expect(JSON.stringify(resolvedRequest.output)).not.toContain(
+        'late answer'
+      );
+      expect(getAuthorizationHeaderThatShouldNotRun).not.toHaveBeenCalled();
+
+      await deleteAiProviderConfiguration(getAuthorizationHeader, {
+        userId: 'user-1',
+        providerConfigurationId: configuration.id,
+      });
+    });
+
     it('forks local custom provider requests by trimming messages', async () => {
       const getAuthorizationHeaderThatShouldNotRun = (jest.fn(async () => {
         throw new Error(
@@ -1621,6 +1707,12 @@ describe('Generation service', () => {
           .replyOnce(config => {
             const data = JSON.parse(config.data);
             expect(data.tools).toBeUndefined();
+            expect(data.messages.some(message => message.role === 'tool')).toBe(
+              false
+            );
+            expect(data.messages.some(message => message.tool_calls)).toBe(
+              false
+            );
             expect(data.messages[data.messages.length - 1].content).toContain(
               'Reply only with a JSON object'
             );
@@ -2399,6 +2491,51 @@ describe('Generation service', () => {
         userId: 'user-1',
         providerConfigurationId: configuration.id,
       });
+    });
+
+    it('turns a local provider update to a remote URL into a backend provider', async () => {
+      const getAuthorizationHeaderThatShouldNotRun = (jest.fn(async () => {
+        throw new Error(
+          'Localhost providers should not request authorization.'
+        );
+      }): any);
+      const localConfiguration = await createAiProviderConfiguration(
+        getAuthorizationHeaderThatShouldNotRun,
+        {
+          userId: 'user-1',
+          configuration: localProviderPayload,
+        }
+      );
+
+      mock.onPost('/ai-provider-configuration').reply(config => {
+        expect(config.params).toEqual({ userId: 'user-1' });
+        expect(config.headers.Authorization).toBe('Bearer test-token');
+        expect(JSON.parse(config.data)).toEqual({
+          ...providerPayloadWithoutApiKey,
+          apiKey: 'sk-local',
+        });
+        return [200, mockProviderConfiguration];
+      });
+
+      const configuration = await updateAiProviderConfiguration(
+        getAuthorizationHeader,
+        {
+          userId: 'user-1',
+          providerConfigurationId: localConfiguration.id,
+          configuration: providerPayloadWithoutApiKey,
+        }
+      );
+
+      expect(configuration).toEqual(mockProviderConfiguration);
+      expect(mock.history.post).toHaveLength(1);
+
+      mock.reset();
+      mock.onGet('/ai-provider-configuration').reply(() => [200, []]);
+      await expect(
+        listAiProviderConfigurations(getAuthorizationHeader, {
+          userId: 'user-1',
+        })
+      ).resolves.not.toContainEqual(localConfiguration);
     });
 
     it('turns a route-unavailable remote provider update into a usable local provider', async () => {

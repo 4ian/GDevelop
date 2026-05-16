@@ -327,6 +327,24 @@ export const AskAiStandAloneForm = ({
               mode: aiRequestModeForForm,
               toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
               aiConfiguration,
+              onLocalAiRequestCreated: localAiRequest => {
+                const localAiRequestWithConfiguration = getAiRequestWithPreservedAiConfiguration(
+                  {
+                    aiRequest: localAiRequest,
+                    aiConfiguration,
+                  }
+                );
+                setSendingAiRequest(null, false);
+                updateAiRequest(
+                  localAiRequest.id,
+                  () => localAiRequestWithConfiguration
+                );
+
+                if (!upToDateSelectedAiRequestId.current) {
+                  setAiRequestIdForForm(localAiRequest.id);
+                  setSelectedAiRequestId(localAiRequest.id);
+                }
+              },
             }),
             aiConfiguration,
           });

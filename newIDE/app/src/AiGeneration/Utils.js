@@ -641,7 +641,6 @@ export const useAiRequestState = ({
           !selectedAiRequest ||
           (selectedAiRequest.mode !== 'agent' &&
             selectedAiRequest.mode !== 'orchestrator') ||
-          isLocalAiRequestId(selectedAiRequest.id) ||
           isSendingAiRequest(selectedAiRequest.id) ||
           !selectedAiRequest.output ||
           selectedAiRequest.output.length === 0 ||

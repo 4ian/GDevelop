@@ -568,6 +568,23 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                       ? AI_ORCHESTRATOR_TOOLS_VERSION
                       : AI_CHAT_TOOLS_VERSION,
                   aiConfiguration,
+                  onLocalAiRequestCreated: localAiRequest => {
+                    const localAiRequestWithConfiguration = getAiRequestWithPreservedAiConfiguration(
+                      {
+                        aiRequest: localAiRequest,
+                        aiConfiguration,
+                      }
+                    );
+                    setSendingAiRequest(null, false);
+                    updateAiRequest(
+                      localAiRequest.id,
+                      () => localAiRequestWithConfiguration
+                    );
+
+                    if (!upToDateSelectedAiRequestId.current) {
+                      setSelectedAiRequestId(localAiRequest.id);
+                    }
+                  },
                 }),
                 aiConfiguration,
               });

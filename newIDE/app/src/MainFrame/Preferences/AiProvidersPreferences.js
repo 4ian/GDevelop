@@ -33,6 +33,7 @@ import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import {
   createAiProviderConfiguration,
   deleteAiProviderConfiguration,
+  isLocalAiProviderBaseUrl,
   testAiProviderConfiguration,
   updateAiProviderConfiguration,
   type AiProviderConfiguration,
@@ -427,6 +428,18 @@ export const AiProvidersPreferences = (): React.Node => {
         !apiKey
       ) {
         setOperationError(t`Enter an API key before saving this provider.`);
+        return null;
+      }
+      if (
+        selectedConfiguration &&
+        selectedConfiguration.hasApiKey &&
+        isLocalAiProviderBaseUrl(baseUrl) &&
+        !isLocalAiProviderBaseUrl(selectedConfiguration.baseUrl || '') &&
+        !apiKey
+      ) {
+        setOperationError(
+          t`Enter an API key before saving this provider locally.`
+        );
         return null;
       }
 

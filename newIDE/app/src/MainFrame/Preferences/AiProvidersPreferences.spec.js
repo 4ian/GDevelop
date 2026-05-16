@@ -720,6 +720,23 @@ describe('AiProvidersPreferences', () => {
     expect(fetchAiProviderConfigurations).toHaveBeenCalled();
   });
 
+  it('requires a new API key when converting a saved remote provider to localhost', async () => {
+    const tree = renderAiProvidersPreferences({
+      aiProviderConfigurations: [savedCustomProviderConfiguration],
+      aiProviderSettingsSelectionId:
+        'configuration:custom-provider-configuration',
+    });
+    const root = tree.root;
+
+    setTextFieldValue(root, 1, 'http://127.0.0.1:18080/');
+    await clickSave(root);
+
+    expect(updateAiProviderConfiguration).not.toHaveBeenCalled();
+    expect(getTextContent(tree.toJSON())).toContain(
+      'Enter an API key before saving this provider locally.'
+    );
+  });
+
   it('saves a blank output token limit as the provider default and explains the behavior', async () => {
     mockFn(createAiProviderConfiguration).mockResolvedValue(
       savedOpenAiProviderConfiguration

@@ -853,16 +853,19 @@ const markOpenAiCompatibleProviderUnsupportedFeature = (
   const key = getOpenAiCompatibleProviderCompatibilityKey(
     providerConfiguration
   );
-  const compatibility = openAiCompatibleProviderCompatibilityByKey[key] || {};
-  openAiCompatibleProviderCompatibilityByKey[key] = {
-    ...compatibility,
-    ...(feature === 'reasoning_effort'
-      ? { unsupportedReasoningEffort: true }
-      : {}),
-    ...(feature === 'temperature' ? { unsupportedTemperature: true } : {}),
-    ...(feature === 'max_tokens' ? { unsupportedMaxTokens: true } : {}),
-    ...(feature === 'tools' ? { unsupportedTools: true } : {}),
+  const compatibility: OpenAiCompatibleProviderCompatibility = {
+    ...(openAiCompatibleProviderCompatibilityByKey[key] || {}),
   };
+  if (feature === 'reasoning_effort') {
+    compatibility.unsupportedReasoningEffort = true;
+  } else if (feature === 'temperature') {
+    compatibility.unsupportedTemperature = true;
+  } else if (feature === 'max_tokens') {
+    compatibility.unsupportedMaxTokens = true;
+  } else if (feature === 'tools') {
+    compatibility.unsupportedTools = true;
+  }
+  openAiCompatibleProviderCompatibilityByKey[key] = compatibility;
 };
 
 export const clearOpenAiCompatibleProviderCompatibilityCacheForTests = () => {

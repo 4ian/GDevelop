@@ -4,6 +4,8 @@ import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
 import {
   editorFunctions,
   type EditorFunctionGenericOutput,
+  type EventsGenerationOptions,
+  type EventsGenerationResult,
   type LaunchFunctionOptionsWithProject,
 } from './index';
 
@@ -1098,9 +1100,11 @@ describe('editorFunctions', () => {
 
     it('asks a local Custom Model to repair generated events that cannot be applied', async () => {
       testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      const generateEvents = jest
-        .fn()
+      const generateEvents: JestMockFn<
+        [EventsGenerationOptions],
+        Promise<EventsGenerationResult>
+      > = jest
+        .fn<[EventsGenerationOptions], EventsGenerationResult>()
         .mockResolvedValueOnce({
           generationCompleted: true,
           aiGeneratedEvent: {

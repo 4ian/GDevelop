@@ -3773,7 +3773,7 @@ const addSceneEvents: EditorFunction = {
     onWillInstallExtension,
     onExtensionInstalled,
     searchAndInstallResources,
-  }) => {
+  }): Promise<EditorFunctionGenericOutput> => {
     const sceneName = extractRequiredString(args, 'scene_name');
     const eventsDescription = extractRequiredString(args, 'events_description');
     const extensionNamesList = extractRequiredString(
@@ -3813,6 +3813,13 @@ const addSceneEvents: EditorFunction = {
 
     let hasRetriedLocalEventRepair = false;
     let repairInstructions: string | null = null;
+    const restoreProjectBeforeApplyingChanges = (
+      serializedProjectBeforeApplyingChanges: any
+    ) => {
+      unserializeFromJSObject(project, serializedProjectBeforeApplyingChanges);
+      scene = project.getLayout(sceneName);
+      currentSceneEvents = scene.getEvents();
+    };
 
     for (;;) {
       try {
@@ -3850,7 +3857,7 @@ const addSceneEvents: EditorFunction = {
           details?: {|
             generatedEventsErrorDiagnostics: string,
           |}
-        ) => {
+        ): EditorFunctionGenericOutput => {
           return {
             success: false,
             message,
@@ -3900,14 +3907,6 @@ const addSceneEvents: EditorFunction = {
         const serializedProjectBeforeApplyingChanges = serializeToJSObject(
           project
         );
-        const restoreProjectBeforeApplyingChanges = () => {
-          unserializeFromJSObject(
-            project,
-            serializedProjectBeforeApplyingChanges
-          );
-          scene = project.getLayout(sceneName);
-          currentSceneEvents = scene.getEvents();
-        };
 
         try {
           const extensionNames = new Set<string>();
@@ -3984,7 +3983,9 @@ const addSceneEvents: EditorFunction = {
               !hasRetriedLocalEventRepair &&
               isLocalAiGeneratedEventId(aiGeneratedEvent.id)
             ) {
-              restoreProjectBeforeApplyingChanges();
+              restoreProjectBeforeApplyingChanges(
+                serializedProjectBeforeApplyingChanges
+              );
               hasRetriedLocalEventRepair = true;
               repairInstructions = [
                 'The previously generated event changes could not be applied by GDevelop.',
@@ -3996,7 +3997,9 @@ const addSceneEvents: EditorFunction = {
               continue;
             }
 
-            restoreProjectBeforeApplyingChanges();
+            restoreProjectBeforeApplyingChanges(
+              serializedProjectBeforeApplyingChanges
+            );
             return {
               success: false,
               message: `Changes were properly generated, but could not be applied. Event generation output is:
@@ -4065,6 +4068,9 @@ See attached errors that happened when some changes were applied in the project.
         );
       }
     }
+    // Flow does not infer that the retry loop always returns or continues.
+    // eslint-disable-next-line no-unreachable
+    throw new Error('Unexpected event generation loop exit.');
   },
   modifiesProject: true,
 };

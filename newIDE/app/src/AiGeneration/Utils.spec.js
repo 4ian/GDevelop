@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+// $FlowFixMe[missing-export] The Flow stub does not include React 18's act export.
 import renderer, { act } from 'react-test-renderer';
 import { processEditorFunctionCalls } from '../EditorFunctions/EditorFunctionCallRunner';
 import { useProcessFunctionCalls } from './Utils';

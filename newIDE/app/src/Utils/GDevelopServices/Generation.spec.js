@@ -1114,6 +1114,12 @@ describe('Generation service', () => {
         .onPost('https://api.openai.com/v1/chat/completions')
         .replyOnce(config => {
           const data = JSON.parse(config.data);
+          const put2dInstancesTool = data.tools.find(
+            tool => tool.function.name === 'put_2d_instances'
+          );
+          expect(put2dInstancesTool.function.parameters.required).toContain(
+            'object_name'
+          );
           expect(data.messages).toEqual([
             expect.objectContaining({ role: 'system' }),
             { role: 'user', content: 'make pong' },
@@ -2005,6 +2011,13 @@ describe('Generation service', () => {
           },
         })
       ).toBe(true);
+
+      expect(
+        isAiProviderConfigurationRouteUnavailableError({
+          request: {},
+          message: 'Network Error',
+        })
+      ).toBe(false);
 
       expect(
         isAiProviderConfigurationRouteUnavailableError({

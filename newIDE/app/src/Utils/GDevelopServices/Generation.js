@@ -554,8 +554,6 @@ const getProviderErrorDisplayMessage = (error: any): string | null => {
 export const isAiProviderConfigurationRouteUnavailableError = (
   error: any
 ): boolean => {
-  if (error && error.request && !error.response) return true;
-
   const errorType = getResponseHeader(error, 'x-amzn-errortype');
   if (!!errorType && errorType.indexOf('IncompleteSignatureException') === 0) {
     return true;
@@ -1034,7 +1032,7 @@ const localEditorTools: Array<OpenAiCompatibleTool> = [
       instances_z_order: numberSchema('Z order for instances.'),
       instances_size: stringSchema('Optional size as "width,height".'),
     },
-    required: ['scene_name', 'layer_name', 'brush_kind'],
+    required: ['scene_name', 'object_name', 'layer_name', 'brush_kind'],
   }),
   makeOpenAiCompatibleTool({
     name: 'change_object_property',

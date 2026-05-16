@@ -749,9 +749,9 @@ export const AiProvidersPreferences = (): React.Node => {
                 {({ i18n }) => (
                   <TextField
                     value={formState.maxTokens}
-                    floatingLabelText={<Trans>Context window</Trans>}
+                    floatingLabelText={<Trans>Max output tokens</Trans>}
                     helperMarkdownText={i18n._(
-                      t`Leave blank to auto-detect from the model/provider.`
+                      t`Leave blank to use the model/provider default.`
                     )}
                     type="number"
                     fullWidth

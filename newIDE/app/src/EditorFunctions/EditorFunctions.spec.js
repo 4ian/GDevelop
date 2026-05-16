@@ -1097,6 +1097,7 @@ describe('editorFunctions', () => {
     });
 
     it('asks a local Custom Model to repair generated events that cannot be applied', async () => {
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
       // $FlowFixMe[underconstrained-implicit-instantiation]
       const generateEvents = jest
         .fn()
@@ -1125,8 +1126,27 @@ describe('editorFunctions', () => {
                 areEventsValid: true,
                 extensionNames: [],
                 diagnosticLines: [],
-                undeclaredVariables: [],
-                undeclaredObjectVariables: {},
+                undeclaredVariables: [
+                  {
+                    name: 'discardedGlobalVariable',
+                    type: 'number',
+                    requiredScope: 'global',
+                  },
+                  {
+                    name: 'discardedSceneVariable',
+                    type: 'number',
+                    requiredScope: 'scene',
+                  },
+                ],
+                undeclaredObjectVariables: {
+                  Player: [
+                    {
+                      name: 'discardedObjectVariable',
+                      type: 'number',
+                      requiredScope: 'none',
+                    },
+                  ],
+                },
                 missingObjectBehaviors: {},
                 missingResources: [],
               },
@@ -1208,12 +1228,21 @@ describe('editorFunctions', () => {
         aiGeneratedEventId: 'local-custom-provider-ai-generated-event-second',
         newlyAddedResources: [],
       });
+      const repairedScene = project.getLayout('TestScene');
       expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalledWith({
-        scene: testScene,
+        scene: repairedScene,
         newOrChangedAiGeneratedEventIds: new Set([
           'local-custom-provider-ai-generated-event-second',
         ]),
       });
+      expect(project.getVariables().has('discardedGlobalVariable')).toBe(false);
+      expect(repairedScene.getVariables().has('discardedSceneVariable')).toBe(
+        false
+      );
+      const repairedPlayer = repairedScene.getObjects().getObject('Player');
+      expect(repairedPlayer.getVariables().has('discardedObjectVariable')).toBe(
+        false
+      );
     });
   });
 

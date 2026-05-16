@@ -3800,8 +3800,8 @@ const addSceneEvents: EditorFunction = {
         'No related AI request ID found for events generation.'
       );
     }
-    const scene = project.getLayout(sceneName);
-    const currentSceneEvents = scene.getEvents();
+    let scene = project.getLayout(sceneName);
+    let currentSceneEvents = scene.getEvents();
 
     const existingEventsAsText = renderNonTranslatedEventsAsText({
       eventsList: currentSceneEvents,
@@ -3897,6 +3897,18 @@ const addSceneEvents: EditorFunction = {
           );
         }
 
+        const serializedProjectBeforeApplyingChanges = serializeToJSObject(
+          project
+        );
+        const restoreProjectBeforeApplyingChanges = () => {
+          unserializeFromJSObject(
+            project,
+            serializedProjectBeforeApplyingChanges
+          );
+          scene = project.getLayout(sceneName);
+          currentSceneEvents = scene.getEvents();
+        };
+
         try {
           const extensionNames = new Set<string>();
           for (const change of changes) {
@@ -3972,6 +3984,7 @@ const addSceneEvents: EditorFunction = {
               !hasRetriedLocalEventRepair &&
               isLocalAiGeneratedEventId(aiGeneratedEvent.id)
             ) {
+              restoreProjectBeforeApplyingChanges();
               hasRetriedLocalEventRepair = true;
               repairInstructions = [
                 'The previously generated event changes could not be applied by GDevelop.',
@@ -3983,6 +3996,7 @@ const addSceneEvents: EditorFunction = {
               continue;
             }
 
+            restoreProjectBeforeApplyingChanges();
             return {
               success: false,
               message: `Changes were properly generated, but could not be applied. Event generation output is:

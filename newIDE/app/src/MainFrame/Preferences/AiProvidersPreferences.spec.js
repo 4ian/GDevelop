@@ -720,7 +720,7 @@ describe('AiProvidersPreferences', () => {
     expect(fetchAiProviderConfigurations).toHaveBeenCalled();
   });
 
-  it('saves a blank context window as auto-detect and explains the behavior', async () => {
+  it('saves a blank output token limit as the provider default and explains the behavior', async () => {
     mockFn(createAiProviderConfiguration).mockResolvedValue(
       savedOpenAiProviderConfiguration
     );
@@ -738,8 +738,9 @@ describe('AiProvidersPreferences', () => {
         }),
       })
     );
+    expect(getTextContent(tree.toJSON())).toContain('Max output tokens');
     expect(getTextContent(tree.toJSON())).toContain(
-      'Leave blank to auto-detect from the model/provider.'
+      'Leave blank to use the model/provider default.'
     );
     expect(getTextContent(tree.toJSON())).toContain(
       'Auto lets the model/provider choose. If a selected level is unsupported, GDevelop retries without it.'

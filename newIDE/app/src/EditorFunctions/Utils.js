@@ -4,10 +4,8 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 const gd: libGDevelop = global.gd;
 
 export type ObjectSizeInfo = {|
-  // `width`/`height`/`centerX`/`centerY` are `null` when the object has no
-  // intrinsic size (e.g. TextObject, where width/height depend on the rendered
-  // text and must be defined per-instance via `customSize`). The instance
-  // position is still meaningful in that case — it is the object's origin.
+  // `width`/`height`/`centerX`/`centerY` are `null` when size is not known.
+  // `depth`/`originZ`/`centerZ` are `null` when the object is 2D.
   width: number | null,
   height: number | null,
   depth: number | null,
@@ -132,10 +130,6 @@ export const getObjectSizeInfo = (
   }
 
   if (objectType === 'TextObject::Text') {
-    // TextObject has no intrinsic size: width/height depend on the rendered
-    // text and the font, and the engine cannot know them without rendering.
-    // Origin is the top-left of the object — instances should set their own
-    // width/height (via `customSize`) to define a box the text lives in.
     return {
       width: null,
       height: null,
@@ -267,26 +261,6 @@ export const getObjectSizeInfo = (
   return null;
 };
 
-/**
- * A structured hint surfaced to the AI as the `hints` field on a tool result.
- *
- * Hints are kept STRUCTURED (a stable `code` plus a human-readable `message`
- * and the list of objects the hint applies to) so they can be merged across
- * many tool calls when the sub-agent's work is reported back to the
- * orchestrator: hints with the same `code` collapse into one, with their
- * `objectNames` unioned and their `message`s deduplicated.
- *
- * Codes currently in use:
- * - `no-intrinsic-size`: the listed objects have no intrinsic width/height
- *   (e.g. TextObject). Instances must define their own width/height for the
- *   rendered box to be predictable.
- */
-export type HintEntry = {|
-  code: string,
-  message: string,
-  objectNames: Array<string>,
-|};
-
 const NO_INTRINSIC_SIZE_MESSAGE =
   'These objects have no intrinsic size (width/height = null in `objectSizeInfo`). Instances should define their own width and height (e.g. via `instances_size` in `put_2d_instances`). Also check origin X;Y (if 0;0, it means the origin is the top-left).';
 
@@ -299,7 +273,11 @@ const NO_INTRINSIC_SIZE_MESSAGE =
  */
 export const getObjectSizeInfoHints = (objectSizeInfoByName: {
   [string]: ObjectSizeInfo | null,
-}): Array<HintEntry> => {
+}): Array<{|
+  code: string,
+  message: string,
+  objectNames: Array<string>,
+|}> => {
   const objectNames: Array<string> = [];
   for (const objectName in objectSizeInfoByName) {
     const info = objectSizeInfoByName[objectName];

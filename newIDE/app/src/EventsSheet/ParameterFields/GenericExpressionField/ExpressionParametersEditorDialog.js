@@ -71,6 +71,7 @@ const ExpressionParametersEditorDialog = ({
               <HelpButton
                 key="help-button"
                 helpPagePath={expressionMetadata.getHelpPath()}
+                scopeName="Expressions"
               />,
             ]
           : []

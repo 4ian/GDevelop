@@ -544,7 +544,11 @@ function NewObjectDialog({
           <Dialog
             title={<Trans>New object</Trans>}
             secondaryActions={[
-              <HelpButton helpPagePath="/objects" key="help" />,
+              <HelpButton
+                helpPagePath="/objects"
+                key="help"
+                scopeName="Objects"
+              />,
             ]}
             actions={[
               <FlatButton

@@ -400,6 +400,7 @@ const ExtensionDetailPanel = ({
             <HelpButton
               key="help-button"
               helpPagePath={extensionHeader.helpPath}
+              scopeName={t`Extension`}
             />
           )}
         {shouldDisplayButtons && isAlreadyInstalled && (

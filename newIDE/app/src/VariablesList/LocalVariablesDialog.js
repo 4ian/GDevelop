@@ -65,6 +65,7 @@ const LocalVariablesDialog = ({
       // $FlowFixMe[incompatible-type]
       tabs={tabs}
       helpPagePath={'/all-features/variables/local-variables'}
+      scopeName="Local variables"
       id="local-variables-dialog"
       initiallySelectedVariable={initiallySelectedVariable}
       hotReloadPreviewButtonProps={null}

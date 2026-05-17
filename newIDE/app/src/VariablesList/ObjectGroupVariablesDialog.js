@@ -175,6 +175,7 @@ const ObjectGroupVariablesDialog = ({
         <HelpButton
           helpPagePath={'/all-features/variables/object-variables'}
           key="help"
+          scopeName="Object variables"
         />,
       ]}
       onRequestClose={onCancel}

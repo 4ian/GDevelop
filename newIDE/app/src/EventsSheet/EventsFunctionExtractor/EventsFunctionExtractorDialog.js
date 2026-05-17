@@ -156,6 +156,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
           <HelpButton
             helpPagePath="/events/functions/extract-events"
             key="help"
+            scopeName="Extract to function"
           />,
         ]}
         actions={[

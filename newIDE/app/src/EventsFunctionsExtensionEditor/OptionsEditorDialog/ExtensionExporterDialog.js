@@ -102,7 +102,11 @@ const ExtensionExporterDialog = (props: Props): React.Node => {
     <Dialog
       title={<Trans>Export extension</Trans>}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath="/extensions/share-extension/" />,
+        <HelpButton
+          key="help"
+          helpPagePath="/extensions/share-extension/"
+          scopeName="Extensions"
+        />,
         <FlatButton
           label={
             isFromTheStore ? (

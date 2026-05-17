@@ -68,6 +68,7 @@ const ObjectVariablesDialog = ({
       tabs={tabs}
       initiallySelectedVariable={initiallySelectedVariable}
       helpPagePath={'/all-features/variables/object-variables'}
+      scopeName="Object variables"
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="object-variables-dialog"
       isListLocked={isListLocked}

@@ -36,6 +36,7 @@ export default function BehaviorMethodSelectorDialog({
         <HelpButton
           key="help"
           helpPagePath="/behaviors/events-based-behaviors"
+          scopeName="Behaviors"
         />,
       ]}
       actions={[

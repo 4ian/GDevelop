@@ -151,7 +151,11 @@ const ProfileDialog = ({ onClose }: Props) => {
         />,
       ]}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath="/interface/profile" />,
+        <HelpButton
+          key="help"
+          helpPagePath="/interface/profile"
+          scopeName="Profile"
+        />,
         isConnected && (
           <FlatButton
             label={<Trans>Logout</Trans>}

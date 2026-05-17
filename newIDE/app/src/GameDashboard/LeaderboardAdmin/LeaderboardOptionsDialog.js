@@ -138,6 +138,7 @@ function LeaderboardOptionsDialog({
               key="help"
               helpPagePath="/interface/games-dashboard/leaderboard-administration"
               anchor="change_the_appearance_of_a_leaderboard"
+              scopeName="Leaderboard options"
             />,
           ]}
           actions={[

@@ -216,7 +216,8 @@ const LayerEditorDialog = ({
       secondaryActions={[
         <HelpButton
           key="help"
-          helpPagePath={'/interface/scene-editor/layer-effects' /* TODO */}
+          helpPagePath={'/interface/scene-editor/layer-effects'}
+          scopeName="Layer effects"
         />,
         <HotReloadPreviewButton
           key="hot-reload-preview-button"

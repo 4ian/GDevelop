@@ -134,7 +134,8 @@ export default class ResourcesLoader {
       const projectPath = path.dirname(file);
       const resourceAbsolutePath = path
         .resolve(projectPath, urlOrFilename)
-        .replace(/\\/g, '/');
+        .replace(/\\/g, '/')
+        .replace(/#/g, '%23');
 
       console.info('Caching resolved local filename:', resourceAbsolutePath);
       return this._cache.cacheLocalFileUrl(

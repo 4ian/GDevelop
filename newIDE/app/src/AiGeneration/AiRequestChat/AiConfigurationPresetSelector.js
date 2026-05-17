@@ -13,6 +13,9 @@ type AiConfigurationPresetSelectorProps = {
   aiConfigurationPresetsWithAvailability: Array<AiConfigurationPresetWithAvailability>,
   aiRequestMode: string,
   disabled?: boolean,
+  customAiConfigurationPresetId?: string,
+  showCustomAiConfigurationPreset?: boolean,
+  disableCustomAiConfigurationPreset?: boolean,
 };
 
 export const AiConfigurationPresetSelector = ({
@@ -21,6 +24,9 @@ export const AiConfigurationPresetSelector = ({
   aiConfigurationPresetsWithAvailability,
   aiRequestMode,
   disabled,
+  customAiConfigurationPresetId,
+  showCustomAiConfigurationPreset,
+  disableCustomAiConfigurationPreset,
 }: AiConfigurationPresetSelectorProps): React.Node => {
   const filteredAiConfigurationPresets = aiConfigurationPresetsWithAvailability.filter(
     preset => preset.mode === aiRequestMode
@@ -77,6 +83,14 @@ export const AiConfigurationPresetSelector = ({
               shouldNotTranslate
             />
           ))}
+          {showCustomAiConfigurationPreset && customAiConfigurationPresetId && (
+            <SelectOption
+              key={customAiConfigurationPresetId}
+              value={customAiConfigurationPresetId}
+              label={t`Custom Model`}
+              disabled={disableCustomAiConfigurationPreset}
+            />
+          )}
           {upgradeAiConfigurationPresets.length > 0 && (
             <optgroup key={`upgrade`} label={i18n._(t`Upgrade for:`)}>
               {upgradeAiConfigurationPresets.map(preset => (

@@ -96,12 +96,14 @@ export const prepareAiUserContent = async ({
   simplifiedProjectJson,
   projectSpecificExtensionsSummaryJson,
   eventsJson,
+  shouldUpload,
 }: {|
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   simplifiedProjectJson: string | null,
   projectSpecificExtensionsSummaryJson: string | null,
   eventsJson?: string | null,
+  shouldUpload?: boolean,
 |}): Promise<{
   eventsJson: null | string,
   eventsJsonUserRelativeKey: null | string,
@@ -146,11 +148,13 @@ export const prepareAiUserContent = async ({
     hash: eventsJsonHash,
     contentLength: eventsJson ? eventsJson.length : 0,
   });
+  const shouldUseUploadedContent = shouldUpload !== false;
 
   if (
-    shouldUploadGameProjectJson ||
-    shouldUploadProjectSpecificExtensionsSummary ||
-    shouldUploadEventsJson
+    shouldUseUploadedContent &&
+    (shouldUploadGameProjectJson ||
+      shouldUploadProjectSpecificExtensionsSummary ||
+      shouldUploadEventsJson)
   ) {
     const startTime = Date.now();
     const {
@@ -253,15 +257,17 @@ export const prepareAiUserContent = async ({
 
   // Get the key at which the content was uploaded, if it was uploaded.
   // If not, the content will be sent as part of the request instead of the upload key.
-  const gameProjectJsonUserRelativeKey = gameProjectJsonUploadCache.getUserRelativeKey(
-    gameProjectJsonHash
-  );
-  const projectSpecificExtensionsSummaryJsonUserRelativeKey = projectSpecificExtensionsSummaryUploadCache.getUserRelativeKey(
-    projectSpecificExtensionsSummaryJsonHash
-  );
-  const eventsJsonUserRelativeKey = eventsJsonUploadCache.getUserRelativeKey(
-    eventsJsonHash
-  );
+  const gameProjectJsonUserRelativeKey = shouldUseUploadedContent
+    ? gameProjectJsonUploadCache.getUserRelativeKey(gameProjectJsonHash)
+    : null;
+  const projectSpecificExtensionsSummaryJsonUserRelativeKey = shouldUseUploadedContent
+    ? projectSpecificExtensionsSummaryUploadCache.getUserRelativeKey(
+        projectSpecificExtensionsSummaryJsonHash
+      )
+    : null;
+  const eventsJsonUserRelativeKey = shouldUseUploadedContent
+    ? eventsJsonUploadCache.getUserRelativeKey(eventsJsonHash)
+    : null;
   return {
     gameProjectJsonUserRelativeKey,
     gameProjectJson: gameProjectJsonUserRelativeKey

@@ -125,6 +125,7 @@ export const getInitialPreferences = (): {
   resourcesImporationBehavior: string,
   shareDialogDefaultTab: string,
   showAiAskButtonInTitleBar: boolean,
+  aiProviderSettingsSelectionId: string | null,
   showBasicProfilingCounters: boolean,
   showCreateSectionByDefault: boolean,
   showDeprecatedInstructionWarning: string,
@@ -398,6 +399,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ): any),
     // $FlowFixMe[method-unbinding]
     setAutomaticallyUseCreditsForAiRequests: (this._setAutomaticallyUseCreditsForAiRequests.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setAiProviderSettingsSelectionId: (this._setAiProviderSettingsSelectionId.bind(
       this
     ): any),
     // $FlowFixMe[method-unbinding]
@@ -1392,6 +1397,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           automaticallyUseCreditsForAiRequests: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setAiProviderSettingsSelectionId(newValue: string | null) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          aiProviderSettingsSelectionId: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

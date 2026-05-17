@@ -6,6 +6,7 @@ import { delay } from '../Utils/Delay';
 import {
   getAiGeneratedEvent,
   createAiGeneratedEvent,
+  isLocalAiRequestId,
 } from '../Utils/GDevelopServices/Generation';
 
 import { type EventsGenerationResult } from '../EditorFunctions';
@@ -25,6 +26,7 @@ type _UseGenerateEventsReturnType = {
     relatedAiRequestId: string,
     sceneName: string,
     estimatedComplexity: number | null,
+    repairInstructions?: string | null,
   }) => Promise<EventsGenerationResult>,
 };
 export const useGenerateEvents = ({
@@ -47,6 +49,7 @@ export const useGenerateEvents = ({
       placementHint,
       relatedAiRequestId,
       estimatedComplexity,
+      repairInstructions,
     }: {|
       sceneName: string,
       eventsDescription: string,
@@ -57,6 +60,7 @@ export const useGenerateEvents = ({
       placementHint: string,
       relatedAiRequestId: string,
       estimatedComplexity: number | null,
+      repairInstructions?: string | null,
     |}): Promise<EventsGenerationResult> => {
       if (!project) throw new Error('No project is opened.');
       if (!profile) throw new Error('User should be authenticated.');
@@ -76,6 +80,7 @@ export const useGenerateEvents = ({
           simplifiedProjectJson,
           projectSpecificExtensionsSummaryJson,
           eventsJson: existingEventsJson,
+          shouldUpload: !isLocalAiRequestId(relatedAiRequestId),
         });
 
         const createResult = await retryIfFailed(
@@ -101,6 +106,7 @@ export const useGenerateEvents = ({
               placementHint,
               relatedAiRequestId,
               estimatedComplexity,
+              repairInstructions,
             })
         );
 

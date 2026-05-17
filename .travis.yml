@@ -44,10 +44,10 @@ install:
   # Build GDevelop.js
   # (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
   - (set -e; cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && cd ..)
-  # Install newIDE tests dependencies
+  # Install newIDE dependencies (monorepo root)
   - npm -v
-  - cd newIDE/app && npm install
-  - cd ../..
+  - cd newIDE && npm install
+  - cd ..
   # Install GDJS tests dependencies
   - cd GDJS && npm install && cd tests && npm install
   - cd ../..

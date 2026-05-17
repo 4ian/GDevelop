@@ -12,12 +12,12 @@ GDevelop editor and games engines are designed so that all objects, behaviors, e
 
 ## 1) Installation 💻
 
-To modify extensions, you need to have the development version of GDevelop running. Make sure to have [Git](https://git-scm.com/) and [Node.js](https://nodejs.org) installed. [Yarn](https://yarnpkg.com) is optional.
+To modify extensions, you need to have the development version of GDevelop running. Make sure to have [Git](https://git-scm.com/) and [Node.js](https://nodejs.org) installed.
 
 ```bash
-git clone https://github.com/4ian/GD.git
-cd GD/newIDE/app
-npm install #or yarn
+git clone https://github.com/4ian/GDevelop.git
+cd GDevelop/newIDE
+npm install
 ```
 
 Refer to the [GDevelop IDE Readme](./README.md) for more information about the installation.

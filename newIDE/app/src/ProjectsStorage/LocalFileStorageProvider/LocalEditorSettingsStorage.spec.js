@@ -9,9 +9,7 @@ import path from 'path';
 
 describe('LocalEditorSettingsStorage', () => {
   it('stores settings separately for projects in the same folder', () => {
-    expect(
-      getProjectEditorSettingsFilePath('C:/Projects/game.json')
-    ).toBe(
+    expect(getProjectEditorSettingsFilePath('C:/Projects/game.json')).toBe(
       path.join('C:/Projects', '.gdevelop', 'game.editor-settings.json')
     );
     expect(

@@ -68,9 +68,8 @@ export const extractProjectEditorSettings = (
         typeof externalLayout.name === 'string' &&
         hasOwn(externalLayout, 'editionSettings')
       ) {
-        projectEditorSettings.externalLayoutSettings[
-          externalLayout.name
-        ] = externalLayout.editionSettings;
+        projectEditorSettings.externalLayoutSettings[externalLayout.name] =
+          externalLayout.editionSettings;
         delete externalLayout.editionSettings;
       }
     });

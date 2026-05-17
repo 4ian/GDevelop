@@ -3,6 +3,10 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import { type FileMetadata } from '../index';
 import { unsplit } from '../../Utils/ObjectSplitter';
 import { openFilePicker, readJSONFile } from '../../Utils/FileSystem';
+import {
+  applyProjectEditorSettings,
+  getProjectEditorSettingsFilePath,
+} from './LocalEditorSettingsStorage';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 
@@ -34,9 +38,25 @@ export const onOpen = (
       // to be un-splitted, but not the content of these properties), to avoid very slow processing
       // of large game files.
       maxUnsplitDepth: 3,
-    }).then(() => {
-      return { content: object };
-    });
+    })
+      .then(() =>
+        readJSONFile(getProjectEditorSettingsFilePath(filePath))
+          .then(projectEditorSettings => {
+            applyProjectEditorSettings(object, projectEditorSettings);
+          })
+          .catch(error => {
+            if (error && error.code === 'ENOENT') {
+              return;
+            }
+            console.warn(
+              'Unable to read project editor settings. Opening the project without them.',
+              error
+            );
+          })
+      )
+      .then(() => {
+        return { content: object };
+      });
   });
 };
 

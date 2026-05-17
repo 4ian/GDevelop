@@ -592,7 +592,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
-      .SetDefaultValue("true")
+      .SetDefaultValue("True")
       // This parameter allows to keep the operand expression
       // when the editor switch between variable instructions.
       .AddCodeOnlyParameter("yesorno", _("Value"))
@@ -903,7 +903,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
-      .SetDefaultValue("true")
+      .SetDefaultValue("True")
       .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForFunctionEventsOnly();
 

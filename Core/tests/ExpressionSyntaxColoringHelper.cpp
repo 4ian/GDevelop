@@ -96,6 +96,25 @@ TEST_CASE("ExpressionSyntaxColoringHelper", "[common][events]") {
     REQUIRE(getColorationsFor("number", "MyObject.MyFunction()") ==
             expectedCompletions);
   }
+  SECTION("Can colorize behavior function") {
+    // clang-format off
+    std::vector<gd::String> expectedCompletions{
+        "Object [0 8[",
+        "Number [8 33[",
+    };
+    // clang-format on
+    REQUIRE(getColorationsFor("number", "MyObject.MyBehavior::MyFunction()") ==
+            expectedCompletions);
+  }
+  SECTION("Can colorize extension string function") {
+    // clang-format off
+    std::vector<gd::String> expectedCompletions{
+        "String [0 25[",
+    };
+    // clang-format on
+    REQUIRE(getColorationsFor("string", "MyExtension::MyFunction()") ==
+            expectedCompletions);
+  }
   SECTION("Can colorize function parameters") {
     // clang-format off
     std::vector<gd::String> expectedCompletions{

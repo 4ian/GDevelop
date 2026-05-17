@@ -86,10 +86,7 @@ export const extractProjectEditorSettings = (
       }
 
       extension.eventsBasedObjects.forEach(eventsBasedObject => {
-        if (
-          !eventsBasedObject ||
-          typeof eventsBasedObject.name !== 'string'
-        ) {
+        if (!eventsBasedObject || typeof eventsBasedObject.name !== 'string') {
           return;
         }
 
@@ -184,10 +181,7 @@ export const applyProjectEditorSettings = (
       }
 
       extension.eventsBasedObjects.forEach(eventsBasedObject => {
-        if (
-          !eventsBasedObject ||
-          typeof eventsBasedObject.name !== 'string'
-        ) {
+        if (!eventsBasedObject || typeof eventsBasedObject.name !== 'string') {
           return;
         }
 

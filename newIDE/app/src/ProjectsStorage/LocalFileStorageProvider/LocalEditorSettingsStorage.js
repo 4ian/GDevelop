@@ -33,7 +33,7 @@ const makeProjectEditorSettings = (): ProjectEditorSettings => ({
 });
 
 const hasOwn = (object: Object, propertyName: string): boolean =>
-  Object.prototype.hasOwnProperty.call(object, propertyName);
+  Object.keys(object).indexOf(propertyName) !== -1;
 
 const isEmpty = (object: Object): boolean => Object.keys(object).length === 0;
 
@@ -170,9 +170,7 @@ export const applyProjectEditorSettings = (
     });
   }
 
-  const {
-    eventsBasedObjectVariantSettings,
-  } = projectEditorSettings;
+  const { eventsBasedObjectVariantSettings } = projectEditorSettings;
   if (
     eventsBasedObjectVariantSettings &&
     Array.isArray(serializedProjectObject.eventsFunctionsExtensions)

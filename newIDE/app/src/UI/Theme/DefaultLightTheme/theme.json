@@ -291,8 +291,8 @@
       },
       "secondary": {
         "color": {
-          "value": "#494952",
-          "comment": "Palette/Grey/70 - Text/ Secondary"
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50 - Text/ Secondary"
         }
       },
       "disabled": {
@@ -908,8 +908,8 @@
         "value": "#bbbbbb"
       },
       "background-color": {
-        "value": "#FAFAFA",
-        "comment": "Palette/Grey/00"
+        "value": "#F5F5F7",
+        "comment": "Palette/Grey/10 - Background Primary"
       }
     },
     "toolbar": {
@@ -939,20 +939,22 @@
     "row": {
       "odd": {
         "background-color": {
-          "value": "#fafafa"
+          "value": "#F5F5F7"
         }
       },
       "even": {
         "background-color": {
-          "value": "#FFFFFF"
+          "value": "#F5F5F7"
         }
       },
       "selected": {
         "background-color": {
-          "value": "#4c92ff"
+          "value": "#ECE5FF",
+          "comment": "Palette/Purple/10"
         },
         "color": {
-          "value": "#FFFFFF"
+          "value": "#1D1D26",
+          "comment": "Text/Primary"
         }
       }
     }

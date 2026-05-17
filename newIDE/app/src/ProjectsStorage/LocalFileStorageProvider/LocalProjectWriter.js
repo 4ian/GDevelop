@@ -1,11 +1,7 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
-import {
-  serializeToJSObject,
-  serializeToJSON,
-  addFinalNewline,
-} from '../../Utils/Serializer';
+import { serializeToJSObject, addFinalNewline } from '../../Utils/Serializer';
 import { serializeToJSObjectInBackground } from '../../Utils/BackgroundSerializer';
 import {
   type FileMetadata,
@@ -117,6 +113,24 @@ const writeAndCheckFormattedJSONFile = async (
   await writeAndCheckFile(content, filePath);
 };
 
+const writeLocalProjectUiSettings = async (
+  localProjectUiSettings: Object,
+  projectFilePath: string
+): Promise<void> => {
+  const localProjectUiSettingsPath = getLocalProjectUiSettingsFilePath(
+    projectFilePath,
+    path
+  );
+  if (hasLocalProjectUiSettings(localProjectUiSettings)) {
+    await writeAndCheckFormattedJSONFile(
+      localProjectUiSettings,
+      localProjectUiSettingsPath
+    );
+  } else {
+    await fs.remove(localProjectUiSettingsPath);
+  }
+};
+
 const writeProjectFiles = async ({
   project,
   filePath,
@@ -140,10 +154,6 @@ const writeProjectFiles = async ({
   const localProjectUiSettings = extractLocalProjectUiSettings(
     serializedProjectObject
   );
-  const localProjectUiSettingsPath = getLocalProjectUiSettingsFilePath(
-    filePath,
-    path
-  );
 
   if (project.isFolderProject()) {
     const partialObjects = split(serializedProjectObject, {
@@ -166,22 +176,14 @@ const writeProjectFiles = async ({
         throw err;
       });
     });
-    const shouldWriteLocalProjectUiSettings = hasLocalProjectUiSettings(
-      localProjectUiSettings
-    );
-    if (shouldWriteLocalProjectUiSettings) {
-      writePromises.push(
-        writeAndCheckFormattedJSONFile(
-          localProjectUiSettings,
-          localProjectUiSettingsPath
-        ).catch(err => {
+    writePromises.push(
+      writeLocalProjectUiSettings(localProjectUiSettings, filePath).catch(
+        err => {
           console.error('Unable to write the local project UI settings:', err);
           throw err;
-        })
-      );
-    } else {
-      writePromises.push(fs.remove(localProjectUiSettingsPath));
-    }
+        }
+      )
+    );
 
     return Promise.all(writePromises).then(() => {
       return writeAndCheckFormattedJSONFile(
@@ -193,14 +195,7 @@ const writeProjectFiles = async ({
       });
     });
   } else {
-    if (hasLocalProjectUiSettings(localProjectUiSettings)) {
-      await writeAndCheckFormattedJSONFile(
-        localProjectUiSettings,
-        localProjectUiSettingsPath
-      );
-    } else {
-      await fs.remove(localProjectUiSettingsPath);
-    }
+    await writeLocalProjectUiSettings(localProjectUiSettings, filePath);
     await writeAndCheckFormattedJSONFile(serializedProjectObject, filePath);
   }
 
@@ -407,12 +402,18 @@ export const onAutoSaveProject = (
   fileMetadata: FileMetadata
 ): Promise<void> => {
   const autoSavePath = fileMetadata.fileIdentifier + '.autosave';
-  return writeAndCheckFile(serializeToJSON(project), autoSavePath).catch(
-    err => {
+  const serializedProjectObject = serializeToJSObject(project);
+  const localProjectUiSettings = extractLocalProjectUiSettings(
+    serializedProjectObject
+  );
+  return writeLocalProjectUiSettings(localProjectUiSettings, autoSavePath)
+    .then(() =>
+      writeAndCheckFormattedJSONFile(serializedProjectObject, autoSavePath)
+    )
+    .catch(err => {
       console.error(`Unable to write ${autoSavePath}:`, err);
       throw err;
-    }
-  );
+    });
 };
 
 export const getWriteErrorMessage = (error: Error): MessageDescriptor =>

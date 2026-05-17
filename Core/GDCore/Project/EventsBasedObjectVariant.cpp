@@ -37,7 +37,9 @@ void EventsBasedObjectVariant::SerializeTo(SerializerElement &element) const {
 
   layers.SerializeLayersTo(element.AddChild("layers"));
   initialInstances.SerializeTo(element.AddChild("instances"));
-  editorSettings.SerializeTo(element.AddChild("editionSettings"));
+  if (!editorSettings.IsEmpty()) {
+    editorSettings.SerializeTo(element.AddChild("editionSettings"));
+  }
 }
 
 void EventsBasedObjectVariant::UnserializeFrom(

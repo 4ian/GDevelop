@@ -35,6 +35,30 @@ const hasOwnProperty = (object: Object, propertyName: string) =>
 const getName = (object: Object): ?string =>
   typeof object.name === 'string' ? object.name : null;
 
+const getOrCreateEventBasedObjectSettings = (
+  localProjectUiSettings: LocalProjectUiSettings,
+  extensionName: string,
+  eventsBasedObjectName: string
+) => {
+  let extensionsSettings = localProjectUiSettings.eventsFunctionsExtensions;
+  if (!extensionsSettings) {
+    extensionsSettings = ({}: { [string]: Object });
+    localProjectUiSettings.eventsFunctionsExtensions = extensionsSettings;
+  }
+  const extensionSettings = extensionsSettings[extensionName] || {};
+  extensionsSettings[extensionName] = extensionSettings;
+
+  const eventsBasedObjectsSettings =
+    extensionSettings.eventsBasedObjects || ({}: { [string]: Object });
+  extensionSettings.eventsBasedObjects = eventsBasedObjectsSettings;
+
+  const eventsBasedObjectSettings =
+    eventsBasedObjectsSettings[eventsBasedObjectName] || {};
+  eventsBasedObjectsSettings[eventsBasedObjectName] = eventsBasedObjectSettings;
+
+  return eventsBasedObjectSettings;
+};
+
 export const createEmptyLocalProjectUiSettings = (): LocalProjectUiSettings => ({
   version: 1,
 });
@@ -102,10 +126,22 @@ export const extractLocalProjectUiSettings = (
 
       for (const eventsBasedObject of extension.eventsBasedObjects) {
         const eventsBasedObjectName = getName(eventsBasedObject);
-        if (
-          !eventsBasedObjectName ||
-          !Array.isArray(eventsBasedObject.variants)
-        ) {
+        if (!eventsBasedObjectName) {
+          continue;
+        }
+
+        if (hasOwnProperty(eventsBasedObject, 'editionSettings')) {
+          const eventsBasedObjectSettings = getOrCreateEventBasedObjectSettings(
+            localProjectUiSettings,
+            extensionName,
+            eventsBasedObjectName
+          );
+          eventsBasedObjectSettings.editionSettings =
+            eventsBasedObject.editionSettings;
+          delete eventsBasedObject.editionSettings;
+        }
+
+        if (!Array.isArray(eventsBasedObject.variants)) {
           continue;
         }
 
@@ -115,25 +151,11 @@ export const extractLocalProjectUiSettings = (
             continue;
           }
 
-          let extensionsSettings =
-            localProjectUiSettings.eventsFunctionsExtensions;
-          if (!extensionsSettings) {
-            extensionsSettings = ({}: { [string]: Object });
-            localProjectUiSettings.eventsFunctionsExtensions = extensionsSettings;
-          }
-          const extensionSettings = extensionsSettings[extensionName] || {};
-          extensionsSettings[extensionName] = extensionSettings;
-
-          const eventsBasedObjectsSettings =
-            extensionSettings.eventsBasedObjects || ({}: { [string]: Object });
-          extensionSettings.eventsBasedObjects = eventsBasedObjectsSettings;
-
-          const eventsBasedObjectSettings =
-            eventsBasedObjectsSettings[eventsBasedObjectName] || {};
-          eventsBasedObjectsSettings[
+          const eventsBasedObjectSettings = getOrCreateEventBasedObjectSettings(
+            localProjectUiSettings,
+            extensionName,
             eventsBasedObjectName
-          ] = eventsBasedObjectSettings;
-
+          );
           const variantsSettings =
             eventsBasedObjectSettings.variants || ({}: { [string]: Object });
           eventsBasedObjectSettings.variants = variantsSettings;
@@ -205,6 +227,18 @@ export const applyLocalProjectUiSettings = (
           eventsBasedObjectsSettings[eventsBasedObjectName];
         if (
           !eventsBasedObjectSettings ||
+          (!eventsBasedObjectSettings.variants &&
+            !hasOwnProperty(eventsBasedObjectSettings, 'editionSettings'))
+        ) {
+          continue;
+        }
+
+        if (hasOwnProperty(eventsBasedObjectSettings, 'editionSettings')) {
+          eventsBasedObject.editionSettings =
+            eventsBasedObjectSettings.editionSettings;
+        }
+
+        if (
           !eventsBasedObjectSettings.variants ||
           !Array.isArray(eventsBasedObject.variants)
         ) {

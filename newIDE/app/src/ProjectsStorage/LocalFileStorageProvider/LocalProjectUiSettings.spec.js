@@ -69,6 +69,9 @@ describe('LocalProjectUiSettings', () => {
           eventsBasedObjects: [
             {
               name: 'CustomObject',
+              editionSettings: {
+                zoomFactor: 1.5,
+              },
               variants: [
                 {
                   name: 'Variant',
@@ -90,6 +93,10 @@ describe('LocalProjectUiSettings', () => {
     expect(projectObject.externalLayouts[0].editionSettings).toBeUndefined();
     expect(
       projectObject.eventsFunctionsExtensions[0].eventsBasedObjects[0]
+        .editionSettings
+    ).toBeUndefined();
+    expect(
+      projectObject.eventsFunctionsExtensions[0].eventsBasedObjects[0]
         .variants[0].editionSettings
     ).toBeUndefined();
     expect(hasLocalProjectUiSettings(localProjectUiSettings)).toBe(true);
@@ -99,6 +106,9 @@ describe('LocalProjectUiSettings', () => {
           "Extension": Object {
             "eventsBasedObjects": Object {
               "CustomObject": Object {
+                "editionSettings": Object {
+                  "zoomFactor": 1.5,
+                },
                 "variants": Object {
                   "Variant": Object {
                     "editionSettings": Object {
@@ -172,6 +182,9 @@ describe('LocalProjectUiSettings', () => {
           eventsBasedObjects: [
             {
               name: 'CustomObject',
+              editionSettings: {
+                zoomFactor: 1.5,
+              },
               variants: [
                 {
                   name: 'Variant',

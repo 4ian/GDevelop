@@ -12,9 +12,7 @@ describe('LocalEditorSettingsStorage', () => {
     expect(getProjectEditorSettingsFilePath('C:/Projects/game.json')).toBe(
       path.join('C:/Projects', '.gdevelop', 'game.editor-settings.json')
     );
-    expect(
-      getProjectEditorSettingsFilePath('C:/Projects/prototype.json')
-    ).toBe(
+    expect(getProjectEditorSettingsFilePath('C:/Projects/prototype.json')).toBe(
       path.join('C:/Projects', '.gdevelop', 'prototype.editor-settings.json')
     );
   });

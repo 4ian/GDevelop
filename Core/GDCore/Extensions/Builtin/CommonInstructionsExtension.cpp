@@ -64,11 +64,41 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       .AddCondition(
           "Or",
           _("Or"),
-          _("Checks if at least one sub-condition is true. If no "
-            "sub-condition is specified, it will always be false. "
-            "This is rarely used — multiple events and sub-events are "
-            "usually a better approach."),
+          _("True if at least one sub-condition is true.\n\n"
+            "Picked objects: the action only sees objects picked by a "
+            "true branch. Objects mentioned only by false branches end "
+            "up with no selection.\n\n"
+            "Use this when the action acts on the specific object whose "
+            "condition was tested.\n"
+            "Example: \"Door collided with Player OR Coin collided with "
+            "Player\" → hide the touched object. (When the Door branch "
+            "fires, the Door and Player from that collision are picked; "
+            "the Coin is not selected, so an action on Coin does "
+            "nothing.)"),
           _("If one of these conditions is true:"),
+          "",
+          "res/conditions/or24_black.png",
+          "res/conditions/or_black.png")
+      .SetCanHaveSubInstructions()
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition(
+          "OrDistributive",
+          _("Or (independent object picking)"),
+          _("True if at least one sub-condition is true.\n\n"
+            "Picked objects stay the same as before the Or, unless a "
+            "true branch explicitly filters them. A true branch that "
+            "does not reference an object leaves that object's "
+            "selection alone.\n\n"
+            "Use this when the action acts on an object that some "
+            "branches do not mention.\n"
+            "Example: \"Text input is submitted OR Submit button is "
+            "clicked\" → set a variable to the text input's value. "
+            "(The button branch doesn't pick the text input; with the "
+            "regular Or the input would no longer be selected.)"),
+          _("If one of these conditions is true (independent object "
+            "picking):"),
           "",
           "res/conditions/or24_black.png",
           "res/conditions/or_black.png")

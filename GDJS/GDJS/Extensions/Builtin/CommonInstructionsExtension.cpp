@@ -253,6 +253,24 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String conditionsCode;
         gd::InstructionsList &conditions = instruction.GetSubInstructions();
 
+        gd::String codeNamespace = codeGenerator.GetCodeNamespaceAccessor();
+        auto finalListName = [&](const gd::String &objectName) {
+          return codeNamespace + ManObjListName(objectName) +
+                 gd::String::From(parentContext.GetContextDepth()) + "_" +
+                 gd::String::From(parentContext.GetCurrentConditionDepth()) +
+                 "final";
+        };
+        // Per-object runtime flag: was there at least one branch that was
+        // true AND that referenced (declared) this object? If not, we leave
+        // the parent's picked list untouched at the end of the Or, instead
+        // of overwriting it with an empty "final" list.
+        auto hasContribName = [&](const gd::String &objectName) {
+          return codeNamespace + ManObjListName(objectName) +
+                 gd::String::From(parentContext.GetContextDepth()) + "_" +
+                 gd::String::From(parentContext.GetCurrentConditionDepth()) +
+                 "hasContrib";
+        };
+
         // The Or "return" true by setting the upper boolean to true.
         // So, it needs to be initialized to false.
         conditionsCode += codeGenerator.GenerateUpperScopeBooleanFullName(
@@ -279,8 +297,17 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           // Create new objects lists and generate condition
           conditionsCode +=
               codeGenerator.GenerateObjectsDeclarationCode(context);
-          if (!conditions[cId].GetType().empty())
+          if (!conditions[cId].GetType().empty()) {
+            // Reset the branch's boolean to false: condition codegen does
+            // not zero its return boolean, so without this each branch
+            // would inherit the previous branch's truth value, causing a
+            // false branch that picks 0 to be treated as a contribution.
+            conditionsCode +=
+                codeGenerator.GenerateBooleanFullName("isConditionTrue",
+                                                      context) +
+                " = false;\n";
             conditionsCode += conditionCode;
+          }
 
           // If the condition is true : merge all objects picked in the
           // final object lists.
@@ -298,17 +325,20 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                it != objectsListsToBeDeclared.end(); ++it) {
             emptyListsNeeded.insert(*it);
             gd::String objList = codeGenerator.GetObjectListName(*it, context);
-            gd::String finalObjList =
-                codeGenerator.GetCodeNamespaceAccessor() + ManObjListName(*it) +
-                gd::String::From(parentContext.GetContextDepth()) + "_" +
-                gd::String::From(parentContext.GetCurrentConditionDepth()) +
-                "final";
+            gd::String finalObjList = finalListName(*it);
+            gd::String finalObjSet = finalObjList + "Set";
+            // Mark that this object got a contribution from a true branch
+            // that referenced it.
+            conditionsCode += "    " + hasContribName(*it) + " = true;\n";
             conditionsCode += "    for (let j = 0, jLen = " + objList +
                               ".length; j < jLen ; ++j) {\n";
-            conditionsCode += "        if ( " + finalObjList + ".indexOf(" +
-                              objList + "[j]) === -1 )\n";
+            conditionsCode += "        if (!" + finalObjSet + ".has(" +
+                              objList + "[j])) {\n";
+            conditionsCode += "            " + finalObjSet + ".add(" +
+                              objList + "[j]);\n";
             conditionsCode +=
                 "            " + finalObjList + ".push(" + objList + "[j]);\n";
+            conditionsCode += "        }\n";
             conditionsCode += "    }\n";
           }
           conditionsCode += "}\n";
@@ -319,7 +349,6 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String declarationsCode;
 
         // Declarations code
-        gd::String codeNamespace = codeGenerator.GetCodeNamespaceAccessor();
         for (set<gd::String>::iterator it = emptyListsNeeded.begin();
              it != emptyListsNeeded.end(); ++it) {
           //"OR" condition must declare objects list, but without getting
@@ -330,13 +359,15 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           // be filled with objects by conditions, but they will have no
           // incidence on further conditions, as conditions use "normal"
           // ones.
-          gd::String finalObjList =
-              codeNamespace + ManObjListName(*it) +
-              gd::String::From(parentContext.GetContextDepth()) + "_" +
-              gd::String::From(parentContext.GetCurrentConditionDepth()) +
-              "final";
+          gd::String finalObjList = finalListName(*it);
+          gd::String finalObjSet = finalObjList + "Set";
           codeGenerator.AddGlobalDeclaration(finalObjList + " = [];\n");
+          codeGenerator.AddGlobalDeclaration(finalObjSet + " = new Set();\n");
           declarationsCode += finalObjList + ".length = 0;\n";
+          declarationsCode += finalObjSet + ".clear();\n";
+          // Per-object contribution flag, reset at the start of every Or.
+          codeGenerator.AddGlobalDeclaration(hasContribName(*it) + " = false;\n");
+          declarationsCode += hasContribName(*it) + " = false;\n";
         }
         declarationsCode += "let " +
                             codeGenerator.GenerateBooleanFullName(
@@ -349,22 +380,186 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         code += conditionsCode;
 
         // When condition is finished, "final" objects lists become the
-        // "normal" ones.
+        // "normal" ones — but only for objects that received at least one
+        // contribution (a true branch that actually referenced the object).
+        // If no true branch contributed, leave the parent's picked list
+        // untouched so picks established before the Or are preserved.
+        //
+        // Backwards compatibility: projects from before 5.6.269 expect the
+        // old "always overwrite parent.X with final.X" semantics. The
+        // runtime flag `gdjs.useDeprecatedOrConditionPicking` is set from
+        // the project's `useDeprecatedOrConditionPicking` property, and
+        // when true forces the unconditional overwrite — reproducing the
+        // pre-fix behavior for those projects.
         code += "{\n";
         for (set<gd::String>::iterator it = emptyListsNeeded.begin();
              it != emptyListsNeeded.end(); ++it) {
-          gd::String finalObjList =
-              codeNamespace + ManObjListName(*it) +
-              gd::String::From(parentContext.GetContextDepth()) + "_" +
-              gd::String::From(parentContext.GetCurrentConditionDepth()) +
-              "final";
-          code += "gdjs.copyArray(" + finalObjList + ", " +
-                  codeGenerator.GetObjectListName(*it, parentContext) + ");\n";
+          gd::String finalObjList = finalListName(*it);
+          code += "if (gdjs.useDeprecatedOrConditionPicking || " +
+                  hasContribName(*it) + ") gdjs.copyArray(" + finalObjList +
+                  ", " + codeGenerator.GetObjectListName(*it, parentContext) +
+                  ");\n";
         }
         code += "}\n";
 
         return code;
       });
+
+  GetAllConditions()["BuiltinCommonInstructions::OrDistributive"]
+      .SetCustomCodeGenerator(
+          [](gd::Instruction &instruction,
+             gd::EventsCodeGenerator &codeGenerator,
+             gd::EventsCodeGenerationContext &parentContext) {
+            gd::InstructionsList &conditions =
+                instruction.GetSubInstructions();
+            gd::String codeNamespace =
+                codeGenerator.GetCodeNamespaceAccessor();
+
+            auto finalListName = [&](const gd::String &objectName) {
+              return codeNamespace + ManObjListName(objectName) +
+                     gd::String::From(parentContext.GetContextDepth()) + "_" +
+                     gd::String::From(
+                         parentContext.GetCurrentConditionDepth()) +
+                     "distFinal";
+            };
+
+            // PASS 1: Discover every object referenced across all branches
+            // by generating each branch's condition code into a discovery
+            // context. The output is discarded; we only keep the union of
+            // referenced objects, which is needed before we can emit the
+            // real per-branch code with the correct pre-registration.
+            std::set<gd::String> allReferencedObjects;
+            for (unsigned int cId = 0; cId < conditions.size(); ++cId) {
+              gd::EventsCodeGenerationContext discoveryContext;
+              discoveryContext.InheritsFrom(parentContext);
+              discoveryContext.ForbidReuse();
+              codeGenerator.GenerateConditionCode(
+                  conditions[cId], "isConditionTrue", discoveryContext);
+              std::set<gd::String> branchObjects =
+                  discoveryContext.GetAllObjectsToBeDeclared();
+              allReferencedObjects.insert(branchObjects.begin(),
+                                          branchObjects.end());
+            }
+
+            // Distributive Or: every referenced object must be available in
+            // the parent's picked list, filled from the scene if not already
+            // picked by a previous condition. This is what allows a branch
+            // that doesn't reference an object to behave as "unconstrained"
+            // (i.e. contribute the parent's picked list rather than empty).
+            for (auto &objectName : allReferencedObjects) {
+              parentContext.ObjectsListNeeded(objectName);
+            }
+
+            // PASS 2: Emit per-branch code. Each branch's child context is
+            // pre-registered with the entire union of referenced objects,
+            // so the branch's child holds a copy of the parent's picked
+            // list for every union object — even those the branch itself
+            // doesn't constrain.
+            gd::String conditionsCode;
+            conditionsCode += codeGenerator.GenerateUpperScopeBooleanFullName(
+                                  "isConditionTrue", parentContext) +
+                              " = false;\n";
+
+            for (unsigned int cId = 0; cId < conditions.size(); ++cId) {
+              gd::EventsCodeGenerationContext context;
+              context.InheritsFrom(parentContext);
+              context.ForbidReuse();
+
+              // Pre-register every union object on this branch's child so
+              // GenerateObjectsDeclarationCode emits a copy from the parent
+              // even for objects the branch doesn't itself touch.
+              for (auto &objectName : allReferencedObjects) {
+                context.ObjectsListNeeded(objectName);
+              }
+
+              gd::String conditionCode = codeGenerator.GenerateConditionCode(
+                  conditions[cId], "isConditionTrue", context);
+
+              conditionsCode += "{\n";
+              conditionsCode +=
+                  codeGenerator.GenerateObjectsDeclarationCode(context);
+              if (!conditions[cId].GetType().empty()) {
+                // See the matching reset comment in the Or generator above:
+                // each branch must start with isConditionTrue = false so a
+                // previous true branch does not leak into this one.
+                conditionsCode +=
+                    codeGenerator.GenerateBooleanFullName("isConditionTrue",
+                                                          context) +
+                    " = false;\n";
+                conditionsCode += conditionCode;
+              }
+
+              conditionsCode += "if(" +
+                                codeGenerator.GenerateBooleanFullName(
+                                    "isConditionTrue", context) +
+                                ") {\n";
+              conditionsCode +=
+                  "    " +
+                  codeGenerator.GenerateUpperScopeBooleanFullName(
+                      "isConditionTrue", context) +
+                  " = true;\n";
+              for (auto &objectName : allReferencedObjects) {
+                gd::String objList =
+                    codeGenerator.GetObjectListName(objectName, context);
+                gd::String finalObjList = finalListName(objectName);
+                gd::String finalObjSet = finalObjList + "Set";
+                conditionsCode += "    for (let j = 0, jLen = " + objList +
+                                  ".length; j < jLen ; ++j) {\n";
+                conditionsCode += "        if (!" + finalObjSet + ".has(" +
+                                  objList + "[j])) {\n";
+                conditionsCode += "            " + finalObjSet + ".add(" +
+                                  objList + "[j]);\n";
+                conditionsCode += "            " + finalObjList + ".push(" +
+                                  objList + "[j]);\n";
+                conditionsCode += "        }\n";
+                conditionsCode += "    }\n";
+              }
+              conditionsCode += "}\n";
+              conditionsCode += "}\n";
+            }
+
+            // Emit "final" lists declarations.
+            gd::String declarationsCode;
+            for (auto &objectName : allReferencedObjects) {
+              gd::String finalObjList = finalListName(objectName);
+              gd::String finalObjSet = finalObjList + "Set";
+              codeGenerator.AddGlobalDeclaration(finalObjList + " = [];\n");
+              codeGenerator.AddGlobalDeclaration(finalObjSet + " = new Set();\n");
+              declarationsCode += finalObjList + ".length = 0;\n";
+              declarationsCode += finalObjSet + ".clear();\n";
+            }
+            declarationsCode += "let " +
+                                codeGenerator.GenerateBooleanFullName(
+                                    "isConditionTrue", parentContext) +
+                                " = false;\n";
+
+            gd::String code;
+            code += declarationsCode;
+            code += conditionsCode;
+
+            // Final copy: distributive Or overwrites the parent's picked
+            // list with the union built up across branches when at least
+            // one branch was true. Each true branch contributes (either
+            // its own picks if it referenced the object, or the parent's
+            // list as it was at the start of the Or otherwise). When no
+            // branch was true the Or returns false; in that case we leave
+            // the parent's picks untouched so behavior is consistent with
+            // the regular Or in the all-false case.
+            code += "if (" +
+                    codeGenerator.GenerateUpperScopeBooleanFullName(
+                        "isConditionTrue", parentContext) +
+                    ") {\n";
+            for (auto &objectName : allReferencedObjects) {
+              gd::String finalObjList = finalListName(objectName);
+              code += "gdjs.copyArray(" + finalObjList + ", " +
+                      codeGenerator.GetObjectListName(objectName,
+                                                      parentContext) +
+                      ");\n";
+            }
+            code += "}\n";
+
+            return code;
+          });
 
   GetAllConditions()["BuiltinCommonInstructions::And"].SetCustomCodeGenerator(
       [](gd::Instruction &instruction, gd::EventsCodeGenerator &codeGenerator,

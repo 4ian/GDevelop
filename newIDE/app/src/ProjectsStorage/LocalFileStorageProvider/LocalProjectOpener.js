@@ -3,6 +3,10 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import { type FileMetadata } from '../index';
 import { unsplit } from '../../Utils/ObjectSplitter';
 import { openFilePicker, readJSONFile } from '../../Utils/FileSystem';
+import {
+  applyLocalProjectUiSettings,
+  getLocalProjectUiSettingsFilePath,
+} from './LocalProjectUiSettings';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 
@@ -24,6 +28,10 @@ export const onOpen = (
 |}> => {
   const filePath = fileMetadata.fileIdentifier;
   const projectPath = path.dirname(filePath);
+  const localProjectUiSettingsPath = getLocalProjectUiSettingsFilePath(
+    filePath,
+    path
+  );
   return readJSONFile(filePath).then(object => {
     return unsplit(object, {
       getReferencePartialObject: referencePath => {
@@ -34,9 +42,19 @@ export const onOpen = (
       // to be un-splitted, but not the content of these properties), to avoid very slow processing
       // of large game files.
       maxUnsplitDepth: 3,
-    }).then(() => {
-      return { content: object };
-    });
+    })
+      .then(() => {
+        if (!fs.existsSync(localProjectUiSettingsPath)) return;
+
+        return readJSONFile(localProjectUiSettingsPath).then(
+          localProjectUiSettings => {
+            applyLocalProjectUiSettings(object, localProjectUiSettings);
+          }
+        );
+      })
+      .then(() => {
+        return { content: object };
+      });
   });
 };
 

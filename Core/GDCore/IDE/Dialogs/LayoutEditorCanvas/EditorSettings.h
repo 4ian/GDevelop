@@ -33,6 +33,14 @@ class GD_CORE_API EditorSettings {
    * \brief Unserialize the settings.
    */
   void UnserializeFrom(const SerializerElement& element);
+
+  /**
+   * \brief Return true if the settings contain no serialized data.
+   */
+  bool IsEmpty() const {
+    gd::SerializerElement contentCopy(content);
+    return contentCopy.IsEmpty() && contentCopy.IsValueUndefined();
+  }
   ///@}
 
 private:

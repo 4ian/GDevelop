@@ -262,7 +262,7 @@ export const getObjectSizeInfo = (
 };
 
 const NO_INTRINSIC_SIZE_MESSAGE =
-  'These objects have no intrinsic size (width/height = null in `objectSizeInfo`). Instances should define their own width and height (e.g. via `instances_size` in `put_2d_instances`). Also check origin X;Y (if 0;0, it means the origin is the top-left).';
+  "These objects have no intrinsic size (width/height = null in `objectSizeInfo`). For precise placement of instance(s), set the instance's size (e.g.: via `instances_size` in `put_2d_instances`). Also check origin X;Y (if 0;0, it means the instance position defines the top-left, not the center).";
 
 /**
  * Build structured hints for an `objectSizeInfo` map.

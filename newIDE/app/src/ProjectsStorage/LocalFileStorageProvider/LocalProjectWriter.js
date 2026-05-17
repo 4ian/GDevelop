@@ -19,6 +19,11 @@ import {
   splitPaths,
   getSlugifiedUniqueNameFromProperty,
 } from '../../Utils/ObjectSplitter';
+import {
+  extractLocalProjectUiSettings,
+  getLocalProjectUiSettingsFilePath,
+  hasLocalProjectUiSettings,
+} from './LocalProjectUiSettings';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import SaveAsOptionsDialog from '../SaveAsOptionsDialog';
@@ -132,6 +137,13 @@ const writeProjectFiles = async ({
     serializedProjectObject = serializeToJSObject(project);
   }
   const serializeEndTime = Date.now();
+  const localProjectUiSettings = extractLocalProjectUiSettings(
+    serializedProjectObject
+  );
+  const localProjectUiSettingsPath = getLocalProjectUiSettingsFilePath(
+    filePath,
+    path
+  );
 
   if (project.isFolderProject()) {
     const partialObjects = split(serializedProjectObject, {
@@ -145,17 +157,33 @@ const writeProjectFiles = async ({
       isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
     });
 
-    return Promise.all(
-      partialObjects.map(partialObject => {
-        return writeAndCheckFormattedJSONFile(
-          partialObject.object,
-          path.join(projectPath, partialObject.reference) + '.json'
+    const writePromises = partialObjects.map(partialObject => {
+      return writeAndCheckFormattedJSONFile(
+        partialObject.object,
+        path.join(projectPath, partialObject.reference) + '.json'
+      ).catch(err => {
+        console.error('Unable to write a partial file:', err);
+        throw err;
+      });
+    });
+    const shouldWriteLocalProjectUiSettings = hasLocalProjectUiSettings(
+      localProjectUiSettings
+    );
+    if (shouldWriteLocalProjectUiSettings) {
+      writePromises.push(
+        writeAndCheckFormattedJSONFile(
+          localProjectUiSettings,
+          localProjectUiSettingsPath
         ).catch(err => {
-          console.error('Unable to write a partial file:', err);
+          console.error('Unable to write the local project UI settings:', err);
           throw err;
-        });
-      })
-    ).then(() => {
+        })
+      );
+    } else {
+      writePromises.push(fs.remove(localProjectUiSettingsPath));
+    }
+
+    return Promise.all(writePromises).then(() => {
       return writeAndCheckFormattedJSONFile(
         serializedProjectObject,
         filePath
@@ -165,6 +193,14 @@ const writeProjectFiles = async ({
       });
     });
   } else {
+    if (hasLocalProjectUiSettings(localProjectUiSettings)) {
+      await writeAndCheckFormattedJSONFile(
+        localProjectUiSettings,
+        localProjectUiSettingsPath
+      );
+    } else {
+      await fs.remove(localProjectUiSettingsPath);
+    }
     await writeAndCheckFormattedJSONFile(serializedProjectObject, filePath);
   }
 

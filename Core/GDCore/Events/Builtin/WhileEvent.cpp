@@ -13,6 +13,20 @@ using namespace std;
 
 namespace gd {
 
+gd::InstructionsList* WhileEvent::GetInstructionList(const gd::String& label) {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  if (label == BaseEvent::whileConditionsLabel) return &whileConditions;
+  return nullptr;
+}
+const gd::InstructionsList* WhileEvent::GetInstructionList(
+    const gd::String& label) const {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  if (label == BaseEvent::whileConditionsLabel) return &whileConditions;
+  return nullptr;
+}
+
 vector<gd::InstructionsList*> WhileEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;
   allConditions.push_back(&whileConditions);

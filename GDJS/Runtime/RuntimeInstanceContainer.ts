@@ -56,6 +56,8 @@ namespace gdjs {
     _debugDrawShowPointsNames: boolean = false;
     _debugDrawShowCustomPoints: boolean = false;
 
+    _onceTriggers: OnceTriggers;
+
     /**
      * @param runtimeGame The game associated to this scene.
      */
@@ -71,6 +73,7 @@ namespace gdjs {
         // Register an UnknownRuntimeObject to use when the object doesn't exist.
         this.registerObject(unknownObjectData);
       }
+      this._onceTriggers = new gdjs.OnceTriggers();
     }
 
     /**
@@ -867,6 +870,13 @@ namespace gdjs {
     }
 
     /**
+     * Get the structure containing the triggers for "Trigger once" conditions.
+     */
+    getOnceTriggers() {
+      return this._onceTriggers;
+    }
+
+    /**
      * Clear any data structures to make sure memory is freed as soon as
      * possible.
      */
@@ -883,6 +893,8 @@ namespace gdjs {
       this._instancesRemoved = [];
       this._layersCameraCoordinates = {};
       this._initialBehaviorSharedData = new Hashtable();
+      // @ts-ignore We are deleting the object
+      this._onceTriggers = null;
     }
   }
 }

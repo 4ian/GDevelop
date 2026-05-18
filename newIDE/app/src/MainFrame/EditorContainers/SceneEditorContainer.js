@@ -161,6 +161,10 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     // No thing to be done.
   }
 
+  selectAllInsideEditor() {
+    // No thing to be done.
+  }
+
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
     if (changes.scene !== this.getLayout()) {
       return;

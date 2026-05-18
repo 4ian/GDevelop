@@ -36,9 +36,11 @@ import AdvancedIcon from '../../UI/CustomSvgIcons/AddCircle';
 import BehaviorIcon from '../../UI/CustomSvgIcons/Behavior';
 import SceneIcon from '../../UI/CustomSvgIcons/Scene';
 import ResourceIcon from '../../UI/CustomSvgIcons/ProjectResources';
+import LayerIcon from '../../UI/CustomSvgIcons/Layers';
 import VariableStringIcon from '../../VariablesList/Icons/VariableStringIcon';
 import VariableNumberIcon from '../../VariablesList/Icons/VariableNumberIcon';
 import VariableBooleanIcon from '../../VariablesList/Icons/VariableBooleanIcon';
+import NewBehaviorDialog from '../../BehaviorsEditor/NewBehaviorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -81,9 +83,39 @@ const renderValueTypeIcon = (type: string, className: string): React.Node => {
     case 'Resource':
       return <ResourceIcon className={className} />;
 
+    case 'Layer':
+      return <LayerIcon className={className} />;
+
     default:
       return null;
   }
+};
+
+export const fillBehaviorProperty = (
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  eventsBasedBehavior: gdEventsBasedBehavior,
+  property: gdNamedPropertyDescriptor,
+  behaviorType: string
+) => {
+  // Change the type of the required behavior.
+  const extraInfo = property.getExtraInfo();
+  if (extraInfo.size() === 0) {
+    extraInfo.push_back(behaviorType);
+  } else {
+    extraInfo.set(0, behaviorType);
+  }
+  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+    projectScopedContainersAccessor.getScope().project.getCurrentPlatform(),
+    behaviorType
+  );
+  const projectScopedContainers = projectScopedContainersAccessor.get();
+  const validatedNewName = getValidatedPropertyName(
+    eventsBasedBehavior.getPropertyDescriptors(),
+    projectScopedContainers,
+    behaviorMetadata.getDefaultName()
+  );
+  property.setName(validatedNewName);
+  property.setLabel(behaviorMetadata.getFullName());
 };
 
 const setExtraInfoString = (
@@ -110,6 +142,8 @@ type Props = {|
   onPropertyTypeChanged: (propertyName: string) => void,
   onEventsFunctionsAdded: () => void,
   behaviorObjectType: string,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 // Those names are used internally by GDevelop.
@@ -142,15 +176,18 @@ const getChoicesArray = (
   }));
 };
 
-export type EventsBasedBehaviorPropertiesEditorInterface = {|
+export type EventsBasedBehaviorOrObjectPropertiesEditorInterface = {|
   forceUpdate: () => void,
   getPropertyEditorRef: (propertyName: string) => React.ElementRef<any>,
 |};
 
-export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
+export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
   ...Props,
-  +ref?: React.RefSetter<EventsBasedBehaviorPropertiesEditorInterface>,
-}> = React.forwardRef<Props, EventsBasedBehaviorPropertiesEditorInterface>(
+  +ref?: React.RefSetter<EventsBasedBehaviorOrObjectPropertiesEditorInterface>,
+}> = React.forwardRef<
+  Props,
+  EventsBasedBehaviorOrObjectPropertiesEditorInterface
+>(
   (
     {
       project,
@@ -166,6 +203,8 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
       onPropertyTypeChanged,
       onEventsFunctionsAdded,
       behaviorObjectType,
+      onWillInstallExtension,
+      onExtensionInstalled,
     }: Props,
     ref
   ) => {
@@ -176,6 +215,10 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
       getPropertyEditorRef: (propertyName: string) =>
         propertyRefs ? propertyRefs.current.get(propertyName) : null,
     }));
+
+    const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState<{
+      behaviorProperty: gdNamedPropertyDescriptor,
+    } | null>(null);
 
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
@@ -508,6 +551,12 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
                                       value="Resource"
                                       label={t`Resource`}
                                     />
+                                    {eventsBasedBehavior && (
+                                      <SelectOption
+                                        value="Layer"
+                                        label={t`Layer (text)`}
+                                      />
+                                    )}
                                     {eventsBasedBehavior &&
                                       !isSharedProperties && (
                                         <SelectOption
@@ -576,7 +625,8 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
                                 property.getType() === 'Number' ||
                                 property.getType() === 'ObjectAnimationName' ||
                                 property.getType() === 'KeyboardKey' ||
-                                property.getType() === 'MultilineString') && (
+                                property.getType() === 'MultilineString' ||
+                                property.getType() === 'Layer') && (
                                 <CompactPropertiesEditorRowField
                                   label={i18n._(t`Default value`)}
                                   field={
@@ -663,26 +713,14 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
                                       : property.getExtraInfo().at(0)
                                   }
                                   onChange={(newValue: string) => {
-                                    // Change the type of the required behavior.
-                                    const extraInfo = property.getExtraInfo();
-                                    if (extraInfo.size() === 0) {
-                                      extraInfo.push_back(newValue);
-                                    } else {
-                                      extraInfo.set(0, newValue);
+                                    if (!eventsBasedBehavior) {
+                                      return;
                                     }
-                                    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-                                      project.getCurrentPlatform(),
+                                    fillBehaviorProperty(
+                                      projectScopedContainersAccessor,
+                                      eventsBasedBehavior,
+                                      property,
                                       newValue
-                                    );
-                                    const projectScopedContainers = projectScopedContainersAccessor.get();
-                                    const validatedNewName = getValidatedPropertyName(
-                                      properties,
-                                      projectScopedContainers,
-                                      behaviorMetadata.getDefaultName()
-                                    );
-                                    property.setName(validatedNewName);
-                                    property.setLabel(
-                                      behaviorMetadata.getFullName()
                                     );
                                     forceUpdate();
                                     onPropertiesUpdated();
@@ -690,6 +728,11 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
                                   onFocus={() =>
                                     onFocusProperty(property.getName())
                                   }
+                                  onOpenBehaviorTypeDialog={() => {
+                                    setNewBehaviorDialogOpen({
+                                      behaviorProperty: property,
+                                    });
+                                  }}
                                   disabled={false}
                                 />
                               )}
@@ -810,6 +853,35 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
                       );
                     }
                   }
+                )}
+                {newBehaviorDialogOpen && eventsBasedBehavior && (
+                  <NewBehaviorDialog
+                    title={<Trans>Select a behavior</Trans>}
+                    project={project}
+                    eventsFunctionsExtension={extension}
+                    open={!!newBehaviorDialogOpen}
+                    objectType={eventsBasedBehavior.getObjectType()}
+                    // It doesn't matter if there are 2 parameters with the
+                    // same behavior for an object at some point.
+                    objectBehaviorsTypes={[]}
+                    isChildObject={false}
+                    onClose={() => setNewBehaviorDialogOpen(null)}
+                    onChoose={type => {
+                      const property = newBehaviorDialogOpen.behaviorProperty;
+                      fillBehaviorProperty(
+                        projectScopedContainersAccessor,
+                        eventsBasedBehavior,
+                        property,
+                        type
+                      );
+                      forceUpdate();
+                      onPropertiesUpdated();
+                      setNewBehaviorDialogOpen(null);
+                    }}
+                    onWillInstallExtension={onWillInstallExtension}
+                    onExtensionInstalled={onExtensionInstalled}
+                    shouldShowCapabilityBehaviors={true}
+                  />
                 )}
               </Column>
             ) : (

@@ -5,8 +5,8 @@ import VariableField, {
   getRootVariableName,
   renderVariableWithIcon,
   type VariableFieldInterface,
-  type VariableDialogOpeningProps,
 } from './VariableField';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import GlobalAndSceneVariablesDialog from '../../VariablesList/GlobalAndSceneVariablesDialog';
 import LocalVariablesDialog from '../../VariablesList/LocalVariablesDialog';
 import {
@@ -126,6 +126,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           }
           onInstructionTypeChanged={onInstructionTypeChanged}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
+          editEventsFunctionParameter={null}
         />
         {editorOpen &&
           (variableSourceType === gd.VariablesContainer.Local ? (
@@ -139,8 +140,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 open
                 onCancel={() => setEditorOpen(null)}
                 onApply={onVariableEditorApply}
-                initiallySelectedVariableName={editorOpen.variableName}
-                shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+                initiallySelectedVariable={editorOpen}
                 isListLocked={false}
               />
             )
@@ -154,8 +154,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 variableSourceType === gd.VariablesContainer.Global ||
                 variableSourceType === gd.VariablesContainer.ExtensionGlobal
               }
-              initiallySelectedVariableName={editorOpen.variableName}
-              shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+              initiallySelectedVariable={editorOpen}
               hotReloadPreviewButtonProps={null}
               isListLocked={false}
             />

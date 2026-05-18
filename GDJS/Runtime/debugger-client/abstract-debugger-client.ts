@@ -497,7 +497,7 @@ namespace gdjs {
           );
         }
       } catch (error) {
-        this.onUncaughtException(error);
+        this.onUncaughtException(error as Error);
       }
     }
 

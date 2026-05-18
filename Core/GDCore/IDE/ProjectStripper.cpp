@@ -7,14 +7,24 @@
 
 #include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/IDE/WholeProjectBrowser.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h"
 #include "GDCore/IDE/Events/BehaviorDefaultFlagClearer.h"
+#include "GDCore/Serialization/SerializerElement.h"
 
 namespace gd {
+
+namespace {
+void ClearEditorSettings(gd::EditorSettings &editorSettings) {
+  gd::SerializerElement emptyEditorSettings;
+  editorSettings.UnserializeFrom(emptyEditorSettings);
+}
+}  // namespace
 
 void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project &project) {
   project.GetObjects().GetObjectGroups().Clear();
@@ -26,7 +36,14 @@ void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project &project) {
   wholeProjectBrowser.ExposeObjects(project, behaviorDefaultFlagClearer);
 
   for (unsigned int i = 0; i < project.GetLayoutsCount(); ++i) {
-    project.GetLayout(i).GetEvents().Clear();
+    auto &layout = project.GetLayout(i);
+    layout.GetEvents().Clear();
+    ClearEditorSettings(layout.GetAssociatedEditorSettings());
+  }
+
+  for (unsigned int i = 0; i < project.GetExternalLayoutsCount(); ++i) {
+    ClearEditorSettings(
+        project.GetExternalLayout(i).GetAssociatedEditorSettings());
   }
 
   // Keep:
@@ -58,6 +75,13 @@ void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project &project) {
       auto &eventsBasedObject = eventsBasedObjects.at(objectIndex);
       eventsBasedObject.SetFullName("");
       eventsBasedObject.SetDescription("");
+      ClearEditorSettings(
+          eventsBasedObject.GetDefaultVariant().GetAssociatedEditorSettings());
+      for (auto &&eventsBasedObjectVariant :
+           eventsBasedObject.GetVariants().GetInternalVector()) {
+        ClearEditorSettings(
+            eventsBasedObjectVariant->GetAssociatedEditorSettings());
+      }
       eventsBasedObject.GetEventsFunctions().GetInternalVector().clear();
       eventsBasedObject.GetPropertyDescriptors().GetInternalVector().clear();
     }

@@ -1,11 +1,7 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
-import {
-  serializeToJSObject,
-  serializeToJSON,
-  addFinalNewline,
-} from '../../Utils/Serializer';
+import { serializeToJSObject, addFinalNewline } from '../../Utils/Serializer';
 import { serializeToJSObjectInBackground } from '../../Utils/BackgroundSerializer';
 import {
   type FileMetadata,
@@ -19,6 +15,11 @@ import {
   splitPaths,
   getSlugifiedUniqueNameFromProperty,
 } from '../../Utils/ObjectSplitter';
+import {
+  extractLocalProjectUiSettings,
+  getLocalProjectUiSettingsFilePath,
+  hasLocalProjectUiSettings,
+} from './LocalProjectUiSettings';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import SaveAsOptionsDialog from '../SaveAsOptionsDialog';
@@ -112,6 +113,24 @@ const writeAndCheckFormattedJSONFile = async (
   await writeAndCheckFile(content, filePath);
 };
 
+const writeLocalProjectUiSettings = async (
+  localProjectUiSettings: Object,
+  projectFilePath: string
+): Promise<void> => {
+  const localProjectUiSettingsPath = getLocalProjectUiSettingsFilePath(
+    projectFilePath,
+    path
+  );
+  if (hasLocalProjectUiSettings(localProjectUiSettings)) {
+    await writeAndCheckFormattedJSONFile(
+      localProjectUiSettings,
+      localProjectUiSettingsPath
+    );
+  } else {
+    await fs.remove(localProjectUiSettingsPath);
+  }
+};
+
 const writeProjectFiles = async ({
   project,
   filePath,
@@ -132,6 +151,9 @@ const writeProjectFiles = async ({
     serializedProjectObject = serializeToJSObject(project);
   }
   const serializeEndTime = Date.now();
+  const localProjectUiSettings = extractLocalProjectUiSettings(
+    serializedProjectObject
+  );
 
   if (project.isFolderProject()) {
     const partialObjects = split(serializedProjectObject, {
@@ -145,17 +167,25 @@ const writeProjectFiles = async ({
       isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
     });
 
-    return Promise.all(
-      partialObjects.map(partialObject => {
-        return writeAndCheckFormattedJSONFile(
-          partialObject.object,
-          path.join(projectPath, partialObject.reference) + '.json'
-        ).catch(err => {
-          console.error('Unable to write a partial file:', err);
+    const writePromises = partialObjects.map(partialObject => {
+      return writeAndCheckFormattedJSONFile(
+        partialObject.object,
+        path.join(projectPath, partialObject.reference) + '.json'
+      ).catch(err => {
+        console.error('Unable to write a partial file:', err);
+        throw err;
+      });
+    });
+    writePromises.push(
+      writeLocalProjectUiSettings(localProjectUiSettings, filePath).catch(
+        err => {
+          console.error('Unable to write the local project UI settings:', err);
           throw err;
-        });
-      })
-    ).then(() => {
+        }
+      )
+    );
+
+    return Promise.all(writePromises).then(() => {
       return writeAndCheckFormattedJSONFile(
         serializedProjectObject,
         filePath
@@ -165,6 +195,7 @@ const writeProjectFiles = async ({
       });
     });
   } else {
+    await writeLocalProjectUiSettings(localProjectUiSettings, filePath);
     await writeAndCheckFormattedJSONFile(serializedProjectObject, filePath);
   }
 
@@ -371,12 +402,18 @@ export const onAutoSaveProject = (
   fileMetadata: FileMetadata
 ): Promise<void> => {
   const autoSavePath = fileMetadata.fileIdentifier + '.autosave';
-  return writeAndCheckFile(serializeToJSON(project), autoSavePath).catch(
-    err => {
+  const serializedProjectObject = serializeToJSObject(project);
+  const localProjectUiSettings = extractLocalProjectUiSettings(
+    serializedProjectObject
+  );
+  return writeLocalProjectUiSettings(localProjectUiSettings, autoSavePath)
+    .then(() =>
+      writeAndCheckFormattedJSONFile(serializedProjectObject, autoSavePath)
+    )
+    .catch(err => {
       console.error(`Unable to write ${autoSavePath}:`, err);
       throw err;
-    }
-  );
+    });
 };
 
 export const getWriteErrorMessage = (error: Error): MessageDescriptor =>

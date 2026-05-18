@@ -12,6 +12,7 @@
     "postinstall": "npm run import-zipped-electron-extensions && cd app && npm install && cd .. && npm run copy-electron-remote-to-app-resources",
     "app-build": "node scripts/app-build.js",
     "build": "node scripts/build.js",
+    "build-portable": "node scripts/build-portable.js",
     "format": "prettier --write --ignore-path .gitignore \"**/*.js\"",
     "check-format": "prettier --list-different --ignore-path .gitignore \"**/*.js\"",
     "start": "electron app",

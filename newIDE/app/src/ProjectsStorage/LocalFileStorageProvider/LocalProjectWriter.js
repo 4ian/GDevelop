@@ -117,19 +117,27 @@ const writeProjectFiles = async ({
   filePath,
   projectPath,
   useBackgroundSerializer,
+  canonicalEventSerialization,
 }: {
   project: gdProject,
   filePath: string,
   projectPath: string,
   useBackgroundSerializer: boolean,
+  canonicalEventSerialization: boolean,
 }): Promise<void> => {
   const startTime = Date.now();
 
   let serializedProjectObject;
   if (useBackgroundSerializer) {
+    // Canonical mode is currently not propagated to the background
+    // serializer worker (which uses its own libGD instance). Background
+    // serialization is hardcoded off in MainFrame so this is not
+    // exercised in production yet.
     serializedProjectObject = await serializeToJSObjectInBackground(project);
   } else {
-    serializedProjectObject = serializeToJSObject(project);
+    serializedProjectObject = serializeToJSObject(project, 'serializeTo', {
+      canonicalEventSerialization,
+    });
   }
   const serializeEndTime = Date.now();
 
@@ -224,6 +232,8 @@ export const onSaveProject = async (
     projectPath,
     useBackgroundSerializer:
       !!saveOptions && !!saveOptions.useBackgroundSerializer,
+    canonicalEventSerialization:
+      !!saveOptions && !!saveOptions.canonicalEventSerialization,
   });
   return {
     wasSaved: true,
@@ -358,6 +368,9 @@ export const onSaveProjectAs = async (
     filePath,
     projectPath,
     useBackgroundSerializer: false,
+    // SaveAs is a one-off operation: the user will typically save again
+    // through the normal onSaveProject path, which honors the preference.
+    canonicalEventSerialization: false,
   });
   return {
     wasSaved: true,

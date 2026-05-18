@@ -105,6 +105,7 @@ describe('gdjs.EffectsManager', () => {
       title: '',
       behaviorsSharedData: [],
       objects: [],
+      objectsGroups: [],
       instances: [],
       usedResources: [],
       uiSettings: {

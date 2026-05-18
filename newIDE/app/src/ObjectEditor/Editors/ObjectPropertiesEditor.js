@@ -50,6 +50,7 @@ const ObjectPropertiesEditor = (props: Props): React.Node => {
         .getValue(),
     onUpdateProperty: (object, name, value) =>
       object.updateProperty(name, value),
+    layersContainer: null,
   });
 
   const extraInformation = getExtraObjectsInformation()[

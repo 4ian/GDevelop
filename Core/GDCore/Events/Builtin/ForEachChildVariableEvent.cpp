@@ -20,6 +20,19 @@ ForEachChildVariableEvent::ForEachChildVariableEvent()
       iterableVariableName(""),
       variables(gd::VariablesContainer::SourceType::Local) {}
 
+gd::InstructionsList* ForEachChildVariableEvent::GetInstructionList(
+    const gd::String& label) {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  return nullptr;
+}
+const gd::InstructionsList* ForEachChildVariableEvent::GetInstructionList(
+    const gd::String& label) const {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  return nullptr;
+}
+
 vector<gd::InstructionsList*> ForEachChildVariableEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;
   allConditions.push_back(&conditions);

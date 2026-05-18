@@ -791,6 +791,8 @@ export class gdObject extends EmscriptenObject {
   getAssetStoreId(): string;
   setType(type: string): void;
   getType(): string;
+  setResourcesPreloading(value: string): void;
+  getResourcesPreloading(): string;
   getConfiguration(): ObjectConfiguration;
   getVariables(): VariablesContainer;
   getEffects(): EffectsContainer;
@@ -1454,6 +1456,7 @@ export class AbstractFunctionMetadata extends EmscriptenObject {
   addCodeOnlyParameter(type: string, supplementaryInformation: string): AbstractFunctionMetadata;
   setDefaultValue(defaultValue: string): AbstractFunctionMetadata;
   setParameterLongDescription(longDescription: string): AbstractFunctionMetadata;
+  setParameterHint(hint: string): AbstractFunctionMetadata;
   setParameterExtraInfo(extraInfo: string): AbstractFunctionMetadata;
   setHidden(): AbstractFunctionMetadata;
   setPrivate(): AbstractFunctionMetadata;
@@ -1498,7 +1501,10 @@ export class InstructionMetadata extends AbstractFunctionMetadata {
   addCodeOnlyParameter(type: string, supplementaryInformation: string): InstructionMetadata;
   setDefaultValue(defaultValue: string): InstructionMetadata;
   setParameterLongDescription(longDescription: string): InstructionMetadata;
+  setParameterHint(hint: string): InstructionMetadata;
   setParameterExtraInfo(extraInfo: string): InstructionMetadata;
+  setHint(hint: string): InstructionMetadata;
+  getHint(): string;
   useStandardOperatorParameters(type: string, options: ParameterOptions): InstructionMetadata;
   useStandardRelationalOperatorParameters(type: string, options: ParameterOptions): InstructionMetadata;
   markAsSimple(): InstructionMetadata;
@@ -1546,6 +1552,7 @@ export class ExpressionMetadata extends AbstractFunctionMetadata {
   addCodeOnlyParameter(type: string, supplementaryInformation: string): ExpressionMetadata;
   setDefaultValue(defaultValue: string): ExpressionMetadata;
   setParameterLongDescription(longDescription: string): ExpressionMetadata;
+  setParameterHint(hint: string): ExpressionMetadata;
   setParameterExtraInfo(extraInfo: string): ExpressionMetadata;
   getCodeExtraInformation(): ExpressionMetadata;
   setFunctionName(functionName: string): ExpressionMetadata;
@@ -1561,6 +1568,7 @@ export class MultipleInstructionMetadata extends AbstractFunctionMetadata {
   addCodeOnlyParameter(type: string, supplementaryInformation: string): MultipleInstructionMetadata;
   setDefaultValue(defaultValue: string): MultipleInstructionMetadata;
   setParameterLongDescription(longDescription: string): MultipleInstructionMetadata;
+  setParameterHint(hint: string): MultipleInstructionMetadata;
   setParameterExtraInfo(extraInfo: string): MultipleInstructionMetadata;
   useStandardParameters(type: string, options: ParameterOptions): MultipleInstructionMetadata;
   setHidden(): MultipleInstructionMetadata;
@@ -1614,6 +1622,8 @@ export class ParameterMetadata extends EmscriptenObject {
   setDescription(description_: string): ParameterMetadata;
   getLongDescription(): string;
   setLongDescription(longDescription_: string): ParameterMetadata;
+  getHint(): string;
+  setHint(hint_: string): ParameterMetadata;
   isCodeOnly(): boolean;
   setCodeOnly(codeOnly_: boolean): ParameterMetadata;
   getDefaultValue(): string;
@@ -1917,6 +1927,7 @@ export class BaseEvent extends EmscriptenObject {
   setDisabled(disable: boolean): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
+  getInstructionList(label: string): InstructionsList;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
   getAiGeneratedEventId(): string;
@@ -2308,6 +2319,7 @@ export class ExpressionValidator extends EmscriptenObject {
   constructor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, extraInfo: string);
   getAllErrors(): VectorExpressionParserError;
   getFatalErrors(): VectorExpressionParserError;
+  getDeprecationWarnings(): VectorExpressionParserError;
 }
 
 export class ExpressionCompletionDescription extends EmscriptenObject {

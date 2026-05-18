@@ -61,6 +61,10 @@ import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEdit
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
+import {
+  type Field,
+  type FieldChoices,
+} from '../../PropertiesEditor/PropertiesEditorSchema';
 
 const gd: libGDevelop = global.gd;
 
@@ -219,6 +223,38 @@ export const TopLevelCollapsibleSection = ({
     </Column>
   </>
 );
+
+const resourcesPreloadingFieldChoices: Array<FieldChoices> = [
+  {
+    value: 'with-scene',
+    label: t`Preload with the scene`,
+  },
+  {
+    value: 'manually',
+    label: t`Preload with an action`,
+  },
+];
+const getResourcesPreloadingField = ({ i18n }: {| i18n: I18nType |}): Field => {
+  return {
+    name: 'LoadingSettings',
+    title: i18n._(t`Loading`),
+    type: 'column',
+    children: [
+      {
+        name: 'ResourcesPreloading',
+        getLabel: () => i18n._(t`Resources preloading`),
+        valueType: 'string',
+        getChoices: () => resourcesPreloadingFieldChoices,
+        getValue: ({ object }: { object: gdObject }): string =>
+          object.getResourcesPreloading(),
+        setValue: ({ object }: { object: gdObject }, newValue: string) =>
+          object.setResourcesPreloading(newValue),
+        defaultValue: 'with-scene',
+        visibility: 'advanced',
+      },
+    ],
+  };
+};
 
 type Props = {|
   project: gdProject,
@@ -508,7 +544,7 @@ export const CompactObjectPropertiesEditor = ({
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
       const properties = objectConfigurationAsGd.getProperties();
-      return propertiesMapToSchema({
+      const schema = propertiesMapToSchema({
         properties,
         defaultValueProperties: customObjectEventsBasedObject
           ? customObjectEventsBasedObject.getPropertyDescriptors()
@@ -524,15 +560,24 @@ export const CompactObjectPropertiesEditor = ({
           onObjectsModified([object]);
         },
         object,
+        layersContainer,
         visibility: 'All',
       });
+
+      if (layout && layout.getObjects().hasObjectNamed(object.getName())) {
+        schema.push(getResourcesPreloadingField({ i18n }));
+      }
+      return schema;
     },
     [
       schemaRecomputeTrigger,
       objectConfigurationAsGd,
-      object,
       customObjectEventsBasedObject,
+      object,
+      layersContainer,
+      layout,
       onObjectsModified,
+      i18n,
     ]
   );
 
@@ -781,6 +826,7 @@ export const CompactObjectPropertiesEditor = ({
                           behaviorOverriding={null}
                           initialInstance={null}
                           object={object}
+                          layersContainer={layersContainer}
                           onBehaviorUpdated={() => {}}
                           resourceManagementProps={resourceManagementProps}
                           onOpenFullEditor={() =>

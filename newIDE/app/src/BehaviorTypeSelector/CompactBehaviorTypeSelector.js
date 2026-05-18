@@ -11,6 +11,16 @@ import {
 import CompactPropertiesEditorRowField from '../CompactPropertiesEditor/CompactPropertiesEditorRowField';
 import ListIcon from '../UI/ListIcon';
 import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
+import { LineStackLayout } from '../UI/Layout';
+import IconButton from '../UI/IconButton';
+import OpenIconButton from '../UI/CustomSvgIcons/ShareExternal';
+import { Column } from '../UI/Grid';
+
+export const styles = {
+  icon: {
+    fontSize: 18,
+  },
+};
 
 type Props = {|
   project: gdProject,
@@ -20,6 +30,7 @@ type Props = {|
   disabled?: boolean,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   onFocus?: () => void,
+  onOpenBehaviorTypeDialog: () => void,
 |};
 
 export default function CompactBehaviorTypeSelector({
@@ -30,6 +41,7 @@ export default function CompactBehaviorTypeSelector({
   onChange,
   objectType,
   onFocus,
+  onOpenBehaviorTypeDialog,
 }: Props): React.Node {
   const behaviorMetadataList: Array<EnumeratedBehaviorMetadata> = React.useMemo(
     () =>
@@ -56,42 +68,51 @@ export default function CompactBehaviorTypeSelector({
         <CompactPropertiesEditorRowField
           label={i18n._(t`Behavior type`)}
           field={
-            <CompactSelectField
-              value={value}
-              onChange={value => {
-                onChange(value);
-              }}
-              disabled={disabled}
-              onFocus={onFocus}
-              renderOptionIcon={className =>
-                behaviorMetadata ? (
-                  <ListIcon
-                    src={behaviorMetadata.previewIconUrl}
-                    iconSize={16}
-                    brightness={disabled ? 0.5 : null}
-                  />
-                ) : (
-                  <ExtensionIcon className={className} />
-                )
-              }
-            >
-              {behaviorMetadataList.map(
-                (metadata: EnumeratedBehaviorMetadata) => (
-                  <SelectOption
-                    key={metadata.type}
-                    value={metadata.type}
-                    label={metadata.fullName}
-                    disabled={
-                      metadata.objectType !== '' &&
-                      metadata.objectType !== objectType
-                    }
-                  />
-                )
+            <LineStackLayout alignItems="center" noMargin>
+              <Column noMargin expand noOverflowParent>
+                <CompactSelectField
+                  value={value}
+                  onChange={value => {
+                    onChange(value);
+                  }}
+                  disabled={disabled}
+                  onFocus={onFocus}
+                  renderOptionIcon={className =>
+                    behaviorMetadata ? (
+                      <ListIcon
+                        src={behaviorMetadata.previewIconUrl}
+                        iconSize={16}
+                        brightness={disabled ? 0.5 : null}
+                      />
+                    ) : (
+                      <ExtensionIcon className={className} />
+                    )
+                  }
+                >
+                  {behaviorMetadataList.map(
+                    (metadata: EnumeratedBehaviorMetadata) => (
+                      <SelectOption
+                        key={metadata.type}
+                        value={metadata.type}
+                        label={metadata.fullName}
+                        disabled={
+                          metadata.objectType !== '' &&
+                          metadata.objectType !== objectType
+                        }
+                      />
+                    )
+                  )}
+                  {!valueIsListed && value && (
+                    <SelectOption value={value} label={value} />
+                  )}
+                </CompactSelectField>
+              </Column>
+              {!disabled && (
+                <IconButton size="small" onClick={onOpenBehaviorTypeDialog}>
+                  <OpenIconButton style={styles.icon} />
+                </IconButton>
               )}
-              {!valueIsListed && value && (
-                <SelectOption value={value} label={value} />
-              )}
-            </CompactSelectField>
+            </LineStackLayout>
           }
         />
       )}

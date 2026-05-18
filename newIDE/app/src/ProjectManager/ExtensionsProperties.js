@@ -50,6 +50,7 @@ function ExtensionsProperties(props: Props): React.Node | null {
             .setValue(extension.getName(), propertyName, newValue);
         }
       },
+      layersContainer: null,
     });
 
     propertyList.push(

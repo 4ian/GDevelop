@@ -180,9 +180,13 @@ export const applyVariableChange = ({
     const segment = pathSegments[i];
 
     if (segment.type === 'property') {
-      // Navigate to structure property
+      // Navigate to structure property. Only cast if not already a Structure:
+      // castTo always clears children, even when the type already matches.
       // $FlowFixMe[incompatible-use]
-      variable.castTo('Structure');
+      if (variable.getType() !== gd.Variable.Structure) {
+        // $FlowFixMe[incompatible-use]
+        variable.castTo('Structure');
+      }
       // $FlowFixMe[incompatible-use]
       if (!variable.hasChild(segment.value)) {
         addedNewVariable = true;
@@ -190,10 +194,14 @@ export const applyVariableChange = ({
       // $FlowFixMe[incompatible-use]
       variable = variable.getChild(segment.value);
     } else if (segment.type === 'index') {
-      // Navigate to array element
+      // Navigate to array element. Only cast if not already an Array:
+      // castTo always clears children, even when the type already matches.
       const index = parseInt(segment.value, 10);
       // $FlowFixMe[incompatible-use]
-      variable.castTo('Array');
+      if (variable.getType() !== gd.Variable.Array) {
+        // $FlowFixMe[incompatible-use]
+        variable.castTo('Array');
+      }
 
       // Ensure array has enough elements
       // $FlowFixMe[incompatible-use]

@@ -3,8 +3,8 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import EventsBasedBehaviorEditor from './EventsBasedBehaviorEditor';
 import {
-  EventsBasedBehaviorPropertiesEditor,
-  type EventsBasedBehaviorPropertiesEditorInterface,
+  EventsBasedBehaviorOrObjectPropertiesEditor,
+  type EventsBasedBehaviorOrObjectPropertiesEditorInterface,
 } from './EventsBasedBehaviorOrObjectPropertiesEditor';
 import Background from '../../UI/Background';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
@@ -40,6 +40,8 @@ type Props = {|
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 export type EventsBasedBehaviorOrObjectEditorInterface = {|
@@ -69,6 +71,8 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
       onFocusProperty,
       onOpenCustomObjectEditor,
       onEventsBasedObjectChildrenEdited,
+      onWillInstallExtension,
+      onExtensionInstalled,
     }: Props,
     ref
   ) => {
@@ -85,10 +89,10 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
     );
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
-    const propertiesEditor = React.useRef<?EventsBasedBehaviorPropertiesEditorInterface>(
+    const propertiesEditor = React.useRef<?EventsBasedBehaviorOrObjectPropertiesEditorInterface>(
       null
     );
-    const scenePropertiesEditor = React.useRef<?EventsBasedBehaviorPropertiesEditorInterface>(
+    const scenePropertiesEditor = React.useRef<?EventsBasedBehaviorOrObjectPropertiesEditorInterface>(
       null
     );
 
@@ -204,7 +208,7 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
                   )}
                 </Text>
                 {eventsBasedEntity && (
-                  <EventsBasedBehaviorPropertiesEditor
+                  <EventsBasedBehaviorOrObjectPropertiesEditor
                     ref={propertiesEditor}
                     project={project}
                     projectScopedContainersAccessor={
@@ -226,6 +230,8 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
                     }
                     onPropertyTypeChanged={onPropertyTypeChanged}
                     onEventsFunctionsAdded={onEventsFunctionsAdded}
+                    onWillInstallExtension={onWillInstallExtension}
+                    onExtensionInstalled={onExtensionInstalled}
                   />
                 )}
                 {eventsBasedBehavior && (
@@ -234,7 +240,7 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
                   </Text>
                 )}
                 {eventsBasedBehavior && (
-                  <EventsBasedBehaviorPropertiesEditor
+                  <EventsBasedBehaviorOrObjectPropertiesEditor
                     ref={scenePropertiesEditor}
                     isSharedProperties
                     project={project}
@@ -257,6 +263,8 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
                     }
                     onPropertyTypeChanged={onPropertyTypeChanged}
                     onEventsFunctionsAdded={onEventsFunctionsAdded}
+                    onWillInstallExtension={onWillInstallExtension}
+                    onExtensionInstalled={onExtensionInstalled}
                   />
                 )}
               </ColumnStackLayout>

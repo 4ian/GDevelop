@@ -1,7 +1,7 @@
 // @flow
 import { fakeAssetShortHeader1 } from '../fixtures/GDevelopServicesTestData';
 import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
-import { getObjectSizeInfo } from './Utils';
+import { getObjectSizeInfo, getObjectSizeInfoHints } from './Utils';
 
 const gd: libGDevelop = global.gd;
 
@@ -42,13 +42,13 @@ describe('getObjectSizeInfo', () => {
       ).toEqual({
         width: 100,
         height: 240,
-        depth: 0,
+        depth: null,
         originX: 10,
         originY: 20,
-        originZ: 0,
+        originZ: null,
         centerX: 50,
         centerY: 120,
-        centerZ: 0,
+        centerZ: null,
       });
     });
 
@@ -76,13 +76,13 @@ describe('getObjectSizeInfo', () => {
       ).toEqual({
         width: 100,
         height: 240,
-        depth: 0,
+        depth: null,
         originX: 0,
         originY: 0,
-        originZ: 0,
+        originZ: null,
         centerX: 40,
         centerY: 80,
-        centerZ: 0,
+        centerZ: null,
       });
     });
 
@@ -108,17 +108,17 @@ describe('getObjectSizeInfo', () => {
       ).toEqual({
         width: 100,
         height: 240,
-        depth: 0,
+        depth: null,
         originX: 0,
         originY: 0,
-        originZ: 0,
+        originZ: null,
         centerX: 50,
         centerY: 120,
-        centerZ: 0,
+        centerZ: null,
       });
     });
 
-    it('returns 0 dimensions when texture is not valid/loaded', () => {
+    it('returns null when texture is not valid/loaded', () => {
       const objects = project.getObjects();
       const object = objects.insertNewObject(
         project,
@@ -136,17 +136,7 @@ describe('getObjectSizeInfo', () => {
 
       expect(
         getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
-      ).toEqual({
-        width: 0,
-        height: 0,
-        depth: 0,
-        originX: 0,
-        originY: 0,
-        originZ: 0,
-        centerX: 0,
-        centerY: 0,
-        centerZ: 0,
-      });
+      ).toEqual(null);
     });
 
     it('uses assetShortHeader dimensions when provided (asset store case)', () => {
@@ -175,13 +165,13 @@ describe('getObjectSizeInfo', () => {
       ).toEqual({
         width: 200,
         height: 300,
-        depth: 0,
+        depth: null,
         originX: 0,
         originY: 0,
-        originZ: 0,
+        originZ: null,
         centerX: 100,
         centerY: 150,
-        centerZ: 0,
+        centerZ: null,
       });
     });
 
@@ -196,17 +186,7 @@ describe('getObjectSizeInfo', () => {
 
       expect(
         getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
-      ).toEqual({
-        width: 0,
-        height: 0,
-        depth: 0,
-        originX: 0,
-        originY: 0,
-        originZ: 0,
-        centerX: 0,
-        centerY: 0,
-        centerZ: 0,
-      });
+      ).toEqual(null);
     });
   });
 
@@ -228,13 +208,13 @@ describe('getObjectSizeInfo', () => {
       ).toEqual({
         width: 200,
         height: 150,
-        depth: 0,
+        depth: null,
         originX: 0,
         originY: 0,
-        originZ: 0,
+        originZ: null,
         centerX: 100,
         centerY: 75,
-        centerZ: 0,
+        centerZ: null,
       });
     });
   });
@@ -257,13 +237,13 @@ describe('getObjectSizeInfo', () => {
       ).toEqual({
         width: 120,
         height: 390,
-        depth: 0,
+        depth: null,
         originX: 0,
         originY: 0,
-        originZ: 0,
+        originZ: null,
         centerX: 60,
         centerY: 195,
-        centerZ: 0,
+        centerZ: null,
       });
     });
   });
@@ -292,13 +272,13 @@ describe('getObjectSizeInfo', () => {
       ).toEqual({
         width: 100,
         height: 80,
-        depth: 0,
+        depth: null,
         originX: 0,
         originY: 0,
-        originZ: 0,
+        originZ: null,
         centerX: 50,
         centerY: 40,
-        centerZ: 0,
+        centerZ: null,
       });
     });
 
@@ -323,13 +303,13 @@ describe('getObjectSizeInfo', () => {
       expect(getObjectSizeInfo(object, project, null)).toEqual({
         width: 100,
         height: 60,
-        depth: 0,
+        depth: null,
         originX: 10,
         originY: 20,
-        originZ: 0,
+        originZ: null,
         centerX: 50,
         centerY: 30,
-        centerZ: 0,
+        centerZ: null,
       });
     });
 
@@ -370,13 +350,13 @@ describe('getObjectSizeInfo', () => {
       ).toEqual({
         width: 50,
         height: 40,
-        depth: 0,
+        depth: null,
         originX: 5,
         originY: 10,
-        originZ: 0,
+        originZ: null,
         centerX: 25,
         centerY: 20,
-        centerZ: 0,
+        centerZ: null,
       });
     });
 
@@ -417,8 +397,34 @@ describe('getObjectSizeInfo', () => {
     });
   });
 
-  describe('Unsupported object type', () => {
-    it('returns 0 dimensions for unknown types', () => {
+  describe('TextInput::TextInputObject', () => {
+    it('returns the default 300x30 size with centered center point', () => {
+      const objects = project.getObjects();
+      const object = objects.insertNewObject(
+        project,
+        'TextInput::TextInputObject',
+        'MyTextInput',
+        objects.getObjectsCount()
+      );
+
+      expect(
+        getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
+      ).toEqual({
+        width: 300,
+        height: 30,
+        depth: null,
+        originX: 0,
+        originY: 0,
+        originZ: null,
+        centerX: 150,
+        centerY: 15,
+        centerZ: null,
+      });
+    });
+  });
+
+  describe('TextObject::Text', () => {
+    it('returns a top-left origin with null width/height (no intrinsic size)', () => {
       const objects = project.getObjects();
       const object = objects.insertNewObject(
         project,
@@ -430,16 +436,102 @@ describe('getObjectSizeInfo', () => {
       expect(
         getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
       ).toEqual({
-        width: 0,
-        height: 0,
-        depth: 0,
+        width: null,
+        height: null,
+        depth: null,
         originX: 0,
         originY: 0,
-        originZ: 0,
-        centerX: 0,
-        centerY: 0,
-        centerZ: 0,
+        originZ: null,
+        centerX: null,
+        centerY: null,
+        centerZ: null,
       });
     });
+  });
+});
+
+describe('getObjectSizeInfoHints', () => {
+  it('returns no hint when all known objects have an intrinsic size', () => {
+    expect(
+      getObjectSizeInfoHints({
+        Player: {
+          width: 64,
+          height: 64,
+          depth: null,
+          originX: 0,
+          originY: 0,
+          originZ: null,
+          centerX: 32,
+          centerY: 32,
+          centerZ: null,
+        },
+      })
+    ).toEqual([]);
+  });
+
+  it('returns no hint when objectSizeInfo for an object is null (unknown)', () => {
+    expect(getObjectSizeInfoHints({ Mystery: null })).toEqual([]);
+  });
+
+  it('returns a structured no-intrinsic-size hint when an object has null width/height (e.g. TextObject)', () => {
+    const hints = getObjectSizeInfoHints({
+      Title: {
+        width: null,
+        height: null,
+        depth: null,
+        originX: 0,
+        originY: 0,
+        originZ: null,
+        centerX: null,
+        centerY: null,
+        centerZ: null,
+      },
+    });
+    expect(hints).toHaveLength(1);
+    expect(hints[0].code).toBe('no-intrinsic-size');
+    expect(hints[0].objectNames).toEqual(['Title']);
+    expect(hints[0].message).toMatch(/no intrinsic size/);
+    expect(hints[0].message).toMatch(/instances_size/);
+  });
+
+  it('groups all unsized objects into a single hint entry (so the wrap-up can merge them)', () => {
+    const hints = getObjectSizeInfoHints({
+      Title: {
+        width: null,
+        height: null,
+        depth: null,
+        originX: 0,
+        originY: 0,
+        originZ: null,
+        centerX: null,
+        centerY: null,
+        centerZ: null,
+      },
+      Subtitle: {
+        width: null,
+        height: null,
+        depth: null,
+        originX: 0,
+        originY: 0,
+        originZ: null,
+        centerX: null,
+        centerY: null,
+        centerZ: null,
+      },
+      Player: {
+        width: 64,
+        height: 64,
+        depth: null,
+        originX: 0,
+        originY: 0,
+        originZ: null,
+        centerX: 32,
+        centerY: 32,
+        centerZ: null,
+      },
+    });
+    expect(hints).toHaveLength(1);
+    expect(hints[0].code).toBe('no-intrinsic-size');
+    expect(hints[0].objectNames).toEqual(['Title', 'Subtitle']);
   });
 });

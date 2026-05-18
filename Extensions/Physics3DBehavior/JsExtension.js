@@ -2226,7 +2226,17 @@ module.exports = {
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
         .addParameter('expression', _('Stick angle (in degrees)'))
+        .setParameterLongDescription(
+          _(
+            'A stick angle for a 3D Physics character of 0° means the object will move to the right, 90° backward and -90° (or 270°) forward.'
+          )
+        )
         .addParameter('expression', _('Stick force (between 0 and 1)'))
+        .setHint(
+          _(
+            "Simulating a stick control is usually used for connecting gamepads. For NPCs, it's usually better to rotate them toward target & simulate forward key instead."
+          )
+        )
         .markAsAdvanced()
         .setFunctionName('simulateStick');
 

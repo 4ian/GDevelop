@@ -79,7 +79,7 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectCompleteCode(
                   *eventsFunction,
                   methodCodeNamespace,
                   methodFullyQualifiedName,
-                  "that._onceTriggers",
+                  "runtimeScene.getOnceTriggers()",
                   functionName == doStepPreEventsFunctionName
                       ? GenerateDoStepPreEventsPreludeCode(eventsBasedObject)
                       : "",
@@ -208,7 +208,6 @@ CODE_NAMESPACE.RUNTIME_OBJECT_CLASSNAME = class RUNTIME_OBJECT_CLASSNAME extends
     super(parentInstanceContainer, objectData, instanceData);
     this._parentInstanceContainer = parentInstanceContainer;
 
-    this._onceTriggers = new gdjs.OnceTriggers();
     this._objectData = {};
     INITIALIZE_PROPERTIES_CODE
     INITIALIZE_ANIMATABLE_CODE
@@ -360,7 +359,7 @@ CODE_NAMESPACE.RUNTIME_OBJECT_CLASSNAME.prototype.doStepPreEvents = function() {
 gd::String ObjectCodeGenerator::GenerateDoStepPreEventsPreludeCode(
     const gd::EventsBasedObject& eventsBasedObject) {
   gd::String doStepPreEventsPreludeCode;
-  doStepPreEventsPreludeCode += "this._onceTriggers.startNewFrame();";
+  doStepPreEventsPreludeCode += "this._instanceContainer.getOnceTriggers().startNewFrame();";
   if (eventsBasedObject.IsAnimatable()) {
     doStepPreEventsPreludeCode +=
         "\nthis._animator.step(this.getElapsedTime() / 1000);";

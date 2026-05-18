@@ -19,6 +19,18 @@ RepeatEvent::RepeatEvent()
       variables(gd::VariablesContainer::SourceType::Local),
       repeatNumberExpressionSelected(false) {}
 
+gd::InstructionsList* RepeatEvent::GetInstructionList(const gd::String& label) {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  return nullptr;
+}
+const gd::InstructionsList* RepeatEvent::GetInstructionList(
+    const gd::String& label) const {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  return nullptr;
+}
+
 vector<gd::InstructionsList*> RepeatEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;
   allConditions.push_back(&conditions);

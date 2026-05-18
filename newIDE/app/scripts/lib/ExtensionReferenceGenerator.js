@@ -393,6 +393,10 @@ const generateInstructionReferenceRowsText = ({
 }) => {
   const paramPadding = '    ';
   const codeOnlyParametersIndexes = [];
+  /** @type {Set<string>} */
+  const hints = new Set();
+  const instructionHint = instructionMetadata.getHint();
+  if (instructionHint) hints.add(instructionHint);
   let parametersList = mapFor(
     0,
     instructionMetadata.getParameters().getParametersCount(),
@@ -414,6 +418,9 @@ const generateInstructionReferenceRowsText = ({
       const humanReadableTypeDesc = translateTypeToHumanReadableDescription(
         type
       );
+
+      const parameterHint = parameterMetadata.getHint();
+      if (parameterHint) hints.add(parameterHint);
 
       if (parameterMetadata.isCodeOnly()) {
         codeOnlyParametersIndexes.push(index);
@@ -467,6 +474,21 @@ const generateInstructionReferenceRowsText = ({
       isCondition ? 'condition' : 'action'
     } internal type (in GDevelop JSON) is \`${instructionType}\`.`;
 
+  const hintsBlock =
+    hints.size > 0
+      ? [
+          '??? tip "Hints and advice"',
+          '',
+          ...Array.from(hints, hint =>
+            hint
+              .split('\n')
+              .map(line => `${paramPadding}${line}`)
+              .join('\n')
+          ),
+          '',
+        ]
+      : [];
+
   return {
     orderKey: instructionType,
     text: [
@@ -476,6 +498,7 @@ const generateInstructionReferenceRowsText = ({
       ...(parametersList
         ? ['??? quote "See parameters & details"', '', parametersList, '']
         : []),
+      ...hintsBlock,
     ].join('\n'),
   };
 };

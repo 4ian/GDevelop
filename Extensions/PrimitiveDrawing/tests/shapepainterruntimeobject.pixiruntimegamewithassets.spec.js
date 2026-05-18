@@ -47,6 +47,7 @@ describe('gdjs.ShapePainterRuntimeObject (using a PixiJS RuntimeGame with assets
         title: '',
         behaviorsSharedData: [],
         objects: [],
+        objectsGroups: [],
         instances: [],
         variables: [],
         usedResources: [],

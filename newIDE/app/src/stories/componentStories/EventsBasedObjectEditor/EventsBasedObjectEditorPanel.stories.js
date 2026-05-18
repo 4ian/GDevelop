@@ -33,6 +33,8 @@ export const Default = (): React.Node => (
       onFocusProperty={action('onFocusProperty')}
       onPropertiesUpdated={action('onPropertiesUpdated')}
       onRenameSharedProperty={action('onRenameSharedProperty')}
+      onWillInstallExtension={action('onWillInstallExtension')}
+      onExtensionInstalled={action('onExtensionInstalled')}
     />
   </DragAndDropContextProvider>
 );

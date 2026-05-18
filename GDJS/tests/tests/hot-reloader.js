@@ -182,6 +182,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
       objects: objects || [
         createSpriteData({ name: 'MyObject', image: 'ResourceA' }),
       ],
+      objectsGroups: [],
       instances: instances
         ? instances.map((instance) => ({ ...defaultInstance, ...instance }))
         : [],
@@ -221,6 +222,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
       objects: objects || [
         createSpriteData({ name: 'MyChildObject', image: 'ResourceA' }),
       ],
+        objectsGroups: [],
       layers: [baseLayer],
       areaMinX: 0,
       areaMinY: 0,

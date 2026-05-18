@@ -80,6 +80,10 @@ export class DebuggerEditorContainer extends React.Component<
     // No thing to be done.
   }
 
+  selectAllInsideEditor() {
+    // No thing to be done.
+  }
+
   notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
     setEditorHotReloadNeeded(hotReloadSteps);
   }

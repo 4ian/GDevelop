@@ -5,7 +5,9 @@ import { I18n } from '@lingui/react';
 import * as React from 'react';
 import ObjectGroupsListWithObjectGroupEditor from '../../ObjectGroupsList/ObjectGroupsListWithObjectGroupEditor';
 import { Tabs } from '../../UI/Tabs';
-import { CompactEventsFunctionParametersEditor } from './CompactEventsFunctionParametersEditor';
+import CompactEventsFunctionParametersEditor, {
+  type CompactEventsFunctionParametersEditorInterface,
+} from './CompactEventsFunctionParametersEditor';
 import { CompactEventsFunctionPropertiesEditor } from './CompactEventsFunctionPropertiesEditor';
 import { Column, Line } from '../../UI/Grid';
 import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
@@ -13,8 +15,14 @@ import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 
 const gd: libGDevelop = global.gd;
+
+export type EventsFunctionConfigurationEditorInterface = {
+  editEventsFunctionParameter: VariableDialogOpeningProps => void,
+};
 
 type Props = {|
   project: gdProject,
@@ -62,84 +70,18 @@ type Props = {|
   ) => void,
   unsavedChanges?: ?UnsavedChanges,
   getFunctionGroupNames?: () => string[],
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 type TabNames = 'config' | 'parameters' | 'groups';
 
-type State = {|
-  currentTab: TabNames,
-|};
-
-export default class EventsFunctionConfigurationEditor extends React.Component<
-  Props,
-  State
-> {
-  // $FlowFixMe[missing-local-annot]
-  state = {
-    currentTab: 'config',
-  };
-
-  _getValidatedObjectOrGroupName = (newName: string): any => {
-    const { projectScopedContainersAccessor } = this.props;
-    const objectsContainersList = projectScopedContainersAccessor
-      .get()
-      .getObjectsContainersList();
-
-    const safeAndUniqueNewName = newNameGenerator(
-      gd.Project.getSafeName(newName),
-      tentativeNewName =>
-        objectsContainersList.hasObjectOrGroupNamed(tentativeNewName)
-    );
-
-    return safeAndUniqueNewName;
-  };
-
-  _onDeleteGroup = (
-    groupWithContext: GroupWithContext,
-    done: boolean => void
-  ) => {
-    done(true);
-  };
-
-  _onRenameGroup = (
-    groupWithContext: GroupWithContext,
-    newName: string,
-    done: boolean => void
-  ) => {
-    const { group } = groupWithContext;
-    const {
-      project,
-      projectScopedContainersAccessor,
-      eventsFunction,
-      objectsContainer,
-    } = this.props;
-
-    // newName is supposed to have been already validated
-
-    // Avoid triggering renaming refactoring if name has not really changed
-    if (group.getName() !== newName) {
-      gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsFunction(
-        project,
-        projectScopedContainersAccessor.get(),
-        eventsFunction,
-        // This is the ObjectsContainer generated from parameters
-        objectsContainer,
-        group.getName(),
-        newName,
-        /* isObjectGroup=*/ true
-      );
-    }
-
-    done(true);
-  };
-
-  _chooseTab = (currentTab: TabNames): any =>
-    this.setState({
-      currentTab,
-    });
-
-  render(): any {
-    const {
+const EventsFunctionConfigurationEditor: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<EventsFunctionConfigurationEditorInterface>,
+}> = React.forwardRef<Props, EventsFunctionConfigurationEditorInterface>(
+  (
+    {
       project,
       projectScopedContainersAccessor,
       globalObjectsContainer,
@@ -147,20 +89,87 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       eventsFunction,
       eventsBasedBehavior,
       eventsBasedObject,
-      freezeEventsFunctionType,
-      onConfigurationUpdated,
+      eventsFunctionsContainer,
+      eventsFunctionsExtension,
       onParametersOrGroupsUpdated,
-      freezeParameters,
       helpPagePath,
+      onConfigurationUpdated,
+      freezeParameters,
+      freezeEventsFunctionType,
       onMoveFreeEventsParameter,
       onMoveBehaviorEventsParameter,
       onMoveObjectEventsParameter,
-      getFunctionGroupNames,
-      eventsFunctionsContainer,
-      eventsFunctionsExtension,
       onFunctionParameterWillBeRenamed,
       onFunctionParameterTypeChanged,
-    } = this.props;
+      unsavedChanges,
+      getFunctionGroupNames,
+      onWillInstallExtension,
+      onExtensionInstalled,
+    },
+    ref
+  ) => {
+    const forceUpdate = useForceUpdate();
+    const [currentTab, setCurrentTab] = React.useState<TabNames>('config');
+    const parametersEditor = React.useRef<?CompactEventsFunctionParametersEditorInterface>(
+      null
+    );
+
+    React.useImperativeHandle(ref, () => ({
+      editEventsFunctionParameter: (props: VariableDialogOpeningProps) => {
+        if (parametersEditor.current) {
+          parametersEditor.current.editEventsFunctionParameter(props);
+        }
+      },
+    }));
+
+    const _getValidatedObjectOrGroupName = (newName: string): any => {
+      const objectsContainersList = projectScopedContainersAccessor
+        .get()
+        .getObjectsContainersList();
+
+      const safeAndUniqueNewName = newNameGenerator(
+        gd.Project.getSafeName(newName),
+        tentativeNewName =>
+          objectsContainersList.hasObjectOrGroupNamed(tentativeNewName)
+      );
+
+      return safeAndUniqueNewName;
+    };
+
+    const _onDeleteGroup = (
+      groupWithContext: GroupWithContext,
+      done: boolean => void
+    ) => {
+      done(true);
+    };
+
+    const _onRenameGroup = (
+      groupWithContext: GroupWithContext,
+      newName: string,
+      done: boolean => void
+    ) => {
+      const { group } = groupWithContext;
+
+      // newName is supposed to have been already validated
+
+      // Avoid triggering renaming refactoring if name has not really changed
+      if (group.getName() !== newName) {
+        gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsFunction(
+          project,
+          projectScopedContainersAccessor.get(),
+          eventsFunction,
+          // This is the ObjectsContainer generated from parameters
+          objectsContainer,
+          group.getName(),
+          newName,
+          /* isObjectGroup=*/ true
+        );
+      }
+
+      done(true);
+    };
+
+    const _chooseTab = (currentTab: TabNames): any => setCurrentTab(currentTab);
 
     const hasLegacyFunctionObjectGroups =
       eventsFunction.getObjectGroups().count() > 0;
@@ -173,8 +182,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
               <Line>
                 <Column noMargin expand noOverflowParent>
                   <Tabs
-                    value={this.state.currentTab}
-                    onChange={this._chooseTab}
+                    value={currentTab}
+                    onChange={_chooseTab}
                     options={[
                       {
                         value: ('config': TabNames),
@@ -189,8 +198,9 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 </Column>
               </Line>
             ) : null}
-            {this.state.currentTab === 'config' ? (
+            {currentTab === 'config' ? (
               <CompactEventsFunctionParametersEditor
+                ref={parametersEditor}
                 project={project}
                 projectScopedContainersAccessor={
                   projectScopedContainersAccessor
@@ -210,6 +220,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                   onFunctionParameterWillBeRenamed
                 }
                 onFunctionParameterTypeChanged={onFunctionParameterTypeChanged}
+                onWillInstallExtension={onWillInstallExtension}
+                onExtensionInstalled={onExtensionInstalled}
                 key={eventsFunction ? eventsFunction.ptr : null}
               >
                 <CompactEventsFunctionPropertiesEditor
@@ -226,14 +238,14 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                         extensionItemConfigurationAttribute
                       );
                     // A function configuration change may impact the parameters.
-                    this.forceUpdate();
+                    forceUpdate();
                   }}
                   freezeEventsFunctionType={freezeEventsFunctionType}
                   getFunctionGroupNames={getFunctionGroupNames}
                 />
               </CompactEventsFunctionParametersEditor>
             ) : null}
-            {this.state.currentTab === 'groups' ? (
+            {currentTab === 'groups' ? (
               <ObjectGroupsListWithObjectGroupEditor
                 project={project}
                 projectScopedContainersAccessor={
@@ -243,14 +255,12 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 objectsContainer={objectsContainer}
                 globalObjectGroups={null}
                 objectGroups={eventsFunction.getObjectGroups()}
-                getValidatedObjectOrGroupName={
-                  this._getValidatedObjectOrGroupName
-                }
-                onRenameGroup={this._onRenameGroup}
-                onDeleteGroup={this._onDeleteGroup}
+                getValidatedObjectOrGroupName={_getValidatedObjectOrGroupName}
+                onRenameGroup={_onRenameGroup}
+                onDeleteGroup={_onDeleteGroup}
                 onGroupsUpdated={onParametersOrGroupsUpdated}
                 canSetAsGlobalGroup={false}
-                unsavedChanges={this.props.unsavedChanges}
+                unsavedChanges={unsavedChanges}
               />
             ) : null}
           </Column>
@@ -258,4 +268,6 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       </I18n>
     );
   }
-}
+);
+
+export default EventsFunctionConfigurationEditor;

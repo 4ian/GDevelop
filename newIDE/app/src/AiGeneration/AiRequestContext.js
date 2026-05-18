@@ -456,7 +456,7 @@ export type ActiveSubAgent = {|
   callId: string,
 |};
 
-type AiRequestContextState = {|
+export type AiRequestContextState = {|
   aiRequestStorage: AiRequestStorage,
   aiRequestHistory: AiRequestHistory,
   editorFunctionCallResultsStorage: EditorFunctionCallResultsStorage,

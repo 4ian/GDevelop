@@ -312,30 +312,30 @@ namespace gdjs {
     collisionChecker: gdjs.Physics3DRuntimeBehavior.CollisionChecker;
     owner3D: gdjs.RuntimeObject3D;
 
-    bodyType: string;
-    bullet: boolean;
-    fixedRotation: boolean;
-    _shape: string;
-    private meshShapeResourceName: string;
-    private shapeOrientation: string;
-    private shapeDimensionA: float;
-    private shapeDimensionB: float;
-    private shapeDimensionC: float;
-    private shapeOffsetX: float;
-    private shapeOffsetY: float;
-    shapeOffsetZ: float;
-    private massCenterOffsetX: float;
-    private massCenterOffsetY: float;
-    private massCenterOffsetZ: float;
-    private density: float;
-    massOverride: float;
-    friction: float;
-    restitution: float;
-    linearDamping: float;
-    angularDamping: float;
-    gravityScale: float;
-    private layers: integer;
-    private masks: integer;
+    bodyType!: string;
+    bullet!: boolean;
+    fixedRotation!: boolean;
+    _shape!: string;
+    private meshShapeResourceName!: string;
+    private shapeOrientation!: string;
+    private shapeDimensionA!: float;
+    private shapeDimensionB!: float;
+    private shapeDimensionC!: float;
+    private shapeOffsetX!: float;
+    private shapeOffsetY!: float;
+    shapeOffsetZ!: float;
+    private massCenterOffsetX!: float;
+    private massCenterOffsetY!: float;
+    private massCenterOffsetZ!: float;
+    private density!: float;
+    massOverride!: float;
+    friction!: float;
+    restitution!: float;
+    linearDamping!: float;
+    angularDamping!: float;
+    gravityScale!: float;
+    private layers!: integer;
+    private masks!: integer;
     shapeScale: number = 1;
 
     /**
@@ -433,59 +433,6 @@ namespace gdjs {
       const tempQuat = this._sharedData._tempQuat;
       tempQuat.Set(x, y, z, w);
       return tempQuat;
-    }
-
-    override applyBehaviorOverriding(behaviorData): boolean {
-      if (behaviorData.bullet !== undefined) {
-        this.setBullet(behaviorData.bullet);
-      }
-      if (behaviorData.fixedRotation !== undefined) {
-        this.setFixedRotation(behaviorData.fixedRotation);
-      }
-      if (behaviorData.shapeDimensionA !== undefined) {
-        this.shapeDimensionA = behaviorData.shapeDimensionA;
-        this._needToRecreateShape = true;
-      }
-      if (behaviorData.shapeDimensionB !== undefined) {
-        this.shapeDimensionB = behaviorData.shapeDimensionB;
-        this._needToRecreateShape = true;
-      }
-      if (behaviorData.density !== undefined) {
-        this.setDensity(behaviorData.density);
-      }
-      if (behaviorData.friction !== undefined) {
-        this.setFriction(behaviorData.friction);
-      }
-      if (behaviorData.restitution !== undefined) {
-        this.setRestitution(behaviorData.restitution);
-      }
-      if (behaviorData.linearDamping !== undefined) {
-        this.setLinearDamping(behaviorData.linearDamping);
-      }
-      if (behaviorData.angularDamping !== undefined) {
-        this.setAngularDamping(behaviorData.angularDamping);
-      }
-      if (behaviorData.gravityScale !== undefined) {
-        this.setGravityScale(behaviorData.gravityScale);
-      }
-
-      // TODO: make these properties updatable.
-      if (behaviorData.layers !== undefined) {
-        return false;
-      }
-      if (behaviorData.masks !== undefined) {
-        return false;
-      }
-      if (behaviorData.vertices !== undefined) {
-        return false;
-      }
-      if (behaviorData.bodyType !== undefined) {
-        return false;
-      }
-      if (behaviorData.shape !== undefined) {
-        return false;
-      }
-      return true;
     }
 
     override getNetworkSyncData(

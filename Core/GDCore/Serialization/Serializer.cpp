@@ -24,7 +24,7 @@ using namespace rapidjson;
 
 namespace gd {
 
-bool Serializer::s_canonicalMode = false;
+bool Serializer::canonicalMode = false;
 
 gd::String Serializer::ToEscapedXMLString(const gd::String& str) {
   return str.FindAndReplace("&", "&amp;")
@@ -108,34 +108,39 @@ void ElementToRapidJson(const gd::SerializerElement& element,
       //
       // Children with the same name (rare, but allowed) keep their
       // relative insertion order thanks to std::multimap stability.
+      //
+      // Exactly one of attributeValue / childElement is non-null per
+      // entry; we discriminate on which pointer is set.
       struct Entry {
-        bool isAttribute;
-        const SerializerValue* attributeValue;     // valid if isAttribute
-        const gd::SerializerElement* childElement; // valid if !isAttribute
+        const SerializerValue* attributeValue;
+        const gd::SerializerElement* childElement;
       };
       std::multimap<gd::String, Entry> sortedEntries;
 
       for (const auto& attribute : attributes) {
         sortedEntries.emplace(
             attribute.first,
-            Entry{true, &attribute.second, nullptr});
+            Entry{&attribute.second, nullptr});
       }
       for (const auto& child : children) {
         sortedEntries.emplace(
             child.first,
-            Entry{false, nullptr, child.second.get()});
+            Entry{nullptr, child.second.get()});
       }
 
       for (const auto& entry : sortedEntries) {
         Value name(entry.first.c_str(), allocator);
         Value childValue;
-        if (entry.second.isAttribute) {
+        if (entry.second.attributeValue != nullptr) {
           // Implicit conversion SerializerValue -> SerializerElement.
           ElementToRapidJson(
               *entry.second.attributeValue, childValue, allocator);
-        } else {
+        } else if (entry.second.childElement != nullptr) {
           ElementToRapidJson(
               *entry.second.childElement, childValue, allocator);
+        } else {
+          // Defensive: skip malformed entries instead of dereferencing null.
+          continue;
         }
         value.AddMember(name, childValue, allocator);
       }

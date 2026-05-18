@@ -134,6 +134,7 @@ import { findEventByPath } from '../Utils/EventsValidationScanner';
 import type { SearchFilterParams } from '../Utils/Search';
 import type { InitialSearchFilterParams } from './SearchPanel';
 import { isNullPtr } from '../Utils/IsNullPtr';
+import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -193,6 +194,7 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  editEventsFunctionParameter: VariableDialogOpeningProps => void,
 |};
 
 type ComponentProps = {|
@@ -2514,6 +2516,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             }}
             onWillInstallExtension={this.props.onWillInstallExtension}
             onExtensionInstalled={this.props.onExtensionInstalled}
+            editEventsFunctionParameter={this.props.editEventsFunctionParameter}
           />
         )}
       </I18n>
@@ -2596,6 +2599,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       windowSize,
       screenType,
       highlightedAiGeneratedEventIds,
+      editEventsFunctionParameter,
     } = this.props;
     if (!project) return null;
 
@@ -2929,6 +2933,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       this._searchPanel.markSearchResultsDirty();
                   }}
                   resourceManagementProps={resourceManagementProps}
+                  editEventsFunctionParameter={editEventsFunctionParameter}
                 />
                 <ContextMenu
                   ref={eventContextMenu =>
@@ -3009,12 +3014,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               }
             }}
             variablesContainer={this.state.editedVariable.variablesContainer}
-            initiallySelectedVariableName={
-              this.state.editedVariable.variableName
-            }
-            shouldCreateInitiallySelectedVariable={
-              this.state.editedVariable.shouldCreateVariable
-            }
+            initiallySelectedVariable={this.state.editedVariable}
             isListLocked={false}
             loopIndexVariableName={
               editedVariableLoopEvent
@@ -3045,6 +3045,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             onApply={() => this.editLayoutVariables(false)}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             isListLocked={false}
+            initiallySelectedVariable={null}
           />
         )}
         {this.state.textEditedEvent && (

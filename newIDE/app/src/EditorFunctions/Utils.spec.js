@@ -1,7 +1,7 @@
 // @flow
 import { fakeAssetShortHeader1 } from '../fixtures/GDevelopServicesTestData';
 import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
-import { getObjectSizeInfo } from './Utils';
+import { getObjectSizeInfo, getObjectSizeInfoHints } from './Utils';
 
 const gd: libGDevelop = global.gd;
 
@@ -423,8 +423,8 @@ describe('getObjectSizeInfo', () => {
     });
   });
 
-  describe('Unsupported object type', () => {
-    it('returns null for unknown types', () => {
+  describe('TextObject::Text', () => {
+    it('returns a top-left origin with null width/height (no intrinsic size)', () => {
       const objects = project.getObjects();
       const object = objects.insertNewObject(
         project,
@@ -435,7 +435,103 @@ describe('getObjectSizeInfo', () => {
 
       expect(
         getObjectSizeInfo(object, project, PixiResourcesLoaderMock)
-      ).toEqual(null);
+      ).toEqual({
+        width: null,
+        height: null,
+        depth: null,
+        originX: 0,
+        originY: 0,
+        originZ: null,
+        centerX: null,
+        centerY: null,
+        centerZ: null,
+      });
     });
+  });
+});
+
+describe('getObjectSizeInfoHints', () => {
+  it('returns no hint when all known objects have an intrinsic size', () => {
+    expect(
+      getObjectSizeInfoHints({
+        Player: {
+          width: 64,
+          height: 64,
+          depth: null,
+          originX: 0,
+          originY: 0,
+          originZ: null,
+          centerX: 32,
+          centerY: 32,
+          centerZ: null,
+        },
+      })
+    ).toEqual([]);
+  });
+
+  it('returns no hint when objectSizeInfo for an object is null (unknown)', () => {
+    expect(getObjectSizeInfoHints({ Mystery: null })).toEqual([]);
+  });
+
+  it('returns a structured no-intrinsic-size hint when an object has null width/height (e.g. TextObject)', () => {
+    const hints = getObjectSizeInfoHints({
+      Title: {
+        width: null,
+        height: null,
+        depth: null,
+        originX: 0,
+        originY: 0,
+        originZ: null,
+        centerX: null,
+        centerY: null,
+        centerZ: null,
+      },
+    });
+    expect(hints).toHaveLength(1);
+    expect(hints[0].code).toBe('no-intrinsic-size');
+    expect(hints[0].objectNames).toEqual(['Title']);
+    expect(hints[0].message).toMatch(/no intrinsic size/);
+    expect(hints[0].message).toMatch(/instances_size/);
+  });
+
+  it('groups all unsized objects into a single hint entry (so the wrap-up can merge them)', () => {
+    const hints = getObjectSizeInfoHints({
+      Title: {
+        width: null,
+        height: null,
+        depth: null,
+        originX: 0,
+        originY: 0,
+        originZ: null,
+        centerX: null,
+        centerY: null,
+        centerZ: null,
+      },
+      Subtitle: {
+        width: null,
+        height: null,
+        depth: null,
+        originX: 0,
+        originY: 0,
+        originZ: null,
+        centerX: null,
+        centerY: null,
+        centerZ: null,
+      },
+      Player: {
+        width: 64,
+        height: 64,
+        depth: null,
+        originX: 0,
+        originY: 0,
+        originZ: null,
+        centerX: 32,
+        centerY: 32,
+        centerZ: null,
+      },
+    });
+    expect(hints).toHaveLength(1);
+    expect(hints[0].code).toBe('no-intrinsic-size');
+    expect(hints[0].objectNames).toEqual(['Title', 'Subtitle']);
   });
 });

@@ -79,6 +79,7 @@ type Props = {|
   isTypeSelectorShown: boolean,
   isExpressionType?: boolean,
   getLastObjectParameterObjectType: () => string,
+  onOpenBehaviorTypeDialog: () => void,
 |};
 
 const getExtraInfoArray = (type: gdValueTypeMetadata): Array<string> => {
@@ -116,6 +117,7 @@ export default function CompactValueTypeEditor({
   onTypeUpdated,
   getLastObjectParameterObjectType,
   isExpressionType,
+  onOpenBehaviorTypeDialog,
 }: Props): React.Node {
   const forceUpdate = useForceUpdate();
 
@@ -275,6 +277,7 @@ export default function CompactValueTypeEditor({
                 onTypeUpdated();
               }}
               disabled={disabled}
+              onOpenBehaviorTypeDialog={onOpenBehaviorTypeDialog}
             />
           )}
           {valueTypeMetadata.getName() === 'yesorno' && (

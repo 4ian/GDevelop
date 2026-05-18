@@ -143,6 +143,12 @@
   color: var(--event-sheet-instruction-parameter-base-color);
 }
 
+.gd-events-sheet .instruction-parameter.string,
+.gd-events-sheet .instruction-parameter.resource,
+.gd-events-sheet .instruction-parameter.mouse {
+  color: var(--event-sheet-instruction-parameter-base-color);
+}
+
 .gd-events-sheet .instruction-parameter.number {
   color: var(--event-sheet-instruction-parameter-number-color);
 }

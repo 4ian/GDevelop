@@ -451,6 +451,24 @@ jobs:
             node scripts/build.js --skip-app-build --win appx --publish=never
 
             cd ..\..
+      - run:
+          name: Build portable zip (without code signing)
+          command: |
+            cd newIDE\electron-app
+
+            $Env:GD_SIGNTOOL_THUMBPRINT = ''
+
+            $Env:GD_SIGNTOOL_SUBJECT_NAME = ''
+
+            $Env:CSC_LINK = ''
+
+            $Env:CSC_KEY_PASSWORD = ''
+
+            $Env:GD_PORTABLE_BUILD = 'true'
+
+            node scripts/build.js --skip-app-build --win zip --publish=never
+
+            cd ..\..
 
       - run:
           name: Clean binaries

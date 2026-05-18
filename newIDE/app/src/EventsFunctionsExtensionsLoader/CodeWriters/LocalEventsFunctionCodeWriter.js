@@ -35,15 +35,14 @@ export const makeLocalEventsFunctionCodeWriter = ({
     os.tmpdir(),
     `GDGeneratedEventsFunctions-` + getUID()
   );
-  fs.mkdir(outputDir, err => {
-    if (err && err.code !== 'EEXIST') {
-      console.error(
-        'Unable to create the directory where to output events functions generated code: ',
-        err
-      );
-      return;
-    }
-  });
+  try {
+    fs.mkdirSync(outputDir, { recursive: true });
+  } catch (err) {
+    console.error(
+      'Unable to create the directory where to output events functions generated code: ',
+      err
+    );
+  }
 
   const getPathFor = (codeNamespace: string) => {
     return `${outputDir}/${slugs(codeNamespace)}.js`;

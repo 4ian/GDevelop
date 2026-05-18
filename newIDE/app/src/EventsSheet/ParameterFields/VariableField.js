@@ -703,10 +703,10 @@ export const renderVariableWithIcon = (
             variable: true,
           })}
         />
-        {expressionIsValid
-          ? renderStylizedText(
-              value,
-              mergeStylizedText(
+        {renderStylizedText(
+          value,
+          expressionIsValid
+            ? mergeStylizedText(
                 getHighlightSearchTextParts(value, highlightedSearchText, {
                   matchCase: highlightedSearchMatchCase,
                 }),
@@ -718,13 +718,10 @@ export const renderVariableWithIcon = (
                   projectScopedContainers: projectScopedContainersAccessor.get(),
                 })
               )
-            )
-          : renderStylizedText(
-              value,
-              getHighlightSearchTextParts(value, highlightedSearchText, {
+            : getHighlightSearchTextParts(value, highlightedSearchText, {
                 matchCase: highlightedSearchMatchCase,
               })
-            )}
+        )}
       </IconAndNameContainer>
     </span>
   );

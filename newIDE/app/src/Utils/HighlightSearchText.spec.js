@@ -20,28 +20,6 @@ describe('HighlightSearchText', () => {
           }
         )
       ).toMatchInlineSnapshot(
-        [
-          {
-            startIndex: 0,
-            endIndex: 7,
-            props: {},
-            key: 'ipsum-0',
-          },
-          {
-            startIndex: 7,
-            endIndex: 12,
-            props: {
-              className: 'Highlighted',
-            },
-            key: 'ipsum-1',
-          },
-          {
-            startIndex: 12,
-            endIndex: 32,
-            props: {},
-            key: 'ipsum-2',
-          },
-        ],
         `
         Array [
           Object {

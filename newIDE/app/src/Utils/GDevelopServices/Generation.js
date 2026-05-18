@@ -42,7 +42,9 @@ export type AiRequestMessageAssistantFunctionCall = {|
   call_id: string,
   name: string,
   arguments: string,
+
   taskId?: string,
+  subAgentAiRequestId?: string,
 |};
 
 export type AiRequestFunctionCallOutput = {
@@ -122,6 +124,7 @@ export type AiRequest = {
   forkedFromAiRequestId?: string | null,
   forkedAfterOriginalMessageId?: string | null,
   forkedAfterNewMessageId?: string | null,
+  parentAiRequestId?: string | null,
 
   error: {
     code: string,
@@ -194,6 +197,14 @@ export type AiGeneratedEventChange = {
   missingResources: AiGeneratedEventMissingResource[],
 };
 
+export type AiGeneratedEventBatch = {
+  eventsDescription: string,
+  placementRelation: string,
+  placementTargetEventId: string | null,
+  placementExpectedParentEventId: string | null,
+  placementRationale: string | null,
+};
+
 export type AiGeneratedEvent = {
   id: string,
   createdAt: string,
@@ -202,7 +213,8 @@ export type AiGeneratedEvent = {
   status: GenerationStatus,
 
   partialGameProjectJson: string,
-  eventsDescription: string,
+  eventsDescription: string | null,
+  eventBatches: Array<AiGeneratedEventBatch> | null,
   extensionNamesList: string,
   objectsList: string,
   existingEventsAsText: string,
@@ -668,6 +680,7 @@ export const createAiGeneratedEvent = async (
     projectSpecificExtensionsSummaryJsonUserRelativeKey,
     sceneName,
     eventsDescription,
+    eventBatches,
     extensionNamesList,
     objectsList,
     existingEventsAsText,
@@ -683,7 +696,8 @@ export const createAiGeneratedEvent = async (
     projectSpecificExtensionsSummaryJson: string | null,
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
     sceneName: string,
-    eventsDescription: string,
+    eventsDescription: string | null,
+    eventBatches: Array<AiGeneratedEventBatch> | null,
     extensionNamesList: string,
     objectsList: string,
     existingEventsAsText: string,
@@ -705,6 +719,7 @@ export const createAiGeneratedEvent = async (
       projectSpecificExtensionsSummaryJsonUserRelativeKey,
       sceneName,
       eventsDescription,
+      eventBatches,
       extensionNamesList,
       objectsList,
       existingEventsAsText,

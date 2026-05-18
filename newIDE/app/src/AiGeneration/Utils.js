@@ -22,9 +22,11 @@ import {
   type EditorFunctionCallResult,
 } from '../EditorFunctions';
 import {
+  getAllSubAgentFunctionCalls,
   getFunctionCallNameByCallId,
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
+  getPendingSubAgentFunctionCalls,
   getLastMessagesFromAiRequestOutput,
   getLatestActivePlan,
 } from './AiRequestUtils';
@@ -34,6 +36,7 @@ import { useSearchAndInstallAsset } from './UseSearchAndInstallAsset';
 import { useSearchAndInstallResource } from './UseSearchAndInstallResource';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AiRequestContext } from './AiRequestContext';
+import { ObjectStoreContext } from '../AssetStore/ObjectStoreContext';
 
 import { delay } from '../Utils/Delay';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
@@ -89,14 +92,35 @@ export const useRefreshLimits = (
 
 export const AI_AGENT_TOOLS_VERSION = 'v8';
 export const AI_CHAT_TOOLS_VERSION = 'v8';
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v1';
+export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v3';
+export const AI_AGENT_EXPLORER_TOOLS_VERSION = 'v3'; // TODO: useless?
+export const AI_AGENT_EDIT_TOOLS_VERSION = 'v3';
+
+export const getToolsVersionForAiRequestMode = (mode: string): string => {
+  switch (mode) {
+    case 'agent':
+      return AI_AGENT_TOOLS_VERSION;
+    case 'chat':
+      return AI_CHAT_TOOLS_VERSION;
+    case 'orchestrator':
+      return AI_ORCHESTRATOR_TOOLS_VERSION;
+    case 'agent-explorer':
+      return AI_AGENT_EXPLORER_TOOLS_VERSION;
+    case 'agent-edit':
+      return AI_AGENT_EDIT_TOOLS_VERSION;
+    default:
+      throw new Error(
+        `Unknown AI request mode: ${mode} - unable to get tools version.`
+      );
+  }
+};
 
 export const useProcessFunctionCalls = ({
   i18n,
   project,
   resourceManagementProps,
   editorCallbacks,
-  selectedAiRequest,
+  aiRequestsToProcess,
   onSendEditorFunctionCallResults,
   getEditorFunctionCallResults,
   addEditorFunctionCallResults,
@@ -112,8 +136,9 @@ export const useProcessFunctionCalls = ({
   project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
   editorCallbacks: EditorCallbacks,
-  selectedAiRequest: ?AiRequest,
+  aiRequestsToProcess: Array<AiRequest>,
   onSendEditorFunctionCallResults: (
+    aiRequestId: string,
     editorFunctionCallResults: Array<EditorFunctionCallResult>,
     options: {|
       createdSceneNames?: Array<string>,
@@ -142,6 +167,7 @@ export const useProcessFunctionCalls = ({
   isReadyToProcessFunctionCalls: boolean,
 |}): {
   onProcessFunctionCalls: (
+    aiRequest: AiRequest,
     functionCalls: Array<AiRequestMessageAssistantFunctionCall>
   ) => Promise<void>,
 } => {
@@ -160,28 +186,50 @@ export const useProcessFunctionCalls = ({
     resourceManagementProps,
   });
   const { generateEvents } = useGenerateEvents({ project });
+
+  const { translatedObjectShortHeadersByType, fetchObjects } = React.useContext(
+    ObjectStoreContext
+  );
+
+  React.useEffect(
+    () => {
+      fetchObjects();
+    },
+    [fetchObjects]
+  );
+  const getAssetStoreTagForNewObject = React.useCallback(
+    (objectType: string): string | null => {
+      const header = translatedObjectShortHeadersByType[objectType];
+      return (header && header.assetStoreTag) || null;
+    },
+    [translatedObjectShortHeadersByType]
+  );
+
   // In-memory guard against duplicate processing of the same function call.
   //
   // The main protection is marking calls as "working" in the ref-backed
   // results store (see useEditorFunctionCallResultsStorage).  However,
   // React 18 can re-run an effect before a forceUpdate() re-render has
   // propagated (e.g. StrictMode double-invocations in development, or a
-  // polling update to selectedAiRequest that recreates onProcessFunctionCalls
-  // while the previous invocation is still awaiting).
+  // polling update that recreates onProcessFunctionCalls while the previous
+  // invocation is still awaiting).
   // This Set acts as an immediate, synchronous lock keyed by
   // "<requestId>:<callId>" so a call that is already being processed is
   // never started a second time.
   const inFlightFunctionCallIdsRef = React.useRef<Set<string>>(new Set());
 
   const onProcessFunctionCalls = React.useCallback(
-    async (functionCalls: Array<AiRequestMessageAssistantFunctionCall>) => {
-      if (!selectedAiRequest || !isReadyToProcessFunctionCalls) return;
-      if (selectedAiRequest.status === 'suspended') return;
+    async (
+      aiRequest: AiRequest,
+      functionCalls: Array<AiRequestMessageAssistantFunctionCall>
+    ) => {
+      if (!isReadyToProcessFunctionCalls) return;
+      if (aiRequest.status === 'suspended') return;
 
       const functionCallsToProcess = functionCalls.filter(
         functionCall =>
           !inFlightFunctionCallIdsRef.current.has(
-            `${selectedAiRequest.id}:${functionCall.call_id}`
+            `${aiRequest.id}:${functionCall.call_id}`
           )
       );
       if (functionCallsToProcess.length === 0) {
@@ -194,12 +242,12 @@ export const useProcessFunctionCalls = ({
       // Lock these call IDs so concurrent invocations skip them.
       functionCallsToProcess.forEach(functionCall => {
         inFlightFunctionCallIdsRef.current.add(
-          `${selectedAiRequest.id}:${functionCall.call_id}`
+          `${aiRequest.id}:${functionCall.call_id}`
         );
       });
 
       addEditorFunctionCallResults(
-        selectedAiRequest.id,
+        aiRequest.id,
         functionCallsToProcess.map(functionCall => ({
           status: 'working',
           call_id: functionCall.call_id,
@@ -215,16 +263,16 @@ export const useProcessFunctionCalls = ({
           project,
           editorCallbacks,
           // $FlowFixMe[incompatible-type]
-          toolOptions: selectedAiRequest.toolOptions || null,
+          toolOptions: aiRequest.toolOptions || null,
           i18n,
           functionCalls: functionCallsToProcess.map(functionCall => ({
             name: functionCall.name,
             arguments: functionCall.arguments,
             call_id: functionCall.call_id,
           })),
-          relatedAiRequestId: selectedAiRequest.id,
+          relatedAiRequestId: aiRequest.id,
           getRelatedAiRequestLastMessages: () =>
-            getLastMessagesFromAiRequestOutput(selectedAiRequest.output || []),
+            getLastMessagesFromAiRequestOutput(aiRequest.output || []),
           generateEvents,
           onSceneEventsModifiedOutsideEditor,
           onInstancesModifiedOutsideEditor,
@@ -235,6 +283,7 @@ export const useProcessFunctionCalls = ({
           onExtensionInstalled,
           searchAndInstallAsset,
           searchAndInstallResources,
+          getAssetStoreTagForNewObject,
         });
 
         // If the request was suspended while we were processing, discard the
@@ -247,14 +296,9 @@ export const useProcessFunctionCalls = ({
           return;
         }
 
-        const newResults = addEditorFunctionCallResults(
-          selectedAiRequest.id,
-          results
-        );
+        const newResults = addEditorFunctionCallResults(aiRequest.id, results);
 
-        // We may have processed everything, so try to send the results
-        // to the backend.
-        await onSendEditorFunctionCallResults(newResults, {
+        await onSendEditorFunctionCallResults(aiRequest.id, newResults, {
           createdSceneNames,
           createdProject,
         });
@@ -263,14 +307,13 @@ export const useProcessFunctionCalls = ({
         // (e.g. after an error or a suspension).
         functionCallsToProcess.forEach(functionCall => {
           inFlightFunctionCallIdsRef.current.delete(
-            `${selectedAiRequest.id}:${functionCall.call_id}`
+            `${aiRequest.id}:${functionCall.call_id}`
           );
         });
       }
     },
     [
       i18n,
-      selectedAiRequest,
       isReadyToProcessFunctionCalls,
       addEditorFunctionCallResults,
       project,
@@ -284,40 +327,125 @@ export const useProcessFunctionCalls = ({
       onExtensionInstalled,
       searchAndInstallAsset,
       searchAndInstallResources,
+      getAssetStoreTagForNewObject,
       generateEvents,
       onSendEditorFunctionCallResults,
     ]
   );
 
-  const allFunctionCallsToProcess = React.useMemo(
-    () =>
-      selectedAiRequest
-        ? getFunctionCallsToProcess({
-            aiRequest: selectedAiRequest,
-            editorFunctionCallResults: getEditorFunctionCallResults(
-              selectedAiRequest.id
-            ),
-          })
-        : [],
-    [selectedAiRequest, getEditorFunctionCallResults]
+  // Collect all function calls to process across all active AI requests.
+  const allFunctionCallsToProcess: Array<{|
+    aiRequest: AiRequest,
+    functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
+  |}> = React.useMemo(
+    () => {
+      const result = [];
+      for (const aiRequest of aiRequestsToProcess) {
+        const functionCalls = getFunctionCallsToProcess({
+          aiRequest,
+          editorFunctionCallResults: getEditorFunctionCallResults(aiRequest.id),
+        });
+        if (functionCalls.length > 0) {
+          result.push({ aiRequest, functionCalls });
+        }
+      }
+      return result;
+    },
+    [aiRequestsToProcess, getEditorFunctionCallResults]
   );
 
   React.useEffect(
     () => {
+      if (allFunctionCallsToProcess.length === 0) return;
+
       (async () => {
-        if (!selectedAiRequest) return;
-        if (selectedAiRequest.status === 'suspended') return;
-        if (allFunctionCallsToProcess.length === 0) return;
-        console.info('Automatically processing AI function calls...');
-        await onProcessFunctionCalls(allFunctionCallsToProcess);
+        for (const { aiRequest, functionCalls } of allFunctionCallsToProcess) {
+          if (aiRequest.status === 'suspended') continue;
+          console.info(
+            `Automatically processing AI function calls for request ${
+              aiRequest.id
+            }...`
+          );
+          await onProcessFunctionCalls(aiRequest, functionCalls);
+        }
       })();
     },
-    [selectedAiRequest, onProcessFunctionCalls, allFunctionCallsToProcess]
+    [onProcessFunctionCalls, allFunctionCallsToProcess]
   );
 
   return {
     onProcessFunctionCalls,
   };
+};
+
+/**
+ * Detects sub-agent function calls in the selected AI request and activates
+ * them so that AiRequestContext starts polling and processing them.
+ */
+export const useActivatePendingSubAgents = ({
+  selectedAiRequest,
+}: {|
+  selectedAiRequest: ?AiRequest,
+|}) => {
+  const { activateSubAgent } = React.useContext(AiRequestContext);
+
+  React.useEffect(
+    () => {
+      if (!selectedAiRequest) return;
+
+      const subAgentCalls = getPendingSubAgentFunctionCalls({
+        aiRequest: selectedAiRequest,
+      });
+      subAgentCalls.forEach(call => {
+        if (call.subAgentAiRequestId) {
+          activateSubAgent(
+            call.subAgentAiRequestId,
+            selectedAiRequest.id,
+            call.call_id
+          );
+        }
+      });
+    },
+    [selectedAiRequest, activateSubAgent]
+  );
+};
+
+/**
+ * For every sub-agent function call in the selected AI request, ensures that
+ * its AiRequest is loaded into the shared `aiRequests` storage so its details
+ * can be displayed (e.g. for historical or suspended parents whose sub-agents
+ * are no longer being polled by `useActivatePendingSubAgents`).
+ *
+ * One-shot fetch only — the polling/activation pipeline remains responsible
+ * for live updates of still-running sub-agents.
+ */
+export const useLoadSubAgentRequests = ({
+  selectedAiRequest,
+}: {|
+  selectedAiRequest: ?AiRequest,
+|}) => {
+  const { aiRequestStorage } = React.useContext(AiRequestContext);
+  const { aiRequests, refreshAiRequest } = aiRequestStorage;
+  const attemptedFetchRef = React.useRef<Set<string>>(new Set());
+
+  React.useEffect(
+    () => {
+      if (!selectedAiRequest) return;
+
+      const subAgentCalls = getAllSubAgentFunctionCalls({
+        aiRequest: selectedAiRequest,
+      });
+      for (const call of subAgentCalls) {
+        const subAgentAiRequestId = call.subAgentAiRequestId;
+        if (!subAgentAiRequestId) continue;
+        if (aiRequests[subAgentAiRequestId]) continue;
+        if (attemptedFetchRef.current.has(subAgentAiRequestId)) continue;
+        attemptedFetchRef.current.add(subAgentAiRequestId);
+        refreshAiRequest(subAgentAiRequestId);
+      }
+    },
+    [selectedAiRequest, aiRequests, refreshAiRequest]
+  );
 };
 
 export const useAiRequestState = ({
@@ -416,6 +544,7 @@ export const useAiRequestState = ({
         )
           return;
 
+        // Check if there are tools being run. If so, no suggestions at this time.
         const hasFunctionsCallsToProcess =
           getFunctionCallsToProcess({
             aiRequest: selectedAiRequest,
@@ -424,6 +553,14 @@ export const useAiRequestState = ({
             ),
           }).length > 0;
         if (hasFunctionsCallsToProcess) return;
+
+        // If there are sub-agents running, it means the request is still running,
+        // so no suggestions at this time.
+        const hasPendingSubAgentCalls =
+          getPendingSubAgentFunctionCalls({
+            aiRequest: selectedAiRequest,
+          }).length > 0;
+        if (hasPendingSubAgentCalls) return;
 
         const {
           hasUnfinishedResult,

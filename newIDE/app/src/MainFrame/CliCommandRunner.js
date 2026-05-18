@@ -159,7 +159,13 @@ export const useCliCommandRunner = ({
 
       run();
     },
-    [project, i18n, commandPaletteRef, eventsFunctionsExtensionsState]
+    [
+      project,
+      i18n,
+      commandPaletteRef,
+      eventsFunctionsExtensionsState,
+      preferences,
+    ]
   );
 
   React.useEffect(

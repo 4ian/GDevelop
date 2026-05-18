@@ -201,7 +201,10 @@
     ]
   },
   "lint-staged": {
-    "src/!(locales)/**/*.js": "prettier --write"
+    "src/!(locales)/**/*.js": [
+      "prettier --write",
+      "eslint --max-warnings=0"
+    ]
   },
   "browserslist": [
     ">0.2%",

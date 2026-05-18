@@ -1738,7 +1738,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   copySelection = () => {
-    copySelectionToClipboard(this.state.selection);
+    copySelectionToClipboard(
+      this.state.selection,
+      (events: Array<gdBaseEvent>) => this._getChangedEventRows(events)
+    );
   };
 
   cutSelection = () => {

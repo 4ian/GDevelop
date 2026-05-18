@@ -466,10 +466,6 @@ namespace gdjs {
       functionId: string,
       eventIndex: number
     ): boolean {
-      // A pause can end the frame before "Trigger once" events re-evaluate.
-      // Preserve last-frame state so Once doesn't refire on resume/step.
-      this._onceTriggers.preserveLastFrameOnNextCycle();
-
       // Hit info only; the dump is built lazily from Electron main over
       // CDP once V8 is paused, keeping the `debugger;` path cheap.
       const ds = this._runtimeGame._debugState;
@@ -525,13 +521,6 @@ namespace gdjs {
       }
       if (this._profiler) {
         this._profiler.begin('events');
-      }
-      // While stepping, successive frames are logical continuations of the
-      // same paused user action, so preserve Once's last-frame state to
-      // avoid triggering Onces that were already consumed before stepping
-      // started (see OnceTriggers.preserveLastFrameOnNextCycle).
-      if (this._runtimeGame._debugState.stepNextEvent) {
-        this._onceTriggers.preserveLastFrameOnNextCycle();
       }
       if (this._eventsFunction !== null) this._eventsFunction(this);
 

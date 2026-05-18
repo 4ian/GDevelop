@@ -212,9 +212,6 @@ scene, so generated code for custom objects can call them uniformly.
 
 The **only** work done on the hot path before returning `true`:
 
-- `_onceTriggers.preserveLastFrameOnNextCycle()` — so `TriggerOnce`
-  bookkeeping survives the pause (without this, stepping would re-enter
-  sub-events of an already-triggered-once event after resume).
 - Stashes `{ functionId, eventIndex, sceneName }` on
   `_debugState.lastBreakpoint`.
 - Stashes `this` (the scene) on `_debugState.lastBpCallingContainer` as
@@ -259,23 +256,6 @@ never ran, or events ended early):
 When a breakpoint actually fires, `__checkBreakpoint` already cleared
 `stepNextEvent` before returning `true`, so this branch only handles
 misses.
-
-### `OnceTriggers.preserveLastFrameOnNextCycle`
-
-Public method on `OnceTriggers`. Sets a one-shot flag that makes the
-next `startNewFrame()` skip the *clearing* of `_lastFrameOnceTrigger`
-(normally done before moving this frame's `_onceTriggers` into it).
-Result: `alreadyTriggered()` keeps reporting `true` for triggers
-fired in the pre-pause frame even after intervening `startNewFrame`
-cycles.
-
-Set from two places:
-
-- `RuntimeScene._triggerBreakpoint` — at hit time, before the pause.
-- `RuntimeScene.renderAndStep` — at the top of every frame while
-  `stepNextEvent` is armed. Stepping can span multiple frames, and
-  each must preserve Once so a previously-consumed Once doesn't
-  re-fire inside sub-events on resume.
 
 ### `abstract-debugger-client.ts`
 

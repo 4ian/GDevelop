@@ -202,7 +202,7 @@ protected:
     if (gd::ParameterMetadata::IsObject(type)) {
       AddColoration(gd::ExpressionColorationDescription::ColorationKind::Object,
                     node.identifierNameLocation.GetStartPosition(),
-                    node.identifierNameLocation.GetStartPosition());
+                    node.identifierNameLocation.GetEndPosition());
 
     } else if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
       AddColoration(

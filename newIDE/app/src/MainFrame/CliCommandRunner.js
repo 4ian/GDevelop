@@ -6,6 +6,10 @@ import { exportLocalHtml5Headless } from '../ExportAndShare/Headless/ExportLocal
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import PreferencesContext, {
+  type Preferences,
+} from './Preferences/PreferencesContext';
+import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
 import Window from '../Utils/Window';
 import optionalRequire from '../Utils/OptionalRequire';
 
@@ -18,11 +22,23 @@ const fs = optionalRequire('fs');
 // fire-and-forget via launchCommand.
 export type CliCommandRunner = (
   project: gdProject,
-  i18n: I18nType
+  i18n: I18nType,
+  context: {| preferences: Preferences |}
 ) => Promise<void>;
 
 const runners: { [commandName: string]: CliCommandRunner } = {
-  EXPORT_HTML5_EXTERNAL: async (project, i18n) => {
+  EXPORT_HTML5_EXTERNAL: async (project, i18n, { preferences }) => {
+    if (preferences.getBlockPreviewAndExportOnDiagnosticErrors()) {
+      const errors = scanProjectForValidationErrors(project);
+      if (errors.length > 0) {
+        console.error(
+          `[CLI] Diagnostic report has ${
+            errors.length
+          } error(s). Export blocked.`
+        );
+        throw new Error('Export blocked by diagnostic errors.');
+      }
+    }
     await exportLocalHtml5Headless({ project, i18n });
   },
 };
@@ -80,6 +96,7 @@ export const useCliCommandRunner = ({
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
+  const preferences = React.useContext(PreferencesContext);
 
   // Dispatch `--run-command` once the project is loaded. "Awaitable" commands
   // are awaited for a proper exit code; others fall back to fire-and-forget
@@ -109,7 +126,7 @@ export const useCliCommandRunner = ({
 
           const awaitableRunner = getAwaitableCliRunner(commandName);
           if (awaitableRunner) {
-            await awaitableRunner(project, i18n);
+            await awaitableRunner(project, i18n, { preferences });
             console.info(
               `[CLI] Command "${commandName}" finished successfully.`
             );

@@ -107,7 +107,12 @@ extracted on a CI runner and used to execute CLI commands:
 ```bash
 cd newIDE/electron-app
 npm install
-npm run build-portable          # produces dist/*.zip
+
+# Linux / macOS
+GD_PORTABLE_BUILD=true npm run build -- --publish never
+
+# Windows (PowerShell)
+$Env:GD_PORTABLE_BUILD='true'; npm run build -- --publish never
 ```
 
 The resulting zip contains the full editor. After extracting, run commands like:

@@ -90,7 +90,7 @@ const artifactsToDownload = {
     outputFilename: `GDevelop-5-${version}-arm64.AppImage`,
   },
   'Linux portable zip': {
-    url: `${pathToArtifacts}/GDevelop 5-${version}.zip`,
+    url: `${pathToArtifacts}/gdevelop-${version}.zip`,
     outputFilename: `GDevelop-5-${version}-linux.zip`,
   },
   'Linux auto-update file (amd64)': {

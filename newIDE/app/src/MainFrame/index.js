@@ -4226,6 +4226,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           skipNewVersionWarning:
             !!checkedOutVersionStatus ||
             (options && options.skipNewVersionWarning),
+          canonicalEventSerialization:
+            preferences.values.canonicalEventSerialization,
         };
         if (cloudProjectRecoveryOpenedVersionId) {
           saveOptions.previousVersion = cloudProjectRecoveryOpenedVersionId;

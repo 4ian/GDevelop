@@ -3,11 +3,15 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { type CommandPaletteInterface } from '../CommandPalette/CommandPalette';
 import { exportLocalHtml5Headless } from '../ExportAndShare/Headless/ExportLocalHtml5Headless';
+import EventsFunctionsExtensionsContext, {
+  type EventsFunctionsExtensionsState,
+} from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Window from '../Utils/Window';
 import optionalRequire from '../Utils/OptionalRequire';
 
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
+const fs = optionalRequire('fs');
 
 // Commands registered here are awaited by the CLI dispatcher so the process
 // exits with a meaningful code. Unregistered commands fall back to
@@ -33,6 +37,35 @@ const exitApp = (exitCode: number) => {
   if (ipcRenderer) ipcRenderer.send('app-exit', exitCode);
 };
 
+const ensureProjectExtensionsReadyForCli = async (
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState
+): Promise<boolean> => {
+  await eventsFunctionsExtensionsState.ensureLoadFinished();
+
+  if (eventsFunctionsExtensionsState.eventsFunctionsExtensionsError) {
+    console.error(
+      '[CLI] Project extensions failed to load:',
+      eventsFunctionsExtensionsState.eventsFunctionsExtensionsError
+    );
+    return false;
+  }
+
+  if (fs) {
+    const includeFileHashs = eventsFunctionsExtensionsState.getIncludeFileHashs();
+    const missingIncludeFiles = Object.keys(includeFileHashs).filter(
+      includeFile => !fs.existsSync(includeFile)
+    );
+    if (missingIncludeFiles.length > 0) {
+      console.warn(
+        '[CLI] Some generated extension code files are missing on disk (extension compatibility issue):',
+        missingIncludeFiles
+      );
+    }
+  }
+
+  return true;
+};
+
 type Props = {|
   project: ?gdProject,
   i18n: I18nType,
@@ -44,6 +77,10 @@ export const useCliCommandRunner = ({
   i18n,
   commandPaletteRef,
 }: Props) => {
+  const eventsFunctionsExtensionsState = React.useContext(
+    EventsFunctionsExtensionsContext
+  );
+
   // Dispatch `--run-command` once the project is loaded. "Awaitable" commands
   // are awaited for a proper exit code; others fall back to fire-and-forget
   // via commandPaletteRef.launchCommand.
@@ -62,6 +99,14 @@ export const useCliCommandRunner = ({
 
       const run = async () => {
         try {
+          const extensionsReady = await ensureProjectExtensionsReadyForCli(
+            eventsFunctionsExtensionsState
+          );
+          if (!extensionsReady) {
+            if (!keepOpen) exitApp(1);
+            return;
+          }
+
           const awaitableRunner = getAwaitableCliRunner(commandName);
           if (awaitableRunner) {
             await awaitableRunner(project, i18n);
@@ -97,7 +142,7 @@ export const useCliCommandRunner = ({
 
       run();
     },
-    [project, i18n, commandPaletteRef]
+    [project, i18n, commandPaletteRef, eventsFunctionsExtensionsState]
   );
 
   React.useEffect(

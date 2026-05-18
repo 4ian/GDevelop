@@ -48,6 +48,7 @@ const QuickBehaviorPropertiesEditor = ({
         object,
         visibility: 'Basic-Quick',
         quickCustomizationVisibilities: behavior.getPropertiesQuickCustomizationVisibilities(),
+        layersContainer: null,
       });
     },
     [behavior, object, schemaRecomputeTrigger]

@@ -503,7 +503,7 @@ namespace gdjs {
                 });
                 closeSaving(leaderboardEntry);
               } catch (errorCode) {
-                closeSavingWithError(errorCode);
+                closeSavingWithError(errorCode as string);
               }
             } catch {
               // Do nothing: saving was rejected for a reason already logged.
@@ -553,7 +553,7 @@ namespace gdjs {
                 });
                 closeSaving(leaderboardEntryId);
               } catch (errorCode) {
-                closeSavingWithError(errorCode);
+                closeSavingWithError(errorCode as string);
               }
             } catch {
               // Do nothing: saving was rejected for a reason already logged.

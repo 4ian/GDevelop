@@ -44,7 +44,7 @@ namespace gdjs {
       const originalUpdateText = this._pixiObject.updateText.bind(
         this._pixiObject
       );
-      this._pixiObject.updateText = (...args: any) => {
+      this._pixiObject.updateText = (...args) => {
         try {
           originalUpdateText(...args);
         } catch (error) {

@@ -1,7 +1,9 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import VariablesEditorDialog from './VariablesEditorDialog';
+import VariablesEditorDialog, {
+  type VariableDialogOpeningProps,
+} from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
@@ -13,8 +15,7 @@ type Props = {|
   onCancel: () => void,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps | null,
   isGlobalTabInitiallyOpen?: boolean,
-  initiallySelectedVariableName?: string,
-  shouldCreateInitiallySelectedVariable?: boolean,
+  initiallySelectedVariable: VariableDialogOpeningProps | null,
   isListLocked: boolean,
 |};
 
@@ -25,8 +26,7 @@ const GlobalAndSceneVariablesDialog = ({
   onApply,
   hotReloadPreviewButtonProps,
   isGlobalTabInitiallyOpen,
-  initiallySelectedVariableName,
-  shouldCreateInitiallySelectedVariable,
+  initiallySelectedVariable,
   isListLocked,
 }: Props): React.Node => {
   const {
@@ -123,10 +123,7 @@ const GlobalAndSceneVariablesDialog = ({
       initiallyOpenTabId={
         isGlobalTabInitiallyOpen ? 'global-variables' : 'scene-variables'
       }
-      initiallySelectedVariableName={initiallySelectedVariableName}
-      shouldCreateInitiallySelectedVariable={
-        shouldCreateInitiallySelectedVariable
-      }
+      initiallySelectedVariable={initiallySelectedVariable}
       helpPagePath={'/all-features/variables/scene-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="global-and-scene-variables-dialog"

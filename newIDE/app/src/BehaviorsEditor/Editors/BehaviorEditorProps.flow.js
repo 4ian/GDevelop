@@ -10,6 +10,7 @@ export type BehaviorEditorProps = {|
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   object: gdObject,
+  layersContainer: gdLayersContainer,
   resourceManagementProps: ResourceManagementProps,
   onBehaviorUpdated: () => void,
   isAdvancedSectionInitiallyUncollapsed?: boolean,

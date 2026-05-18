@@ -140,4 +140,15 @@ TEST_CASE("ExpressionSyntaxColoringHelper", "[common][events]") {
     REQUIRE(getColorationsFor("number", "(123 + 456) * 2") ==
             expectedCompletions);
   }
+  SECTION("Can colorize object parameters") {
+    // clang-format off
+    std::vector<gd::String> expectedCompletions{
+        "Number [0 20[",
+        "Object [20 28[",
+        "Number [28 29["
+    };
+    // clang-format on
+    REQUIRE(getColorationsFor("number", "SceneInstancesCount(MyObject)") ==
+            expectedCompletions);
+  }
 }

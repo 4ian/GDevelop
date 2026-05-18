@@ -116,8 +116,8 @@ The resulting zip contains the full editor. After extracting, run commands like:
 # Windows
 GDevelop.exe --disable-update-check --run-command EXPORT_HTML5_EXTERNAL path\to\game.json
 
-# Linux (xvfb-run required for Chromium GPU init)
-xvfb-run -a ./GDevelop --no-sandbox --disable-update-check \
+# Linux (install required libs: sudo apt install -y libnss3 libasound2t64)
+./gdevelop --no-sandbox --disable-update-check \
   --run-command EXPORT_HTML5_EXTERNAL /path/to/game.json
 ```
 

@@ -22,7 +22,6 @@ import {
   type EditorFunctionCallResult,
 } from '../EditorFunctions';
 import {
-  getAllSubAgentFunctionCalls,
   getFunctionCallNameByCallId,
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
@@ -410,43 +409,7 @@ export const useActivatePendingSubAgents = ({
   );
 };
 
-/**
- * For every sub-agent function call in the selected AI request, ensures that
- * its AiRequest is loaded into the shared `aiRequests` storage so its details
- * can be displayed (e.g. for historical or suspended parents whose sub-agents
- * are no longer being polled by `useActivatePendingSubAgents`).
- *
- * One-shot fetch only — the polling/activation pipeline remains responsible
- * for live updates of still-running sub-agents.
- */
-export const useLoadSubAgentRequests = ({
-  selectedAiRequest,
-}: {|
-  selectedAiRequest: ?AiRequest,
-|}) => {
-  const { aiRequestStorage } = React.useContext(AiRequestContext);
-  const { aiRequests, refreshAiRequest } = aiRequestStorage;
-  const attemptedFetchRef = React.useRef<Set<string>>(new Set());
-
-  React.useEffect(
-    () => {
-      if (!selectedAiRequest) return;
-
-      const subAgentCalls = getAllSubAgentFunctionCalls({
-        aiRequest: selectedAiRequest,
-      });
-      for (const call of subAgentCalls) {
-        const subAgentAiRequestId = call.subAgentAiRequestId;
-        if (!subAgentAiRequestId) continue;
-        if (aiRequests[subAgentAiRequestId]) continue;
-        if (attemptedFetchRef.current.has(subAgentAiRequestId)) continue;
-        attemptedFetchRef.current.add(subAgentAiRequestId);
-        refreshAiRequest(subAgentAiRequestId);
-      }
-    },
-    [selectedAiRequest, aiRequests, refreshAiRequest]
-  );
-};
+export { useLoadSubAgentRequests } from './UseLoadSubAgentRequests';
 
 export const useAiRequestState = ({
   project,

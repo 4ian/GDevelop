@@ -108,7 +108,7 @@ type AiRequestStorage = {|
     aiRequestId: string,
     updateFn: (prevAiRequest: ?AiRequest) => AiRequest
   ) => void,
-  refreshAiRequest: (aiRequestId: string) => Promise<void>,
+  refreshAiRequest: (aiRequestId: string) => Promise<boolean>,
   isSendingAiRequest: (aiRequestId: string | null) => boolean,
   getLastSendError: (aiRequestId: string | null) => ?Error,
   setSendingAiRequest: (aiRequestId: string | null, isSending: boolean) => void,
@@ -250,8 +250,8 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
   );
 
   const refreshAiRequest = React.useCallback(
-    async (aiRequestId: string) => {
-      if (!profile) return;
+    async (aiRequestId: string): Promise<boolean> => {
+      if (!profile) return false;
 
       try {
         const updatedAiRequest = await getAiRequest(getAuthorizationHeader, {
@@ -259,11 +259,13 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
           aiRequestId: aiRequestId,
         });
         updateAiRequest(updatedAiRequest.id, () => updatedAiRequest);
+        return true;
       } catch (error) {
         console.error(
           'Error while background refreshing AI request - ignoring:',
           error
         );
+        return false;
       }
     },
     [getAuthorizationHeader, profile, updateAiRequest]
@@ -483,7 +485,7 @@ export const initialAiRequestContextState: AiRequestContextState = {
     isLoading: false,
     aiRequests: {},
     updateAiRequest: () => {},
-    refreshAiRequest: async () => {},
+    refreshAiRequest: async () => false,
     isSendingAiRequest: () => false,
     getLastSendError: () => null,
     setSendingAiRequest: () => {},

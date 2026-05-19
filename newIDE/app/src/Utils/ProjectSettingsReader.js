@@ -29,7 +29,7 @@ export const OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY = 'overridenPreviewLayoutName';
  * Returns null when missing or not a non-empty string. Does not mutate the map.
  */
 export const getOverridenPreviewLayoutNameFromPreferences = (
-  preferences: ?{ [string]: boolean | string | number }
+  preferences: ?$ReadOnly<{ [string]: boolean | string | number }>
 ): string | null => {
   if (!preferences) return null;
   const value = preferences[OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY];

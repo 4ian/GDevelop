@@ -359,10 +359,9 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
         onChange(fieldCurrentValue);
         onOpenDialog({
           variableName: fieldCurrentValue,
-          shouldCreate: !isRootVariableDeclared(
-            fieldCurrentValue,
-            variablesContainers
-          ),
+          shouldCreate:
+            !!fieldCurrentValue &&
+            !isRootVariableDeclared(fieldCurrentValue, variablesContainers),
           variableType: getVariableTypeName(variableType),
         });
       },

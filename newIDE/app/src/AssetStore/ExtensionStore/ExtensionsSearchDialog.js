@@ -31,6 +31,7 @@ import { ExtensionStoreContext } from './ExtensionStoreContext';
 import ShareExternalIcon from '../../UI/CustomSvgIcons/ShareExternal';
 import Window from '../../Utils/Window';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { useInstallExtensionWithDependencies } from '../../ProjectManager/InstalledExtensionDetails';
 
 type Props = {|
   project: gdProject,
@@ -52,7 +53,7 @@ const ExtensionsSearchDialog = ({
 }: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const { isMobile } = useResponsiveWindowSize();
-  const installExtension = useInstallExtension();
+  const installExtensionWithDependencies = useInstallExtensionWithDependencies();
   const {
     translatedExtensionShortHeadersByName: extensionShortHeadersByName,
   } = React.useContext(ExtensionStoreContext);
@@ -80,43 +81,11 @@ const ExtensionsSearchDialog = ({
     try {
       if (extensionShortHeader) {
         try {
-          const extensionShortHeaders: Array<ExtensionShortHeader> = [
-            extensionShortHeader,
-          ];
-          const requiredExtensions = getRequiredExtensions(
-            extensionShortHeaders
-          );
-          requiredExtensions.push({
-            extensionName: extensionShortHeader.name,
-            extensionVersion: extensionShortHeader.version,
-          });
-          const requiredExtensionInstallation = await checkRequiredExtensionsUpdate(
-            {
-              requiredExtensions,
-              project,
-              extensionShortHeadersByName,
-            }
-          );
-          if (
-            !requiredExtensionInstallation.missingExtensionShortHeaders.includes(
-              extensionShortHeader
-            )
-          ) {
-            // The extension chosen by users is not part of `requiredExtensions`
-            // but should always be installed. This is true even if the versions
-            // are matching to allow to reinstall the extension.
-            requiredExtensionInstallation.missingExtensionShortHeaders.push(
-              extensionShortHeader
-            );
-          }
-          const wasExtensionInstalled = await installExtension({
+          const wasExtensionInstalled = await installExtensionWithDependencies({
             project,
-            requiredExtensionInstallation,
-            importedSerializedExtensions: [],
+            extensionShortHeader,
             onWillInstallExtension,
             onExtensionInstalled,
-            updateMode: 'all',
-            reason: 'extension',
           });
           if (!wasExtensionInstalled) {
             return false;

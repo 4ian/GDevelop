@@ -988,11 +988,11 @@ export const fetchAiSettings = async ({
 |}): Promise<AiSettings> => {
   // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
-    `${GDevelopAiCdn.baseUrl[environment]}/ai-settings.json`
+    `${GDevelopAiCdn.baseUrl[environment]}/ai-settings-v2.json`
   );
   return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'aiRequest',
-    endpointName: '/ai-settings.json of Generation API',
+    endpointName: '/ai-settings-v2.json of Generation API',
   });
 };

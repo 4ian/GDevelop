@@ -18,6 +18,7 @@ import {
 import ThreeDotsMenu from '../CustomSvgIcons/ThreeDotsMenu';
 import { type ItemData, type ItemBaseAttributes, navigationKeys } from '.';
 import { useLongTouch } from '../../Utils/UseLongTouch';
+import { useDragDropManager } from 'react-dnd';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import { type DraggedItem } from '../DragAndDrop/DragSourceAndDropTarget';
 import classNames from 'classnames';
@@ -160,9 +161,16 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     'before' | 'after' | 'inside'
   >('before');
   const containerRef = React.useRef<?HTMLDivElement>(null);
+  const dragDropManager = useDragDropManager();
   const openContextMenu = React.useCallback(
     // $FlowFixMe[missing-local-annot]
     ({ clientX, clientY }) => {
+      // When the context menu opens it intercepts subsequent touch events,
+      // so the drag backend never receives touchend/touchcancel and the drag
+      // stays active indefinitely. End it explicitly before opening the menu.
+      if (dragDropManager.getMonitor().isDragging()) {
+        dragDropManager.getActions().endDrag();
+      }
       onContextMenu({
         index: index,
         item: node.item,
@@ -170,15 +178,15 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         y: clientY,
       });
     },
-    [onContextMenu, index, node.item]
+    [dragDropManager, onContextMenu, index, node.item]
   );
 
-  const {
-    isPressingRef: isLongTouchPressingRef,
-    contextMenuProps: longTouchForContextMenuProps,
-  } = useLongTouch(openContextMenu, {
-    delay: DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE,
-  });
+  const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
+    openContextMenu,
+    {
+      delay: DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE,
+    }
+  );
 
   const onClickItem = React.useCallback(
     // $FlowFixMe[missing-local-annot]
@@ -274,15 +282,6 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     <div style={style} ref={containerRef}>
       <DragSourceAndDropTarget
         beginDrag={() => {
-          // During a long-press (which will open the context menu on mobile), suppress
-          // the drag preview by returning an item with no data. We cannot block canDrag()
-          // instead, because react-dnd-touch-backend evaluates canDrag() once (after its
-          // delayTouchStart of 100ms), at which point isPressingRef is always true — so
-          // blocking canDrag() would permanently break intentional drags on mobile.
-          if (isLongTouchPressingRef.current) {
-            return {};
-          }
-
           if (!node.selected) onSelect({ node, exclusive: !node.selected });
 
           if (forceDefaultDraggingPreview) {

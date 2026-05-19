@@ -9,11 +9,7 @@ import FlatButton from '../../UI/FlatButton';
 import { ExtensionStore } from '.';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import HelpButton from '../../UI/HelpButton';
-import {
-  useImportExtension,
-  useInstallExtension,
-  getRequiredExtensions,
-} from './InstallExtension';
+import { useImportExtension } from './InstallExtension';
 import DismissableInfoBar from '../../UI/Messages/DismissableInfoBar';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
@@ -25,9 +21,7 @@ import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMea
 import Download from '../../UI/CustomSvgIcons/Download';
 import Add from '../../UI/CustomSvgIcons/Add';
 import ErrorBoundary from '../../UI/ErrorBoundary';
-import { checkRequiredExtensionsUpdate } from '../../AssetStore/ExtensionStore/InstallExtension';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
-import { ExtensionStoreContext } from './ExtensionStoreContext';
 import ShareExternalIcon from '../../UI/CustomSvgIcons/ShareExternal';
 import Window from '../../Utils/Window';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
@@ -54,9 +48,6 @@ const ExtensionsSearchDialog = ({
   const preferences = React.useContext(PreferencesContext);
   const { isMobile } = useResponsiveWindowSize();
   const installExtensionWithDependencies = useInstallExtensionWithDependencies();
-  const {
-    translatedExtensionShortHeadersByName: extensionShortHeadersByName,
-  } = React.useContext(ExtensionStoreContext);
   const importExtension = useImportExtension();
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(

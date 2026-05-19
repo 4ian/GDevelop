@@ -50,7 +50,6 @@ export const useLongTouch = (
     doNotCancelOnScroll?: boolean,
   }
 ): {|
-  isPressingRef: {| current: boolean |},
   contextMenuProps: {|
     onTouchEnd: () => void,
     onTouchMove: (event: TouchEvent) => void,
@@ -61,10 +60,8 @@ export const useLongTouch = (
   const context = options && options.context ? options.context : null;
   const delay = options && options.delay ? options.delay : defaultDelay;
   const currentClientCoordinates = React.useRef<?ClientCoordinates>(null);
-  const isPressingRef = React.useRef<boolean>(false);
   const clear = React.useCallback(
     () => {
-      isPressingRef.current = false;
       if (context) delete contextLocks[context];
       timeout.current && clearTimeout(timeout.current);
     },
@@ -113,9 +110,7 @@ export const useLongTouch = (
 
       const clientCoordinates = getClientXY(event);
       currentClientCoordinates.current = clientCoordinates;
-      isPressingRef.current = true;
       timeout.current = setTimeout(() => {
-        isPressingRef.current = false;
         callback(clientCoordinates);
       }, delay);
     },
@@ -148,7 +143,6 @@ export const useLongTouch = (
   );
 
   return {
-    isPressingRef,
     contextMenuProps: {
       onTouchStart: start,
       onTouchMove: onMove,

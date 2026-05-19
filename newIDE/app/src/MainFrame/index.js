@@ -211,7 +211,10 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
-import { readProjectSettings } from '../Utils/ProjectSettingsReader';
+import {
+  readProjectSettings,
+  getOverridenPreviewLayoutNameFromPreferences,
+} from '../Utils/ProjectSettingsReader';
 import useNpmScriptRunner from './NpmScriptRunner/useNpmScriptRunner';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
@@ -1228,6 +1231,21 @@ const MainFrame = (props: Props): React.MixedElement => {
               ...currentState,
               toolbarButtons: parsedProjectSettings.toolbarButtons || [],
             }));
+
+            const overridenPreviewLayoutName = getOverridenPreviewLayoutNameFromPreferences(
+              parsedProjectSettings.preferences
+            );
+            if (
+              overridenPreviewLayoutName &&
+              project.hasLayoutNamed(overridenPreviewLayoutName)
+            ) {
+              setPreviewState(previewState => ({
+                ...previewState,
+                isPreviewOverriden: true,
+                overridenPreviewLayoutName,
+                overridenPreviewExternalLayoutName: null,
+              }));
+            }
           }
         } catch (error) {
           console.warn(

@@ -601,10 +601,10 @@ const EventsTree: React.ComponentType<{
 
   const _onEndDrag = React.useCallback(
     () => {
-      // Don't guard on the closed-over draggedNode value. On mobile, the OS
+      // Don't look at the draggedNode value. On mobile, the OS
       // fires touchcancel almost immediately after beginDrag, creating a race
       // where the spec callback arrives before React re-renders with the updated
-      // draggedNode — so the guarded version sees draggedNode=null (stale
+      // draggedNode — so checking the value makes it see draggedNode=null (stale
       // closure) and skips the cleanup. Calling unconditionally is safe: React
       // deduplicates the null→null state update, and _restoreFoldedNodes is a
       // no-op when no nodes were temporarily unfolded.

@@ -26,7 +26,7 @@ export const OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY = 'overridenPreviewLayoutName';
 
 /**
  * Reads the overriden preview scene name from a parsed `preferences` map.
- * Returns null when missing or not a non-empty string. Does not mutate the map.
+ * Returns null when missing or not a non-empty string.
  */
 export const getOverridenPreviewLayoutNameFromPreferences = (
   preferences: ?$ReadOnly<{ [string]: boolean | string | number }>

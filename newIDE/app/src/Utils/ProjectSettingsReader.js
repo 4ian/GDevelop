@@ -17,6 +17,25 @@ export type ParsedProjectSettings = {
 
 const SETTINGS_FILE_NAME = 'gdevelop-settings.yaml';
 
+/**
+ * Key inside the `preferences:` block of `gdevelop-settings.yaml` that forces
+ * "Use this scene to start all previews" to the given scene name when opening
+ * the project (if the scene exists).
+ */
+export const OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY = 'overridenPreviewLayoutName';
+
+/**
+ * Reads the overriden preview scene name from a parsed `preferences` map.
+ * Returns null when missing or not a non-empty string. Does not mutate the map.
+ */
+export const getOverridenPreviewLayoutNameFromPreferences = (
+  preferences: ?{ [string]: boolean | string | number }
+): string | null => {
+  if (!preferences) return null;
+  const value = preferences[OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY];
+  return typeof value === 'string' && value.length > 0 ? value : null;
+};
+
 // Only allow safe characters in npm script names to prevent command injection
 const SAFE_SCRIPT_NAME_PATTERN = /^[a-zA-Z0-9_:-]+$/;
 

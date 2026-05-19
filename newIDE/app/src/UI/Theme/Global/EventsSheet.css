@@ -184,7 +184,9 @@
   color: var(--event-sheet-instruction-parameter-behavior-color);
 }
 
-.gd-events-sheet .instruction-parameter.operator {
+.gd-events-sheet .instruction-parameter.operator,
+.gd-events-sheet .instruction-parameter.yesorno,
+.gd-events-sheet .instruction-parameter.trueorfalse {
   color: var(--event-sheet-instruction-parameter-operator-color);
 }
 

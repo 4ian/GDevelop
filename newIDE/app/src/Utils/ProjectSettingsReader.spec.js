@@ -3,7 +3,11 @@ import {
   filterAllowedPreferences,
   applyProjectPreferences,
 } from './ApplyProjectPreferences';
-import { parseToolbarButtons } from './ProjectSettingsReader';
+import {
+  parseToolbarButtons,
+  getOverridenPreviewLayoutNameFromPreferences,
+  OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY,
+} from './ProjectSettingsReader';
 import YAML from 'yaml';
 import { type Preferences } from '../MainFrame/Preferences/PreferencesContext';
 
@@ -157,6 +161,71 @@ preferences:
       const parsed = YAML.parse(yamlContent);
       // readProjectSettings checks for preferences and returns null if empty/null
       expect(parsed.preferences).toBeNull();
+    });
+
+    test('overridenPreviewLayoutName is parsed but not applied to global preferences', () => {
+      const yamlContent = `
+preferences:
+  themeName: "Dark"
+  ${OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY}: "MyMenuScene"
+`;
+      const parsed = YAML.parse(yamlContent);
+      const rawPreferences = parsed.preferences;
+      expect(rawPreferences[OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY]).toBe(
+        'MyMenuScene'
+      );
+
+      // The key is not in the allowlist, so it must not reach setMultipleValues.
+      const filtered = filterAllowedPreferences(rawPreferences);
+      expect(filtered).toEqual({ themeName: 'Dark' });
+      expect(filtered[OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY]).toBeUndefined();
+
+      // The key is exposed for MainFrame to read via the helper.
+      expect(getOverridenPreviewLayoutNameFromPreferences(rawPreferences)).toBe(
+        'MyMenuScene'
+      );
+    });
+  });
+
+  describe('getOverridenPreviewLayoutNameFromPreferences', () => {
+    test('returns the scene name when present and a non-empty string', () => {
+      expect(
+        getOverridenPreviewLayoutNameFromPreferences({
+          [OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY]: 'Intro',
+        })
+      ).toBe('Intro');
+    });
+
+    test('returns null when missing or not a non-empty string', () => {
+      expect(getOverridenPreviewLayoutNameFromPreferences(null)).toBeNull();
+      expect(getOverridenPreviewLayoutNameFromPreferences({})).toBeNull();
+      expect(
+        getOverridenPreviewLayoutNameFromPreferences({
+          [OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY]: '',
+        })
+      ).toBeNull();
+      expect(
+        getOverridenPreviewLayoutNameFromPreferences({
+          [OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY]: 123,
+        })
+      ).toBeNull();
+      expect(
+        getOverridenPreviewLayoutNameFromPreferences({
+          [OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY]: true,
+        })
+      ).toBeNull();
+    });
+
+    test('does not mutate the preferences map', () => {
+      const prefs = {
+        themeName: 'Dark',
+        [OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY]: 'Intro',
+      };
+      getOverridenPreviewLayoutNameFromPreferences(prefs);
+      expect(prefs).toEqual({
+        themeName: 'Dark',
+        [OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY]: 'Intro',
+      });
     });
   });
 

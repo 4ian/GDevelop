@@ -13,6 +13,60 @@ import {
 } from '../AssetStore/ExtensionStore/InstallExtension';
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 
+export const useInstallExtensionWithDependencies = (): (({
+  project: gdProject,
+  extensionShortHeader: ExtensionShortHeader,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+}) => Promise<boolean>) => {
+  const installExtension = useInstallExtension();
+  const {
+    translatedExtensionShortHeadersByName: extensionShortHeadersByName,
+  } = React.useContext(ExtensionStoreContext);
+
+  return async ({
+    project,
+    extensionShortHeader,
+    onWillInstallExtension,
+    onExtensionInstalled,
+  }: {
+    project: gdProject,
+    extensionShortHeader: ExtensionShortHeader,
+    onWillInstallExtension: (extensionNames: Array<string>) => void,
+    onExtensionInstalled: (extensionNames: Array<string>) => void,
+  }): Promise<boolean> => {
+    const extensionShortHeaders: Array<ExtensionShortHeader> = [
+      extensionShortHeader,
+    ];
+    const requiredExtensionInstallation = await checkRequiredExtensionsUpdate({
+      requiredExtensions: getRequiredExtensions(extensionShortHeaders),
+      project,
+      extensionShortHeadersByName,
+    });
+    if (
+      !requiredExtensionInstallation.missingExtensionShortHeaders.includes(
+        extensionShortHeader
+      )
+    ) {
+      // The extension chosen by users is not part of `requiredExtensions`
+      // but should always be installed. This is true even if the versions
+      // are matching to allow to reinstall the extension.
+      requiredExtensionInstallation.missingExtensionShortHeaders.push(
+        extensionShortHeader
+      );
+    }
+    return await installExtension({
+      project,
+      requiredExtensionInstallation,
+      importedSerializedExtensions: [],
+      onWillInstallExtension,
+      onExtensionInstalled,
+      updateMode: 'all',
+      reason: 'extension',
+    });
+  };
+};
+
 type Props = {|
   project: gdProject,
   onClose: () => void,
@@ -33,44 +87,16 @@ function InstalledExtensionDetails({
   onOpenEventsFunctionsExtension,
 }: Props): React.Node {
   const [isInstalling, setIsInstalling] = React.useState<boolean>(false);
-  const installExtension = useInstallExtension();
-  const {
-    translatedExtensionShortHeadersByName: extensionShortHeadersByName,
-  } = React.useContext(ExtensionStoreContext);
+  const installExtensionWithDependencies = useInstallExtensionWithDependencies();
 
-  const installOrUpdateExtension = async (i18n: I18nType) => {
+  const installOrUpdateExtensionAndChangeState = async (i18n: I18nType) => {
     setIsInstalling(true);
     try {
-      const extensionShortHeaders: Array<ExtensionShortHeader> = [
-        extensionShortHeader,
-      ];
-      const requiredExtensionInstallation = await checkRequiredExtensionsUpdate(
-        {
-          requiredExtensions: getRequiredExtensions(extensionShortHeaders),
-          project,
-          extensionShortHeadersByName,
-        }
-      );
-      if (
-        !requiredExtensionInstallation.missingExtensionShortHeaders.includes(
-          extensionShortHeader
-        )
-      ) {
-        // The extension chosen by users is not part of `requiredExtensions`
-        // but should always be installed. This is true even if the versions
-        // are matching to allow to reinstall the extension.
-        requiredExtensionInstallation.missingExtensionShortHeaders.push(
-          extensionShortHeader
-        );
-      }
-      await installExtension({
+      await installExtensionWithDependencies({
         project,
-        requiredExtensionInstallation,
-        importedSerializedExtensions: [],
+        extensionShortHeader,
         onWillInstallExtension,
         onExtensionInstalled,
-        updateMode: 'all',
-        reason: 'extension',
       });
     } finally {
       setIsInstalling(false);
@@ -84,7 +110,7 @@ function InstalledExtensionDetails({
           project={project}
           isInstalling={isInstalling}
           onClose={onClose}
-          onInstall={() => installOrUpdateExtension(i18n)}
+          onInstall={() => installOrUpdateExtensionAndChangeState(i18n)}
           extensionShortHeader={extensionShortHeader}
           onEdit={() => {
             onOpenEventsFunctionsExtension(extensionName);

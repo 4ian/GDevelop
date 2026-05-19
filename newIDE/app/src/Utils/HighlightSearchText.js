@@ -173,7 +173,7 @@ const getColorationName = (
       return 'number';
 
     case gd.ExpressionColorationDescription.Object:
-      return 'object';
+      return 'objectInExpression';
 
     case gd.ExpressionColorationDescription.Variable:
       return 'variable';

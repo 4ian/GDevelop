@@ -181,9 +181,9 @@ preferences:
       expect(filtered[OVERRIDEN_PREVIEW_LAYOUT_NAME_KEY]).toBeUndefined();
 
       // The key is exposed for MainFrame to read via the helper.
-      expect(
-        getOverridenPreviewLayoutNameFromPreferences(rawPreferences)
-      ).toBe('MyMenuScene');
+      expect(getOverridenPreviewLayoutNameFromPreferences(rawPreferences)).toBe(
+        'MyMenuScene'
+      );
     });
   });
 

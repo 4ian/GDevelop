@@ -923,8 +923,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
-    // A whitespace between `-` and the number forces a unary minus (legacy
-    // behaviour preserved). Ensure `2 - 3` is still a binary subtract and
+    // Whitespace around `-` keeps it a binary subtract. Ensure `2 - 3` is
     // not collapsed into `2` followed by NumberNode("-3").
     {
       auto node = parser.ParseExpression("2 - 3");

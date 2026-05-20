@@ -59,18 +59,9 @@ export class ProjectScopedContainersAccessor {
     } = this._scope;
     const gd: libGDevelop = global.gd;
 
-    // The `MakeNew...` calls below are static methods on the C++ side. The
-    // use-after-free detection in `postjs.js` only wraps prototype methods,
-    // and `adaptNamingConventions` copies the unwrapped reference onto the
-    // class function (`gd.ProjectScopedContainers.makeNew...`), so neither
-    // `this` nor the wrapped object arguments are checked before C++ runs.
-    // If `project` or `layout` (or another wrapped scope object) has been
-    // destroyed, C++ will dereference freed memory and abort somewhere deep
-    // in libGD with an unhelpful "Aborted()" error.
-    //
-    // Asserting liveness here turns that into a `UseAfterFreeError` carrying
-    // the destruction context (which JS call destroyed the object, when, and
-    // the last successful call against the wrapper).
+    // Surface destruction context (which JS call destroyed which object,
+    // when) instead of a libGD `Aborted()` if a wrapped scope object is
+    // dead before the static `MakeNew...` C++ call dereferences it.
     gd.assertObjectAlive(project);
     if (layout) gd.assertObjectAlive(layout);
     if (eventsFunctionsExtension) gd.assertObjectAlive(eventsFunctionsExtension);

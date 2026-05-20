@@ -498,7 +498,12 @@ function patchClassesForUseAfterFreeDetection(
       const contextId = nextContextId++;
       callContextLabels[contextId] = gdClass + '.' + methodName;
 
-      // Wrap the method with:
+      // Detect static methods: adaptNamingConventions copied the unwrapped
+      // reference from the prototype onto the class function before this
+      // patching pass, so the two references are still identical here.
+      const isStatic = gd[gdClass][methodName] === desc.value;
+
+      // Wrap the prototype method with:
       // 1. A liveness check (assertAlive).
       // 2. Setting the call-context ID on the C++ side (~50-100ns) so
       //    MemoryTrackedRegistry::remove() knows which JS call triggered
@@ -529,6 +534,40 @@ function patchClassesForUseAfterFreeDetection(
           return result;
         };
       })(desc.value, methodName, className, contextId);
+
+      // Static methods are called via `gd.ClassName.method(...)` which goes
+      // through the class-function reference, not the prototype, so the
+      // wrapper above is never invoked. `this` there is the class function
+      // (no ptr to check) — instead check each wrapped object argument.
+      if (isStatic) {
+        gd[gdClass][methodName] = (function (
+          original,
+          wrappedCallLabel,
+          wrappedContextId
+        ) {
+          return function staticUseAfterFreeDetectionWrapper() {
+            for (var i = 0; i < arguments.length; i++) {
+              var arg = arguments[i];
+              if (
+                arg &&
+                typeof arg === 'object' &&
+                arg._memoryTrackedClassName
+              ) {
+                assertAlive(
+                  arg,
+                  wrappedCallLabel + ' arg#' + i,
+                  gd,
+                  arg._memoryTrackedClassName
+                );
+              }
+            }
+            setCurrentCallContextId(wrappedContextId);
+            var result = original.apply(this, arguments);
+            setCurrentCallContextId(0);
+            return result;
+          };
+        })(desc.value, gdClass + '.' + methodName, contextId);
+      }
     });
 
     // Wrap delete() to set the call-context ID before calling gd.destroy().

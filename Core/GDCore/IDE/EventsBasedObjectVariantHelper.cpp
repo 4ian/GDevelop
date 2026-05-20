@@ -53,18 +53,20 @@ void EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
         continue;
       }
       // Change object types
-      auto &object = objects.GetObject(objectName);
-      if (object.GetType() != defaultObject->GetType()) {
+      // Do not try to factorize `objects.GetObject(objectName)` because the
+      // object may be removed.
+      if (objects.GetObject(objectName).GetType() != defaultObject->GetType()) {
         // Keep a copy of the old object.
         auto oldObject = objects.GetObject(objectName);
         objects.RemoveObject(objectName);
-        objects.InsertObject(*defaultObject,
-                             defaultObjects.GetObjectPosition(objectName));
-        object.CopyWithoutConfiguration(oldObject);
+        auto &newObject = objects.InsertObject(
+            *defaultObject, defaultObjects.GetObjectPosition(objectName));
+        newObject.CopyWithoutConfiguration(oldObject);
         objects.AddMissingObjectsInRootFolder();
       }
 
       // Copy missing behaviors
+      auto &object = objects.GetObject(objectName);
       for (const auto &pair : defaultBehaviors) {
         const auto &behaviorName = pair.first;
         const auto &defaultBehavior = pair.second;

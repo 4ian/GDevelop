@@ -579,6 +579,25 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     {
+      auto node = parser.ParseExpression("-123-456");
+      REQUIRE(node != nullptr);
+      auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number|string", operatorNode);
+      REQUIRE(operatorNode.op == '-');
+      REQUIRE(type == "number");
+      auto &leftNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.leftHandSide);
+      REQUIRE(leftNumberNode.number == "-123");
+      auto &rightNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.rightHandSide);
+      REQUIRE(rightNumberNode.number == "456");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
       auto node = parser.ParseExpression("\"abc\" + \"def\"");
       REQUIRE(node != nullptr);
       auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);

@@ -1240,11 +1240,12 @@ const MainFrame = (props: Props): React.MixedElement => {
         // (set via "Use this scene to start all previews").
         const previewLayoutName = project.getPreviewLayout();
         if (previewLayoutName && project.hasLayoutNamed(previewLayoutName)) {
-          setPreviewOverride({
+          setPreviewState(previewState => ({
+            ...previewState,
             isPreviewOverriden: true,
             overridenPreviewLayoutName: previewLayoutName,
             overridenPreviewExternalLayoutName: null,
-          });
+          }));
         }
 
         setIsProjectClosedSoAvoidReloadingExtensions(false);

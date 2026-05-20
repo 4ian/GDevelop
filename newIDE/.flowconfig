@@ -1,15 +1,19 @@
 [ignore]
-<PROJECT_ROOT>/resources/.*
+<PROJECT_ROOT>/app/resources/.*
 <PROJECT_ROOT>/node_modules/protobufjs/src/bower.json
 <PROJECT_ROOT>/node_modules/resolve/test/resolver/malformed_package_json/.*
 <PROJECT_ROOT>/node_modules/eslint-plugin-react/node_modules/resolve/test/resolver/malformed_package_json/.*
 <PROJECT_ROOT>/node_modules/.cache/.*
+<PROJECT_ROOT>/app/node_modules/.cache/.*
 # Don't type check the GDJS runtime and extensions copied into node_modules (only used for the web-app),
 # as this would be redundant for JsExtension.js files (see [include] section) of Extensions, and the
 # game engine and extensions are annotated with TypeScript annotations, not Flow.
 # It would also force Flow to restart every single time GDJS-for-web-app-only is updated, which is
 # almost always during development (any change in GDJS/extensions, or any restart of the app).
-<PROJECT_ROOT>/node_modules/GDJS-for-web-app-only/.*
+<PROJECT_ROOT>/app/node_modules/GDJS-for-web-app-only/.*
+# Don't type check other workspace packages
+<PROJECT_ROOT>/electron-app/.*
+<PROJECT_ROOT>/web-app/.*
 
 [untyped]
 # react-window has some errors
@@ -17,17 +21,19 @@
 
 [declarations]
 <PROJECT_ROOT>/node_modules/fbjs/.*
-<PROJECT_ROOT>/flow-libs/.*
-<PROJECT_ROOT>/../../GDevelop.js/types/.*
-<PROJECT_ROOT>/flow-typed/.*
+<PROJECT_ROOT>/node_modules/.*/node_modules/fbjs/.*
+<PROJECT_ROOT>/app/flow-libs/.*
+<PROJECT_ROOT>/../GDevelop.js/types/.*
+<PROJECT_ROOT>/app/flow-typed/.*
 # lingui-js triggers some Flow errors
 <PROJECT_ROOT>/node_modules/@lingui/core/.*
 # JSS triggers a Flow error
 <PROJECT_ROOT>/node_modules/jss/src/index.js
 
 [libs]
-flow-libs
-../../GDevelop.js/types
+app/flow-libs
+app/flow-typed
+../GDevelop.js/types
 
 [options]
 module.ignore_non_literal_requires=true

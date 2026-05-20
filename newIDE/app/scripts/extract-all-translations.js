@@ -32,7 +32,7 @@ if (fs.existsSync(enIdeMessagesPotPath)) {
 shell.echo('ℹ️ Extracting translations for newIDE...');
 
 hasErrors |=
-  shell.exec('node node_modules/.bin/lingui extract --clean --overwrite', {
+  shell.exec('npx lingui extract --clean --overwrite', {
     cwd: newIdeAppPath,
   }).code !== 0;
 

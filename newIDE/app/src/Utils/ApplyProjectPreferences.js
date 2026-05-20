@@ -48,6 +48,7 @@ const allowedPreferenceKeys: $ReadOnlyArray<
   'takeScreenshotOnPreview',
   'showAiAskButtonInTitleBar',
   'automaticallyUseCreditsForAiRequests',
+  'canonicalEventSerialization',
 ];
 
 const allowedPreferences: Set<string> = new Set(allowedPreferenceKeys);

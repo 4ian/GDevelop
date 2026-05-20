@@ -292,6 +292,54 @@ jobs:
           name: Deploy to S3 (specific commit)
           command: aws s3 sync Binaries/embuild/GDevelop.js s3://gdevelop-gdevelop.js/$(git rev-parse --abbrev-ref HEAD)/variant/debug-sanitizers/commit/$(git rev-parse HEAD)/
 
+  # Build and run the native GDCore_tests with AddressSanitizer + UBSan, to
+  # catch heap-use-after-free, buffer overflows and undefined behaviour that
+  # only sometimes manifest as flaky segfaults in the non-sanitized builds
+  # (Travis, Semaphore). The Emscripten build has its own sanitizer job:
+  # build-gdevelop_js-debug-sanitizers-and-extra-checks.
+  build-gdcore-tests-sanitizers:
+    resource_class: large
+    docker:
+      - image: cimg/base:current
+
+    working_directory: ~/GDevelop
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install build dependencies (cmake, clang, libstdc++ dev)
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y cmake clang libstdc++-12-dev
+
+      - run:
+          name: Configure GDCore_tests with ASan + UBSan (Debug)
+          command: |
+            mkdir -p .build-tests-asan
+            cd .build-tests-asan
+            cmake \
+              -DBUILD_GDJS=FALSE \
+              -DBUILD_EXTENSIONS=FALSE \
+              -DBUILD_TESTS=TRUE \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DUSE_SANITIZERS="address,undefined" \
+              -DCMAKE_CXX_COMPILER=$(which clang++) \
+              -DCMAKE_C_COMPILER=$(which clang) \
+              ..
+
+      - run:
+          name: Build GDCore_tests
+          command: cd .build-tests-asan && make -j 4 GDCore_tests
+
+      - run:
+          name: Run GDCore_tests with sanitizers (20 iterations to catch flakes)
+          command: |
+            cd .build-tests-asan
+            export ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:print_stacktrace=1
+            export UBSAN_OPTIONS=print_stacktrace=1
+            for i in {1..20}; do echo "Run $i"; Core/GDCore_tests; done
+
   # Trigger AppVeyor build, which also does a Windows build (keep it for redundancy).
   trigger-appveyor-windows-build:
     docker:
@@ -502,6 +550,7 @@ workflows:
   builds:
     jobs:
       - build-gdevelop_js-wasm-only
+      - build-gdcore-tests-sanitizers
       - build-macos:
           # The macOS version builds by itself GDevelop.js
           # (so we verify we can build it on macOS).

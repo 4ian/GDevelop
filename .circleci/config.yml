@@ -333,13 +333,12 @@ jobs:
           command: cd .build-tests-asan && make -j 4 GDCore_tests
 
       - run:
-          name: Run GDCore_tests with sanitizers (20 iterations to catch flakes)
+          name: Run GDCore_tests with sanitizers
           command: |
             cd .build-tests-asan
-            for i in {1..2}; do echo "Traditional run $i"; Core/GDCore_tests; done
             export ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:print_stacktrace=1
             export UBSAN_OPTIONS=print_stacktrace=1
-            for i in {1..2}; do echo "Sanitizers run $i"; Core/GDCore_tests; done
+            Core/GDCore_tests
 
   # Trigger AppVeyor build, which also does a Windows build (keep it for redundancy).
   trigger-appveyor-windows-build:

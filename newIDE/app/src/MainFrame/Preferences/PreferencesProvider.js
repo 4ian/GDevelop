@@ -140,6 +140,7 @@ export const getInitialPreferences = (): {
   useShortcutToClosePreviewWindow: boolean,
   userShortcutMap: {},
   watchProjectFolderFilesForLocalProjects: boolean,
+  homePageMenuIsCollapsed: boolean,
 } => {
   let languageOrLocale = 'en';
   const browserLanguageOrLocale = getBrowserLanguageOrLocale();
@@ -406,6 +407,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ): any),
     // $FlowFixMe[method-unbinding]
     setShowJsTypeError: (this._setShowJsTypeError.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setHomePageMenuIsCollapsed: (this._setHomePageMenuIsCollapsed.bind(
+      this
+    ): any),
   };
 
   componentDidMount() {
@@ -1392,6 +1397,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           automaticallyUseCreditsForAiRequests: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setHomePageMenuIsCollapsed(homePageMenuIsCollapsed: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          homePageMenuIsCollapsed,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

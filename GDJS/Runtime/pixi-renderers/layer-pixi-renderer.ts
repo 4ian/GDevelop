@@ -216,7 +216,7 @@ namespace gdjs {
     private _threeCameraDirty: boolean = false;
     private _threeEffectComposer: THREE_ADDONS.EffectComposer | null = null;
     private _basis: Basis | null = null;
-    private static matrix4: THREE.Matrix4 = new THREE.Matrix4();
+    private static matrix4: THREE.Matrix4 | null = null;
 
     // For a 2D+3D layer, the 2D rendering is done on the render texture
     // and then must be displayed on a plane in the 3D world:
@@ -829,7 +829,8 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      const runtimeGame = this._layer.getRuntimeScene().getGame();
+      const instanceContainer = this._layer.getInstanceContainer();
+      const runtimeGame = instanceContainer.getGame();
 
       // Update the 3D camera position and rotation.
       if (this._threeCamera) {
@@ -921,8 +922,10 @@ namespace gdjs {
         const centerY =
           this._layer.getCameraX() * effectivePixiZoom * angleSinValue +
           this._layer.getCameraY() * effectivePixiZoom * angleCosValue;
-        this._pixiContainer.position.x = this._layer.getWidth() / 2 - centerX;
-        this._pixiContainer.position.y = this._layer.getHeight() / 2 - centerY;
+        this._pixiContainer.position.x =
+          instanceContainer.getViewportOriginX() - centerX;
+        this._pixiContainer.position.y =
+          instanceContainer.getViewportOriginY() - centerY;
       }
 
       // Pixel rounding for the Pixi rendering (be it for 2D only
@@ -1085,7 +1088,11 @@ namespace gdjs {
         return this._basis;
       }
 
-      const rotationMatrix = gdjs.LayerPixiRenderer.matrix4;
+      let rotationMatrix = gdjs.LayerPixiRenderer.matrix4;
+      if (!rotationMatrix) {
+        rotationMatrix = new THREE.Matrix4();
+        gdjs.LayerPixiRenderer.matrix4 = rotationMatrix;
+      }
       rotationMatrix.makeRotationFromEuler(this._threeCamera.rotation);
       const elements = rotationMatrix.elements;
 

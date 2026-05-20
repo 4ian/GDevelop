@@ -375,6 +375,8 @@ export const CompactEventsFunctionPropertiesEditor = ({
                 if (onConfigurationUpdated) onConfigurationUpdated();
               }}
               getLastObjectParameterObjectType={() => ''}
+              // Expression can't return behaviors
+              onOpenBehaviorTypeDialog={() => {}}
             />
           )}
           <CompactCollapsibleAdvancedSection>

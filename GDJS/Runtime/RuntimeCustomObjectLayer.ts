@@ -10,6 +10,9 @@ namespace gdjs {
    * @category Core Engine > Layers
    */
   export class RuntimeCustomObjectLayer extends gdjs.RuntimeLayer {
+    private _cameraDeltaX: float = 0;
+    private _cameraDeltaY: float = 0;
+
     /**
      * @param layerData The data used to initialize the layer
      * @param instanceContainer The container in which the layer is used
@@ -22,6 +25,8 @@ namespace gdjs {
 
       // Let the renderer do its final set up:
       this._renderer.onCreated();
+      // We don't call `this._renderer.updatePosition` because the camera has
+      // no effect unless it's moved.
     }
 
     override onGameResolutionResized(
@@ -30,23 +35,29 @@ namespace gdjs {
     ): void {}
 
     override getCameraX(cameraId?: integer): float {
-      return 0;
+      return this._cameraDeltaX + this._runtimeScene.getViewportOriginX();
     }
 
     override getCameraY(cameraId?: integer): float {
-      return 0;
+      return this._cameraDeltaY + this._runtimeScene.getViewportOriginY();
     }
 
-    override setCameraX(x: float, cameraId?: integer): void {}
+    override setCameraX(x: float, cameraId?: integer): void {
+      this._cameraDeltaX = x - this._runtimeScene.getViewportOriginX();
+      this._renderer.updatePosition();
+    }
 
-    override setCameraY(y: float, cameraId?: integer): void {}
+    override setCameraY(y: float, cameraId?: integer): void {
+      this._cameraDeltaY = y - this._runtimeScene.getViewportOriginY();
+      this._renderer.updatePosition();
+    }
 
     override getCameraWidth(cameraId?: integer): float {
-      return 0;
+      return this.getWidth();
     }
 
     override getCameraHeight(cameraId?: integer): float {
-      return 0;
+      return this.getHeight();
     }
 
     override setCameraZoom(newZoom: float, cameraId?: integer): void {}
@@ -121,9 +132,15 @@ namespace gdjs {
       cameraId: integer,
       result: FloatPoint
     ): FloatPoint {
+      // The result parameter used to be optional.
+      let position = result || [0, 0];
+
+      x += this._cameraDeltaX;
+      y += this._cameraDeltaY;
+
       // TODO EBO use an AffineTransformation to avoid chained calls.
       // The result parameter used to be optional.
-      return this._runtimeScene.convertCoords(x, y, result || [0, 0]);
+      return this._runtimeScene.convertCoords(x, y, position);
     }
 
     override convertInverseCoords(
@@ -132,9 +149,16 @@ namespace gdjs {
       cameraId: integer,
       result: FloatPoint
     ): FloatPoint {
+      // The result parameter used to be optional.
+      let position = result || [0, 0];
+
       // TODO EBO use an AffineTransformation to avoid chained calls.
       // The result parameter used to be optional.
-      return this._runtimeScene.convertInverseCoords(x, y, result || [0, 0]);
+      this._runtimeScene.convertInverseCoords(x, y, position);
+      position[0] -= this._cameraDeltaX;
+      position[1] -= this._cameraDeltaY;
+
+      return position;
     }
 
     override applyLayerInverseTransformation(
@@ -143,8 +167,8 @@ namespace gdjs {
       cameraId: integer,
       result: FloatPoint
     ): FloatPoint {
-      result[0] = x;
-      result[1] = y;
+      result[0] = x - this._cameraDeltaX;
+      result[1] = y - this._cameraDeltaY;
       return result;
     }
 
@@ -154,8 +178,8 @@ namespace gdjs {
       cameraId: integer,
       result: FloatPoint
     ): FloatPoint {
-      result[0] = x;
-      result[1] = y;
+      result[0] = x + this._cameraDeltaX;
+      result[1] = y + this._cameraDeltaY;
       return result;
     }
   }

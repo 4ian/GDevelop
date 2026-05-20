@@ -14,7 +14,7 @@ namespace gdjs {
     _isContainerDirty: boolean = true;
     _threeGroup: THREE.Group;
     private _basis: Basis | null = null;
-    private static matrix4: THREE.Matrix4 = new THREE.Matrix4();
+    private static matrix4: THREE.Matrix4 | null = null;
 
     constructor(
       object: gdjs.CustomRuntimeObject3D,
@@ -193,7 +193,11 @@ namespace gdjs {
         gdjs.toRad(this._object.angle)
       );
 
-      const rotationMatrix = gdjs.CustomRuntimeObject3DRenderer.matrix4;
+      let rotationMatrix = gdjs.CustomRuntimeObject3DRenderer.matrix4;
+      if (!rotationMatrix) {
+        rotationMatrix = new THREE.Matrix4();
+        gdjs.CustomRuntimeObject3DRenderer.matrix4 = rotationMatrix;
+      }
       rotationMatrix.makeRotationFromEuler(threeObject3D.rotation);
       const elements = rotationMatrix.elements;
 

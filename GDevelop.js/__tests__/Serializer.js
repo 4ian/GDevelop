@@ -127,6 +127,147 @@ describe('libGD.js object serialization', function () {
     });
   });
 
+  describe('gd.Serializer canonical mode', function () {
+    afterEach(() => {
+      // Always reset, even if a test failed mid-way: leaving the flag on
+      // would silently change the format of every subsequent test.
+      gd.Serializer.setCanonicalMode(false);
+    });
+
+    it('defaults to off', function () {
+      expect(gd.Serializer.isCanonicalMode()).toBe(false);
+    });
+
+    it('toggles on and off', function () {
+      gd.Serializer.setCanonicalMode(true);
+      expect(gd.Serializer.isCanonicalMode()).toBe(true);
+      gd.Serializer.setCanonicalMode(false);
+      expect(gd.Serializer.isCanonicalMode()).toBe(false);
+    });
+
+    const buildElement = () => {
+      const element = new gd.SerializerElement();
+      element.addChild('zeta').setStringValue('z');
+      element.addChild('alpha').setStringValue('a');
+      element.addChild('mu').setStringValue('m');
+      return element;
+    };
+
+    it('keeps insertion key order when off', function () {
+      const element = buildElement();
+      const json = gd.Serializer.toJSON(element);
+      element.delete();
+      expect(json).toBe('{"zeta":"z","alpha":"a","mu":"m"}');
+    });
+
+    it('writes JSON keys alphabetically when on', function () {
+      gd.Serializer.setCanonicalMode(true);
+      const element = buildElement();
+      const json = gd.Serializer.toJSON(element);
+      element.delete();
+      expect(json).toBe('{"alpha":"a","mu":"m","zeta":"z"}');
+    });
+
+    it('round-trips through fromJSON/toJSON in canonical mode', function () {
+      gd.Serializer.setCanonicalMode(true);
+      const input = '{"a":1,"b":{"x":[1,2,3],"y":"v"},"c":true}';
+      const element = gd.Serializer.fromJSON(input);
+      const json = gd.Serializer.toJSON(element);
+      expect(json).toBe(input);
+    });
+
+    const serializeLayoutEvent = (canonicalMode) => {
+      gd.Serializer.setCanonicalMode(canonicalMode);
+
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Scene', 0);
+      const events = layout.getEvents();
+      events.insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
+      const element = new gd.SerializerElement();
+      events.serializeTo(element);
+      const json = gd.Serializer.toJSON(element);
+      element.delete();
+      project.delete();
+
+      return JSON.parse(json);
+    };
+
+    it('writes default booleans/empty arrays for an empty StandardEvent when on', function () {
+      const eventsArray = serializeLayoutEvent(true);
+      expect(Array.isArray(eventsArray)).toBe(true);
+      expect(eventsArray.length).toBe(1);
+      const event = eventsArray[0];
+
+      expect(event.disabled).toBe(false);
+      expect(event.folded).toBe(false);
+      expect(event.events).toEqual([]);
+      expect(event.variables).toBeDefined();
+
+      // Keys must be alphabetical.
+      const keys = Object.keys(event);
+      const sorted = [...keys].sort();
+      expect(keys).toEqual(sorted);
+    });
+
+    it('omits default values for an empty StandardEvent when off', function () {
+      const eventsArray = serializeLayoutEvent(false);
+      const event = eventsArray[0];
+
+      expect(event.disabled).toBeUndefined();
+      expect(event.folded).toBeUndefined();
+      expect(event.events).toBeUndefined();
+      expect(event.variables).toBeUndefined();
+    });
+
+    it('produces stable, byte-identical output across two serializations', function () {
+      gd.Serializer.setCanonicalMode(true);
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Scene', 0);
+      layout.getObjects().insertNewObject(project, 'Sprite', 'Object1', 0);
+
+      const elementA = new gd.SerializerElement();
+      project.serializeTo(elementA);
+      const jsonA = gd.Serializer.toJSON(elementA);
+      elementA.delete();
+
+      const elementB = new gd.SerializerElement();
+      project.serializeTo(elementB);
+      const jsonB = gd.Serializer.toJSON(elementB);
+      elementB.delete();
+
+      expect(jsonA).toBe(jsonB);
+
+      project.delete();
+    });
+
+    it('round-trips through serialize -> deserialize -> serialize', function () {
+      gd.Serializer.setCanonicalMode(true);
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('SceneA', 0);
+      project.insertNewLayout('SceneB', 1);
+
+      const elementA = new gd.SerializerElement();
+      project.serializeTo(elementA);
+      const jsonA = gd.Serializer.toJSON(elementA);
+      elementA.delete();
+
+      const elementB = gd.Serializer.fromJSON(jsonA);
+      const project2 = new gd.ProjectHelper.createNewGDJSProject();
+      project2.unserializeFrom(elementB);
+
+      const elementC = new gd.SerializerElement();
+      project2.serializeTo(elementC);
+      const jsonB = gd.Serializer.toJSON(elementC);
+      elementC.delete();
+
+      expect(jsonB).toBe(jsonA);
+
+      project.delete();
+      project2.delete();
+    });
+  });
+
   describe('gd.BinarySerializer', function () {
     const serializeToBinarySnapshot = (serializerElement) => {
       // Create binary snapshot

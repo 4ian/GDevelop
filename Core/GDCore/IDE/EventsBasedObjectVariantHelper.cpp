@@ -53,18 +53,20 @@ void EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
         continue;
       }
       // Change object types
-      auto &object = objects.GetObject(objectName);
-      if (object.GetType() != defaultObject->GetType()) {
+      // Do not try to factorize `objects.GetObject(objectName)` because the
+      // object may be removed.
+      if (objects.GetObject(objectName).GetType() != defaultObject->GetType()) {
         // Keep a copy of the old object.
         auto oldObject = objects.GetObject(objectName);
         objects.RemoveObject(objectName);
-        objects.InsertObject(*defaultObject,
-                             defaultObjects.GetObjectPosition(objectName));
-        object.CopyWithoutConfiguration(oldObject);
+        auto &newObject = objects.InsertObject(
+            *defaultObject, defaultObjects.GetObjectPosition(objectName));
+        newObject.CopyWithoutConfiguration(oldObject);
         objects.AddMissingObjectsInRootFolder();
       }
 
       // Copy missing behaviors
+      auto &object = objects.GetObject(objectName);
       for (const auto &pair : defaultBehaviors) {
         const auto &behaviorName = pair.first;
         const auto &defaultBehavior = pair.second;
@@ -141,11 +143,7 @@ void EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
     auto &defaultObjectGroups =
         eventsBasedObject.GetDefaultVariant().GetObjects().GetObjectGroups();
     auto &objectGroups = variant->GetObjects().GetObjectGroups();
-    auto objectGroupsCount = objectGroups.Count();
-    // Clear groups
-    for (size_t index = 0; index < objectGroupsCount; index++) {
-      objectGroups.Remove(objectGroups.Get(0).GetName());
-    }
+    objectGroups.Clear();
     // Copy groups
     for (size_t index = 0; index < defaultObjectGroups.Count(); index++) {
       objectGroups.Insert(defaultObjectGroups.Get(index), index);

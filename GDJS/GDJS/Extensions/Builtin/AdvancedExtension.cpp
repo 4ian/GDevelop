@@ -58,7 +58,8 @@ AdvancedExtension::AdvancedExtension() {
         if (codeGenerator.HasProjectAndLayout()) {
             return gd::String("");
         }
-        // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
+        // This is duplicated from `EventsCodeGenerator::GenerateParameterCodes`
+        // and `InstructionSentenceFormatter::GetFormattedParameterValue`.
         gd::String parameter = instruction.GetParameter(0).GetPlainString();
         gd::String booleanCode =
             (parameter == "True" || parameter == "Vrai") ? "true" : "false";

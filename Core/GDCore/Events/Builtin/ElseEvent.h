@@ -39,6 +39,9 @@ class GD_CORE_API ElseEvent : public gd::BaseEvent {
   const gd::InstructionsList& GetActions() const { return actions; };
   gd::InstructionsList& GetActions() { return actions; };
 
+  virtual gd::InstructionsList* GetInstructionList(const gd::String& label) override;
+  virtual const gd::InstructionsList* GetInstructionList(const gd::String& label) const override;
+
   virtual std::vector<const gd::InstructionsList*> GetAllConditionsVectors() const;
   virtual std::vector<const gd::InstructionsList*> GetAllActionsVectors() const;
   virtual std::vector<gd::InstructionsList*> GetAllConditionsVectors();

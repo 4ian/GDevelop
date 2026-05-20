@@ -91,6 +91,7 @@ gdjs.getPixiRuntimeGameWithAssets = (props = null) => {
         mangledName: '',
         name: '',
         objects: [],
+    objectsGroups: [],
         layers: [],
         instances: [],
         behaviorsSharedData: [],

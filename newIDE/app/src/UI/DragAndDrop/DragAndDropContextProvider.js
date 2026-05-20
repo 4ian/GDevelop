@@ -4,7 +4,13 @@ import { DndProvider } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
 
 const touchBackendOptions = {
-  delayTouchStart: 100,
+  // A small delay lets the touch backend distinguish a tap from a drag
+  // without requiring the user to hold perfectly still. 50ms is short enough
+  // that any intentional drag gesture will still trigger reliably on iOS.
+  delayTouchStart: 50,
+  // Also handle mouse events so that Android Chrome's compatibility mouse
+  // events (fired after touch events) can trigger drags with no delay,
+  // making dragging feel instant on Android.
   enableMouseEvents: true,
 };
 

@@ -45,7 +45,6 @@ namespace gdjs {
     /** Should the canvas be cleared before this scene rendering. */
     _clearCanvas: boolean = true;
 
-    _onceTriggers: OnceTriggers;
     _profiler: gdjs.Profiler | null = null;
 
     // Set to `new gdjs.Profiler()` to have profiling done on the scene.
@@ -74,7 +73,6 @@ namespace gdjs {
         gdjs.VariablesContainer
       >();
       this._timeManager = new gdjs.TimeManager();
-      this._onceTriggers = new gdjs.OnceTriggers();
       this._requestedChange = SceneChangeRequest.CONTINUE;
       this._cachedGameResolutionWidth = runtimeGame
         ? runtimeGame.getGameResolutionWidth()
@@ -345,8 +343,6 @@ namespace gdjs {
       this._eventsFunction = null;
       this._lastId = 0;
       this.networkId = null;
-      // @ts-ignore We are deleting the object
-      this._onceTriggers = null;
     }
 
     /**
@@ -817,13 +813,6 @@ namespace gdjs {
       if (onProfilerStopped) {
         onProfilerStopped(oldProfiler);
       }
-    }
-
-    /**
-     * Get the structure containing the triggers for "Trigger once" conditions.
-     */
-    getOnceTriggers() {
-      return this._onceTriggers;
     }
 
     /**

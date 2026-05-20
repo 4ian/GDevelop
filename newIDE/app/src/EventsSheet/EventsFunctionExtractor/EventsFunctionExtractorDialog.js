@@ -2,7 +2,6 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';

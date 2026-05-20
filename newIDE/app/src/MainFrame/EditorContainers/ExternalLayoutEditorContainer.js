@@ -220,6 +220,10 @@ export class ExternalLayoutEditorContainer extends React.Component<
     // No thing to be done.
   }
 
+  selectAllInsideEditor() {
+    // No thing to be done.
+  }
+
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
     if (changes.scene !== this.getLayout()) {
       return;

@@ -1,7 +1,6 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 import React from 'react';
 import EventsSheet, { type EventsSheetInterface } from '../../EventsSheet';
 import RaisedButton from '../../UI/RaisedButton';
@@ -120,6 +119,10 @@ export class ExternalEventsEditorContainer extends React.Component<
 
   clearGlobalSearchResults() {
     if (this.editor) this.editor.clearGlobalSearchResults();
+  }
+
+  selectAllInsideEditor() {
+    if (this.editor) this.editor.selectAllEvents();
   }
 
   forceUpdateEditor() {
@@ -285,6 +288,8 @@ export class ExternalEventsEditorContainer extends React.Component<
                 }
                 onWillInstallExtension={this.props.onWillInstallExtension}
                 onExtensionInstalled={this.props.onExtensionInstalled}
+                // Scene events don't have parameters
+                editEventsFunctionParameter={() => {}}
               />
             )}
             {!layout && (

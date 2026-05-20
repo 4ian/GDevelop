@@ -51,6 +51,7 @@ export type MainMenuCallbacks = {|
   onOpenLanguage: (open?: boolean) => void,
   onOpenProfile: (open?: boolean) => void,
   onOpenAskAi: () => void,
+  onSelectAll: () => void,
   setElectronUpdateStatus: ElectronUpdateStatus => void,
 |};
 
@@ -79,6 +80,7 @@ export type MainMenuEvent =
   | 'main-menu-open-language'
   | 'main-menu-open-profile'
   | 'main-menu-open-ask-ai'
+  | 'main-menu-select-all'
   | 'update-status';
 
 const getMainMenuEventCallback = (
@@ -105,6 +107,7 @@ const getMainMenuEventCallback = (
     'main-menu-open-language': callbacks.onOpenLanguage,
     'main-menu-open-profile': callbacks.onOpenProfile,
     'main-menu-open-ask-ai': callbacks.onOpenAskAi,
+    'main-menu-select-all': callbacks.onSelectAll,
     'update-status': callbacks.setElectronUpdateStatus,
   };
 
@@ -215,7 +218,11 @@ export const buildMainMenuDeclarativeTemplate = ({
       { label: i18n._(t`Paste`), role: 'paste' },
       { label: i18n._(t`Paste and Match Style`), role: 'pasteandmatchstyle' },
       { label: i18n._(t`Delete`), role: 'delete' },
-      { label: i18n._(t`Select All`), role: 'selectall' },
+      {
+        label: i18n._(t`Select All`),
+        accelerator: 'CmdOrCtrl+A',
+        onClickSendEvent: 'main-menu-select-all',
+      },
     ],
   };
 

@@ -54,6 +54,7 @@ type Props = {|
   layout: gdLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
+  layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onComputeAllVariableNames: () => Array<string>,
   resourceManagementProps: ResourceManagementProps,
@@ -101,6 +102,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     layout,
     eventsFunctionsExtension,
     eventsBasedObject,
+    layersContainer,
     helpPagePath,
     resourceManagementProps,
     getValidatedObjectOrGroupName,
@@ -420,6 +422,7 @@ const InnerDialog = (props: InnerDialogProps) => {
               isChildObject={!!eventsBasedObject}
               project={project}
               eventsFunctionsExtension={eventsFunctionsExtension}
+              layersContainer={layersContainer}
               resourceManagementProps={_resourceManagementProps}
               projectScopedContainersAccessor={projectScopedContainersAccessor}
               onSizeUpdated={

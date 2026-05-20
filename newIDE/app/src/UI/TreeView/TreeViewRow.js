@@ -18,6 +18,7 @@ import {
 import ThreeDotsMenu from '../CustomSvgIcons/ThreeDotsMenu';
 import { type ItemData, type ItemBaseAttributes, navigationKeys } from '.';
 import { useLongTouch } from '../../Utils/UseLongTouch';
+import { useDragDropManager } from 'react-dnd';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import { type DraggedItem } from '../DragAndDrop/DragSourceAndDropTarget';
 import classNames from 'classnames';
@@ -160,9 +161,16 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     'before' | 'after' | 'inside'
   >('before');
   const containerRef = React.useRef<?HTMLDivElement>(null);
+  const dragDropManager = useDragDropManager();
   const openContextMenu = React.useCallback(
     // $FlowFixMe[missing-local-annot]
     ({ clientX, clientY }) => {
+      // When the context menu opens it intercepts subsequent touch events,
+      // so the drag backend never receives touchend/touchcancel and the drag
+      // stays active indefinitely. End it explicitly before opening the menu.
+      if (dragDropManager.getMonitor().isDragging()) {
+        dragDropManager.getActions().endDrag();
+      }
       onContextMenu({
         index: index,
         item: node.item,
@@ -170,15 +178,15 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         y: clientY,
       });
     },
-    [onContextMenu, index, node.item]
+    [dragDropManager, onContextMenu, index, node.item]
   );
 
-  const {
-    isPressingRef: isLongTouchPressingRef,
-    ...longTouchForContextMenuProps
-  } = useLongTouch(openContextMenu, {
-    delay: DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE,
-  });
+  const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
+    openContextMenu,
+    {
+      delay: DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE,
+    }
+  );
 
   const onClickItem = React.useCallback(
     // $FlowFixMe[missing-local-annot]
@@ -306,10 +314,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           !node.item.isRoot &&
           !node.item.isPlaceholder &&
           // Prevent dragging of item whose name is edited, allowing to select text with click and drag on text.
-          renamedItemId !== node.id &&
-          // Prevent drag from starting during a long-press (which opens the context menu on mobile).
-          // When the user moves their finger, useLongTouch cancels, clearing isPressingRef, re-enabling drag.
-          !isLongTouchPressingRef.current
+          renamedItemId !== node.id
         }
         canDrop={canDrop ? () => canDrop(node.item, whereToDrop) : () => true}
         drop={() => {

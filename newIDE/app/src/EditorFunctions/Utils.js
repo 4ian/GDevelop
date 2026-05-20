@@ -4,15 +4,17 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 const gd: libGDevelop = global.gd;
 
 export type ObjectSizeInfo = {|
-  width: number,
-  height: number,
-  depth: number,
+  // `width`/`height`/`centerX`/`centerY` are `null` when size is not known.
+  // `depth`/`originZ`/`centerZ` are `null` when the object is 2D.
+  width: number | null,
+  height: number | null,
+  depth: number | null,
   originX: number,
   originY: number,
-  originZ: number,
-  centerX: number,
-  centerY: number,
-  centerZ: number,
+  originZ: number | null,
+  centerX: number | null,
+  centerY: number | null,
+  centerZ: number | null,
 |};
 
 /**
@@ -27,7 +29,7 @@ export const getObjectSizeInfo = (
   project: gdProject,
   pixiResourcesLoader: any,
   assetShortHeader?: AssetShortHeader | null
-): ObjectSizeInfo => {
+): ObjectSizeInfo | null => {
   const objectConfiguration = object.getConfiguration();
   const objectType = object.getType();
 
@@ -80,27 +82,17 @@ export const getObjectSizeInfo = (
         return {
           width,
           height,
-          depth: 0,
+          depth: null,
           originX,
           originY,
-          originZ: 0,
+          originZ: null,
           centerX,
           centerY,
-          centerZ: 0,
+          centerZ: null,
         };
       }
     }
-    return {
-      width: 0,
-      height: 0,
-      depth: 0,
-      originX: 0,
-      originY: 0,
-      originZ: 0,
-      centerX: 0,
-      centerY: 0,
-      centerZ: 0,
-    };
+    return null;
   }
 
   if (objectType === 'TiledSpriteObject::TiledSprite') {
@@ -110,13 +102,13 @@ export const getObjectSizeInfo = (
     return {
       width,
       height,
-      depth: 0,
+      depth: null,
       originX: 0,
       originY: 0,
-      originZ: 0,
+      originZ: null,
       centerX: width / 2,
       centerY: height / 2,
-      centerZ: 0,
+      centerZ: null,
     };
   }
 
@@ -127,13 +119,106 @@ export const getObjectSizeInfo = (
     return {
       width,
       height,
-      depth: 0,
+      depth: null,
+      originX: 0,
+      originY: 0,
+      originZ: null,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: null,
+    };
+  }
+
+  if (objectType === 'TextObject::Text') {
+    return {
+      width: null,
+      height: null,
+      depth: null,
+      originX: 0,
+      originY: 0,
+      originZ: null,
+      centerX: null,
+      centerY: null,
+      centerZ: null,
+    };
+  }
+
+  if (objectType === 'TextInput::TextInputObject') {
+    // Defaults match DEFAULT_WIDTH/DEFAULT_HEIGHT in Extensions/TextInput/JsExtension.js.
+    const width = 300;
+    const height = 30;
+    return {
+      width,
+      height,
+      depth: null,
+      originX: 0,
+      originY: 0,
+      originZ: null,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: null,
+    };
+  }
+
+  if (objectType === 'Lighting::LightObject') {
+    const properties = objectConfiguration.getProperties();
+    const radius = properties.has('radius')
+      ? parseFloat(properties.get('radius').getValue()) || 0
+      : 0;
+    const width = radius * 2;
+    const height = radius * 2;
+    return {
+      width,
+      height,
+      depth: null,
+      originX: radius,
+      originY: radius,
+      originZ: null,
+      centerX: radius,
+      centerY: radius,
+      centerZ: null,
+    };
+  }
+
+  if (objectType === 'Scene3D::Cube3DObject') {
+    const properties = objectConfiguration.getProperties();
+    const width = properties.has('width')
+      ? parseFloat(properties.get('width').getValue()) || 0
+      : 0;
+    const height = properties.has('height')
+      ? parseFloat(properties.get('height').getValue()) || 0
+      : 0;
+    const depth = properties.has('depth')
+      ? parseFloat(properties.get('depth').getValue()) || 0
+      : 0;
+    return {
+      width,
+      height,
+      depth,
       originX: 0,
       originY: 0,
       originZ: 0,
       centerX: width / 2,
       centerY: height / 2,
-      centerZ: 0,
+      centerZ: depth / 2,
+    };
+  }
+
+  if (objectType === 'Scene3D::Model3DObject') {
+    const config = gd.asModel3DConfiguration(objectConfiguration);
+    const width = config.getWidth();
+    const height = config.getHeight();
+    const depth = config.getDepth();
+    return {
+      width,
+      height,
+      depth,
+      originX: 0,
+      originY: 0,
+      originZ: 0,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: depth / 2,
     };
   }
 
@@ -163,25 +248,50 @@ export const getObjectSizeInfo = (
     return {
       width,
       height,
-      depth,
+      depth: isRenderedIn3D ? depth : null,
       originX: -minX || 0,
       originY: -minY || 0,
-      originZ: -minZ || 0,
+      originZ: isRenderedIn3D ? -minZ || 0 : null,
       centerX: width / 2,
       centerY: height / 2,
-      centerZ: depth / 2,
+      centerZ: isRenderedIn3D ? depth / 2 : null,
     };
   }
 
-  return {
-    width: 0,
-    height: 0,
-    depth: 0,
-    originX: 0,
-    originY: 0,
-    originZ: 0,
-    centerX: 0,
-    centerY: 0,
-    centerZ: 0,
-  };
+  return null;
+};
+
+const NO_INTRINSIC_SIZE_MESSAGE =
+  "These objects have no intrinsic size (width/height = null in `objectSizeInfo`). For precise placement of instance(s), set the instance's size (e.g.: via `instances_size` in `put_2d_instances`). Also check origin X;Y (if 0;0, it means the instance position defines the top-left, not the center).";
+
+/**
+ * Build structured hints for an `objectSizeInfo` map.
+ *
+ * Returns at most one `no-intrinsic-size` entry per call, listing all objects
+ * whose width/height is null. `depth` being null is normal for 2D objects —
+ * not a hint trigger.
+ */
+export const getObjectSizeInfoHints = (objectSizeInfoByName: {
+  [string]: ObjectSizeInfo | null,
+}): Array<{|
+  code: string,
+  message: string,
+  objectNames: Array<string>,
+|}> => {
+  const objectNames: Array<string> = [];
+  for (const objectName in objectSizeInfoByName) {
+    const info = objectSizeInfoByName[objectName];
+    if (!info) continue;
+    if (info.width === null || info.height === null) {
+      objectNames.push(objectName);
+    }
+  }
+  if (objectNames.length === 0) return [];
+  return [
+    {
+      code: 'no-intrinsic-size',
+      message: NO_INTRINSIC_SIZE_MESSAGE,
+      objectNames,
+    },
+  ];
 };

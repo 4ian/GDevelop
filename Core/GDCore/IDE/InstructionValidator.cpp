@@ -60,19 +60,11 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
                                             parameterMetadata.GetExtraInfo());
     expressionNode.Visit(expressionValidator);
 
-    // Check for fatal errors (validation)
-    if (!expressionValidator.GetFatalErrors().empty()) {
+    if (!expressionValidator.GetAllErrors().empty()) {
       result.isValid = false;
     }
-
-    // Check for deprecation warnings in the same pass
-    const auto &allErrors = expressionValidator.GetAllErrors();
-    for (const auto *error : allErrors) {
-      if (error->GetType() ==
-          gd::ExpressionParserError::ErrorType::DeprecatedExpression) {
-        result.hasDeprecationWarning = true;
-        break;
-      }
+    if (!expressionValidator.GetDeprecationWarnings().empty()) {
+      result.hasDeprecationWarning = true;
     }
 
     // New object variable instructions require the variable to be

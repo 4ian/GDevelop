@@ -124,6 +124,8 @@ const gd::String ValueTypeMetadata::leaderboardIdValueType = "leaderboardId";
 const gd::String ValueTypeMetadata::objectAnimationNameValueType = "objectAnimationName";
 const gd::String ValueTypeMetadata::objectSkinNameValueType = "objectSkinName";
 const gd::String ValueTypeMetadata::keyboardKeyValueType = "keyboardKey";
+const gd::String ValueTypeMetadata::layerValueType = "layer";
+const gd::String ValueTypeMetadata::layerValueType2 = "layer";
 
 const gd::String &ValueTypeMetadata::ConvertPropertyTypeToValueType(
     const gd::String &propertyType) {
@@ -145,6 +147,8 @@ const gd::String &ValueTypeMetadata::ConvertPropertyTypeToValueType(
     return objectAnimationNameValueType;
   } else if (propertyType == "KeyboardKey") {
     return keyboardKeyValueType;
+  } else if (propertyType == "Layer") {
+    return layerValueType;
   }
   // For "String", "Resource", "MultilineString" or default
   return stringValueType;

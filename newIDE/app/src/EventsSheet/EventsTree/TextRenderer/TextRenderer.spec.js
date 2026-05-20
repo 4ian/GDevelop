@@ -31,6 +31,30 @@ describe('EventsTree/TextRenderer', () => {
               type: { value: 'Show' },
               parameters: ['GroupOfObjects', ''],
             },
+            {
+              type: { value: 'ActivateBehavior' },
+              parameters: [
+                'GroupOfSpriteObjectsWithBehaviors',
+                'PlatformerObject',
+                '',
+              ],
+            },
+            {
+              type: { value: 'ActivateBehavior' },
+              parameters: [
+                'GroupOfSpriteObjectsWithBehaviors',
+                'PlatformerObject',
+                'yes',
+              ],
+            },
+            {
+              type: { value: 'ActivateBehavior' },
+              parameters: [
+                'GroupOfSpriteObjectsWithBehaviors',
+                'PlatformerObject',
+                'something else',
+              ],
+            },
           ],
           events: [
             {
@@ -439,6 +463,9 @@ describe('EventsTree/TextRenderer', () => {
          Actions:
          - Change the number of the animation of MySpriteObject: = 1
          - Show GroupOfObjects
+         - Activate behavior PlatformerObject of GroupOfSpriteObjectsWithBehaviors: no
+         - Activate behavior PlatformerObject of GroupOfSpriteObjectsWithBehaviors: yes
+         - Activate behavior PlatformerObject of GroupOfSpriteObjectsWithBehaviors: no
          Sub-events:
           <event-0.0>
            ~~Else~~ (Else is ignored because not following a standard event)

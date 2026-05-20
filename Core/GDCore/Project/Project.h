@@ -848,6 +848,18 @@ class GD_CORE_API Project {
    */
   const gd::String& GetFirstLayout() { return firstLayout; }
 
+  /**
+   * Set the layout used by the IDE to start all previews.
+   * An empty string means there is no preview override.
+   */
+  void SetPreviewLayout(const gd::String& name) { previewLayout = name; }
+
+  /**
+   * Get the layout used by the IDE to start all previews.
+   * Returns an empty string if there is no preview override.
+   */
+  const gd::String& GetPreviewLayout() const { return previewLayout; }
+
   ///@}
 
   /** \name Events functions extensions management
@@ -996,16 +1008,16 @@ class GD_CORE_API Project {
   ResourcesContainer& GetResourcesManager() { return resourcesContainer; }
 
   /**
-   * Set when the scenes must preload their resources: `at-startup`, `never`
-   * (default).
+   * Set when the scenes must preload their resources: `at-startup` (default),
+   * `never`.
    */
   void SetSceneResourcesPreloading(gd::String sceneResourcesPreloading_) {
     sceneResourcesPreloading = sceneResourcesPreloading_;
   }
 
   /**
-   * Get when the scenes must preload their resources: `at-startup`, `never`
-   * (default).
+   * Get when the scenes must preload their resources: `at-startup` (default),
+   * `never`.
    */
   const gd::String& GetSceneResourcesPreloading() const {
     return sceneResourcesPreloading;
@@ -1159,6 +1171,8 @@ class GD_CORE_API Project {
   std::vector<gd::Platform*>
       platforms;  ///< Pointers to the platforms this project supports.
   gd::String firstLayout;
+  gd::String previewLayout;  ///< Editor-only: layout used by the IDE to start
+                             ///< all previews. Empty if not set.
   gd::String author;        ///< Game author name, for publishing purpose.
   std::vector<gd::String>
       authorIds;  ///< Game author ids, from GDevelop users DB.

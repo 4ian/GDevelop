@@ -39,6 +39,7 @@ export const Default = (): React.Node => {
         onOpenFullEditor={action('onOpenFullEditor')}
         onBehaviorUpdated={action('onBehaviorUpdated')}
         resourceManagementProps={fakeResourceManagementProps}
+        layersContainer={testProject.testLayout.getLayers()}
       />
     </SerializedObjectDisplay>
   );

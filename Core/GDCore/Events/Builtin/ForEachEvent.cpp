@@ -7,6 +7,7 @@
 #include "ForEachEvent.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
+#include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
 using namespace std;
@@ -20,6 +21,19 @@ ForEachEvent::ForEachEvent()
       order("asc"),
       limit(""),
       variables(gd::VariablesContainer::SourceType::Local) {}
+
+gd::InstructionsList* ForEachEvent::GetInstructionList(
+    const gd::String& label) {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  return nullptr;
+}
+const gd::InstructionsList* ForEachEvent::GetInstructionList(
+    const gd::String& label) const {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  return nullptr;
+}
 
 vector<gd::InstructionsList*> ForEachEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;
@@ -83,25 +97,26 @@ vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
 }
 
 void ForEachEvent::SerializeTo(SerializerElement& element) const {
+  const bool canonical = gd::Serializer::IsCanonicalMode();
   element.AddChild("object").SetValue(objectsToPick.GetPlainString());
   gd::EventsListSerialization::SerializeInstructionsTo(
       conditions, element.AddChild("conditions"));
   gd::EventsListSerialization::SerializeInstructionsTo(
       actions, element.AddChild("actions"));
 
-  if (!events.IsEmpty())
+  if (canonical || !events.IsEmpty())
     gd::EventsListSerialization::SerializeEventsTo(events,
                                                   element.AddChild("events"));
-  if (HasVariables()) {
+  if (canonical || HasVariables()) {
     variables.SerializeTo(element.AddChild("variables"));
   }
-  if (!loopIndexVariableName.empty()) {
+  if (canonical || !loopIndexVariableName.empty()) {
     element.AddChild("loopIndexVariable").SetStringValue(loopIndexVariableName);
   }
-  if (!orderBy.GetPlainString().empty()) {
+  if (canonical || !orderBy.GetPlainString().empty()) {
     element.AddChild("orderBy").SetValue(orderBy.GetPlainString());
     element.AddChild("order").SetStringValue(order);
-    if (!limit.GetPlainString().empty()) {
+    if (canonical || !limit.GetPlainString().empty()) {
       element.AddChild("limit").SetValue(limit.GetPlainString());
     }
   }

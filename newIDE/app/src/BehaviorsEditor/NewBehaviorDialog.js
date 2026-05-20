@@ -40,6 +40,8 @@ type Props = {|
   onChoose: (type: string, defaultName: string) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  shouldShowCapabilityBehaviors: boolean,
+  title?: React.Node,
 |};
 
 export default function NewBehaviorDialog({
@@ -53,6 +55,8 @@ export default function NewBehaviorDialog({
   isChildObject,
   onWillInstallExtension,
   onExtensionInstalled,
+  shouldShowCapabilityBehaviors,
+  title,
 }: Props): null | React.Node {
   const [isInstalling, setIsInstalling] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -103,7 +107,7 @@ export default function NewBehaviorDialog({
   const allInstalledBehaviorMetadataList: Array<BehaviorShortHeader> = React.useMemo(
     () => {
       const platform = project.getCurrentPlatform();
-      const behaviorMetadataList =
+      let behaviorMetadataList =
         project && platform
           ? enumerateBehaviorsMetadata(
               platform,
@@ -112,39 +116,48 @@ export default function NewBehaviorDialog({
             )
           : [];
 
-      return behaviorMetadataList
-        .filter(behavior => !behavior.behaviorMetadata.isHidden())
-        .map(behavior => ({
-          type: behavior.type,
-          fullName: behavior.fullName,
-          description: behavior.description,
-          previewIconUrl: behavior.previewIconUrl,
-          objectType: behavior.objectType,
-          category: behavior.category,
-          allRequiredBehaviorTypes: getAllRequiredBehaviorTypes(
-            behavior.behaviorMetadata
-          ),
-          tags: behavior.tags,
-          name: gd.PlatformExtension.getBehaviorNameFromFullBehaviorType(
-            behavior.type
-          ),
-          extensionName: gd.PlatformExtension.getExtensionFromFullBehaviorType(
-            behavior.type
-          ),
+      if (!shouldShowCapabilityBehaviors) {
+        behaviorMetadataList = behaviorMetadataList.filter(
+          behavior => !behavior.behaviorMetadata.isHidden()
+        );
+      }
 
-          isInstalled: true,
-          // The tier will be overridden with repository data.
-          // Only the built-in and user extensions will keep this value.
-          tier: 'installed',
-          // Not relevant for `installed` extensions
-          version: '',
-          url: '',
-          headerUrl: '',
-          extensionNamespace: '',
-          authorIds: [],
-        }));
+      return behaviorMetadataList.map(behavior => ({
+        type: behavior.type,
+        fullName: behavior.fullName,
+        description: behavior.description,
+        previewIconUrl: behavior.previewIconUrl,
+        objectType: behavior.objectType,
+        category: behavior.category,
+        allRequiredBehaviorTypes: getAllRequiredBehaviorTypes(
+          behavior.behaviorMetadata
+        ),
+        tags: behavior.tags,
+        name: gd.PlatformExtension.getBehaviorNameFromFullBehaviorType(
+          behavior.type
+        ),
+        extensionName: gd.PlatformExtension.getExtensionFromFullBehaviorType(
+          behavior.type
+        ),
+
+        isInstalled: true,
+        // The tier will be overridden with repository data.
+        // Only the built-in and user extensions will keep this value.
+        tier: 'installed',
+        // Not relevant for `installed` extensions
+        version: '',
+        url: '',
+        headerUrl: '',
+        extensionNamespace: '',
+        authorIds: [],
+      }));
     },
-    [project, eventsFunctionsExtension, getAllRequiredBehaviorTypes]
+    [
+      project,
+      eventsFunctionsExtension,
+      shouldShowCapabilityBehaviors,
+      getAllRequiredBehaviorTypes,
+    ]
   );
 
   const installedBehaviorMetadataList: Array<BehaviorShortHeader> = React.useMemo(
@@ -244,7 +257,7 @@ export default function NewBehaviorDialog({
     <I18n>
       {({ i18n }) => (
         <Dialog
-          title={<Trans>Add a new behavior to the object</Trans>}
+          title={title || <Trans>Add a new behavior to the object</Trans>}
           actions={[
             <FlatButton
               key="close"

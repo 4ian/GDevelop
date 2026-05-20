@@ -9,6 +9,7 @@
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/Serialization.h"
+#include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
 using namespace std;
@@ -19,6 +20,19 @@ StandardEvent::StandardEvent()
     : BaseEvent(), variables(gd::VariablesContainer::SourceType::Local) {}
 
 StandardEvent::~StandardEvent(){};
+
+gd::InstructionsList* StandardEvent::GetInstructionList(
+    const gd::String& label) {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  return nullptr;
+}
+const gd::InstructionsList* StandardEvent::GetInstructionList(
+    const gd::String& label) const {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  return nullptr;
+}
 
 vector<const gd::InstructionsList*> StandardEvent::GetAllConditionsVectors()
     const {
@@ -50,15 +64,16 @@ vector<gd::InstructionsList*> StandardEvent::GetAllActionsVectors() {
 }
 
 void StandardEvent::SerializeTo(SerializerElement& element) const {
+  const bool canonical = gd::Serializer::IsCanonicalMode();
   gd::EventsListSerialization::SerializeInstructionsTo(
       conditions, element.AddChild("conditions"));
   gd::EventsListSerialization::SerializeInstructionsTo(
       actions, element.AddChild("actions"));
 
-  if (!events.IsEmpty())
+  if (canonical || !events.IsEmpty())
     gd::EventsListSerialization::SerializeEventsTo(events,
                                                   element.AddChild("events"));
-  if (HasVariables()) {
+  if (canonical || HasVariables()) {
     variables.SerializeTo(element.AddChild("variables"));
   }
 }

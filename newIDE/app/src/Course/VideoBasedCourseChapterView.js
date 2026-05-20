@@ -143,7 +143,9 @@ const VideoBasedCourseChapterView: React.ComponentType<{
             onClickUnlock={onClickUnlock}
           />
         )}
-        {course.videoPosition === 'top' && youtubeVideo}
+        {course.videoPosition === 'top' &&
+          !courseChapter.isLocked &&
+          youtubeVideo}
         {!courseChapter.isLocked && (
           <div
             style={{

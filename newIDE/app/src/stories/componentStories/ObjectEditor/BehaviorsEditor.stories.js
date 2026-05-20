@@ -23,6 +23,7 @@ export const Default = (): React.Node => (
       project={testProject.project}
       eventsFunctionsExtension={null}
       object={testProject.spriteObjectWithBehaviors}
+      layersContainer={testProject.testLayout.getLayers()}
       isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
       projectScopedContainersAccessor={
@@ -44,6 +45,7 @@ export const WithoutAnyBehaviors = (): React.Node => (
       project={testProject.project}
       eventsFunctionsExtension={null}
       object={testProject.spriteObjectWithoutBehaviors}
+      layersContainer={testProject.testLayout.getLayers()}
       isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
       projectScopedContainersAccessor={
@@ -65,6 +67,7 @@ export const Locked = (): React.Node => (
       project={testProject.project}
       eventsFunctionsExtension={null}
       object={testProject.spriteObjectWithBehaviors}
+      layersContainer={testProject.testLayout.getLayers()}
       isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
       projectScopedContainersAccessor={
@@ -86,6 +89,7 @@ export const LockedWithoutAnyBehaviors = (): React.Node => (
       project={testProject.project}
       eventsFunctionsExtension={null}
       object={testProject.spriteObjectWithoutBehaviors}
+      layersContainer={testProject.testLayout.getLayers()}
       isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
       projectScopedContainersAccessor={

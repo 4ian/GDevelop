@@ -59,6 +59,10 @@ inline bool IsUnaryOperator(gd::String::value_type character) {
   return character == '+' || character == '-';
 }
 
+inline bool IsNumberSign(gd::String::value_type character) {
+  return character == '-';
+}
+
 inline bool IsTermOperator(gd::String::value_type character) {
   return character == '/' || character == '*';
 }

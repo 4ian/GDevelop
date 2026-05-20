@@ -47,7 +47,8 @@ export const insertInVariablesContainer = (
   name: string,
   serializedVariable: any | null,
   index: number,
-  inheritedVariablesContainer: ?gdVariablesContainer
+  inheritedVariablesContainer: ?gdVariablesContainer,
+  variableType?: 'number' | 'string' | 'boolean' | null
 ): { name: string, variable: gdVariable } => {
   const newName = newNameGenerator(
     name,
@@ -65,6 +66,13 @@ export const insertInVariablesContainer = (
     newVariable.resetPersistentUuid();
   }
   const variable = variablesContainer.insert(newName, newVariable, index);
+  if (variableType === 'number') {
+    variable.setValue(0);
+  } else if (variableType === 'string') {
+    variable.setString('');
+  } else if (variableType === 'boolean') {
+    variable.setBool(false);
+  }
   newVariable.delete();
   return { name: newName, variable };
 };

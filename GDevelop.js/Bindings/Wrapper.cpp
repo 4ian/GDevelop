@@ -40,6 +40,7 @@
 #include <GDCore/IDE/Events/EventsTypesLister.h>
 #include <GDCore/IDE/Events/EventsVariablesFinder.h>
 #include <GDCore/IDE/Events/ExpressionCompletionFinder.h>
+#include <GDCore/IDE/Events/ExpressionSyntaxColoringHelper.h>
 #include <GDCore/IDE/Events/ExpressionNodeLocationFinder.h>
 #include <GDCore/IDE/Events/ExpressionTypeFinder.h>
 #include <GDCore/IDE/Events/ExpressionValidator.h>
@@ -512,6 +513,10 @@ typedef ExpressionCompletionDescription::CompletionKind
     ExpressionCompletionDescription_CompletionKind;
 typedef std::vector<gd::ExpressionCompletionDescription>
     VectorExpressionCompletionDescription;
+typedef ExpressionColorationDescription::ColorationKind
+    ExpressionColorationDescription_ColorationKind;
+typedef std::vector<gd::ExpressionColorationDescription>
+    VectorExpressionColorationDescription;
 typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
     MapExtensionProperties;
 typedef gd::Variable::Type Variable_Type;
@@ -893,6 +898,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
   IsExtensionLifecycleEventsFunction
 
 #define STATIC_GetCompletionDescriptionsFor GetCompletionDescriptionsFor
+#define STATIC_GetColorationDescriptionsFor GetColorationDescriptionsFor
 #define STATIC_GetType GetType
 #define STATIC_GetNodeAtPosition GetNodeAtPosition
 

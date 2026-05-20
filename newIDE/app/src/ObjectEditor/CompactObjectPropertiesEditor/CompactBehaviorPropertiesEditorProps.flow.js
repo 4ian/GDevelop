@@ -9,6 +9,7 @@ export type CompactBehaviorPropertiesEditorProps = {|
   behaviorMetadata: gdBehaviorMetadata,
   behavior: gdBehavior,
   object: gdObject,
+  layersContainer: gdLayersContainer,
   behaviorOverriding: gdBehavior | null,
   initialInstance: gdInitialInstance | null,
   onOpenFullEditor?: () => void,

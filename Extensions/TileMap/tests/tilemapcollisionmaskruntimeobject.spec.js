@@ -55,6 +55,7 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
         title: '',
         behaviorsSharedData: [],
         objects: [],
+        objectsGroups: [],
         instances: [],
         usedResources: [],
         uiSettings: {

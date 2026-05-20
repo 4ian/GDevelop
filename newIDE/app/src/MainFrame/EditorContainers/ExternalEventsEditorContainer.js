@@ -120,6 +120,10 @@ export class ExternalEventsEditorContainer extends React.Component<
     if (this.editor) this.editor.clearGlobalSearchResults();
   }
 
+  selectAllInsideEditor() {
+    if (this.editor) this.editor.selectAllEvents();
+  }
+
   forceUpdateEditor() {
     // No updates to be done.
   }
@@ -277,6 +281,8 @@ export class ExternalEventsEditorContainer extends React.Component<
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             onWillInstallExtension={this.props.onWillInstallExtension}
             onExtensionInstalled={this.props.onExtensionInstalled}
+            // Scene events don't have parameters
+            editEventsFunctionParameter={() => {}}
           />
         )}
         {!layout && (

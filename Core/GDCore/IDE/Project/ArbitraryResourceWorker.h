@@ -178,8 +178,11 @@ ResourceWorkerInEventsWorker GD_CORE_API GetResourceWorkerOnEvents(
 class GD_CORE_API ResourceWorkerInObjectsWorker
     : public gd::ArbitraryObjectsWorker {
 public:
-  ResourceWorkerInObjectsWorker(const gd::Project &project_, gd::ArbitraryResourceWorker &worker_)
-      : project(project_), worker(worker_){};
+  ResourceWorkerInObjectsWorker(
+      const gd::Project &project_, gd::ArbitraryResourceWorker &worker_,
+      std::function<bool(const gd::Object &)> &shouldCheckObject_)
+      : project(project_), worker(worker_),
+        shouldCheckObject(shouldCheckObject_){};
   ~ResourceWorkerInObjectsWorker() {}
 
 private:
@@ -188,9 +191,14 @@ private:
 
   const gd::Project &project;
   gd::ArbitraryResourceWorker &worker;
+  std::function<bool(const gd::Object &)> shouldCheckObject;
 };
 
-gd::ResourceWorkerInObjectsWorker GD_CORE_API
-GetResourceWorkerOnObjects(const gd::Project &project, gd::ArbitraryResourceWorker &worker);
+gd::ResourceWorkerInObjectsWorker GD_CORE_API GetResourceWorkerOnObjects(
+    const gd::Project &project, gd::ArbitraryResourceWorker &worker);
+
+gd::ResourceWorkerInObjectsWorker GD_CORE_API GetResourceWorkerOnObjects(
+    const gd::Project &project, gd::ArbitraryResourceWorker &worker,
+    std::function<bool(const gd::Object &)> &shouldCheckObject);
 
 }  // namespace gd

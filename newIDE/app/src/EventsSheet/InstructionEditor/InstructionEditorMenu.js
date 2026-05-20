@@ -22,6 +22,7 @@ import Paste from '../../UI/CustomSvgIcons/Paste';
 import { Column, Line } from '../../UI/Grid';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import PortalContainerContext from '../../UI/PortalContainerContext';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 
 const styles = {
   fullHeightSelector: {
@@ -59,6 +60,7 @@ type Props = {|
   onPasteInstructions: () => void, // Unused
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  editEventsFunctionParameter: VariableDialogOpeningProps => void,
 |};
 
 /**

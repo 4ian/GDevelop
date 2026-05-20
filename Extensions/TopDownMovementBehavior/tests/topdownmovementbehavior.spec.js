@@ -32,6 +32,7 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
         title: '',
         behaviorsSharedData: [],
         objects: [],
+        objectsGroups: [],
         instances: [],
         usedResources: [],
         uiSettings: {

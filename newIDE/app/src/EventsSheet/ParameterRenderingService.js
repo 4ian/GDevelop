@@ -53,7 +53,9 @@ import ObjectVariableField, {
   renderInlineObjectVariable,
 } from './ParameterFields/ObjectVariableField';
 import LayerField from './ParameterFields/LayerField';
-import ImageResourceField from './ParameterFields/ImageResourceField';
+import ImageResourceField, {
+  renderInlineResourceField,
+} from './ParameterFields/ImageResourceField';
 import AudioResourceField from './ParameterFields/AudioResourceField';
 import VideoResourceField from './ParameterFields/VideoResourceField';
 import JsonResourceField from './ParameterFields/JsonResourceField';
@@ -83,10 +85,21 @@ import TilemapResourceField from './ParameterFields/TilemapResourceField';
 import TilesetResourceField from './ParameterFields/TilesetResourceField';
 import Model3DResourceField from './ParameterFields/Model3DResourceField';
 import AtlasResourceField from './ParameterFields/AtlasResourceField';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+} from './ParameterFields/ParameterFieldCommons';
 
 const gd: libGDevelop = global.gd;
 
-const components = {
+export type ParameterField = React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>;
+
+const components: {
+  [string]: ParameterField,
+} = {
   default: DefaultField,
   mouse: MouseField,
   mouseButton: MouseButtonField,
@@ -153,6 +166,7 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   mouse: renderInlineMouse,
   mouseButton: renderInlineMouseButton,
   object: renderInlineObjectWithThumbnail,
+  resource: renderInlineResourceField,
   yesorno: renderInlineYesNo,
   trueorfalse: renderInlineTrueFalse,
   operator: renderInlineOperator,
@@ -208,7 +222,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
 
 const ParameterRenderingService = {
   components,
-  getParameterComponent: (rawType: string): any => {
+  getParameterComponent: (rawType: string): ParameterField => {
     const fieldType = gd.ParameterMetadata.isObject(rawType)
       ? 'object'
       : rawType;
@@ -218,10 +232,12 @@ const ParameterRenderingService = {
     else return components.default;
   },
   renderInlineParameter: (props: ParameterInlineRendererProps): React.Node => {
-    const rawType = props.parameterMetadata.getType();
-    const fieldType = gd.ParameterMetadata.isObject(rawType)
+    const valueTypeMetadata = props.parameterMetadata.getValueTypeMetadata();
+    const fieldType = valueTypeMetadata.isObject()
       ? 'object'
-      : rawType;
+      : valueTypeMetadata.isResource()
+      ? 'resource'
+      : valueTypeMetadata.getName();
 
     const inlineRenderer =
       inlineRenderers[fieldType] || inlineRenderers.default;

@@ -118,6 +118,7 @@ export const CompactBehaviorPropertiesEditor = ({
   behaviorMetadata,
   behavior,
   object,
+  layersContainer,
   behaviorOverriding,
   initialInstance,
   onOpenFullEditor,
@@ -149,6 +150,7 @@ export const CompactBehaviorPropertiesEditor = ({
               initialInstance
             ),
           object,
+          layersContainer,
           visibility: 'All',
           showcaseNonDefaultValues: true,
         });
@@ -166,15 +168,17 @@ export const CompactBehaviorPropertiesEditor = ({
           instance.updateProperty(name, value);
         },
         object,
+        layersContainer,
         visibility: 'All',
       });
     },
     [
       schemaRecomputeTrigger,
       initialInstance,
-      behavior,
       behaviorMetadata,
       object,
+      layersContainer,
+      behavior,
       project,
     ]
   );

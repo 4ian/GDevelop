@@ -206,7 +206,9 @@ const ProjectVersionRow = ({
     },
     [version, onCancelRenaming]
   );
-  const longTouchProps = useLongTouch(e => onContextMenu(e, version));
+  const { contextMenuProps: longTouchProps } = useLongTouch(e =>
+    onContextMenu(e, version)
+  );
 
   const classes = useClassesForRowContainer();
   const borderStyle = useBorder(version, openedVersionStatus);

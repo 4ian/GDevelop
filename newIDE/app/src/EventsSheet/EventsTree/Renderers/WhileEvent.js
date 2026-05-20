@@ -94,7 +94,7 @@ export default class WhileEvent extends React.Component<
           projectScopedContainersAccessor={
             this.props.projectScopedContainersAccessor
           }
-          idPrefix={this.props.idPrefix}
+          idPrefix={`${this.props.idPrefix}-while`}
           highlightedSearchText={this.props.highlightedSearchText}
           highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
         />

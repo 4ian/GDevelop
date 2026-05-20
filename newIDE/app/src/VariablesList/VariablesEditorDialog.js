@@ -21,6 +21,12 @@ import { getNodeIdFromVariableName } from './VariableToTreeNodeHandling';
 
 const gd: libGDevelop = global.gd;
 
+export type VariableDialogOpeningProps = {
+  variableName: string,
+  shouldCreate: boolean,
+  variableType: 'number' | 'string' | 'boolean' | null,
+};
+
 type TabProps = {
   id: string,
   label: React.Node,
@@ -49,8 +55,7 @@ type Props = {|
   objectName?: ?string,
   initialInstances?: ?gdInitialInstancesContainer,
   initiallyOpenTabId?: string,
-  initiallySelectedVariableName?: string,
-  shouldCreateInitiallySelectedVariable?: boolean,
+  initiallySelectedVariable: VariableDialogOpeningProps | null,
   isListLocked: boolean,
 
   project: gdProject,
@@ -72,8 +77,7 @@ const VariablesEditorDialog = ({
   id,
   tabs,
   initiallyOpenTabId,
-  initiallySelectedVariableName,
-  shouldCreateInitiallySelectedVariable,
+  initiallySelectedVariable,
   projectScopedContainersAccessor,
   objectName,
   initialInstances,
@@ -103,10 +107,10 @@ const VariablesEditorDialog = ({
   }, []);
 
   const shouldCreateVariable = React.useRef<boolean>(
-    shouldCreateInitiallySelectedVariable || false
+    initiallySelectedVariable ? initiallySelectedVariable.shouldCreate : false
   );
   const actualInitiallySelectedVariableName = React.useRef<?string>(
-    initiallySelectedVariableName
+    initiallySelectedVariable ? initiallySelectedVariable.variableName : null
   );
   if (shouldCreateVariable.current) {
     shouldCreateVariable.current = false;
@@ -119,12 +123,13 @@ const VariablesEditorDialog = ({
     const { variablesContainer, inheritedVariablesContainer } = tabs[tabIndex];
     const { name: actualVariableName } = insertInVariablesContainer(
       variablesContainer,
-      initiallySelectedVariableName
-        ? getRootVariableName(initiallySelectedVariableName)
+      initiallySelectedVariable
+        ? getRootVariableName(initiallySelectedVariable.variableName)
         : 'Variable',
       null,
       variablesContainer.count(),
-      inheritedVariablesContainer
+      inheritedVariablesContainer,
+      initiallySelectedVariable ? initiallySelectedVariable.variableType : null
     );
     actualInitiallySelectedVariableName.current = actualVariableName;
     lastSelectedVariableNodeId.current = getNodeIdFromVariableName(

@@ -271,6 +271,7 @@ export const CompactInstancePropertiesEditor = ({
             globalObjectsContainer || objectsContainer,
             objectsContainer
           ),
+        layersContainer,
       });
 
       const reorderedInstanceSchemaForCustomProperties = reorderInstanceSchemaForCustomProperties(
@@ -449,6 +450,7 @@ export const CompactInstancePropertiesEditor = ({
                                   behavior={behavior}
                                   behaviorOverriding={behaviorOverriding}
                                   object={object}
+                                  layersContainer={layersContainer}
                                   initialInstance={instance}
                                   onBehaviorUpdated={() => {
                                     if (

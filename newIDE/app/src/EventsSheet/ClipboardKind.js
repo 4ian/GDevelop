@@ -87,14 +87,24 @@ const excludeEventsChildren = (
   return filteredEvents;
 };
 
-export const copySelectionToClipboard = (selection: SelectionState) => {
+export const copySelectionToClipboard = (
+  selection: SelectionState,
+  getIndexes: (Array<gdBaseEvent>) => Array<number>
+) => {
   const eventsList = new gd.EventsList();
   const actionsList = new gd.InstructionsList();
   const conditionsList = new gd.InstructionsList();
 
-  excludeEventsChildren(getSelectedEvents(selection)).forEach(event =>
-    eventsList.insertEvent(event, eventsList.getEventsCount())
-  );
+  const unorderedEvents = excludeEventsChildren(getSelectedEvents(selection));
+  const eventIndexes = getIndexes(unorderedEvents);
+  const sortedEvents = unorderedEvents
+    .map((event, i) => ({ event, index: eventIndexes[i] }))
+    .sort((a, b) => a.index - b.index);
+
+  for (const { event } of sortedEvents) {
+    eventsList.insertEvent(event, eventsList.getEventsCount());
+  }
+
   getSelectedInstructionsContexts(selection).forEach(instructionContext => {
     if (instructionContext.isCondition) {
       conditionsList.insert(

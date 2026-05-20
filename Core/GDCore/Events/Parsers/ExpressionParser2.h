@@ -199,8 +199,14 @@ class GD_CORE_API ExpressionParser2 {
       std::unique_ptr<ExpressionNode> factor = ReadNumber();
       return factor;
     } else if (CheckIfChar(IsOpeningParenthesis)) {
+      size_t expressionStartPosition = GetCurrentPosition();
       SkipChar();
-      std::unique_ptr<ExpressionNode> factor = SubExpression();
+
+      // The expression inside the parentheses excluding them.
+      auto expression = Expression();
+
+      // The expression and its parentheses.
+      auto factor = gd::make_unique<SubExpressionNode>(std::move(expression));
 
       if (!CheckIfChar(IsClosingParenthesis)) {
         factor->diagnostic =
@@ -208,7 +214,10 @@ class GD_CORE_API ExpressionParser2 {
                                "parenthesis for each opening parenthesis."));
       }
       SkipIfChar(IsClosingParenthesis);
-      return factor;
+      factor->location = ExpressionParserLocation(expressionStartPosition,
+                                                  GetCurrentPosition());
+
+      return std::move(factor);
     } else if (CheckIfChar(IsAllowedInIdentifier)) {
       return Identifier();
     }
@@ -216,19 +225,6 @@ class GD_CORE_API ExpressionParser2 {
     std::unique_ptr<ExpressionNode> factor = ReadUntilWhitespace();
     return factor;
   }
-
-  std::unique_ptr<SubExpressionNode> SubExpression() {
-    size_t expressionStartPosition = GetCurrentPosition();
-
-    auto expression = Expression();
-
-    auto subExpression =
-        gd::make_unique<SubExpressionNode>(std::move(expression));
-    subExpression->location =
-        ExpressionParserLocation(expressionStartPosition, GetCurrentPosition());
-
-    return std::move(subExpression);
-  };
 
   std::unique_ptr<IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode>
   Identifier() {

@@ -44,6 +44,7 @@ export type AutoCompleteOption =
       // $FlowFixMe[prop-missing]
       renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
       disabled?: boolean, // If true, the item is disabled and cannot be selected.
+      id?: string,
     |};
 
 export type DataSource = Array<AutoCompleteOption>;
@@ -73,6 +74,7 @@ type Props = {|
   openOnFocus?: boolean,
   style?: Object,
   inputStyle?: Object,
+  filterOptionById?: string => boolean,
 |};
 
 export type SemiControlledAutoCompleteInterface = {|
@@ -157,12 +159,15 @@ const isOptionDisabled = (option: AutoCompleteOption) =>
 const filterFunction = (
   options: DataSource,
   state: Object,
-  value: string
+  value: string,
+  filterOptionById: (string => boolean) | null
 ): DataSource => {
   const lowercaseInputValue = value.toLowerCase();
   const optionList = options.filter(option => {
     if (option.type === 'separator') return true;
-    if (!option.text) return true;
+    if (!option.text) {
+      return filterOptionById && option.id ? filterOptionById(option.id) : true;
+    }
     return option.text.toLowerCase().indexOf(lowercaseInputValue) !== -1;
   });
 
@@ -343,7 +348,12 @@ export default (React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
               getOptionLabel(option, currentInputValue)
             }
             filterOptions={(options: DataSource, state) =>
-              filterFunction(options, state, currentInputValue)
+              filterFunction(
+                options,
+                state,
+                currentInputValue,
+                props.filterOptionById || null
+              )
             }
             id={props.id}
             renderInput={params => {

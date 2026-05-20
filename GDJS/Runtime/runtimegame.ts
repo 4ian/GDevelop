@@ -915,6 +915,143 @@ namespace gdjs {
     }
 
     /**
+     * Preload an object assets in background.
+     */
+    loadObjectOrGroupAssets(
+      objectOrGroupName: string,
+      sceneName?: string
+    ): void {
+      const currentScene = this._sceneStack.getCurrentScene();
+      if (!currentScene) {
+        return;
+      }
+      if (!sceneName) {
+        sceneName = currentScene.getName();
+      }
+      const objectGroupData = this.getObjectGroupData(
+        sceneName,
+        objectOrGroupName
+      );
+      if (objectGroupData) {
+        for (const object of objectGroupData.objects) {
+          this._loadObjectAssets(sceneName, object.name);
+        }
+      } else {
+        this._loadObjectAssets(sceneName, objectOrGroupName);
+      }
+    }
+
+    private _loadObjectAssets(sceneName: string, objectName: string) {
+      const objectData = this.getObjectData(sceneName, objectName);
+      if (!objectData) {
+        return;
+      }
+      const usedResources = objectData.usedResources;
+      if (!usedResources) {
+        return;
+      }
+      this._resourcesLoader.loadObjectResources(
+        sceneName,
+        objectName,
+        usedResources
+      );
+    }
+
+    /**
+     * @returns true when all the resources of the given object are loaded.
+     */
+    areObjectOrGroupAssetsLoaded(
+      objectOrGroupName: string,
+      sceneName?: string
+    ): boolean {
+      const currentScene = this._sceneStack.getCurrentScene();
+      if (!currentScene) {
+        return false;
+      }
+      if (!sceneName) {
+        sceneName = currentScene.getName();
+      }
+      const objectGroupData = this.getObjectGroupData(
+        sceneName,
+        objectOrGroupName
+      );
+      if (objectGroupData) {
+        for (const object of objectGroupData.objects) {
+          if (
+            !this._resourcesLoader.areObjectAssetsReady(sceneName, object.name)
+          ) {
+            return false;
+          }
+        }
+        return true;
+      }
+      return this._resourcesLoader.areObjectAssetsReady(
+        sceneName,
+        objectOrGroupName
+      );
+    }
+
+    /**
+     * Unload an object assets.
+     */
+    unloadObjectOrGroupAssets(
+      objectOrGroupName: string,
+      sceneName?: string
+    ): void {
+      const currentScene = this._sceneStack.getCurrentScene();
+      if (!currentScene) {
+        return;
+      }
+      if (!sceneName) {
+        sceneName = currentScene.getName();
+      }
+      const objectGroupData = this.getObjectGroupData(
+        sceneName,
+        objectOrGroupName
+      );
+      if (objectGroupData) {
+        for (const object of objectGroupData.objects) {
+          this._resourcesLoader.unloadObjectResources(sceneName, object.name);
+        }
+      } else {
+        this._resourcesLoader.unloadObjectResources(
+          sceneName,
+          objectOrGroupName
+        );
+      }
+    }
+
+    private getObjectData(
+      sceneName: string,
+      objectName: string
+    ): ObjectData | null {
+      const sceneData = this.getSceneData(sceneName);
+      if (sceneData) {
+        for (const objectData of sceneData.objects) {
+          if (objectData.name === objectName) {
+            return objectData;
+          }
+        }
+      }
+      return null;
+    }
+
+    private getObjectGroupData(
+      sceneName: string,
+      objectGroupName: string
+    ): ObjectGroupData | null {
+      const sceneData = this.getSceneData(sceneName);
+      if (sceneData) {
+        for (const objectGroupData of sceneData.objectsGroups) {
+          if (objectGroupData.name === objectGroupName) {
+            return objectGroupData;
+          }
+        }
+      }
+      return null;
+    }
+
+    /**
      * Preload a scene assets as soon as possible in background.
      */
     prioritizeLoadingOfScene(sceneName: string) {
@@ -1020,7 +1157,8 @@ namespace gdjs {
           gdjs.getAllAsynchronouslyLoadingLibraryPromise(),
         ]);
       } catch (e) {
-        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
+        if (this._debuggerClient)
+          this._debuggerClient.onUncaughtException(e as Error);
 
         throw e;
       }
@@ -1251,7 +1389,7 @@ namespace gdjs {
             return true;
           } catch (e) {
             if (this._debuggerClient)
-              this._debuggerClient.onUncaughtException(e);
+              this._debuggerClient.onUncaughtException(e as Error);
 
             throw e;
           }
@@ -1263,7 +1401,8 @@ namespace gdjs {
           this._captureManager.setupCaptureOptions(this._isPreview);
         }
       } catch (e) {
-        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
+        if (this._debuggerClient)
+          this._debuggerClient.onUncaughtException(e as Error);
 
         throw e;
       }

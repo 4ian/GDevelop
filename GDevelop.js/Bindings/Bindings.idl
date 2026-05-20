@@ -914,6 +914,8 @@ interface gdObject {
     [Const, Ref] DOMString GetAssetStoreId();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
+    void SetResourcesPreloading([Const] DOMString value);
+    [Const, Ref] DOMString GetResourcesPreloading();
 
     [Ref] ObjectConfiguration GetConfiguration();
 
@@ -1738,6 +1740,7 @@ interface AbstractFunctionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] AbstractFunctionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] AbstractFunctionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] AbstractFunctionMetadata SetParameterHint([Const] DOMString hint);
     [Ref] AbstractFunctionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
     [Ref] AbstractFunctionMetadata SetHidden();
@@ -1790,7 +1793,10 @@ interface InstructionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] InstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] InstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] InstructionMetadata SetParameterHint([Const] DOMString hint);
     [Ref] InstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
+    [Ref] InstructionMetadata SetHint([Const] DOMString hint);
+    [Const, Ref] DOMString GetHint();
 
     [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
     [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
@@ -1857,6 +1863,7 @@ interface ExpressionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] ExpressionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] ExpressionMetadata SetParameterHint([Const] DOMString hint);
     [Ref] ExpressionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
     [Ref] ExpressionMetadata GetCodeExtraInformation();
@@ -1879,6 +1886,7 @@ interface MultipleInstructionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] MultipleInstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] MultipleInstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] MultipleInstructionMetadata SetParameterHint([Const] DOMString hint);
     [Ref] MultipleInstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
     [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
@@ -1943,6 +1951,8 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetDescription([Const] DOMString description_);
     [Const, Ref] DOMString GetLongDescription();
     [Ref] ParameterMetadata SetLongDescription([Const] DOMString longDescription_);
+    [Const, Ref] DOMString GetHint();
+    [Ref] ParameterMetadata SetHint([Const] DOMString hint_);
     boolean IsCodeOnly();
     [Ref] ParameterMetadata SetCodeOnly(boolean codeOnly_);
     [Const, Ref] DOMString GetDefaultValue();
@@ -1976,6 +1986,7 @@ interface ValueTypeMetadata {
     boolean IsNumber();
     boolean IsString();
     boolean IsVariable();
+    boolean IsResource();
 
     boolean STATIC_IsTypeObject([Const] DOMString parameterType);
     boolean STATIC_IsTypeBehavior([Const] DOMString parameterType);
@@ -2488,6 +2499,8 @@ interface BaseEvent {
     void SetDisabled(boolean disable);
     boolean IsFolded();
     void SetFolded(boolean folded);
+
+    InstructionsList GetInstructionList([Const] DOMString label);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -3198,6 +3211,7 @@ interface ExpressionValidator {
 
     [Const, Ref] VectorExpressionParserError GetAllErrors();
     [Const, Ref] VectorExpressionParserError GetFatalErrors();
+    [Const, Ref] VectorExpressionParserError GetDeprecationWarnings();
 
     //Inherited from ExpressionParser2NodeWorker:
 };
@@ -3241,6 +3255,37 @@ interface ExpressionCompletionFinder {
     [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ProjectScopedContainers projectScopedContainers, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
 
     [Const, Ref] VectorExpressionCompletionDescription GetCompletionDescriptions();
+
+    //Inherited from ExpressionParser2NodeWorker:
+};
+
+enum ExpressionColorationDescription_ColorationKind {
+  "ExpressionColorationDescription::String",
+  "ExpressionColorationDescription::Number",
+  "ExpressionColorationDescription::Object",
+  "ExpressionColorationDescription::Variable",
+  "ExpressionColorationDescription::Operator",
+};
+
+interface ExpressionColorationDescription {
+  ExpressionColorationDescription_ColorationKind GetColorationKind();
+  unsigned long GetStartPosition();
+  unsigned long GetEndPosition();
+};
+
+interface VectorExpressionColorationDescription {
+    unsigned long size();
+    [Value] ExpressionColorationDescription at(unsigned long index);
+};
+
+interface ExpressionSyntaxColoringHelper {
+    [Value] VectorExpressionColorationDescription STATIC_GetColorationDescriptionsFor(
+        [Const, Ref] Platform platform, [Const, Ref]
+        ProjectScopedContainers projectScopedContainers,
+        [Const] DOMString rootType,
+        [Ref] ExpressionNode node);
+
+    [Const, Ref] VectorExpressionColorationDescription GetColorationDescriptions();
 
     //Inherited from ExpressionParser2NodeWorker:
 };

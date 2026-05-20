@@ -603,6 +603,19 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     {
       auto node = parser.ParseExpression("-123");
       REQUIRE(node != nullptr);
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number", numberNode);
+      REQUIRE(type == "number");
+      REQUIRE(numberNode.number == "-123");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("- 123");
+      REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
           platform, projectScopedContainers, "number", unaryOperatorNode);
@@ -634,6 +647,19 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
     {
       auto node = parser.ParseExpression("-123.2");
+      REQUIRE(node != nullptr);
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number", numberNode);
+      REQUIRE(type == "number");
+      REQUIRE(numberNode.number == "-123.2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("- 123.2");
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
@@ -653,14 +679,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     {
       auto node = parser.ParseExpression("-123");
       REQUIRE(node != nullptr);
-      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, projectScopedContainers, "number|string", unaryOperatorNode);
-      REQUIRE(unaryOperatorNode.op == '-');
+          platform, projectScopedContainers, "number|string", numberNode);
       REQUIRE(type == "number");
-      auto &numberNode =
-          dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
-      REQUIRE(numberNode.number == "123");
+      REQUIRE(numberNode.number == "-123");
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
@@ -685,14 +708,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     {
       auto node = parser.ParseExpression("-123.2");
       REQUIRE(node != nullptr);
-      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, projectScopedContainers, "number|string", unaryOperatorNode);
-      REQUIRE(unaryOperatorNode.op == '-');
+          platform, projectScopedContainers, "number|string", numberNode);
       REQUIRE(type == "number");
-      auto &numberNode =
-          dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
-      REQUIRE(numberNode.number == "123.2");
+      REQUIRE(numberNode.number == "-123.2");
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);

@@ -166,9 +166,32 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
   }
 
-  SECTION("Valid unary operator generation") {
+  SECTION("Valid negative number generation") {
     {
       auto node = parser.ParseExpression("-12.45");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
+                                                          context);
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "-12.45");
+    }
+    {
+      auto node = parser.ParseExpression("12.5 + -2.  /   (.3)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
+                                                          context);
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "12.5 + -2. / (0.3)");
+    }
+  }
+
+  SECTION("Valid unary operator generation") {
+    {
+      auto node = parser.ParseExpression("- 12.45");
       gd::ExpressionCodeGenerator expressionCodeGenerator("number",
                                                           "",
                                                           codeGenerator,
@@ -178,7 +201,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(expressionCodeGenerator.GetOutput() == "-(12.45)");
     }
     {
-      auto node = parser.ParseExpression("12.5 + -2.  /   (.3)");
+      auto node = parser.ParseExpression("12.5 + - 2.  /   (.3)");
       gd::ExpressionCodeGenerator expressionCodeGenerator("number",
                                                           "",
                                                           codeGenerator,

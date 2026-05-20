@@ -39,16 +39,8 @@ export class ProjectScopedContainersAccessor {
     this._parameterResourcesContainer = parameterResourcesContainer;
     this._propertyResourcesContainer = propertyResourcesContainer;
     this._eventPath = eventPath;
-    // Trigger parameterObjectsContainer update (the call to `get()` has side
-    // effects on `_parameterObjectsContainer` for the events function scopes).
-    // The returned `gdProjectScopedContainers` is not used here, so it must be
-    // released to avoid leaking memory on the WebAssembly heap. Over long
-    // editor sessions, accumulating these objects (every render of editors
-    // like `SceneEditorContainer` or `EventsEditorContainer` creates a new
-    // accessor) eventually exhausts the heap and triggers an abort inside
-    // `MakeNewProjectScopedContainersForProjectAndLayout`.
-    const temporaryProjectScopedContainers = this.get();
-    temporaryProjectScopedContainers.delete();
+    // Trigger parameterObjectsContainer update.
+    this.get();
   }
 
   getScope(): EventsScope {
@@ -163,16 +155,10 @@ export class ProjectScopedContainersAccessor {
       );
     }
     for (const event of this._eventPath) {
-      const newProjectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersWithLocalVariables(
+      projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersWithLocalVariables(
         projectScopedContainers,
         event
       );
-      // The intermediate `gdProjectScopedContainers` is copied internally by
-      // `makeNewProjectScopedContainersWithLocalVariables`, so it is no longer
-      // needed and must be released to avoid leaking it on the WebAssembly
-      // heap.
-      projectScopedContainers.delete();
-      projectScopedContainers = newProjectScopedContainers;
     }
 
     return projectScopedContainers;

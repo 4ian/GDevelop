@@ -1208,7 +1208,9 @@ void Project::SerializeTo(SerializerElement& element) const {
   GetVariables().SerializeTo(element.AddChild("variables"));
 
   element.SetAttribute("firstLayout", firstLayout);
-  element.SetAttribute("previewLayout", previewLayout);
+  if (!previewLayout.empty()) {
+    element.SetAttribute("previewLayout", previewLayout);
+  }
   gd::SerializerElement& layoutsElement = element.AddChild("layouts");
   layoutsElement.ConsiderAsArrayOf("layout");
   for (std::size_t i = 0; i < GetLayoutsCount(); i++)

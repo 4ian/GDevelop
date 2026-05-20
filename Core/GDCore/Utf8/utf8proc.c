@@ -429,7 +429,8 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_decompose(
         if (uc < 0) return UTF8PROC_ERROR_INVALIDUTF8;
       }
       decomp_result = utf8proc_decompose_char(
-        uc, buffer + wpos, (bufsize > wpos) ? (bufsize - wpos) : 0, options,
+        uc, buffer ? buffer + wpos : NULL,
+        (bufsize > wpos) ? (bufsize - wpos) : 0, options,
         &boundclass
       );
       if (decomp_result < 0) return decomp_result;

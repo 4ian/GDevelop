@@ -301,10 +301,7 @@ private:
       const gd::ProjectScopedContainers &projectScopedContainers_,
       const gd::String &rootType_)
       : platform(platform_), projectScopedContainers(projectScopedContainers_),
-        rootType(rootType_),
-        rootObjectName("") // Always empty, might be changed if variable fields
-                           // in the editor are changed to use coloration.
-        {};
+        rootType(rootType_){};
 
   void AddColoration(
       gd::ExpressionColorationDescription::ColorationKind colorationKind,
@@ -321,12 +318,10 @@ private:
   }
 
   std::vector<ExpressionColorationDescription> colorations;
-  size_t searchedPosition;
 
   const gd::Platform &platform;
   const gd::ProjectScopedContainers &projectScopedContainers;
   const gd::String rootType;
-  const gd::String rootObjectName;
 };
 
 } // namespace gd

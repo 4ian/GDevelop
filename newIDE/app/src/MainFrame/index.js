@@ -1236,6 +1236,17 @@ const MainFrame = (props: Props): React.MixedElement => {
           );
         }
 
+        // Apply the preview layout override stored in the project file
+        // (set via "Use this scene to start all previews").
+        const previewLayoutName = project.getPreviewLayout();
+        if (previewLayoutName && project.hasLayoutNamed(previewLayoutName)) {
+          setPreviewOverride({
+            isPreviewOverriden: true,
+            overridenPreviewLayoutName: previewLayoutName,
+            overridenPreviewExternalLayoutName: null,
+          });
+        }
+
         setIsProjectClosedSoAvoidReloadingExtensions(false);
       }
 
@@ -2243,6 +2254,19 @@ const MainFrame = (props: Props): React.MixedElement => {
       overridenPreviewLayoutName,
       overridenPreviewExternalLayoutName,
     }));
+
+    // Persist the preview layout override on the project (like firstLayout),
+    // so it is restored when the project is re-opened.
+    if (currentProject) {
+      const persistedLayoutName =
+        isPreviewOverriden && overridenPreviewLayoutName
+          ? overridenPreviewLayoutName
+          : '';
+      if (currentProject.getPreviewLayout() !== persistedLayoutName) {
+        currentProject.setPreviewLayout(persistedLayoutName);
+        triggerUnsavedChanges();
+      }
+    }
   };
 
   const autosaveProjectIfNeeded = React.useCallback(

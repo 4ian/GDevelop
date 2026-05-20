@@ -739,6 +739,374 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Negative numbers (edge cases)") {
+    // A negative number with a leading dot is normalized like a positive one.
+    {
+      auto node = parser.ParseExpression("-.5");
+      REQUIRE(node != nullptr);
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
+      REQUIRE(numberNode.number == "-0.5");
+      REQUIRE(numberNode.location.GetStartPosition() == 0);
+      REQUIRE(numberNode.location.GetEndPosition() == 3);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // A negative number with a trailing dot is allowed.
+    {
+      auto node = parser.ParseExpression("-3.");
+      REQUIRE(node != nullptr);
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
+      REQUIRE(numberNode.number == "-3.");
+      REQUIRE(numberNode.location.GetStartPosition() == 0);
+      REQUIRE(numberNode.location.GetEndPosition() == 3);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // Leading zeros are stripped but the minus sign is kept.
+    {
+      auto node = parser.ParseExpression("-007");
+      REQUIRE(node != nullptr);
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
+      REQUIRE(numberNode.number == "-7");
+      REQUIRE(numberNode.location.GetStartPosition() == 0);
+      REQUIRE(numberNode.location.GetEndPosition() == 4);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // Negative zero is preserved.
+    {
+      auto node = parser.ParseExpression("-0");
+      REQUIRE(node != nullptr);
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
+      REQUIRE(numberNode.number == "-0");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // Leading whitespace before a negative number does not break it.
+    {
+      auto node = parser.ParseExpression("   -123");
+      REQUIRE(node != nullptr);
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
+      REQUIRE(numberNode.number == "-123");
+      // The minus sign position becomes the location start.
+      REQUIRE(numberNode.location.GetStartPosition() == 3);
+      REQUIRE(numberNode.location.GetEndPosition() == 7);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // A `+` is never treated as a number sign: `+123` stays a unary operator
+    // applied to NumberNode("123").
+    {
+      auto node = parser.ParseExpression("+123");
+      REQUIRE(node != nullptr);
+      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      REQUIRE(unaryOperatorNode.op == '+');
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
+      REQUIRE(numberNode.number == "123");
+    }
+  }
+
+  SECTION("Negative numbers in binary operations") {
+    // `2*-3` becomes 2 * NumberNode("-3"): the unary minus is folded into the
+    // number, but the `*` remains a real binary operator.
+    {
+      auto node = parser.ParseExpression("2*-3");
+      REQUIRE(node != nullptr);
+      auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+      REQUIRE(operatorNode.op == '*');
+      auto &leftNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.leftHandSide);
+      REQUIRE(leftNumberNode.number == "2");
+      auto &rightNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.rightHandSide);
+      REQUIRE(rightNumberNode.number == "-3");
+      // Location of the negative number should cover the minus.
+      REQUIRE(rightNumberNode.location.GetStartPosition() == 2);
+      REQUIRE(rightNumberNode.location.GetEndPosition() == 4);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // `2/-3`
+    {
+      auto node = parser.ParseExpression("2/-3");
+      REQUIRE(node != nullptr);
+      auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+      REQUIRE(operatorNode.op == '/');
+      auto &rightNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.rightHandSide);
+      REQUIRE(rightNumberNode.number == "-3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // `1+-2` parses cleanly into NumberNode("1") + NumberNode("-2").
+    {
+      auto node = parser.ParseExpression("1+-2");
+      REQUIRE(node != nullptr);
+      auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+      REQUIRE(operatorNode.op == '+');
+      auto &rightNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.rightHandSide);
+      REQUIRE(rightNumberNode.number == "-2");
+      REQUIRE(rightNumberNode.location.GetStartPosition() == 2);
+      REQUIRE(rightNumberNode.location.GetEndPosition() == 4);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // `1--2` (subtract a negative literal) parses to a binary `-` whose right
+    // hand side is the literal -2 (not a unary minus on 2).
+    {
+      auto node = parser.ParseExpression("1--2");
+      REQUIRE(node != nullptr);
+      auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+      REQUIRE(operatorNode.op == '-');
+      auto &leftNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.leftHandSide);
+      REQUIRE(leftNumberNode.number == "1");
+      auto &rightNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.rightHandSide);
+      REQUIRE(rightNumberNode.number == "-2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // `-1 + 2`: the negative literal is the left hand side of `+`.
+    {
+      auto node = parser.ParseExpression("-1 + 2");
+      REQUIRE(node != nullptr);
+      auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+      REQUIRE(operatorNode.op == '+');
+      auto &leftNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.leftHandSide);
+      REQUIRE(leftNumberNode.number == "-1");
+      auto &rightNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.rightHandSide);
+      REQUIRE(rightNumberNode.number == "2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // Multiplicative precedence: `-2*3 + 1` → ((-2) * 3) + 1.
+    {
+      auto node = parser.ParseExpression("-2*3 + 1");
+      REQUIRE(node != nullptr);
+      auto &plusNode = dynamic_cast<gd::OperatorNode &>(*node);
+      REQUIRE(plusNode.op == '+');
+      auto &mulNode = dynamic_cast<gd::OperatorNode &>(*plusNode.leftHandSide);
+      REQUIRE(mulNode.op == '*');
+      auto &mulLeft = dynamic_cast<gd::NumberNode &>(*mulNode.leftHandSide);
+      REQUIRE(mulLeft.number == "-2");
+      auto &mulRight = dynamic_cast<gd::NumberNode &>(*mulNode.rightHandSide);
+      REQUIRE(mulRight.number == "3");
+      auto &plusRight = dynamic_cast<gd::NumberNode &>(*plusNode.rightHandSide);
+      REQUIRE(plusRight.number == "1");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // A whitespace between `-` and the number forces a unary minus (legacy
+    // behaviour preserved). Ensure `2 - 3` is still a binary subtract and
+    // not collapsed into `2` followed by NumberNode("-3").
+    {
+      auto node = parser.ParseExpression("2 - 3");
+      REQUIRE(node != nullptr);
+      auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+      REQUIRE(operatorNode.op == '-');
+      auto &leftNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.leftHandSide);
+      REQUIRE(leftNumberNode.number == "2");
+      auto &rightNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.rightHandSide);
+      // The right operand is the positive literal 3.
+      REQUIRE(rightNumberNode.number == "3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Negative numbers with parenthesis") {
+    // `(-3)` → SubExpression(NumberNode("-3")).
+    {
+      auto node = parser.ParseExpression("(-3)");
+      REQUIRE(node != nullptr);
+      auto &subExpression = dynamic_cast<gd::SubExpressionNode &>(*node);
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*subExpression.expression);
+      REQUIRE(numberNode.number == "-3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // `-(3)` is *not* a negative literal: the `(` is not a digit so the parser
+    // takes the unary-operator path and wraps a SubExpression.
+    {
+      auto node = parser.ParseExpression("-(3)");
+      REQUIRE(node != nullptr);
+      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      REQUIRE(unaryOperatorNode.op == '-');
+      auto &subExpression =
+          dynamic_cast<gd::SubExpressionNode &>(*unaryOperatorNode.factor);
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*subExpression.expression);
+      REQUIRE(numberNode.number == "3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // `-(-3)` is a unary minus around a sub-expression containing a negative
+    // literal.
+    {
+      auto node = parser.ParseExpression("-(-3)");
+      REQUIRE(node != nullptr);
+      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      REQUIRE(unaryOperatorNode.op == '-');
+      auto &subExpression =
+          dynamic_cast<gd::SubExpressionNode &>(*unaryOperatorNode.factor);
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*subExpression.expression);
+      REQUIRE(numberNode.number == "-3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Stacked unary operators with negative numbers") {
+    // `--3` is a unary minus on a NumberNode("-3").
+    {
+      auto node = parser.ParseExpression("--3");
+      REQUIRE(node != nullptr);
+      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      REQUIRE(unaryOperatorNode.op == '-');
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
+      REQUIRE(numberNode.number == "-3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // `+-3` is unary `+` around NumberNode("-3").
+    {
+      auto node = parser.ParseExpression("+-3");
+      REQUIRE(node != nullptr);
+      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      REQUIRE(unaryOperatorNode.op == '+');
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
+      REQUIRE(numberNode.number == "-3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // `-+3` is unary `-` around a unary `+` around NumberNode("3") (the `+` is
+    // never folded into the literal).
+    {
+      auto node = parser.ParseExpression("-+3");
+      REQUIRE(node != nullptr);
+      auto &outerUnary = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      REQUIRE(outerUnary.op == '-');
+      auto &innerUnary =
+          dynamic_cast<gd::UnaryOperatorNode &>(*outerUnary.factor);
+      REQUIRE(innerUnary.op == '+');
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*innerUnary.factor);
+      REQUIRE(numberNode.number == "3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Unary minus on non-numbers stays a unary operator") {
+    // `-MyExtension::GetNumber()`: the `-` is not followed by a digit, so it
+    // must stay a unary operator.
+    {
+      auto node = parser.ParseExpression("-MyExtension::GetNumber()");
+      REQUIRE(node != nullptr);
+      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      REQUIRE(unaryOperatorNode.op == '-');
+      auto &functionNode =
+          dynamic_cast<gd::FunctionCallNode &>(*unaryOperatorNode.factor);
+      REQUIRE(functionNode.functionName == "MyExtension::GetNumber");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    // `-(123)`: `-` followed by an opening parenthesis is also a unary
+    // operator (the `(` is not a number first char).
+    {
+      auto node = parser.ParseExpression("-(123)");
+      REQUIRE(node != nullptr);
+      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      REQUIRE(unaryOperatorNode.op == '-');
+      auto &subExpression =
+          dynamic_cast<gd::SubExpressionNode &>(*unaryOperatorNode.factor);
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*subExpression.expression);
+      REQUIRE(numberNode.number == "123");
+    }
+  }
+
+  SECTION("Negative numbers as function arguments") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetNumberWith3Params(-1, \"hello\", -2.5)");
+    REQUIRE(node != nullptr);
+    auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+    REQUIRE(functionNode.parameters.size() == 3);
+    auto &firstArg =
+        dynamic_cast<gd::NumberNode &>(*functionNode.parameters[0]);
+    REQUIRE(firstArg.number == "-1");
+    auto &thirdArg =
+        dynamic_cast<gd::NumberNode &>(*functionNode.parameters[2]);
+    REQUIRE(thirdArg.number == "-2.5");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+    node->Visit(validator);
+    REQUIRE(validator.GetFatalErrors().size() == 0);
+  }
+
+  SECTION("Negative number in a string-only context is rejected") {
+    auto node = parser.ParseExpression("-123");
+    REQUIRE(node != nullptr);
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
+    node->Visit(validator);
+    REQUIRE(validator.GetFatalErrors().size() == 1);
+    REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+            "You entered a number, but a text was expected (in quotes).");
+    // The error should report the position of the literal, including the
+    // minus sign.
+    REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 4);
+  }
+
   SECTION("Invalid unary operators") {
     {
       auto node = parser.ParseExpression("*123");

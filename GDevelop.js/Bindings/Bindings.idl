@@ -633,6 +633,8 @@ interface Project {
     void RemoveLayout([Const] DOMString name);
     void SetFirstLayout([Const] DOMString name);
     [Const, Ref] DOMString GetFirstLayout();
+    void SetPreviewLayout([Const] DOMString name);
+    [Const, Ref] DOMString GetPreviewLayout();
     unsigned long GetLayoutPosition([Const] DOMString name);
 
     boolean HasExternalEventsNamed([Const] DOMString name);

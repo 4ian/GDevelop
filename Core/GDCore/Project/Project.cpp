@@ -902,6 +902,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     layout.UnserializeFrom(*this, layoutElement);
   }
   SetFirstLayout(element.GetChild("firstLayout").GetStringValue());
+  SetPreviewLayout(element.GetChild("previewLayout").GetStringValue());
 
   externalEvents.clear();
   const SerializerElement& externalEventsElement =
@@ -1207,6 +1208,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   GetVariables().SerializeTo(element.AddChild("variables"));
 
   element.SetAttribute("firstLayout", firstLayout);
+  element.SetAttribute("previewLayout", previewLayout);
   gd::SerializerElement& layoutsElement = element.AddChild("layouts");
   layoutsElement.ConsiderAsArrayOf("layout");
   for (std::size_t i = 0; i < GetLayoutsCount(); i++)
@@ -1289,6 +1291,7 @@ void Project::Init(const gd::Project& game) {
   categories = game.categories;
   description = game.description;
   firstLayout = game.firstLayout;
+  previewLayout = game.previewLayout;
   version = game.version;
   windowWidth = game.windowWidth;
   windowHeight = game.windowHeight;

@@ -143,11 +143,7 @@ void EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
     auto &defaultObjectGroups =
         eventsBasedObject.GetDefaultVariant().GetObjects().GetObjectGroups();
     auto &objectGroups = variant->GetObjects().GetObjectGroups();
-    auto objectGroupsCount = objectGroups.Count();
-    // Clear groups
-    for (size_t index = 0; index < objectGroupsCount; index++) {
-      objectGroups.Remove(objectGroups.Get(0).GetName());
-    }
+    objectGroups.Clear();
     // Copy groups
     for (size_t index = 0; index < defaultObjectGroups.Count(); index++) {
       objectGroups.Insert(defaultObjectGroups.Get(index), index);

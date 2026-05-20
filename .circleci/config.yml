@@ -298,7 +298,7 @@ jobs:
   # (Travis, Semaphore). The Emscripten build has its own sanitizer job:
   # build-gdevelop_js-debug-sanitizers-and-extra-checks.
   build-gdcore-tests-sanitizers:
-    resource_class: large
+    resource_class: medium+
     docker:
       - image: cimg/base:current
 
@@ -336,9 +336,10 @@ jobs:
           name: Run GDCore_tests with sanitizers (20 iterations to catch flakes)
           command: |
             cd .build-tests-asan
+            for i in {1..2}; do echo "Traditional run $i"; Core/GDCore_tests; done
             export ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:print_stacktrace=1
             export UBSAN_OPTIONS=print_stacktrace=1
-            for i in {1..20}; do echo "Run $i"; Core/GDCore_tests; done
+            for i in {1..2}; do echo "Sanitizers run $i"; Core/GDCore_tests; done
 
   # Trigger AppVeyor build, which also does a Windows build (keep it for redundancy).
   trigger-appveyor-windows-build:

@@ -547,7 +547,7 @@ function NewObjectDialog({
               <HelpButton
                 helpPagePath="/objects"
                 key="help"
-                scopeName="Objects"
+                scopeName={i18n._(t`Objects`)}
               />,
             ]}
             actions={[

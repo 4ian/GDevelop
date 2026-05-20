@@ -230,7 +230,7 @@ export default function EventsBasedBehaviorEditor({
             <HelpButton
               key="help"
               helpPagePath="/behaviors/events-based-behaviors"
-              scopeName="Behaviors"
+              scopeName={i18n._(t`Behaviors`)}
             />
           </Line>
         </ColumnStackLayout>

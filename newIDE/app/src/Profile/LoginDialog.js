@@ -1,5 +1,6 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -81,11 +82,11 @@ const LoginDialog = ({
     </LeftLoader>,
   ];
 
-  const secondaryActions = [
+  const secondaryActions = (i18n: any) => [
     <HelpButton
       key="help"
       helpPagePath={'/interface/profile'}
-      scopeName="Account"
+      scopeName={i18n._(t`Account`)}
     />,
   ];
 
@@ -122,22 +123,26 @@ const LoginDialog = ({
   );
 
   return (
-    <Dialog
-      title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
-      id="login-dialog"
-      // $FlowFixMe[incompatible-type]
-      actions={actions}
-      // $FlowFixMe[incompatible-type]
-      secondaryActions={secondaryActions}
-      cannotBeDismissed={loginInProgress}
-      onRequestClose={onClose}
-      onApply={doLogin}
-      maxWidth="md"
-      open
-      flexColumnBody
-    >
-      {dialogContent}
-    </Dialog>
+    <I18n>
+      {({ i18n }) => (
+        <Dialog
+          title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
+          id="login-dialog"
+          // $FlowFixMe[incompatible-type]
+          actions={actions}
+          // $FlowFixMe[incompatible-type]
+          secondaryActions={secondaryActions(i18n)}
+          cannotBeDismissed={loginInProgress}
+          onRequestClose={onClose}
+          onApply={doLogin}
+          maxWidth="md"
+          open
+          flexColumnBody
+        >
+          {dialogContent}
+        </Dialog>
+      )}
+    </I18n>
   );
 };
 

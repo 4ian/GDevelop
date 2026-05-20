@@ -1,5 +1,6 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -149,72 +150,76 @@ const ObjectGroupVariablesDialog = ({
   );
 
   return (
-    <Dialog
-      title={<Trans>{objectGroup.getName()} variables</Trans>}
-      actions={[
-        <FlatButton
-          label={<Trans>Cancel</Trans>}
-          onClick={onCancel}
-          key="Cancel"
-        />,
-        <DialogPrimaryButton
-          label={<Trans>Apply</Trans>}
-          primary
-          onClick={apply}
-          key="Apply"
-          id="apply-button"
-        />,
-      ]}
-      secondaryActions={[
-        hotReloadPreviewButtonProps ? (
-          <HotReloadPreviewButton
-            key="hot-reload-preview-button"
-            {...hotReloadPreviewButtonProps}
-          />
-        ) : null,
-        <HelpButton
-          helpPagePath={'/all-features/variables/object-variables'}
-          key="help"
-          scopeName="Object variables"
-        />,
-      ]}
-      onRequestClose={onCancel}
-      onApply={apply}
-      open={open}
-      flexBody
-      fullHeight
-      id="object-group-variables-dialog"
-    >
-      <Column expand noMargin noOverflowParent>
-        {groupVariablesContainer.count() > 0 && DismissableTutorialMessage && (
-          <Line>
-            <Column expand>{DismissableTutorialMessage}</Column>
-          </Line>
-        )}
-        <VariablesList
-          projectScopedContainersAccessor={projectScopedContainersAccessor}
-          variablesContainer={groupVariablesContainer}
-          areObjectVariables
-          initiallySelectedVariableName={
-            actualInitiallySelectedVariableName.current
-          }
-          emptyPlaceholderTitle={
-            <Trans>Add your first object group variable</Trans>
-          }
-          emptyPlaceholderDescription={
-            <Trans>
-              These variables hold additional information and are available on
-              all objects of the group.
-            </Trans>
-          }
-          helpPagePath={'/all-features/variables/object-variables'}
-          onComputeAllVariableNames={onComputeAllVariableNames}
-          onVariablesUpdated={notifyOfVariableChange}
-          onSelectedVariableChange={onSelectedVariableChange}
-          isListLocked={isListLocked}
-        />
-      </Column>
-    </Dialog>
+    <I18n>
+      {({ i18n }) => (
+        <Dialog
+          title={<Trans>{objectGroup.getName()} variables</Trans>}
+          actions={[
+            <FlatButton
+              label={<Trans>Cancel</Trans>}
+              onClick={onCancel}
+              key="Cancel"
+            />,
+            <DialogPrimaryButton
+              label={<Trans>Apply</Trans>}
+              primary
+              onClick={apply}
+              key="Apply"
+              id="apply-button"
+            />,
+          ]}
+          secondaryActions={[
+            hotReloadPreviewButtonProps ? (
+              <HotReloadPreviewButton
+                key="hot-reload-preview-button"
+                {...hotReloadPreviewButtonProps}
+              />
+            ) : null,
+            <HelpButton
+              helpPagePath={'/all-features/variables/object-variables'}
+              key="help"
+              scopeName={i18n._(t`Object variables`)}
+            />,
+          ]}
+          onRequestClose={onCancel}
+          onApply={apply}
+          open={open}
+          flexBody
+          fullHeight
+          id="object-group-variables-dialog"
+        >
+          <Column expand noMargin noOverflowParent>
+            {groupVariablesContainer.count() > 0 && DismissableTutorialMessage && (
+              <Line>
+                <Column expand>{DismissableTutorialMessage}</Column>
+              </Line>
+            )}
+            <VariablesList
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
+              variablesContainer={groupVariablesContainer}
+              areObjectVariables
+              initiallySelectedVariableName={
+                actualInitiallySelectedVariableName.current
+              }
+              emptyPlaceholderTitle={
+                <Trans>Add your first object group variable</Trans>
+              }
+              emptyPlaceholderDescription={
+                <Trans>
+                  These variables hold additional information and are available
+                  on all objects of the group.
+                </Trans>
+              }
+              helpPagePath={'/all-features/variables/object-variables'}
+              onComputeAllVariableNames={onComputeAllVariableNames}
+              onVariablesUpdated={notifyOfVariableChange}
+              onSelectedVariableChange={onSelectedVariableChange}
+              isListLocked={isListLocked}
+            />
+          </Column>
+        </Dialog>
+      )}
+    </I18n>
   );
 };
 

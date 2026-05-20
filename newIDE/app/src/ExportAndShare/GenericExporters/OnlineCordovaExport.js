@@ -1,5 +1,7 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
@@ -31,136 +33,143 @@ export const SetupExportHeader = ({
   if (!!build && build.status === 'complete') return null;
 
   return (
-    <Column noMargin expand>
-      <Line>
-        <Text align="center">
-          <Trans>
-            Packaging your game for Android will create an APK file that can be
-            installed on Android phones or an Android App Bundle that can be
-            published to Google Play.
-          </Trans>
-        </Text>
-      </Line>
-      <Column>
-        <RadioGroup
-          value={exportState.targets[0] || 'androidApk'}
-          onChange={event => {
-            const targetName = event.target.value;
-            updateExportState(prevExportState => ({
-              ...prevExportState,
-              targets: [targetName],
-            }));
-          }}
-        >
-          <FormControlLabel
-            value={'androidApk'}
-            control={<Radio color="secondary" disabled={isExporting} />}
-            label={
+    <I18n>
+      {({ i18n }) => (
+        <Column noMargin expand>
+          <Line>
+            <Text align="center">
               <Trans>
-                APK (for testing on device or sharing outside Google Play)
+                Packaging your game for Android will create an APK file that can
+                be installed on Android phones or an Android App Bundle that can
+                be published to Google Play.
               </Trans>
-            }
-          />
-          <FormControlLabel
-            value={'androidAppBundle'}
-            control={<Radio color="secondary" disabled={isExporting} />}
-            label={
-              <Trans>Android App Bundle (for publishing on Google Play)</Trans>
-            }
-          />
-        </RadioGroup>
-        <Line noMargin justifyContent="flex-end">
-          <FlatButton
-            label={<Trans>Signing options</Trans>}
-            onClick={() => {
-              updateExportState(prevExportState => ({
-                ...prevExportState,
-                signingDialogOpen: true,
-              }));
-            }}
-            disabled={
-              exportState.targets[0] !== 'androidAppBundle' || isExporting
-            }
-          />
-        </Line>
-      </Column>
-      {exportState.signingDialogOpen && (
-        <Dialog
-          title={<Trans>Signing options</Trans>}
-          actions={[
-            <FlatButton
-              key="close"
-              label={<Trans>Close</Trans>}
-              primary
-              keyboardFocused
-              onClick={() => {
+            </Text>
+          </Line>
+          <Column>
+            <RadioGroup
+              value={exportState.targets[0] || 'androidApk'}
+              onChange={event => {
+                const targetName = event.target.value;
+                updateExportState(prevExportState => ({
+                  ...prevExportState,
+                  targets: [targetName],
+                }));
+              }}
+            >
+              <FormControlLabel
+                value={'androidApk'}
+                control={<Radio color="secondary" disabled={isExporting} />}
+                label={
+                  <Trans>
+                    APK (for testing on device or sharing outside Google Play)
+                  </Trans>
+                }
+              />
+              <FormControlLabel
+                value={'androidAppBundle'}
+                control={<Radio color="secondary" disabled={isExporting} />}
+                label={
+                  <Trans>
+                    Android App Bundle (for publishing on Google Play)
+                  </Trans>
+                }
+              />
+            </RadioGroup>
+            <Line noMargin justifyContent="flex-end">
+              <FlatButton
+                label={<Trans>Signing options</Trans>}
+                onClick={() => {
+                  updateExportState(prevExportState => ({
+                    ...prevExportState,
+                    signingDialogOpen: true,
+                  }));
+                }}
+                disabled={
+                  exportState.targets[0] !== 'androidAppBundle' || isExporting
+                }
+              />
+            </Line>
+          </Column>
+          {exportState.signingDialogOpen && (
+            <Dialog
+              title={<Trans>Signing options</Trans>}
+              actions={[
+                <FlatButton
+                  key="close"
+                  label={<Trans>Close</Trans>}
+                  primary
+                  keyboardFocused
+                  onClick={() => {
+                    updateExportState(prevExportState => ({
+                      ...prevExportState,
+                      signingDialogOpen: false,
+                    }));
+                  }}
+                />,
+              ]}
+              secondaryActions={[
+                <HelpButton
+                  helpPagePath="/publishing/android/play-store/upgrading-from-apk-to-aab"
+                  key="help"
+                  scopeName={i18n._(t`Android publishing`)}
+                />,
+              ]}
+              open
+              onRequestClose={() => {
                 updateExportState(prevExportState => ({
                   ...prevExportState,
                   signingDialogOpen: false,
                 }));
               }}
-            />,
-          ]}
-          secondaryActions={[
-            <HelpButton
-              helpPagePath="/publishing/android/play-store/upgrading-from-apk-to-aab"
-              key="help"
-              scopeName="Android publishing"
-            />,
-          ]}
-          open
-          onRequestClose={() => {
-            updateExportState(prevExportState => ({
-              ...prevExportState,
-              signingDialogOpen: false,
-            }));
-          }}
-          maxWidth="sm"
-        >
-          <Text>
-            <Trans>
-              Choose the upload key to use to identify your Android App Bundle.
-              In most cases you don't need to change this. Use the "Old upload
-              key" if you used to publish your game as an APK and you activated
-              Play App Signing before switching to Android App Bundle.
-            </Trans>
-          </Text>
-          <RadioGroup
-            name="signing-keystore"
-            value={exportState.keystore}
-            onChange={event => {
-              const keystore = event.target.value;
-              updateExportState(prevExportState => ({
-                ...prevExportState,
-                keystore,
-              }));
-            }}
-          >
-            <FormControlLabel
-              value={'new'}
-              control={<Radio color="primary" />}
-              label={<Trans>Default upload key (recommended)</Trans>}
-            />
-            <FormControlLabel
-              value={'old'}
-              control={<Radio color="primary" />}
-              label={
+              maxWidth="sm"
+            >
+              <Text>
                 <Trans>
-                  Old, legacy upload key (only if you used to publish your game
-                  as an APK and already activated Play App Signing)
+                  Choose the upload key to use to identify your Android App
+                  Bundle. In most cases you don't need to change this. Use the
+                  "Old upload key" if you used to publish your game as an APK
+                  and you activated Play App Signing before switching to Android
+                  App Bundle.
                 </Trans>
-              }
-            />
-            <FormControlLabel
-              value={'custom'}
-              control={<Radio color="primary" />}
-              label={<Trans>Custom upload key (not available yet)</Trans>}
-              disabled
-            />
-          </RadioGroup>
-        </Dialog>
+              </Text>
+              <RadioGroup
+                name="signing-keystore"
+                value={exportState.keystore}
+                onChange={event => {
+                  const keystore = event.target.value;
+                  updateExportState(prevExportState => ({
+                    ...prevExportState,
+                    keystore,
+                  }));
+                }}
+              >
+                <FormControlLabel
+                  value={'new'}
+                  control={<Radio color="primary" />}
+                  label={<Trans>Default upload key (recommended)</Trans>}
+                />
+                <FormControlLabel
+                  value={'old'}
+                  control={<Radio color="primary" />}
+                  label={
+                    <Trans>
+                      Old, legacy upload key (only if you used to publish your
+                      game as an APK and already activated Play App Signing)
+                    </Trans>
+                  }
+                />
+                <FormControlLabel
+                  value={'custom'}
+                  control={<Radio color="primary" />}
+                  label={<Trans>Custom upload key (not available yet)</Trans>}
+                  disabled
+                />
+              </RadioGroup>
+            </Dialog>
+          )}
+        </Column>
       )}
-    </Column>
+    </I18n>
   );
 };
 

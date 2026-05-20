@@ -1,5 +1,6 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectGroupEditor from '.';
@@ -142,104 +143,113 @@ const EditedObjectGroupEditorDialog = ({
   );
 
   return (
-    <Dialog
-      title={<Trans>Edit {group.getName()}</Trans>}
-      key={group.ptr}
-      actions={[
-        <FlatButton
-          key="cancel"
-          label={<Trans>Cancel</Trans>}
-          keyboardFocused
-          onClick={onCancelChanges}
-        />,
-        <DialogPrimaryButton
-          key="apply"
-          label={<Trans>Apply</Trans>}
-          primary
-          onClick={apply}
-        />,
-      ]}
-      secondaryActions={[
-        <HelpButton
-          key="help-button"
-          helpPagePath="/objects/object-group"
-          scopeName="Object groups"
-        />,
-      ]}
-      onRequestClose={onCancelChanges}
-      onApply={apply}
-      open
-      fullHeight
-      flexBody
-      fixedContent={
-        <Tabs
-          value={currentTab}
-          onChange={setCurrentTab}
-          options={[
-            {
-              label: <Trans>Objects</Trans>,
-              value: 'objects',
-            },
-            {
-              label: <Trans>Variables</Trans>,
-              value: 'variables',
-            },
+    <I18n>
+      {({ i18n }) => (
+        <Dialog
+          title={<Trans>Edit {group.getName()}</Trans>}
+          key={group.ptr}
+          actions={[
+            <FlatButton
+              key="cancel"
+              label={<Trans>Cancel</Trans>}
+              keyboardFocused
+              onClick={onCancelChanges}
+            />,
+            <DialogPrimaryButton
+              key="apply"
+              label={<Trans>Apply</Trans>}
+              primary
+              onClick={apply}
+            />,
           ]}
-        />
-      }
-    >
-      {currentTab === 'objects' &&
-        (isObjectListLocked && group.getAllObjectsNames().size() === 0 ? (
-          <Column noMargin expand justifyContent="center">
-            <Text size="block-title" align="center">
-              {<Trans>Empty group</Trans>}
-            </Text>
-            <Text align="center" noMargin>
-              {<Trans>This object group is empty and locked.</Trans>}
-            </Text>
-          </Column>
-        ) : (
-          <ObjectGroupEditor
-            project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            globalObjectsContainer={globalObjectsContainer}
-            objectsContainer={objectsContainer}
-            groupObjectNames={group.getAllObjectsNames().toJSArray()}
-            onObjectAdded={addObject}
-            onObjectRemoved={removeObject}
-            isObjectListLocked={isObjectListLocked}
-          />
-        ))}
-      {currentTab === 'variables' && (
-        <Column expand noMargin>
-          {groupVariablesContainer.count() > 0 && DismissableTutorialMessage && (
-            <Line>
-              <Column noMargin expand>
-                {DismissableTutorialMessage}
+          secondaryActions={[
+            <HelpButton
+              key="help-button"
+              helpPagePath="/objects/object-group"
+              scopeName={i18n._(t`Object groups`)}
+            />,
+          ]}
+          onRequestClose={onCancelChanges}
+          onApply={apply}
+          open
+          fullHeight
+          flexBody
+          fixedContent={
+            <Tabs
+              value={currentTab}
+              onChange={setCurrentTab}
+              options={[
+                {
+                  label: <Trans>Objects</Trans>,
+                  value: 'objects',
+                },
+                {
+                  label: <Trans>Variables</Trans>,
+                  value: 'variables',
+                },
+              ]}
+            />
+          }
+        >
+          {currentTab === 'objects' &&
+            (isObjectListLocked && group.getAllObjectsNames().size() === 0 ? (
+              <Column noMargin expand justifyContent="center">
+                <Text size="block-title" align="center">
+                  {<Trans>Empty group</Trans>}
+                </Text>
+                <Text align="center" noMargin>
+                  {<Trans>This object group is empty and locked.</Trans>}
+                </Text>
               </Column>
-            </Line>
+            ) : (
+              <ObjectGroupEditor
+                project={project}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
+                globalObjectsContainer={globalObjectsContainer}
+                objectsContainer={objectsContainer}
+                groupObjectNames={group.getAllObjectsNames().toJSArray()}
+                onObjectAdded={addObject}
+                onObjectRemoved={removeObject}
+                isObjectListLocked={isObjectListLocked}
+              />
+            ))}
+          {currentTab === 'variables' && (
+            <Column expand noMargin>
+              {groupVariablesContainer.count() > 0 &&
+                DismissableTutorialMessage && (
+                  <Line>
+                    <Column noMargin expand>
+                      {DismissableTutorialMessage}
+                    </Column>
+                  </Line>
+                )}
+              <VariablesList
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
+                variablesContainer={groupVariablesContainer}
+                areObjectVariables
+                emptyPlaceholderTitle={
+                  <Trans>Add your first object group variable</Trans>
+                }
+                emptyPlaceholderDescription={
+                  <Trans>
+                    These variables hold additional information and are
+                    available on all objects of the group.
+                  </Trans>
+                }
+                helpPagePath={'/all-features/variables/object-variables'}
+                onComputeAllVariableNames={onComputeAllVariableNames}
+                onVariablesUpdated={notifyOfVariableChange}
+                isListLocked={isVariableListLocked}
+              />
+            </Column>
           )}
-          <VariablesList
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            variablesContainer={groupVariablesContainer}
-            areObjectVariables
-            emptyPlaceholderTitle={
-              <Trans>Add your first object group variable</Trans>
-            }
-            emptyPlaceholderDescription={
-              <Trans>
-                These variables hold additional information and are available on
-                all objects of the group.
-              </Trans>
-            }
-            helpPagePath={'/all-features/variables/object-variables'}
-            onComputeAllVariableNames={onComputeAllVariableNames}
-            onVariablesUpdated={notifyOfVariableChange}
-            isListLocked={isVariableListLocked}
-          />
-        </Column>
+        </Dialog>
       )}
-    </Dialog>
+    </I18n>
   );
 };
 

@@ -1,5 +1,6 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -140,132 +141,136 @@ const ProfileDialog = ({ onClose }: Props) => {
     !!authenticatedUser.subscription.isTeacher;
 
   return (
-    <Dialog
-      title={isConnected ? <Trans>My profile</Trans> : null}
-      actions={[
-        <FlatButton
-          label={<Trans>Close</Trans>}
-          key="close"
-          primary={false}
-          onClick={onClose}
-        />,
-      ]}
-      secondaryActions={[
-        <HelpButton
-          key="help"
-          helpPagePath="/interface/profile"
-          scopeName="Profile"
-        />,
-        isConnected && (
-          <FlatButton
-            label={<Trans>Logout</Trans>}
-            key="logout"
-            onClick={onLogout}
-            disabled={isUserLoading}
-          />
-        ),
-        <FlatButton
-          leftIcon={<RedemptionCodeIcon />}
-          label={
-            isMobile ? <Trans>Redeem</Trans> : <Trans>Redeem a code</Trans>
-          }
-          key="redeem-code"
-          disabled={isUserLoading}
-          primary={false}
-          onClick={() => {
-            if (authenticatedUser.authenticated) {
-              openRedeemCodeDialog();
-            } else {
-              authenticatedUser.onOpenCreateAccountDialog();
-            }
-          }}
-        />,
-      ]}
-      onRequestClose={onClose}
-      open
-      fullHeight={!!isConnected}
-      maxWidth={isConnected ? 'md' : 'sm'}
-      flexColumnBody
-    >
-      {!isConnected && authenticatedUser.loginState === 'loggingIn' ? (
-        <PlaceholderLoader />
-      ) : authenticatedUser.authenticated && authenticatedUser.profile ? (
-        <Line>
-          <Column expand noMargin>
-            <AuthenticatedUserProfileDetails
-              authenticatedUser={authenticatedUser}
-              onOpenEditProfileDialog={
-                authenticatedUser.onOpenEditProfileDialog
-              }
-              onOpenChangeEmailDialog={
-                authenticatedUser.onOpenChangeEmailDialog
-              }
-            />
-            {isStudentAccount ? null : (
-              <SubscriptionDetails
-                onManageSubscription={onManageSubscription}
-                isManageSubscriptionLoading={isManageSubscriptionLoading}
+    <I18n>
+      {({ i18n }) => (
+        <Dialog
+          title={isConnected ? <Trans>My profile</Trans> : null}
+          actions={[
+            <FlatButton
+              label={<Trans>Close</Trans>}
+              key="close"
+              primary={false}
+              onClick={onClose}
+            />,
+          ]}
+          secondaryActions={[
+            <HelpButton
+              key="help"
+              helpPagePath="/interface/profile"
+              scopeName={i18n._(t`Profile`)}
+            />,
+            isConnected && (
+              <FlatButton
+                label={<Trans>Logout</Trans>}
+                key="logout"
+                onClick={onLogout}
+                disabled={isUserLoading}
               />
-            )}
-            {!isStudentAccount && !isTeacherAccount && (
-              <Column noMargin>
-                <Line alignItems="center">
-                  <Column noMargin>
-                    <Text size="block-title">
-                      <Trans>GDevelop credits</Trans>
-                    </Text>
-                    <Text size="body" noMargin>
-                      <Trans>
-                        Get perks and cloud benefits when getting closer to your
-                        game launch.{' '}
-                        <Link
-                          href="https://wiki.gdevelop.io/gdevelop5/interface/profile/credits"
-                          onClick={() =>
-                            Window.openExternalURL(
-                              'https://wiki.gdevelop.io/gdevelop5/interface/profile/credits'
-                            )
-                          }
-                        >
-                          Learn more
-                        </Link>
-                      </Trans>
-                    </Text>
-                  </Column>
-                </Line>
-                <CreditsStatusBanner displayPurchaseAction />
-              </Column>
-            )}
-            {!isStudentAccount && (
-              <ContributionsDetails userId={authenticatedUser.profile.id} />
-            )}
-            {isConnected && (
-              <div ref={userAchievementsContainerRef}>
-                <UserAchievements
-                  achievements={authenticatedUser.achievements}
-                  badges={authenticatedUser.badges}
+            ),
+            <FlatButton
+              leftIcon={<RedemptionCodeIcon />}
+              label={
+                isMobile ? <Trans>Redeem</Trans> : <Trans>Redeem a code</Trans>
+              }
+              key="redeem-code"
+              disabled={isUserLoading}
+              primary={false}
+              onClick={() => {
+                if (authenticatedUser.authenticated) {
+                  openRedeemCodeDialog();
+                } else {
+                  authenticatedUser.onOpenCreateAccountDialog();
+                }
+              }}
+            />,
+          ]}
+          onRequestClose={onClose}
+          open
+          fullHeight={!!isConnected}
+          maxWidth={isConnected ? 'md' : 'sm'}
+          flexColumnBody
+        >
+          {!isConnected && authenticatedUser.loginState === 'loggingIn' ? (
+            <PlaceholderLoader />
+          ) : authenticatedUser.authenticated && authenticatedUser.profile ? (
+            <Line>
+              <Column expand noMargin>
+                <AuthenticatedUserProfileDetails
+                  authenticatedUser={authenticatedUser}
+                  onOpenEditProfileDialog={
+                    authenticatedUser.onOpenEditProfileDialog
+                  }
+                  onOpenChangeEmailDialog={
+                    authenticatedUser.onOpenChangeEmailDialog
+                  }
                 />
-              </div>
-            )}
-          </Column>
-        </Line>
-      ) : (
-        <Column noMargin expand justifyContent="center">
-          <CreateProfile
-            onOpenLoginDialog={authenticatedUser.onOpenLoginDialog}
-            onOpenCreateAccountDialog={
-              authenticatedUser.onOpenCreateAccountDialog
-            }
-            message={
-              <Trans>
-                Create an account to register your games and to get access to
-                metrics collected anonymously, like the number of daily players
-                and retention of the players after a few days.
-              </Trans>
-            }
-          />
-        </Column>
+                {isStudentAccount ? null : (
+                  <SubscriptionDetails
+                    onManageSubscription={onManageSubscription}
+                    isManageSubscriptionLoading={isManageSubscriptionLoading}
+                  />
+                )}
+                {!isStudentAccount && !isTeacherAccount && (
+                  <Column noMargin>
+                    <Line alignItems="center">
+                      <Column noMargin>
+                        <Text size="block-title">
+                          <Trans>GDevelop credits</Trans>
+                        </Text>
+                        <Text size="body" noMargin>
+                          <Trans>
+                            Get perks and cloud benefits when getting closer to
+                            your game launch.{' '}
+                            <Link
+                              href="https://wiki.gdevelop.io/gdevelop5/interface/profile/credits"
+                              onClick={() =>
+                                Window.openExternalURL(
+                                  'https://wiki.gdevelop.io/gdevelop5/interface/profile/credits'
+                                )
+                              }
+                            >
+                              Learn more
+                            </Link>
+                          </Trans>
+                        </Text>
+                      </Column>
+                    </Line>
+                    <CreditsStatusBanner displayPurchaseAction />
+                  </Column>
+                )}
+                {!isStudentAccount && (
+                  <ContributionsDetails userId={authenticatedUser.profile.id} />
+                )}
+                {isConnected && (
+                  <div ref={userAchievementsContainerRef}>
+                    <UserAchievements
+                      achievements={authenticatedUser.achievements}
+                      badges={authenticatedUser.badges}
+                    />
+                  </div>
+                )}
+              </Column>
+            </Line>
+          ) : (
+            <Column noMargin expand justifyContent="center">
+              <CreateProfile
+                onOpenLoginDialog={authenticatedUser.onOpenLoginDialog}
+                onOpenCreateAccountDialog={
+                  authenticatedUser.onOpenCreateAccountDialog
+                }
+                message={
+                  <Trans>
+                    Create an account to register your games and to get access
+                    to metrics collected anonymously, like the number of daily
+                    players and retention of the players after a few days.
+                  </Trans>
+                }
+              />
+            </Column>
+          )}
+        </Dialog>
       )}
-    </Dialog>
+    </I18n>
   );
 };
 

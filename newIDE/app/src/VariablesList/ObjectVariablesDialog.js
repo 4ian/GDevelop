@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import VariablesEditorDialog from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
@@ -55,27 +56,31 @@ const ObjectVariablesDialog = ({
   );
 
   return (
-    <VariablesEditorDialog
-      project={project}
-      projectScopedContainersAccessor={projectScopedContainersAccessor}
-      objectName={objectName}
-      initialInstances={initialInstances}
-      open={open}
-      onCancel={onCancel}
-      onApply={onApply}
-      title={<Trans>{objectName} variables</Trans>}
-      // $FlowFixMe[incompatible-type]
-      tabs={tabs}
-      initiallySelectedVariableName={initiallySelectedVariableName}
-      shouldCreateInitiallySelectedVariable={
-        shouldCreateInitiallySelectedVariable
-      }
-      helpPagePath={'/all-features/variables/object-variables'}
-      scopeName="Object variables"
-      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-      id="object-variables-dialog"
-      isListLocked={isListLocked}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <VariablesEditorDialog
+          project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          objectName={objectName}
+          initialInstances={initialInstances}
+          open={open}
+          onCancel={onCancel}
+          onApply={onApply}
+          title={<Trans>{objectName} variables</Trans>}
+          // $FlowFixMe[incompatible-type]
+          tabs={tabs}
+          initiallySelectedVariableName={initiallySelectedVariableName}
+          shouldCreateInitiallySelectedVariable={
+            shouldCreateInitiallySelectedVariable
+          }
+          helpPagePath={'/all-features/variables/object-variables'}
+          scopeName={i18n._(t`Object variables`)}
+          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+          id="object-variables-dialog"
+          isListLocked={isListLocked}
+        />
+      )}
+    </I18n>
   );
 };
 

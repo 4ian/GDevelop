@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import VariablesEditorDialog from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
@@ -105,34 +106,38 @@ const GlobalAndSceneVariablesDialog = ({
   );
 
   return (
-    <VariablesEditorDialog
-      projectScopedContainersAccessor={projectScopedContainersAccessor}
-      project={project}
-      open={open}
-      onCancel={onCancel}
-      onApply={onApply}
-      title={
-        layout ? (
-          <Trans>{layout.getName()} variables</Trans>
-        ) : (
-          <Trans>Extension variables</Trans>
-        )
-      }
-      // $FlowFixMe[incompatible-type]
-      tabs={tabs}
-      initiallyOpenTabId={
-        isGlobalTabInitiallyOpen ? 'global-variables' : 'scene-variables'
-      }
-      initiallySelectedVariableName={initiallySelectedVariableName}
-      shouldCreateInitiallySelectedVariable={
-        shouldCreateInitiallySelectedVariable
-      }
-      helpPagePath={'/all-features/variables/scene-variables'}
-      scopeName="Variables"
-      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-      id="global-and-scene-variables-dialog"
-      isListLocked={isListLocked}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <VariablesEditorDialog
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          project={project}
+          open={open}
+          onCancel={onCancel}
+          onApply={onApply}
+          title={
+            layout ? (
+              <Trans>{layout.getName()} variables</Trans>
+            ) : (
+              <Trans>Extension variables</Trans>
+            )
+          }
+          // $FlowFixMe[incompatible-type]
+          tabs={tabs}
+          initiallyOpenTabId={
+            isGlobalTabInitiallyOpen ? 'global-variables' : 'scene-variables'
+          }
+          initiallySelectedVariableName={initiallySelectedVariableName}
+          shouldCreateInitiallySelectedVariable={
+            shouldCreateInitiallySelectedVariable
+          }
+          helpPagePath={'/all-features/variables/scene-variables'}
+          scopeName={i18n._(t`Variables`)}
+          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+          id="global-and-scene-variables-dialog"
+          isListLocked={isListLocked}
+        />
+      )}
+    </I18n>
   );
 };
 

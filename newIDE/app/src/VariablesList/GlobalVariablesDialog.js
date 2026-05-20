@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import VariablesEditorDialog from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
@@ -63,25 +64,29 @@ const GlobalVariablesDialog = ({
   );
 
   return (
-    <VariablesEditorDialog
-      project={project}
-      projectScopedContainersAccessor={projectScopedContainersAccessor}
-      open={open}
-      onCancel={onCancel}
-      onApply={onApply}
-      title={<Trans>Global variables</Trans>}
-      // $FlowFixMe[incompatible-type]
-      tabs={tabs}
-      initiallySelectedVariableName={initiallySelectedVariableName}
-      shouldCreateInitiallySelectedVariable={
-        shouldCreateInitiallySelectedVariable
-      }
-      helpPagePath={'/all-features/variables/global-variables'}
-      scopeName="Global variables"
-      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-      id="global-variables-dialog"
-      isListLocked={isListLocked}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <VariablesEditorDialog
+          project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          open={open}
+          onCancel={onCancel}
+          onApply={onApply}
+          title={<Trans>Global variables</Trans>}
+          // $FlowFixMe[incompatible-type]
+          tabs={tabs}
+          initiallySelectedVariableName={initiallySelectedVariableName}
+          shouldCreateInitiallySelectedVariable={
+            shouldCreateInitiallySelectedVariable
+          }
+          helpPagePath={'/all-features/variables/global-variables'}
+          scopeName={i18n._(t`Global variables`)}
+          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+          id="global-variables-dialog"
+          isListLocked={isListLocked}
+        />
+      )}
+    </I18n>
   );
 };
 

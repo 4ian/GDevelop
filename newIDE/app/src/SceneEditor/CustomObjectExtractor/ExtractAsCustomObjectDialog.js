@@ -213,7 +213,7 @@ export default function ExtractAsCustomObjectDialog({
             <HelpButton
               helpPagePath="/objects/custom-objects-prefab-template/"
               key="help"
-              scopeName="Custom objects"
+              scopeName={i18n._(t`Custom objects`)}
             />,
           ]}
           onRequestClose={onCancel}

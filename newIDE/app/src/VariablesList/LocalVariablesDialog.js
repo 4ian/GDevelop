@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import VariablesEditorDialog from './VariablesEditorDialog';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
@@ -55,25 +56,29 @@ const LocalVariablesDialog = ({
   );
 
   return (
-    <VariablesEditorDialog
-      project={project}
-      projectScopedContainersAccessor={projectScopedContainersAccessor}
-      open={open}
-      onCancel={onCancel}
-      onApply={onApply}
-      title={<Trans>Local variables</Trans>}
-      // $FlowFixMe[incompatible-type]
-      tabs={tabs}
-      helpPagePath={'/all-features/variables/local-variables'}
-      scopeName="Local variables"
-      id="local-variables-dialog"
-      initiallySelectedVariableName={initiallySelectedVariableName}
-      shouldCreateInitiallySelectedVariable={
-        shouldCreateInitiallySelectedVariable
-      }
-      hotReloadPreviewButtonProps={null}
-      isListLocked={isListLocked}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <VariablesEditorDialog
+          project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          open={open}
+          onCancel={onCancel}
+          onApply={onApply}
+          title={<Trans>Local variables</Trans>}
+          // $FlowFixMe[incompatible-type]
+          tabs={tabs}
+          helpPagePath={'/all-features/variables/local-variables'}
+          scopeName={i18n._(t`Local variables`)}
+          id="local-variables-dialog"
+          initiallySelectedVariableName={initiallySelectedVariableName}
+          shouldCreateInitiallySelectedVariable={
+            shouldCreateInitiallySelectedVariable
+          }
+          hotReloadPreviewButtonProps={null}
+          isListLocked={isListLocked}
+        />
+      )}
+    </I18n>
   );
 };
 

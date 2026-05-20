@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
@@ -343,15 +343,14 @@ const InstructionEditorDialog = ({
             label={
               validHelpPath ? (
                 isCondition ? (
-                  <Trans>About this condition</Trans>
+                  <Trans>See this condition</Trans>
                 ) : (
-                  <Trans>About this action</Trans>
+                  <Trans>See this action</Trans>
                 )
               ) : (
-                undefined
+                <Trans>Events</Trans>
               )
             }
-            scopeName={validHelpPath ? undefined : 'Events'}
           />,
         ]}
         open={open}

@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
@@ -257,7 +257,7 @@ export default function NewBehaviorDialog({
             <HelpButton
               helpPagePath="/behaviors"
               key="help"
-              scopeName="Behaviors"
+              scopeName={i18n._(t`Behaviors`)}
             />,
           ]}
           open

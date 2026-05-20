@@ -1,5 +1,6 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Text from '../UI/Text';
@@ -27,47 +28,51 @@ export default function ExtractAsExternalLayoutDialog({
   ]);
 
   return (
-    <Dialog
-      title={<Trans>Extract as an external layout</Trans>}
-      actions={[
-        <FlatButton
-          key="cancel"
-          label={<Trans>Cancel</Trans>}
-          primary={false}
-          onClick={onCancel}
-        />,
-        <DialogPrimaryButton
-          key="apply"
-          label={<Trans>Move instances</Trans>}
-          primary={true}
-          onClick={apply}
-        />,
-      ]}
-      secondaryActions={[
-        <HelpButton
-          helpPagePath="/interface/scene-editor/external-layouts/"
-          key="help"
-          scopeName="External layouts"
-        />,
-      ]}
-      onRequestClose={onCancel}
-      onApply={apply}
-      open
-      maxWidth="sm"
-    >
-      <ColumnStackLayout noMargin>
-        <Text>
-          <Trans>
-            Selected instances will be moved to a new external layout.
-          </Trans>
-        </Text>
-        <TextField
-          floatingLabelText={<Trans>External layout name</Trans>}
-          fullWidth
-          value={chosenName}
-          onChange={(e, value) => setChosenName(value)}
-        />
-      </ColumnStackLayout>
-    </Dialog>
+    <I18n>
+      {({ i18n }) => (
+        <Dialog
+          title={<Trans>Extract as an external layout</Trans>}
+          actions={[
+            <FlatButton
+              key="cancel"
+              label={<Trans>Cancel</Trans>}
+              primary={false}
+              onClick={onCancel}
+            />,
+            <DialogPrimaryButton
+              key="apply"
+              label={<Trans>Move instances</Trans>}
+              primary={true}
+              onClick={apply}
+            />,
+          ]}
+          secondaryActions={[
+            <HelpButton
+              helpPagePath="/interface/scene-editor/external-layouts/"
+              key="help"
+              scopeName={i18n._(t`External layouts`)}
+            />,
+          ]}
+          onRequestClose={onCancel}
+          onApply={apply}
+          open
+          maxWidth="sm"
+        >
+          <ColumnStackLayout noMargin>
+            <Text>
+              <Trans>
+                Selected instances will be moved to a new external layout.
+              </Trans>
+            </Text>
+            <TextField
+              floatingLabelText={<Trans>External layout name</Trans>}
+              fullWidth
+              value={chosenName}
+              onChange={(e, value) => setChosenName(value)}
+            />
+          </ColumnStackLayout>
+        </Dialog>
+      )}
+    </I18n>
   );
 }

@@ -181,8 +181,14 @@ class GD_CORE_API ExpressionParser2 {
       return factor;
     } else if (CheckIfChar(IsUnaryOperator)) {
       auto unaryOperatorCharacter = GetCurrentChar();
-      SkipChar();
 
+      bool isNumberSign = CheckIfChar(IsNumberSign);
+      SkipChar();
+      if (isNumberSign && CheckIfChar(IsNumberFirstChar)) {
+        std::unique_ptr<ExpressionNode> numberNode =
+            ReadNumber(expressionStartPosition);
+        return numberNode;
+      }
       auto operatorOperand = Factor();
 
       auto unaryOperator = gd::make_unique<UnaryOperatorNode>(
@@ -665,7 +671,7 @@ class GD_CORE_API ExpressionParser2 {
 
   std::unique_ptr<TextNode> ReadText();
 
-  std::unique_ptr<NumberNode> ReadNumber();
+  std::unique_ptr<NumberNode> ReadNumber(size_t minusSignPosition = -1);
 
   std::unique_ptr<EmptyNode> ReadUntilWhitespace() {
     size_t startPosition = GetCurrentPosition();

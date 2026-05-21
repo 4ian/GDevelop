@@ -308,22 +308,23 @@ jobs:
       - checkout
 
       - run:
-          name: Install build dependencies (cmake, clang, libstdc++ dev)
+          name: Install build dependencies (cmake, clang, ccache, libstdc++ dev)
           command: |
             sudo apt-get update
-            sudo apt-get install -y cmake clang libstdc++-12-dev
+            sudo apt-get install -y cmake clang ccache libstdc++-12-dev
 
-      # Cache the .build-tests-asan folder so CMake/make can do an incremental
-      # rebuild on subsequent runs. Cache key includes the branch and revision
-      # so each commit produces a fresh save; the fallback keys let a new
-      # commit reuse the most recent build artifacts from the same branch, or
-      # any branch, as a starting point.
+      # Cache the compiler output via ccache (keyed by content hash, so it is
+      # immune to the fact that 'git checkout' resets every source file's mtime
+      # to "now" on each run - which made a cache of .build-tests-asan useless
+      # because make would still see every .o as stale). Keyed on branch+revision
+      # so each commit saves a fresh cache; the fallback keys reuse the most
+      # recent cache on the same branch, then any branch.
       - restore_cache:
-          name: Restore GDCore_tests ASan/UBSan build cache
+          name: Restore ccache
           keys:
-            - gdcore-tests-asan-build-v1-{{ .Branch }}-{{ .Revision }}
-            - gdcore-tests-asan-build-v1-{{ .Branch }}-
-            - gdcore-tests-asan-build-v1-
+            - gdcore-tests-asan-ccache-v1-{{ .Branch }}-{{ .Revision }}
+            - gdcore-tests-asan-ccache-v1-{{ .Branch }}-
+            - gdcore-tests-asan-ccache-v1-
 
       - run:
           name: Configure GDCore_tests with ASan + UBSan (Debug)
@@ -338,17 +339,21 @@ jobs:
               -DUSE_SANITIZERS="address,undefined" \
               -DCMAKE_CXX_COMPILER=$(which clang++) \
               -DCMAKE_C_COMPILER=$(which clang) \
+              -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
               ..
 
       - run:
           name: Build GDCore_tests
-          command: cd .build-tests-asan && make -j 4 GDCore_tests
+          command: |
+            cd .build-tests-asan && make -j 4 GDCore_tests
+            ccache --show-stats
 
       - save_cache:
-          name: Save GDCore_tests ASan/UBSan build cache
-          key: gdcore-tests-asan-build-v1-{{ .Branch }}-{{ .Revision }}
+          name: Save ccache
+          key: gdcore-tests-asan-ccache-v1-{{ .Branch }}-{{ .Revision }}
           paths:
-            - .build-tests-asan
+            - ~/.cache/ccache
 
       - run:
           name: Run GDCore_tests with sanitizers

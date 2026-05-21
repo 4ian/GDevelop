@@ -736,3 +736,14 @@ workflows:
                 - master
     jobs:
       - portable-cli-html5-export-smoke-test
+
+  # TEMPORARY: also run the smoke test on every push to this PR branch so we
+  # can validate it end-to-end before merging. Remove this workflow once the
+  # job has been verified to work.
+  portable-cli-smoke-test-on-push:
+    jobs:
+      - portable-cli-html5-export-smoke-test:
+          filters:
+            branches:
+              only:
+                - claude/daily-circleci-portable-job-kVjkF

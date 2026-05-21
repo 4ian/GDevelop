@@ -249,7 +249,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
     const freeInstructionsInfoTreeRef = React.useRef<InstructionOrExpressionTreeNode>(
       createTree(
         filterEnumeratedInstructionOrExpressionMetadataByScope(
-          enumerateFreeInstructions(isCondition, i18n),
+          enumerateFreeInstructions(isCondition, project, i18n),
           scope
         ),
         i18n
@@ -277,7 +277,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
       Array<EnumeratedInstructionMetadata>
     >(
       filterEnumeratedInstructionOrExpressionMetadataByScope(
-        enumerateAllInstructions(isCondition, i18n),
+        enumerateAllInstructions(isCondition, project, i18n),
         scope
       )
     );
@@ -488,13 +488,13 @@ const InstructionOrObjectSelector: React.ComponentType<{
       (i18n: I18nType) => {
         freeInstructionsInfoTreeRef.current = createTree(
           filterEnumeratedInstructionOrExpressionMetadataByScope(
-            enumerateFreeInstructions(isCondition, i18n),
+            enumerateFreeInstructions(isCondition, project, i18n),
             scope
           ),
           i18n
         );
         allInstructionsInfoRef.current = filterEnumeratedInstructionOrExpressionMetadataByScope(
-          enumerateAllInstructions(isCondition, i18n),
+          enumerateAllInstructions(isCondition, project, i18n),
           scope
         );
         instructionSearchApiRef.current = createFuse();
@@ -504,7 +504,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
         });
         forceUpdate();
       },
-      [createFuse, forceUpdate, isCondition, scope, search]
+      [createFuse, forceUpdate, isCondition, project, scope, search]
     );
 
     React.useImperativeHandle(ref, () => ({ reEnumerateInstructions }));

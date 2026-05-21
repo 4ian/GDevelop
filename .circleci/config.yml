@@ -212,8 +212,7 @@ jobs:
           command: cd GDevelop.js && npm install && cd ..
 
       # Cache emcc/em++ output via ccache (keyed by content hash, immune to
-      # git checkout resetting source mtimes). Same key shape as the native
-      # sanitizer job.
+      # git checkout resetting source mtimes).
       - restore_cache:
           name: Restore ccache (Emscripten)
           keys:
@@ -238,8 +237,6 @@ jobs:
           paths:
             - ~/.cache/ccache
 
-      # Run the tests against the freshly built libGD.js. Kept in its own step
-      # so a test failure is easy to spot in the CircleCI UI.
       # "--runInBand" is faster and avoids deadlocks on CircleCI Linux machines
       # (probably because of limited process numbers).
       - run:
@@ -323,8 +320,8 @@ jobs:
 
   # Build and run the native GDCore_tests with AddressSanitizer + UBSan, to
   # catch heap-use-after-free, buffer overflows and undefined behaviour that
-  # only sometimes manifest as flaky segfaults in the non-sanitized builds
-  # (Travis, Semaphore). The Emscripten build has its own sanitizer job:
+  # only sometimes manifest as flaky segfaults. 
+  # The Emscripten build has its own sanitizer job:
   # build-gdevelop_js-debug-sanitizers-and-extra-checks.
   build-gdcore-tests-sanitizers:
     resource_class: medium+
@@ -344,10 +341,7 @@ jobs:
 
       # Cache the compiler output via ccache (keyed by content hash, so it is
       # immune to the fact that 'git checkout' resets every source file's mtime
-      # to "now" on each run - which made a cache of .build-tests-asan useless
-      # because make would still see every .o as stale). Keyed on branch+revision
-      # so each commit saves a fresh cache; the fallback keys reuse the most
-      # recent cache on the same branch, then any branch.
+      # to "now" on each run).
       - restore_cache:
           name: Restore ccache
           keys:

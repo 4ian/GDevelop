@@ -10,6 +10,19 @@ namespace gdjs {
     new Promise((resolve) => setTimeout(resolve, ms));
 
   /**
+   * If true, the "Or" sub-condition uses the deprecated pre-5.6.269
+   * object-picking semantics: it unconditionally overwrites the parent
+   * event's picked object lists with the union of branch contributions,
+   * even when no branch contributed for a given object — wiping
+   * outside-Or picks. Set by `RuntimeGame` on startup based on the
+   * project's `useDeprecatedOrConditionPicking` property.
+   *
+   * The generated event code reads this flag at the final copy step of
+   * the Or so old projects keep their existing behavior at runtime.
+   */
+  export let useDeprecatedOrConditionPicking: boolean = false;
+
+  /**
    * Identify a script file, with its content hash (useful for hot-reloading).
    * @category Core Engine > Game
    */
@@ -309,6 +322,8 @@ namespace gdjs {
       this._updateSceneAndExtensionsData();
       gdjs.Variable.useDeprecatedZeroAsDefaultStringVariable =
         !!data.properties.useDeprecatedZeroAsDefaultStringVariable;
+      gdjs.useDeprecatedOrConditionPicking =
+        !!data.properties.useDeprecatedOrConditionPicking;
 
       this._sceneResourcesPreloading =
         this._data.properties.sceneResourcesPreloading || 'at-startup';

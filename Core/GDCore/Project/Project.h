@@ -455,6 +455,25 @@ class GD_CORE_API Project {
   }
 
   /**
+   * \brief Check if the project should use the deprecated "Or" condition
+   * object-picking semantics (the pre-5.6.269 behavior, in which the Or
+   * unconditionally overwrote the parent event's picked object lists with
+   * the union of branch contributions, including when no branch actually
+   * contributed for a given object — wiping outside-Or picks).
+   */
+  bool GetUseDeprecatedOrConditionPicking() const {
+    return useDeprecatedOrConditionPicking;
+  }
+
+  /**
+   * \brief Set whether the project should use the deprecated "Or" condition
+   * object-picking semantics (the pre-5.6.269 behavior).
+   */
+  void SetUseDeprecatedOrConditionPicking(bool enable) {
+    useDeprecatedOrConditionPicking = enable;
+  }
+
+  /**
    * \brief Change the project UUID.
    */
   void SetProjectUuid(const gd::String& projectUuid_) {
@@ -1159,6 +1178,14 @@ class GD_CORE_API Project {
               ///< no stored value default to "0"
               ///< at runtime (behavior before
               ///< 5.6.267).
+  bool useDeprecatedOrConditionPicking =
+      false;  ///< If true, the "Or" condition uses
+              ///< the pre-5.6.269 picking semantics
+              ///< (always overwrite parent's picked
+              ///< list with the union of branch
+              ///< contributions, even when no branch
+              ///< contributed for a given object —
+              ///< wiping outside-Or picks).
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
   gd::VariablesContainer variables;  ///< Initial global variables
   gd::ObjectsContainer objectsContainer;

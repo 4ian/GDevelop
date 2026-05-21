@@ -609,6 +609,8 @@ interface Project {
     boolean GetUseDeprecatedZeroAsDefaultZOrder();
     void SetUseDeprecatedZeroAsDefaultStringVariable(boolean enable);
     boolean GetUseDeprecatedZeroAsDefaultStringVariable();
+    void SetUseDeprecatedOrConditionPicking(boolean enable);
+    boolean GetUseDeprecatedOrConditionPicking();
     boolean AreEffectsHiddenInEditor();
     void SetEffectsHiddenInEditor(boolean enable);
 

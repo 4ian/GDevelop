@@ -67,6 +67,7 @@ Project::Project()
       projectUuid(""),
       useDeprecatedZeroAsDefaultZOrder(false),
       useDeprecatedZeroAsDefaultStringVariable(false),
+      useDeprecatedOrConditionPicking(false),
       isPlayableWithKeyboard(false),
       isPlayableWithGamepad(false),
       isPlayableWithMobile(false),
@@ -803,6 +804,17 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   }
   // end of compatibility code
 
+  // Compatibility with GD <= 5.6.268
+  if (VersionWrapper::IsOlderOrEqual(
+          gdMajorVersion, gdMinorVersion, gdBuildVersion, 0, 5, 6, 268, 0) &&
+      !propElement.HasAttribute("useDeprecatedOrConditionPicking")) {
+    useDeprecatedOrConditionPicking = true;
+  } else {
+    useDeprecatedOrConditionPicking = propElement.GetBoolAttribute(
+        "useDeprecatedOrConditionPicking", false);
+  }
+  // end of compatibility code
+
   // Compatibility with GD <= 5.0.0-beta101
   if (!propElement.HasAttribute("projectUuid") &&
       !propElement.HasChild("projectUuid")) {
@@ -1175,6 +1187,12 @@ void Project::SerializeTo(SerializerElement& element) const {
   }
   // end of compatibility code
 
+  // Compatibility with GD <= 5.6.268
+  if (useDeprecatedOrConditionPicking) {
+    propElement.SetAttribute("useDeprecatedOrConditionPicking", true);
+  }
+  // end of compatibility code
+
   extensionProperties.SerializeTo(propElement.AddChild("extensionProperties"));
   
   SerializerElement& platformsElement = propElement.AddChild("platforms");
@@ -1310,6 +1328,7 @@ void Project::Init(const gd::Project& game) {
   useDeprecatedZeroAsDefaultZOrder = game.useDeprecatedZeroAsDefaultZOrder;
   useDeprecatedZeroAsDefaultStringVariable =
       game.useDeprecatedZeroAsDefaultStringVariable;
+  useDeprecatedOrConditionPicking = game.useDeprecatedOrConditionPicking;
 
   author = game.author;
   authorIds = game.authorIds;

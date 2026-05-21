@@ -605,6 +605,8 @@ export class Project extends EmscriptenObject {
   getUseDeprecatedZeroAsDefaultZOrder(): boolean;
   setUseDeprecatedZeroAsDefaultStringVariable(enable: boolean): void;
   getUseDeprecatedZeroAsDefaultStringVariable(): boolean;
+  setUseDeprecatedOrConditionPicking(enable: boolean): void;
+  getUseDeprecatedOrConditionPicking(): boolean;
   areEffectsHiddenInEditor(): boolean;
   setEffectsHiddenInEditor(enable: boolean): void;
   setLastCompilationDirectory(path: string): void;

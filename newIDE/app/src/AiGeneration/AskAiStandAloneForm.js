@@ -5,6 +5,10 @@ import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
 import {
   addMessageToAiRequest,
   createAiRequest,
+  getAiRequestWithPreservedAiConfiguration,
+  isAiProviderUnavailableError,
+  isLocalAiProviderConfigurationId,
+  type AiConfiguration,
   type AiRequest,
 } from '../Utils/GDevelopServices/Generation';
 import { delay } from '../Utils/Delay';
@@ -157,6 +161,11 @@ export const AskAiStandAloneForm = ({
     editorFunctionCallResultsStorage,
     getAiSettings,
     setSelectedAiRequestId,
+    aiProviderConfigurationState: {
+      aiProviderConfigurations,
+      customProviderSupport,
+      fetchAiProviderConfigurations,
+    },
   } = React.useContext(AiRequestContext);
   const {
     getEditorFunctionCallResults,
@@ -247,13 +256,22 @@ export const AskAiStandAloneForm = ({
         onCloseAskAi();
 
         // Read the options and reset them (to avoid launching the same request twice).
-        const { userRequest, aiConfigurationPresetId } = newAiRequestOptions;
+        const {
+          userRequest,
+          aiConfigurationPresetId,
+          aiProviderConfigurationId,
+        } = newAiRequestOptions;
         startNewAiRequest(null);
 
         // Ensure the user has enough credits to pay for the request, or ask them
         // to buy some more.
         let payWithCredits = false;
-        if (quota && quota.limitReached && aiRequestPriceInCredits) {
+        if (
+          !aiProviderConfigurationId &&
+          quota &&
+          quota.limitReached &&
+          aiRequestPriceInCredits
+        ) {
           payWithCredits = true;
           const doesNotHaveEnoughCreditsToContinue =
             availableCredits < aiRequestPriceInCredits;
@@ -275,33 +293,60 @@ export const AskAiStandAloneForm = ({
           setSendingAiRequest(null, true);
           setIsSendingUserMessage(true);
 
+          const shouldUploadAiUserContent =
+            !aiProviderConfigurationId ||
+            !isLocalAiProviderConfigurationId(aiProviderConfigurationId);
           const preparedAiUserContent = await prepareAiUserContent({
             getAuthorizationHeader,
             userId: profile.id,
             simplifiedProjectJson: null,
             projectSpecificExtensionsSummaryJson: null,
             eventsJson: null,
+            shouldUpload: shouldUploadAiUserContent,
           });
 
-          const aiRequest = await createAiRequest(getAuthorizationHeader, {
-            userRequest: userRequest,
-            userId: profile.id,
-            gameProjectJsonUserRelativeKey:
-              preparedAiUserContent.gameProjectJsonUserRelativeKey,
-            gameProjectJson: preparedAiUserContent.gameProjectJson,
-            projectSpecificExtensionsSummaryJsonUserRelativeKey:
-              preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
-            projectSpecificExtensionsSummaryJson:
-              preparedAiUserContent.projectSpecificExtensionsSummaryJson,
-            payWithCredits,
-            gameId: null, // No game associated when starting from the standalone form.
-            fileMetadata: null, // No file metadata when starting from the standalone form.
-            storageProviderName,
-            mode: aiRequestModeForForm,
-            toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
-            aiConfiguration: {
-              presetId: aiConfigurationPresetId,
-            },
+          const aiConfiguration: AiConfiguration = {
+            presetId: aiConfigurationPresetId,
+            providerConfigurationId: aiProviderConfigurationId || null,
+          };
+          const aiRequest = getAiRequestWithPreservedAiConfiguration({
+            aiRequest: await createAiRequest(getAuthorizationHeader, {
+              userRequest: userRequest,
+              userId: profile.id,
+              gameProjectJsonUserRelativeKey:
+                preparedAiUserContent.gameProjectJsonUserRelativeKey,
+              gameProjectJson: preparedAiUserContent.gameProjectJson,
+              projectSpecificExtensionsSummaryJsonUserRelativeKey:
+                preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+              projectSpecificExtensionsSummaryJson:
+                preparedAiUserContent.projectSpecificExtensionsSummaryJson,
+              payWithCredits,
+              gameId: null, // No game associated when starting from the standalone form.
+              fileMetadata: null, // No file metadata when starting from the standalone form.
+              storageProviderName,
+              mode: aiRequestModeForForm,
+              toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
+              aiConfiguration,
+              onLocalAiRequestCreated: localAiRequest => {
+                const localAiRequestWithConfiguration = getAiRequestWithPreservedAiConfiguration(
+                  {
+                    aiRequest: localAiRequest,
+                    aiConfiguration,
+                  }
+                );
+                setSendingAiRequest(null, false);
+                updateAiRequest(
+                  localAiRequest.id,
+                  () => localAiRequestWithConfiguration
+                );
+
+                if (!upToDateSelectedAiRequestId.current) {
+                  setAiRequestIdForForm(localAiRequest.id);
+                  setSelectedAiRequestId(localAiRequest.id);
+                }
+              },
+            }),
+            aiConfiguration,
           });
 
           console.info('Successfully created a new AI request:', aiRequest);
@@ -328,6 +373,9 @@ export const AskAiStandAloneForm = ({
           });
         } catch (error) {
           console.error('Error starting a new AI request:', error);
+          if (isAiProviderUnavailableError(error)) {
+            fetchAiProviderConfigurations();
+          }
           setLastSendError(null, error);
           setIsSendingUserMessage(false);
         }
@@ -362,6 +410,7 @@ export const AskAiStandAloneForm = ({
       openSubscriptionDialog,
       onCloseAskAi,
       automaticallyUseCreditsForAiRequests,
+      fetchAiProviderConfigurations,
     ]
   );
 
@@ -428,12 +477,19 @@ export const AskAiStandAloneForm = ({
             )
           : null;
 
+        const isUsingLocalAiProvider =
+          !!aiRequestForForm.aiConfiguration &&
+          !!aiRequestForForm.aiConfiguration.providerConfigurationId &&
+          isLocalAiProviderConfigurationId(
+            aiRequestForForm.aiConfiguration.providerConfigurationId
+          );
         const preparedAiUserContent = await prepareAiUserContent({
           getAuthorizationHeader,
           userId: profile.id,
           simplifiedProjectJson,
           projectSpecificExtensionsSummaryJson,
           eventsJson: null,
+          shouldUpload: !isUsingLocalAiProvider,
         });
 
         const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
@@ -459,12 +515,16 @@ export const AskAiStandAloneForm = ({
             paused: false,
             mode: aiRequestModeForForm,
             toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
+            aiConfiguration: aiRequestForForm.aiConfiguration || undefined,
           })
         );
         updateAiRequest(aiRequest.id, () => aiRequest);
         setSendingAiRequest(aiRequest.id, false);
         clearEditorFunctionCallResults(aiRequest.id);
       } catch (error) {
+        if (isAiProviderUnavailableError(error)) {
+          fetchAiProviderConfigurations();
+        }
         // TODO: update the label of the button to send again.
         setLastSendError(aiRequestIdForForm, error);
       }
@@ -496,6 +556,7 @@ export const AskAiStandAloneForm = ({
       project,
       aiRequestForForm,
       refreshLimits,
+      fetchAiProviderConfigurations,
     ]
   );
   const onSendEditorFunctionCallResults = React.useCallback(
@@ -515,13 +576,15 @@ export const AskAiStandAloneForm = ({
     },
     [onSendMessage]
   );
+  const selectedEditorFunctionCallResults =
+    aiRequestForForm && getEditorFunctionCallResults(aiRequestForForm.id);
   const { onProcessFunctionCalls } = useProcessFunctionCalls({
     project,
     resourceManagementProps,
     selectedAiRequest: aiRequestForForm,
     editorCallbacks,
     onSendEditorFunctionCallResults,
-    getEditorFunctionCallResults,
+    editorFunctionCallResults: selectedEditorFunctionCallResults || null,
     addEditorFunctionCallResults,
     i18n,
     onSceneEventsModifiedOutsideEditor: () => {},
@@ -593,9 +656,7 @@ export const AskAiStandAloneForm = ({
           onSendMessage({
             userMessage,
             // mode, Mode is forced to agent in standalone form, no need to pass it here.
-            editorFunctionCallResults: aiRequestForForm
-              ? getEditorFunctionCallResults(aiRequestForForm.id) || []
-              : [],
+            editorFunctionCallResults: selectedEditorFunctionCallResults || [],
           })
         }
         isSending={isLoading}
@@ -610,11 +671,7 @@ export const AskAiStandAloneForm = ({
             : 'none'
         }
         onProcessFunctionCalls={onProcessFunctionCalls}
-        editorFunctionCallResults={
-          (aiRequestForForm &&
-            getEditorFunctionCallResults(aiRequestForForm.id)) ||
-          null
-        }
+        editorFunctionCallResults={selectedEditorFunctionCallResults || null}
         price={aiRequestPrice}
         availableCredits={availableCredits}
         isRefreshingLimits={isRefreshingLimits}
@@ -632,6 +689,8 @@ export const AskAiStandAloneForm = ({
         savingProjectForMessageId={null}
         forkingState={null}
         onRestore={async () => {}}
+        aiProviderConfigurations={aiProviderConfigurations}
+        customProviderSupport={customProviderSupport}
       />
     </ColumnStackLayout>
   );

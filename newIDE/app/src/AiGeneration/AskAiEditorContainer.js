@@ -18,8 +18,12 @@ import {
   createAiRequest,
   sendAiRequestFeedback,
   forkAiRequest,
+  getAiRequestWithPreservedAiConfiguration,
   suspendAiRequest,
   getAiRequest,
+  isAiProviderUnavailableError,
+  isLocalAiProviderConfigurationId,
+  type AiConfiguration,
   type AiRequest,
   type AiRequestMessage,
 } from '../Utils/GDevelopServices/Generation';
@@ -319,6 +323,11 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         selectedAiRequestId,
         selectedAiRequest,
         setSelectedAiRequestId,
+        aiProviderConfigurationState: {
+          aiProviderConfigurations,
+          customProviderSupport,
+          fetchAiProviderConfigurations,
+        },
       } = React.useContext(AiRequestContext);
       const {
         isFetchingSuggestions,
@@ -475,13 +484,19 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               mode,
               userRequest,
               aiConfigurationPresetId,
+              aiProviderConfigurationId,
             } = newAiRequestOptions;
             startNewAiRequest(null);
 
             // Ensure the user has enough credits to pay for the request, or ask them
             // to buy some more.
             let payWithCredits = false;
-            if (quota && quota.limitReached && aiRequestPriceInCredits) {
+            if (
+              !aiProviderConfigurationId &&
+              quota &&
+              quota.limitReached &&
+              aiRequestPriceInCredits
+            ) {
               payWithCredits = true;
               const doesNotHaveEnoughCreditsToContinue =
                 availableCredits < aiRequestPriceInCredits;
@@ -513,39 +528,65 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               setSendingAiRequest(null, true);
               setIsSendingUserMessage(true);
 
+              const aiConfiguration: AiConfiguration = {
+                presetId: aiConfigurationPresetId,
+                providerConfigurationId: aiProviderConfigurationId || null,
+              };
+              const shouldUploadAiUserContent =
+                !aiProviderConfigurationId ||
+                !isLocalAiProviderConfigurationId(aiProviderConfigurationId);
               const preparedAiUserContent = await prepareAiUserContent({
                 getAuthorizationHeader,
                 userId: profile.id,
                 simplifiedProjectJson,
                 projectSpecificExtensionsSummaryJson,
                 eventsJson: null,
+                shouldUpload: shouldUploadAiUserContent,
               });
 
-              const aiRequest = await createAiRequest(getAuthorizationHeader, {
-                userRequest: userRequest,
-                userId: profile.id,
-                gameProjectJsonUserRelativeKey:
-                  preparedAiUserContent.gameProjectJsonUserRelativeKey,
-                gameProjectJson: preparedAiUserContent.gameProjectJson,
-                projectSpecificExtensionsSummaryJsonUserRelativeKey:
-                  preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
-                projectSpecificExtensionsSummaryJson:
-                  preparedAiUserContent.projectSpecificExtensionsSummaryJson,
-                payWithCredits,
-                gameId: project ? project.getProjectUuid() : null,
-                // $FlowFixMe[incompatible-type]
-                fileMetadata,
-                storageProviderName,
-                mode,
-                toolsVersion:
-                  mode === 'agent'
-                    ? AI_AGENT_TOOLS_VERSION
-                    : mode === 'orchestrator'
-                    ? AI_ORCHESTRATOR_TOOLS_VERSION
-                    : AI_CHAT_TOOLS_VERSION,
-                aiConfiguration: {
-                  presetId: aiConfigurationPresetId,
-                },
+              const aiRequest = getAiRequestWithPreservedAiConfiguration({
+                aiRequest: await createAiRequest(getAuthorizationHeader, {
+                  userRequest: userRequest,
+                  userId: profile.id,
+                  gameProjectJsonUserRelativeKey:
+                    preparedAiUserContent.gameProjectJsonUserRelativeKey,
+                  gameProjectJson: preparedAiUserContent.gameProjectJson,
+                  projectSpecificExtensionsSummaryJsonUserRelativeKey:
+                    preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+                  projectSpecificExtensionsSummaryJson:
+                    preparedAiUserContent.projectSpecificExtensionsSummaryJson,
+                  payWithCredits,
+                  gameId: project ? project.getProjectUuid() : null,
+                  // $FlowFixMe[incompatible-type]
+                  fileMetadata,
+                  storageProviderName,
+                  mode,
+                  toolsVersion:
+                    mode === 'agent'
+                      ? AI_AGENT_TOOLS_VERSION
+                      : mode === 'orchestrator'
+                      ? AI_ORCHESTRATOR_TOOLS_VERSION
+                      : AI_CHAT_TOOLS_VERSION,
+                  aiConfiguration,
+                  onLocalAiRequestCreated: localAiRequest => {
+                    const localAiRequestWithConfiguration = getAiRequestWithPreservedAiConfiguration(
+                      {
+                        aiRequest: localAiRequest,
+                        aiConfiguration,
+                      }
+                    );
+                    setSendingAiRequest(null, false);
+                    updateAiRequest(
+                      localAiRequest.id,
+                      () => localAiRequestWithConfiguration
+                    );
+
+                    if (!upToDateSelectedAiRequestId.current) {
+                      setSelectedAiRequestId(localAiRequest.id);
+                    }
+                  },
+                }),
+                aiConfiguration,
               });
 
               console.info('Successfully created a new AI request:', aiRequest);
@@ -579,6 +620,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               });
             } catch (error) {
               console.error('Error starting a new AI request:', error);
+              if (isAiProviderUnavailableError(error)) {
+                fetchAiProviderConfigurations();
+              }
               setLastSendError(null, error);
               setIsSendingUserMessage(false);
             }
@@ -610,6 +654,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           newAiRequestOptions,
           automaticallyUseCreditsForAiRequests,
           storageProviderName,
+          fetchAiProviderConfigurations,
         ]
       );
 
@@ -672,8 +717,18 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
           // Paying with credits is only when a user message is sent (and quota is exhausted).
           let payWithCredits = false;
+          const isUsingCustomAiProvider =
+            !!selectedAiRequest.aiConfiguration &&
+            !!selectedAiRequest.aiConfiguration.providerConfigurationId;
+          const isUsingLocalAiProvider =
+            !!selectedAiRequest.aiConfiguration &&
+            !!selectedAiRequest.aiConfiguration.providerConfigurationId &&
+            isLocalAiProviderConfigurationId(
+              selectedAiRequest.aiConfiguration.providerConfigurationId
+            );
           if (
             userMessage &&
+            !isUsingCustomAiProvider &&
             quota &&
             quota.limitReached &&
             aiRequestPriceInCredits
@@ -719,6 +774,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               simplifiedProjectJson,
               projectSpecificExtensionsSummaryJson,
               eventsJson: null,
+              shouldUpload: !isUsingLocalAiProvider,
             });
 
             // If we're updating the request, following a function call to initialize the project,
@@ -763,15 +819,16 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 userMessage,
                 paused:
                   hasJustInitializedProject && modeForThisMessage === 'agent',
-                mode,
+                mode: modeForThisMessage,
                 toolsVersion:
-                  mode === 'agent'
+                  modeForThisMessage === 'agent'
                     ? AI_AGENT_TOOLS_VERSION
-                    : mode === 'orchestrator'
+                    : modeForThisMessage === 'orchestrator'
                     ? AI_ORCHESTRATOR_TOOLS_VERSION
-                    : mode === 'chat'
+                    : modeForThisMessage === 'chat'
                     ? AI_CHAT_TOOLS_VERSION
                     : undefined,
+                aiConfiguration: selectedAiRequest.aiConfiguration || undefined,
               })
             );
             updateAiRequest(aiRequest.id, () => aiRequest);
@@ -795,6 +852,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             }
           } catch (error) {
             console.error('Error while sending AI request message:', error);
+            if (isAiProviderUnavailableError(error)) {
+              fetchAiProviderConfigurations();
+            }
             // TODO: update the label of the button to send again.
             setLastSendError(selectedAiRequestId, error);
             setIsSendingUserMessage(false);
@@ -846,6 +906,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           selectedAiRequest,
           automaticallyUseCreditsForAiRequests,
           triggerUnsavedChanges,
+          fetchAiProviderConfigurations,
         ]
       );
       const onSendEditorFunctionCallResults = React.useCallback(
@@ -865,13 +926,15 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         },
         [onSendMessage]
       );
+      const selectedEditorFunctionCallResults =
+        selectedAiRequest && getEditorFunctionCallResults(selectedAiRequest.id);
       const { onProcessFunctionCalls } = useProcessFunctionCalls({
         project,
         resourceManagementProps,
         selectedAiRequest,
         editorCallbacks,
         onSendEditorFunctionCallResults,
-        getEditorFunctionCallResults,
+        editorFunctionCallResults: selectedEditorFunctionCallResults || null,
         addEditorFunctionCallResults,
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
@@ -1387,9 +1450,8 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                   onSendMessage({
                     userMessage,
                     mode,
-                    editorFunctionCallResults: selectedAiRequest
-                      ? getEditorFunctionCallResults(selectedAiRequest.id) || []
-                      : [],
+                    editorFunctionCallResults:
+                      selectedEditorFunctionCallResults || [],
                   })
                 }
                 isSending={isSendingAiRequest(selectedAiRequestId)}
@@ -1405,9 +1467,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 }
                 onProcessFunctionCalls={onProcessFunctionCalls}
                 editorFunctionCallResults={
-                  (selectedAiRequest &&
-                    getEditorFunctionCallResults(selectedAiRequest.id)) ||
-                  null
+                  selectedEditorFunctionCallResults || null
                 }
                 price={aiRequestPrice}
                 availableCredits={availableCredits}
@@ -1422,6 +1482,8 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 savingProjectForMessageId={savingProjectForMessageId}
                 forkingState={forkingState}
                 onRestore={onRestore}
+                aiProviderConfigurations={aiProviderConfigurations}
+                customProviderSupport={customProviderSupport}
               />
             </div>
           </Paper>

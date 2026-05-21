@@ -109,6 +109,8 @@ type AiRequestStorage = {|
     updateFn: (prevAiRequest: ?AiRequest) => AiRequest
   ) => void,
   refreshAiRequest: (aiRequestId: string) => Promise<void>,
+  loadSubAgentRequest: (aiRequestId: string) => Promise<void>,
+  subAgentRequestLoadErrors: { [aiRequestId: string]: boolean },
   isSendingAiRequest: (aiRequestId: string | null) => boolean,
   getLastSendError: (aiRequestId: string | null) => ?Error,
   setSendingAiRequest: (aiRequestId: string | null, isSending: boolean) => void,
@@ -269,6 +271,53 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     [getAuthorizationHeader, profile, updateAiRequest]
   );
 
+  // Track which sub-agent AI requests failed to load (after retries), so the
+  // UI can surface a small retry affordance next to the corresponding row.
+  const [subAgentRequestLoadErrors, setSubAgentRequestLoadErrors] = React.useState<{
+    [string]: boolean,
+  }>({});
+  // Guard against concurrent duplicate loads of the same sub-agent.
+  const loadingSubAgentRequestsRef = React.useRef<Set<string>>(new Set());
+
+  const loadSubAgentRequest = React.useCallback(
+    async (aiRequestId: string) => {
+      if (!profile) return;
+      if (loadingSubAgentRequestsRef.current.has(aiRequestId)) return;
+      loadingSubAgentRequestsRef.current.add(aiRequestId);
+      // Clear any previous error for this sub-agent before retrying.
+      setSubAgentRequestLoadErrors(prev => {
+        if (!prev[aiRequestId]) return prev;
+        const next = { ...prev };
+        delete next[aiRequestId];
+        return next;
+      });
+
+      try {
+        const updatedAiRequest = await retryIfFailed(
+          { times: 3, backoff: { initialDelay: 1000 } },
+          () =>
+            getAiRequest(getAuthorizationHeader, {
+              userId: profile.id,
+              aiRequestId: aiRequestId,
+            })
+        );
+        updateAiRequest(updatedAiRequest.id, () => updatedAiRequest);
+      } catch (error) {
+        console.error(
+          `Error while loading sub-agent AI request ${aiRequestId} after retries:`,
+          error
+        );
+        setSubAgentRequestLoadErrors(prev => ({
+          ...prev,
+          [aiRequestId]: true,
+        }));
+      } finally {
+        loadingSubAgentRequestsRef.current.delete(aiRequestId);
+      }
+    },
+    [getAuthorizationHeader, profile, updateAiRequest]
+  );
+
   React.useEffect(
     () => {
       // Reset AI requests when the user logs out.
@@ -341,6 +390,8 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     aiRequests: state.aiRequests,
     updateAiRequest,
     refreshAiRequest,
+    loadSubAgentRequest,
+    subAgentRequestLoadErrors,
     isSendingAiRequest,
     setSendingAiRequest,
     setLastSendError,
@@ -484,6 +535,8 @@ export const initialAiRequestContextState: AiRequestContextState = {
     aiRequests: {},
     updateAiRequest: () => {},
     refreshAiRequest: async () => {},
+    loadSubAgentRequest: async () => {},
+    subAgentRequestLoadErrors: {},
     isSendingAiRequest: () => false,
     getLastSendError: () => null,
     setSendingAiRequest: () => {},

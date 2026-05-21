@@ -29,6 +29,7 @@ import { AiRequestContext } from '../AiRequestContext';
 import { getFunctionCallToFunctionCallOutputMap } from '../AiRequestUtils';
 import SubAgentInput from '../../UI/CustomSvgIcons/SubAgentInput';
 import SubAgentOutput from '../../UI/CustomSvgIcons/SubAgentOutput';
+import Link from '../../UI/Link';
 
 const styles = {
   functionCallText: {
@@ -276,11 +277,16 @@ const SubAgentFunctionCallRow = ({
     aiRequestStorage,
     editorFunctionCallResultsStorage,
   } = React.useContext(AiRequestContext);
-  const { aiRequests } = aiRequestStorage;
+  const {
+    aiRequests,
+    loadSubAgentRequest,
+    subAgentRequestLoadErrors,
+  } = aiRequestStorage;
   const { getEditorFunctionCallResults } = editorFunctionCallResultsStorage;
 
   const subAgentAiRequestId = functionCall.subAgentAiRequestId || '';
   const subAgentRequest = aiRequests[subAgentAiRequestId] || null;
+  const hasLoadFailed = !!subAgentRequestLoadErrors[subAgentAiRequestId];
 
   let existingParsedOutput;
   try {
@@ -455,35 +461,64 @@ const SubAgentFunctionCallRow = ({
           </div>
         </div>
       </div>
-      {showDetails && (subAgentPrompt || subAgentItems.length > 0) && (
-        <div className={classes.detailsContent}>
-          {subAgentPrompt && (
-            <SubAgentTextRow
-              key={`sub-${subAgentAiRequestId}-prompt`}
-              text={subAgentPrompt}
-              textType="prompt"
-            />
-          )}
-          {subAgentItems.map(item =>
-            item.type === 'function_call' ? (
-              <EditorFunctionCallRow
-                project={project}
-                key={item.key}
-                functionCall={item.messageContent}
-                editorFunctionCallResult={item.editorFunctionCallResult}
-                existingFunctionCallOutput={item.existingFunctionCallOutput}
-                editorCallbacks={editorCallbacks}
-              />
-            ) : (
+      {showDetails &&
+        (subAgentPrompt || subAgentItems.length > 0 || hasLoadFailed) && (
+          <div className={classes.detailsContent}>
+            {subAgentPrompt && (
               <SubAgentTextRow
-                key={item.key}
-                text={item.text}
-                textType="output"
+                key={`sub-${subAgentAiRequestId}-prompt`}
+                text={subAgentPrompt}
+                textType="prompt"
               />
-            )
-          )}
-        </div>
-      )}
+            )}
+            {subAgentItems.map(item =>
+              item.type === 'function_call' ? (
+                <EditorFunctionCallRow
+                  project={project}
+                  key={item.key}
+                  functionCall={item.messageContent}
+                  editorFunctionCallResult={item.editorFunctionCallResult}
+                  existingFunctionCallOutput={item.existingFunctionCallOutput}
+                  editorCallbacks={editorCallbacks}
+                />
+              ) : (
+                <SubAgentTextRow
+                  key={item.key}
+                  text={item.text}
+                  textType="output"
+                />
+              )
+            )}
+            {hasLoadFailed && !subAgentRequest && (
+              <SubAgentLoadErrorRow
+                onRetry={() => loadSubAgentRequest(subAgentAiRequestId)}
+              />
+            )}
+          </div>
+        )}
+    </div>
+  );
+};
+
+const SubAgentLoadErrorRow = ({ onRetry }: {| onRetry: () => void |}) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  return (
+    <div className={classes.functionCallContainer}>
+      <div className={classes.functionCallRow}>
+        <span className={classes.statusIconContainer}>
+          <Error htmlColor={gdevelopTheme.message.warning} fontSize="small" />
+        </span>
+        <LineStackLayout noMargin alignItems="center">
+          <Text noMargin size="body-small" color="secondary">
+            <Trans>Could not load sub-agent details.</Trans>
+          </Text>
+          <Link href="#" onClick={onRetry}>
+            <Text noMargin size="body-small" color="inherit">
+              <Trans>Retry</Trans>
+            </Text>
+          </Link>
+        </LineStackLayout>
+      </div>
     </div>
   );
 };

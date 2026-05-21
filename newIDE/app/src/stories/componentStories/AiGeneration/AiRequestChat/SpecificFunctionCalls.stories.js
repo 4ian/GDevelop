@@ -295,6 +295,8 @@ const subAgentFunctionCallMessage = {
 
 const WrappedChatComponentWithSubAgent = ({
   subAgentAiRequest,
+  subAgentRequestLoadErrors,
+  onLoadSubAgentRequest,
   ...chatProps
 }: any) => (
   <AiRequestContext.Provider
@@ -306,6 +308,10 @@ const WrappedChatComponentWithSubAgent = ({
         aiRequests: subAgentAiRequest
           ? { [subAgentAiRequest.id]: subAgentAiRequest }
           : {},
+        subAgentRequestLoadErrors: subAgentRequestLoadErrors || {},
+        loadSubAgentRequest: async (id: string) => {
+          if (onLoadSubAgentRequest) onLoadSubAgentRequest(id);
+        },
       },
     }}
   >
@@ -479,6 +485,64 @@ export const subAgentFunctionCallFromHistoryNotYetLoaded = (): React.Node => (
           output: '{"success":true}',
         },
       ],
+      error: null,
+    }}
+  />
+);
+
+// Reproduces the case where loading the sub-agent AiRequest failed (after
+// the automatic retries in `useLoadSubAgentRequests`). A small inline error
+// message + Retry link is rendered next to the sub-agent prompt.
+export const subAgentFunctionCallLoadFailed = (): React.Node => (
+  <WrappedChatComponentWithSubAgent
+    subAgentAiRequest={null}
+    subAgentRequestLoadErrors={{ 'fake-sub-agent-request-id': true }}
+    onLoadSubAgentRequest={(id: string) =>
+      // eslint-disable-next-line no-console
+      console.info('Retry requested for sub-agent', id)
+    }
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-orchestrator-request',
+      mode: 'orchestrator',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: [
+        userRequestMessage,
+        subAgentFunctionCallMessage,
+        {
+          type: 'function_call_output',
+          call_id: 'tool_0_run_project_edit_agent',
+          output: '{"success":true}',
+        },
+      ],
+      error: null,
+    }}
+  />
+);
+
+// Reproduces the case where the parent request is still working and the
+// sub-agent could not be loaded (e.g. a transient network error). The
+// retry affordance lets the user re-trigger the fetch on demand.
+export const subAgentFunctionCallLoadFailedWhileParentWorking = (): React.Node => (
+  <WrappedChatComponentWithSubAgent
+    subAgentAiRequest={null}
+    subAgentRequestLoadErrors={{ 'fake-sub-agent-request-id': true }}
+    onLoadSubAgentRequest={(id: string) =>
+      // eslint-disable-next-line no-console
+      console.info('Retry requested for sub-agent', id)
+    }
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-orchestrator-request',
+      mode: 'orchestrator',
+      status: 'working',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: [userRequestMessage, subAgentFunctionCallMessage],
       error: null,
     }}
   />

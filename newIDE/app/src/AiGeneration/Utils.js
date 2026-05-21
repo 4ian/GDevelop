@@ -425,7 +425,10 @@ export const useLoadSubAgentRequests = ({
   selectedAiRequest: ?AiRequest,
 |}) => {
   const { aiRequestStorage } = React.useContext(AiRequestContext);
-  const { aiRequests, refreshAiRequest } = aiRequestStorage;
+  const { aiRequests, loadSubAgentRequest } = aiRequestStorage;
+  // Tracks which sub-agent IDs we've already triggered a load for, so we don't
+  // re-launch a fetch on every render. Retries after a failure happen on
+  // demand via `loadSubAgentRequest` from the row's retry affordance.
   const attemptedFetchRef = React.useRef<Set<string>>(new Set());
 
   React.useEffect(
@@ -441,10 +444,10 @@ export const useLoadSubAgentRequests = ({
         if (aiRequests[subAgentAiRequestId]) continue;
         if (attemptedFetchRef.current.has(subAgentAiRequestId)) continue;
         attemptedFetchRef.current.add(subAgentAiRequestId);
-        refreshAiRequest(subAgentAiRequestId);
+        loadSubAgentRequest(subAgentAiRequestId);
       }
     },
-    [selectedAiRequest, aiRequests, refreshAiRequest]
+    [selectedAiRequest, aiRequests, loadSubAgentRequest]
   );
 };
 

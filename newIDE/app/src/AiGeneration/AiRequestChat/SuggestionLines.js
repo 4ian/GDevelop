@@ -79,7 +79,6 @@ export const SuggestionLines = ({
                       <FunctionCallRow
                         project={project}
                         key={functionCallKey}
-                        onProcessFunctionCalls={onProcessFunctionCalls}
                         functionCall={functionCallMessageContent}
                         editorFunctionCallResult={editorFunctionCallResult}
                         existingFunctionCallOutput={existingFunctionCallOutput}

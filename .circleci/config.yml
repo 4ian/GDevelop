@@ -640,8 +640,8 @@ jobs:
       - run:
           name: Install minimal smoke-test deps (axios, minimist, shelljs, adm-zip)
           command: |
-            mkdir -p .smoke-test-deps
-            cd .smoke-test-deps
+            mkdir -p smoke-test-deps
+            cd smoke-test-deps
             npm init -y > /dev/null
             npm install --no-audit --no-fund --silent \
               axios@^0.18.1 \
@@ -657,7 +657,7 @@ jobs:
           # headless Linux runners.
           no_output_timeout: 20m
           command: |
-            export NODE_PATH="$PWD/.smoke-test-deps/node_modules"
+            export NODE_PATH="$PWD/smoke-test-deps/node_modules"
             xvfb-run -a --server-args="-screen 0 1280x800x24" \
               node newIDE/app/scripts/test-portable-cli-export.js \
               --branch=master \

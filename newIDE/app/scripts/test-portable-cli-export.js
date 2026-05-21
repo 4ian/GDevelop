@@ -133,16 +133,21 @@ const fail = msg => {
   }
   shell.echo(`✅ index.html exported (${formatBytes(indexSize)})`);
 
-  // 7. Copy the exported HTML5 game to the artifacts folder so the CI job
-  //    can pick it up via store_artifacts.
-  const artifactGameDir = path.join(
+  // 7. Zip the exported HTML5 game into the artifacts folder so the CI job
+  //    can surface a single downloadable archive via store_artifacts.
+  const artifactZipPath = path.join(
     artifactsDir,
-    `${exampleSlug}-html5-${version}`
+    `${exampleSlug}-html5-${version}.zip`
   );
-  shell.rm('-rf', artifactGameDir);
-  shell.mkdir('-p', artifactGameDir);
-  shell.cp('-R', path.join(exportedBuildDir, '*'), artifactGameDir);
-  shell.echo(`✅ Exported game copied to ${artifactGameDir}`);
+  shell.rm('-f', artifactZipPath);
+  const outZip = new AdmZip();
+  outZip.addLocalFolder(exportedBuildDir);
+  outZip.writeZip(artifactZipPath);
+  shell.echo(
+    `✅ Exported game zipped to ${artifactZipPath} (${formatBytes(
+      fs.statSync(artifactZipPath).size
+    )})`
+  );
 
   shell.echo('🎉 Portable CLI HTML5 export smoke test succeeded.');
 })().catch(err => {

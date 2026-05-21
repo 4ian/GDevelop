@@ -6,18 +6,20 @@
  *   1. Reads the current GDevelop version from
  *      `newIDE/electron-app/app/package.json` (the source of truth, same
  *      as `make-version-metadata.js`).
- *   2. Downloads the matching Linux portable zip (built on master by the
- *      CircleCI build-linux job and uploaded to S3).
+ *   2. Gets the matching Linux portable zip, either from a local path
+ *      (via --zipPath, e.g. the artifact a build-linux job just produced)
+ *      or by downloading it from S3.
  *   3. Extracts it with adm-zip.
  *   4. Sparse-clones an example game from the GDevelop-examples repository
  *      (defaults to "3d-platformer").
  *   5. Runs the extracted GDevelop binary in CLI mode with
  *      `--run-command EXPORT_HTML5_EXTERNAL` to export the game to HTML5.
  *   6. Verifies the exported HTML5 game looks valid (e.g. `index.html`
- *      exists). The exported folder can then be saved as a CI artifact.
+ *      exists) and zips it into the artifacts folder.
  *
  * Usage:
  *   node test-portable-cli-export.js [--branch=master] [--example=3d-platformer]
+ *                                    [--zipPath=/path/to/gdevelop-X.Y.Z.zip]
  *                                    [--workDir=./.portable-cli-test]
  *                                    [--artifactsDir=./portable-cli-artifacts]
  */
@@ -39,6 +41,10 @@ const workDir = path.resolve(args['workDir'] || './.portable-cli-test');
 const artifactsDir = path.resolve(
   args['artifactsDir'] || './portable-cli-artifacts'
 );
+// If set, use this local zip instead of downloading from S3 (useful when
+// running the smoke test right after a build-linux job that already produced
+// the portable zip on disk).
+const localZipPath = args['zipPath'] ? path.resolve(args['zipPath']) : null;
 
 const version = electronAppPackageJson.version;
 const pathToArtifacts = `https://gdevelop-releases.s3.amazonaws.com/${branch}/latest`;
@@ -66,18 +72,33 @@ const fail = msg => {
   shell.mkdir('-p', workDir);
   shell.mkdir('-p', artifactsDir);
 
-  // 1. Download the Linux portable zip.
-  const portableZipPath = path.join(workDir, portableZipName);
-  shell.echo(`🌐 Downloading ${portableZipUrl} ...`);
-  await retryIfFailed(
-    { times: 3, backoff: { initialDelay: 2000, factor: 2 } },
-    () => downloadLocalFile(portableZipUrl, portableZipPath)
-  );
-  shell.echo(
-    `✅ Downloaded ${portableZipName} (${formatBytes(
-      fs.statSync(portableZipPath).size
-    )})`
-  );
+  // 1. Get the Linux portable zip — either from a local path passed in via
+  //    --zipPath (e.g. when chained after a build-linux job) or by
+  //    downloading the latest version from S3.
+  let portableZipPath;
+  if (localZipPath) {
+    if (!fs.existsSync(localZipPath)) {
+      fail(`Local --zipPath does not exist: ${localZipPath}`);
+    }
+    portableZipPath = localZipPath;
+    shell.echo(
+      `📦 Using local portable zip: ${portableZipPath} (${formatBytes(
+        fs.statSync(portableZipPath).size
+      )})`
+    );
+  } else {
+    portableZipPath = path.join(workDir, portableZipName);
+    shell.echo(`🌐 Downloading ${portableZipUrl} ...`);
+    await retryIfFailed(
+      { times: 3, backoff: { initialDelay: 2000, factor: 2 } },
+      () => downloadLocalFile(portableZipUrl, portableZipPath)
+    );
+    shell.echo(
+      `✅ Downloaded ${portableZipName} (${formatBytes(
+        fs.statSync(portableZipPath).size
+      )})`
+    );
+  }
 
   // 2. Extract the portable zip.
   const extractedDir = path.join(workDir, `gdevelop-${version}`);

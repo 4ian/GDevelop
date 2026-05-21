@@ -171,6 +171,25 @@ jobs:
       - store_artifacts:
           path: newIDE/electron-app/dist
 
+      # Stage just the x64 portable zip for the downstream smoke-test job
+      # (avoid sharing the much larger .AppImage/.deb installers via the
+      # workspace).
+      - run:
+          name: Stage portable zip for downstream smoke-test job
+          command: |
+            mkdir -p build-linux-workspace
+            for f in newIDE/electron-app/dist/gdevelop-*.zip; do
+              case "$f" in
+                *arm64*) ;;
+                *) cp "$f" build-linux-workspace/ ;;
+              esac
+            done
+            ls -lh build-linux-workspace
+      - persist_to_workspace:
+          root: build-linux-workspace
+          paths:
+            - .
+
       # Upload artifacts (AWS)
       - run:
           name: Deploy to S3 (specific commit)
@@ -601,11 +620,14 @@ jobs:
           path: newIDE/electron-app/dist
 
   # End-to-end smoke test that downloads the latest "portable" Linux build of
-  # GDevelop from S3, fetches an example game from the GDevelop-examples
-  # repository, and runs the CLI to export it to HTML5. This verifies that
-  # the editor distribution can be used headlessly on a CI machine, which is
-  # required by the `--run-command EXPORT_HTML5_EXTERNAL` workflow.
+  # GDevelop from S3, fetches an example game and runs the CLI to export it
+  # to HTML5.
   portable-cli-html5-export-smoke-test:
+    parameters:
+      use-local-build:
+        description: When true, attach the workspace produced by build-linux and use its portable zip instead of downloading the latest one from S3.
+        type: boolean
+        default: false
     resource_class: medium
     docker:
       - image: cimg/node:24.13.0
@@ -614,6 +636,12 @@ jobs:
 
     steps:
       - checkout
+
+      - when:
+          condition: << parameters.use-local-build >>
+          steps:
+            - attach_workspace:
+                at: ~/GDevelop/build-linux-workspace
 
       # Runtime libraries required by Electron (headless still needs nss /
       # alsa to even start up).
@@ -658,9 +686,21 @@ jobs:
           no_output_timeout: 20m
           command: |
             export NODE_PATH="$PWD/smoke-test-deps/node_modules"
+            if [ "<< parameters.use-local-build >>" = "true" ]; then
+              ZIP_PATH=$(ls ~/GDevelop/build-linux-workspace/gdevelop-*.zip | grep -v -- '-arm64' | head -1)
+              if [ -z "$ZIP_PATH" ]; then
+                echo "No portable zip found in build-linux workspace." >&2
+                exit 1
+              fi
+              echo "Using locally built portable zip: $ZIP_PATH"
+              EXTRA_ARGS="--zipPath=$ZIP_PATH"
+            else
+              echo "No local build available; will download the latest portable zip from S3."
+              EXTRA_ARGS="--branch=master"
+            fi
             xvfb-run -a --server-args="-screen 0 1280x800x24" \
               node newIDE/app/scripts/test-portable-cli-export.js \
-              --branch=master \
+              $EXTRA_ARGS \
               --example=3d-platformer \
               --workDir=./.portable-cli-test \
               --artifactsDir=./portable-cli-artifacts
@@ -680,10 +720,13 @@ workflows:
                 - master
                 - stable
                 - /experimental-build.*/
+  tests:
+    jobs:
+      - build-gdcore-tests-sanitizers
+
   builds:
     jobs:
       - build-gdevelop_js-wasm-only
-      - build-gdcore-tests-sanitizers
       - build-macos:
           # The macOS version builds by itself GDevelop.js
           # (so we verify we can build it on macOS).
@@ -698,6 +741,19 @@ workflows:
       - build-linux:
           requires:
             - build-gdevelop_js-wasm-only
+          filters:
+            branches:
+              only:
+                - master
+                - stable
+                - /experimental-build.*/
+      # Right after build-linux, run the CLI HTML5 export smoke test against
+      # the portable zip it just produced (via the attached workspace).
+      - portable-cli-html5-export-smoke-test:
+          name: portable-cli-html5-export-smoke-test-after-build-linux
+          use-local-build: true
+          requires:
+            - build-linux
           filters:
             branches:
               only:

@@ -17,6 +17,7 @@
 
 #include "../allocators.h"
 #include "swap.h"
+#include <cstddef>
 
 #if defined(__clang__)
 RAPIDJSON_DIAG_PUSH
@@ -117,7 +118,7 @@ public:
          // Use pointer subtraction rather than `stackTop_ + N > stackEnd_` because the
          // stack is lazily allocated: stackTop_ and stackEnd_ are both null until the
          // first Expand(), and `null + non-zero` is undefined behaviour (caught by UBSan).
-        if (RAPIDJSON_UNLIKELY(sizeof(T) * count > static_cast<size_t>(stackEnd_ - stackTop_)))
+        if (RAPIDJSON_UNLIKELY(static_cast<std::ptrdiff_t>(sizeof(T) * count) > (stackEnd_ - stackTop_)))
             Expand<T>(count);
     }
 
@@ -129,7 +130,7 @@ public:
 
     template<typename T>
     RAPIDJSON_FORCEINLINE T* PushUnsafe(size_t count = 1) {
-        RAPIDJSON_ASSERT(sizeof(T) * count <= static_cast<size_t>(stackEnd_ - stackTop_));
+        RAPIDJSON_ASSERT(static_cast<std::ptrdiff_t>(sizeof(T) * count) <= (stackEnd_ - stackTop_));
         T* ret = reinterpret_cast<T*>(stackTop_);
         stackTop_ += sizeof(T) * count;
         return ret;

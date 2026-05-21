@@ -438,6 +438,7 @@ const ProjectPropertiesDialog = (props: Props) => {
             onApply={onApply}
             open={props.open}
             fullHeight
+            maxWidth="md"
             fixedContent={
               <Tabs
                 value={currentTab}

@@ -221,16 +221,6 @@ jobs:
             - gdevelop.js-emscripten-ccache-v1-{{ .Branch }}-
             - gdevelop.js-emscripten-ccache-v1-
 
-      # Cache the Emscripten system library cache (libc, libc++, libcompiler_rt,
-      # etc.) so emcc doesn't have to recompile them on the first link of each
-      # CI run. Keyed on the pinned emsdk version because the libs are
-      # ABI-specific to that toolchain. Bump the version suffix (v1 -> v2 ...)
-      # to invalidate everywhere.
-      - restore_cache:
-          name: Restore Emscripten system libraries cache
-          keys:
-            - gdevelop.js-emscripten-em_cache-v2-3.1.21
-
       # Build GDevelop.js
       - run:
           name: Build GDevelop.js
@@ -247,12 +237,6 @@ jobs:
           key: gdevelop.js-emscripten-ccache-v1-{{ .Branch }}-{{ .Revision }}
           paths:
             - ~/.cache/ccache
-
-      - save_cache:
-          name: Save Emscripten system libraries cache
-          key: gdevelop.js-emscripten-em_cache-v2-3.1.21
-          paths:
-            - emsdk/upstream/emscripten/cache
 
       # Run the tests against the freshly built libGD.js. Kept in its own step
       # so a test failure is easy to spot in the CircleCI UI.

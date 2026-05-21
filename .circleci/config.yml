@@ -419,6 +419,7 @@ jobs:
           # Make sure to DISABLE "malware blocker" in SSL.com to avoid errors like:
           # Error information: "Error: SignerSign() failed." (-2146893821/0x80090003)
           name: Download and Unzip eSignerCKA Setup
+          no_output_timeout: 4m
           command: |
 
             Invoke-WebRequest -OutFile eSigner_CKA_1.0.3.zip "https://www.ssl.com/download/ssl-com-esigner-cka-1-0-3"

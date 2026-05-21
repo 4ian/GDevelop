@@ -165,8 +165,17 @@ const EditedObjectGroupEditorDialog = ({
           secondaryActions={[
             <HelpButton
               key="help-button"
-              helpPagePath="/objects/object-group"
-              scopeName={i18n._(t`Object groups`)}
+              helpPagePath="/objects/object-groups"
+              anchor={
+                currentTab === 'variables'
+                  ? 'add-variables-to-an-object-group'
+                  : 'object-groups'
+              }
+              label={
+                currentTab === 'variables'
+                  ? i18n._(t`Group Variables`)
+                  : i18n._(t`Object groups`)
+              }
             />,
           ]}
           onRequestClose={onCancelChanges}

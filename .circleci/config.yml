@@ -616,7 +616,7 @@ jobs:
       - checkout
 
       # Runtime libraries required by Electron (headless still needs nss /
-      # alsa to even start up) plus `zip`/`unzip` for archive handling.
+      # alsa to even start up).
       - run:
           name: Install Electron runtime dependencies
           command: |
@@ -630,9 +630,24 @@ jobs:
               libatk-bridge2.0-0 \
               libdrm2 \
               libxkbcommon0 \
-              xvfb \
-              zip \
-              unzip
+              xvfb
+
+      # The smoke-test script reuses the helpers from `newIDE/app/scripts`
+      # which depend on axios, minimist, shelljs and adm-zip. Rather than
+      # running a full `npm install` of `newIDE/app` (huge), we install just
+      # the four packages we need into a scratch directory and expose it via
+      # NODE_PATH so the script and its `./lib/*` helpers can `require` them.
+      - run:
+          name: Install minimal smoke-test deps (axios, minimist, shelljs, adm-zip)
+          command: |
+            mkdir -p .smoke-test-deps
+            cd .smoke-test-deps
+            npm init -y > /dev/null
+            npm install --no-audit --no-fund --silent \
+              axios@^0.18.1 \
+              minimist@^1.2.5 \
+              shelljs@^0.8.4 \
+              adm-zip@^0.5.10
 
       - run:
           name: Run portable CLI HTML5 export smoke test
@@ -642,6 +657,7 @@ jobs:
           # headless Linux runners.
           no_output_timeout: 20m
           command: |
+            export NODE_PATH="$PWD/.smoke-test-deps/node_modules"
             xvfb-run -a --server-args="-screen 0 1280x800x24" \
               node newIDE/app/scripts/test-portable-cli-export.js \
               --branch=master \
@@ -652,10 +668,6 @@ jobs:
       - store_artifacts:
           path: ./portable-cli-artifacts
           destination: portable-cli-artifacts
-
-      - store_artifacts:
-          path: ./.portable-cli-test/latest-linux.yml
-          destination: debug/latest-linux.yml
 
 workflows:
   gdevelop_js-wasm-extra-checks:

@@ -282,23 +282,24 @@ const SubAgentFunctionCallRow = ({
   const subAgentAiRequestId = functionCall.subAgentAiRequestId || '';
   const subAgentRequest = aiRequests[subAgentAiRequestId] || null;
 
+  let existingParsedOutput;
+  try {
+    if (existingFunctionCallOutput) {
+      existingParsedOutput = JSON.parse(existingFunctionCallOutput.output);
+    }
+  } catch (error) {
+    existingParsedOutput = null;
+  }
+
   const isFinished =
     !!existingFunctionCallOutput ||
     (subAgentRequest &&
       (subAgentRequest.status === 'ready' ||
         subAgentRequest.status === 'error'));
+  const isStopped = existingParsedOutput && !!existingParsedOutput.stopped;
   const hasErrored =
     (subAgentRequest && subAgentRequest.status === 'error') ||
-    (existingFunctionCallOutput &&
-      (() => {
-        try {
-          return (
-            JSON.parse(existingFunctionCallOutput.output).success === false
-          );
-        } catch (e) {
-          return false;
-        }
-      })());
+    (existingParsedOutput && existingParsedOutput.success === false);
   const isWorking = subAgentRequest && subAgentRequest.status === 'working';
 
   const editorFunction =
@@ -408,6 +409,11 @@ const SubAgentFunctionCallRow = ({
         <span className={classes.statusIconContainer}>
           {hasErrored ? (
             <Error htmlColor={gdevelopTheme.message.error} fontSize="small" />
+          ) : isStopped ? (
+            <Error
+              htmlColor={gdevelopTheme.text.color.disabled}
+              fontSize="small"
+            />
           ) : isFinished ? (
             <Check htmlColor={gdevelopTheme.message.valid} fontSize="small" />
           ) : (

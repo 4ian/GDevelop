@@ -46,7 +46,7 @@ const portableZipName = `gdevelop-${version}.zip`;
 const portableZipUrl = `${pathToArtifacts}/${portableZipName}`;
 
 const EXAMPLES_REPO = 'https://github.com/GDevelopApp/GDevelop-examples.git';
-const EXAMPLES_BRANCH = 'master';
+const EXAMPLES_BRANCH = 'main';
 const CLI_TIMEOUT_MS = 10 * 60 * 1000;
 
 const fail = msg => {

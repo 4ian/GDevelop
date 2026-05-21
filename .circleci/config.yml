@@ -171,11 +171,11 @@ jobs:
       - store_artifacts:
           path: newIDE/electron-app/dist
 
-      # Stage just the x64 portable zip for the downstream smoke-test job
-      # (avoid sharing the much larger .AppImage/.deb installers via the
-      # workspace).
+      # Stage just the x64 portable zip for the downstream
+      # cli-html5-export-linux job (avoid sharing the much larger
+      # .AppImage/.deb installers via the workspace).
       - run:
-          name: Stage portable zip for downstream smoke-test job
+          name: Stage portable zip for downstream cli-html5-export-linux job
           command: |
             mkdir -p build-linux-workspace
             for f in newIDE/electron-app/dist/gdevelop-*.zip; do
@@ -619,10 +619,10 @@ jobs:
       - store_artifacts:
           path: newIDE/electron-app/dist
 
-  # End-to-end smoke test that downloads the latest "portable" Linux build of
-  # GDevelop from S3, fetches an example game and runs the CLI to export it
-  # to HTML5.
-  portable-cli-html5-export-smoke-test:
+  # End-to-end test that runs the GDevelop CLI to export an example game
+  # to HTML5, using either the portable Linux build just produced by
+  # build-linux (use-local-build=true) or the latest one downloaded from S3.
+  run-cli-html5-export-linux:
     parameters:
       use-local-build:
         description: When true, attach the workspace produced by build-linux and use its portable zip instead of downloading the latest one from S3.
@@ -660,16 +660,16 @@ jobs:
               libxkbcommon0 \
               xvfb
 
-      # The smoke-test script reuses the helpers from `newIDE/app/scripts`
-      # which depend on axios, minimist, shelljs and adm-zip. Rather than
-      # running a full `npm install` of `newIDE/app` (huge), we install just
-      # the four packages we need into a scratch directory and expose it via
+      # The script reuses the helpers from `newIDE/app/scripts` which
+      # depend on axios, minimist, shelljs and adm-zip. Rather than running
+      # a full `npm install` of `newIDE/app` (huge), we install just the
+      # four packages we need into a scratch directory and expose it via
       # NODE_PATH so the script and its `./lib/*` helpers can `require` them.
       - run:
-          name: Install minimal smoke-test deps (axios, minimist, shelljs, adm-zip)
+          name: Install minimal script deps (axios, minimist, shelljs, adm-zip)
           command: |
-            mkdir -p smoke-test-deps
-            cd smoke-test-deps
+            mkdir -p cli-html5-export-deps
+            cd cli-html5-export-deps
             npm init -y > /dev/null
             npm install --no-audit --no-fund --silent \
               axios@^0.18.1 \
@@ -678,14 +678,14 @@ jobs:
               adm-zip@^0.5.10
 
       - run:
-          name: Run portable CLI HTML5 export smoke test
+          name: Run CLI HTML5 export
           # Wrap with xvfb-run as a safety net: even though the editor hides
           # its BrowserWindow in --run-command mode, Electron itself still
           # needs a usable display for some GPU/graphics initialization on
           # headless Linux runners.
           no_output_timeout: 20m
           command: |
-            export NODE_PATH="$PWD/smoke-test-deps/node_modules"
+            export NODE_PATH="$PWD/cli-html5-export-deps/node_modules"
             if [ "<< parameters.use-local-build >>" = "true" ]; then
               ZIP_PATH=$(ls ~/GDevelop/build-linux-workspace/gdevelop-*.zip | grep -v -- '-arm64' | head -1)
               if [ -z "$ZIP_PATH" ]; then
@@ -702,12 +702,12 @@ jobs:
               node newIDE/app/scripts/test-portable-cli-export.js \
               $EXTRA_ARGS \
               --example=3d-platformer \
-              --workDir=./.portable-cli-test \
-              --artifactsDir=./portable-cli-artifacts
+              --workDir=./cli-html5-export-work \
+              --artifactsDir=./cli-html5-export-artifacts
 
       - store_artifacts:
-          path: ./portable-cli-artifacts
-          destination: portable-cli-artifacts
+          path: ./cli-html5-export-artifacts
+          destination: cli-html5-export-artifacts
 
 workflows:
   gdevelop_js-wasm-extra-checks:
@@ -747,10 +747,10 @@ workflows:
                 - master
                 - stable
                 - /experimental-build.*/
-      # Right after build-linux, run the CLI HTML5 export smoke test against
-      # the portable zip it just produced (via the attached workspace).
-      - portable-cli-html5-export-smoke-test:
-          name: portable-cli-html5-export-smoke-test-after-build-linux
+      # Right after build-linux, run the CLI HTML5 export against the
+      # portable zip it just produced (via the attached workspace).
+      - run-cli-html5-export-linux:
+          name: cli-html5-export-linux
           use-local-build: true
           requires:
             - build-linux
@@ -779,10 +779,10 @@ workflows:
                 - stable
                 - /experimental-build.*/
 
-  # Daily end-to-end smoke test of the portable Linux build + CLI export.
-  # Runs every day at 16:00 UTC (4pm UTC) against the latest portable build
-  # uploaded to S3 for master.
-  daily-portable-cli-smoke-test:
+  # Daily end-to-end test of the GDevelop CLI HTML5 export. Runs every day
+  # at 16:00 UTC (4pm UTC) against the latest portable build uploaded to S3
+  # for master.
+  daily-cli-html5-export-linux:
     triggers:
       - schedule:
           cron: "0 16 * * *"
@@ -791,15 +791,4 @@ workflows:
               only:
                 - master
     jobs:
-      - portable-cli-html5-export-smoke-test
-
-  # TEMPORARY: also run the smoke test on every push to this PR branch so we
-  # can validate it end-to-end before merging. Remove this workflow once the
-  # job has been verified to work.
-  portable-cli-smoke-test-on-push:
-    jobs:
-      - portable-cli-html5-export-smoke-test:
-          filters:
-            branches:
-              only:
-                - claude/daily-circleci-portable-job-kVjkF
+      - run-cli-html5-export-linux

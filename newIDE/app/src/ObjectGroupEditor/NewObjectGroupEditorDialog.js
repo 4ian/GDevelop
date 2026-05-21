@@ -1,5 +1,6 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectGroupEditor from '.';
@@ -80,63 +81,71 @@ const NewObjectGroupEditorDialog = ({
   );
 
   return (
-    <Dialog
-      title={<Trans>Create a new group</Trans>}
-      id="create-group-dialog"
-      actions={[
-        <FlatButton
-          key="cancel"
-          label={<Trans>Cancel</Trans>}
-          onClick={onCancel}
-        />,
-        <DialogPrimaryButton
-          key="apply"
-          label={<Trans>Create</Trans>}
-          primary
-          onClick={apply}
-        />,
-      ]}
-      secondaryActions={[
-        <HelpButton key="help-button" helpPagePath="/objects/object-group" />,
-      ]}
-      onRequestClose={onCancel}
-      onApply={apply}
-      open
-      maxWidth="sm"
-      fixedContent={
-        <ColumnStackLayout noMargin>
-          {!isGroupAlreadyAdded && (
-            <SemiControlledTextField
-              fullWidth
-              id="group-name"
-              commitOnBlur
-              floatingLabelText={<Trans>Group name</Trans>}
-              floatingLabelFixed
-              value={objectGroupName}
-              translatableHintText={t`Group name`}
-              onChange={setObjectGroupName}
-              autoFocus="desktop"
-            />
-          )}
-          <Checkbox
-            label={<Trans>Add any object variable to the group</Trans>}
-            checked={shouldSpreadAnyVariables}
-            onCheck={(e, checked) => setShouldSpreadAnyVariables(checked)}
+    <I18n>
+      {({ i18n }) => (
+        <Dialog
+          title={<Trans>Create a new group</Trans>}
+          id="create-group-dialog"
+          actions={[
+            <FlatButton
+              key="cancel"
+              label={<Trans>Cancel</Trans>}
+              onClick={onCancel}
+            />,
+            <DialogPrimaryButton
+              key="apply"
+              label={<Trans>Create</Trans>}
+              primary
+              onClick={apply}
+            />,
+          ]}
+          secondaryActions={[
+            <HelpButton
+              key="help-button"
+              helpPagePath="/objects/object-group"
+              scopeName={i18n._(t`Object groups`)}
+            />,
+          ]}
+          onRequestClose={onCancel}
+          onApply={apply}
+          open
+          maxWidth="sm"
+          fixedContent={
+            <ColumnStackLayout noMargin>
+              {!isGroupAlreadyAdded && (
+                <SemiControlledTextField
+                  fullWidth
+                  id="group-name"
+                  commitOnBlur
+                  floatingLabelText={<Trans>Group name</Trans>}
+                  floatingLabelFixed
+                  value={objectGroupName}
+                  translatableHintText={t`Group name`}
+                  onChange={setObjectGroupName}
+                  autoFocus="desktop"
+                />
+              )}
+              <Checkbox
+                label={<Trans>Add any object variable to the group</Trans>}
+                checked={shouldSpreadAnyVariables}
+                onCheck={(e, checked) => setShouldSpreadAnyVariables(checked)}
+              />
+            </ColumnStackLayout>
+          }
+        >
+          <ObjectGroupEditor
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            groupObjectNames={groupObjectNames}
+            onObjectAdded={addObject}
+            onObjectRemoved={removeObject}
+            isObjectListLocked={false}
           />
-        </ColumnStackLayout>
-      }
-    >
-      <ObjectGroupEditor
-        project={project}
-        projectScopedContainersAccessor={projectScopedContainersAccessor}
-        globalObjectsContainer={globalObjectsContainer}
-        objectsContainer={objectsContainer}
-        groupObjectNames={groupObjectNames}
-        onObjectAdded={addObject}
-        onObjectRemoved={removeObject}
-        isObjectListLocked={false}
-      />
-    </Dialog>
+        </Dialog>
+      )}
+    </I18n>
   );
 };
 

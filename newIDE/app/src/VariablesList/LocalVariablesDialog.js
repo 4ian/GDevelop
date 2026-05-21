@@ -1,9 +1,8 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
-import VariablesEditorDialog, {
-  type VariableDialogOpeningProps,
-} from './VariablesEditorDialog';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import VariablesEditorDialog from './VariablesEditorDialog';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 type Props = {|
@@ -16,7 +15,8 @@ type Props = {|
   onRemoveLoopIndexVariable?: () => void,
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
-  initiallySelectedVariable: VariableDialogOpeningProps | null,
+  initiallySelectedVariableName: string,
+  shouldCreateInitiallySelectedVariable?: boolean,
   isListLocked: boolean,
 |};
 
@@ -30,7 +30,8 @@ const LocalVariablesDialog = ({
   open,
   onCancel,
   onApply,
-  initiallySelectedVariable,
+  initiallySelectedVariableName,
+  shouldCreateInitiallySelectedVariable,
   isListLocked,
 }: Props): React.Node => {
   const tabs = React.useMemo(
@@ -55,21 +56,29 @@ const LocalVariablesDialog = ({
   );
 
   return (
-    <VariablesEditorDialog
-      project={project}
-      projectScopedContainersAccessor={projectScopedContainersAccessor}
-      open={open}
-      onCancel={onCancel}
-      onApply={onApply}
-      title={<Trans>Local variables</Trans>}
-      // $FlowFixMe[incompatible-type]
-      tabs={tabs}
-      helpPagePath={'/all-features/variables/local-variables'}
-      id="local-variables-dialog"
-      initiallySelectedVariable={initiallySelectedVariable}
-      hotReloadPreviewButtonProps={null}
-      isListLocked={isListLocked}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <VariablesEditorDialog
+          project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          open={open}
+          onCancel={onCancel}
+          onApply={onApply}
+          title={<Trans>Local variables</Trans>}
+          // $FlowFixMe[incompatible-type]
+          tabs={tabs}
+          helpPagePath={'/all-features/variables/local-variables'}
+          scopeName={i18n._(t`Local variables`)}
+          id="local-variables-dialog"
+          initiallySelectedVariableName={initiallySelectedVariableName}
+          shouldCreateInitiallySelectedVariable={
+            shouldCreateInitiallySelectedVariable
+          }
+          hotReloadPreviewButtonProps={null}
+          isListLocked={isListLocked}
+        />
+      )}
+    </I18n>
   );
 };
 

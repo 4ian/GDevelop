@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
@@ -267,7 +267,11 @@ export default function NewBehaviorDialog({
             />,
           ]}
           secondaryActions={[
-            <HelpButton helpPagePath="/behaviors" key="help" />,
+            <HelpButton
+              helpPagePath="/behaviors"
+              key="help"
+              scopeName={i18n._(t`Behaviors`)}
+            />,
           ]}
           open
           onRequestClose={onClose}

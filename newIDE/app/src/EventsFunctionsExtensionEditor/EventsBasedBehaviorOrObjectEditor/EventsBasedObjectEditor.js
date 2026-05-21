@@ -241,6 +241,7 @@ export default function EventsBasedObjectEditor({
             <HelpButton
               key="help"
               helpPagePath="/objects/custom-objects-prefab-template"
+              scopeName={i18n._(t`Custom objects`)}
             />
           </Line>
         </ColumnStackLayout>

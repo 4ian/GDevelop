@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
@@ -16,7 +16,6 @@ import InstructionOrObjectSelector, {
 } from './InstructionOrObjectSelector';
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import HelpButton from '../../UI/HelpButton';
-import { isRelativePathToDocumentationRoot } from '../../Utils/HelpLink';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { SelectColumns } from '../../UI/Responsive/SelectColumns';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
@@ -164,6 +163,16 @@ const InstructionEditorDialog = ({
   const { isMobile, windowSize, isMediumScreen } = useResponsiveWindowSize();
   const isLargeScreen = windowSize === 'large' || windowSize === 'xlarge';
   const instructionType: string = instruction.getType();
+  const instructionMetadata = getInstructionMetadata({
+    instructionType,
+    isCondition,
+    project,
+  });
+  const rawHelpPath = instructionMetadata
+    ? instructionMetadata.getHelpPath()
+    : null;
+  const validHelpPath =
+    rawHelpPath && rawHelpPath !== 'MISSING' ? rawHelpPath : null;
   const [
     newBehaviorDialogOpen,
     setNewBehaviorDialogOpen,
@@ -328,15 +337,6 @@ const InstructionEditorDialog = ({
     [step, shouldAutofocusInput]
   );
 
-  const instructionMetadata = getInstructionMetadata({
-    instructionType,
-    isCondition,
-    project,
-  });
-  const instructionHelpPage = instructionMetadata
-    ? instructionMetadata.getHelpPath()
-    : undefined;
-
   const renderInstructionOrObjectSelector = () => (
     <I18n>
       {({ i18n }) => (
@@ -449,21 +449,16 @@ const InstructionEditorDialog = ({
           ) : null,
           <HelpButton
             key="help"
-            helpPagePath={
-              instructionHelpPage &&
-              isRelativePathToDocumentationRoot(instructionHelpPage)
-                ? instructionHelpPage
-                : '/events'
-            }
+            helpPagePath={validHelpPath || '/events'}
             label={
-              !instructionHelpPage ||
-              !isRelativePathToDocumentationRoot(instructionHelpPage) ||
-              (isMobile || step === 'object-or-free-instructions') ? (
-                <Trans>Help</Trans>
-              ) : isCondition ? (
-                <Trans>Help for this condition</Trans>
+              validHelpPath ? (
+                isCondition ? (
+                  <Trans>See this condition</Trans>
+                ) : (
+                  <Trans>See this action</Trans>
+                )
               ) : (
-                <Trans>Help for this action</Trans>
+                <Trans>Events</Trans>
               )
             }
           />,

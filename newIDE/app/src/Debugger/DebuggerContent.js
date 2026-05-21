@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import EditorMosaic, { type EditorMosaicInterface } from '../UI/EditorMosaic';
@@ -121,150 +122,176 @@ export default class DebuggerContent extends React.Component<Props, State> {
       rawMode,
     } = this.state;
 
-    const editors = {
-      inspectors: {
-        type: 'primary',
-        title: t`Inspectors`,
-        toolbarControls: [],
-        renderEditor: () => (
-          <Background>
-            <Column expand noMargin useFullHeight>
-              <Line justifyContent="center">
-                <RaisedButton
-                  label={<Trans>Refresh</Trans>}
-                  onClick={onRefresh}
-                  primary
-                />
-              </Line>
-              <InspectorsList
-                gameData={gameData}
-                getInspectorDescriptions={getInspectorDescriptions}
-                onChooseInspector={(
-                  selectedInspector,
-                  selectedInspectorFullPath
-                ) =>
-                  this.setState({
-                    selectedInspector,
-                    selectedInspectorFullPath,
-                  })
-                }
-              />
-            </Column>
-          </Background>
-        ),
-      },
-      'selected-inspector': {
-        type: 'primary',
-        noTitleBar: true,
-        renderEditor: () => (
-          <Background>
-            <ScrollView>
-              <Column>
-                {selectedInspector ? (
-                  rawMode ? (
-                    <RawContentInspector
-                      gameData={get(gameData, selectedInspectorFullPath, null)}
-                      onEdit={(path, newValue) =>
-                        onEdit(selectedInspectorFullPath.concat(path), newValue)
+    return (
+      <I18n>
+        {({ i18n }) => {
+          const editors = {
+            inspectors: {
+              type: 'primary',
+              title: t`Inspectors`,
+              toolbarControls: [],
+              renderEditor: () => (
+                <Background>
+                  <Column expand noMargin useFullHeight>
+                    <Line justifyContent="center">
+                      <RaisedButton
+                        label={<Trans>Refresh</Trans>}
+                        onClick={onRefresh}
+                        primary
+                      />
+                    </Line>
+                    <InspectorsList
+                      gameData={gameData}
+                      getInspectorDescriptions={getInspectorDescriptions}
+                      onChooseInspector={(
+                        selectedInspector,
+                        selectedInspectorFullPath
+                      ) =>
+                        this.setState({
+                          selectedInspector,
+                          selectedInspectorFullPath,
+                        })
                       }
                     />
-                  ) : (
-                    selectedInspector.renderInspector(
-                      get(gameData, selectedInspectorFullPath, null),
-                      {
-                        onCall: (path, args) =>
-                          onCall(selectedInspectorFullPath.concat(path), args),
-                        onEdit: (path, newValue) =>
-                          onEdit(
-                            selectedInspectorFullPath.concat(path),
-                            newValue
-                          ),
-                      }
-                    ) || (
-                      <EmptyMessage>
-                        <Trans>
-                          No inspector, choose another element in the list or
-                          toggle the raw data view.
-                        </Trans>
-                      </EmptyMessage>
-                    )
-                  )
-                ) : (
-                  <EmptyMessage>
-                    {gameData ? (
-                      <Trans>Choose an element to inspect in the list</Trans>
-                    ) : (
-                      <Trans>
-                        Pause the game (from the toolbar) or hit refresh (on the
-                        left) to inspect the game
-                      </Trans>
-                    )}
-                  </EmptyMessage>
-                )}
-              </Column>
-            </ScrollView>
-            <MiniToolbar>
-              <Line justifyContent="space-between" alignItems="center" noMargin>
-                <HelpButton helpPagePath="/interface/debugger" />
-                <div>
-                  <Checkbox
-                    checkedIcon={<Flash />}
-                    uncheckedIcon={<FlashOff />}
-                    checked={rawMode}
-                    onCheck={(e, enabled) =>
-                      this.setState({
-                        rawMode: enabled,
-                      })
-                    }
-                  />
-                </div>
-              </Line>
-            </MiniToolbar>
-          </Background>
-        ),
-      },
-      profiler: {
-        type: 'secondary',
-        title: t`Profiler`,
-        renderEditor: () => (
-          <Profiler
-            onStart={onStartProfiler}
-            onStop={onStopProfiler}
-            profilerOutput={profilerOutput}
-            profilingInProgress={profilingInProgress}
-          />
-        ),
-      },
-      console: {
-        type: 'secondary',
-        title: t`Console`,
-        renderEditor: () => (
-          <Background>
-            <DebuggerConsole logsManager={logsManager || []} />
-          </Background>
-        ),
-      },
-    };
+                  </Column>
+                </Background>
+              ),
+            },
+            'selected-inspector': {
+              type: 'primary',
+              noTitleBar: true,
+              renderEditor: () => (
+                <Background>
+                  <ScrollView>
+                    <Column>
+                      {selectedInspector ? (
+                        rawMode ? (
+                          <RawContentInspector
+                            gameData={get(
+                              gameData,
+                              selectedInspectorFullPath,
+                              null
+                            )}
+                            onEdit={(path, newValue) =>
+                              onEdit(
+                                selectedInspectorFullPath.concat(path),
+                                newValue
+                              )
+                            }
+                          />
+                        ) : (
+                          selectedInspector.renderInspector(
+                            get(gameData, selectedInspectorFullPath, null),
+                            {
+                              onCall: (path, args) =>
+                                onCall(
+                                  selectedInspectorFullPath.concat(path),
+                                  args
+                                ),
+                              onEdit: (path, newValue) =>
+                                onEdit(
+                                  selectedInspectorFullPath.concat(path),
+                                  newValue
+                                ),
+                            }
+                          ) || (
+                            <EmptyMessage>
+                              <Trans>
+                                No inspector, choose another element in the list
+                                or toggle the raw data view.
+                              </Trans>
+                            </EmptyMessage>
+                          )
+                        )
+                      ) : (
+                        <EmptyMessage>
+                          {gameData ? (
+                            <Trans>
+                              Choose an element to inspect in the list
+                            </Trans>
+                          ) : (
+                            <Trans>
+                              Pause the game (from the toolbar) or hit refresh
+                              (on the left) to inspect the game
+                            </Trans>
+                          )}
+                        </EmptyMessage>
+                      )}
+                    </Column>
+                  </ScrollView>
+                  <MiniToolbar>
+                    <Line
+                      justifyContent="space-between"
+                      alignItems="center"
+                      noMargin
+                    >
+                      <HelpButton
+                        helpPagePath="/interface/debugger"
+                        scopeName={i18n._(t`Debugger`)}
+                      />
+                      <div>
+                        <Checkbox
+                          checkedIcon={<Flash />}
+                          uncheckedIcon={<FlashOff />}
+                          checked={rawMode}
+                          onCheck={(e, enabled) =>
+                            this.setState({
+                              rawMode: enabled,
+                            })
+                          }
+                        />
+                      </div>
+                    </Line>
+                  </MiniToolbar>
+                </Background>
+              ),
+            },
+            profiler: {
+              type: 'secondary',
+              title: t`Profiler`,
+              renderEditor: () => (
+                <Profiler
+                  onStart={onStartProfiler}
+                  onStop={onStopProfiler}
+                  profilerOutput={profilerOutput}
+                  profilingInProgress={profilingInProgress}
+                />
+              ),
+            },
+            console: {
+              type: 'secondary',
+              title: t`Console`,
+              renderEditor: () => (
+                <Background>
+                  <DebuggerConsole logsManager={logsManager || []} />
+                </Background>
+              ),
+            },
+          };
 
-    return (
-      <PreferencesContext.Consumer>
-        {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
-          <EditorMosaic
-            ref={editors => (this._editors = editors)}
-            // $FlowFixMe[incompatible-type]
-            editors={editors}
-            centralNodeId="selected-inspector"
-            initialNodes={
-              // $FlowFixMe[incompatible-type]
-              getDefaultEditorMosaicNode('debugger') || initialMosaicEditorNodes
-            }
-            onPersistNodes={node =>
-              setDefaultEditorMosaicNode('debugger', node)
-            }
-            onOpenedEditorsChanged={onOpenedEditorsChanged}
-          />
-        )}
-      </PreferencesContext.Consumer>
+          return (
+            <PreferencesContext.Consumer>
+              {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
+                <EditorMosaic
+                  ref={editors => (this._editors = editors)}
+                  // $FlowFixMe[incompatible-type]
+                  editors={editors}
+                  centralNodeId="selected-inspector"
+                  initialNodes={
+                    // $FlowFixMe[incompatible-type]
+                    getDefaultEditorMosaicNode('debugger') ||
+                    initialMosaicEditorNodes
+                  }
+                  onPersistNodes={node =>
+                    setDefaultEditorMosaicNode('debugger', node)
+                  }
+                  onOpenedEditorsChanged={onOpenedEditorsChanged}
+                />
+              )}
+            </PreferencesContext.Consumer>
+          );
+        }}
+      </I18n>
     );
   }
 }

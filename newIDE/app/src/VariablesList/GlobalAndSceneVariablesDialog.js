@@ -1,9 +1,8 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
-import VariablesEditorDialog, {
-  type VariableDialogOpeningProps,
-} from './VariablesEditorDialog';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import VariablesEditorDialog from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
@@ -15,7 +14,8 @@ type Props = {|
   onCancel: () => void,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps | null,
   isGlobalTabInitiallyOpen?: boolean,
-  initiallySelectedVariable: VariableDialogOpeningProps | null,
+  initiallySelectedVariableName?: string,
+  shouldCreateInitiallySelectedVariable?: boolean,
   isListLocked: boolean,
 |};
 
@@ -26,7 +26,8 @@ const GlobalAndSceneVariablesDialog = ({
   onApply,
   hotReloadPreviewButtonProps,
   isGlobalTabInitiallyOpen,
-  initiallySelectedVariable,
+  initiallySelectedVariableName,
+  shouldCreateInitiallySelectedVariable,
   isListLocked,
 }: Props): React.Node => {
   const {
@@ -105,30 +106,38 @@ const GlobalAndSceneVariablesDialog = ({
   );
 
   return (
-    <VariablesEditorDialog
-      projectScopedContainersAccessor={projectScopedContainersAccessor}
-      project={project}
-      open={open}
-      onCancel={onCancel}
-      onApply={onApply}
-      title={
-        layout ? (
-          <Trans>{layout.getName()} variables</Trans>
-        ) : (
-          <Trans>Extension variables</Trans>
-        )
-      }
-      // $FlowFixMe[incompatible-type]
-      tabs={tabs}
-      initiallyOpenTabId={
-        isGlobalTabInitiallyOpen ? 'global-variables' : 'scene-variables'
-      }
-      initiallySelectedVariable={initiallySelectedVariable}
-      helpPagePath={'/all-features/variables/scene-variables'}
-      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-      id="global-and-scene-variables-dialog"
-      isListLocked={isListLocked}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <VariablesEditorDialog
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          project={project}
+          open={open}
+          onCancel={onCancel}
+          onApply={onApply}
+          title={
+            layout ? (
+              <Trans>{layout.getName()} variables</Trans>
+            ) : (
+              <Trans>Extension variables</Trans>
+            )
+          }
+          // $FlowFixMe[incompatible-type]
+          tabs={tabs}
+          initiallyOpenTabId={
+            isGlobalTabInitiallyOpen ? 'global-variables' : 'scene-variables'
+          }
+          initiallySelectedVariableName={initiallySelectedVariableName}
+          shouldCreateInitiallySelectedVariable={
+            shouldCreateInitiallySelectedVariable
+          }
+          helpPagePath={'/all-features/variables/scene-variables'}
+          scopeName={i18n._(t`Variables`)}
+          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+          id="global-and-scene-variables-dialog"
+          isListLocked={isListLocked}
+        />
+      )}
+    </I18n>
   );
 };
 

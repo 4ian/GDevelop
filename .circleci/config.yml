@@ -600,6 +600,63 @@ jobs:
       - store_artifacts:
           path: newIDE/electron-app/dist
 
+  # End-to-end smoke test that downloads the latest "portable" Linux build of
+  # GDevelop from S3, fetches an example game from the GDevelop-examples
+  # repository, and runs the CLI to export it to HTML5. This verifies that
+  # the editor distribution can be used headlessly on a CI machine, which is
+  # required by the `--run-command EXPORT_HTML5_EXTERNAL` workflow.
+  portable-cli-html5-export-smoke-test:
+    resource_class: medium
+    docker:
+      - image: cimg/node:24.13.0
+
+    working_directory: ~/GDevelop
+
+    steps:
+      - checkout
+
+      # Runtime libraries required by Electron (headless still needs nss /
+      # alsa to even start up) plus `zip`/`unzip` for archive handling.
+      - run:
+          name: Install Electron runtime dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y \
+              libnss3 \
+              libasound2t64 \
+              libgbm1 \
+              libgtk-3-0 \
+              libxss1 \
+              libatk-bridge2.0-0 \
+              libdrm2 \
+              libxkbcommon0 \
+              xvfb \
+              zip \
+              unzip
+
+      - run:
+          name: Run portable CLI HTML5 export smoke test
+          # Wrap with xvfb-run as a safety net: even though the editor hides
+          # its BrowserWindow in --run-command mode, Electron itself still
+          # needs a usable display for some GPU/graphics initialization on
+          # headless Linux runners.
+          no_output_timeout: 20m
+          command: |
+            xvfb-run -a --server-args="-screen 0 1280x800x24" \
+              node newIDE/app/scripts/test-portable-cli-export.js \
+              --branch=master \
+              --example=3d-platformer \
+              --workDir=./.portable-cli-test \
+              --artifactsDir=./portable-cli-artifacts
+
+      - store_artifacts:
+          path: ./portable-cli-artifacts
+          destination: portable-cli-artifacts
+
+      - store_artifacts:
+          path: ./.portable-cli-test/latest-linux.yml
+          destination: debug/latest-linux.yml
+
 workflows:
   gdevelop_js-wasm-extra-checks:
     jobs:
@@ -653,3 +710,17 @@ workflows:
                 - master
                 - stable
                 - /experimental-build.*/
+
+  # Daily end-to-end smoke test of the portable Linux build + CLI export.
+  # Runs every day at 16:00 UTC (4pm UTC) against the latest portable build
+  # uploaded to S3 for master.
+  daily-portable-cli-smoke-test:
+    triggers:
+      - schedule:
+          cron: "0 16 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - portable-cli-html5-export-smoke-test

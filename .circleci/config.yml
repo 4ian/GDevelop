@@ -313,6 +313,18 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y cmake clang libstdc++-12-dev
 
+      # Cache the .build-tests-asan folder so CMake/make can do an incremental
+      # rebuild on subsequent runs. Cache key includes the branch and revision
+      # so each commit produces a fresh save; the fallback keys let a new
+      # commit reuse the most recent build artifacts from the same branch, or
+      # any branch, as a starting point.
+      - restore_cache:
+          name: Restore GDCore_tests ASan/UBSan build cache
+          keys:
+            - gdcore-tests-asan-build-v1-{{ .Branch }}-{{ .Revision }}
+            - gdcore-tests-asan-build-v1-{{ .Branch }}-
+            - gdcore-tests-asan-build-v1-
+
       - run:
           name: Configure GDCore_tests with ASan + UBSan (Debug)
           command: |
@@ -331,6 +343,12 @@ jobs:
       - run:
           name: Build GDCore_tests
           command: cd .build-tests-asan && make -j 4 GDCore_tests
+
+      - save_cache:
+          name: Save GDCore_tests ASan/UBSan build cache
+          key: gdcore-tests-asan-build-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - .build-tests-asan
 
       - run:
           name: Run GDCore_tests with sanitizers

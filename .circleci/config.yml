@@ -194,7 +194,7 @@ jobs:
       # System dependencies (for Emscripten)
       - run:
           name: Install dependencies for Emscripten
-          command: sudo apt-get update && sudo apt install cmake
+          command: sudo apt-get update && sudo apt install cmake ccache
 
       - run:
           name: Install Emscripten (for GDevelop.js)
@@ -211,11 +211,37 @@ jobs:
           name: Install GDevelop.js dependencies and build it
           command: cd GDevelop.js && npm install && cd ..
 
-      # Build GDevelop.js (and run tests to ensure it works)
+      # Cache emcc/em++ output via ccache (keyed by content hash, immune to
+      # git checkout resetting source mtimes).
+      - restore_cache:
+          name: Restore ccache (Emscripten)
+          keys:
+            - gdevelop.js-emscripten-ccache-v1-{{ .Branch }}-{{ .Revision }}
+            - gdevelop.js-emscripten-ccache-v1-{{ .Branch }}-
+            - gdevelop.js-emscripten-ccache-v1-
+
+      # Build GDevelop.js
       - run:
           name: Build GDevelop.js
-          # Use "--runInBand" as it's faster and avoid deadlocks on CircleCI Linux machines (probably because limited in processes number).
-          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test -- --runInBand && cd ..
+          # CMAKE_(C|CXX)_COMPILER_LAUNCHER are read by CMake (>=3.17) from the
+          # environment and prepended to every compiler invocation.
+          command: |
+            export CMAKE_C_COMPILER_LAUNCHER=ccache
+            export CMAKE_CXX_COMPILER_LAUNCHER=ccache
+            cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && cd ..
+            ccache --show-stats
+
+      - save_cache:
+          name: Save ccache (Emscripten)
+          key: gdevelop.js-emscripten-ccache-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.cache/ccache
+
+      # "--runInBand" is faster and avoids deadlocks on CircleCI Linux machines
+      # (probably because of limited process numbers).
+      - run:
+          name: Run GDevelop.js tests
+          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm test -- --runInBand && cd ..
 
       - save_cache:
           paths:
@@ -291,6 +317,74 @@ jobs:
       - run:
           name: Deploy to S3 (specific commit)
           command: aws s3 sync Binaries/embuild/GDevelop.js s3://gdevelop-gdevelop.js/$(git rev-parse --abbrev-ref HEAD)/variant/debug-sanitizers/commit/$(git rev-parse HEAD)/
+
+  # Build and run the native GDCore_tests with AddressSanitizer + UBSan, to
+  # catch heap-use-after-free, buffer overflows and undefined behaviour that
+  # only sometimes manifest as flaky segfaults. 
+  # The Emscripten build has its own sanitizer job:
+  # build-gdevelop_js-debug-sanitizers-and-extra-checks.
+  build-gdcore-tests-sanitizers:
+    resource_class: medium+
+    docker:
+      - image: cimg/base:current
+
+    working_directory: ~/GDevelop
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install build dependencies (cmake, clang, ccache, libstdc++ dev)
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y cmake clang ccache libstdc++-12-dev
+
+      # Cache the compiler output via ccache (keyed by content hash, so it is
+      # immune to the fact that 'git checkout' resets every source file's mtime
+      # to "now" on each run).
+      - restore_cache:
+          name: Restore ccache
+          keys:
+            - gdcore-tests-asan-ccache-v1-{{ .Branch }}-{{ .Revision }}
+            - gdcore-tests-asan-ccache-v1-{{ .Branch }}-
+            - gdcore-tests-asan-ccache-v1-
+
+      - run:
+          name: Configure GDCore_tests with ASan + UBSan (Debug)
+          command: |
+            mkdir -p .build-tests-asan
+            cd .build-tests-asan
+            cmake \
+              -DBUILD_GDJS=FALSE \
+              -DBUILD_EXTENSIONS=FALSE \
+              -DBUILD_TESTS=TRUE \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DUSE_SANITIZERS="address,undefined" \
+              -DCMAKE_CXX_COMPILER=$(which clang++) \
+              -DCMAKE_C_COMPILER=$(which clang) \
+              -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+              ..
+
+      - run:
+          name: Build GDCore_tests
+          command: |
+            cd .build-tests-asan && make -j 4 GDCore_tests
+            ccache --show-stats
+
+      - save_cache:
+          name: Save ccache
+          key: gdcore-tests-asan-ccache-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.cache/ccache
+
+      - run:
+          name: Run GDCore_tests with sanitizers
+          command: |
+            cd .build-tests-asan
+            export ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:print_stacktrace=1
+            export UBSAN_OPTIONS=print_stacktrace=1
+            Core/GDCore_tests
 
   # Trigger AppVeyor build, which also does a Windows build (keep it for redundancy).
   trigger-appveyor-windows-build:
@@ -502,6 +596,7 @@ workflows:
   builds:
     jobs:
       - build-gdevelop_js-wasm-only
+      - build-gdcore-tests-sanitizers
       - build-macos:
           # The macOS version builds by itself GDevelop.js
           # (so we verify we can build it on macOS).

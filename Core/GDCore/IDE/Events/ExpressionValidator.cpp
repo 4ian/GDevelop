@@ -460,6 +460,7 @@ const gd::String ExpressionValidator::numberOrStringTypeString =
 const gd::String ExpressionValidator::variableTypeString = "variable";
 const gd::String ExpressionValidator::objectTypeString = "object";
 const gd::String ExpressionValidator::emptyTypeString = "empty";
+const gd::String ExpressionValidator::emptyParameterExtraInfo;
 
 const gd::String& ExpressionValidator::TypeToString(Type type) {
   switch (type) {

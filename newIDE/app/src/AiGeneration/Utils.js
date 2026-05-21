@@ -813,6 +813,10 @@ export const useAiRequestState = ({
         } = getFunctionCallOutputsFromEditorFunctionCallResults(
           getEditorFunctionCallResults(selectedAiRequest.id)
         );
+        const hasPendingSubAgentCalls =
+          getPendingSubAgentFunctionCalls({
+            aiRequest: selectedAiRequest,
+          }).length > 0;
 
         const hasJustInitializedProject =
           lastMessage.type === 'function_call_output' &&
@@ -838,7 +842,8 @@ export const useAiRequestState = ({
             lastMessage.type === 'function_call_output') &&
           !lastMessage.projectVersionIdAfterMessage &&
           !hasFunctionsCallsToProcess &&
-          !hasUnfinishedResult;
+          !hasUnfinishedResult &&
+          !hasPendingSubAgentCalls;
         if (
           !shouldSaveVersionBeforeMessage &&
           !shouldSaveVersionAfterMessage &&

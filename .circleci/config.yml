@@ -194,7 +194,7 @@ jobs:
       # System dependencies (for Emscripten)
       - run:
           name: Install dependencies for Emscripten
-          command: sudo apt-get update && sudo apt install cmake
+          command: sudo apt-get update && sudo apt install cmake ccache
 
       - run:
           name: Install Emscripten (for GDevelop.js)
@@ -211,11 +211,33 @@ jobs:
           name: Install GDevelop.js dependencies and build it
           command: cd GDevelop.js && npm install && cd ..
 
+      # Cache emcc/em++ output via ccache (keyed by content hash, immune to
+      # git checkout resetting source mtimes). Same key shape as the native
+      # sanitizer job.
+      - restore_cache:
+          name: Restore ccache (Emscripten)
+          keys:
+            - gdevelop.js-emscripten-ccache-v1-{{ .Branch }}-{{ .Revision }}
+            - gdevelop.js-emscripten-ccache-v1-{{ .Branch }}-
+            - gdevelop.js-emscripten-ccache-v1-
+
       # Build GDevelop.js (and run tests to ensure it works)
       - run:
           name: Build GDevelop.js
           # Use "--runInBand" as it's faster and avoid deadlocks on CircleCI Linux machines (probably because limited in processes number).
-          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test -- --runInBand && cd ..
+          # CMAKE_(C|CXX)_COMPILER_LAUNCHER are read by CMake (>=3.17) from the
+          # environment and prepended to every compiler invocation.
+          command: |
+            export CMAKE_C_COMPILER_LAUNCHER=ccache
+            export CMAKE_CXX_COMPILER_LAUNCHER=ccache
+            cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test -- --runInBand && cd ..
+            ccache --show-stats
+
+      - save_cache:
+          name: Save ccache (Emscripten)
+          key: gdevelop.js-emscripten-ccache-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.cache/ccache
 
       - save_cache:
           paths:

@@ -67,6 +67,8 @@ export type BuildSigningOptions = {|
   certificateSerial?: string,
   mobileProvisionUuid?: string,
   authKeyApiKey?: string,
+  androidKeystoreId?: string,
+  verificationTokenAsBase64?: string,
 |};
 
 export type AppleCertificateSigningCredential = {
@@ -89,9 +91,17 @@ export type AppleAuthKeySigningCredential = {
   hasAuthKeyReady: boolean,
 };
 
+export type AndroidKeystoreSigningCredential = {
+  type: 'android-keystore',
+  name: string,
+  keystoreId: string,
+  hasKeystoreReady: boolean,
+};
+
 export type SigningCredential =
   | AppleCertificateSigningCredential
-  | AppleAuthKeySigningCredential;
+  | AppleAuthKeySigningCredential
+  | AndroidKeystoreSigningCredential;
 
 // $FlowFixMe[cannot-resolve-name]
 export const client: Axios = axios.create({
@@ -116,6 +126,17 @@ export const filterAppleAuthKeySigningCredentials = (
     ? // $FlowFixMe[incompatible-type] - we're sure this should refine the type.
       signingCredentials.filter(
         signingCredential => signingCredential.type === 'apple-auth-key'
+      )
+    : null;
+};
+
+export const filterAndroidKeystoreSigningCredentials = (
+  signingCredentials: Array<SigningCredential> | null
+): Array<AndroidKeystoreSigningCredential> | null => {
+  return signingCredentials
+    ? // $FlowFixMe[incompatible-type] - we're sure this should refine the type.
+      signingCredentials.filter(
+        signingCredential => signingCredential.type === 'android-keystore'
       )
     : null;
 };
@@ -261,7 +282,7 @@ export const buildCordovaAndroid = (
   userId: string,
   key: string,
   targets: Array<TargetName>,
-  keystore: 'old' | 'new',
+  signing: BuildSigningOptions,
   gameId: string,
   options: {|
     gameName: string,
@@ -274,9 +295,7 @@ export const buildCordovaAndroid = (
       client.post(
         `/build`,
         JSON.stringify({
-          signing: {
-            keystore,
-          },
+          signing,
         }),
         {
           params: {
@@ -629,6 +648,7 @@ export const signingCredentialApi = {
       appleApiKey?: string,
       certificateSerial?: string,
       mobileProvisionUuid?: string,
+      keystoreId?: string,
     |}
   ): Promise<void> => {
     const authorizationHeader = await getAuthorizationHeader();
@@ -641,6 +661,67 @@ export const signingCredentialApi = {
       headers: {
         Authorization: authorizationHeader,
       },
+    });
+  },
+  uploadAndroidKeystore: async (
+    getAuthorizationHeader: () => Promise<string>,
+    userId: string,
+    options: {|
+      name: string,
+      keystoreAsBase64: string,
+      keystoreAlias: string,
+      keystoreStorePassword: string,
+      keystoreKeyPassword: string,
+    |}
+  ): Promise<{| keystoreId: string, name: string |}> => {
+    const authorizationHeader = await getAuthorizationHeader();
+
+    const response = await client.post(
+      `/signing-credential/action/upload-android-keystore`,
+      { ...options },
+      {
+        params: { userId },
+        headers: { Authorization: authorizationHeader },
+      }
+    );
+
+    return ensureIsObject({
+      data: response.data,
+      endpointName:
+        '/signing-credential/action/upload-android-keystore of Build API',
+    });
+  },
+  createAndroidKeystore: async (
+    getAuthorizationHeader: () => Promise<string>,
+    userId: string,
+    options: {|
+      name: string,
+      keystoreAlias: string,
+      commonName?: string,
+      organizationName?: string,
+      countryName?: string,
+    |}
+  ): Promise<{|
+    keystoreId: string,
+    name: string,
+    keystoreAsBase64: string,
+    keystorePassword: string,
+  |}> => {
+    const authorizationHeader = await getAuthorizationHeader();
+
+    const response = await client.post(
+      `/signing-credential/action/create-android-keystore`,
+      { ...options },
+      {
+        params: { userId },
+        headers: { Authorization: authorizationHeader },
+      }
+    );
+
+    return ensureIsObject({
+      data: response.data,
+      endpointName:
+        '/signing-credential/action/create-android-keystore of Build API',
     });
   },
 };

@@ -245,6 +245,12 @@ export default class Window {
     return remote.getCurrentWindow().on('close', cb);
   }
 
+  /** True when the app was launched with `--run-command` (CLI / CI mode). */
+  static isRunningCommandFromCli(): boolean {
+    const args = Window.getArguments();
+    return !!args['run-command'];
+  }
+
   /**
    * Return the arguments passed to the IDE, either from Electron
    * or from the web-app URL. The resulting object will have a key "_"

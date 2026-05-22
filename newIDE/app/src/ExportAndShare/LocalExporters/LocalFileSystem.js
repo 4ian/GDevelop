@@ -18,10 +18,7 @@ export type UrlFileDescriptor = {|
 // it should always be the posix version. In tests on Windows,
 // it's necessary to use path.posix.
 // Search for "pathPosix" in the codebase for other places where this is used.
-// `path` is null on web (optionalRequire returns null outside Electron/Node).
-// CliCommandRunner statically imports this module, pulling it into the web bundle,
-// so we guard against null here. LocalFileSystem methods are never called on web.
-const pathPosix = path && (path.posix || path);
+const pathPosix = path.posix || path;
 
 /**
  * Gives access to the local filesystem, but returns paths

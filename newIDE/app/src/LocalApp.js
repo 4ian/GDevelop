@@ -26,6 +26,8 @@ import LocalEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoad
 import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
 import { LocalGDJSDevelopmentWatcher } from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
+import { useCliCommandRunner } from './MainFrame/LocalCliCommandRunner';
+import { exportLocalHtml5Headless } from './ExportAndShare/Headless/ExportLocalHtml5Headless';
 import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
 import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
 import LocalResourceMover from './ProjectsStorage/ResourceMover/LocalResourceMover';
@@ -73,6 +75,10 @@ export const create = (authentication: Authentication): React.Node => {
           }) => (
             <MainFrame
               i18n={i18n}
+              useCliCommandRunner={useCliCommandRunner}
+              onExportHtml5External={(project, i18n) =>
+                exportLocalHtml5Headless({ project, i18n })
+              }
               renderMainMenu={(props, callbacks, extraCallbacks) => (
                 <ElectronMainMenu
                   props={props}

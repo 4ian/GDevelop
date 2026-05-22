@@ -75,8 +75,6 @@ import {
   type ObjectGroupsOutsideEditorChanges,
 } from './EditorContainers/BaseEditor';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
-import { exportLocalHtml5Headless } from '../ExportAndShare/Headless/ExportLocalHtml5Headless';
-import { useCliCommandRunner } from './CliCommandRunner';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
@@ -379,7 +377,15 @@ export type Props = {|
   initialExampleSlugToOpen: ?string,
   quickPublishOnlineWebExporter: Exporter,
   i18n: I18n,
+  useCliCommandRunner?: ({|
+    project: ?gdProject,
+    i18n: I18n,
+    commandPaletteRef: {| current: ?CommandPaletteInterface |},
+  |}) => void,
+  onExportHtml5External?: (project: gdProject, i18n: I18n) => Promise<void>,
 |};
+
+const noopUseCliCommandRunner = () => {};
 
 const MainFrame = (props: Props): React.MixedElement => {
   const [state, setState]: [
@@ -647,6 +653,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
     quickPublishOnlineWebExporter,
+    useCliCommandRunner: useCliCommandRunnerProp,
+    onExportHtml5External,
   } = props;
 
   const {
@@ -4948,9 +4956,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     },
     onExportHtml5External: async () => {
       const project = state.currentProject;
-      if (!project) return;
+      if (!project || !onExportHtml5External) return;
       try {
-        await exportLocalHtml5Headless({ project, i18n });
+        await onExportHtml5External(project, i18n);
       } catch (error) {
         console.error('Headless HTML5 export failed:', error);
       }
@@ -4971,7 +4979,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
   });
 
-  useCliCommandRunner({
+  (useCliCommandRunnerProp || noopUseCliCommandRunner)({
     project: state.currentProject,
     i18n,
     commandPaletteRef,

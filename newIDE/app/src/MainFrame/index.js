@@ -377,15 +377,13 @@ export type Props = {|
   initialExampleSlugToOpen: ?string,
   quickPublishOnlineWebExporter: Exporter,
   i18n: I18n,
-  useCliCommandRunner?: ({|
+  useCliCommandRunner: ({|
     project: ?gdProject,
     i18n: I18n,
     commandPaletteRef: {| current: ?CommandPaletteInterface |},
   |}) => void,
   onExportHtml5External?: (project: gdProject, i18n: I18n) => Promise<void>,
 |};
-
-const noopUseCliCommandRunner = () => {};
 
 const MainFrame = (props: Props): React.MixedElement => {
   const [state, setState]: [
@@ -653,7 +651,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
     quickPublishOnlineWebExporter,
-    useCliCommandRunner: useCliCommandRunnerProp,
+    useCliCommandRunner,
     onExportHtml5External,
   } = props;
 
@@ -4979,7 +4977,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
   });
 
-  (useCliCommandRunnerProp || noopUseCliCommandRunner)({
+  useCliCommandRunner({
     project: state.currentProject,
     i18n,
     commandPaletteRef,

@@ -134,6 +134,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
+import { useImportExtension } from '../AssetStore/ExtensionStore/InstallExtension';
 import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
@@ -1725,76 +1726,33 @@ const MainFrame = (props: Props): React.MixedElement => {
     });
   };
 
-  const onWillInstallExtension = (extensionNames: Array<string>) => {
-    const { currentProject } = state;
-    if (!currentProject) return;
+  const onWillInstallExtension = React.useCallback(
+    (extensionNames: Array<string>) => {
+      const currentProject = state.currentProject;
+      if (!currentProject) return;
 
-    for (const extensionName of extensionNames) {
-      // Close the extension tab before updating/reinstalling the extension.
-      // This is especially important when the extension tab in selected.
-      const eventsFunctionsExtensionName = extensionName;
+      for (const extensionName of extensionNames) {
+        // Close the extension tab before updating/reinstalling the extension.
+        // This is especially important when the extension tab in selected.
+        const eventsFunctionsExtensionName = extensionName;
 
-      if (
-        currentProject.hasEventsFunctionsExtensionNamed(
-          eventsFunctionsExtensionName
-        )
-      ) {
-        setState(state => ({
-          ...state,
-          editorTabs: closeEventsFunctionsExtensionTabs(
-            state.editorTabs,
+        if (
+          currentProject.hasEventsFunctionsExtensionNamed(
             eventsFunctionsExtensionName
-          ),
-        }));
+          )
+        ) {
+          setState(state => ({
+            ...state,
+            editorTabs: closeEventsFunctionsExtensionTabs(
+              state.editorTabs,
+              eventsFunctionsExtensionName
+            ),
+          }));
+        }
       }
-    }
-  };
-
-  const onExtensionInstalled = (extensionNames: Array<string>) => {
-    const { currentProject } = state;
-    if (!currentProject) {
-      return;
-    }
-    let hasEventsBasedObject = false;
-    for (const extensionName of extensionNames) {
-      const eventsBasedObjects = currentProject
-        .getEventsFunctionsExtension(extensionName)
-        .getEventsBasedObjects();
-      for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
-        const eventsBasedObject = eventsBasedObjects.getAt(index);
-        gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
-          currentProject,
-          eventsBasedObject
-        );
-      }
-
-      // Close extension tab because `onInstallExtension` is not necessarily
-      // called when the extension tab is not selected.
-
-      // TODO Open the closed tabs back
-      // It would be safer to close the tabs before the extension is installed
-      // but it would make opening them back more complicated.
-      setState(state => ({
-        ...state,
-        editorTabs: closeEventsFunctionsExtensionTabs(
-          state.editorTabs,
-          extensionName
-        ),
-      }));
-
-      hasEventsBasedObject =
-        hasEventsBasedObject || eventsBasedObjects.getCount() > 0;
-    }
-    if (hasEventsBasedObject) {
-      notifyChangesToInGameEditor({
-        shouldReloadProjectData: true,
-        shouldReloadLibraries: true,
-        shouldReloadResources: false,
-        shouldHardReload: false,
-        reasons: ['installed-extension-with-custom-object'],
-      });
-    }
-  };
+    },
+    [state.currentProject, setState]
+  );
 
   const notifyChangesToInGameEditor = React.useCallback(
     (hotReloadSteps: HotReloadSteps) => {
@@ -1815,6 +1773,101 @@ const MainFrame = (props: Props): React.MixedElement => {
       }
     },
     [state.editorTabs]
+  );
+
+  const onExtensionInstalled = React.useCallback(
+    (extensionNames: Array<string>) => {
+      const currentProject = state.currentProject;
+      if (!currentProject) {
+        return;
+      }
+      let hasEventsBasedObject = false;
+      for (const extensionName of extensionNames) {
+        const eventsBasedObjects = currentProject
+          .getEventsFunctionsExtension(extensionName)
+          .getEventsBasedObjects();
+        for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
+          const eventsBasedObject = eventsBasedObjects.getAt(index);
+          gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
+            currentProject,
+            eventsBasedObject
+          );
+        }
+
+        // Close extension tab because `onInstallExtension` is not necessarily
+        // called when the extension tab is not selected.
+
+        // TODO Open the closed tabs back
+        // It would be safer to close the tabs before the extension is installed
+        // but it would make opening them back more complicated.
+        setState(state => ({
+          ...state,
+          editorTabs: closeEventsFunctionsExtensionTabs(
+            state.editorTabs,
+            extensionName
+          ),
+        }));
+
+        hasEventsBasedObject =
+          hasEventsBasedObject || eventsBasedObjects.getCount() > 0;
+      }
+      if (hasEventsBasedObject) {
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: true,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['installed-extension-with-custom-object'],
+        });
+      }
+    },
+    [state.currentProject, notifyChangesToInGameEditor, setState]
+  );
+
+  const importExtensionFromFiles = useImportExtension();
+
+  const importExtensionFromFilePaths = React.useCallback(
+    async (project: gdProject, filePaths: Array<string>) => {
+      const importedExtensionNames = await importExtensionFromFiles({
+        i18n,
+        project,
+        filePaths,
+        skipUserPrompts: true,
+        onWillInstallExtension,
+        onExtensionInstalled,
+      });
+      if (importedExtensionNames.length === 0) {
+        throw new Error(
+          '[CLI] Extension import failed or produced no extensions.'
+        );
+      }
+    },
+    [
+      importExtensionFromFiles,
+      i18n,
+      onWillInstallExtension,
+      onExtensionInstalled,
+    ]
+  );
+
+  const onImportExtension = React.useCallback(
+    async () => {
+      const currentProject = state.currentProject;
+      if (!currentProject) return;
+      await importExtensionFromFiles({
+        i18n,
+        project: currentProject,
+        onWillInstallExtension,
+        onExtensionInstalled,
+      });
+    },
+    [
+      state.currentProject,
+      importExtensionFromFiles,
+      i18n,
+      onWillInstallExtension,
+      onExtensionInstalled,
+    ]
   );
 
   const triggerHotReloadInGameEditorIfNeeded = React.useCallback(
@@ -4975,12 +5028,14 @@ const MainFrame = (props: Props): React.MixedElement => {
     onRestartInGameEditor,
     onOpenGlobalSearch: openGlobalSearch,
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
+    onImportExtension,
   });
 
   useCliCommandRunner({
     project: state.currentProject,
     i18n,
     commandPaletteRef,
+    importExtensionFromFilePaths,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(

@@ -23,8 +23,22 @@ const fs = optionalRequire('fs');
 export type CliCommandRunner = (
   project: gdProject,
   i18n: I18nType,
-  context: {| preferences: Preferences |}
+  context: {|
+    preferences: Preferences,
+    commandArgs: Array<string>,
+    importExtensionFromFilePaths?: (
+      project: gdProject,
+      filePaths: Array<string>
+    ) => Promise<void>,
+  |}
 ) => Promise<void>;
+
+const getCommandArgs = (): Array<string> => {
+  const appArguments = Window.getArguments();
+  const arg = appArguments['cmd-args'];
+  if (!arg) return [];
+  return Array.isArray(arg) ? arg : [arg];
+};
 
 const runners: { [commandName: string]: CliCommandRunner } = {
   EXPORT_HTML5_EXTERNAL: async (project, i18n, { preferences }) => {
@@ -40,6 +54,23 @@ const runners: { [commandName: string]: CliCommandRunner } = {
       }
     }
     await exportLocalHtml5Headless({ project, i18n });
+  },
+  IMPORT_EXTENSION: async (
+    project,
+    i18n,
+    { commandArgs, importExtensionFromFilePaths }
+  ) => {
+    if (commandArgs.length === 0) {
+      throw new Error(
+        '[CLI] IMPORT_EXTENSION requires at least one path via --cmd-args.'
+      );
+    }
+    if (!importExtensionFromFilePaths) {
+      throw new Error(
+        '[CLI] Import extension is not available in this environment.'
+      );
+    }
+    await importExtensionFromFilePaths(project, commandArgs);
   },
 };
 
@@ -86,12 +117,17 @@ type Props = {|
   project: ?gdProject,
   i18n: I18nType,
   commandPaletteRef: {| current: ?CommandPaletteInterface |},
+  importExtensionFromFilePaths?: (
+    project: gdProject,
+    filePaths: Array<string>
+  ) => Promise<void>,
 |};
 
 export const useCliCommandRunner = ({
   project,
   i18n,
   commandPaletteRef,
+  importExtensionFromFilePaths,
 }: Props) => {
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
@@ -126,7 +162,11 @@ export const useCliCommandRunner = ({
 
           const awaitableRunner = getAwaitableCliRunner(commandName);
           if (awaitableRunner) {
-            await awaitableRunner(project, i18n, { preferences });
+            await awaitableRunner(project, i18n, {
+              preferences,
+              commandArgs: getCommandArgs(),
+              importExtensionFromFilePaths,
+            });
             console.info(
               `[CLI] Command "${commandName}" finished successfully.`
             );
@@ -165,6 +205,7 @@ export const useCliCommandRunner = ({
       commandPaletteRef,
       eventsFunctionsExtensionsState,
       preferences,
+      importExtensionFromFilePaths,
     ]
   );
 

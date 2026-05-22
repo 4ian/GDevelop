@@ -2,6 +2,7 @@
 import * as React from 'react';
 import PreferencesContext from '../Preferences/PreferencesContext';
 import { runNpmScript } from '../../Utils/NpmScriptExecutor';
+import type { ScriptEntry } from '../../Utils/NpmScriptExecutor';
 import type {
   ToolbarButtonConfig,
   ToolbarButtonHooksNames,
@@ -20,18 +21,13 @@ type Props = {|
   previewCount: number,
 |};
 
-export type TriggerNpmScript = (
-  npmScript: string,
-  keepTerminalOpen?: boolean
-) => void;
+export type TriggerNpmScript = (entry: ScriptEntry) => void;
 
 type ReturnType = {|
   triggerNpmScript: TriggerNpmScript,
   renderNpmScriptConfirmDialog: () => React.Node,
   projectPath: ?string,
 |};
-
-type ScriptEntry = {| script: string, keepTerminalOpen: boolean |};
 
 const getScriptsByHookName = (
   toolbarButtons: Array<ToolbarButtonConfig>,
@@ -41,7 +37,7 @@ const getScriptsByHookName = (
     if (btn.hook === hookName)
       entries.push({
         script: btn.npmScript,
-        keepTerminalOpen: btn.keepTerminalOpen === true,
+        keepTerminalOpen: btn.keepTerminalOpen,
       });
     return entries;
   }, []);
@@ -89,7 +85,7 @@ const useNpmScriptRunner = ({
         setConfirmDialogOpen(true);
         return;
       }
-      entries.forEach(e => runNpmScript(path, e.script, e.keepTerminalOpen));
+      entries.forEach(e => runNpmScript(path, e));
     },
     [disableNpmScriptConfirmation]
   );
@@ -107,12 +103,9 @@ const useNpmScriptRunner = ({
   );
 
   const triggerNpmScript = React.useCallback(
-    (npmScript: string, keepTerminalOpen?: boolean) => {
+    (entry: ScriptEntry) => {
       if (!projectPath) return;
-      scheduleOrRunRef.current(
-        [{ script: npmScript, keepTerminalOpen: keepTerminalOpen === true }],
-        projectPath
-      );
+      scheduleOrRunRef.current([entry], projectPath);
     },
     [projectPath]
   );
@@ -122,9 +115,7 @@ const useNpmScriptRunner = ({
       setConfirmDialogOpen(false);
       if (dontShowAgain) setDisableNpmScriptConfirmation(true);
       if (pending) {
-        pending.entries.forEach(e =>
-          runNpmScript(pending.path, e.script, e.keepTerminalOpen)
-        );
+        pending.entries.forEach(e => runNpmScript(pending.path, e));
       }
       setPending(null);
     },

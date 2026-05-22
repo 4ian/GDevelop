@@ -1,6 +1,8 @@
 // @flow
 import optionalRequire from './OptionalRequire';
 
+export type ScriptEntry = {| script: string, keepTerminalOpen?: boolean |};
+
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -11,8 +13,7 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
  */
 export const runNpmScript = (
   projectPath: string,
-  npmScript: string,
-  keepTerminalOpen: boolean = false
+  entry: ScriptEntry
 ): boolean => {
   if (!ipcRenderer) {
     console.warn('npm scripts are only supported in the desktop app');
@@ -21,8 +22,8 @@ export const runNpmScript = (
 
   ipcRenderer.send('run-npm-script', {
     projectPath,
-    npmScript,
-    keepTerminalOpen,
+    npmScript: entry.script,
+    keepTerminalOpen: !!entry.keepTerminalOpen,
   });
   return true;
 };

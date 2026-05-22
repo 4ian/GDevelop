@@ -20,7 +20,10 @@ type Props = {|
   previewCount: number,
 |};
 
-export type TriggerNpmScript = (npmScript: string) => void;
+export type TriggerNpmScript = (
+  npmScript: string,
+  keepTerminalOpen?: boolean
+) => void;
 
 type ReturnType = {|
   triggerNpmScript: TriggerNpmScript,
@@ -28,13 +31,19 @@ type ReturnType = {|
   projectPath: ?string,
 |};
 
+type ScriptEntry = {| script: string, keepTerminalOpen: boolean |};
+
 const getScriptsByHookName = (
   toolbarButtons: Array<ToolbarButtonConfig>,
   hookName: ToolbarButtonHooksNames
-): Array<string> => {
-  return toolbarButtons.reduce((scripts, btn) => {
-    if (btn.hook === hookName) scripts.push(btn.npmScript);
-    return scripts;
+): Array<ScriptEntry> => {
+  return toolbarButtons.reduce((entries, btn) => {
+    if (btn.hook === hookName)
+      entries.push({
+        script: btn.npmScript,
+        keepTerminalOpen: btn.keepTerminalOpen === true,
+      });
+    return entries;
   }, []);
 };
 
@@ -63,24 +72,24 @@ const useNpmScriptRunner = ({
 
   const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
   const [pending, setPending] = React.useState<{|
-    scripts: Array<string>,
+    entries: Array<ScriptEntry>,
     path: string,
     hookName?: ToolbarButtonHooksNames,
   |} | null>(null);
 
   const scheduleOrRun = React.useCallback(
     (
-      scripts: Array<string>,
+      entries: Array<ScriptEntry>,
       path: string,
       hookName?: ToolbarButtonHooksNames
     ) => {
-      if (!scripts.length) return;
+      if (!entries.length) return;
       if (!disableNpmScriptConfirmation) {
-        setPending({ scripts, path, hookName });
+        setPending({ entries, path, hookName });
         setConfirmDialogOpen(true);
         return;
       }
-      scripts.forEach(s => runNpmScript(path, s));
+      entries.forEach(e => runNpmScript(path, e.script, e.keepTerminalOpen));
     },
     [disableNpmScriptConfirmation]
   );
@@ -91,16 +100,19 @@ const useNpmScriptRunner = ({
   const callHook = React.useCallback(
     (hookName: ToolbarButtonHooksNames) => {
       if (!projectPath) return;
-      const scripts = getScriptsByHookName(toolbarButtons, hookName);
-      scheduleOrRunRef.current(scripts, projectPath, hookName);
+      const entries = getScriptsByHookName(toolbarButtons, hookName);
+      scheduleOrRunRef.current(entries, projectPath, hookName);
     },
     [toolbarButtons, projectPath]
   );
 
   const triggerNpmScript = React.useCallback(
-    (npmScript: string) => {
+    (npmScript: string, keepTerminalOpen?: boolean) => {
       if (!projectPath) return;
-      scheduleOrRunRef.current([npmScript], projectPath);
+      scheduleOrRunRef.current(
+        [{ script: npmScript, keepTerminalOpen: keepTerminalOpen === true }],
+        projectPath
+      );
     },
     [projectPath]
   );
@@ -110,7 +122,9 @@ const useNpmScriptRunner = ({
       setConfirmDialogOpen(false);
       if (dontShowAgain) setDisableNpmScriptConfirmation(true);
       if (pending) {
-        pending.scripts.forEach(s => runNpmScript(pending.path, s));
+        pending.entries.forEach(e =>
+          runNpmScript(pending.path, e.script, e.keepTerminalOpen)
+        );
       }
       setPending(null);
     },
@@ -144,7 +158,7 @@ const useNpmScriptRunner = ({
 
   const isAutoRun = !!(pending && pending.hookName);
   const scriptNames = pending
-    ? pending.scripts.join(', ')
+    ? pending.entries.map(e => e.script).join(', ')
     : toolbarButtons.map(b => b.npmScript).join(', ');
   const callingHookName =
     pending && pending.hookName ? pending.hookName : undefined;

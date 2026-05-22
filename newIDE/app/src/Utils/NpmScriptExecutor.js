@@ -11,13 +11,18 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
  */
 export const runNpmScript = (
   projectPath: string,
-  npmScript: string
+  npmScript: string,
+  keepTerminalOpen: boolean = false
 ): boolean => {
   if (!ipcRenderer) {
     console.warn('npm scripts are only supported in the desktop app');
     return false;
   }
 
-  ipcRenderer.send('run-npm-script', { projectPath, npmScript });
+  ipcRenderer.send('run-npm-script', {
+    projectPath,
+    npmScript,
+    keepTerminalOpen,
+  });
   return true;
 };

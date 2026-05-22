@@ -616,6 +616,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
                       onWillInstallExtension={onWillInstallExtension}
                       onExtensionInstalled={onExtensionInstalled}
                       onCloseAskAi={onCloseAskAi}
+                      onOpenAskAi={onOpenAskAi}
                       closeProject={closeProject}
                       games={games}
                       onRefreshGames={fetchGames}

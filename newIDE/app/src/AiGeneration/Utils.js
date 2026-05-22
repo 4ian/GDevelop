@@ -1048,4 +1048,5 @@ export type NewAiRequestOptions = {|
   mode: 'chat' | 'agent' | 'orchestrator',
   userRequest: string,
   aiConfigurationPresetId: string,
+  autoEdit: boolean,
 |};

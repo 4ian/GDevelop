@@ -1,0 +1,17 @@
+.statusPill {
+  border-radius: 6px;
+  padding: 1px 4px;
+  margin-left: 2px;
+  min-width: 1.4em;
+  text-align: center;
+}
+
+.statusPillOn {
+  background-color: var(--theme-auto-edit-on-background-color);
+  color: var(--theme-auto-edit-on-text-color);
+}
+
+.statusPillOff {
+  background-color: var(--theme-auto-edit-off-background-color);
+  color: var(--theme-auto-edit-off-text-color);
+}

@@ -168,10 +168,9 @@ const InstructionEditorDialog = ({
     newBehaviorDialogOpen,
     setNewBehaviorDialogOpen,
   ] = React.useState<boolean>(false);
-  const [
-    newExtensionDialogOpen,
-    setNewExtensionDialogOpen,
-  ] = React.useState<boolean>(false);
+  const [newExtensionDialogOpen, setNewExtensionDialogOpen] = React.useState<{
+    searchText: string,
+  } | null>(null);
   const shouldAutofocusInput = useShouldAutofocusInput();
 
   // Handle the back button
@@ -364,7 +363,7 @@ const InstructionEditorDialog = ({
           }}
           focusOnMount={shouldAutofocusInput && !instructionType}
           onSearchStartOrReset={forceUpdate}
-          onClickMore={() => setNewExtensionDialogOpen(true)}
+          onOpenExtensionStore={props => setNewExtensionDialogOpen(props)}
           i18n={i18n}
         />
       )}
@@ -556,9 +555,9 @@ const InstructionEditorDialog = ({
           onChoose={addBehavior}
           onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={extensionName => {
+            onExtensionInstalled(extensionName);
             freeInstructionComponentRef.current &&
               freeInstructionComponentRef.current.reEnumerateInstructions(i18n);
-            onExtensionInstalled(extensionName);
           }}
           shouldShowCapabilityBehaviors={
             chosenObject && !isSceneObject(chosenObject)
@@ -570,15 +569,16 @@ const InstructionEditorDialog = ({
           {({ i18n }) => (
             <ExtensionsSearchDialog
               project={project}
-              onClose={() => setNewExtensionDialogOpen(false)}
+              initialSearchText={newExtensionDialogOpen.searchText}
+              onClose={() => setNewExtensionDialogOpen(null)}
               onWillInstallExtension={onWillInstallExtension}
               onExtensionInstalled={extensionName => {
-                setNewExtensionDialogOpen(false);
+                setNewExtensionDialogOpen(null);
+                onExtensionInstalled(extensionName);
                 freeInstructionComponentRef.current &&
                   freeInstructionComponentRef.current.reEnumerateInstructions(
                     i18n
                   );
-                onExtensionInstalled(extensionName);
               }}
             />
           )}

@@ -490,9 +490,10 @@ export const addSerializedExtensionsToProject = async (
     );
   });
 
-  return eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+  await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
     project
   );
+  return;
 };
 
 /**

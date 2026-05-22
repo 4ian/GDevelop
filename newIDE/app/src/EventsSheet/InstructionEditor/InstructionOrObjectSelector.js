@@ -22,6 +22,7 @@ import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
 import { Tabs } from '../../UI/Tabs';
 import { enumerateObjectsAndGroups } from '../../ObjectsList/EnumerateObjects';
 import EmptyMessage from '../../UI/EmptyMessage';
+import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import {
   type SearchResult,
@@ -205,7 +206,7 @@ type Props = {|
   onChooseObject: (objectName: string) => void,
   onSearchStartOrReset?: () => void,
   style?: Object,
-  onClickMore?: () => void,
+  onOpenExtensionStore: ({ searchText: string }) => void,
   i18n: I18nType,
 |};
 
@@ -232,7 +233,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
       onChooseObject,
       onSearchStartOrReset,
       style,
-      onClickMore,
+      onOpenExtensionStore,
       i18n,
     },
     ref
@@ -284,17 +285,20 @@ const InstructionOrObjectSelector: React.ComponentType<{
     // directly handled by the tree view since they only have one field and their name
     // are straightforward.
     // $FlowFixMe[value-as-type]
-    const instructionSearchApiRef = React.useRef<Fuse>(
-      new Fuse(allInstructionsInfoRef.current, {
-        ...sharedFuseConfiguration,
-        includeScore: true, // Use Fuse.js score to sort results that don't contain exact matches.
-        keys: [
-          { name: 'displayedName', weight: 5 },
-          { name: 'fullGroupName', weight: 1 },
-          { name: 'description', weight: 3 },
-        ],
-      })
+    const createFuse: () => Fuse = React.useCallback(
+      () =>
+        new Fuse(allInstructionsInfoRef.current, {
+          ...sharedFuseConfiguration,
+          includeScore: true, // Use Fuse.js score to sort results that don't contain exact matches.
+          keys: [
+            { name: 'displayedName', weight: 5 },
+            { name: 'fullGroupName', weight: 1 },
+            { name: 'description', weight: 3 },
+          ],
+        }),
+      []
     );
+    const instructionSearchApiRef = React.useRef(createFuse());
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );
@@ -362,22 +366,6 @@ const InstructionOrObjectSelector: React.ComponentType<{
     ]);
 
     const forceUpdate = useForceUpdate();
-
-    const reEnumerateInstructions = React.useCallback(
-      (i18n: I18nType) => {
-        freeInstructionsInfoTreeRef.current = createTree(
-          filterEnumeratedInstructionOrExpressionMetadataByScope(
-            enumerateFreeInstructions(isCondition, i18n),
-            scope
-          ),
-          i18n
-        );
-        forceUpdate();
-      },
-      [forceUpdate, isCondition, scope]
-    );
-
-    React.useImperativeHandle(ref, () => ({ reEnumerateInstructions }));
 
     React.useEffect(
       () => {
@@ -495,6 +483,31 @@ const InstructionOrObjectSelector: React.ComponentType<{
       setSearchResults({ instructions: matchingInstructions });
     }, []);
 
+    const reEnumerateInstructions = React.useCallback(
+      (i18n: I18nType) => {
+        freeInstructionsInfoTreeRef.current = createTree(
+          filterEnumeratedInstructionOrExpressionMetadataByScope(
+            enumerateFreeInstructions(isCondition, i18n),
+            scope
+          ),
+          i18n
+        );
+        allInstructionsInfoRef.current = filterEnumeratedInstructionOrExpressionMetadataByScope(
+          enumerateAllInstructions(isCondition, i18n),
+          scope
+        );
+        instructionSearchApiRef.current = createFuse();
+        setSearchText(searchText => {
+          search(searchText);
+          return searchText;
+        });
+        forceUpdate();
+      },
+      [createFuse, forceUpdate, isCondition, scope, search]
+    );
+
+    React.useImperativeHandle(ref, () => ({ reEnumerateInstructions }));
+
     const onSubmitSearch = () => {
       if (!searchText || !treeViewRef.current) return;
 
@@ -583,19 +596,17 @@ const InstructionOrObjectSelector: React.ComponentType<{
           instructionOrGroup: freeInstructionsInfoTreeRef.current,
           freeInstructionProps: { getGroupIconSrc: getInstructionIconSrc },
         }),
-        onClickMore
-          ? new InstructionLeafTreeViewItem(
-              new MoreInstructionsTreeViewItemContent(
-                isCondition ? (
-                  <Trans>Search for new conditions in extensions</Trans>
-                ) : (
-                  <Trans>Search for new actions in extensions</Trans>
-                ),
-                onClickMore
-              ),
-              true
-            )
-          : null,
+        new InstructionLeafTreeViewItem(
+          new MoreInstructionsTreeViewItemContent(
+            isCondition ? (
+              <Trans>Search for new conditions in extensions</Trans>
+            ) : (
+              <Trans>Search for new actions in extensions</Trans>
+            ),
+            () => onOpenExtensionStore({ searchText })
+          ),
+          true
+        ),
       ].filter(Boolean);
 
     // $FlowFixMe[missing-local-annot]
@@ -689,7 +700,16 @@ const InstructionOrObjectSelector: React.ComponentType<{
                         )
                       )
                     )
-                  : null,
+                  : new LeafTreeViewItem(
+                      new MoreInstructionsTreeViewItemContent(
+                        isCondition ? (
+                          <Trans>Search for new conditions in extensions</Trans>
+                        ) : (
+                          <Trans>Search for new actions in extensions</Trans>
+                        ),
+                        () => onOpenExtensionStore({ searchText })
+                      )
+                    ),
               ].filter(Boolean)
             )
           : null,
@@ -701,6 +721,9 @@ const InstructionOrObjectSelector: React.ComponentType<{
         if (displayedInstructionsList.length > 0) return true;
         const treeView = treeViewRef.current;
         if (!treeView) return true;
+        // TODO An empty panel is displayed the first time there is no result
+        // and the placeholder only shows when the user add another character
+        // because this value is outdated.
         return treeView.getDisplayedItemsCount() > 0;
       },
       [displayedInstructionsList, isSearching]
@@ -770,12 +793,31 @@ const InstructionOrObjectSelector: React.ComponentType<{
         {displayEmptyMessage && currentTab === 'objects' ? (
           <EmptyMessage>{getEmptyMessage(scope)}</EmptyMessage>
         ) : searchHasNoResults ? (
-          <EmptyMessage>
-            <Trans>
-              Nothing corresponding to your search. Choose an object first or
-              browse the list of actions/conditions.
-            </Trans>
-          </EmptyMessage>
+          <Column noMargin expand justifyContent="center">
+            <EmptyPlaceholder
+              title={<Trans>Nothing corresponding to your search</Trans>}
+              description={
+                isCondition ? (
+                  <Trans>
+                    Choose an object first or browse the list of conditions.
+                  </Trans>
+                ) : (
+                  <Trans>
+                    Choose an object first or browse the list of actions.
+                  </Trans>
+                )
+              }
+              actionButtonId="more-instructions"
+              actionLabel={
+                isCondition ? (
+                  <Trans>Search for new conditions in extensions</Trans>
+                ) : (
+                  <Trans>Search for new actions in extensions</Trans>
+                )
+              }
+              onAction={() => onOpenExtensionStore({ searchText })}
+            />
+          </Column>
         ) : null}
         <div
           style={{
@@ -868,6 +910,11 @@ const InstructionOrObjectSelector: React.ComponentType<{
                       instructionMetadata
                     );
                     setSelectedItem(item);
+                  } else if (
+                    itemContentToSelect instanceof
+                    MoreInstructionsTreeViewItemContent
+                  ) {
+                    itemContentToSelect.onClick();
                   }
                 }}
                 searchText={searchText}

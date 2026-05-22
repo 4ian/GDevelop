@@ -10,6 +10,7 @@ import {
   getInstructionMetadata,
 } from './InstructionEditor';
 import InstructionOrObjectSelector, {
+  type InstructionOrObjectSelectorInterface,
   type TabName,
 } from './InstructionOrObjectSelector';
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
@@ -23,6 +24,7 @@ import { Column, Line } from '../../UI/Grid';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import PortalContainerContext from '../../UI/PortalContainerContext';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
+import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 
 const styles = {
   fullHeightSelector: {
@@ -82,6 +84,7 @@ const InstructionEditorMenu = ({
   onSubmit,
   canPasteInstructions,
   onPasteInstructions,
+  onWillInstallExtension,
   onExtensionInstalled,
   i18n,
 }: Props): React.Node => {
@@ -118,6 +121,12 @@ const InstructionEditorMenu = ({
     currentInstructionOrObjectSelectorTab,
     setCurrentInstructionOrObjectSelectorTab,
   ] = React.useState<TabName>('objects');
+  const [newExtensionDialogOpen, setNewExtensionDialogOpen] = React.useState<{
+    searchText: string,
+  } | null>(null);
+  const freeInstructionComponentRef = React.useRef<?InstructionOrObjectSelectorInterface>(
+    null
+  );
   const instructionType: string = instruction.getType();
 
   const submitInstruction = ({
@@ -151,6 +160,7 @@ const InstructionEditorMenu = ({
       {({ i18n }) => (
         <InstructionOrObjectSelector
           key="instruction-or-object-selector"
+          ref={freeInstructionComponentRef}
           style={styles.fullHeightSelector}
           project={project}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
@@ -174,6 +184,7 @@ const InstructionEditorMenu = ({
           }}
           focusOnMount={!instructionType}
           onSearchStartOrReset={forceUpdate}
+          onOpenExtensionStore={props => setNewExtensionDialogOpen(props)}
           i18n={i18n}
         />
       )}
@@ -203,60 +214,82 @@ const InstructionEditorMenu = ({
     ) : null;
 
   return (
-    <Popover
-      open={open}
-      onClose={onCancel}
-      anchorEl={anchorEl}
-      container={portalContainer}
-      anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'left',
-      }}
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'left',
-      }}
-    >
-      <Column>
-        <Line>
-          <SelectColumns
-            columnsRenderer={{
-              'instruction-or-object-selector': renderInstructionOrObjectSelector,
-              'object-instruction-selector': renderObjectInstructionSelector,
-            }}
-            getColumns={() => {
-              if (step === 'object-or-free-instructions') {
-                return [
-                  {
-                    columnName: 'instruction-or-object-selector',
-                  },
-                ];
-              } else {
-                return [
-                  {
-                    columnName: 'object-instruction-selector',
-                  },
-                ];
+    <>
+      <Popover
+        open={open}
+        onClose={onCancel}
+        anchorEl={anchorEl}
+        container={portalContainer}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+      >
+        <Column>
+          <Line>
+            <SelectColumns
+              columnsRenderer={{
+                'instruction-or-object-selector': renderInstructionOrObjectSelector,
+                'object-instruction-selector': renderObjectInstructionSelector,
+              }}
+              getColumns={() => {
+                if (step === 'object-or-free-instructions') {
+                  return [
+                    {
+                      columnName: 'instruction-or-object-selector',
+                    },
+                  ];
+                } else {
+                  return [
+                    {
+                      columnName: 'object-instruction-selector',
+                    },
+                  ];
+                }
+              }}
+            />
+          </Line>
+          <Line noMargin justifyContent="flex-end">
+            <TextButton
+              label={
+                isCondition ? (
+                  <Trans>Paste condition(s)</Trans>
+                ) : (
+                  <Trans>Paste action(s)</Trans>
+                )
               }
-            }}
-          />
-        </Line>
-        <Line noMargin justifyContent="flex-end">
-          <TextButton
-            label={
-              isCondition ? (
-                <Trans>Paste condition(s)</Trans>
-              ) : (
-                <Trans>Paste action(s)</Trans>
-              )
-            }
-            icon={<Paste />}
-            disabled={!canPasteInstructions}
-            onClick={() => onPasteInstructions()}
-          />
-        </Line>
-      </Column>
-    </Popover>
+              icon={<Paste />}
+              disabled={!canPasteInstructions}
+              onClick={() => onPasteInstructions()}
+            />
+          </Line>
+        </Column>
+      </Popover>
+      {newExtensionDialogOpen && (
+        <I18n>
+          {({ i18n }) => (
+            <ExtensionsSearchDialog
+              project={project}
+              initialSearchText={newExtensionDialogOpen.searchText}
+              onClose={() => setNewExtensionDialogOpen(null)}
+              onWillInstallExtension={onWillInstallExtension}
+              onExtensionInstalled={extensionName => {
+                setNewExtensionDialogOpen(null);
+                freeInstructionComponentRef.current &&
+                  freeInstructionComponentRef.current.reEnumerateInstructions(
+                    i18n
+                  );
+                onExtensionInstalled(extensionName);
+              }}
+            />
+          )}
+        </I18n>
+      )}
+    </>
   );
 };
 

@@ -65,6 +65,7 @@ import {
 } from './InstructionOrExpressionTreeViewItems';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
+import OpenIcon from '../../UI/CustomSvgIcons/ShareExternal';
 
 const gd: libGDevelop = global.gd;
 
@@ -808,6 +809,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
                 )
               }
               actionButtonId="more-instructions"
+              actionIcon={<OpenIcon />}
               actionLabel={
                 isCondition ? (
                   <Trans>Search for new conditions in extensions</Trans>

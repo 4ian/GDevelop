@@ -49,7 +49,11 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     let branch = (branchShellString.stdout || '').trim();
     if (branch === 'HEAD') {
       // We're in detached HEAD. Try to read the branch from the CI environment variables.
-      if (process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH) {
+      if (process.env.SEMAPHORE_GIT_PR_BRANCH) {
+        branch = process.env.SEMAPHORE_GIT_PR_BRANCH;
+      } else if (process.env.SEMAPHORE_GIT_BRANCH) {
+        branch = process.env.SEMAPHORE_GIT_BRANCH;
+      } else if (process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH) {
         branch = process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH;
       } else if (process.env.APPVEYOR_REPO_BRANCH) {
         branch = process.env.APPVEYOR_REPO_BRANCH;

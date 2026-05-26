@@ -39,6 +39,7 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 import { fillBehaviorParameter } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/CompactEventsFunctionParametersEditor.js';
 import { fillBehaviorProperty } from '../../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor/EventsBasedBehaviorOrObjectPropertiesEditor';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
+import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -168,10 +169,12 @@ const InstructionEditorDialog = ({
     newBehaviorDialogOpen,
     setNewBehaviorDialogOpen,
   ] = React.useState<boolean>(false);
-  const [newExtensionDialogOpen, setNewExtensionDialogOpen] = React.useState<{
-    searchText: string,
-  } | null>(null);
+  const [
+    newExtensionDialogOpen,
+    setNewExtensionDialogOpen,
+  ] = React.useState<boolean>(false);
   const shouldAutofocusInput = useShouldAutofocusInput();
+  const { setSearchText } = React.useContext(ExtensionStoreContext);
 
   // Handle the back button
   const stepBackFrom = (origin: StepName) => {
@@ -363,7 +366,10 @@ const InstructionEditorDialog = ({
           }}
           focusOnMount={shouldAutofocusInput && !instructionType}
           onSearchStartOrReset={forceUpdate}
-          onOpenExtensionStore={props => setNewExtensionDialogOpen(props)}
+          onOpenExtensionStore={props => {
+            setSearchText(props.searchText);
+            setNewExtensionDialogOpen(true);
+          }}
           i18n={i18n}
         />
       )}
@@ -569,11 +575,10 @@ const InstructionEditorDialog = ({
           {({ i18n }) => (
             <ExtensionsSearchDialog
               project={project}
-              initialSearchText={newExtensionDialogOpen.searchText}
-              onClose={() => setNewExtensionDialogOpen(null)}
+              onClose={() => setNewExtensionDialogOpen(false)}
               onWillInstallExtension={onWillInstallExtension}
               onExtensionInstalled={extensionName => {
-                setNewExtensionDialogOpen(null);
+                setNewExtensionDialogOpen(false);
                 onExtensionInstalled(extensionName);
                 freeInstructionComponentRef.current &&
                   freeInstructionComponentRef.current.reEnumerateInstructions(

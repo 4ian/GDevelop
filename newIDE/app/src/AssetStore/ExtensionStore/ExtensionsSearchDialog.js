@@ -29,7 +29,6 @@ import { useInstallExtensionWithDependencies } from '../../ProjectManager/Instal
 
 type Props = {|
   project: gdProject,
-  initialSearchText?: string | null,
   onClose: () => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -41,7 +40,6 @@ type Props = {|
  */
 const ExtensionsSearchDialog = ({
   project,
-  initialSearchText,
   onClose,
   onWillInstallExtension,
   onExtensionInstalled,
@@ -185,7 +183,6 @@ const ExtensionsSearchDialog = ({
           onRequestClose={onClose}
         >
           <ExtensionStore
-            initialSearchText={initialSearchText}
             isInstalling={isInstalling}
             onInstall={extensionShortHeader =>
               installOrImportExtension(i18n, extensionShortHeader)

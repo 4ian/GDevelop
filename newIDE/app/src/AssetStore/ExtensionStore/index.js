@@ -60,7 +60,6 @@ export const ExtensionDetailSidePanel = ({
 };
 
 type Props = {|
-  initialSearchText?: string | null,
   isInstalling: boolean,
   project: gdProject,
   onInstall: ExtensionShortHeader => Promise<boolean>,
@@ -71,7 +70,6 @@ const getExtensionName = (extensionShortHeader: ExtensionShortHeader) =>
   extensionShortHeader.name;
 
 export const ExtensionStore = ({
-  initialSearchText,
   isInstalling,
   project,
   onInstall,
@@ -93,23 +91,6 @@ export const ExtensionStore = ({
     setChosenCategory,
   } = React.useContext(ExtensionStoreContext);
   const { isMobile } = useResponsiveWindowSize();
-
-  React.useEffect(
-    () => {
-      if (initialSearchText != null) {
-        setSearchText(initialSearchText);
-      }
-    },
-    [initialSearchText, setSearchText]
-  );
-  const hasSearchTextBeenEdited = React.useRef(false);
-  const onSetSearchText = React.useCallback(
-    (value: string) => {
-      setSearchText(value);
-      hasSearchTextBeenEdited.current = true;
-    },
-    [setSearchText]
-  );
 
   React.useEffect(
     () => {
@@ -165,13 +146,8 @@ export const ExtensionStore = ({
                 <Column expand noMargin>
                   <SearchBar
                     id="extension-search-bar"
-                    value={
-                      initialSearchText != null &&
-                      !hasSearchTextBeenEdited.current
-                        ? initialSearchText
-                        : searchText
-                    }
-                    onChange={onSetSearchText}
+                    value={searchText}
+                    onChange={setSearchText}
                     onRequestSearch={() => {}}
                     placeholder={t`Search extensions`}
                     autoFocus="desktop"

@@ -25,6 +25,7 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 import PortalContainerContext from '../../UI/PortalContainerContext';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
+import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
 
 const styles = {
   fullHeightSelector: {
@@ -121,12 +122,14 @@ const InstructionEditorMenu = ({
     currentInstructionOrObjectSelectorTab,
     setCurrentInstructionOrObjectSelectorTab,
   ] = React.useState<TabName>('objects');
-  const [newExtensionDialogOpen, setNewExtensionDialogOpen] = React.useState<{
-    searchText: string,
-  } | null>(null);
+  const [
+    newExtensionDialogOpen,
+    setNewExtensionDialogOpen,
+  ] = React.useState<boolean>(false);
   const freeInstructionComponentRef = React.useRef<?InstructionOrObjectSelectorInterface>(
     null
   );
+  const { setSearchText } = React.useContext(ExtensionStoreContext);
   const instructionType: string = instruction.getType();
 
   const submitInstruction = ({
@@ -184,7 +187,10 @@ const InstructionEditorMenu = ({
           }}
           focusOnMount={!instructionType}
           onSearchStartOrReset={forceUpdate}
-          onOpenExtensionStore={props => setNewExtensionDialogOpen(props)}
+          onOpenExtensionStore={props => {
+            setSearchText(props.searchText);
+            setNewExtensionDialogOpen(true);
+          }}
           i18n={i18n}
         />
       )}
@@ -274,11 +280,10 @@ const InstructionEditorMenu = ({
           {({ i18n }) => (
             <ExtensionsSearchDialog
               project={project}
-              initialSearchText={newExtensionDialogOpen.searchText}
-              onClose={() => setNewExtensionDialogOpen(null)}
+              onClose={() => setNewExtensionDialogOpen(false)}
               onWillInstallExtension={onWillInstallExtension}
               onExtensionInstalled={extensionName => {
-                setNewExtensionDialogOpen(null);
+                setNewExtensionDialogOpen(false);
                 freeInstructionComponentRef.current &&
                   freeInstructionComponentRef.current.reEnumerateInstructions(
                     i18n

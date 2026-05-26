@@ -17,7 +17,7 @@ const {
  */
 const generateExtensionSection = (extension, baseFolder) => {
   const folderName = getExtensionFolderName(extension.getName());
-  const referencePageUrl = `${gdevelopWikiUrlRoot}/${baseFolder}/${folderName}`;
+  const referencePageUrl = `${gdevelopWikiUrlRoot}/${baseFolder}/${folderName}/reference`;
   const helpPageUrl = getHelpLink(extension.getHelpPath()) || referencePageUrl;
 
   // @ts-ignore

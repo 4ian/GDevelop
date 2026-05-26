@@ -1,10 +1,10 @@
 // @flow
-import { canBenefitFromDiscordRole, type Subscription } from './Usage';
+import { canBenefitFromSocialRole, type Subscription } from './Usage';
 
 describe('Usage service', () => {
-  describe('canBenefitFromDiscordRole', () => {
+  describe('canBenefitFromSocialRole', () => {
     it('should return false when subscription is null', () => {
-      const result = canBenefitFromDiscordRole(null);
+      const result = canBenefitFromSocialRole(null);
       expect(result).toBe(false);
     });
 
@@ -16,7 +16,7 @@ describe('Usage service', () => {
         userId: 'user_id',
         pricingSystemId: null,
       };
-      const result = canBenefitFromDiscordRole(subscription);
+      const result = canBenefitFromSocialRole(subscription);
       expect(result).toBe(false);
     });
 
@@ -28,7 +28,7 @@ describe('Usage service', () => {
         userId: 'user_id',
         pricingSystemId: 'silver_1month',
       };
-      const result = canBenefitFromDiscordRole(subscription);
+      const result = canBenefitFromSocialRole(subscription);
       expect(result).toBe(true);
     });
 
@@ -40,7 +40,7 @@ describe('Usage service', () => {
         userId: 'user_id',
         pricingSystemId: 'pro_1month',
       };
-      const result = canBenefitFromDiscordRole(subscription);
+      const result = canBenefitFromSocialRole(subscription);
       expect(result).toBe(false);
     });
 
@@ -53,7 +53,7 @@ describe('Usage service', () => {
         userId: 'user_id',
         pricingSystemId: 'TEAM_MEMBER',
       };
-      const result = canBenefitFromDiscordRole(subscription);
+      const result = canBenefitFromSocialRole(subscription);
       expect(result).toBe(false);
     });
 
@@ -65,7 +65,7 @@ describe('Usage service', () => {
         userId: 'user_id',
         pricingSystemId: 'education_1month',
       };
-      const result = canBenefitFromDiscordRole(subscription);
+      const result = canBenefitFromSocialRole(subscription);
       expect(result).toBe(true);
     });
 
@@ -77,7 +77,7 @@ describe('Usage service', () => {
         userId: 'user_id',
         pricingSystemId: 'gold_1month',
       };
-      const result = canBenefitFromDiscordRole(subscription);
+      const result = canBenefitFromSocialRole(subscription);
       expect(result).toBe(true);
     });
 
@@ -89,7 +89,7 @@ describe('Usage service', () => {
         userId: 'user_id',
         pricingSystemId: 'startup_1month',
       };
-      const result = canBenefitFromDiscordRole(subscription);
+      const result = canBenefitFromSocialRole(subscription);
       expect(result).toBe(true);
     });
   });

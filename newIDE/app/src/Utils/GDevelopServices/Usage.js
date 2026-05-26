@@ -695,7 +695,7 @@ export const validateCoupon = async (
   return response.data;
 };
 
-export const canBenefitFromDiscordRole = (
+export const canBenefitFromSocialRole = (
   subscription: ?Subscription
 ): false | true | boolean => {
   return (

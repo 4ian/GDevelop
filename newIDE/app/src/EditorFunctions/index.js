@@ -5313,6 +5313,20 @@ const readFullDocs: EditorFunction = {
   modifiesProject: false,
 };
 
+const searchDocs: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    return {
+      text: <Trans>Search GDevelop documentation.</Trans>,
+    };
+  },
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to read full documentation - continue with your existing GDevelop knowledge.`
+    );
+  },
+  modifiesProject: false,
+};
+
 const initializeProject: EditorFunctionWithoutProject = {
   renderForEditor: ({ args }) => {
     const project_name = extractRequiredString(args, 'project_name');
@@ -5478,6 +5492,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   change_scene_properties_layers_effects_groups: changeScenePropertiesLayersEffectsGroups,
   add_or_edit_variable: addOrEditVariable,
   read_full_docs: readFullDocs,
+  search_docs: searchDocs,
 
   create_or_update_plan: createOrUpdatePlan,
 

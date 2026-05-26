@@ -102,7 +102,7 @@ const CompactSemiControlledNumberField = ({
         const isValueWithLeadingSign = /[+-]\s*\d+/.test(newValueAsString);
         // parseFloat correctly parses '12+' as '12' so we need to check
         // for math characters ourselves.
-        const containsMathCharacters = /[+-/*^()%]/.test(newValueAsString);
+        const containsMathCharacters = /[+\-/*^()%]/.test(newValueAsString);
         const isNewValueAsFloatValidOrStartsWithSign =
           newValueAsValidFloat !== null &&
           (!containsMathCharacters ||

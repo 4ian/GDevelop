@@ -45,6 +45,9 @@ const mockOptionalRequire = jest.fn(
     if (moduleName === 'path') {
       return path;
     }
+    if (moduleName === 'url') {
+      return require('url');
+    }
     if (moduleName === 'os') {
       return mockOs;
     }

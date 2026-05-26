@@ -20,7 +20,7 @@ describe('Usage service', () => {
       expect(result).toBe(false);
     });
 
-    it('should return false for silver subscription', () => {
+    it('should return true for silver subscription', () => {
       const subscription: Subscription = {
         planId: 'gdevelop_silver',
         createdAt: Date.now(),
@@ -29,7 +29,7 @@ describe('Usage service', () => {
         pricingSystemId: 'silver_1month',
       };
       const result = canBenefitFromDiscordRole(subscription);
-      expect(result).toBe(false);
+      expect(result).toBe(true);
     });
 
     it('should return false for legacy sub', () => {

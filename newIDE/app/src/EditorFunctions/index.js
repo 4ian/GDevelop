@@ -5415,8 +5415,22 @@ const initializeProject: EditorFunctionWithoutProject = {
   modifiesProject: true,
 };
 
+const MAX_SUB_AGENT_TITLE_WORDS = 30;
+
+const truncateSubAgentTitleByWords = (title: string): string => {
+  const words = title.trim().split(/\s+/);
+  if (words.length <= MAX_SUB_AGENT_TITLE_WORDS) return title.trim();
+  return words.slice(0, MAX_SUB_AGENT_TITLE_WORDS).join(' ') + '...';
+};
+
 const runExplorerAgent: EditorFunction = {
   renderForEditor: ({ args }) => {
+    const shortTitle = SafeExtractor.extractStringProperty(args, 'short_title');
+    if (shortTitle && shortTitle.trim()) {
+      return {
+        text: truncateSubAgentTitleByWords(shortTitle),
+      };
+    }
     return {
       text: <Trans>Exploring the game.</Trans>,
     };
@@ -5431,6 +5445,12 @@ const runExplorerAgent: EditorFunction = {
 
 const runEditAgent: EditorFunction = {
   renderForEditor: ({ args }) => {
+    const shortTitle = SafeExtractor.extractStringProperty(args, 'short_title');
+    if (shortTitle && shortTitle.trim()) {
+      return {
+        text: truncateSubAgentTitleByWords(shortTitle),
+      };
+    }
     return {
       text: <Trans>Editing the game.</Trans>,
     };

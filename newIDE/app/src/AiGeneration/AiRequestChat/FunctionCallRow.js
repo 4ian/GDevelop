@@ -270,7 +270,7 @@ const SubAgentFunctionCallRow = ({
   existingFunctionCallOutput,
   editorCallbacks,
 }: Props) => {
-  const [showDetails, setShowDetails] = React.useState(true);
+  const [showDetails, setShowDetails] = React.useState(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const {
     aiRequestStorage,

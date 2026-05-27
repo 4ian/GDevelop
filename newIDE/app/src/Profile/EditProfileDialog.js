@@ -503,7 +503,7 @@ const EditProfileDialog = ({
                           subscription.planId
                         )
                       ? t`Add your Discord username to get access to a dedicated channel! Join the [GDevelop Discord](https://discord.gg/gdevelop).`
-                      : t`Add your Discord username to get a role or access to a dedicated channel on the GDevelop Discord if you have a Silver, Gold or Pro subscription! Join the [GDevelop Discord](https://discord.gg/gdevelop).`
+                      : t`Add your Discord username to get a role on the GDevelop Discord or access to a dedicated channel if you have a Gold or Pro subscription! Join the [GDevelop Discord](https://discord.gg/gdevelop).`
                   )}
                 />
               )}

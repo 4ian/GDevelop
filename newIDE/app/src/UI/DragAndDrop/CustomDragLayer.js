@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
-import { DragLayer } from 'react-dnd';
-import { Identifier } from 'dnd-core';
+import { useDragLayer } from 'react-dnd';
 import Text from '../Text';
 import { instancesEditorId } from '../../InstancesEditor';
 import {
@@ -59,20 +58,7 @@ const getItemStyles = ({
   };
 };
 
-type XYCoord = {|
-  x: number,
-  y: number,
-|};
-
-type InternalCustomDragLayerProps = {|
-  item?: DraggedItem,
-  // $FlowFixMe[value-as-type]
-  itemType?: Identifier | null,
-  initialOffset?: XYCoord | null,
-  currentOffset?: XYCoord | null,
-  clientOffset?: XYCoord | null,
-  isDragging?: boolean,
-|};
+type XYCoord = {| x: number, y: number |};
 
 const shouldHidePreviewBecauseDraggingOnSceneEditorCanvas = ({
   x,
@@ -134,14 +120,22 @@ const shouldHidePreviewBecauseDraggingOnSceneEditorCanvas = ({
   return false;
 };
 
-const CustomDragLayer = ({
-  item,
-  itemType,
-  isDragging,
-  initialOffset,
-  currentOffset,
-  clientOffset,
-}: InternalCustomDragLayerProps) => {
+const CustomDragLayer = (): React.Node => {
+  const {
+    item,
+    isDragging,
+    clientOffset,
+  }: {|
+    item: ?DraggedItem,
+    isDragging: boolean,
+    clientOffset: ?XYCoord,
+  |} = useDragLayer(monitor => ({
+    // $FlowFixMe[incompatible-return]
+    item: monitor.getItem(),
+    isDragging: monitor.isDragging(),
+    // $FlowFixMe[incompatible-exact]
+    clientOffset: monitor.getClientOffset(),
+  }));
   const screenType = useScreenType();
   const renderedItem = React.useMemo(
     () => {
@@ -190,23 +184,4 @@ const CustomDragLayer = ({
   );
 };
 
-const collect = (monitor: any): InternalCustomDragLayerProps => ({
-  // This contains the item that is returned by the method `beginDrag` of the DragSourceAndDropTarget component.
-  item: monitor.getItem(),
-  // This contains the type of the item being dragged, defined when calling the function `makeDragSourceAndDropTarget`.
-  itemType: monitor.getItemType(),
-  // This is the initial offset of the drag source.
-  initialOffset: monitor.getInitialSourceClientOffset(),
-  // This is the current offset of the drag source (the whole wrapper element, not just the mouse position)
-  currentOffset: monitor.getSourceClientOffset(),
-  // This is the current offset of the mouse.
-  clientOffset: monitor.getClientOffset(),
-  isDragging: monitor.isDragging(),
-});
-
-// $FlowFixMe[incompatible-type] - Forcing the type of the component, unsure how to make the DragLayer happy.
-const ExternalCustomDragLayer: ({||}) => React.Node = DragLayer(collect)(
-  CustomDragLayer
-);
-
-export default ExternalCustomDragLayer;
+export default CustomDragLayer;

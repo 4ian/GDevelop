@@ -411,6 +411,7 @@ export const AiRequestChat: React.ComponentType<{
     const project = exceptionallyGuardAgainstDeadObject(nullableProject);
     const {
       aiRequestHistory: { handleNavigateHistory, resetNavigation },
+      activeSubAgents,
     } = React.useContext(AiRequestContext);
     const [selectedMode, setSelectedMode] = React.useState<
       'chat' | 'agent' | 'orchestrator'
@@ -611,10 +612,16 @@ export const AiRequestChat: React.ComponentType<{
       getFunctionCallOutputsFromEditorFunctionCallResults(
         editorFunctionCallResults
       ).hasUnfinishedResult;
+    const hasActiveSubAgents =
+      !!aiRequest &&
+      Object.values(activeSubAgents).some(
+        subAgent => subAgent.parentAiRequestId === aiRequest.id
+      );
     const hasWorkToProcess =
       hasUnfinishedResult ||
       !!hasWorkingFunctionCalls ||
       !!hasFunctionsCallsToProcess ||
+      hasActiveSubAgents ||
       (!!aiRequest && aiRequest.status === 'working');
     const isWorking = isSending || hasWorkToProcess;
     const canRequestBeStopped = isWorking && !!aiRequest;

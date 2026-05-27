@@ -973,7 +973,10 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                   justifyContent="flex-start"
                 >
                   <ChatBubble role="assistant">
-                    <FunctionCallsGroup key={`group-${itemIndex}`}>
+                    <FunctionCallsGroup
+                      key={`group-${itemIndex}`}
+                      mode={aiRequest.mode}
+                    >
                       {item.items.map(
                         ({
                           key,
@@ -984,7 +987,6 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                           <FunctionCallRow
                             project={project}
                             key={key}
-                            onProcessFunctionCalls={onProcessFunctionCalls}
                             functionCall={messageContent}
                             editorFunctionCallResult={editorFunctionCallResult}
                             existingFunctionCallOutput={
@@ -1064,7 +1066,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                     >
                       <Column noMargin>
                         {functionCallItems && functionCallItems.length > 0 && (
-                          <FunctionCallsGroup>
+                          <FunctionCallsGroup mode={aiRequest.mode}>
                             {functionCallItems.map(
                               // $FlowFixMe[missing-local-annot]
                               ({
@@ -1076,9 +1078,6 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                                 <FunctionCallRow
                                   project={project}
                                   key={functionCallKey}
-                                  onProcessFunctionCalls={
-                                    onProcessFunctionCalls
-                                  }
                                   functionCall={functionCallMessageContent}
                                   editorFunctionCallResult={
                                     editorFunctionCallResult

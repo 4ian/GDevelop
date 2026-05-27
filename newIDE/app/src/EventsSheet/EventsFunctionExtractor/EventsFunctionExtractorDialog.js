@@ -21,7 +21,7 @@ import {
 } from '.';
 import AlertMessage from '../../UI/AlertMessage';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
-import { CompactEventsFunctionParametersEditor } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/CompactEventsFunctionParametersEditor';
+import CompactEventsFunctionParametersEditor from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/CompactEventsFunctionParametersEditor';
 import { CompactEventsFunctionPropertiesEditor } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/CompactEventsFunctionPropertiesEditor';
 import HelpButton from '../../UI/HelpButton';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
@@ -333,6 +333,12 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                 // Won't happen as the editor is freezed.
               }}
               onFunctionParameterTypeChanged={() => {
+                // Won't happen as the editor is freezed.
+              }}
+              onWillInstallExtension={() => {
+                // Won't happen as the editor is freezed.
+              }}
+              onExtensionInstalled={() => {
                 // Won't happen as the editor is freezed.
               }}
               freezeParameters

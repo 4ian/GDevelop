@@ -40,7 +40,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   ExpressionValidator(const gd::Platform &platform_,
                       const gd::ProjectScopedContainers & projectScopedContainers_,
                       const gd::String &rootType_,
-                      const gd::String &extraInfo_ = "")
+                      const gd::String &extraInfo_ = emptyParameterExtraInfo)
       : platform(platform_),
         projectScopedContainers(projectScopedContainers_),
         parentType(StringToType(gd::ValueTypeMetadata::GetExpressionPrimitiveValueType(rootType_))),
@@ -555,6 +555,10 @@ private:
   static const gd::String objectTypeString;
   static const gd::String identifierTypeString;
   static const gd::String emptyTypeString;
+  // Used as the default for the `extraInfo_` constructor argument: a long-lived
+  // empty string, so that storing &extraInfo_ in currentParameterExtraInfo
+  // never dangles when no explicit extraInfo is provided.
+  static const gd::String emptyParameterExtraInfo;
 
   std::vector<ExpressionParserError*> fatalErrors;
   std::vector<ExpressionParserError*> allErrors;

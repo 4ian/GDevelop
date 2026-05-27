@@ -1,11 +1,12 @@
 // @flow
 import * as React from 'react';
-import { mapFor, mapVector } from '../Utils/MapFor';
+import { mapFor, mapVector, mapReverseFor } from '../Utils/MapFor';
 import {
   type Schema,
   type Instance,
   type FieldVisibility,
   type Field,
+  type FieldChoices,
 } from './PropertiesEditorSchema';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import MeasurementUnitDocumentation from '../PropertiesEditor/MeasurementUnitDocumentation';
@@ -36,6 +37,7 @@ const createField = (
     value: boolean
   ) => void,
   defaultValue: string | null,
+  layers: gdLayersContainer | null,
   object: ?gdObject,
   showcaseNonDefaultValues: boolean
 ): ?Field => {
@@ -63,7 +65,12 @@ const createField = (
     description: measurementUnit.getDescription(),
     elementsWithWords: measurementUnit.getElementsWithWords(),
   };
-  const getEndAdornment = (instance: Instance) => {
+  const getEndAdornment = (
+    instance: Instance
+  ): {
+    label: string,
+    tooltipContent: React.Node,
+  } => {
     return {
       label: enumeratedMeasurementUnit.shortLabel,
       tooltipContent: (
@@ -106,8 +113,7 @@ const createField = (
         ? (instance: gdInitialInstance) => {
             return getValueForNumber(instance) === defaultValueNumber
               ? null
-              : // $FlowFixMe[missing-local-annot]
-                className => <Restore className={className} />;
+              : (className: string) => <Restore className={className} />;
           }
         : undefined;
     const setValue = (instance: Instance, newValue: number) => {
@@ -119,7 +125,6 @@ const createField = (
             setValue(instance, defaultValueNumber);
           }
         : undefined;
-    // $FlowFixMe[incompatible-type]
     return {
       name,
       valueType,
@@ -174,23 +179,25 @@ const createField = (
     };
   } else if (valueType === 'choice' || valueType === 'numberwithchoices') {
     // Choice is a "string" (with a selector for the user in the UI)
-    const choices = mapVector(property.getChoices(), choice => ({
-      value: choice.getValue(),
-      label:
-        choice.getValue() +
-        (choice.getLabel() && choice.getLabel() !== choice.getValue()
-          ? ` — ${choice.getLabel()}`
-          : ''),
-    }));
+    const choices: Array<FieldChoices> = mapVector(
+      property.getChoices(),
+      choice => ({
+        value: choice.getValue(),
+        label:
+          choice.getValue() +
+          (choice.getLabel() && choice.getLabel() !== choice.getValue()
+            ? ` — ${choice.getLabel()}`
+            : ''),
+      })
+    );
     // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
-    const deprecatedChoices = property
+    const deprecatedChoices: Array<FieldChoices> = property
       .getExtraInfo()
       .toJSArray()
       .map(value => ({ value, label: value }));
 
     return valueType === 'numberwithchoices'
-      ? // $FlowFixMe[incompatible-type]
-        {
+      ? {
           name,
           valueType: 'number',
           getChoices: () => [...choices, ...deprecatedChoices],
@@ -204,8 +211,7 @@ const createField = (
           visibility,
           isHighlighted: isHighlightedForNumber,
         }
-      : // $FlowFixMe[incompatible-type]
-        {
+      : {
           name,
           valueType: 'string',
           getChoices: () => [...choices, ...deprecatedChoices],
@@ -313,13 +319,13 @@ const createField = (
       isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'objectanimationname') {
-    // $FlowFixMe[incompatible-type]
     return {
       getChoices: () => {
         if (!object) {
           return [];
         }
-        const choices = mapFor(
+        // $FlowFixMe[incompatible-type]
+        const choices: Array<FieldChoices> = mapFor(
           0,
           object.getConfiguration().getAnimationsCount(),
           i => {
@@ -346,11 +352,40 @@ const createField = (
       visibility,
       isHighlighted: isHighlightedForString,
     };
-  } else if (valueType === 'keyboardkey') {
-    // $FlowFixMe[incompatible-type]
+  } else if (valueType === 'layer') {
     return {
       getChoices: () => {
-        const choices = keyNames.map(keyName => ({
+        const choices: Array<FieldChoices> = layers
+          ? mapReverseFor(0, layers.getLayersCount(), i => {
+              const layerName = layers.getLayerAt(i).getName();
+              return layerName === ''
+                ? {
+                    value: layerName,
+                    label: 'Base layer',
+                  }
+                : {
+                    value: layerName,
+                    label: layerName,
+                  };
+            })
+          : [];
+        return choices;
+      },
+      name,
+      valueType: 'string',
+      getValue: getValueForString,
+      setValue: (instance: Instance, newValue: string) => {
+        setStringValue(instance, name, newValue);
+      },
+      getLabel,
+      getDescription,
+      visibility,
+      isHighlighted: isHighlightedForString,
+    };
+  } else if (valueType === 'keyboardkey') {
+    return {
+      getChoices: () => {
+        const choices: Array<FieldChoices> = keyNames.map(keyName => ({
           value: keyName,
           label: keyName,
         }));
@@ -404,8 +439,7 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['Width', 'Height', 'Depth'],
 ];
 
-// $FlowFixMe[missing-local-annot]
-const uncapitalize = str => {
+const uncapitalize = (str: string) => {
   if (!str) return str;
   return str[0].toLowerCase() + str.substr(1);
 };
@@ -504,6 +538,7 @@ export const effectPropertiesMapToSchema = ({
     properties: defaultValueProperties,
     defaultValueProperties,
     object,
+    layersContainer: null,
     visibility,
     quickCustomizationVisibilities,
     showcaseNonDefaultValues,
@@ -554,6 +589,7 @@ const propertiesMapToSchema = ({
   getPropertyValue,
   onUpdateProperty,
   object,
+  layersContainer,
   visibility = 'All',
   quickCustomizationVisibilities,
   showcaseNonDefaultValues,
@@ -566,11 +602,13 @@ const propertiesMapToSchema = ({
     propertyName: string,
     newValue: string
   ) => void,
+  layersContainer: gdLayersContainer | null,
 }): Schema => {
   return adaptablePropertiesMapToSchema({
     properties,
     defaultValueProperties,
     object,
+    layersContainer,
     visibility,
     quickCustomizationVisibilities,
     showcaseNonDefaultValues,
@@ -600,6 +638,7 @@ const adaptablePropertiesMapToSchema = ({
   properties,
   defaultValueProperties,
   object,
+  layersContainer,
   visibility = 'All',
   quickCustomizationVisibilities,
   showcaseNonDefaultValues,
@@ -630,6 +669,7 @@ const adaptablePropertiesMapToSchema = ({
     propertyName: string,
     value: boolean
   ) => void,
+  layersContainer: gdLayersContainer | null,
 |}): Schema => {
   const propertyNames = properties.keys();
   // Aggregate field by groups to be able to build field groups with a title.
@@ -734,6 +774,7 @@ const adaptablePropertiesMapToSchema = ({
               setStringValue,
               setBooleanValue,
               rowPropertyDefaultValue,
+              layersContainer,
               object,
               !!showcaseNonDefaultValues
             );
@@ -772,6 +813,7 @@ const adaptablePropertiesMapToSchema = ({
             ? defaultValueProperties.get(name).getValue()
             : ''
           : null,
+        layersContainer,
         object,
         !!showcaseNonDefaultValues
       );

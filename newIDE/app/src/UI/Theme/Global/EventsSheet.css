@@ -143,6 +143,12 @@
   color: var(--event-sheet-instruction-parameter-base-color);
 }
 
+.gd-events-sheet .instruction-parameter.string,
+.gd-events-sheet .instruction-parameter.resource,
+.gd-events-sheet .instruction-parameter.mouse {
+  color: var(--event-sheet-instruction-parameter-base-color);
+}
+
 .gd-events-sheet .instruction-parameter.number {
   color: var(--event-sheet-instruction-parameter-number-color);
 }
@@ -174,11 +180,18 @@
   font-weight: bold;
 }
 
+.gd-events-sheet .instruction-parameter.objectInExpression {
+  color: var(--event-sheet-instruction-parameter-object-color);
+}
+
 .gd-events-sheet .instruction-parameter.behavior {
   color: var(--event-sheet-instruction-parameter-behavior-color);
 }
 
-.gd-events-sheet .instruction-parameter.operator {
+.gd-events-sheet .instruction-parameter.operator,
+.gd-events-sheet .instruction-parameter.relationalOperator,
+.gd-events-sheet .instruction-parameter.yesorno,
+.gd-events-sheet .instruction-parameter.trueorfalse {
   color: var(--event-sheet-instruction-parameter-operator-color);
 }
 

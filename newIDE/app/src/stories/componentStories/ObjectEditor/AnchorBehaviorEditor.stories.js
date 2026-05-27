@@ -32,6 +32,7 @@ export const Default = (): React.Node => {
         projectScopedContainersAccessor={
           testProject.testSceneProjectScopedContainersAccessor
         }
+        layersContainer={testProject.testLayout.getLayers()}
       />
     </SerializedObjectDisplay>
   );

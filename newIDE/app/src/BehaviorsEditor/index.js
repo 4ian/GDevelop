@@ -88,6 +88,7 @@ type BehaviorConfigurationEditorProps = {|
     behaviorName: string
   ) => void,
   isListLocked: boolean,
+  layersContainer: gdLayersContainer,
 |};
 
 const BehaviorConfigurationEditor = React.forwardRef<
@@ -111,6 +112,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
       openExtension,
       openBehaviorPropertiesQuickCustomizationDialog,
       isListLocked,
+      layersContainer,
     },
     ref
   ) => {
@@ -286,6 +288,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
                 behavior={behavior}
                 project={project}
                 object={object}
+                layersContainer={layersContainer}
                 resourceManagementProps={resourceManagementProps}
                 projectScopedContainersAccessor={
                   projectScopedContainersAccessor
@@ -609,6 +612,7 @@ export const useManageObjectBehaviors = ({
       eventsFunctionsExtension={eventsFunctionsExtension}
       onWillInstallExtension={onWillInstallExtension}
       onExtensionInstalled={onExtensionInstalled}
+      shouldShowCapabilityBehaviors={false}
     />
   );
 
@@ -633,6 +637,7 @@ type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   object: gdObject,
+  layersContainer: gdLayersContainer,
   isChildObject: boolean,
   onUpdateBehaviorsSharedData: () => void,
   onSizeUpdated?: ?() => void,
@@ -660,6 +665,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
     isChildObject,
     project,
     eventsFunctionsExtension,
+    layersContainer,
     onSizeUpdated,
     onBehaviorsUpdated,
     onUpdateBehaviorsSharedData,
@@ -810,6 +816,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
                   key={behaviorName}
                   project={project}
                   object={object}
+                  layersContainer={layersContainer}
                   isChildObject={isChildObject}
                   behavior={behavior}
                   copyBehavior={copyBehavior}

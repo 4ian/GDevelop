@@ -112,6 +112,14 @@ export enum ExpressionCompletionDescription_CompletionKind {
   Parameter = 6,
 }
 
+export enum ExpressionColorationDescription_ColorationKind {
+  String = 0,
+  Number = 1,
+  Object = 2,
+  Variable = 3,
+  Operator = 4,
+}
+
 export enum EventsFunction_FunctionType {
   Action = 0,
   Condition = 1,
@@ -617,6 +625,8 @@ export class Project extends EmscriptenObject {
   removeLayout(name: string): void;
   setFirstLayout(name: string): void;
   getFirstLayout(): string;
+  setPreviewLayout(name: string): void;
+  getPreviewLayout(): string;
   getLayoutPosition(name: string): number;
   hasExternalEventsNamed(name: string): boolean;
   getExternalEvents(name: string): ExternalEvents;
@@ -1373,6 +1383,8 @@ export class SharedPtrSerializerElement extends EmscriptenObject {
 export class Serializer extends EmscriptenObject {
   static toJSON(element: SerializerElement): string;
   static fromJSON(json: string): SerializerElement;
+  static setCanonicalMode(canonical: boolean): void;
+  static isCanonicalMode(): boolean;
   static fromJSObject(object: Object): gdSerializerElement;
   static toJSObject(element: gdSerializerElement): any;
 }
@@ -1650,6 +1662,7 @@ export class ValueTypeMetadata extends EmscriptenObject {
   isNumber(): boolean;
   isString(): boolean;
   isVariable(): boolean;
+  isResource(): boolean;
   static isTypeObject(parameterType: string): boolean;
   static isTypeBehavior(parameterType: string): boolean;
   static isTypeExpression(type: string, parameterType: string): boolean;
@@ -2347,6 +2360,22 @@ export class VectorExpressionCompletionDescription extends EmscriptenObject {
 export class ExpressionCompletionFinder extends EmscriptenObject {
   static getCompletionDescriptionsFor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, node: ExpressionNode, location: number): VectorExpressionCompletionDescription;
   getCompletionDescriptions(): VectorExpressionCompletionDescription;
+}
+
+export class ExpressionColorationDescription extends EmscriptenObject {
+  getColorationKind(): ExpressionColorationDescription_ColorationKind;
+  getStartPosition(): number;
+  getEndPosition(): number;
+}
+
+export class VectorExpressionColorationDescription extends EmscriptenObject {
+  size(): number;
+  at(index: number): ExpressionColorationDescription;
+}
+
+export class ExpressionSyntaxColoringHelper extends EmscriptenObject {
+  static getColorationDescriptionsFor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, node: ExpressionNode): VectorExpressionColorationDescription;
+  getColorationDescriptions(): VectorExpressionColorationDescription;
 }
 
 export class ExpressionNodeLocationFinder extends EmscriptenObject {

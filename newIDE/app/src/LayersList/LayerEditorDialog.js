@@ -239,6 +239,7 @@ const LayerEditorDialog = ({
       onRequestClose={onCancelChanges}
       onApply={() => onApply(hasAnyEffectBeenAdded)}
       fullHeight
+      maxWidth="md"
       flexColumnBody
       fixedContent={
         <Tabs

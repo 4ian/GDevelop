@@ -566,6 +566,7 @@ export const CompactObjectPropertiesEditor = ({
           onObjectsModified([object]);
         },
         object,
+        layersContainer,
         visibility: 'All',
       });
 
@@ -579,6 +580,7 @@ export const CompactObjectPropertiesEditor = ({
       objectConfigurationAsGd,
       customObjectEventsBasedObject,
       object,
+      layersContainer,
       layout,
       onObjectsModified,
       i18n,
@@ -833,6 +835,7 @@ export const CompactObjectPropertiesEditor = ({
                           onBehaviorUpdated={() =>
                             debouncedNotifyBehaviorUpdated(object)
                           }
+                          layersContainer={layersContainer}
                           resourceManagementProps={resourceManagementProps}
                           onOpenFullEditor={() =>
                             onEditObject(object, 'behaviors')

@@ -82,6 +82,7 @@ export const create = (authentication: Authentication): React.Node => {
           }) => (
             <MainFrame
               i18n={i18n}
+              useCliCommandRunner={() => {}}
               renderPreviewLauncher={(props, ref) =>
                 canUseBrowserSW ? (
                   // $FlowFixMe[incompatible-type]

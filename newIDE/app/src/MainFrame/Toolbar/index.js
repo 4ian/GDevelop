@@ -83,7 +83,12 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
               key={index}
               name={button.name}
               icon={button.icon}
-              onClick={() => triggerNpmScript(button.npmScript)}
+              onClick={() =>
+                triggerNpmScript({
+                  script: button.npmScript,
+                  keepTerminalOpen: button.keepTerminalOpen,
+                })
+              }
             />
           ))}
           {props.checkedOutVersionStatus && (

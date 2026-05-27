@@ -1168,6 +1168,8 @@ const generateExtensionRawText = (
                 ].join(' ');
               }),
               '',
+              effectMetadata.getHelpPath() ? generateReadMoreLink(effectMetadata.getHelpPath()) : '',
+              '',
             ].join(`\n`),
           };
         }

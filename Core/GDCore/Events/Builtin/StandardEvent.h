@@ -25,17 +25,17 @@ class GD_CORE_API StandardEvent : public gd::BaseEvent {
  public:
   StandardEvent();
   virtual ~StandardEvent();
-  virtual gd::StandardEvent* Clone() const { return new StandardEvent(*this); }
+  virtual gd::StandardEvent* Clone() const override { return new StandardEvent(*this); }
 
-  virtual bool IsExecutable() const { return true; }
+  virtual bool IsExecutable() const override { return true; }
 
-  virtual bool CanHaveSubEvents() const { return true; }
-  virtual const gd::EventsList& GetSubEvents() const { return events; };
-  virtual gd::EventsList& GetSubEvents() { return events; };
+  virtual bool CanHaveSubEvents() const override { return true; }
+  virtual const gd::EventsList& GetSubEvents() const override { return events; };
+  virtual gd::EventsList& GetSubEvents() override { return events; };
 
-  virtual bool CanHaveVariables() const { return true; }
-  virtual const gd::VariablesContainer& GetVariables() const { return variables; };
-  virtual gd::VariablesContainer& GetVariables() { return variables; };
+  virtual bool CanHaveVariables() const override { return true; }
+  virtual const gd::VariablesContainer& GetVariables() const override { return variables; };
+  virtual gd::VariablesContainer& GetVariables() override { return variables; };
 
   const gd::InstructionsList& GetConditions() const { return conditions; };
   gd::InstructionsList& GetConditions() { return conditions; };
@@ -47,14 +47,14 @@ class GD_CORE_API StandardEvent : public gd::BaseEvent {
   virtual const gd::InstructionsList* GetInstructionList(const gd::String& label) const override;
 
   virtual std::vector<const gd::InstructionsList*> GetAllConditionsVectors()
-      const;
-  virtual std::vector<const gd::InstructionsList*> GetAllActionsVectors() const;
-  virtual std::vector<gd::InstructionsList*> GetAllConditionsVectors();
-  virtual std::vector<gd::InstructionsList*> GetAllActionsVectors();
+      const override;
+  virtual std::vector<const gd::InstructionsList*> GetAllActionsVectors() const override;
+  virtual std::vector<gd::InstructionsList*> GetAllConditionsVectors() override;
+  virtual std::vector<gd::InstructionsList*> GetAllActionsVectors() override;
 
-  virtual void SerializeTo(SerializerElement& element) const;
+  virtual void SerializeTo(SerializerElement& element) const override;
   virtual void UnserializeFrom(gd::Project& project,
-                               const SerializerElement& element);
+                               const SerializerElement& element) override;
 
  private:
   gd::InstructionsList conditions;

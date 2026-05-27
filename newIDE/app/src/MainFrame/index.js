@@ -377,6 +377,12 @@ export type Props = {|
   initialExampleSlugToOpen: ?string,
   quickPublishOnlineWebExporter: Exporter,
   i18n: I18n,
+  useCliCommandRunner: ({|
+    project: ?gdProject,
+    i18n: I18n,
+    commandPaletteRef: {| current: ?CommandPaletteInterface |},
+  |}) => void,
+  onExportHtml5External?: (project: gdProject, i18n: I18n) => Promise<void>,
 |};
 
 const MainFrame = (props: Props): React.MixedElement => {
@@ -645,6 +651,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
     quickPublishOnlineWebExporter,
+    useCliCommandRunner,
+    onExportHtml5External,
   } = props;
 
   const {
@@ -931,7 +939,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     // We use the current storage provider, as it's supposed to be able to open
     // the initial file metadata. Indeed, it's the responsibility of the `ProjectStorageProviders`
     // to set the initial storage provider if an initial file metadata is set.
-    const state = await openFromFileMetadata(initialFileMetadataToOpen);
+    const state = await openFromFileMetadata(initialFileMetadataToOpen, {
+      ignoreAutoSave: Window.isRunningCommandFromCli(),
+    });
     if (state)
       openSceneOrProjectManager({
         currentProject: state.currentProject,
@@ -1181,21 +1191,28 @@ const MainFrame = (props: Props): React.MixedElement => {
       ResourcesLoader.burstAllUrlsCache();
       PixiResourcesLoader.burstCache();
 
+      // Set the on-disk path before exposing the project via state so that
+      // consumers (like the CLI command dispatcher) can call getProjectFile()
+      // immediately after the re-render triggered by setState.
+      if (updatedFileMetadata) {
+        project.setProjectFile(updatedFileMetadata.fileIdentifier);
+      }
+
+      // Start extension code generation before exposing the project via state.
+      // This ensures that when the CLI useEffect fires (triggered by the
+      // setState below), ensureLoadFinished() will see the pending promise
+      // and wait for generation to complete.
+      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        project
+      );
+
       const state = await setState(state => ({
         ...state,
         currentProject: project,
         currentFileMetadata: updatedFileMetadata,
       }));
 
-      // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
-      // their editor will take care of reloading them.
-      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-        project
-      );
-
       if (updatedFileMetadata) {
-        project.setProjectFile(updatedFileMetadata.fileIdentifier);
-
         const storageProvider = getStorageProvider();
         const storageProviderOperations = getStorageProviderOperations(
           storageProvider
@@ -1234,6 +1251,18 @@ const MainFrame = (props: Props): React.MixedElement => {
             '[MainFrame] Failed to read project settings:',
             error.message
           );
+        }
+
+        // Apply the preview layout override stored in the project file
+        // (set via "Use this scene to start all previews").
+        const previewLayoutName = project.getPreviewLayout();
+        if (previewLayoutName && project.hasLayoutNamed(previewLayoutName)) {
+          setPreviewState(previewState => ({
+            ...previewState,
+            isPreviewOverriden: true,
+            overridenPreviewLayoutName: previewLayoutName,
+            overridenPreviewExternalLayoutName: null,
+          }));
         }
 
         setIsProjectClosedSoAvoidReloadingExtensions(false);
@@ -2243,6 +2272,19 @@ const MainFrame = (props: Props): React.MixedElement => {
       overridenPreviewLayoutName,
       overridenPreviewExternalLayoutName,
     }));
+
+    // Persist the preview layout override on the project (like firstLayout),
+    // so it is restored when the project is re-opened.
+    if (currentProject) {
+      const persistedLayoutName =
+        isPreviewOverriden && overridenPreviewLayoutName
+          ? overridenPreviewLayoutName
+          : '';
+      if (currentProject.getPreviewLayout() !== persistedLayoutName) {
+        currentProject.setPreviewLayout(persistedLayoutName);
+        triggerUnsavedChanges();
+      }
+    }
   };
 
   const autosaveProjectIfNeeded = React.useCallback(
@@ -4226,6 +4268,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           skipNewVersionWarning:
             !!checkedOutVersionStatus ||
             (options && options.skipNewVersionWarning),
+          canonicalEventSerialization:
+            preferences.values.canonicalEventSerialization,
         };
         if (cloudProjectRecoveryOpenedVersionId) {
           saveOptions.previousVersion = cloudProjectRecoveryOpenedVersionId;
@@ -4908,6 +4952,15 @@ const MainFrame = (props: Props): React.MixedElement => {
     onExportGame: () => {
       openShareDialog('publish');
     },
+    onExportHtml5External: async () => {
+      const project = state.currentProject;
+      if (!project || !onExportHtml5External) return;
+      try {
+        await onExportHtml5External(project, i18n);
+      } catch (error) {
+        console.error('Headless HTML5 export failed:', error);
+      }
+    },
     onInviteCollaborators: () => {
       openShareDialog('invite');
     },
@@ -4922,6 +4975,12 @@ const MainFrame = (props: Props): React.MixedElement => {
     onRestartInGameEditor,
     onOpenGlobalSearch: openGlobalSearch,
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
+  });
+
+  useCliCommandRunner({
+    project: state.currentProject,
+    i18n,
+    commandPaletteRef,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -5442,7 +5501,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         language={props.i18n.language}
         hasUnsavedChanges={hasUnsavedChanges}
       />
-      <ChangelogDialogContainer />
+      {!Window.isRunningCommandFromCli() && <ChangelogDialogContainer />}
       {selectedInAppTutorialInfo && (
         <StartInAppTutorialDialog
           open

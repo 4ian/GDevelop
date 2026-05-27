@@ -54,6 +54,7 @@ import {
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { useLongTouch } from '../../Utils/UseLongTouch';
+import { useDragDropManager } from 'react-dnd';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
@@ -210,15 +211,19 @@ const EventContainer = (props: EventsContainerProps) => {
     [onEventContextMenu]
   );
 
-  const {
-    isPressingRef,
-    contextMenuProps: longTouchForContextMenuProps,
-  } = useLongTouch(
+  const dragDropManager = useDragDropManager();
+  const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
     React.useCallback(
       (domEvent: any) => {
+        // When the context menu opens it intercepts subsequent touch events,
+        // so the drag backend never receives touchend/touchcancel and the drag
+        // stays active indefinitely. End it explicitly before opening the menu.
+        if (dragDropManager.getMonitor().isDragging()) {
+          dragDropManager.getActions().endDrag();
+        }
         onEventContextMenu(domEvent.clientX, domEvent.clientY);
       },
-      [onEventContextMenu]
+      [dragDropManager, onEventContextMenu]
     ),
     { context: 'events-tree-event-component' }
   );
@@ -247,15 +252,6 @@ const EventContainer = (props: EventsContainerProps) => {
   return (
     <EventDragSourceAndDropTarget
       beginDrag={() => {
-        // During a long-press (which will open the context menu on mobile), suppress
-        // the drag by returning an item with no data. We cannot block canDrag()
-        // instead, because react-dnd-touch-backend evaluates canDrag() once (after its
-        // delayTouchStart of 100ms), at which point isPressingRef is always true — so
-        // blocking canDrag() would permanently break drags on mobile.
-        if (isPressingRef.current) {
-          // $FlowFixMe[incompatible-type]
-          return {};
-        }
         props.onBeginDrag();
         // $FlowFixMe[incompatible-type]
         return props.node;
@@ -605,18 +601,18 @@ const EventsTree: React.ComponentType<{
 
   const _onEndDrag = React.useCallback(
     () => {
-      // This method is always called at the end of the drag, regardless of whether
-      // an event was actually dropped. It is also already called in `_onDrop` to update
-      // the event list and compute history. So if draggedNode is null, we want to avoid
-      // recomputing the event list.
-      // $FlowFixMe[constant-condition]
-      if (draggedNode) {
-        setDraggedNode(null);
-        _restoreFoldedNodes();
-        forceUpdate();
-      }
+      // Don't look at the draggedNode value. On mobile, the OS
+      // fires touchcancel almost immediately after beginDrag, creating a race
+      // where the spec callback arrives before React re-renders with the updated
+      // draggedNode — so checking the value makes it see draggedNode=null (stale
+      // closure) and skips the cleanup. Calling unconditionally is safe: React
+      // deduplicates the null→null state update, and _restoreFoldedNodes is a
+      // no-op when no nodes were temporarily unfolded.
+      setDraggedNode(null);
+      _restoreFoldedNodes();
+      forceUpdate();
     },
-    [draggedNode, _restoreFoldedNodes, forceUpdate]
+    [_restoreFoldedNodes, forceUpdate]
   );
 
   // Position-based height snapshot. Used as a fallback in _getRowHeight when

@@ -25,7 +25,8 @@ namespace gdjs {
 
       // Let the renderer do its final set up:
       this._renderer.onCreated();
-      this._renderer.updatePosition();
+      // We don't call `this._renderer.updatePosition` because the camera has
+      // no effect unless it's moved.
     }
 
     override onGameResolutionResized(

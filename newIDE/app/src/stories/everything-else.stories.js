@@ -2053,6 +2053,7 @@ storiesOf('InstructionEditorDialog', module)
           onPasteInstructions={action('paste instructions')}
           onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('extension installed')}
+          editEventsFunctionParameter={action('editEventsFunctionParameter')}
         />
       )}
     </I18n>
@@ -2081,6 +2082,7 @@ storiesOf('InstructionEditorDialog', module)
           onPasteInstructions={action('paste instructions')}
           onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('extension installed')}
+          editEventsFunctionParameter={action('editEventsFunctionParameter')}
         />
       )}
     </I18n>
@@ -2118,6 +2120,7 @@ storiesOf('InstructionEditorDialog', module)
             onPasteInstructions={action('paste instructions')}
             onWillInstallExtension={action('extension will be installed')}
             onExtensionInstalled={action('extension installed')}
+            editEventsFunctionParameter={action('editEventsFunctionParameter')}
           />
         )}
       </I18n>
@@ -2166,6 +2169,9 @@ storiesOf('InstructionEditorMenu', module)
                 onPasteInstructions={action('paste instructions')}
                 onWillInstallExtension={action('extension will be installed')}
                 onExtensionInstalled={action('extension installed')}
+                editEventsFunctionParameter={action(
+                  'editEventsFunctionParameter'
+                )}
               />
             )}
           </I18n>

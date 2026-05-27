@@ -369,9 +369,12 @@ namespace gdjs {
        */
       export const loadObjectOrGroupAssets = (
         runtimeScene: gdjs.RuntimeScene,
-        objectOrGroupName: string
+        objectOrGroupName: string,
+        sceneName: string
       ): void => {
-        runtimeScene.getGame().loadObjectOrGroupAssets(objectOrGroupName);
+        runtimeScene
+          .getGame()
+          .loadObjectOrGroupAssets(objectOrGroupName, sceneName);
       };
 
       /**
@@ -379,9 +382,12 @@ namespace gdjs {
        */
       export const unloadObjectOrGroupAssets = (
         runtimeScene: gdjs.RuntimeScene,
-        objectOrGroupName: string
+        objectOrGroupName: string,
+        sceneName: string
       ): void => {
-        runtimeScene.getGame().unloadObjectOrGroupAssets(objectOrGroupName);
+        runtimeScene
+          .getGame()
+          .unloadObjectOrGroupAssets(objectOrGroupName, sceneName);
       };
 
       /**
@@ -389,11 +395,12 @@ namespace gdjs {
        */
       export const areObjectOrGroupAssetsLoaded = (
         runtimeScene: gdjs.RuntimeScene,
-        objectOrGroupName: string
+        objectOrGroupName: string,
+        sceneName: string
       ): boolean => {
         return runtimeScene
           .getGame()
-          .areObjectOrGroupAssetsLoaded(objectOrGroupName);
+          .areObjectOrGroupAssetsLoaded(objectOrGroupName, sceneName);
       };
     }
   }

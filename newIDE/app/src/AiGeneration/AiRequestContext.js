@@ -16,6 +16,7 @@ import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInterval } from '../Utils/UseInterval';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import { aiRequestShouldBeWatched } from './AiRequestUtils';
 
 type EditorFunctionCallResultsStorage = {|
   getEditorFunctionCallResults: (
@@ -450,7 +451,12 @@ export const useAiRequestHistory = (
   };
 };
 
-type AiRequestContextState = {|
+export type ActiveSubAgent = {|
+  parentAiRequestId: string,
+  callId: string,
+|};
+
+export type AiRequestContextState = {|
   aiRequestStorage: AiRequestStorage,
   aiRequestHistory: AiRequestHistory,
   editorFunctionCallResultsStorage: EditorFunctionCallResultsStorage,
@@ -460,6 +466,12 @@ type AiRequestContextState = {|
   selectedAiRequestId: string | null,
   setSelectedAiRequestId: (aiRequestId: string | null) => void,
   selectedAiRequest: AiRequest | null,
+  activeSubAgents: { [subAgentAiRequestId: string]: ActiveSubAgent },
+  activateSubAgent: (
+    subAgentAiRequestId: string,
+    parentAiRequestId: string,
+    callId: string
+  ) => void,
 |};
 
 export const initialAiRequestContextState: AiRequestContextState = {
@@ -494,6 +506,8 @@ export const initialAiRequestContextState: AiRequestContextState = {
   selectedAiRequestId: null,
   setSelectedAiRequestId: () => {},
   selectedAiRequest: null,
+  activeSubAgents: {},
+  activateSubAgent: () => {},
 };
 export const AiRequestContext: React.Context<AiRequestContextState> = React.createContext<AiRequestContextState>(
   initialAiRequestContextState
@@ -530,13 +544,13 @@ export const AiRequestProvider = ({
   const lastFullFetchTimeRef = React.useRef<number>(0);
   const fullFetchIntervalInMs = 5000;
 
-  // If the selected AI request is in a "working" state, watch it until it's finished.
-  // Every ~1.4s we do a partial (status-only) fetch; every 5s we do a full fetch to
-  // pick up new messages from the orchestrator/agent while it is still running.
-  const status = selectedAiRequest ? selectedAiRequest.status : null;
+  // Watch the selected AI request while it needs polling (backend is working,
+  // or sub-agents are running). Every ~1.4s we do a partial (status-only) fetch;
+  // every 5s we do a full fetch to pick up new messages.
   const onWatch = async () => {
     if (!profile) return;
-    if (!selectedAiRequestId || !status || status !== 'working') return;
+    if (!selectedAiRequestId || !selectedAiRequest) return;
+    if (!aiRequestShouldBeWatched(selectedAiRequest)) return;
 
     const clearFetchingSuggestionsIfDone = (aiRequest: AiRequest) => {
       if (!isFetchingSuggestions) return;
@@ -579,7 +593,8 @@ export const AiRequestProvider = ({
           }
         );
 
-        if (partialAiRequest.status === 'working') {
+        if (partialAiRequest.status === selectedAiRequest.status) {
+          // No status change — just merge the partial data.
           updateAiRequest(selectedAiRequestId, prevRequest => ({
             ...(prevRequest || {}),
             ...partialAiRequest,
@@ -623,19 +638,206 @@ export const AiRequestProvider = ({
       if (
         selectedAiRequestId &&
         selectedAiRequest &&
-        selectedAiRequest.status === 'working'
+        aiRequestShouldBeWatched(selectedAiRequest)
       ) {
         setShouldWatchRequest(true);
       } else {
         setShouldWatchRequest(false);
       }
 
-      // Ensure we stop watching when the request is no longer working.
       return () => {
         setShouldWatchRequest(false);
       };
     },
     [selectedAiRequestId, selectedAiRequest]
+  );
+
+  // --- Sub-agent tracking & polling ---
+  // Use a ref-backed map for immediate consistency (same pattern as send states).
+  const activeSubAgentsRef = React.useRef<{
+    [subAgentAiRequestId: string]: ActiveSubAgent,
+  }>({});
+  const forceUpdateForSubAgents = useForceUpdate();
+
+  const activateSubAgent = React.useCallback(
+    (
+      subAgentAiRequestId: string,
+      parentAiRequestId: string,
+      callId: string
+    ) => {
+      if (activeSubAgentsRef.current[subAgentAiRequestId]) return;
+      activeSubAgentsRef.current = {
+        ...activeSubAgentsRef.current,
+        [subAgentAiRequestId]: { parentAiRequestId, callId },
+      };
+      forceUpdateForSubAgents();
+    },
+    [forceUpdateForSubAgents]
+  );
+
+  const subAgentLastFullFetchTimeRef = React.useRef<{
+    [subAgentAiRequestId: string]: number,
+  }>({});
+
+  const removeSubAgent = React.useCallback(
+    (subAgentAiRequestId: string) => {
+      delete subAgentLastFullFetchTimeRef.current[subAgentAiRequestId];
+      const { [subAgentAiRequestId]: _, ...rest } = activeSubAgentsRef.current;
+      activeSubAgentsRef.current = rest;
+      forceUpdateForSubAgents();
+    },
+    [forceUpdateForSubAgents]
+  );
+
+  const removeSubAgentsOfRequest = React.useCallback(
+    (aiRequestId: string): Array<string> => {
+      const subAgents = activeSubAgentsRef.current;
+      const subAgentIds = Object.keys(subAgents).filter(
+        id => subAgents[id].parentAiRequestId === aiRequestId
+      );
+      if (subAgentIds.length > 0) {
+        subAgentIds.forEach(id => {
+          delete subAgentLastFullFetchTimeRef.current[id];
+        });
+        const remaining = { ...activeSubAgentsRef.current };
+        subAgentIds.forEach(id => delete remaining[id]);
+        activeSubAgentsRef.current = remaining;
+        forceUpdateForSubAgents();
+      }
+
+      return subAgentIds;
+    },
+    [forceUpdateForSubAgents]
+  );
+
+  const hasActiveSubAgents = Object.keys(activeSubAgentsRef.current).length > 0;
+
+  /**
+   * Remove a sub-agent only when the parent AI request has received a
+   * function_call_output for the sub-agent's call. Until that point the
+   * sub-agent must stay active (its own function calls can be processed by the editor).
+   */
+  const removeSubAgentIfDone = React.useCallback(
+    (subAgentId: string) => {
+      const subAgentInfo = activeSubAgentsRef.current[subAgentId];
+      if (!subAgentInfo) return;
+
+      const parentRequest = aiRequests[subAgentInfo.parentAiRequestId];
+      if (!parentRequest) return;
+
+      const parentOutput = parentRequest.output || [];
+      const hasOutputForSubAgent = parentOutput.some(
+        message =>
+          message.type === 'function_call_output' &&
+          message.call_id === subAgentInfo.callId
+      );
+
+      if (hasOutputForSubAgent) {
+        removeSubAgent(subAgentId);
+        console.info(
+          `Removed sub-agent #${subAgentId} of parent #${
+            subAgentInfo.parentAiRequestId
+          } as done.`
+        );
+      }
+    },
+    [aiRequests, removeSubAgent]
+  );
+
+  useInterval(
+    () => {
+      if (!profile) return;
+      const subAgents = activeSubAgentsRef.current;
+      const subAgentIds = Object.keys(subAgents);
+      if (subAgentIds.length === 0) return;
+
+      subAgentIds.forEach(async subAgentId => {
+        const now = Date.now();
+        const lastFullFetch =
+          subAgentLastFullFetchTimeRef.current[subAgentId] || 0;
+        const shouldDoFullFetch = now - lastFullFetch >= fullFetchIntervalInMs;
+
+        const doFullFetch = async () => {
+          subAgentLastFullFetchTimeRef.current[subAgentId] = now;
+          const aiRequest = await retryIfFailed({ times: 2 }, () =>
+            getAiRequest(getAuthorizationHeader, {
+              userId: profile.id,
+              aiRequestId: subAgentId,
+            })
+          );
+          updateAiRequest(subAgentId, () => aiRequest);
+
+          if (aiRequest.status === 'ready' || aiRequest.status === 'error') {
+            removeSubAgentIfDone(subAgentId);
+          }
+        };
+
+        try {
+          if (shouldDoFullFetch) {
+            await doFullFetch();
+          } else {
+            const partialAiRequest = await getPartialAiRequest(
+              getAuthorizationHeader,
+              {
+                userId: profile.id,
+                aiRequestId: subAgentId,
+                include: 'status',
+              }
+            );
+
+            if (partialAiRequest.status !== aiRequests[subAgentId].status) {
+              // Status changed — do a full fetch immediately.
+              await doFullFetch();
+            } else {
+              updateAiRequest(subAgentId, prevRequest => ({
+                ...(prevRequest || {}),
+                ...partialAiRequest,
+              }));
+            }
+          }
+        } catch (error) {
+          console.warn(
+            `Error while watching sub-agent AI request ${subAgentId}. Will retry on next interval.`,
+            error
+          );
+        }
+      });
+    },
+    hasActiveSubAgents ? watchPollingIntervalInMs : null
+  );
+
+  // Clear sub-agents when the parent request is suspended.
+  React.useEffect(
+    () => {
+      if (selectedAiRequest && selectedAiRequest.status === 'suspended') {
+        const subAgentIds = removeSubAgentsOfRequest(selectedAiRequest.id);
+        if (subAgentIds.length > 0) {
+          console.info(
+            `Removed ${subAgentIds.length} sub-agents of parent #${
+              selectedAiRequest.id
+            } as suspended.`
+          );
+        }
+      }
+    },
+    [selectedAiRequest, removeSubAgentsOfRequest]
+  );
+  // Clear sub-agents when the selected AI request is changed.
+  React.useEffect(
+    () => {
+      if (!selectedAiRequestId) return;
+      return () => {
+        const subAgentIds = removeSubAgentsOfRequest(selectedAiRequestId);
+        if (subAgentIds.length > 0) {
+          console.info(
+            `Removed ${
+              subAgentIds.length
+            } sub-agents of parent #${selectedAiRequestId} as selected AI request changed.`
+          );
+        }
+      };
+    },
+    [selectedAiRequestId, removeSubAgentsOfRequest]
   );
 
   const environment = Window.isDev() ? 'staging' : 'live';
@@ -669,6 +871,8 @@ export const AiRequestProvider = ({
     [getAiSettings]
   );
 
+  const activeSubAgents = activeSubAgentsRef.current;
+
   const state = React.useMemo(
     (): AiRequestContextState => ({
       aiRequestStorage,
@@ -680,6 +884,8 @@ export const AiRequestProvider = ({
       selectedAiRequestId,
       setSelectedAiRequestId,
       selectedAiRequest,
+      activeSubAgents,
+      activateSubAgent,
     }),
     [
       aiRequestStorage,
@@ -691,6 +897,8 @@ export const AiRequestProvider = ({
       selectedAiRequestId,
       setSelectedAiRequestId,
       selectedAiRequest,
+      activeSubAgents,
+      activateSubAgent,
     ]
   );
 

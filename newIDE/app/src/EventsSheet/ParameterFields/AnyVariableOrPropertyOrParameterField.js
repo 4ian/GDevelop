@@ -5,8 +5,8 @@ import VariableField, {
   getRootVariableName,
   renderVariableWithIcon,
   type VariableFieldInterface,
-  type VariableDialogOpeningProps,
 } from './VariableField';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import GlobalAndSceneVariablesDialog from '../../VariablesList/GlobalAndSceneVariablesDialog';
 import LocalVariablesDialog from '../../VariablesList/LocalVariablesDialog';
 import {
@@ -41,6 +41,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       projectScopedContainersAccessor,
       onChange,
       value,
+      editEventsFunctionParameter,
     } = props;
 
     const enumerateGlobalAndSceneVariables = React.useCallback(
@@ -94,6 +95,13 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     );
     const variableSourceType = variablesContainer.getSourceType();
 
+    const onOpenDialog = React.useCallback(
+      (props: VariableDialogOpeningProps) => {
+        setEditorOpen(props);
+      },
+      []
+    );
+
     return (
       <React.Fragment>
         <VariableField
@@ -110,7 +118,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onRequestClose={props.onRequestClose}
           onApply={props.onApply}
           ref={field}
-          onOpenDialog={setEditorOpen}
+          onOpenDialog={onOpenDialog}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
@@ -122,6 +130,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           }
           onInstructionTypeChanged={onInstructionTypeChanged}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
+          editEventsFunctionParameter={editEventsFunctionParameter || null}
         />
         {editorOpen &&
           (variableSourceType === gd.VariablesContainer.Local ? (
@@ -135,8 +144,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 open
                 onCancel={() => setEditorOpen(null)}
                 onApply={onVariableEditorApply}
-                initiallySelectedVariableName={editorOpen.variableName}
-                shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+                initiallySelectedVariable={editorOpen}
                 isListLocked={false}
               />
             )
@@ -150,8 +158,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 variableSourceType === gd.VariablesContainer.Global ||
                 variableSourceType === gd.VariablesContainer.ExtensionGlobal
               }
-              initiallySelectedVariableName={editorOpen.variableName}
-              shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+              initiallySelectedVariable={editorOpen}
               hotReloadPreviewButtonProps={null}
               isListLocked={false}
             />

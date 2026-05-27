@@ -14,6 +14,7 @@ export type ToolbarButtonConfig = {|
   icon: string,
   npmScript: string,
   hook?: ToolbarButtonHooksNames,
+  keepTerminalOpen?: boolean,
 |};
 
 type Props = {|

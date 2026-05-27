@@ -633,6 +633,8 @@ interface Project {
     void RemoveLayout([Const] DOMString name);
     void SetFirstLayout([Const] DOMString name);
     [Const, Ref] DOMString GetFirstLayout();
+    void SetPreviewLayout([Const] DOMString name);
+    [Const, Ref] DOMString GetPreviewLayout();
     unsigned long GetLayoutPosition([Const] DOMString name);
 
     boolean HasExternalEventsNamed([Const] DOMString name);
@@ -1643,6 +1645,8 @@ interface SharedPtrSerializerElement {
 interface Serializer {
     [Const, Value] DOMString STATIC_ToJSON([Const, Ref] SerializerElement element);
     [Value] SerializerElement STATIC_FromJSON([Const] DOMString json);
+    void STATIC_SetCanonicalMode(boolean canonical);
+    boolean STATIC_IsCanonicalMode();
 };
 
 [NoDelete]
@@ -1986,6 +1990,7 @@ interface ValueTypeMetadata {
     boolean IsNumber();
     boolean IsString();
     boolean IsVariable();
+    boolean IsResource();
 
     boolean STATIC_IsTypeObject([Const] DOMString parameterType);
     boolean STATIC_IsTypeBehavior([Const] DOMString parameterType);
@@ -3254,6 +3259,37 @@ interface ExpressionCompletionFinder {
     [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ProjectScopedContainers projectScopedContainers, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
 
     [Const, Ref] VectorExpressionCompletionDescription GetCompletionDescriptions();
+
+    //Inherited from ExpressionParser2NodeWorker:
+};
+
+enum ExpressionColorationDescription_ColorationKind {
+  "ExpressionColorationDescription::String",
+  "ExpressionColorationDescription::Number",
+  "ExpressionColorationDescription::Object",
+  "ExpressionColorationDescription::Variable",
+  "ExpressionColorationDescription::Operator",
+};
+
+interface ExpressionColorationDescription {
+  ExpressionColorationDescription_ColorationKind GetColorationKind();
+  unsigned long GetStartPosition();
+  unsigned long GetEndPosition();
+};
+
+interface VectorExpressionColorationDescription {
+    unsigned long size();
+    [Value] ExpressionColorationDescription at(unsigned long index);
+};
+
+interface ExpressionSyntaxColoringHelper {
+    [Value] VectorExpressionColorationDescription STATIC_GetColorationDescriptionsFor(
+        [Const, Ref] Platform platform, [Const, Ref]
+        ProjectScopedContainers projectScopedContainers,
+        [Const] DOMString rootType,
+        [Ref] ExpressionNode node);
+
+    [Const, Ref] VectorExpressionColorationDescription GetColorationDescriptions();
 
     //Inherited from ExpressionParser2NodeWorker:
 };

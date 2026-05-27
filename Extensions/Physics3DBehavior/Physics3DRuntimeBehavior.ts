@@ -1371,11 +1371,11 @@ namespace gdjs {
     }
 
     setGravityY(gravityY: float): void {
-      if (this._sharedData.gravityX === gravityY) {
+      if (this._sharedData.gravityY === gravityY) {
         return;
       }
 
-      this._sharedData.gravityX = gravityY;
+      this._sharedData.gravityY = gravityY;
       this._sharedData.physicsSystem.SetGravity(
         this.getVec3(
           this._sharedData.gravityX,
@@ -1386,7 +1386,7 @@ namespace gdjs {
     }
 
     setGravityZ(gravityZ: float): void {
-      if (this._sharedData.gravityX === gravityZ) {
+      if (this._sharedData.gravityZ === gravityZ) {
         return;
       }
 

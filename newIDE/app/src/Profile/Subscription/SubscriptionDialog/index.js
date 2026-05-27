@@ -171,12 +171,14 @@ export default function SubscriptionDialog({
     subscriptionPlanPricingSystem: SubscriptionPlanPricingSystem | null
   ) => {
     if (!profile || !subscription) return;
-    if (subscriptionPlanPricingSystem) {
-      sendChoosePlanClicked({
-        planId: subscriptionPlanPricingSystem.planId,
-        pricingSystemId: subscriptionPlanPricingSystem.id,
-      });
-    }
+    sendChoosePlanClicked({
+      planId: subscriptionPlanPricingSystem
+        ? subscriptionPlanPricingSystem.planId
+        : null,
+      pricingSystemId: subscriptionPlanPricingSystem
+        ? subscriptionPlanPricingSystem.id
+        : null,
+    });
 
     // Subscribing from an account without a subscription
     if (!subscription.planId && subscriptionPlanPricingSystem) {

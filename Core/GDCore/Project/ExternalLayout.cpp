@@ -23,7 +23,9 @@ void ExternalLayout::UnserializeFrom(gd::Project &project,
 void ExternalLayout::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", name);
   instances.SerializeTo(element.AddChild("instances"));
-  editorSettings.SerializeTo(element.AddChild("editionSettings"));
+  if (!editorSettings.IsEmpty()) {
+    editorSettings.SerializeTo(element.AddChild("editionSettings"));
+  }
   element.SetAttribute("associatedLayout", associatedLayout);
 }
 

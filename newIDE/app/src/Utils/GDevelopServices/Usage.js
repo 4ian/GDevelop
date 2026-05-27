@@ -695,12 +695,17 @@ export const validateCoupon = async (
   return response.data;
 };
 
-export const canBenefitFromDiscordRole = (
+export const canBenefitFromSocialRole = (
   subscription: ?Subscription
 ): false | true | boolean => {
   return (
     !!subscription &&
-    ['gdevelop_education', 'gdevelop_startup', 'gdevelop_gold'].includes(
+    [
+      'gdevelop_education',
+      'gdevelop_startup',
+      'gdevelop_gold',
+      'gdevelop_silver',
+    ].includes(
       // $FlowFixMe[incompatible-type]
       subscription.planId
     ) &&

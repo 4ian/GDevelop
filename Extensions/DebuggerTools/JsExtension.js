@@ -87,6 +87,53 @@ module.exports = {
 
     extension
       .addAction(
+        'EnableDebugDraw3D',
+        _('Draw 3D collision shapes'),
+        _(
+          'This activates the display of wireframe meshes showing the 3D collision shapes of objects using the 3D physics engine (box, sphere, capsule, cylinder).'
+        ),
+        _(
+          'Enable 3D debug draw of collision shapes: _PARAM1_ (color: _PARAM2_, depth test: _PARAM3_)'
+        ),
+        '',
+        'res/actions/planicon24.png',
+        'res/actions/planicon.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('yesorno', _('Enable 3D debug draw'), '', true)
+      .setDefaultValue('yes')
+      .addParameter('color', _('Wireframe color'), '', true)
+      .setDefaultValue('"0;255;0"')
+      .addParameter(
+        'yesorno',
+        _('Apply depth test (hide shapes behind geometry)'),
+        '',
+        true
+      )
+      .setDefaultValue('yes')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
+      .setFunctionName('gdjs.evtTools.debuggerTools.enableDebugDraw3D');
+
+    extension
+      .addAction(
+        'ToggleDebugDraw3D',
+        _('Toggle 3D collision shapes drawing'),
+        _(
+          'Toggles the display of wireframe meshes showing the 3D collision shapes of objects using the 3D physics engine. The last used color and depth test settings are reused.'
+        ),
+        _('Toggle 3D debug draw of collision shapes'),
+        '',
+        'res/actions/planicon24.png',
+        'res/actions/planicon.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
+      .setFunctionName('gdjs.evtTools.debuggerTools.toggleDebugDraw3D');
+
+    extension
+      .addAction(
         'ConsoleLog',
         _('Log a message to the console'),
         _("Logs a message to the debugger's console."),

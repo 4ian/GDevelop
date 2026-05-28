@@ -505,7 +505,7 @@ namespace gdjs {
           d = 0,
           radius = 0,
           totalHeight = 0;
-        const autoRadius = (a: number, b: number) => Math.sqrt(a * b) / 2;
+        const autoRadius = (a: number, b: number) => Math.max(a, b) / 2;
 
         if (shape === 'Box') {
           w =
@@ -523,7 +523,7 @@ namespace gdjs {
           totalHeight = d;
         } else if (shape === 'Sphere') {
           const volumeRadius =
-            Math.pow(worldWidth * worldHeight * worldDepth, 1 / 3) / 2;
+            Math.max(worldWidth, worldHeight, worldDepth) / 2;
           radius =
             physics3DBehavior.shapeDimensionA === 0
               ? volumeRadius

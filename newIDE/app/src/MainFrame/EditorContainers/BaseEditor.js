@@ -139,7 +139,7 @@ export type RenderEditorContainerProps = {|
       | 'scene-events-editor'
       | 'extension-events-editor'
       | 'external-events-editor'
-  ) => void,
+  ) => Promise<void>,
   onRenamedEventsBasedObject: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     oldName: string,

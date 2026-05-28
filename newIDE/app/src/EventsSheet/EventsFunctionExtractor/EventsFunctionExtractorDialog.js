@@ -38,7 +38,10 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   serializedEvents: Object,
   onClose: () => void,
-  onCreate: (extensionName: string, eventsFunction: gdEventsFunction) => void,
+  onCreate: (
+    extensionName: string,
+    eventsFunction: gdEventsFunction
+  ) => Promise<void>,
 |};
 
 const CREATE_NEW_EXTENSION_PLACEHOLDER = '<create a new extension>';

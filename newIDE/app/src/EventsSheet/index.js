@@ -187,7 +187,7 @@ type Props = {|
   onCreateEventsFunction: (
     extensionName: string,
     eventsFunction: gdEventsFunction
-  ) => void,
+  ) => Promise<void>,
   onBeginCreateEventsFunction: () => void,
   unsavedChanges?: ?UnsavedChanges,
   isActive: boolean,
@@ -2973,8 +2973,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               })
             }
             serializedEvents={this.state.serializedEventsToExtract}
-            onCreate={(extensionName, eventsFunction) => {
-              onCreateEventsFunction(extensionName, eventsFunction);
+            onCreate={async (extensionName, eventsFunction) => {
+              await onCreateEventsFunction(extensionName, eventsFunction);
               this._replaceSelectionByEventsFunction(
                 extensionName,
                 eventsFunction

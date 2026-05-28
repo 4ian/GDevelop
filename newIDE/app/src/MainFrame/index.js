@@ -3545,7 +3545,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     forceUpdate();
   };
 
-  const onCreateEventsFunction = (
+  const onCreateEventsFunction = async (
     extensionName: string,
     eventsFunction: gdEventsFunction,
     editorIdentifier:
@@ -3577,7 +3577,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     }
 
     extension.getEventsFunctions().insertEventsFunction(eventsFunction, 0);
-    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+    await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
       currentProject
     );
     setEditorHotReloadNeeded({

@@ -3,7 +3,10 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
-import { type TargetName } from '../../Utils/GDevelopServices/Build';
+import {
+  type TargetName,
+  type BuildSigningOptions,
+} from '../../Utils/GDevelopServices/Build';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
@@ -14,10 +17,15 @@ import { type HeaderProps, type ExportFlowProps } from '../ExportPipeline.flow';
 import BuildStepsProgress from '../Builds/BuildStepsProgress';
 import RaisedButton from '../../UI/RaisedButton';
 import { ColumnStackLayout } from '../../UI/Layout';
+import { AndroidSigningCredentialsSelector } from '../SigningCredentials/AndroidSigningCredentialsSelector';
+import TextField from '../../UI/TextField';
+import { t } from '@lingui/macro';
+import AlertMessage from '../../UI/AlertMessage';
 
 export type ExportState = {|
   targets: Array<TargetName>,
-  keystore: 'old' | 'new',
+  keystore: 'old' | 'new' | 'custom',
+  buildSigningOptions: BuildSigningOptions | null,
   signingDialogOpen: boolean,
 |};
 
@@ -26,6 +34,7 @@ export const SetupExportHeader = ({
   updateExportState,
   isExporting,
   build,
+  authenticatedUser,
 }: HeaderProps<ExportState>): null | React.Node => {
   // Build is finished, hide options.
   if (!!build && build.status === 'complete') return null;
@@ -79,7 +88,9 @@ export const SetupExportHeader = ({
               }));
             }}
             disabled={
-              exportState.targets[0] !== 'androidAppBundle' || isExporting
+              (exportState.targets[0] === 'androidApk' &&
+                exportState.keystore !== 'custom') ||
+              isExporting
             }
           />
         </Line>
@@ -153,10 +164,65 @@ export const SetupExportHeader = ({
             <FormControlLabel
               value={'custom'}
               control={<Radio color="primary" />}
-              label={<Trans>Custom upload key (not available yet)</Trans>}
-              disabled
+              label={<Trans>Custom upload key</Trans>}
             />
           </RadioGroup>
+          {exportState.keystore === 'custom' && (
+            <ColumnStackLayout noMargin>
+              <AndroidSigningCredentialsSelector
+                authenticatedUser={authenticatedUser}
+                buildSigningOptions={exportState.buildSigningOptions}
+                onSelectBuildSigningOptions={buildSigningOptions => {
+                  updateExportState(prevExportState => ({
+                    ...prevExportState,
+                    buildSigningOptions,
+                  }));
+                }}
+                disabled={isExporting}
+              />
+              {exportState.targets[0] === 'androidApk' && (
+                <ColumnStackLayout noMargin>
+                  <AlertMessage kind="info">
+                    <Trans>
+                      If Google Play asks you to prove package name ownership,
+                      paste the content of your{' '}
+                      <b>adi-registration.properties</b> file from Google Play
+                      Console here.
+                    </Trans>
+                  </AlertMessage>
+                  <TextField
+                    floatingLabelText={
+                      <Trans>Package name verification token (optional)</Trans>
+                    }
+                    hintText={t`Paste the content of adi-registration.properties`}
+                    value={
+                      exportState.buildSigningOptions &&
+                      exportState.buildSigningOptions.verificationTokenAsBase64
+                        ? atob(
+                            exportState.buildSigningOptions
+                              .verificationTokenAsBase64
+                          )
+                        : ''
+                    }
+                    onChange={(e, value) => {
+                      updateExportState(prevExportState => ({
+                        ...prevExportState,
+                        buildSigningOptions: {
+                          ...prevExportState.buildSigningOptions,
+                          verificationTokenAsBase64: value
+                            ? btoa(value)
+                            : undefined,
+                        },
+                      }));
+                    }}
+                    multiline
+                    rows={4}
+                    fullWidth
+                  />
+                </ColumnStackLayout>
+              )}
+            </ColumnStackLayout>
+          )}
         </Dialog>
       )}
     </Column>

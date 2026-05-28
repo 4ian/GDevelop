@@ -1,14 +1,15 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import { enumerateEventsFunctionsExtensions } from '../../ProjectManager/EnumerateProjectItems';
-import { Line, Column } from '../../UI/Grid';
-import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import SelectField from '../../UI/SelectField';
+import { Line } from '../../UI/Grid';
+import CompactSemiControlledTextField from '../../UI/CompactSemiControlledTextField';
+import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
 import {
   setupFunctionFromEvents,
@@ -25,6 +26,7 @@ import HelpButton from '../../UI/HelpButton';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import CompactPropertiesEditorRowField from '../../CompactPropertiesEditor/CompactPropertiesEditorRowField';
 
 const gd: libGDevelop = global.gd;
 
@@ -127,189 +129,210 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     };
 
     return (
-      <Dialog
-        title={<Trans>Extract the events in a function</Trans>}
-        secondaryActions={[
-          <HelpButton
-            helpPagePath="/events/functions/extract-events"
-            key="help"
-          />,
-        ]}
-        actions={[
-          <FlatButton
-            key="cancel"
-            label={<Trans>Cancel</Trans>}
-            onClick={onClose}
-          />,
-          <DialogPrimaryButton
-            key="create"
-            label={<Trans>Create</Trans>}
-            primary
-            disabled={
-              !canCreateEventsFunction(project, extensionName, eventsFunction)
-            }
-            onClick={onApply}
-          />,
-        ]}
-        open
-        cannotBeDismissed
-        onRequestClose={onClose}
-        onApply={onApply}
-        maxWidth="sm"
-      >
-        <ColumnStackLayout noMargin>
-          <DismissableAlertMessage
-            identifier="function-extractor-explanation"
-            kind="info"
+      <I18n>
+        {({ i18n }) => (
+          <Dialog
+            title={<Trans>Extract the events in a function</Trans>}
+            secondaryActions={[
+              <HelpButton
+                helpPagePath="/events/functions/extract-events"
+                key="help"
+              />,
+            ]}
+            actions={[
+              <FlatButton
+                key="cancel"
+                label={<Trans>Cancel</Trans>}
+                onClick={onClose}
+              />,
+              <DialogPrimaryButton
+                key="create"
+                label={<Trans>Create</Trans>}
+                primary
+                disabled={
+                  !canCreateEventsFunction(
+                    project,
+                    extensionName,
+                    eventsFunction
+                  )
+                }
+                onClick={onApply}
+              />,
+            ]}
+            open
+            cannotBeDismissed
+            onRequestClose={onClose}
+            onApply={onApply}
+            maxWidth="sm"
           >
-            After creating a function, it will be usable in the events sheet.
-            Functions are grouped by extensions. Choose, or enter the name of a
-            new extension, and a function name, then configure the function and
-            its parameters.
-          </DismissableAlertMessage>
-          <Column noMargin>
-            <ResponsiveLineStackLayout noMargin expand>
-              <SelectField
-                floatingLabelText={
-                  <Trans>Extension (storing the function)</Trans>
-                }
-                value={
-                  createNewExtension
-                    ? CREATE_NEW_EXTENSION_PLACEHOLDER
-                    : extensionName
-                }
-                onChange={(e, i, extensionName) => {
-                  if (extensionName === CREATE_NEW_EXTENSION_PLACEHOLDER) {
-                    this.setState({
-                      createNewExtension: true,
-                      extensionName: getSafeExtensionName(
-                        project,
-                        'MyExtension'
-                      ),
-                    });
-                  } else {
-                    this.setState({
-                      createNewExtension: false,
-                      extensionName,
-                    });
-                  }
-                  eventsFunction.setName(
-                    getSafeEventsFunctionName(
-                      project,
-                      extensionName,
-                      eventsFunction.getName()
-                    )
-                  );
-                }}
-                fullWidth
+            <ColumnStackLayout noMargin>
+              <DismissableAlertMessage
+                identifier="function-extractor-explanation"
+                kind="info"
               >
-                {eventsFunctionsExtensions.map(eventsFunctionsExtension => (
-                  <SelectOption
-                    key={eventsFunctionsExtension.getName()}
-                    value={eventsFunctionsExtension.getName()}
-                    label={
-                      eventsFunctionsExtension.getFullName() ||
-                      eventsFunctionsExtension.getName()
+                After creating a function, it will be usable in the events
+                sheet. Functions are grouped by extensions. Choose, or enter the
+                name of a new extension, and a function name, then configure the
+                function and its parameters.
+              </DismissableAlertMessage>
+              <ColumnStackLayout noMargin expand noOverflowParent>
+                <ResponsiveLineStackLayout noMargin expand>
+                  <CompactPropertiesEditorRowField
+                    label={i18n._(t`Extension`)}
+                    markdownDescription={i18n._(
+                      t`Extension containing the new function`
+                    )}
+                    field={
+                      <CompactSelectField
+                        value={
+                          createNewExtension
+                            ? CREATE_NEW_EXTENSION_PLACEHOLDER
+                            : extensionName
+                        }
+                        onChange={extensionName => {
+                          if (
+                            extensionName === CREATE_NEW_EXTENSION_PLACEHOLDER
+                          ) {
+                            this.setState({
+                              createNewExtension: true,
+                              extensionName: getSafeExtensionName(
+                                project,
+                                'MyExtension'
+                              ),
+                            });
+                          } else {
+                            this.setState({
+                              createNewExtension: false,
+                              extensionName,
+                            });
+                          }
+                          eventsFunction.setName(
+                            getSafeEventsFunctionName(
+                              project,
+                              extensionName,
+                              eventsFunction.getName()
+                            )
+                          );
+                        }}
+                      >
+                        {eventsFunctionsExtensions.map(
+                          eventsFunctionsExtension => (
+                            <SelectOption
+                              key={eventsFunctionsExtension.getName()}
+                              value={eventsFunctionsExtension.getName()}
+                              label={
+                                eventsFunctionsExtension.getFullName() ||
+                                eventsFunctionsExtension.getName()
+                              }
+                            />
+                          )
+                        )}
+                        <SelectOption
+                          value={CREATE_NEW_EXTENSION_PLACEHOLDER}
+                          label={t`<Create a New Extension>`}
+                        />
+                      </CompactSelectField>
                     }
                   />
-                ))}
-                <SelectOption
-                  value={CREATE_NEW_EXTENSION_PLACEHOLDER}
-                  label={t`<Create a New Extension>`}
-                />
-              </SelectField>
-              {createNewExtension ? (
-                <SemiControlledTextField
-                  commitOnBlur
-                  value={extensionName}
-                  floatingLabelText={<Trans>New extension name</Trans>}
-                  onChange={(extensionName: string) =>
-                    this.setState({
-                      extensionName: getSafeExtensionName(
-                        project,
-                        extensionName
-                      ),
-                    })
+                  {createNewExtension ? (
+                    <CompactPropertiesEditorRowField
+                      label={i18n._(t`Extension name`)}
+                      markdownDescription={i18n._(t`New extension name`)}
+                      field={
+                        <CompactSemiControlledTextField
+                          commitOnBlur
+                          value={extensionName}
+                          onChange={(extensionName: string) =>
+                            this.setState({
+                              extensionName: getSafeExtensionName(
+                                project,
+                                extensionName
+                              ),
+                            })
+                          }
+                        />
+                      }
+                    />
+                  ) : null}
+                </ResponsiveLineStackLayout>
+                <CompactPropertiesEditorRowField
+                  label={i18n._(t`Function name`)}
+                  field={
+                    <CompactSemiControlledTextField
+                      commitOnBlur
+                      value={eventsFunction.getName()}
+                      onChange={(functionName: string) => {
+                        eventsFunction.setName(
+                          getSafeEventsFunctionName(
+                            project,
+                            extensionName,
+                            functionName
+                          )
+                        );
+                        this.forceUpdate();
+                      }}
+                    />
                   }
-                  fullWidth
                 />
-              ) : null}
-            </ResponsiveLineStackLayout>
-            <Line>
-              <SemiControlledTextField
-                commitOnBlur
-                value={eventsFunction.getName()}
-                floatingLabelText={<Trans>Function name</Trans>}
-                onChange={(functionName: string) => {
-                  eventsFunction.setName(
-                    getSafeEventsFunctionName(
-                      project,
-                      extensionName,
-                      functionName
-                    )
-                  );
+                {hasLotsOfParameters ? (
+                  <Line>
+                    <AlertMessage kind="warning">
+                      <Trans>
+                        This function will have a lot of parameters. Consider
+                        creating groups or functions for a smaller set of
+                        objects so that the function is easier to reuse.
+                      </Trans>
+                    </AlertMessage>
+                  </Line>
+                ) : null}
+              </ColumnStackLayout>
+              <CompactEventsFunctionPropertiesEditor
+                project={project}
+                eventsFunction={eventsFunction}
+                eventsBasedBehavior={null}
+                eventsBasedObject={null}
+                eventsFunctionsContainer={null}
+                eventsFunctionsExtension={null}
+                onConfigurationUpdated={() => {
+                  // Force re-running logic to see if Create button is disabled.
                   this.forceUpdate();
                 }}
-                fullWidth
+                freezeEventsFunctionType
               />
-            </Line>
-            {hasLotsOfParameters ? (
-              <Line>
-                <AlertMessage kind="warning">
-                  <Trans>
-                    This function will have a lot of parameters. Consider
-                    creating groups or functions for a smaller set of objects so
-                    that the function is easier to reuse.
-                  </Trans>
-                </AlertMessage>
-              </Line>
-            ) : null}
-          </Column>
-          <CompactEventsFunctionPropertiesEditor
-            project={project}
-            eventsFunction={eventsFunction}
-            eventsBasedBehavior={null}
-            eventsBasedObject={null}
-            eventsFunctionsContainer={null}
-            eventsFunctionsExtension={null}
-            onConfigurationUpdated={() => {
-              // Force re-running logic to see if Create button is disabled.
-              this.forceUpdate();
-            }}
-            freezeEventsFunctionType
-          />
-          {this._projectScopedContainersAccessor && (
-            <CompactEventsFunctionParametersEditor
-              project={project}
-              projectScopedContainersAccessor={
-                this._projectScopedContainersAccessor
-              }
-              eventsFunction={eventsFunction}
-              eventsBasedBehavior={null}
-              eventsBasedObject={null}
-              eventsFunctionsContainer={null}
-              eventsFunctionsExtension={null}
-              onParametersUpdated={() => {
-                // Force the dialog to adapt its size
-                this.forceUpdate();
-              }}
-              onFunctionParameterWillBeRenamed={() => {
-                // Won't happen as the editor is freezed.
-              }}
-              onFunctionParameterTypeChanged={() => {
-                // Won't happen as the editor is freezed.
-              }}
-              onWillInstallExtension={() => {
-                // Won't happen as the editor is freezed.
-              }}
-              onExtensionInstalled={() => {
-                // Won't happen as the editor is freezed.
-              }}
-              freezeParameters
-            />
-          )}
-        </ColumnStackLayout>
-      </Dialog>
+              {this._projectScopedContainersAccessor && (
+                <CompactEventsFunctionParametersEditor
+                  project={project}
+                  projectScopedContainersAccessor={
+                    this._projectScopedContainersAccessor
+                  }
+                  eventsFunction={eventsFunction}
+                  eventsBasedBehavior={null}
+                  eventsBasedObject={null}
+                  eventsFunctionsContainer={null}
+                  eventsFunctionsExtension={null}
+                  onParametersUpdated={() => {
+                    // Force the dialog to adapt its size
+                    this.forceUpdate();
+                  }}
+                  onFunctionParameterWillBeRenamed={() => {
+                    // Won't happen as the editor is freezed.
+                  }}
+                  onFunctionParameterTypeChanged={() => {
+                    // Won't happen as the editor is freezed.
+                  }}
+                  onWillInstallExtension={() => {
+                    // Won't happen as the editor is freezed.
+                  }}
+                  onExtensionInstalled={() => {
+                    // Won't happen as the editor is freezed.
+                  }}
+                  freezeParameters
+                />
+              )}
+            </ColumnStackLayout>
+          </Dialog>
+        )}
+      </I18n>
     );
   }
 }

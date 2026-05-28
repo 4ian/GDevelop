@@ -44,6 +44,7 @@ import {
   getDefaultAiConfigurationPresetId,
 } from '../AiConfiguration';
 import { AiConfigurationPresetSelector } from './AiConfigurationPresetSelector';
+import { FreeAiBanner } from './FreeAiBanner';
 import { AiRequestContext } from '../AiRequestContext';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useStickyVisibility } from './UseStickyVisibility';
@@ -596,6 +597,14 @@ export const AiRequestChat: React.ComponentType<{
         selectedMode,
         aiConfigurationPresetsWithAvailability
       );
+    // Whether the next/current request uses the "low" (free, open-source)
+    // preset, to show a banner about its limitations.
+    const isLowFreePreset = aiRequest
+      ? !!(
+          aiRequest.aiConfiguration &&
+          aiRequest.aiConfiguration.presetId === 'low'
+        )
+      : chosenOrDefaultAiConfigurationPresetId === 'low';
     const hasFunctionsCallsToProcess =
       aiRequest &&
       getFunctionCallsToProcess({
@@ -629,6 +638,9 @@ export const AiRequestChat: React.ComponentType<{
     const doesNotHaveEnoughCreditsToContinue =
       !!price && availableCredits < price.priceInCredits;
     const cannotContinue =
+      // The "low" (free, open-source) preset never consumes credits/quota,
+      // so it can always be used, even without credits or a subscription.
+      !isLowFreePreset &&
       !!quota &&
       quota.limitReached &&
       (!automaticallyUseCreditsForAiRequests ||
@@ -756,6 +768,17 @@ export const AiRequestChat: React.ComponentType<{
       [onSubmitForNewChat]
     );
 
+    // Switch to the "start a new AI request" screen, preselecting the "low"
+    // (free, open-source) preset (only available in the orchestrator mode).
+    const onStartNewChatWithLowFreePreset = React.useCallback(
+      () => {
+        setSelectedMode('orchestrator');
+        setAiConfigurationPresetId('low');
+        onStartOrOpenChat({ aiRequestId: null });
+      },
+      [onStartOrOpenChat]
+    );
+
     // Calculate feedback banner visibility for sticky behavior
     // (must be before conditional returns to follow React hooks rules)
     const shouldDisplayFeedbackBannerNow =
@@ -799,6 +822,10 @@ export const AiRequestChat: React.ComponentType<{
                 alignItems="stretch"
                 justifyContent="stretch"
               >
+                {isLowFreePreset &&
+                  !shouldReplaceFormWithCreditsOrSubscriptionPrompt && (
+                    <FreeAiBanner />
+                  )}
                 {!shouldReplaceFormWithCreditsOrSubscriptionPrompt ? (
                   <CompactTextAreaFieldWithControls
                     maxLength={6000}
@@ -946,6 +973,18 @@ export const AiRequestChat: React.ComponentType<{
                             />
                           )}
                         </LineStackLayout>
+                        <Line noMargin justifyContent="flex-end">
+                          <FlatButton
+                            onClick={onStartNewChatWithLowFreePreset}
+                            label={
+                              <Trans>
+                                Start a new conversation with free, open-source
+                                models (limited performance/intelligence)
+                              </Trans>
+                            }
+                            noBackground
+                          />
+                        </Line>
                       </Column>
                     </Paper>
                   </div>
@@ -1081,6 +1120,7 @@ export const AiRequestChat: React.ComponentType<{
               setHasSwitchedToGDevelopCreditsMidChat(true)
             }
             onStartOrOpenChat={onStartOrOpenChat}
+            onStartNewChatWithLowFreePreset={onStartNewChatWithLowFreePreset}
             isFetchingSuggestions={isFetchingSuggestions}
             isSending={isSendingUserMessage}
             savingProjectForMessageId={savingProjectForMessageId}
@@ -1118,6 +1158,7 @@ export const AiRequestChat: React.ComponentType<{
             alignItems="stretch"
             noMargin
           >
+            {isLowFreePreset && !standAloneForm && <FreeAiBanner />}
             {/* $FlowFixMe[constant-condition] */}
             {!standAloneForm && (
               <CompactTextAreaFieldWithControls

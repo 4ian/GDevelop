@@ -438,6 +438,36 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSta
   );
 };
 
+export const LowFreePreset = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: false,
+      current: 10,
+      max: 50,
+      resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+      period: '7days',
+    }}
+    aiConfigurationPresetsWithAvailability={[
+      {
+        id: 'default',
+        nameByLocale: { en: 'Medium' },
+        mode: 'orchestrator',
+        disabled: false,
+        enableWith: null,
+      },
+      {
+        id: 'low',
+        nameByLocale: { en: 'Low (Free, Open-Source)' },
+        mode: 'orchestrator',
+        isDefault: true,
+        disabled: false,
+        enableWith: null,
+      },
+    ]}
+  />
+);
+
 export const Launching = (): React.Node => (
   <WrappedChatComponent aiRequest={null} isSending={true} />
 );

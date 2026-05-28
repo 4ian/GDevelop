@@ -119,6 +119,7 @@ type Props = {|
   onSwitchedToGDevelopCredits: () => void,
 
   onStartOrOpenChat: (options: ?{| aiRequestId: string | null |}) => void,
+  onStartNewChatWithLowFreePreset: () => void,
   isFetchingSuggestions: boolean,
   isSending?: boolean,
   savingProjectForMessageId: ?string,
@@ -201,6 +202,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     hasStartedRequestButCannotContinue,
     onSwitchedToGDevelopCredits,
     onStartOrOpenChat,
+    onStartNewChatWithLowFreePreset,
     isFetchingSuggestions,
     isSending,
     savingProjectForMessageId,
@@ -1469,6 +1471,16 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                     disabled={false}
                   />
                 )}
+                <FlatButton
+                  color="ai"
+                  onClick={onStartNewChatWithLowFreePreset}
+                  label={
+                    <Trans>
+                      Start a new conversation with free, open-source models
+                      (limited performance/intelligence)
+                    </Trans>
+                  }
+                />
               </ColumnStackLayout>
             </Paper>
           </Line>

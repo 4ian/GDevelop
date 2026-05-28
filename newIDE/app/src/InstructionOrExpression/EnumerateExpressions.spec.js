@@ -9,6 +9,11 @@ import {
 import { createTree, type TreeNode } from './CreateTree';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import { type EnumeratedExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
+
 const gd: libGDevelop = global.gd;
 
 // $FlowFixMe[incompatible-type]
@@ -21,7 +26,12 @@ const makeFakeI18n = (fakeI18n): I18nType => ({
 
 describe('EnumerateExpressions', () => {
   it('can enumerate and filter free expressions (number only)', () => {
-    const freeExpressions = enumerateFreeExpressions('number', makeFakeI18n());
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const freeExpressions = enumerateFreeExpressions(
+      'number',
+      project,
+      makeFakeI18n()
+    );
 
     // Should find atan, atan2, atanh math function
     expect(filterExpressions(freeExpressions, 'atan')).toHaveLength(3);
@@ -31,10 +41,16 @@ describe('EnumerateExpressions', () => {
 
     expect(filterExpressions(freeExpressions, 'CursorX')).toHaveLength(1);
     expect(filterExpressions(freeExpressions, 'CursorY')).toHaveLength(1);
+    project.delete();
   });
 
   it('can enumerate and filter free expressions', () => {
-    const freeExpressions = enumerateFreeExpressions('string', makeFakeI18n());
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const freeExpressions = enumerateFreeExpressions(
+      'string',
+      project,
+      makeFakeI18n()
+    );
 
     // Should find ToString and LargeNumberToString:
     expect(filterExpressions(freeExpressions, 'ToString')).toHaveLength(2);
@@ -47,6 +63,7 @@ describe('EnumerateExpressions', () => {
 
     expect(filterExpressions(freeExpressions, 'CursorX')).toHaveLength(1);
     expect(filterExpressions(freeExpressions, 'CursorY')).toHaveLength(1);
+    project.delete();
   });
 
   it('can enumerate and filter object expressions (number only)', () => {
@@ -134,6 +151,90 @@ describe('EnumerateExpressions', () => {
     );
   });
 
+  it('can enumerate expressions hiding deprecated extensions in new projects', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const serializedProject = serializeToJSObject(project);
+    serializedProject.initialGDVersion = '5.6.270';
+    unserializeFromJSObject(project, serializedProject);
+
+    const freeExpressions = enumerateFreeExpressions(
+      'string',
+      project,
+      makeFakeI18n()
+    );
+
+    expect(
+      freeExpressions.every(
+        expression => expression.type !== 'Inventory::Count'
+      )
+    );
+
+    const allExpressions = enumerateAllExpressions(
+      'string',
+      project,
+      makeFakeI18n()
+    );
+
+    expect(
+      allExpressions.every(
+        expression => expression.scope.extension.name !== 'Inventory'
+      )
+    ).toBe(true);
+    expect(
+      allExpressions.every(
+        expression => expression.scope.extension.name !== 'PhysicsBehavior'
+      )
+    ).toBe(true);
+    expect(
+      allExpressions.every(
+        expression => expression.scope.extension.name !== 'TextEntryObject'
+      )
+    ).toBe(true);
+    project.delete();
+  });
+
+  it('can enumerate expressions showing deprecated extensions in old projects', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const serializedProject = serializeToJSObject(project);
+    serializedProject.initialGDVersion = '5.6.269';
+    unserializeFromJSObject(project, serializedProject);
+
+    const freeExpressions = enumerateFreeExpressions(
+      'string',
+      project,
+      makeFakeI18n()
+    );
+
+    expect(
+      freeExpressions.every(
+        expression => expression.type !== 'Inventory::Count'
+      )
+    );
+
+    const allExpressions = enumerateAllExpressions(
+      'string',
+      project,
+      makeFakeI18n()
+    );
+
+    expect(
+      allExpressions.some(
+        expression => expression.scope.extension.name === 'Inventory'
+      )
+    ).toBe(true);
+    expect(
+      allExpressions.some(
+        expression => expression.scope.extension.name === 'PhysicsBehavior'
+      )
+    ).toBe(true);
+    expect(
+      allExpressions.some(
+        expression => expression.scope.extension.name === 'TextEntryObject'
+      )
+    ).toBe(true);
+    project.delete();
+  });
+
   it('can create the tree of some object expressions', () => {
     const objectsExpressions = enumerateObjectExpressions('number', '');
     expect(createTree(objectsExpressions, makeFakeI18n())).toMatchObject({
@@ -158,8 +259,10 @@ describe('EnumerateExpressions', () => {
 
   it('can enumerate all expressions (number only)', () => {
     makeTestExtensions(gd);
+    const project = gd.ProjectHelper.createNewGDJSProject();
     const allNumberExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
       'number',
+      project,
       makeFakeI18n()
     );
     // Check a free expression:
@@ -183,12 +286,15 @@ describe('EnumerateExpressions', () => {
         'SomethingReturningStringWith1NumberParam'
       )
     ).toHaveLength(0);
+    project.delete();
   });
 
   it('can enumerate all expressions', () => {
     makeTestExtensions(gd);
+    const project = gd.ProjectHelper.createNewGDJSProject();
     const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
       'string',
+      project,
       makeFakeI18n()
     );
     // Check a free expression:
@@ -213,11 +319,14 @@ describe('EnumerateExpressions', () => {
         type: 'SomethingReturningNumberWith1NumberParam',
       })
     );
+    project.delete();
   });
 
   it('can create the tree of all expressions', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
     const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
       'number',
+      project,
       makeFakeI18n()
     );
     const allExpressionsTree = createTree(allExpressions, makeFakeI18n());
@@ -306,5 +415,6 @@ describe('EnumerateExpressions', () => {
         },
       },
     });
+    project.delete();
   });
 });

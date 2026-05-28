@@ -191,6 +191,46 @@ describe('EnumerateExpressions', () => {
     project.delete();
   });
 
+  it('can enumerate expressions showing deprecated extensions in old projects', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const serializedProject = serializeToJSObject(project);
+    serializedProject.initialGDVersion = '5.6.269';
+    unserializeFromJSObject(project, serializedProject);
+
+    const freeExpressions = enumerateFreeExpressions(
+      'string',
+      project,
+      makeFakeI18n()
+    );
+
+    expect(
+      freeExpressions.every(
+        expression => expression.type !== 'Inventory::Count'
+      )
+    );
+
+    const allExpressions = enumerateAllExpressions(
+      'string',
+      project,
+      makeFakeI18n()
+    );
+
+    expect(
+      allExpressions.some(expression => expression.type === 'Inventory::Count')
+    );
+    expect(
+      allExpressions.some(
+        expression => expression.type === 'PhysicsBehavior::VelocityX'
+      )
+    );
+    expect(
+      allExpressions.some(
+        expression => expression.type === 'TextEntryObject::String'
+      )
+    );
+    project.delete();
+  });
+
   it('can create the tree of some object expressions', () => {
     const objectsExpressions = enumerateObjectExpressions('number', '');
     expect(createTree(objectsExpressions, makeFakeI18n())).toMatchObject({

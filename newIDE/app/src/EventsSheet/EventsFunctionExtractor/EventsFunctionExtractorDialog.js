@@ -1,14 +1,15 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import { enumerateEventsFunctionsExtensions } from '../../ProjectManager/EnumerateProjectItems';
-import { Line, Column } from '../../UI/Grid';
-import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import SelectField from '../../UI/SelectField';
+import { Line } from '../../UI/Grid';
+import CompactSemiControlledTextField from '../../UI/CompactSemiControlledTextField';
+import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
 import {
   setupFunctionFromEvents,
@@ -22,9 +23,11 @@ import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import CompactEventsFunctionParametersEditor from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/CompactEventsFunctionParametersEditor';
 import { CompactEventsFunctionPropertiesEditor } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/CompactEventsFunctionPropertiesEditor';
 import HelpButton from '../../UI/HelpButton';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout } from '../../UI/Layout';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import CompactPropertiesEditorRowField from '../../CompactPropertiesEditor/CompactPropertiesEditorRowField';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 
 const gd: libGDevelop = global.gd;
 
@@ -38,222 +41,207 @@ type Props = {|
   onCreate: (extensionName: string, eventsFunction: gdEventsFunction) => void,
 |};
 
-type State = {|
-  eventsFunction: ?gdEventsFunction,
-  extensionName: string,
-  createNewExtension: boolean,
-|};
-
 const CREATE_NEW_EXTENSION_PLACEHOLDER = '<create a new extension>';
 
-export default class EventsFunctionExtractorDialog extends React.Component<
-  Props,
-  State
-> {
-  // $FlowFixMe[missing-local-annot]
-  state = {
-    eventsFunction: null,
-    extensionName: '',
-    createNewExtension: false,
-  };
-  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
+const EventsFunctionExtractorDialog = ({
+  project,
+  scope,
+  globalObjectsContainer,
+  objectsContainer,
+  serializedEvents,
+  onClose,
+  onCreate,
+}: Props): React.Node => {
+  const [extensionName, setExtensionName] = React.useState(() =>
+    getSafeExtensionName(project, 'MyExtension')
+  );
+  const [createNewExtension, setCreateNewExtension] = React.useState(true);
 
-  componentDidMount() {
-    const {
-      project,
-      scope,
-      globalObjectsContainer,
-      objectsContainer,
-      serializedEvents,
-    } = this.props;
+  const forceUpdate = useForceUpdate();
 
-    // This is only used to check parameter for name conflict,but the parameter
-    // editor is locked so users can't actually change parameter names.
-    // Thus, it's fine to use the wrong scope.
-    this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
-      { project }
-    );
+  // This is only used to check parameter for name conflict,but the parameter
+  // editor is locked so users can't actually change parameter names.
+  // Thus, it's fine to use the wrong scope.
+  const projectScopedContainersAccessor = React.useMemo<ProjectScopedContainersAccessor>(
+    () => new ProjectScopedContainersAccessor({ project }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
-    // Set up the function
-    const eventsFunction = new gd.EventsFunction();
-    setupFunctionFromEvents({
-      project,
-      scope,
-      globalObjectsContainer,
-      objectsContainer,
-      serializedEvents,
-      eventsFunction,
-    });
-    this.setState({
-      eventsFunction,
-    });
-
-    // Prepopulate the form
-    const extensionName = getSafeExtensionName(project, 'MyExtension');
-    this.setState({
-      createNewExtension: true,
-      extensionName,
-    });
-    eventsFunction.setName(
-      getSafeEventsFunctionName(
+  const eventsFunction = React.useMemo<gdEventsFunction>(
+    () => {
+      // Set up the function
+      const newEventsFunction = new gd.EventsFunction();
+      setupFunctionFromEvents({
         project,
-        extensionName,
-        eventsFunction.getName()
-      )
-    );
-  }
+        scope,
+        globalObjectsContainer,
+        objectsContainer,
+        serializedEvents,
+        eventsFunction: newEventsFunction,
+      });
 
-  componentWillUnmount() {
-    const { eventsFunction } = this.state;
-    if (eventsFunction) eventsFunction.delete();
-  }
+      // Prepopulate the form
+      newEventsFunction.setName(
+        getSafeEventsFunctionName(
+          project,
+          extensionName,
+          newEventsFunction.getName()
+        )
+      );
+      return newEventsFunction;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
-  render(): any {
-    const { project, onClose, onCreate } = this.props;
-    const { eventsFunction, extensionName, createNewExtension } = this.state;
-    if (!eventsFunction) return null;
-
-    const eventsFunctionsExtensions = enumerateEventsFunctionsExtensions(
-      project
-    );
-    const hasLotsOfParameters = functionHasLotsOfParameters(eventsFunction);
-
-    const onApply = () => {
-      if (!canCreateEventsFunction(project, extensionName, eventsFunction)) {
-        onClose();
-      } else {
-        onCreate(extensionName, eventsFunction);
-      }
+  React.useEffect(() => {
+    return () => {
+      eventsFunction.delete();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    return (
-      <Dialog
-        title={<Trans>Extract the events in a function</Trans>}
-        secondaryActions={[
-          <HelpButton
-            helpPagePath="/events/functions/extract-events"
-            key="help"
-          />,
-        ]}
-        actions={[
-          <FlatButton
-            key="cancel"
-            label={<Trans>Cancel</Trans>}
-            onClick={onClose}
-          />,
-          <DialogPrimaryButton
-            key="create"
-            label={<Trans>Create</Trans>}
-            primary
-            disabled={
-              !canCreateEventsFunction(project, extensionName, eventsFunction)
-            }
-            onClick={onApply}
-          />,
-        ]}
-        open
-        cannotBeDismissed
-        onRequestClose={onClose}
-        onApply={onApply}
-        maxWidth="sm"
-      >
-        <ColumnStackLayout noMargin>
-          <DismissableAlertMessage
-            identifier="function-extractor-explanation"
-            kind="info"
-          >
-            After creating a function, it will be usable in the events sheet.
-            Functions are grouped by extensions. Choose, or enter the name of a
-            new extension, and a function name, then configure the function and
-            its parameters.
-          </DismissableAlertMessage>
-          <Column noMargin>
-            <ResponsiveLineStackLayout noMargin expand>
-              <SelectField
-                floatingLabelText={
-                  <Trans>Extension (storing the function)</Trans>
-                }
-                value={
-                  createNewExtension
-                    ? CREATE_NEW_EXTENSION_PLACEHOLDER
-                    : extensionName
-                }
-                onChange={(e, i, extensionName) => {
-                  if (extensionName === CREATE_NEW_EXTENSION_PLACEHOLDER) {
-                    this.setState({
-                      createNewExtension: true,
-                      extensionName: getSafeExtensionName(
-                        project,
-                        'MyExtension'
-                      ),
-                    });
-                  } else {
-                    this.setState({
-                      createNewExtension: false,
-                      extensionName,
-                    });
+  const eventsFunctionsExtensions = enumerateEventsFunctionsExtensions(project);
+
+  const onApply = React.useCallback(
+    () => {
+      if (!canCreateEventsFunction(project, extensionName, eventsFunction)) {
+        return;
+      }
+      onCreate(extensionName, eventsFunction);
+    },
+    [eventsFunction, extensionName, onCreate, project]
+  );
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <Dialog
+          title={<Trans>Extract the events in a function</Trans>}
+          secondaryActions={[
+            <HelpButton
+              helpPagePath="/events/functions/extract-events"
+              key="help"
+            />,
+          ]}
+          actions={[
+            <FlatButton
+              key="cancel"
+              label={<Trans>Cancel</Trans>}
+              onClick={onClose}
+            />,
+            <DialogPrimaryButton
+              key="create"
+              label={<Trans>Create</Trans>}
+              primary
+              disabled={
+                // This won't actually happen
+                !canCreateEventsFunction(project, extensionName, eventsFunction)
+              }
+              onClick={onApply}
+            />,
+          ]}
+          open
+          cannotBeDismissed
+          onRequestClose={onClose}
+          onApply={onApply}
+          maxWidth="sm"
+        >
+          <ColumnStackLayout noMargin expand noOverflowParent>
+            <DismissableAlertMessage
+              identifier="function-extractor-explanation"
+              kind="info"
+            >
+              After creating a function, it will be usable in the events sheet.
+              Functions are grouped by extensions. Choose, or enter the name of
+              a new extension, and a function name, then configure the function
+              and its parameters.
+            </DismissableAlertMessage>
+            <CompactPropertiesEditorRowField
+              label={i18n._(t`Extension`)}
+              markdownDescription={i18n._(
+                t`Extension containing the new function`
+              )}
+              field={
+                <CompactSelectField
+                  value={
+                    createNewExtension
+                      ? CREATE_NEW_EXTENSION_PLACEHOLDER
+                      : extensionName
                   }
-                  eventsFunction.setName(
-                    getSafeEventsFunctionName(
-                      project,
-                      extensionName,
-                      eventsFunction.getName()
-                    )
-                  );
-                }}
-                fullWidth
-              >
-                {eventsFunctionsExtensions.map(eventsFunctionsExtension => (
-                  <SelectOption
-                    key={eventsFunctionsExtension.getName()}
-                    value={eventsFunctionsExtension.getName()}
-                    label={
-                      eventsFunctionsExtension.getFullName() ||
-                      eventsFunctionsExtension.getName()
+                  onChange={extensionName => {
+                    if (extensionName === CREATE_NEW_EXTENSION_PLACEHOLDER) {
+                      setCreateNewExtension(true);
+                      setExtensionName(
+                        getSafeExtensionName(project, 'MyExtension')
+                      );
+                    } else {
+                      setCreateNewExtension(false);
+                      setExtensionName(extensionName);
                     }
-                  />
-                ))}
-                <SelectOption
-                  value={CREATE_NEW_EXTENSION_PLACEHOLDER}
-                  label={t`<Create a New Extension>`}
-                />
-              </SelectField>
-              {createNewExtension ? (
-                <SemiControlledTextField
-                  commitOnBlur
-                  value={extensionName}
-                  floatingLabelText={<Trans>New extension name</Trans>}
-                  onChange={(extensionName: string) =>
-                    this.setState({
-                      extensionName: getSafeExtensionName(
+                    eventsFunction.setName(
+                      getSafeEventsFunctionName(
                         project,
-                        extensionName
-                      ),
-                    })
-                  }
-                  fullWidth
-                />
-              ) : null}
-            </ResponsiveLineStackLayout>
-            <Line>
-              <SemiControlledTextField
-                commitOnBlur
-                value={eventsFunction.getName()}
-                floatingLabelText={<Trans>Function name</Trans>}
-                onChange={(functionName: string) => {
-                  eventsFunction.setName(
-                    getSafeEventsFunctionName(
-                      project,
-                      extensionName,
-                      functionName
-                    )
-                  );
-                  this.forceUpdate();
-                }}
-                fullWidth
+                        extensionName,
+                        eventsFunction.getName()
+                      )
+                    );
+                  }}
+                >
+                  {eventsFunctionsExtensions.map(eventsFunctionsExtension => (
+                    <SelectOption
+                      key={eventsFunctionsExtension.getName()}
+                      value={eventsFunctionsExtension.getName()}
+                      label={
+                        eventsFunctionsExtension.getFullName() ||
+                        eventsFunctionsExtension.getName()
+                      }
+                    />
+                  ))}
+                  <SelectOption
+                    value={CREATE_NEW_EXTENSION_PLACEHOLDER}
+                    label={t`<Create a New Extension>`}
+                  />
+                </CompactSelectField>
+              }
+            />
+            {createNewExtension ? (
+              <CompactPropertiesEditorRowField
+                label={i18n._(t`New extension name`)}
+                field={
+                  <CompactSemiControlledTextField
+                    commitOnBlur
+                    value={extensionName}
+                    onChange={(extensionName: string) => {
+                      setExtensionName(
+                        getSafeExtensionName(project, extensionName)
+                      );
+                    }}
+                  />
+                }
               />
-            </Line>
-            {hasLotsOfParameters ? (
+            ) : null}
+            <CompactPropertiesEditorRowField
+              label={i18n._(t`Function name`)}
+              field={
+                <CompactSemiControlledTextField
+                  commitOnBlur
+                  value={eventsFunction.getName()}
+                  onChange={(functionName: string) => {
+                    eventsFunction.setName(
+                      getSafeEventsFunctionName(
+                        project,
+                        extensionName,
+                        functionName
+                      )
+                    );
+                    forceUpdate();
+                  }}
+                />
+              }
+            />
+            {functionHasLotsOfParameters(eventsFunction) ? (
               <Line>
                 <AlertMessage kind="warning">
                   <Trans>
@@ -264,26 +252,22 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                 </AlertMessage>
               </Line>
             ) : null}
-          </Column>
-          <CompactEventsFunctionPropertiesEditor
-            project={project}
-            eventsFunction={eventsFunction}
-            eventsBasedBehavior={null}
-            eventsBasedObject={null}
-            eventsFunctionsContainer={null}
-            eventsFunctionsExtension={null}
-            onConfigurationUpdated={() => {
-              // Force re-running logic to see if Create button is disabled.
-              this.forceUpdate();
-            }}
-            freezeEventsFunctionType
-          />
-          {this._projectScopedContainersAccessor && (
+            <CompactEventsFunctionPropertiesEditor
+              project={project}
+              eventsFunction={eventsFunction}
+              eventsBasedBehavior={null}
+              eventsBasedObject={null}
+              eventsFunctionsContainer={null}
+              eventsFunctionsExtension={null}
+              onConfigurationUpdated={() => {
+                // Force re-running logic to see if Create button is disabled.
+                forceUpdate();
+              }}
+              freezeEventsFunctionType
+            />
             <CompactEventsFunctionParametersEditor
               project={project}
-              projectScopedContainersAccessor={
-                this._projectScopedContainersAccessor
-              }
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
               eventsFunction={eventsFunction}
               eventsBasedBehavior={null}
               eventsBasedObject={null}
@@ -291,7 +275,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
               eventsFunctionsExtension={null}
               onParametersUpdated={() => {
                 // Force the dialog to adapt its size
-                this.forceUpdate();
+                forceUpdate();
               }}
               onFunctionParameterWillBeRenamed={() => {
                 // Won't happen as the editor is freezed.
@@ -307,9 +291,11 @@ export default class EventsFunctionExtractorDialog extends React.Component<
               }}
               freezeParameters
             />
-          )}
-        </ColumnStackLayout>
-      </Dialog>
-    );
-  }
-}
+          </ColumnStackLayout>
+        </Dialog>
+      )}
+    </I18n>
+  );
+};
+
+export default EventsFunctionExtractorDialog;

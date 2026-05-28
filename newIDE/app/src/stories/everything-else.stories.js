@@ -1979,7 +1979,7 @@ storiesOf('InstructionOrObjectSelector', module)
                 chosenObjectName={null}
                 onChooseObject={action('choose object')}
                 focusOnMount
-                onClickMore={action('See new behaviors')}
+                onOpenExtensionStore={action('See new extensions')}
                 i18n={i18n}
               />
             </FixedHeightFlexContainer>
@@ -2013,7 +2013,7 @@ storiesOf('InstructionOrObjectSelector', module)
                 chosenObjectName={'MySpriteObject'}
                 onChooseObject={action('choose object')}
                 focusOnMount
-                onClickMore={action('See new behaviors')}
+                onOpenExtensionStore={action('See new extensions')}
                 i18n={i18n}
               />
             </FixedHeightFlexContainer>

@@ -971,7 +971,7 @@ module.exports = {
           'ShapeScale',
           _('Shape scale'),
           _(
-            'Modify an object shape scale. It affects custom shape dimensions, if custom dimensions are not set the body will be scaled automatically to the object size.'
+            'Modify an object shape scale. It affects custom shape dimensions. If custom dimensions are not set, the body will be scaled automatically to the object size.'
           ),
           _('the shape scale'),
           _('Body settings'),

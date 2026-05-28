@@ -312,30 +312,30 @@ namespace gdjs {
     collisionChecker: gdjs.Physics3DRuntimeBehavior.CollisionChecker;
     owner3D: gdjs.RuntimeObject3D;
 
-    bodyType!: string;
-    bullet!: boolean;
-    fixedRotation!: boolean;
-    _shape!: string;
-    private meshShapeResourceName!: string;
-    private shapeOrientation!: string;
-    private shapeDimensionA!: float;
-    private shapeDimensionB!: float;
-    private shapeDimensionC!: float;
-    private shapeOffsetX!: float;
-    private shapeOffsetY!: float;
-    shapeOffsetZ!: float;
-    private massCenterOffsetX!: float;
-    private massCenterOffsetY!: float;
-    private massCenterOffsetZ!: float;
-    private density!: float;
-    massOverride!: float;
-    friction!: float;
-    restitution!: float;
-    linearDamping!: float;
-    angularDamping!: float;
-    gravityScale!: float;
-    private layers!: integer;
-    private masks!: integer;
+    bodyType: string;
+    bullet: boolean;
+    fixedRotation: boolean;
+    _shape: string;
+    private meshShapeResourceName: string;
+    private shapeOrientation: string;
+    private shapeDimensionA: float;
+    private shapeDimensionB: float;
+    private shapeDimensionC: float;
+    private shapeOffsetX: float;
+    private shapeOffsetY: float;
+    shapeOffsetZ: float;
+    private massCenterOffsetX: float;
+    private massCenterOffsetY: float;
+    private massCenterOffsetZ: float;
+    private density: float;
+    massOverride: float;
+    friction: float;
+    restitution: float;
+    linearDamping: float;
+    angularDamping: float;
+    gravityScale: float;
+    private layers: integer;
+    private masks: integer;
     shapeScale: number = 1;
 
     /**
@@ -1101,25 +1101,24 @@ namespace gdjs {
       if ('masks' in data) this.masks = data.masks;
     }
 
-    override applyBehaviorOverriding(diff: BehaviorData): boolean {
-      this._applyBehaviorData(diff);
+    override applyBehaviorOverriding(behaviorData): boolean {
+      this._applyBehaviorData(behaviorData);
 
       // Recreate the body if any shape-related property changed.
-      const d = diff as any;
       const shapeChanged =
-        'shape' in d ||
-        'shapeOrientation' in d ||
-        'shapeDimensionA' in d ||
-        'shapeDimensionB' in d ||
-        'shapeDimensionC' in d ||
-        'shapeOffsetX' in d ||
-        'shapeOffsetY' in d ||
-        'shapeOffsetZ' in d ||
-        'massCenterOffsetX' in d ||
-        'massCenterOffsetY' in d ||
-        'massCenterOffsetZ' in d ||
-        'meshShapeResourceName' in d ||
-        'bodyType' in d;
+        'shape' in behaviorData ||
+        'shapeOrientation' in behaviorData ||
+        'shapeDimensionA' in behaviorData ||
+        'shapeDimensionB' in behaviorData ||
+        'shapeDimensionC' in behaviorData ||
+        'shapeOffsetX' in behaviorData ||
+        'shapeOffsetY' in behaviorData ||
+        'shapeOffsetZ' in behaviorData ||
+        'massCenterOffsetX' in behaviorData ||
+        'massCenterOffsetY' in behaviorData ||
+        'massCenterOffsetZ' in behaviorData ||
+        'meshShapeResourceName' in behaviorData ||
+        'bodyType' in behaviorData;
       if (shapeChanged) {
         this.recreateBody();
       }

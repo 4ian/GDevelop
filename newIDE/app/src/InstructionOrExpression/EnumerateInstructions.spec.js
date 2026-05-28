@@ -120,19 +120,19 @@ describe('EnumerateInstructions', () => {
 
     expect(
       instructions.some(instruction => instruction.type === 'Inventory::Add')
-    );
+    ).toBe(true);
     expect(
       instructions.some(
         instruction =>
           instruction.type ===
           'PhysicsBehavior::ApplyForceUsingPolarCoordinates'
       )
-    );
+    ).toBe(true);
     expect(
       instructions.some(
         instruction => instruction.type === 'TextEntryObject::String'
       )
-    );
+    ).toBe(true);
     project.delete();
   });
 
@@ -151,19 +151,19 @@ describe('EnumerateInstructions', () => {
 
     expect(
       instructions.some(instruction => instruction.type === 'Inventory::Add')
-    );
+    ).toBe(true);
     expect(
       instructions.some(
         instruction =>
           instruction.type ===
           'PhysicsBehavior::ApplyForceUsingPolarCoordinates'
       )
-    );
+    ).toBe(true);
     expect(
       instructions.some(
         instruction => instruction.type === 'TextEntryObject::String'
       )
-    );
+    ).toBe(true);
     project.delete();
   });
 
@@ -189,12 +189,12 @@ describe('EnumerateInstructions', () => {
           instruction.type !==
           'PhysicsBehavior::ApplyForceUsingPolarCoordinates'
       )
-    );
+    ).toBe(true);
     expect(
       instructions.every(
         instruction => instruction.type !== 'TextEntryObject::String'
       )
-    );
+    ).toBe(true);
     project.delete();
   });
 

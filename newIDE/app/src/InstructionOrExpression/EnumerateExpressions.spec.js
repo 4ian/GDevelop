@@ -176,18 +176,20 @@ describe('EnumerateExpressions', () => {
     );
 
     expect(
-      allExpressions.every(expression => expression.type !== 'Inventory::Count')
-    );
+      allExpressions.every(
+        expression => expression.scope.extension.name !== 'Inventory'
+      )
+    ).toBe(true);
     expect(
       allExpressions.every(
-        expression => expression.type !== 'PhysicsBehavior::VelocityX'
+        expression => expression.scope.extension.name !== 'PhysicsBehavior'
       )
-    );
+    ).toBe(true);
     expect(
       allExpressions.every(
-        expression => expression.type !== 'TextEntryObject::String'
+        expression => expression.scope.extension.name !== 'TextEntryObject'
       )
-    );
+    ).toBe(true);
     project.delete();
   });
 
@@ -216,18 +218,20 @@ describe('EnumerateExpressions', () => {
     );
 
     expect(
-      allExpressions.some(expression => expression.type === 'Inventory::Count')
-    );
+      allExpressions.some(
+        expression => expression.scope.extension.name === 'Inventory'
+      )
+    ).toBe(true);
     expect(
       allExpressions.some(
-        expression => expression.type === 'PhysicsBehavior::VelocityX'
+        expression => expression.scope.extension.name === 'PhysicsBehavior'
       )
-    );
+    ).toBe(true);
     expect(
       allExpressions.some(
-        expression => expression.type === 'TextEntryObject::String'
+        expression => expression.scope.extension.name === 'TextEntryObject'
       )
-    );
+    ).toBe(true);
     project.delete();
   });
 

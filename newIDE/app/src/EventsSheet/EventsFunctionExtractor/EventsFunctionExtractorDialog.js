@@ -23,7 +23,7 @@ import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import CompactEventsFunctionParametersEditor from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/CompactEventsFunctionParametersEditor';
 import { CompactEventsFunctionPropertiesEditor } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/CompactEventsFunctionPropertiesEditor';
 import HelpButton from '../../UI/HelpButton';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout } from '../../UI/Layout';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import CompactPropertiesEditorRowField from '../../CompactPropertiesEditor/CompactPropertiesEditorRowField';
@@ -148,7 +148,7 @@ const EventsFunctionExtractorDialog = ({
           onApply={onApply}
           maxWidth="sm"
         >
-          <ColumnStackLayout noMargin>
+          <ColumnStackLayout noMargin expand noOverflowParent>
             <DismissableAlertMessage
               identifier="function-extractor-explanation"
               kind="info"
@@ -158,109 +158,100 @@ const EventsFunctionExtractorDialog = ({
               a new extension, and a function name, then configure the function
               and its parameters.
             </DismissableAlertMessage>
-            <ColumnStackLayout noMargin expand noOverflowParent>
-              <ResponsiveLineStackLayout noMargin expand>
-                <CompactPropertiesEditorRowField
-                  label={i18n._(t`Extension`)}
-                  markdownDescription={i18n._(
-                    t`Extension containing the new function`
-                  )}
-                  field={
-                    <CompactSelectField
-                      value={
-                        createNewExtension
-                          ? CREATE_NEW_EXTENSION_PLACEHOLDER
-                          : extensionName
-                      }
-                      onChange={extensionName => {
-                        if (
-                          extensionName === CREATE_NEW_EXTENSION_PLACEHOLDER
-                        ) {
-                          setCreateNewExtension(true);
-                          setExtensionName(
-                            getSafeExtensionName(project, 'MyExtension')
-                          );
-                        } else {
-                          setCreateNewExtension(false);
-                          setExtensionName(extensionName);
-                        }
-                        eventsFunction.setName(
-                          getSafeEventsFunctionName(
-                            project,
-                            extensionName,
-                            eventsFunction.getName()
-                          )
-                        );
-                      }}
-                    >
-                      {eventsFunctionsExtensions.map(
-                        eventsFunctionsExtension => (
-                          <SelectOption
-                            key={eventsFunctionsExtension.getName()}
-                            value={eventsFunctionsExtension.getName()}
-                            label={
-                              eventsFunctionsExtension.getFullName() ||
-                              eventsFunctionsExtension.getName()
-                            }
-                          />
-                        )
-                      )}
-                      <SelectOption
-                        value={CREATE_NEW_EXTENSION_PLACEHOLDER}
-                        label={t`<Create a New Extension>`}
-                      />
-                    </CompactSelectField>
+            <CompactPropertiesEditorRowField
+              label={i18n._(t`Extension`)}
+              markdownDescription={i18n._(
+                t`Extension containing the new function`
+              )}
+              field={
+                <CompactSelectField
+                  value={
+                    createNewExtension
+                      ? CREATE_NEW_EXTENSION_PLACEHOLDER
+                      : extensionName
                   }
-                />
-                {createNewExtension ? (
-                  <CompactPropertiesEditorRowField
-                    label={i18n._(t`Extension name`)}
-                    markdownDescription={i18n._(t`New extension name`)}
-                    field={
-                      <CompactSemiControlledTextField
-                        commitOnBlur
-                        value={extensionName}
-                        onChange={(extensionName: string) => {
-                          setExtensionName(
-                            getSafeExtensionName(project, extensionName)
-                          );
-                        }}
-                      />
+                  onChange={extensionName => {
+                    if (extensionName === CREATE_NEW_EXTENSION_PLACEHOLDER) {
+                      setCreateNewExtension(true);
+                      setExtensionName(
+                        getSafeExtensionName(project, 'MyExtension')
+                      );
+                    } else {
+                      setCreateNewExtension(false);
+                      setExtensionName(extensionName);
                     }
+                    eventsFunction.setName(
+                      getSafeEventsFunctionName(
+                        project,
+                        extensionName,
+                        eventsFunction.getName()
+                      )
+                    );
+                  }}
+                >
+                  {eventsFunctionsExtensions.map(eventsFunctionsExtension => (
+                    <SelectOption
+                      key={eventsFunctionsExtension.getName()}
+                      value={eventsFunctionsExtension.getName()}
+                      label={
+                        eventsFunctionsExtension.getFullName() ||
+                        eventsFunctionsExtension.getName()
+                      }
+                    />
+                  ))}
+                  <SelectOption
+                    value={CREATE_NEW_EXTENSION_PLACEHOLDER}
+                    label={t`<Create a New Extension>`}
                   />
-                ) : null}
-              </ResponsiveLineStackLayout>
+                </CompactSelectField>
+              }
+            />
+            {createNewExtension ? (
               <CompactPropertiesEditorRowField
-                label={i18n._(t`Function name`)}
+                label={i18n._(t`New extension name`)}
                 field={
                   <CompactSemiControlledTextField
                     commitOnBlur
-                    value={eventsFunction.getName()}
-                    onChange={(functionName: string) => {
-                      eventsFunction.setName(
-                        getSafeEventsFunctionName(
-                          project,
-                          extensionName,
-                          functionName
-                        )
+                    value={extensionName}
+                    onChange={(extensionName: string) => {
+                      setExtensionName(
+                        getSafeExtensionName(project, extensionName)
                       );
-                      forceUpdate();
                     }}
                   />
                 }
               />
-              {functionHasLotsOfParameters(eventsFunction) ? (
-                <Line>
-                  <AlertMessage kind="warning">
-                    <Trans>
-                      This function will have a lot of parameters. Consider
-                      creating groups or functions for a smaller set of objects
-                      so that the function is easier to reuse.
-                    </Trans>
-                  </AlertMessage>
-                </Line>
-              ) : null}
-            </ColumnStackLayout>
+            ) : null}
+            <CompactPropertiesEditorRowField
+              label={i18n._(t`Function name`)}
+              field={
+                <CompactSemiControlledTextField
+                  commitOnBlur
+                  value={eventsFunction.getName()}
+                  onChange={(functionName: string) => {
+                    eventsFunction.setName(
+                      getSafeEventsFunctionName(
+                        project,
+                        extensionName,
+                        functionName
+                      )
+                    );
+                    forceUpdate();
+                  }}
+                />
+              }
+            />
+            {functionHasLotsOfParameters(eventsFunction) ? (
+              <Line>
+                <AlertMessage kind="warning">
+                  <Trans>
+                    This function will have a lot of parameters. Consider
+                    creating groups or functions for a smaller set of objects so
+                    that the function is easier to reuse.
+                  </Trans>
+                </AlertMessage>
+              </Line>
+            ) : null}
             <CompactEventsFunctionPropertiesEditor
               project={project}
               eventsFunction={eventsFunction}

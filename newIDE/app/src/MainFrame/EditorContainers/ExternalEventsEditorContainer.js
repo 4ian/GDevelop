@@ -225,11 +225,11 @@ export class ExternalEventsEditorContainer extends React.Component<
     });
   };
 
-  onCreateEventsFunction = (
+  onCreateEventsFunction = async (
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => {
-    this.props.onCreateEventsFunction(
+    await this.props.onCreateEventsFunction(
       extensionName,
       eventsFunction,
       'external-events-editor'

@@ -78,7 +78,7 @@ type Props = {|
       | 'scene-events-editor'
       | 'extension-events-editor'
       | 'external-events-editor'
-  ) => void,
+  ) => Promise<void>,
   onBehaviorEdited?: () => void,
   onObjectEdited?: () => void,
   onFunctionEdited?: () => void,
@@ -1324,11 +1324,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     });
   };
 
-  onCreateEventsFunction = (
+  onCreateEventsFunction = async (
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => {
-    this.props.onCreateEventsFunction(
+    await this.props.onCreateEventsFunction(
       extensionName,
       eventsFunction,
       'extension-events-editor'

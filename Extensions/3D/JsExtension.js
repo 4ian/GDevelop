@@ -2200,6 +2200,7 @@ module.exports = {
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
+        .setHelpPath('/objects/3d-light')
         .addIncludeFile('Extensions/3D/AmbientLight.js');
       const properties = effect.getProperties();
       properties
@@ -2224,6 +2225,7 @@ module.exports = {
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
+        .setHelpPath('/objects/3d-light')
         .addIncludeFile('Extensions/3D/DirectionalLight.js');
       const properties = effect.getProperties();
       properties
@@ -2314,6 +2316,7 @@ module.exports = {
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
+        .setHelpPath('/objects/3d-light')
         .addIncludeFile('Extensions/3D/HemisphereLight.js');
       const properties = effect.getProperties();
       properties

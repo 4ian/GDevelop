@@ -39,7 +39,6 @@ type Props = {|
   helpPagePath?: string,
   onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
   freezeEventsFunctionType?: boolean,
-  getFunctionGroupNames?: () => string[],
 |};
 
 const getFullNameHintText = (
@@ -80,7 +79,6 @@ export const CompactEventsFunctionPropertiesEditor = ({
   helpPagePath,
   eventsBasedBehavior,
   eventsBasedObject,
-  getFunctionGroupNames,
   eventsFunctionsContainer,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();

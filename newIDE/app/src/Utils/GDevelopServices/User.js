@@ -645,6 +645,21 @@ export const syncDiscordUsername = async (
   );
 };
 
+export const syncForumGroup = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/user/${userId}/action/update-discourse-group`,
+    {},
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+};
+
 export const getUserCommentQualityRatingsLeaderboards = async (): Promise<
   Array<UserLeaderboard>
 > => {

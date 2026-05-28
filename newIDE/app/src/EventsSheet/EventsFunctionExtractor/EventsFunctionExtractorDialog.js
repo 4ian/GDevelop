@@ -14,10 +14,8 @@ import {
   setupFunctionFromEvents,
   canCreateEventsFunction,
   functionHasLotsOfParameters,
-  validateExtensionNameUniqueness,
-  validateExtensionName,
-  validateEventsFunctionNameUniqueness,
-  validateEventsFunctionName,
+  getSafeExtensionName,
+  getSafeEventsFunctionName,
 } from '.';
 import AlertMessage from '../../UI/AlertMessage';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
@@ -27,6 +25,7 @@ import HelpButton from '../../UI/HelpButton';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -90,46 +89,24 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     });
 
     // Prepopulate the form
-    const eventsFunctionsExtensions = enumerateEventsFunctionsExtensions(
-      project
+    const extensionName = getSafeExtensionName(project, 'MyExtension');
+    this.setState({
+      createNewExtension: true,
+      extensionName,
+    });
+    eventsFunction.setName(
+      getSafeEventsFunctionName(
+        project,
+        extensionName,
+        eventsFunction.getName()
+      )
     );
-    if (eventsFunctionsExtensions.length === 0) {
-      this.setState({
-        createNewExtension: true,
-      });
-    }
   }
 
   componentWillUnmount() {
     const { eventsFunction } = this.state;
     if (eventsFunction) eventsFunction.delete();
   }
-
-  _getFunctionGroupNames = (): Array<string> => {
-    const { createNewExtension, extensionName } = this.state;
-    if (createNewExtension || !extensionName) {
-      return [];
-    }
-    const groupNames = new Set<string>();
-    const { project } = this.props;
-    const eventsFunctionsExtension = project.getEventsFunctionsExtension(
-      extensionName
-    );
-    const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
-    for (
-      let index = 0;
-      index < freeEventsFunctions.getEventsFunctionsCount();
-      index++
-    ) {
-      const groupName = freeEventsFunctions
-        .getEventsFunctionAt(index)
-        .getGroup();
-      if (groupName) {
-        groupNames.add(groupName);
-      }
-    }
-    return [...groupNames].sort((a, b) => a.localeCompare(b));
-  };
 
   render(): any {
     const { project, onClose, onCreate } = this.props;
@@ -205,7 +182,10 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                   if (extensionName === CREATE_NEW_EXTENSION_PLACEHOLDER) {
                     this.setState({
                       createNewExtension: true,
-                      extensionName: '',
+                      extensionName: getSafeExtensionName(
+                        project,
+                        'MyExtension'
+                      ),
                     });
                   } else {
                     this.setState({
@@ -213,6 +193,13 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                       extensionName,
                     });
                   }
+                  eventsFunction.setName(
+                    getSafeEventsFunctionName(
+                      project,
+                      extensionName,
+                      eventsFunction.getName()
+                    )
+                  );
                 }}
                 fullWidth
               >
@@ -237,23 +224,14 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                   value={extensionName}
                   floatingLabelText={<Trans>New extension name</Trans>}
                   onChange={(extensionName: string) =>
-                    this.setState({ extensionName })
+                    this.setState({
+                      extensionName: getSafeExtensionName(
+                        project,
+                        extensionName
+                      ),
+                    })
                   }
                   fullWidth
-                  errorText={
-                    !validateExtensionNameUniqueness(project, extensionName) ? (
-                      <Trans>
-                        This name is already taken by another extension.
-                      </Trans>
-                    ) : !validateExtensionName(extensionName) ? (
-                      <Trans>
-                        This name is not valid. Only use alphanumeric characters
-                        (0-9, a-z) and underscores.
-                      </Trans>
-                    ) : (
-                      undefined
-                    )
-                  }
                 />
               ) : null}
             </ResponsiveLineStackLayout>
@@ -263,29 +241,16 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                 value={eventsFunction.getName()}
                 floatingLabelText={<Trans>Function name</Trans>}
                 onChange={(functionName: string) => {
-                  eventsFunction.setName(functionName);
+                  eventsFunction.setName(
+                    getSafeEventsFunctionName(
+                      project,
+                      extensionName,
+                      functionName
+                    )
+                  );
                   this.forceUpdate();
                 }}
                 fullWidth
-                errorText={
-                  !validateEventsFunctionNameUniqueness(
-                    project,
-                    extensionName,
-                    eventsFunction
-                  ) ? (
-                    <Trans>
-                      This name is already taken by another function. Choose
-                      another name.
-                    </Trans>
-                  ) : !validateEventsFunctionName(eventsFunction.getName()) ? (
-                    <Trans>
-                      This name is not valid. Only use alphanumeric characters
-                      (0-9, a-z) and underscores.
-                    </Trans>
-                  ) : (
-                    undefined
-                  )
-                }
               />
             </Line>
             {hasLotsOfParameters ? (
@@ -312,7 +277,6 @@ export default class EventsFunctionExtractorDialog extends React.Component<
               this.forceUpdate();
             }}
             freezeEventsFunctionType
-            getFunctionGroupNames={this._getFunctionGroupNames}
           />
           {this._projectScopedContainersAccessor && (
             <CompactEventsFunctionParametersEditor

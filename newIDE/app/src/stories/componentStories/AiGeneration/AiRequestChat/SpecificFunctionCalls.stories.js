@@ -284,8 +284,62 @@ const subAgentFunctionCallMessage = {
     {
       type: 'function_call',
       status: 'completed',
-      call_id: 'tool_0_run_project_edit_agent',
-      name: 'run_project_edit_agent',
+      call_id: 'tool_0_run_edit_agent',
+      name: 'run_edit_agent',
+      arguments:
+        '{"short_title":"Adding an enemy that falls off screen","prompt":"Add an enemy to the game. The enemy should be a Sprite object placed in Level1, and should be deleted automatically when it falls off the bottom of the screen."}',
+      subAgentAiRequestId: 'fake-sub-agent-request-id',
+    },
+  ],
+};
+
+const subAgentExplorerFunctionCallMessage = {
+  type: 'message',
+  status: 'completed',
+  role: 'assistant',
+  content: [
+    {
+      type: 'function_call',
+      status: 'completed',
+      call_id: 'tool_0_run_explorer_agent',
+      name: 'run_explorer_agent',
+      arguments:
+        '{"short_title":"Listing all scenes and their objects","prompt":"List every scene of the game project together with the objects placed on each of them."}',
+      subAgentAiRequestId: 'fake-sub-agent-request-id',
+    },
+  ],
+};
+
+const subAgentFunctionCallMessageWithLongTitle = {
+  type: 'message',
+  status: 'completed',
+  role: 'assistant',
+  content: [
+    {
+      type: 'function_call',
+      status: 'completed',
+      call_id: 'tool_0_run_edit_agent',
+      name: 'run_edit_agent',
+      arguments: JSON.stringify({
+        short_title:
+          'Adding a complete double jump mechanic to the player object including animations sounds particle effects and proper collision handling with platforms and enemies while also updating the existing event sheet to use the new mechanic everywhere',
+        prompt: 'Implement a polished double jump for the Player object.',
+      }),
+      subAgentAiRequestId: 'fake-sub-agent-request-id',
+    },
+  ],
+};
+
+const subAgentFunctionCallMessageWithoutShortTitle = {
+  type: 'message',
+  status: 'completed',
+  role: 'assistant',
+  content: [
+    {
+      type: 'function_call',
+      status: 'completed',
+      call_id: 'tool_0_run_edit_agent',
+      name: 'run_edit_agent',
       arguments:
         '{"prompt":"Add an enemy to the game. The enemy should be a Sprite object placed in Level1, and should be deleted automatically when it falls off the bottom of the screen."}',
       subAgentAiRequestId: 'fake-sub-agent-request-id',
@@ -371,7 +425,7 @@ export const subAgentFunctionCallFinished = (): React.Node => (
         subAgentFunctionCallMessage,
         {
           type: 'function_call_output',
-          call_id: 'tool_0_run_project_edit_agent',
+          call_id: 'tool_0_run_edit_agent',
           output: '{"success":true}',
         },
       ],
@@ -396,7 +450,7 @@ export const subAgentFunctionCallWithTextFinished = (): React.Node => (
         subAgentFunctionCallMessage,
         {
           type: 'function_call_output',
-          call_id: 'tool_0_run_project_edit_agent',
+          call_id: 'tool_0_run_edit_agent',
           output: '{"success":true}',
         },
       ],
@@ -475,7 +529,89 @@ export const subAgentFunctionCallFromHistoryNotYetLoaded = (): React.Node => (
         subAgentFunctionCallMessage,
         {
           type: 'function_call_output',
-          call_id: 'tool_0_run_project_edit_agent',
+          call_id: 'tool_0_run_edit_agent',
+          output: '{"success":true}',
+        },
+      ],
+      error: null,
+    }}
+  />
+);
+
+// Shows the explorer sub-agent variant, so the rendering of the
+// short_title for run_explorer_agent can be checked.
+export const subAgentExplorerFunctionCallFinished = (): React.Node => (
+  <WrappedChatComponentWithSubAgent
+    subAgentAiRequest={fakeSubAgentAiRequest}
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-orchestrator-request',
+      mode: 'orchestrator',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: [
+        userRequestMessage,
+        subAgentExplorerFunctionCallMessage,
+        {
+          type: 'function_call_output',
+          call_id: 'tool_0_run_explorer_agent',
+          output: '{"success":true}',
+        },
+      ],
+      error: null,
+    }}
+  />
+);
+
+// Verifies that a short_title longer than 30 words is truncated with
+// an ellipsis.
+export const subAgentFunctionCallWithLongShortTitle = (): React.Node => (
+  <WrappedChatComponentWithSubAgent
+    subAgentAiRequest={fakeSubAgentAiRequest}
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-orchestrator-request',
+      mode: 'orchestrator',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: [
+        userRequestMessage,
+        subAgentFunctionCallMessageWithLongTitle,
+        {
+          type: 'function_call_output',
+          call_id: 'tool_0_run_edit_agent',
+          output: '{"success":true}',
+        },
+      ],
+      error: null,
+    }}
+  />
+);
+
+// Verifies the fallback to "Editing the game." when short_title is
+// missing (e.g. for old AI requests created before this parameter
+// existed).
+export const subAgentFunctionCallWithoutShortTitle = (): React.Node => (
+  <WrappedChatComponentWithSubAgent
+    subAgentAiRequest={fakeSubAgentAiRequest}
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-orchestrator-request',
+      mode: 'orchestrator',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: [
+        userRequestMessage,
+        subAgentFunctionCallMessageWithoutShortTitle,
+        {
+          type: 'function_call_output',
+          call_id: 'tool_0_run_edit_agent',
           output: '{"success":true}',
         },
       ],

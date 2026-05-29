@@ -79,6 +79,47 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
   },
+  quotaContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    overflow: 'hidden',
+    gap: 4,
+    width: '100%',
+  },
+  quotaPlaceholderContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  quotaPlaceholderTextContainer: {
+    flex: 1,
+    minWidth: 0,
+    textAlign: 'right',
+    ...textEllipsisStyle,
+  },
+  quotaInfoIconSpan: {
+    flexShrink: 0,
+    display: 'inline-flex',
+    alignItems: 'center',
+  },
+  quotaInfoIcon: {
+    fontSize: 18,
+  },
+  quotaProgressBarWrapper: {
+    width: 30,
+  },
+  quotaProgressBar: {
+    height: 4,
+    borderRadius: 2,
+  },
+  quotaCoinSpan: {
+    verticalAlign: 'middle',
+    display: 'inline-block',
+    marginRight: 4,
+  },
+  quotaPlaceholder: {
+    height: 29,
+  },
 };
 
 const getRowsAndHeight = ({
@@ -113,35 +154,20 @@ const getPriceAndRequestsTextAndTooltip = ({
     if (isRefreshingLimits) {
       // Placeholder to avoid layout shift, while showing the (i) icon.
       return (
-        <div
-          style={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}
-        >
-          <div
-            style={{
-              flex: 1,
-              minWidth: 0,
-              textAlign: 'right',
-              ...textEllipsisStyle,
-            }}
-          >
+        <div style={styles.quotaPlaceholderContainer}>
+          <div style={styles.quotaPlaceholderTextContainer}>
             <Text size="body-small" color="secondary" noMargin>
               <Trans>Calculating...</Trans>
             </Text>
           </div>
-          <span
-            style={{
-              flexShrink: 0,
-              display: 'inline-flex',
-              alignItems: 'center',
-            }}
-          >
-            <CircledInfo color="inherit" />
+          <span style={styles.quotaInfoIconSpan}>
+            <CircledInfo color="inherit" style={styles.quotaInfoIcon} />
           </span>
         </div>
       );
     }
     // Placeholder to avoid layout shift.
-    return <div style={{ height: 29 }} />;
+    return <div style={styles.quotaPlaceholder} />;
   }
 
   const aiCreditsAvailable = Math.max(0, quota.max - quota.current);
@@ -214,27 +240,13 @@ const getPriceAndRequestsTextAndTooltip = ({
     quota.limitReached && automaticallyUseCreditsForAiRequests;
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        overflow: 'hidden',
-        gap: 4,
-        width: '100%',
-      }}
-    >
+    <div style={styles.quotaContainer}>
       <Text size="body-small" color="secondary" noMargin>
         {isRefreshingLimits ? (
           <Trans>Calculating...</Trans>
         ) : shouldShowCredits ? (
           <>
-            <span
-              style={{
-                verticalAlign: 'middle',
-                display: 'inline-block',
-                marginRight: 4,
-              }}
-            >
+            <span style={styles.quotaCoinSpan}>
               <Coin fontSize="small" />
             </span>
             <Trans>{Math.max(0, availableCredits)} credits available</Trans>
@@ -244,25 +256,19 @@ const getPriceAndRequestsTextAndTooltip = ({
         )}
       </Text>
       {!isRefreshingLimits && !shouldShowCredits && (
-        <div style={{ width: 30 }}>
+        <div style={styles.quotaProgressBarWrapper}>
           <LinearProgress
             variant="determinate"
             value={percentage}
             barColor={progressBarColor}
             trackColor={progressTrackColor}
-            style={{ height: 4, borderRadius: 2 }}
+            style={{ ...styles.quotaProgressBar }}
           />
         </div>
       )}
-      <span
-        style={{
-          flexShrink: 0,
-          display: 'inline-flex',
-          alignItems: 'center',
-        }}
-      >
+      <span style={styles.quotaInfoIconSpan}>
         <Tooltip title={tooltipText} placement="top" interactive>
-          <CircledInfo color="inherit" />
+          <CircledInfo color="inherit" style={styles.quotaInfoIcon} />
         </Tooltip>
       </span>
     </div>

@@ -30,8 +30,6 @@ type Props = {|
 
 const networkIcons = [NetworkLow, NetworkMedium, NetworkHigh, NetworkMaximum];
 
-const subscriptionIconStyle = { width: 20, height: 20 };
-
 const styles = {
   paper: {
     borderRadius: 8,
@@ -53,6 +51,16 @@ const styles = {
     fontSize: 12,
     opacity: 0.7,
   },
+  networkIcon: {
+    fontSize: 20,
+  },
+  chevronIcon: {
+    fontSize: 20,
+  },
+  subscriptionIcon: {
+    width: 20,
+    height: 20,
+  },
 };
 
 const getSubscriptionBadge = (enabledWithPlans: Array<string>): React.Node => {
@@ -68,12 +76,12 @@ const getSubscriptionBadge = (enabledWithPlans: Array<string>): React.Node => {
       p => p === 'gdevelop_silver' || p === 'gdevelop_indie'
     )
   ) {
-    return <Silver style={subscriptionIconStyle} />;
+    return <Silver style={styles.subscriptionIcon} />;
   }
   if (enabledWithPlans.some(p => p === 'gdevelop_gold')) {
-    return <GoldCompact style={subscriptionIconStyle} />;
+    return <GoldCompact style={styles.subscriptionIcon} />;
   }
-  return <Startup style={subscriptionIconStyle} />;
+  return <Startup style={styles.subscriptionIcon} />;
 };
 
 export const ReasoningLevelSelector = ({
@@ -145,9 +153,9 @@ export const ReasoningLevelSelector = ({
                   style={styles.button}
                 >
                   <NetworkIcon
-                    style={{ fontSize: 20, color: networkIconColor }}
+                    style={{ ...styles.networkIcon, color: networkIconColor }}
                   />
-                  <ChevronArrowBottom style={{ fontSize: 20 }} />
+                  <ChevronArrowBottom style={styles.chevronIcon} />
                 </ButtonBase>
               </span>
             </Tooltip>

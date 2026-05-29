@@ -42,6 +42,7 @@ import {
   useProcessFunctionCalls,
   useRefreshLimits,
   type NewAiRequestOptions,
+  type OpenAskAiOptions,
   AI_ORCHESTRATOR_TOOLS_VERSION,
 } from './Utils';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
@@ -81,6 +82,8 @@ type Props = {|
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onCloseAskAi: () => void,
+  onOpenAskAi?: (?OpenAskAiOptions) => void,
+  closeProject?: () => Promise<void>,
   dismissableIdentifier?: string,
 |};
 
@@ -94,6 +97,8 @@ export const AskAiStandAloneForm = ({
   onCreateEmptyProject,
   onOpenLayout,
   onCloseAskAi,
+  onOpenAskAi,
+  closeProject,
   dismissableIdentifier,
   onWillInstallExtension,
   onExtensionInstalled,
@@ -243,13 +248,20 @@ export const AskAiStandAloneForm = ({
           return;
         }
 
+        // Read the options and reset them immediately to prevent the effect from firing
+        // again if dependencies change during the async operations below (e.g. when
+        // closeProject causes project to become null).
+        const { userRequest, aiConfigurationPresetId } = newAiRequestOptions;
+        startNewAiRequest(null);
+
         // Ensure the Ask AI pane is closed, to avoid multiple requests being sent
         // at the same time from the editor and the standalone form.
         onCloseAskAi();
 
-        // Read the options and reset them (to avoid launching the same request twice).
-        const { userRequest, aiConfigurationPresetId } = newAiRequestOptions;
-        startNewAiRequest(null);
+        // Close any open project since the AI will create a new one.
+        if (project && closeProject) {
+          await closeProject();
+        }
 
         // Ensure the user has enough credits to pay for the request, or ask them
         // to buy some more.
@@ -299,6 +311,7 @@ export const AskAiStandAloneForm = ({
             fileMetadata: null, // No file metadata when starting from the standalone form.
             storageProviderName,
             mode: aiRequestModeForForm,
+            autoEdit: true,
             toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
             aiConfiguration: {
               presetId: aiConfigurationPresetId,
@@ -313,10 +326,24 @@ export const AskAiStandAloneForm = ({
           // Select the new AI request just created - unless the user switched to another one
           // in the meantime.
           if (!upToDateSelectedAiRequestId.current) {
-            setAiRequestIdForForm(aiRequest.id);
-            // Also set the global selected AI request state,
-            // so that the editor is in sync, when we'll open it.
+            // Set the global selected AI request state so the editor tab
+            // can find the right request when it opens.
             setSelectedAiRequestId(aiRequest.id);
+          }
+
+          // Open the Ask AI tab right away. Always use 'center' pane since
+          // the project has been closed (or was never open) at this point.
+          if (onOpenAskAi) {
+            onOpenAskAi({
+              continueProcessingFunctionCallsOnMount: true,
+              paneIdentifier: 'center',
+            });
+          }
+
+          // Reset the form so it's ready for a new request (the tab now owns the request).
+          setAiRequestIdForForm(null);
+          if (aiRequestChatRef.current) {
+            aiRequestChatRef.current.resetUserInput('');
           }
 
           sendAiRequestStarted({
@@ -363,6 +390,8 @@ export const AskAiStandAloneForm = ({
       openSubscriptionDialog,
       onCloseAskAi,
       automaticallyUseCreditsForAiRequests,
+      onOpenAskAi,
+      closeProject,
     ]
   );
 
@@ -377,12 +406,14 @@ export const AskAiStandAloneForm = ({
       createdSceneNames,
       createdProject,
       editorFunctionCallResults,
+      autoEdit,
     }: {|
       aiRequestId: string,
       userMessage: string,
       createdSceneNames?: Array<string>,
       createdProject?: ?gdProject,
       editorFunctionCallResults: Array<EditorFunctionCallResult>,
+      autoEdit?: boolean,
     |}) => {
       if (!profile) return;
 
@@ -464,6 +495,7 @@ export const AskAiStandAloneForm = ({
             // If we switch back to agent mode for the standalone form in the future,
             // check if it has just initialized the project to mark it as paused.
             paused: false,
+            autoEdit,
             mode: aiRequestModeForForm,
             toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
           })
@@ -610,14 +642,17 @@ export const AskAiStandAloneForm = ({
         onSendUserMessage={async ({
           userMessage,
           mode,
+          autoEdit,
         }: {|
           userMessage: string,
           mode: 'chat' | 'agent' | 'orchestrator',
+          autoEdit: boolean,
         |}) => {
           if (!aiRequestIdForForm) return;
           await onSendMessage({
             aiRequestId: aiRequestIdForForm,
             userMessage,
+            autoEdit,
             // mode, Mode is forced to agent in standalone form, no need to pass it here.
             editorFunctionCallResults: aiRequestForForm
               ? getEditorFunctionCallResults(aiRequestForForm.id) || []

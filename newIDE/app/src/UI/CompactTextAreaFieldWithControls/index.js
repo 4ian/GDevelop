@@ -117,6 +117,13 @@ export const CompactTextAreaFieldWithControls: React.ComponentType<{
           return;
         }
 
+        // Stop propagation for all other Cmd/Ctrl combos (Cmd+A, Cmd+C, Cmd+Z, etc.)
+        // so parent keyboard shortcut handlers don't intercept standard text editing.
+        if (e.metaKey || e.ctrlKey) {
+          e.stopPropagation();
+          return;
+        }
+
         if (!onNavigateHistory) {
           return;
         }

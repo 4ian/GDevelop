@@ -62,6 +62,7 @@ import { BundleStoreContext } from '../AssetStore/Bundles/BundleStoreContext';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { isNativeMobileApp } from '../Utils/Platform';
 import { AskAiStandAloneForm } from '../AiGeneration/AskAiStandAloneForm';
+import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 import { AiRequestContext } from '../AiGeneration/AiRequestContext';
 
 const electron = optionalRequire('electron');
@@ -125,6 +126,8 @@ type Props = {|
     i18n: I18nType
   ) => Promise<CreateProjectResult>,
   onCloseAskAi: () => void,
+  onOpenAskAi?: (?OpenAskAiOptions) => void,
+  closeProject?: () => Promise<void>,
   selectedExampleShortHeader: ?ExampleShortHeader,
   onSelectExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
   selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
@@ -161,6 +164,8 @@ const NewProjectSetupDialog = ({
   onCreateFromExample,
   onCreateProjectFromPrivateGameTemplate,
   onCloseAskAi,
+  onOpenAskAi,
+  closeProject,
   selectedExampleShortHeader,
   onSelectExampleShortHeader,
   selectedPrivateGameTemplateListingData,
@@ -677,6 +682,8 @@ const NewProjectSetupDialog = ({
                   onWillInstallExtension={onWillInstallExtension}
                   onExtensionInstalled={onExtensionInstalled}
                   onCloseAskAi={onCloseAskAi}
+                  onOpenAskAi={onOpenAskAi}
+                  closeProject={closeProject}
                 />
                 <EmptyAndStartingPointProjects
                   onSelectExampleShortHeader={exampleShortHeader => {

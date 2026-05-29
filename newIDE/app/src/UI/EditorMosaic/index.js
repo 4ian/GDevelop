@@ -337,7 +337,9 @@ const EditorMosaic: React.ComponentType<{
           setHidableMosaicNode(newMosaicNode);
         } else {
           updateSourceSplit(newMosaicNode);
-          setHidableMosaicNode(newMosaicNode);
+          setHidableMosaicNode(hidableMosaicNode =>
+            shallowClone(hidableMosaicNode)
+          );
         }
       },
       [mosaicNode]

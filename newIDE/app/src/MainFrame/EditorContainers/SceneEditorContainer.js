@@ -119,12 +119,20 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   }
 
-  onEventsBasedObjectChildrenEdited() {
+  onEventsBasedObjectChildrenEdited(
+    eventsBasedObject: gdEventsBasedObject,
+    editedObject?: ?gdObject,
+    hasResourceChanged?: boolean
+  ) {
     const { editor } = this;
     if (editor) {
       // Update every custom object because some custom objects may include
       // the one actually edited.
-      editor.forceUpdateCustomObjectRenderedInstances();
+      editor.forceUpdateCustomObjectRenderedInstances(
+        eventsBasedObject,
+        editedObject,
+        hasResourceChanged
+      );
     }
   }
 
@@ -286,7 +294,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         }
         onEffectAdded={this.props.onEffectAdded}
         onObjectListsModified={this.props.onObjectListsModified}
-        onObjectEdited={objectWithContext =>
+        onObjectEdited={(objectWithContext, _hasResourceChanged) =>
           this.props.onSceneObjectEdited(layout, objectWithContext)
         }
         onObjectsDeleted={() => this.props.onSceneObjectsDeleted(layout)}

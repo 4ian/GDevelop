@@ -3429,7 +3429,11 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const onEventsBasedObjectChildrenEdited = React.useCallback(
-    (eventsBasedObject: gdEventsBasedObject) => {
+    (
+      eventsBasedObject: gdEventsBasedObject,
+      editedObject?: ?gdObject,
+      hasResourceChanged?: boolean
+    ) => {
       const project = state.currentProject;
       if (!project) {
         return;
@@ -3442,7 +3446,11 @@ const MainFrame = (props: Props): React.MixedElement => {
       for (const editor of getAllEditorTabs(state.editorTabs)) {
         const { editorRef } = editor;
         if (editorRef) {
-          editorRef.onEventsBasedObjectChildrenEdited();
+          editorRef.onEventsBasedObjectChildrenEdited(
+            eventsBasedObject,
+            editedObject,
+            hasResourceChanged
+          );
         }
       }
     },

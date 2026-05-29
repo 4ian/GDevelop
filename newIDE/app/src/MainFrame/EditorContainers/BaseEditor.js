@@ -222,7 +222,9 @@ export type RenderEditorContainerProps = {|
   // Object editing
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onEventsBasedObjectChildrenEdited: (
-    eventsBasedObject: gdEventsBasedObject
+    eventsBasedObject: gdEventsBasedObject,
+    editedObject?: ?gdObject,
+    hasResourceChanged?: boolean
   ) => void,
   onSceneObjectEdited: (
     scene: gdLayout,

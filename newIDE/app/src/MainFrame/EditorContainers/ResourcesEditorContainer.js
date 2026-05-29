@@ -47,7 +47,11 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     // No updates to be done.
   }
 
-  onEventsBasedObjectChildrenEdited() {
+  onEventsBasedObjectChildrenEdited(
+    eventsBasedObject: gdEventsBasedObject,
+    editedObject?: ?gdObject,
+    hasResourceChanged?: boolean
+  ) {
     // No thing to be done.
   }
 

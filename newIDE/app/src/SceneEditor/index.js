@@ -98,6 +98,10 @@ import {
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import Rectangle from '../Utils/Rectangle';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
+import {
+  getImageResourceNamesForEditedObject,
+  shouldResetObjectRendererForCustomObjectChildrenEdit,
+} from './CustomObjectResourceReload';
 
 const gd: libGDevelop = global.gd;
 
@@ -207,10 +211,15 @@ type Props = {|
 
   onOpenMoreSettings?: ?() => void,
   onOpenEvents: (sceneName: string) => void,
-  onObjectEdited: (objectWithContext: ObjectWithContext) => void,
+  onObjectEdited: (
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged: boolean
+  ) => void,
   onObjectGroupEdited: (objectGroupWithContext: GroupWithContext) => void,
   onEventsBasedObjectChildrenEdited: (
-    eventsBasedObject: gdEventsBasedObject
+    eventsBasedObject: gdEventsBasedObject,
+    editedObject?: ?gdObject,
+    hasResourceChanged?: boolean
   ) => void,
 
   onObjectsDeleted: () => void,
@@ -1482,7 +1491,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   ) => {
     const { project, layout, resourceManagementProps } = this.props;
     // It triggers forceUpdateRenderedInstancesOfObject on this editor too.
-    this.props.onObjectEdited(objectWithContext);
+    this.props.onObjectEdited(objectWithContext, hasResourceChanged);
     if (layout) {
       if (objectWithContext.global) {
         gd.WholeProjectRefactorer.behaviorsAddedToGlobalObject(
@@ -2817,30 +2826,54 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay) this.editorDisplay.forceUpdatePropertiesEditor();
   };
 
-  forceUpdateCustomObjectRenderedInstances = async () => {
+  forceUpdateCustomObjectRenderedInstances = async (
+    editedEventsBasedObject?: ?gdEventsBasedObject,
+    editedObject?: ?gdObject,
+    hasResourceChanged?: boolean = false
+  ) => {
     const { project, projectScopedContainersAccessor } = this.props;
 
-    const resourcesInUse = new gd.ResourcesInUseHelper(
-      project.getResourcesManager()
-    );
-    projectScopedContainersAccessor.forEachObject(object => {
-      if (project.hasEventsBasedObject(object.getType())) {
-        object.getConfiguration().exposeResources(resourcesInUse);
-      }
-    });
-    const objectResourceNames = resourcesInUse
-      .getAllImages() // TODO: should probably check all resources.
-      .toNewVectorString()
-      .toJSArray();
-    resourcesInUse.delete();
+    const objectResourceNames: Array<string> = [];
+    if (hasResourceChanged && editedObject) {
+      objectResourceNames.push(
+        ...getImageResourceNamesForEditedObject(project, editedObject)
+      );
+    } else if (!editedEventsBasedObject) {
+      const resourcesInUse = new gd.ResourcesInUseHelper(
+        project.getResourcesManager()
+      );
+      projectScopedContainersAccessor.forEachObject(object => {
+        if (project.hasEventsBasedObject(object.getType())) {
+          object.getConfiguration().exposeResources(resourcesInUse);
+        }
+      });
+      objectResourceNames.push(
+        ...resourcesInUse
+          .getAllImages() // TODO: should probably check all resources.
+          .toNewVectorString()
+          .toJSArray()
+      );
+      resourcesInUse.delete();
+    }
 
-    await this._reloadResources(objectResourceNames, 'custom object edited');
+    if (objectResourceNames.length > 0) {
+      await this._reloadResources(objectResourceNames, 'custom object edited');
+    }
     const { editorDisplay } = this;
     if (editorDisplay) {
       projectScopedContainersAccessor.forEachObject(object => {
-        editorDisplay.instancesHandlers.resetInstanceRenderersFor(
-          object.getName()
-        );
+        if (
+          shouldResetObjectRendererForCustomObjectChildrenEdit({
+            project,
+            object,
+            editedEventsBasedObject,
+            editedObject,
+          })
+        ) {
+          editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+            object.getName()
+          );
+        }
       });
     }
   };
@@ -3115,7 +3148,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                           if (editedObjectWithContext) {
                             // Object changes are reverted but not the
                             // resources modified with an external editor.
-                            this.props.onObjectEdited(editedObjectWithContext);
+                            this.props.onObjectEdited(
+                              editedObjectWithContext,
+                              false
+                            );
                           }
                           this.editObject(null);
                           // An hot-reload for an edited image may be on hold.

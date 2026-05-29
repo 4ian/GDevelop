@@ -17,7 +17,11 @@ const {
  */
 const generateExtensionSection = (extension, baseFolder) => {
   const folderName = getExtensionFolderName(extension.getName());
-  const referencePageUrl = `${gdevelopWikiUrlRoot}/${baseFolder}/${folderName}/reference`;
+  // TODO Remove the extra `/reference` folder once pages are moved.
+  const referencePageUrl =
+    baseFolder === 'all-features'
+      ? `${gdevelopWikiUrlRoot}/${baseFolder}/${folderName}/reference`
+      : `${gdevelopWikiUrlRoot}/${baseFolder}/${folderName}`;
   const helpPageUrl = getHelpLink(extension.getHelpPath()) || referencePageUrl;
 
   // @ts-ignore

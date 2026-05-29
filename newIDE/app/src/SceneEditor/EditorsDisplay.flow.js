@@ -6,6 +6,7 @@ import {
   type ObjectWithContext,
 } from '../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { type EventsBasedObjectChildrenEditedOptions } from '../MainFrame/EditorContainers/BaseEditor';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type InstancesEditorSettings } from '../InstancesEditor/InstancesEditorSettings';
@@ -161,7 +162,10 @@ export type SceneEditorsDisplayProps = {|
   onOpenedEditorsChanged: () => void,
   onRestartInGameEditor: (reason: string) => void,
   showRestartInGameEditorAfterErrorButton: boolean,
-  onEventsBasedObjectChildrenEdited: gdEventsBasedObject => void,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject,
+    options?: EventsBasedObjectChildrenEditedOptions
+  ) => void,
 |};
 
 export type SceneEditorsDisplayInterface = {|

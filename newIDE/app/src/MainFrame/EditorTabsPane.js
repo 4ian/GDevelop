@@ -263,7 +263,8 @@ export type EditorTabsPaneCommonProps = {|
     variant: gdEventsBasedObjectVariant
   ) => void,
   onEventsBasedObjectChildrenEdited: (
-    eventsBasedObject: gdEventsBasedObject
+    eventsBasedObject: gdEventsBasedObject,
+    options?: EventsBasedObjectChildrenEditedOptions
   ) => void,
   onSceneObjectEdited: (
     scene: gdLayout,

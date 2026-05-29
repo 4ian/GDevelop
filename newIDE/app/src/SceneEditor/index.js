@@ -51,6 +51,7 @@ import {
 } from '../ObjectsList/EnumerateObjects';
 import InfoBar from '../UI/Messages/InfoBar';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { type EventsBasedObjectChildrenEditedOptions } from '../MainFrame/EditorContainers/BaseEditor';
 import SceneVariablesDialog from '../VariablesList/SceneVariablesDialog';
 import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
 import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
@@ -207,10 +208,14 @@ type Props = {|
 
   onOpenMoreSettings?: ?() => void,
   onOpenEvents: (sceneName: string) => void,
-  onObjectEdited: (objectWithContext: ObjectWithContext) => void,
+  onObjectEdited: (
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged?: boolean
+  ) => void,
   onObjectGroupEdited: (objectGroupWithContext: GroupWithContext) => void,
   onEventsBasedObjectChildrenEdited: (
-    eventsBasedObject: gdEventsBasedObject
+    eventsBasedObject: gdEventsBasedObject,
+    options?: EventsBasedObjectChildrenEditedOptions
   ) => void,
 
   onObjectsDeleted: () => void,
@@ -1482,7 +1487,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   ) => {
     const { project, layout, resourceManagementProps } = this.props;
     // It triggers forceUpdateRenderedInstancesOfObject on this editor too.
-    this.props.onObjectEdited(objectWithContext);
+    this.props.onObjectEdited(objectWithContext, hasResourceChanged);
     if (layout) {
       if (objectWithContext.global) {
         gd.WholeProjectRefactorer.behaviorsAddedToGlobalObject(
@@ -2817,14 +2822,58 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay) this.editorDisplay.forceUpdatePropertiesEditor();
   };
 
-  forceUpdateCustomObjectRenderedInstances = async () => {
+  forceUpdateCustomObjectRenderedInstances = async (
+    eventsBasedObject?: ?gdEventsBasedObject,
+    options?: EventsBasedObjectChildrenEditedOptions
+  ) => {
+    const editedObject = options ? options.editedObject : undefined;
+    const hasResourceChanged = options
+      ? options.hasResourceChanged
+      : undefined;
+
+    if (editedObject) {
+      const { editorDisplay } = this;
+      if (!hasResourceChanged) {
+        // No texture changes: only refresh instance renderers.
+        if (editorDisplay) {
+          editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+            editedObject.getName()
+          );
+          if (eventsBasedObject) {
+            editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+              eventsBasedObject.getName()
+            );
+          }
+          editorDisplay.forceUpdateObjectsList();
+        }
+        return;
+      }
+
+      await this.forceUpdateRenderedInstancesOfObject(editedObject);
+      if (editorDisplay && eventsBasedObject) {
+        editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+          eventsBasedObject.getName()
+        );
+      }
+      return;
+    }
+
     const { project, projectScopedContainersAccessor } = this.props;
+    const eventsBasedObjectName = eventsBasedObject
+      ? eventsBasedObject.getName()
+      : null;
 
     const resourcesInUse = new gd.ResourcesInUseHelper(
       project.getResourcesManager()
     );
     projectScopedContainersAccessor.forEachObject(object => {
       if (project.hasEventsBasedObject(object.getType())) {
+        if (
+          eventsBasedObjectName &&
+          object.getType() !== eventsBasedObjectName
+        ) {
+          return;
+        }
         object.getConfiguration().exposeResources(resourcesInUse);
       }
     });
@@ -2834,18 +2883,35 @@ export default class SceneEditor extends React.Component<Props, State> {
       .toJSArray();
     resourcesInUse.delete();
 
+    if (objectResourceNames.length === 0) {
+      return;
+    }
+
     await this._reloadResources(objectResourceNames, 'custom object edited');
     const { editorDisplay } = this;
     if (editorDisplay) {
-      projectScopedContainersAccessor.forEachObject(object => {
+      if (eventsBasedObjectName) {
         editorDisplay.instancesHandlers.resetInstanceRenderersFor(
-          object.getName()
+          eventsBasedObjectName
         );
-      });
+        projectScopedContainersAccessor.forEachObject(object => {
+          if (!project.hasEventsBasedObject(object.getType())) {
+            editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+              object.getName()
+            );
+          }
+        });
+      } else {
+        projectScopedContainersAccessor.forEachObject(object => {
+          editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+            object.getName()
+          );
+        });
+      }
     }
   };
 
-  forceUpdateRenderedInstancesOfObject = (object: gdObject) => {
+  forceUpdateRenderedInstancesOfObject = async (object: gdObject) => {
     const { project } = this.props;
 
     const resourcesInUse = new gd.ResourcesInUseHelper(
@@ -2858,7 +2924,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       .toJSArray();
     resourcesInUse.delete();
 
-    this._reloadResources(objectResourceNames, 'object edited');
+    if (objectResourceNames.length === 0) {
+      return;
+    }
+
+    await this._reloadResources(objectResourceNames, 'object edited');
   };
 
   render(): any {

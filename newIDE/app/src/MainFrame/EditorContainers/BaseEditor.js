@@ -47,6 +47,11 @@ export type InstancesOutsideEditorChanges = {|
   scene: gdLayout,
 |};
 
+export type EventsBasedObjectChildrenEditedOptions = {|
+  editedObject?: gdObject,
+  hasResourceChanged?: boolean,
+|};
+
 export type ObjectsOutsideEditorChanges = {|
   scene: gdLayout,
   isNewObjectTypeUsed: boolean,
@@ -222,7 +227,8 @@ export type RenderEditorContainerProps = {|
   // Object editing
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onEventsBasedObjectChildrenEdited: (
-    eventsBasedObject: gdEventsBasedObject
+    eventsBasedObject: gdEventsBasedObject,
+    options?: EventsBasedObjectChildrenEditedOptions
   ) => void,
   onSceneObjectEdited: (
     scene: gdLayout,

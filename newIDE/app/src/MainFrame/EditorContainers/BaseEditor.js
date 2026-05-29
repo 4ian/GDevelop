@@ -222,11 +222,13 @@ export type RenderEditorContainerProps = {|
   // Object editing
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onEventsBasedObjectChildrenEdited: (
-    eventsBasedObject: gdEventsBasedObject
+    eventsBasedObject: gdEventsBasedObject,
+    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
   ) => void,
   onSceneObjectEdited: (
     scene: gdLayout,
-    objectWithContext: ObjectWithContext
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged?: boolean
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,

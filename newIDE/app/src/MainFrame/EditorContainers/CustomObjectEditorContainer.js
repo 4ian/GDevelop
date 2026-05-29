@@ -155,12 +155,15 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     }
   }
 
-  onEventsBasedObjectChildrenEdited() {
+  onEventsBasedObjectChildrenEdited(options?: {|
+    editedObject?: ?gdObject,
+    hasResourceChanged?: boolean,
+  |}) {
     const { editor } = this;
     if (editor) {
       // Update every custom object because some custom objects may include
       // the one actually edited.
-      editor.forceUpdateCustomObjectRenderedInstances();
+      editor.forceUpdateCustomObjectRenderedInstances(options);
     }
   }
 
@@ -340,8 +343,11 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           previewDebuggerServer={this.props.previewDebuggerServer}
           hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           openBehaviorEvents={this.props.openBehaviorEvents}
-          onObjectEdited={() =>
-            this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
+          onObjectEdited={(objectWithContext, hasResourceChanged) =>
+            this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject, {
+              editedObject: objectWithContext.object,
+              hasResourceChanged,
+            })
           }
           onObjectsDeleted={() =>
             this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)

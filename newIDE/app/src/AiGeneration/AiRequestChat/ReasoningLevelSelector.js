@@ -20,7 +20,6 @@ import Startup from '../../Profile/Subscription/Icons/Startup';
 import { type AiConfigurationPresetWithAvailability } from '../AiConfiguration';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 import { tooltipEnterDelay } from '../../UI/Tooltip';
-import Window from '../../Utils/Window';
 
 type Props = {|
   chosenOrDefaultAiConfigurationPresetId: string,
@@ -39,7 +38,7 @@ const styles = {
     display: 'flex',
   },
   button: {
-    padding: '4px 8px',
+    padding: '4px 4px 4px 8px',
     display: 'flex',
     alignItems: 'center',
   },
@@ -148,7 +147,7 @@ export const ReasoningLevelSelector = ({
                   <NetworkIcon
                     style={{ fontSize: 20, color: networkIconColor }}
                   />
-                  <ChevronArrowBottom />
+                  <ChevronArrowBottom style={{ fontSize: 20 }} />
                 </ButtonBase>
               </span>
             </Tooltip>
@@ -179,8 +178,6 @@ export const ReasoningLevelSelector = ({
                           preset.reasoningLevelByLocale
                         )
                       : selectMessageByLocale(i18n, preset.nameByLocale)}
-                    {Window.isDev() &&
-                      ` (${selectMessageByLocale(i18n, preset.nameByLocale)})`}
                   </span>
                   {getSubscriptionBadge(preset.enabledWithPlans)}
                 </div>

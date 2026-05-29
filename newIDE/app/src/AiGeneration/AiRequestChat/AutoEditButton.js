@@ -17,8 +17,8 @@ const styles = {
     display: 'flex',
   },
   button: {
-    padding: '7px 12px',
-    fontSize: 14,
+    padding: '6px 12px',
+    fontSize: 12,
     fontFamily: 'var(--gdevelop-modern-font-family)',
     color: 'inherit',
     whiteSpace: 'nowrap',

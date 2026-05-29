@@ -44,8 +44,10 @@ import { ReasoningLevelSelector } from './ReasoningLevelSelector';
 import { AiRequestContext } from '../AiRequestContext';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useStickyVisibility } from './UseStickyVisibility';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import CircledInfo from '../../UI/CustomSvgIcons/CircledInfo';
 import Coin from '../../Credits/Icons/Coin';
+import LinearProgress from '../../UI/LinearProgress';
 import FlatButton from '../../UI/FlatButton';
 import GoldCompact from '../../Profile/Subscription/Icons/GoldCompact';
 import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
@@ -96,12 +98,16 @@ const getPriceAndRequestsTextAndTooltip = ({
   availableCredits,
   automaticallyUseCreditsForAiRequests,
   isRefreshingLimits,
+  progressBarColor,
+  progressTrackColor,
 }: {|
   quota: Quota | null,
   price: UsagePrice | null,
   availableCredits: number,
   automaticallyUseCreditsForAiRequests: boolean,
   isRefreshingLimits?: boolean,
+  progressBarColor: string,
+  progressTrackColor: string,
 |}): React.Node => {
   if (!quota || !price) {
     if (isRefreshingLimits) {
@@ -139,52 +145,55 @@ const getPriceAndRequestsTextAndTooltip = ({
   }
 
   const aiCreditsAvailable = Math.max(0, quota.max - quota.current);
-
-  const currentQuotaText = (
-    <Trans>{aiCreditsAvailable} AI credits available</Trans>
-  );
-  const creditsText = (
-    <Trans>{Math.max(0, availableCredits)} credits available</Trans>
-  );
+  const percentage =
+    quota.max > 0 ? Math.round((aiCreditsAvailable / quota.max) * 100) : 0;
 
   const timeForReset = quota.resetsAt ? new Date(quota.resetsAt) : null;
   const now = new Date();
-  let summarySentence =
-    quota.period === '7days' ? (
-      <Trans>Your credits reset every week.</Trans>
-    ) : quota.period === '30days' ? (
-      <Trans>Your credits reset every month.</Trans>
-    ) : (
-      <Trans>Your credits reset every day.</Trans>
-    );
-  if (timeForReset) {
-    const timeDiff = timeForReset.getTime() - now.getTime();
-    // Date to look like 'Nov 30th'
-    const dateString = timeForReset.toLocaleDateString(undefined, {
+
+  let dateString = '';
+  let timeString = '';
+  if (timeForReset && timeForReset.getTime() - now.getTime() > 0) {
+    dateString = timeForReset.toLocaleDateString(undefined, {
       month: 'short',
       day: 'numeric',
     });
-    // Time to look like '14:05'
-    const timeString = timeForReset.toLocaleTimeString(undefined, {
+    timeString = timeForReset.toLocaleTimeString(undefined, {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
     });
-    if (timeDiff <= 0) {
-      summarySentence = <Trans>Your credits will reset soon.</Trans>;
-    } else {
-      summarySentence = (
-        <Trans>
-          You need to wait until {dateString} at {timeString} to reset to
-          {quota.max} AI credits.
-        </Trans>
-      );
-    }
   }
+  const hasTimeForReset = !!dateString;
+
+  const tooltipSentence = hasTimeForReset ? (
+    quota.period === '7days' ? (
+      <Trans>
+        You still have {percentage}% left on this week's AI usage. It resets on{' '}
+        {dateString} at {timeString}.
+      </Trans>
+    ) : quota.period === '30days' ? (
+      <Trans>
+        You still have {percentage}% left on this month's AI usage. It resets on{' '}
+        {dateString} at {timeString}.
+      </Trans>
+    ) : (
+      <Trans>
+        You still have {percentage}% left on today's AI usage. It resets on{' '}
+        {dateString} at {timeString}.
+      </Trans>
+    )
+  ) : quota.period === '7days' ? (
+    <Trans>You still have {percentage}% left on this week's AI usage.</Trans>
+  ) : quota.period === '30days' ? (
+    <Trans>You still have {percentage}% left on this month's AI usage.</Trans>
+  ) : (
+    <Trans>You still have {percentage}% left on today's AI usage.</Trans>
+  );
 
   const tooltipText = (
     <ColumnStackLayout noMargin>
-      {summarySentence && <Line noMargin>{summarySentence}</Line>}
+      <Line noMargin>{tooltipSentence}</Line>
       <Line noMargin>
         <Link
           href={getHelpLink('/interface/ai/', 'cost-of-ai-requests')}
@@ -205,17 +214,20 @@ const getPriceAndRequestsTextAndTooltip = ({
     quota.limitReached && automaticallyUseCreditsForAiRequests;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
-      <div
-        style={{
-          flex: 1,
-          minWidth: 0,
-          textAlign: 'right',
-          ...textEllipsisStyle,
-        }}
-      >
-        <Text size="body-small" color="secondary" noMargin>
-          {!isRefreshingLimits && shouldShowCredits && (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        overflow: 'hidden',
+        gap: 4,
+        width: '100%',
+      }}
+    >
+      <Text size="body-small" color="secondary" noMargin>
+        {isRefreshingLimits ? (
+          <Trans>Calculating...</Trans>
+        ) : shouldShowCredits ? (
+          <>
             <span
               style={{
                 verticalAlign: 'middle',
@@ -225,16 +237,23 @@ const getPriceAndRequestsTextAndTooltip = ({
             >
               <Coin fontSize="small" />
             </span>
-          )}
-          {isRefreshingLimits ? (
-            <Trans>Calculating...</Trans>
-          ) : shouldShowCredits ? (
-            creditsText
-          ) : (
-            currentQuotaText
-          )}
-        </Text>
-      </div>
+            <Trans>{Math.max(0, availableCredits)} credits available</Trans>
+          </>
+        ) : (
+          <Trans>{percentage}% left</Trans>
+        )}
+      </Text>
+      {!isRefreshingLimits && !shouldShowCredits && (
+        <div style={{ width: 30 }}>
+          <LinearProgress
+            variant="determinate"
+            value={percentage}
+            barColor={progressBarColor}
+            trackColor={progressTrackColor}
+            style={{ height: 4, borderRadius: 2 }}
+          />
+        </div>
+      )}
       <span
         style={{
           flexShrink: 0,
@@ -391,6 +410,11 @@ export const AiRequestChat: React.ComponentType<{
       values: { automaticallyUseCreditsForAiRequests },
       setAutomaticallyUseCreditsForAiRequests,
     } = React.useContext(PreferencesContext);
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
+    const progressBarColor =
+      gdevelopTheme.palette.type === 'light' ? '#7046EC' : '#9979F1';
+    const progressTrackColor =
+      gdevelopTheme.palette.type === 'light' ? '#D9D9DE' : '#32323B';
     const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
     const { openCreditsPackageDialog } = React.useContext(
       CreditsPackageStoreContext
@@ -556,6 +580,8 @@ export const AiRequestChat: React.ComponentType<{
       availableCredits,
       automaticallyUseCreditsForAiRequests,
       isRefreshingLimits: isRefreshingLimitsStable,
+      progressBarColor,
+      progressTrackColor,
     });
 
     const chosenOrDefaultAiConfigurationPresetId =

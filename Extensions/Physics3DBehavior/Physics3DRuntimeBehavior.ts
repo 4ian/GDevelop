@@ -409,31 +409,7 @@ namespace gdjs {
       this.collisionChecker =
         new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(this);
       this.owner3D = owner;
-      this.bodyType = behaviorData.bodyType;
-      this.bullet = behaviorData.bullet;
-      this.fixedRotation = behaviorData.fixedRotation;
-      this._shape = behaviorData.shape;
-      this.meshShapeResourceName = behaviorData.meshShapeResourceName || '';
-      this.shapeOrientation =
-        behaviorData.shape === 'Box' ? 'Z' : behaviorData.shapeOrientation;
-      this.shapeDimensionA = behaviorData.shapeDimensionA;
-      this.shapeDimensionB = behaviorData.shapeDimensionB;
-      this.shapeDimensionC = behaviorData.shapeDimensionC;
-      this.shapeOffsetX = behaviorData.shapeOffsetX || 0;
-      this.shapeOffsetY = behaviorData.shapeOffsetY || 0;
-      this.shapeOffsetZ = behaviorData.shapeOffsetZ || 0;
-      this.massCenterOffsetX = behaviorData.massCenterOffsetX || 0;
-      this.massCenterOffsetY = behaviorData.massCenterOffsetY || 0;
-      this.massCenterOffsetZ = behaviorData.massCenterOffsetZ || 0;
-      this.density = Math.max(0.0001, behaviorData.density);
-      this.massOverride = behaviorData.massOverride || 0;
-      this.friction = behaviorData.friction;
-      this.restitution = behaviorData.restitution;
-      this.linearDamping = Math.max(0, behaviorData.linearDamping);
-      this.angularDamping = Math.max(0, behaviorData.angularDamping);
-      this.gravityScale = behaviorData.gravityScale;
-      this.layers = behaviorData.layers;
-      this.masks = behaviorData.masks;
+      this._applyBehaviorData(behaviorData);
       this._sharedData = Physics3DSharedData.getSharedData(
         instanceContainer.getScene(),
         behaviorData.name
@@ -457,59 +433,6 @@ namespace gdjs {
       const tempQuat = this._sharedData._tempQuat;
       tempQuat.Set(x, y, z, w);
       return tempQuat;
-    }
-
-    override applyBehaviorOverriding(behaviorData): boolean {
-      if (behaviorData.bullet !== undefined) {
-        this.setBullet(behaviorData.bullet);
-      }
-      if (behaviorData.fixedRotation !== undefined) {
-        this.setFixedRotation(behaviorData.fixedRotation);
-      }
-      if (behaviorData.shapeDimensionA !== undefined) {
-        this.shapeDimensionA = behaviorData.shapeDimensionA;
-        this._needToRecreateShape = true;
-      }
-      if (behaviorData.shapeDimensionB !== undefined) {
-        this.shapeDimensionB = behaviorData.shapeDimensionB;
-        this._needToRecreateShape = true;
-      }
-      if (behaviorData.density !== undefined) {
-        this.setDensity(behaviorData.density);
-      }
-      if (behaviorData.friction !== undefined) {
-        this.setFriction(behaviorData.friction);
-      }
-      if (behaviorData.restitution !== undefined) {
-        this.setRestitution(behaviorData.restitution);
-      }
-      if (behaviorData.linearDamping !== undefined) {
-        this.setLinearDamping(behaviorData.linearDamping);
-      }
-      if (behaviorData.angularDamping !== undefined) {
-        this.setAngularDamping(behaviorData.angularDamping);
-      }
-      if (behaviorData.gravityScale !== undefined) {
-        this.setGravityScale(behaviorData.gravityScale);
-      }
-
-      // TODO: make these properties updatable.
-      if (behaviorData.layers !== undefined) {
-        return false;
-      }
-      if (behaviorData.masks !== undefined) {
-        return false;
-      }
-      if (behaviorData.vertices !== undefined) {
-        return false;
-      }
-      if (behaviorData.bodyType !== undefined) {
-        return false;
-      }
-      if (behaviorData.shape !== undefined) {
-        return false;
-      }
-      return true;
     }
 
     override getNetworkSyncData(
@@ -1129,6 +1052,77 @@ namespace gdjs {
     ) {
       // Reset world step to update next frame
       this._sharedData.stepped = false;
+    }
+
+    private _applyBehaviorData(data: any): void {
+      if ('bodyType' in data) this.bodyType = data.bodyType;
+      if ('bullet' in data) this.bullet = data.bullet;
+      if ('fixedRotation' in data) this.fixedRotation = data.fixedRotation;
+
+      if ('shape' in data) {
+        this._shape = data.shape;
+        const orientation =
+          'shapeOrientation' in data
+            ? data.shapeOrientation
+            : this.shapeOrientation;
+        this.shapeOrientation = data.shape === 'Box' ? 'Z' : orientation;
+      } else if ('shapeOrientation' in data) {
+        this.shapeOrientation =
+          this._shape === 'Box' ? 'Z' : data.shapeOrientation;
+      }
+
+      if ('meshShapeResourceName' in data)
+        this.meshShapeResourceName = data.meshShapeResourceName || '';
+      if ('shapeDimensionA' in data)
+        this.shapeDimensionA = data.shapeDimensionA;
+      if ('shapeDimensionB' in data)
+        this.shapeDimensionB = data.shapeDimensionB;
+      if ('shapeDimensionC' in data)
+        this.shapeDimensionC = data.shapeDimensionC;
+      if ('shapeOffsetX' in data) this.shapeOffsetX = data.shapeOffsetX || 0;
+      if ('shapeOffsetY' in data) this.shapeOffsetY = data.shapeOffsetY || 0;
+      if ('shapeOffsetZ' in data) this.shapeOffsetZ = data.shapeOffsetZ || 0;
+      if ('massCenterOffsetX' in data)
+        this.massCenterOffsetX = data.massCenterOffsetX || 0;
+      if ('massCenterOffsetY' in data)
+        this.massCenterOffsetY = data.massCenterOffsetY || 0;
+      if ('massCenterOffsetZ' in data)
+        this.massCenterOffsetZ = data.massCenterOffsetZ || 0;
+      if ('density' in data) this.density = Math.max(0.0001, data.density);
+      if ('massOverride' in data) this.massOverride = data.massOverride || 0;
+      if ('friction' in data) this.friction = data.friction;
+      if ('restitution' in data) this.restitution = data.restitution;
+      if ('linearDamping' in data)
+        this.linearDamping = Math.max(0, data.linearDamping);
+      if ('angularDamping' in data)
+        this.angularDamping = Math.max(0, data.angularDamping);
+      if ('gravityScale' in data) this.gravityScale = data.gravityScale;
+      if ('layers' in data) this.layers = data.layers;
+      if ('masks' in data) this.masks = data.masks;
+    }
+
+    override applyBehaviorOverriding(behaviorData): boolean {
+      this._applyBehaviorData(behaviorData);
+
+      // Recreate the body if any shape-related property changed.
+      const shapeChanged =
+        'shape' in behaviorData ||
+        'shapeOrientation' in behaviorData ||
+        'shapeDimensionA' in behaviorData ||
+        'shapeDimensionB' in behaviorData ||
+        'shapeDimensionC' in behaviorData ||
+        'shapeOffsetX' in behaviorData ||
+        'shapeOffsetY' in behaviorData ||
+        'shapeOffsetZ' in behaviorData ||
+        'massCenterOffsetX' in behaviorData ||
+        'massCenterOffsetY' in behaviorData ||
+        'massCenterOffsetZ' in behaviorData ||
+        'meshShapeResourceName' in behaviorData ||
+        'bodyType' in behaviorData;
+      if (shapeChanged) {
+        this.recreateBody();
+      }
+      return true;
     }
 
     onObjectHotReloaded() {

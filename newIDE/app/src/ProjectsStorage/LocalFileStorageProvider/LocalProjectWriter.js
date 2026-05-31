@@ -19,6 +19,10 @@ import {
   splitPaths,
   getSlugifiedUniqueNameFromProperty,
 } from '../../Utils/ObjectSplitter';
+import {
+  extractProjectEditorSettings,
+  getProjectEditorSettingsFilePath,
+} from './LocalEditorSettingsStorage';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import SaveAsOptionsDialog from '../SaveAsOptionsDialog';
@@ -139,7 +143,19 @@ const writeProjectFiles = async ({
       canonicalEventSerialization,
     });
   }
+  const projectEditorSettings = extractProjectEditorSettings(
+    serializedProjectObject
+  );
   const serializeEndTime = Date.now();
+
+  if (projectEditorSettings) {
+    await writeAndCheckFormattedJSONFile(
+      projectEditorSettings,
+      getProjectEditorSettingsFilePath(filePath)
+    );
+  } else {
+    await fs.remove(getProjectEditorSettingsFilePath(filePath));
+  }
 
   if (project.isFolderProject()) {
     const partialObjects = split(serializedProjectObject, {

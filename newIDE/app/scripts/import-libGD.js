@@ -66,17 +66,28 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     return branch;
   };
 
-  // Try to download libGD.js from a specific commit on the current branch
-  const downloadCommitLibGdJs = (branch, gitRef) =>
+  const getHashFromGitRef = gitRef => {
+    const hashShellString = shell.exec(`git rev-parse "${gitRef}"`, {
+      silent: true,
+    });
+    const hash = (hashShellString.stdout || 'unknown-hash').trim();
+
+    if (hashShellString.stderr || hashShellString.code) {
+      shell.echo(`⚠️ Can't find the hash of the associated commit.`);
+      return null;
+    }
+
+    return hash;
+  };
+
+  // Try to download libGD.js from a specific commit on the inferred branch.
+  const downloadCommitLibGdJs = gitRef =>
     new Promise((resolve, reject) => {
       shell.echo(`ℹ️ Trying to download libGD.js for ${gitRef}.`);
 
-      var hashShellString = shell.exec(`git rev-parse "${gitRef}"`, {
-        silent: true,
-      });
-      const hash = (hashShellString.stdout || 'unknown-hash').trim();
+      const hash = getHashFromGitRef(gitRef);
       const branch = getBranchFromGitRef(gitRef);
-      if (hashShellString.stderr || hashShellString.code || !branch) {
+      if (!hash || !branch) {
         shell.echo(
           `⚠️ Can't find the hash or branch of the associated commit.`
         );
@@ -87,6 +98,25 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
       resolve(
         downloadLibGdJs(
           `https://s3.amazonaws.com/gdevelop-gdevelop.js/${branch}/commit/${hash}`
+        )
+      );
+    });
+
+  const downloadMasterCommitLibGdJs = gitRef =>
+    new Promise((resolve, reject) => {
+      shell.echo(
+        `ℹ️ Trying to download libGD.js for ${gitRef} from master.`
+      );
+
+      const hash = getHashFromGitRef(gitRef);
+      if (!hash) {
+        reject();
+        return;
+      }
+
+      resolve(
+        downloadLibGdJs(
+          `https://s3.amazonaws.com/gdevelop-gdevelop.js/master/commit/${hash}`
         )
       );
     });
@@ -151,48 +181,55 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
   };
 
   const branch = getBranchFromGitRef('HEAD');
+  const downloadCommitLibGdJsWithMasterFallback = gitRef =>
+    downloadCommitLibGdJs(gitRef).catch(() =>
+      downloadMasterCommitLibGdJs(gitRef)
+    );
+  const tryDownloadInOrder = downloaders =>
+    downloaders.reduce(
+      (previousDownload, download) => previousDownload.catch(() => download()),
+      Promise.reject()
+    );
 
   // Try to download the latest libGD.js, fallback to previous or master ones
   // if not found (including different parents, for handling of merge commits).
-  downloadCommitLibGdJs(branch, 'HEAD').then(onLibGdJsDownloaded, () => {
-    // Force the exact version of GDevelop.js to be downloaded for AppVeyor - because
-    // this means we build the app and we don't want to risk mismatch (Core C++ not up to date
-    // with the IDE JavaScript).
-    if (process.env.APPVEYOR || process.env.REQUIRES_EXACT_LIBGD_JS_VERSION) {
-      shell.echo(
-        `❌ Can't download the exact required version of libGD.js - check it was built by CircleCI before running this CI.`
-      );
-      shell.echo(
-        `ℹ️ See the pipeline on https://app.circleci.com/pipelines/github/4ian/GDevelop.`
-      );
-      shell.exit(1);
-    }
+  downloadCommitLibGdJsWithMasterFallback('HEAD').then(
+    onLibGdJsDownloaded,
+    () => {
+      // Force the exact version of GDevelop.js to be downloaded for AppVeyor - because
+      // this means we build the app and we don't want to risk mismatch (Core C++ not up to date
+      // with the IDE JavaScript).
+      if (process.env.APPVEYOR || process.env.REQUIRES_EXACT_LIBGD_JS_VERSION) {
+        shell.echo(
+          `❌ Can't download the exact required version of libGD.js - check it was built by CircleCI before running this CI.`
+        );
+        shell.echo(
+          `ℹ️ See the pipeline on https://app.circleci.com/pipelines/github/4ian/GDevelop.`
+        );
+        shell.exit(1);
+      }
 
-    downloadCommitLibGdJs(branch, 'HEAD~1').then(onLibGdJsDownloaded, () =>
-      downloadCommitLibGdJs(branch, 'HEAD~2').then(onLibGdJsDownloaded, () =>
-        downloadCommitLibGdJs(branch, 'HEAD~3').then(onLibGdJsDownloaded, () =>
-          downloadBranchLatestLibGdJs(branch).then(onLibGdJsDownloaded, () =>
-            downloadBranchLatestLibGdJs('master').then(
-              onLibGdJsDownloaded,
-              () => {
-                if (alreadyHasLibGdJs) {
-                  shell.echo(
-                    `ℹ️ Can't download any version of libGD.js, assuming you can go ahead with the existing one.`
-                  );
-                  shell.exit(0);
-                  return;
-                } else {
-                  shell.echo(
-                    `❌ Can't download any version of libGD.js, please check your internet connection.`
-                  );
-                  shell.exit(1);
-                  return;
-                }
-              }
-            )
-          )
-        )
-      )
-    );
-  });
+      tryDownloadInOrder([
+        () => downloadCommitLibGdJsWithMasterFallback('HEAD~1'),
+        () => downloadCommitLibGdJsWithMasterFallback('HEAD~2'),
+        () => downloadCommitLibGdJsWithMasterFallback('HEAD~3'),
+        () => downloadBranchLatestLibGdJs(branch),
+        () => downloadBranchLatestLibGdJs('master'),
+      ]).then(onLibGdJsDownloaded, () => {
+        if (alreadyHasLibGdJs) {
+          shell.echo(
+            `ℹ️ Can't download any version of libGD.js, assuming you can go ahead with the existing one.`
+          );
+          shell.exit(0);
+          return;
+        } else {
+          shell.echo(
+            `❌ Can't download any version of libGD.js, please check your internet connection.`
+          );
+          shell.exit(1);
+          return;
+        }
+      });
+    }
+  );
 }

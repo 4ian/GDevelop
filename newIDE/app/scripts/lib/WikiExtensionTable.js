@@ -8,50 +8,58 @@ const {
 } = require('./WikiHelpLink');
 
 /** @typedef {import('../../../../GDevelop.js/types').EventsFunctionsExtension} EventsFunctionsExtension */
+/** @typedef {import('../../../../GDevelop.js/types').AbstractEventsBasedEntity} AbstractEventsBasedEntity */
 /** @typedef {import('../../../../GDevelop.js/types').PlatformExtension} PlatformExtension */
+/** @typedef {import('../../../../GDevelop.js/types').ObjectMetadata} ObjectMetadata */
+/** @typedef {import('../../../../GDevelop.js/types').BehaviorMetadata} BehaviorMetadata */
+
+/**
+ * @typedef {Object} ExtensionItem
+ * @prop {string} extensionName
+ * @prop {string} fullName
+ * @prop {string} description
+ * @prop {string} iconUrl
+ * @prop {string} helpPath
+ * @prop {string} category
+ */
 
 /**
  * Generate a section for an extension.
- * @param {EventsFunctionsExtension | PlatformExtension} extension The extension
+ * @param {ExtensionItem} extension The extension
  * @param {string} baseFolder The base folder for the extension pages.
  */
 const generateExtensionSection = (extension, baseFolder) => {
-  const folderName = getExtensionFolderName(extension.getName());
+  const folderName = getExtensionFolderName(extension.extensionName);
   // TODO Remove the extra `/reference` folder once pages are moved.
   const referencePageUrl =
     baseFolder === 'all-features'
       ? `${gdevelopWikiUrlRoot}/${baseFolder}/${folderName}/reference`
       : `${gdevelopWikiUrlRoot}/${baseFolder}/${folderName}`;
-  const helpPageUrl = getHelpLink(extension.getHelpPath()) || referencePageUrl;
+  const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
 
   // @ts-ignore
-  const icon = extension.getPreviewIconUrl
-    ? // @ts-ignore
-      extension.getPreviewIconUrl()
-    : extension.getIconUrl();
-  // @ts-ignore
-  const shortDescription = extension.getShortDescription
-    ? // @ts-ignore
-      extension.getShortDescription()
-    : extension.getDescription().slice(0, 100) + '...';
+  const shortDescription =
+    extension.description.length > 150
+      ? extension.description.slice(0, 100) + '...'
+      : extension.description;
 
-  return `|${generateSvgImageIcon(
-    icon
-  )}|**${extension.getFullName()}**|${shortDescription}|${`[Read more...](${helpPageUrl})` +
+  return `|${generateSvgImageIcon(extension.iconUrl)}|**${
+    extension.fullName
+  }**|${shortDescription}|${`[Read more...](${helpPageUrl})` +
     (helpPageUrl !== referencePageUrl
       ? ` ([reference](${referencePageUrl}))`
       : '')}|\n`;
 };
 
 /**
- * @param {{extensions: Array<EventsFunctionsExtension | PlatformExtension>, baseFolder: string}} options
+ * @param {{extensionItems: Array<ExtensionItem>, baseFolder: string}} options
  */
-const generateAllExtensionsSections = ({ extensions, baseFolder }) => {
+const generateAllExtensionsSections = ({ extensionItems, baseFolder }) => {
   let extensionSectionsContent = '';
 
-  /** @type {Record<string, Array<EventsFunctionsExtension | PlatformExtension>>} */
+  /** @type {Record<string, Array<ExtensionItem>>} */
   const extensionsByCategory = sortKeys(
-    groupBy(extensions, pair => pair.getCategory() || 'General')
+    groupBy(extensionItems, pair => pair.category || 'General')
   );
   for (const category in extensionsByCategory) {
     const extensions = extensionsByCategory[category];

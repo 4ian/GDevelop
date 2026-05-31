@@ -28,9 +28,16 @@ const { groupBy, sortKeys } = require('./lib/ArrayHelpers');
 const { generateAllExtensionsSections } = require('./lib/WikiExtensionTable');
 
 /** @typedef {import("./lib/ExtensionReferenceGenerator.js").RawText} RawText */
+/** @typedef {import("./lib/ExtensionReferenceGenerator.js").ExtensionReference} ExtensionReference */
+/** @typedef {import("./lib/WikiExtensionTable.js").ExtensionItem} ExtensionItem */
 /** @typedef {import('../../../GDevelop.js/types').EventsFunctionsExtension} EventsFunctionsExtension */
+/** @typedef {import('../../../GDevelop.js/types').AbstractEventsBasedEntity} AbstractEventsBasedEntity */
+/** @typedef {import('../../../GDevelop.js/types').EventsBasedObject} EventsBasedObject */
+/** @typedef {import('../../../GDevelop.js/types').EventsBasedBehavior} EventsBasedBehavior */
 /** @typedef {import('../../../GDevelop.js/types').Project} Project */
 /** @typedef {import('../../../GDevelop.js/types').PlatformExtension} PlatformExtension */
+/** @typedef {import('../../../GDevelop.js/types').ObjectMetadata} ObjectMetadata */
+/** @typedef {import('../../../GDevelop.js/types').BehaviorMetadata} BehaviorMetadata */
 
 /** @typedef {{ tier: 'community' | 'experimental' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number}} ExtensionShortHeader */
 
@@ -40,6 +47,16 @@ const gdRootPath = path.join(__dirname, '..', '..', '..');
 const outputRootPath = path.join(gdRootPath, 'docs-wiki');
 const extensionsRootPath = path.join(outputRootPath, 'extensions');
 const extensionsMainFilePath = path.join(extensionsRootPath, 'index.md');
+const objectsListFilePath = path.join(
+  outputRootPath,
+  'objects',
+  'all-objects.md'
+);
+const behaviorsListFilePath = path.join(
+  outputRootPath,
+  'behaviors',
+  'all-behaviors.md'
+);
 
 /**
  * @param {{id: string, username: string}[]} authors
@@ -350,6 +367,19 @@ const generateExtensionsPageList = (extensions, indentationLevel) => {
 };
 
 /**
+ * @param {EventsFunctionsExtension} extension The extension
+ * @return {ExtensionItem}
+ */
+const getEventsFunctionExtensionItem = extension => ({
+  extensionName: extension.getName(),
+  fullName: extension.getFullName(),
+  description: extension.getShortDescription() || extension.getDescription(),
+  iconUrl: extension.getPreviewIconUrl() || extension.getIconUrl(),
+  helpPath: extension.getHelpPath(),
+  category: extension.getCategory(),
+});
+
+/**
  * @param {Array<any>} reviewedExtensions The extension (gdEventsFunctionsExtension)
  * @param {Array<any>} experimentalExtensions The extension (gdEventsFunctionsExtension)
  */
@@ -376,28 +406,24 @@ ${generateExtensionsPageList(experimentalExtensions, 2)}
   console.info(`ℹ️ File generated: ${extensionsDotPagesFilePath}`);
 };
 
-const generateExtensionsList = async gd => {
+/**
+ * @param {any} gd
+ * @param {Project} project
+ * @param {Array<EventsFunctionsExtension>} extensions
+ * @param {Array<ExtensionShortHeader>} extensionShortHeaders
+ * @param {boolean} isExperimental
+ * @returns
+ */
+const generateExtensionsList = async (
+  gd,
+  project,
+  extensions,
+  extensionShortHeaders,
+  isExperimental
+) => {
   let content = '';
-  const project = new gd.ProjectHelper.createNewGDJSProject();
-  await addAllExtensionsToProject(gd, project);
-  const extensionShortHeaders = await getAllExtensionShortHeaders();
 
-  const reviewedExtensionShortHeaders = extensionShortHeaders.filter(
-    header => header.tier !== 'community' && header.tier !== 'experimental'
-  );
-  const experimentalExtensionShortHeaders = extensionShortHeaders.filter(
-    header => header.tier === 'community' || header.tier === 'experimental'
-  );
-
-  const reviewedExtensions = reviewedExtensionShortHeaders.map(header =>
-    project.getEventsFunctionsExtension(header.name)
-  );
-  const experimentalExtensions = experimentalExtensionShortHeaders.map(header =>
-    project.getEventsFunctionsExtension(header.name)
-  );
-
-  content += '## Reviewed extensions\n\n';
-  for (const extension of reviewedExtensions) {
+  for (const extension of extensions) {
     const extensionShortHeader = extensionShortHeaders.find(
       header => header.name === extension.getName()
     );
@@ -411,57 +437,238 @@ const generateExtensionsList = async gd => {
       project,
       extension,
       extensionShortHeader,
-      false
+      isExperimental
     );
   }
   content += generateAllExtensionsSections({
-    extensions: reviewedExtensions,
+    extensionItems: extensions.map(extension =>
+      getEventsFunctionExtensionItem(extension)
+    ),
     baseFolder: 'extensions',
   });
 
-  content += `## Experimental extensions
-
-The following extensions are made by a community members and they only got
-though a light review by the GDevelop extension team. As such, we can't
-guarantee they meet all the quality standards of fully reviewed extensions.
-
-`;
-  for (const extension of experimentalExtensions) {
-    const extensionShortHeader = extensionShortHeaders.find(
-      header => header.name === extension.getName()
-    );
-    if (!extensionShortHeader) {
-      throw new Error(
-        `Could not find header for extension: ${extension.getName()}`
-      );
-    }
-    await createExtensionReferencePage(
-      gd,
-      project,
-      extension,
-      extensionShortHeader,
-      true
-    );
-  }
-  content += generateAllExtensionsSections({
-    extensions: experimentalExtensions,
-    baseFolder: 'extensions',
-  });
-
-  await generateExtensionsMkDocsDotPagesFile(
-    reviewedExtensions,
-    experimentalExtensions
-  );
-
-  project.delete();
   return content;
 };
 
-initializeGDevelopJs().then(async gd => {
-  try {
-    console.info(`ℹ️ Loading all community extensions...`);
+/**
+ * @type {any} gd
+ * @returns {Array<ExtensionReference>}
+ */
+const generateAllExtensionReferences = gd => {
+  const platformExtensions = gd.JsPlatform.get().getAllPlatformExtensions();
 
-    let indexPageContent = `---
+  /** @type {Array<ExtensionReference>} */
+  const extensionReferences = mapVector(platformExtensions, platformExtension =>
+    generateExtensionReference({
+      platform: gd.JsPlatform.get(),
+      extension: platformExtension,
+      eventsFunctionsExtension: null,
+    })
+  );
+
+  return extensionReferences;
+};
+
+/**
+ * @param {PlatformExtension} extension
+ * @param {ObjectMetadata | BehaviorMetadata} entityMetadata
+ * @return {ExtensionItem}
+ */
+const getEntityMetadataExtensionItem = (extension, entityMetadata) => {
+  const iconUrl = entityMetadata.getIconFilename() || extension.getIconUrl();
+  return {
+    extensionName: extension.getName(),
+    fullName: entityMetadata.getFullName(),
+    description: entityMetadata.getDescription(),
+    iconUrl: iconUrl ? '/gdevelop5/icons/' + iconUrl : iconUrl,
+    helpPath: entityMetadata.getHelpPath() || extension.getHelpPath(),
+    category: extension.getCategory(),
+  };
+};
+
+/**
+ * @param {Array<ExtensionReference>} extensionReferences
+ * @returns
+ */
+const generateBuiltInObjectsList = extensionReferences => {
+  /** @type {Array<ExtensionItem>} */
+  const objects = [];
+  for (const extensionReference of extensionReferences) {
+    for (const objectReference of extensionReference.objectReferences) {
+      objects.push(
+        getEntityMetadataExtensionItem(
+          extensionReference.extension,
+          objectReference.objectMetadata
+        )
+      );
+    }
+  }
+  let content = '';
+  content += generateAllExtensionsSections({
+    extensionItems: objects,
+    baseFolder: 'all-features',
+  });
+  return content;
+};
+
+/**
+ * @param {Array<ExtensionReference>} extensionReferences
+ * @returns
+ */
+const generateBuiltInBehaviorsList = extensionReferences => {
+  /** @type {Array<ExtensionItem>} */
+  const behaviors = [];
+  for (const extensionReference of extensionReferences) {
+    for (const behaviorReference of extensionReference.behaviorReferences) {
+      behaviors.push(
+        getEntityMetadataExtensionItem(
+          extensionReference.extension,
+          behaviorReference.behaviorMetadata
+        )
+      );
+    }
+  }
+  let content = '';
+  content += generateAllExtensionsSections({
+    extensionItems: behaviors,
+    baseFolder: 'all-features',
+  });
+  return content;
+};
+
+/**
+ * @param {EventsFunctionsExtension} extension
+ * @param {AbstractEventsBasedEntity} eventBasedEntity
+ * @return {ExtensionItem}
+ */
+const getEventBasedEntityExtensionItem = (extension, eventBasedEntity) => ({
+  extensionName: extension.getName(),
+  fullName: eventBasedEntity.getFullName(),
+  description: eventBasedEntity.getDescription(),
+  iconUrl:
+    eventBasedEntity.getPreviewIconUrl() || extension.getPreviewIconUrl(),
+  helpPath: eventBasedEntity.getHelpPath() || extension.getHelpPath(),
+  category: extension.getCategory(),
+});
+
+/**
+ * @param {Array<EventsFunctionsExtension>} extensions
+ * @returns
+ */
+const generateObjectsList = extensions => {
+  /** @type {Array<ExtensionItem>} */
+  const objects = [];
+  for (const extension of extensions) {
+    mapVector(extension.getEventsBasedObjects(), eventsBasedObject => {
+      objects.push(
+        getEventBasedEntityExtensionItem(extension, eventsBasedObject)
+      );
+    });
+  }
+  let content = '';
+  content += generateAllExtensionsSections({
+    extensionItems: objects,
+    baseFolder: 'extensions',
+  });
+  return content;
+};
+
+/**
+ * @param {Array<EventsFunctionsExtension>} extensions
+ * @returns
+ */
+const generateBehaviorsList = extensions => {
+  /** @type {Array<ExtensionItem>} */
+  const objects = [];
+  for (const extension of extensions) {
+    mapVector(extension.getEventsBasedBehaviors(), eventsBasedBehaviors => {
+      objects.push(
+        getEventBasedEntityExtensionItem(extension, eventsBasedBehaviors)
+      );
+    });
+  }
+  let content = '';
+  content += generateAllExtensionsSections({
+    extensionItems: objects,
+    baseFolder: 'extensions',
+  });
+  return content;
+};
+
+const getExperimentalWarningMessage = subject =>
+  `The following ${subject} are made by a community members and they only got
+though a light review by the GDevelop extension team. As such, we can't
+guarantee they meet all the quality standards of fully reviewed ${subject}.`;
+
+/**
+ * @param {any} gd
+ * @param {Array<EventsFunctionsExtension>} reviewedExtensions
+ * @param {Array<EventsFunctionsExtension>} experimentalExtensions
+ */
+const generateObjectsListPage = async (
+  gd,
+  reviewedExtensions,
+  experimentalExtensions
+) => {
+  let content = '# Objects\n\n';
+  content += '## Core objects\n\n';
+  content += generateBuiltInObjectsList(generateAllExtensionReferences(gd));
+  content += '## Reviewed objects\n\n';
+  content += generateObjectsList(reviewedExtensions);
+  content += '## Experimental objects\n\n';
+  content += getExperimentalWarningMessage('objects') + '\n\n';
+  content += generateObjectsList(experimentalExtensions);
+
+  await fs.mkdir(path.dirname(objectsListFilePath), {
+    recursive: true,
+  });
+  await fs.writeFile(objectsListFilePath, content);
+  console.info(`ℹ️ File generated: ${objectsListFilePath}`);
+};
+
+/**
+ * @param {any} gd
+ * @param {Array<EventsFunctionsExtension>} reviewedExtensions
+ * @param {Array<EventsFunctionsExtension>} experimentalExtensions
+ */
+const generateBehaviorsListPage = async (
+  gd,
+  reviewedExtensions,
+  experimentalExtensions
+) => {
+  let content = '# Behaviors\n\n';
+  content += '## Core behaviors\n\n';
+  content += generateBuiltInBehaviorsList(generateAllExtensionReferences(gd));
+  content += '## Reviewed behaviors\n\n';
+  content += generateBehaviorsList(reviewedExtensions);
+  content += '## Experimental behaviors\n\n';
+  content += getExperimentalWarningMessage('behaviors') + '\n\n';
+  content += generateBehaviorsList(experimentalExtensions);
+
+  await fs.mkdir(path.dirname(behaviorsListFilePath), {
+    recursive: true,
+  });
+  await fs.writeFile(behaviorsListFilePath, content);
+  console.info(`ℹ️ File generated: ${behaviorsListFilePath}`);
+};
+
+/**
+ * @param {any} gd
+ * @param {Project} project
+ * @param {Array<EventsFunctionsExtension>} reviewedExtensions
+ * @param {Array<EventsFunctionsExtension>} experimentalExtensions
+ * @param {Array<ExtensionShortHeader>} reviewedExtensionShortHeaders
+ * @param {Array<ExtensionShortHeader>} experimentalExtensionShortHeaders
+ */
+const generateExtensionListPage = async (
+  gd,
+  project,
+  reviewedExtensions,
+  experimentalExtensions,
+  reviewedExtensionShortHeaders,
+  experimentalExtensionShortHeaders
+) => {
+  let content = `---
 icon: material/star-plus
 ---
 # Extensions
@@ -481,16 +688,80 @@ Read more about this:
 
 `;
 
-    indexPageContent += await generateExtensionsList(gd);
+  content += '## Reviewed extensions\n\n';
+  content += await generateExtensionsList(
+    gd,
+    project,
+    reviewedExtensions,
+    reviewedExtensionShortHeaders,
+    false
+  );
 
-    try {
-      await fs.mkdir(path.dirname(extensionsMainFilePath), { recursive: true });
-      await fs.writeFile(extensionsMainFilePath, indexPageContent);
-      console.info(`✅ Done. File generated: ${extensionsMainFilePath}`);
-    } catch (err) {
-      console.error('❌ Error while writing output', err);
-      shell.exit(1);
-    }
+  content += '## Experimental extensions\n\n';
+  content += getExperimentalWarningMessage('extensions') + '\n\n';
+  content += await generateExtensionsList(
+    gd,
+    project,
+    experimentalExtensions,
+    experimentalExtensionShortHeaders,
+    true
+  );
+
+  await fs.mkdir(path.dirname(extensionsMainFilePath), { recursive: true });
+  await fs.writeFile(extensionsMainFilePath, content);
+  console.info(`✅ Done. File generated: ${extensionsMainFilePath}`);
+};
+
+initializeGDevelopJs().then(async gd => {
+  try {
+    console.info(`ℹ️ Loading all community extensions...`);
+
+    /** @type {Project} */
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    await addAllExtensionsToProject(gd, project);
+    const extensionShortHeaders = await getAllExtensionShortHeaders();
+
+    const reviewedExtensionShortHeaders = extensionShortHeaders.filter(
+      header => header.tier !== 'community' && header.tier !== 'experimental'
+    );
+    const experimentalExtensionShortHeaders = extensionShortHeaders.filter(
+      header => header.tier === 'community' || header.tier === 'experimental'
+    );
+
+    const reviewedExtensions = reviewedExtensionShortHeaders.map(header =>
+      project.getEventsFunctionsExtension(header.name)
+    );
+    const experimentalExtensions = experimentalExtensionShortHeaders.map(
+      header => project.getEventsFunctionsExtension(header.name)
+    );
+
+    await generateExtensionListPage(
+      gd,
+      project,
+      reviewedExtensions,
+      experimentalExtensions,
+      reviewedExtensionShortHeaders,
+      experimentalExtensionShortHeaders
+    );
+
+    await generateExtensionsMkDocsDotPagesFile(
+      reviewedExtensions,
+      experimentalExtensions
+    );
+
+    await generateObjectsListPage(
+      gd,
+      reviewedExtensions,
+      experimentalExtensions
+    );
+
+    await generateBehaviorsListPage(
+      gd,
+      reviewedExtensions,
+      experimentalExtensions
+    );
+
+    project.delete();
 
     if (improperlyFormattedHelpPaths.size > 0) {
       console.info(
@@ -501,7 +772,7 @@ Read more about this:
       console.info(`✅ Extensions documents generated.`);
     }
   } catch (err) {
-    console.error('❌ Error while fetching data', err);
+    console.error('❌ Error while writing output', err);
     shell.exit(1);
   }
 });

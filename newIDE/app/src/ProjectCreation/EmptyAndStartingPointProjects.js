@@ -1,9 +1,8 @@
 // @flow
 import * as React from 'react';
-import { I18n } from '@lingui/react';
 import Add from '../UI/CustomSvgIcons/Add';
 import Text from '../UI/Text';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { Column, Line, Spacer } from '../UI/Grid';
 import { type GDevelopTheme } from '../UI/Theme';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
@@ -18,6 +17,7 @@ import classes from './EmptyAndStartingPointProjects.module.css';
 import { getItemsColumns } from './NewProjectSetupDialog';
 import FlatButton from '../UI/FlatButton';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
+import SearchBar from '../UI/SearchBar';
 
 const ITEMS_SPACING = 5;
 const getStyles = (theme: GDevelopTheme) => ({
@@ -113,6 +113,31 @@ export const isLinkedToStartingPointExampleShortHeader = (
   );
 };
 
+const getNormalizedSearchText = (searchText: string): string =>
+  searchText.trim().toLowerCase();
+
+export const filterExampleShortHeadersBySearchText = (
+  exampleShortHeaders: Array<ExampleShortHeader>,
+  searchText: string
+): Array<ExampleShortHeader> => {
+  const normalizedSearchText = getNormalizedSearchText(searchText);
+  if (!normalizedSearchText) return exampleShortHeaders;
+
+  return exampleShortHeaders.filter(exampleShortHeader => {
+    const searchableTexts = [
+      exampleShortHeader.name,
+      exampleShortHeader.slug,
+      exampleShortHeader.shortDescription,
+      exampleShortHeader.description,
+      ...exampleShortHeader.tags,
+    ];
+
+    return searchableTexts.some(searchableText =>
+      searchableText.toLowerCase().includes(normalizedSearchText)
+    );
+  });
+};
+
 type Props = {|
   onSelectEmptyProject: () => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
@@ -131,65 +156,82 @@ const EmptyAndStartingPointProjects = ({
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const columnsCount = getItemsColumns(windowSize, isLandscape);
+  const [
+    projectTemplateSearchText,
+    setProjectTemplateSearchText,
+  ] = React.useState<string>('');
 
   const startingPointExampleShortHeaders = React.useMemo(
     () => {
       const allStarterShortHeaders = exampleShortHeaders
         ? exampleShortHeaders.filter(isStartingPointExampleShortHeader)
         : [];
+      const filteredStarterShortHeaders = filterExampleShortHeadersBySearchText(
+        allStarterShortHeaders,
+        projectTemplateSearchText
+      );
+      const isSearchActive = !!getNormalizedSearchText(
+        projectTemplateSearchText
+      );
 
-      if (onSeeAll) {
+      if (onSeeAll && !isSearchActive) {
         // only return 2 rows of items.
         const maxItemsToShow = columnsCount * 2 - 1; // -1 for the empty project tile
-        return allStarterShortHeaders.slice(0, maxItemsToShow);
+        return filteredStarterShortHeaders.slice(0, maxItemsToShow);
       }
 
-      return allStarterShortHeaders;
+      return filteredStarterShortHeaders;
     },
-    [exampleShortHeaders, onSeeAll, columnsCount]
+    [exampleShortHeaders, onSeeAll, columnsCount, projectTemplateSearchText]
   );
 
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Column noMargin>
-          {onSeeAll ? (
-            <Line justifyContent="space-between" alignItems="center">
-              <Text size="block-title">
-                <Trans>Continue with Human Intelligence</Trans>
-              </Text>
-              <FlatButton
-                label={<Trans>See all</Trans>}
-                rightIcon={<ArrowRight fontSize="small" />}
-                onClick={onSeeAll}
-                primary
-                disabled={disabled}
-              />
-            </Line>
-          ) : null}
-          <GridList
-            cols={columnsCount}
-            style={styles.grid}
-            cellHeight="auto"
-            spacing={ITEMS_SPACING * 2}
-          >
-            <EmptyProjectTile
-              onSelectEmptyProject={onSelectEmptyProject}
-              disabled={disabled}
-            />
-            {startingPointExampleShortHeaders.map(exampleShortHeader => (
-              <ExampleTile
-                exampleShortHeader={exampleShortHeader}
-                onSelect={() => onSelectExampleShortHeader(exampleShortHeader)}
-                key={exampleShortHeader.id}
-                disabled={disabled}
-                centerTitle
-              />
-            ))}
-          </GridList>
-        </Column>
-      )}
-    </I18n>
+    <Column noMargin>
+      {onSeeAll ? (
+        <Line justifyContent="space-between" alignItems="center">
+          <Text size="block-title">
+            <Trans>Continue with Human Intelligence</Trans>
+          </Text>
+          <FlatButton
+            label={<Trans>See all</Trans>}
+            rightIcon={<ArrowRight fontSize="small" />}
+            onClick={onSeeAll}
+            primary
+            disabled={disabled}
+          />
+        </Line>
+      ) : null}
+      <Spacer />
+      <SearchBar
+        id="project-templates-search-bar"
+        value={projectTemplateSearchText}
+        onChange={setProjectTemplateSearchText}
+        onRequestSearch={setProjectTemplateSearchText}
+        placeholder={t`Search project templates`}
+        disabled={disabled}
+      />
+      <Spacer />
+      <GridList
+        cols={columnsCount}
+        style={styles.grid}
+        cellHeight="auto"
+        spacing={ITEMS_SPACING * 2}
+      >
+        <EmptyProjectTile
+          onSelectEmptyProject={onSelectEmptyProject}
+          disabled={disabled}
+        />
+        {startingPointExampleShortHeaders.map(exampleShortHeader => (
+          <ExampleTile
+            exampleShortHeader={exampleShortHeader}
+            onSelect={() => onSelectExampleShortHeader(exampleShortHeader)}
+            key={exampleShortHeader.id}
+            disabled={disabled}
+            centerTitle
+          />
+        ))}
+      </GridList>
+    </Column>
   );
 };
 

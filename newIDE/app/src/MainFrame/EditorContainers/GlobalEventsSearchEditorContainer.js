@@ -54,7 +54,10 @@ export class GlobalEventsSearchEditorContainer extends React.Component<RenderEdi
     }
   }
 
-  onEventsBasedObjectChildrenEdited() {
+  onEventsBasedObjectChildrenEdited(
+    eventsBasedObject: gdEventsBasedObject,
+    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+  ) {
     // Nothing to do.
   }
 

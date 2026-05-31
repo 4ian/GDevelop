@@ -98,6 +98,11 @@ import {
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import Rectangle from '../Utils/Rectangle';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
+import {
+  type EventsBasedObjectChildrenEditedOptions,
+  getImageResourceNamesForEditedObject,
+  shouldResetObjectRendererForCustomObjectChildrenEdit,
+} from './CustomObjectResourceReload';
 
 const gd: libGDevelop = global.gd;
 
@@ -214,7 +219,7 @@ type Props = {|
   onObjectGroupEdited: (objectGroupWithContext: GroupWithContext) => void,
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject,
-    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+    options?: EventsBasedObjectChildrenEditedOptions
   ) => void,
 
   onObjectsDeleted: () => void,
@@ -2833,49 +2838,44 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay) this.editorDisplay.forceUpdatePropertiesEditor();
   };
 
-  _getObjectImageResourceNames = (object: gdObject): Array<string> => {
-    const { project } = this.props;
-
-    const resourcesInUse = new gd.ResourcesInUseHelper(
-      project.getResourcesManager()
-    );
-    object.getConfiguration().exposeResources(resourcesInUse);
-    const objectResourceNames = resourcesInUse
-      .getAllImages() // TODO: should probably check all resources.
-      .toNewVectorString()
-      .toJSArray();
-    resourcesInUse.delete();
-
-    return objectResourceNames;
-  };
-
-  forceUpdateCustomObjectRenderedInstances = async ({
-    editedObject,
-    hasResourceChanged = false,
-  }: {|
-    editedObject?: ?gdObject,
-    hasResourceChanged?: boolean,
-  |} = {}) => {
-    const { projectScopedContainersAccessor } = this.props;
+  forceUpdateCustomObjectRenderedInstances = async (
+    editedEventsBasedObject: gdEventsBasedObject,
+    {
+      editedObject,
+      hasResourceChanged = false,
+    }: EventsBasedObjectChildrenEditedOptions = {}
+  ) => {
+    const { project, projectScopedContainersAccessor } = this.props;
 
     // Only the resources of the object that was actually edited may need to be
-    // reloaded from the disk - and only if a resource really changed. The
-    // instance renderers of *every* custom object are still reset below because
-    // some of them may include (nest) the one that was edited.
+    // reloaded from the disk, and only if a resource really changed.
     const objectResourceNames =
-      editedObject && hasResourceChanged
-        ? this._getObjectImageResourceNames(editedObject)
+      hasResourceChanged && editedObject
+        ? getImageResourceNamesForEditedObject(project, editedObject)
         : [];
 
+    // _reloadResources also refreshes the objects list and resets the renderers
+    // of every object *directly* using these resources (custom objects nesting
+    // the edited one are handled below). The textures are only read again from
+    // the disk when a resource really changed.
     await this._reloadResources(objectResourceNames, 'custom object edited', {
       reloadFromDisk: hasResourceChanged,
     });
     const { editorDisplay } = this;
     if (editorDisplay) {
       projectScopedContainersAccessor.forEachObject(object => {
-        editorDisplay.instancesHandlers.resetInstanceRenderersFor(
-          object.getName()
-        );
+        if (
+          shouldResetObjectRendererForCustomObjectChildrenEdit({
+            project,
+            object,
+            editedEventsBasedObject,
+            editedObject,
+          })
+        ) {
+          editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+            object.getName()
+          );
+        }
       });
     }
   };
@@ -2884,7 +2884,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     object: gdObject,
     hasResourceChanged: boolean = true
   ) => {
-    const objectResourceNames = this._getObjectImageResourceNames(object);
+    const { project } = this.props;
+    const objectResourceNames = getImageResourceNamesForEditedObject(
+      project,
+      object
+    );
 
     this._reloadResources(objectResourceNames, 'object edited', {
       reloadFromDisk: hasResourceChanged,

@@ -90,6 +90,93 @@ const addSceneEventsSchema = {
   additionalProperties: true,
 };
 
+const extensionNameSchema = {
+  type: 'object',
+  properties: {
+    extension_name: {
+      type: 'string',
+      description: 'Name of the project events-functions extension.',
+    },
+  },
+  required: ['extension_name'],
+  additionalProperties: true,
+};
+
+const extensionFunctionSchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    function_name: {
+      type: 'string',
+      description: 'Internal name of the events function.',
+    },
+    parent_kind: {
+      type: 'string',
+      description:
+        'Optional parent kind: extension, behavior, or object. Defaults to extension/free function.',
+    },
+    parent_name: {
+      type: 'string',
+      description:
+        'Required when parent_kind is behavior or object: internal behavior/object name.',
+    },
+  },
+  required: ['extension_name', 'function_name'],
+  additionalProperties: true,
+};
+
+const extensionBehaviorSchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    behavior_name: {
+      type: 'string',
+      description: 'Internal name of the events-based behavior.',
+    },
+  },
+  required: ['extension_name', 'behavior_name'],
+  additionalProperties: true,
+};
+
+const extensionObjectSchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    object_name: {
+      type: 'string',
+      description: 'Internal name of the events-based object.',
+    },
+  },
+  required: ['extension_name', 'object_name'],
+  additionalProperties: true,
+};
+
+const extensionPropertySchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    target_kind: {
+      type: 'string',
+      description: 'Property owner kind: behavior or object.',
+    },
+    target_name: {
+      type: 'string',
+      description: 'Internal name of the target events-based behavior/object.',
+    },
+    property_name: {
+      type: 'string',
+      description: 'Internal property name.',
+    },
+    is_shared: {
+      type: 'boolean',
+      description:
+        'For behavior properties only, true targets shared properties instead of instance properties.',
+    },
+  },
+  required: ['extension_name', 'target_kind', 'target_name', 'property_name'],
+  additionalProperties: true,
+};
+
 const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_get_editor_state',
@@ -153,6 +240,42 @@ const readTools: Array<McpTool> = [
       },
       additionalProperties: false,
     },
+  },
+  {
+    name: 'gdevelop_list_extensions',
+    description:
+      'List project-specific events-functions extensions with counts and metadata.',
+    inputSchema: emptyObjectSchema,
+  },
+  {
+    name: 'gdevelop_inspect_extension',
+    description:
+      'Inspect a project-specific extension, including free functions, events-based behaviors, events-based objects, properties, parameters, events, and serialized JSON.',
+    inputSchema: extensionNameSchema,
+  },
+  {
+    name: 'gdevelop_inspect_extension_function',
+    description:
+      'Inspect a free, behavior, or object events function inside a project-specific extension.',
+    inputSchema: extensionFunctionSchema,
+  },
+  {
+    name: 'gdevelop_inspect_extension_behavior',
+    description:
+      'Inspect an events-based behavior inside a project-specific extension.',
+    inputSchema: extensionBehaviorSchema,
+  },
+  {
+    name: 'gdevelop_inspect_extension_object',
+    description:
+      'Inspect an events-based object inside a project-specific extension.',
+    inputSchema: extensionObjectSchema,
+  },
+  {
+    name: 'gdevelop_inspect_extension_property',
+    description:
+      'Inspect an events-based behavior/object property inside a project-specific extension.',
+    inputSchema: extensionPropertySchema,
   },
   {
     name: 'gdevelop_list_commands',
@@ -328,7 +451,8 @@ const readTools: Array<McpTool> = [
   },
   {
     name: 'read_game_project_json',
-    description: 'Read the full GDevelop project JSON through the existing editor function.',
+    description:
+      'Read the full GDevelop project JSON through the existing editor function.',
     inputSchema: emptyObjectSchema,
   },
   {
@@ -346,7 +470,8 @@ const readTools: Array<McpTool> = [
 const writeTools: Array<McpTool> = [
   {
     name: 'initialize_project',
-    description: 'Create a new GDevelop project, optionally from a template slug.',
+    description:
+      'Create a new GDevelop project, optionally from a template slug.',
     inputSchema: emptyObjectSchema,
   },
   {
@@ -415,13 +540,71 @@ const writeTools: Array<McpTool> = [
   },
   {
     name: 'create_or_update_plan',
-    description: 'Create or update an AI orchestration plan stored in the conversation output.',
+    description:
+      'Create or update an AI orchestration plan stored in the conversation output.',
     inputSchema: emptyObjectSchema,
   },
   {
     name: 'generate_events',
     description: 'Alias for add_scene_events.',
     inputSchema: addSceneEventsSchema,
+  },
+  {
+    name: 'gdevelop_create_or_update_extension',
+    description:
+      'Create or update a project-specific extension. Supports metadata fields, tags, rename, and serialized_extension for advanced edits.',
+    inputSchema: extensionNameSchema,
+  },
+  {
+    name: 'gdevelop_delete_extension',
+    description: 'Delete a project-specific extension by internal name.',
+    inputSchema: extensionNameSchema,
+  },
+  {
+    name: 'gdevelop_create_or_update_extension_function',
+    description:
+      'Create or update a free, behavior, or object events function inside an extension, including type, metadata, parameters, and events_json.',
+    inputSchema: extensionFunctionSchema,
+  },
+  {
+    name: 'gdevelop_delete_extension_function',
+    description:
+      'Delete a free, behavior, or object events function inside an extension.',
+    inputSchema: extensionFunctionSchema,
+  },
+  {
+    name: 'gdevelop_create_or_update_extension_behavior',
+    description:
+      'Create or update an events-based behavior inside an extension, including metadata and target object type.',
+    inputSchema: extensionBehaviorSchema,
+  },
+  {
+    name: 'gdevelop_delete_extension_behavior',
+    description: 'Delete an events-based behavior inside an extension.',
+    inputSchema: extensionBehaviorSchema,
+  },
+  {
+    name: 'gdevelop_create_or_update_extension_object',
+    description:
+      'Create or update an events-based object inside an extension, including metadata, 2D/3D flags, default name, and inner area bounds.',
+    inputSchema: extensionObjectSchema,
+  },
+  {
+    name: 'gdevelop_delete_extension_object',
+    description: 'Delete an events-based object inside an extension.',
+    inputSchema: extensionObjectSchema,
+  },
+  {
+    name: 'gdevelop_create_or_update_extension_property',
+    description:
+      'Create or update an events-based behavior/object property inside an extension, including type, default value, label, description, choices, and flags.',
+    inputSchema: extensionPropertySchema,
+  },
+  {
+    name: 'gdevelop_delete_extension_property',
+    description:
+      'Delete an events-based behavior/object property inside an extension.',
+    inputSchema: extensionPropertySchema,
   },
 ];
 

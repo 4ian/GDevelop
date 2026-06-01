@@ -23,9 +23,10 @@ When a user asks for any GDevelop edit:
 6. If the user's request refers to "selected", "current object", "this instance", "the thing I clicked", or similar UI context, call `gdevelop_get_editor_selection` before inferring targets from project data.
 7. For layout work, call `describe_instances` before placing, moving, or deleting instances.
 8. For object/behavior work, call `inspect_object_properties` and, when relevant, `inspect_behavior_properties`.
-9. Make the smallest write that satisfies the user request.
-10. Read back with the relevant read tool.
-11. Summarize what changed and mention any remaining uncertainty.
+9. For extension work, call `gdevelop_list_extensions` and then `gdevelop_inspect_extension` for the target extension before editing functions, events-based objects, events-based behaviors, or extension properties.
+10. Make the smallest write that satisfies the user request.
+11. Read back with the relevant read tool.
+12. Summarize what changed and mention any remaining uncertainty.
 
 Do not start by reading or rewriting the full project JSON unless a focused tool cannot answer the question.
 
@@ -39,6 +40,12 @@ Read-only context:
 - `gdevelop_read_project_json`: full project JSON; use sparingly and with `maxLength` for large projects.
 - `gdevelop_list_scenes`: all scenes/layouts.
 - `gdevelop_list_objects`: global objects and scene objects.
+- `gdevelop_list_extensions`: project-specific events-functions extensions with metadata and counts.
+- `gdevelop_inspect_extension`: full extension detail: free functions, events-based behaviors, events-based objects, parameters, properties, events, and serialized JSON.
+- `gdevelop_inspect_extension_function`: one free/behavior/object function inside an extension.
+- `gdevelop_inspect_extension_behavior`: one events-based behavior inside an extension.
+- `gdevelop_inspect_extension_object`: one events-based object inside an extension.
+- `gdevelop_inspect_extension_property`: one behavior/object property inside an extension.
 - `read_scene_events`: event sheet rendered as text.
 - `describe_instances`: object instances in a scene; use before `put_2d_instances` or `put_3d_instances`.
 - `inspect_object_properties`: object properties, behaviors, animations, size hints.
@@ -69,6 +76,19 @@ Write tools:
 - `add_scene_events`: direct event sheet edits. Prefer `events_json` or `event_changes`.
 - `generate_events`: alias for `add_scene_events`.
 - `create_or_update_plan`: store/update an AI orchestration plan when the task needs one.
+
+Extension write tools:
+
+- `gdevelop_create_or_update_extension`: create/update extension metadata. Supports `extension_name`, optional `new_extension_name`, `namespace`, `full_name`, `short_description`, `description`, `version`, `category`, `dimension`, `help_path`, `icon_url`, `preview_icon_url`, `tags`, and advanced `serialized_extension`.
+- `gdevelop_delete_extension`: delete a project-specific extension.
+- `gdevelop_create_or_update_extension_function`: create/update a free, behavior, or object function. Supports `parent_kind` (`extension`, `behavior`, `object`), `parent_name`, `function_type`, `full_name`, `description`, `sentence`, `help_url`, privacy/async/deprecated flags, `parameters`, `expression_type`, `events_json`, and advanced `serialized_function`.
+- `gdevelop_delete_extension_function`: delete a free, behavior, or object function.
+- `gdevelop_create_or_update_extension_behavior`: create/update an events-based behavior. Supports `behavior_name`, optional rename, display metadata, `object_type`, privacy, icons, and advanced `serialized_behavior`.
+- `gdevelop_delete_extension_behavior`: delete an events-based behavior.
+- `gdevelop_create_or_update_extension_object`: create/update an events-based object. Supports `object_name`, optional rename, display metadata, default name, privacy, 3D/text/animation/inner-area flags, icons, `area`, and advanced `serialized_object`.
+- `gdevelop_delete_extension_object`: delete an events-based object.
+- `gdevelop_create_or_update_extension_property`: create/update a behavior/object property. Supports `target_kind`, `target_name`, `property_name`, optional rename, `property_type`, `value`, `label`, `description`, `measurement_unit`, `group`, visibility/advanced/deprecated flags, `extra_info`, `choices`, `is_shared` for behavior shared properties, and advanced `serialized_property`.
+- `gdevelop_delete_extension_property`: delete a behavior/object property.
 
 Command tool:
 
@@ -119,6 +139,8 @@ Use this sequence for adding or modifying events:
 Never use `add_scene_events` with a natural language description expecting server-side generation. MCP direct event writing does not call the GDevelop AI event generation service. Always pass `events_json` or `event_changes`.
 
 `gdevelop_validate_events_json` and `add_scene_events` use GDevelop's own instruction metadata and `InstructionValidator` path for parameter validation. This catches expression type errors, unknown instruction types, missing parameters, invalid object/variable references, and malformed string/number expressions before events are inserted.
+
+For extension function event bodies, use the same event JSON shape and metadata workflow. `gdevelop_create_or_update_extension_function` validates `events_json` before replacing the function's event list. Invalid function event JSON must be fixed before retrying.
 
 ## Event JSON Shape
 
@@ -246,6 +268,45 @@ Add gameplay logic:
 4. Write with `add_scene_events`.
 5. Read events back.
 
+Create or edit an extension:
+
+1. `gdevelop_list_extensions`.
+2. If the extension exists, `gdevelop_inspect_extension`; otherwise call `gdevelop_create_or_update_extension`.
+3. Add/edit behaviors with `gdevelop_create_or_update_extension_behavior`.
+4. Add/edit objects with `gdevelop_create_or_update_extension_object`.
+5. Add/edit behavior or object properties with `gdevelop_create_or_update_extension_property`.
+6. Add/edit functions with `gdevelop_create_or_update_extension_function`.
+7. Read back with `gdevelop_inspect_extension`.
+
+Add an extension free function:
+
+1. `gdevelop_inspect_extension`.
+2. Decide exact `function_type`: `action`, `condition`, `expression`, `expression_and_condition`, or `action_with_operator`.
+3. If adding events, search instruction metadata and draft valid `events_json`.
+4. Call `gdevelop_create_or_update_extension_function` with `parent_kind: "extension"`.
+5. `gdevelop_inspect_extension_function`.
+
+Add a behavior method:
+
+1. `gdevelop_inspect_extension_behavior`.
+2. Call `gdevelop_create_or_update_extension_function` with `parent_kind: "behavior"` and `parent_name`.
+3. Remember GDevelop inserts mandatory behavior parameters first: usually object and behavior parameters. Custom parameters follow them, so `_PARAM0_` and `_PARAM1_` may already be reserved in the sentence.
+4. `gdevelop_inspect_extension_function`.
+
+Add an object method:
+
+1. `gdevelop_inspect_extension_object`.
+2. Call `gdevelop_create_or_update_extension_function` with `parent_kind: "object"` and `parent_name`.
+3. Remember GDevelop inserts mandatory object parameters first. Custom parameters follow them.
+4. `gdevelop_inspect_extension_function`.
+
+Add a behavior/object property:
+
+1. Inspect the target behavior/object first.
+2. Use `gdevelop_create_or_update_extension_property`.
+3. For behavior shared properties, pass `is_shared: true`; for object properties, omit it or pass false.
+4. Inspect the target again.
+
 Fix broken gameplay:
 
 1. `read_scene_events`.
@@ -267,9 +328,11 @@ Run a command:
 - Prefer readback over assumption.
 - Prefer exact instruction metadata over remembered internal names.
 - Prefer `event_changes` for modifying existing event sheets; use `events_json` for simple append.
+- Prefer extension-specific tools over raw serialized extension JSON. Use `serialized_*` only when no structured field exists for the required edit.
 - Do not delete or replace large event blocks unless the user requested broad refactoring or the current events are clearly wrong.
 - When a write returns partial success or errors, stop and inspect the readback before trying another write.
 - If the scene/object name is ambiguous, list options and choose the most likely target only when the user request gives enough context.
+- When creating behavior/object functions, account for mandatory parameters that GDevelop inserts automatically before custom parameters.
 
 ## Validation Checklist
 
@@ -279,7 +342,7 @@ Before claiming completion:
 - Every generated instruction type came from metadata search or exact metadata lookup.
 - Event JSON was validated before insertion, and `issues`/`errors` was empty.
 - A write tool reported success or a non-error result.
-- The affected scene/object/instance/event sheet was read back.
+- The affected scene/object/instance/event sheet/extension was read back.
 - Remaining limitations were reported honestly.
 
 ## Common Mistakes
@@ -293,3 +356,6 @@ Before claiming completion:
 - Assuming command names. Fix: call `gdevelop_list_commands`.
 - Forgetting that events without conditions run every frame. Fix: add conditions such as `SceneJustBegins` or a trigger condition when appropriate.
 - Adding object-specific events before the object exists. Fix: create/inspect object first.
+- Editing extension functions without checking parent kind. Fix: pass `parent_kind` and `parent_name` for behavior/object methods.
+- Writing behavior/object function sentences with wrong `_PARAMx_` indexes. Fix: inspect the function after creation and account for mandatory inserted parameters.
+- Using `is_shared` for object properties. Fix: only behavior properties can be shared.

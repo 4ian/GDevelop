@@ -26,7 +26,10 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('gdevelop_search_instruction_metadata');
     expect(toolNames).toContain('gdevelop_get_instruction_metadata');
     expect(toolNames).toContain('gdevelop_get_editor_selection');
+    expect(toolNames).toContain('gdevelop_list_extensions');
+    expect(toolNames).toContain('gdevelop_inspect_extension');
     expect(toolNames).not.toContain('create_scene');
+    expect(toolNames).not.toContain('gdevelop_create_or_update_extension');
     expect(toolNames).not.toContain('gdevelop_run_command');
   });
 
@@ -39,14 +42,22 @@ describe('McpToolCatalog', () => {
 
     expect(toolNames).toContain('create_scene');
     expect(toolNames).toContain('change_object_property');
+    expect(toolNames).toContain('gdevelop_create_or_update_extension');
+    expect(toolNames).toContain('gdevelop_create_or_update_extension_function');
+    expect(toolNames).toContain('gdevelop_create_or_update_extension_behavior');
+    expect(toolNames).toContain('gdevelop_create_or_update_extension_object');
+    expect(toolNames).toContain('gdevelop_create_or_update_extension_property');
     expect(toolNames).toContain('gdevelop_run_command');
   });
 
   it('classifies tool permissions', () => {
     expect(isWriteTool('create_scene')).toBe(true);
+    expect(isWriteTool('gdevelop_create_or_update_extension')).toBe(true);
     expect(isWriteTool('read_scene_events')).toBe(false);
+    expect(isWriteTool('gdevelop_list_extensions')).toBe(false);
     expect(isCommandTool('gdevelop_run_command')).toBe(true);
     expect(isKnownMcpTool('inspect_object_properties')).toBe(true);
+    expect(isKnownMcpTool('gdevelop_inspect_extension')).toBe(true);
     expect(isKnownMcpTool('totally_unknown_tool')).toBe(false);
   });
 

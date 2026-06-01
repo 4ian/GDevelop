@@ -19,6 +19,24 @@ import {
   searchInstructionMetadata,
   validateEventsJson,
 } from './McpEventKnowledge';
+import {
+  createOrUpdateExtension,
+  createOrUpdateExtensionBehavior,
+  createOrUpdateExtensionFunction,
+  createOrUpdateExtensionObject,
+  createOrUpdateExtensionProperty,
+  deleteExtension,
+  deleteExtensionBehavior,
+  deleteExtensionFunction,
+  deleteExtensionObject,
+  deleteExtensionProperty,
+  inspectExtensionBehavior,
+  inspectExtensionFunction,
+  inspectExtensionObject,
+  inspectExtensionProperty,
+  inspectProjectExtension,
+  listProjectExtensions,
+} from './McpExtensionTools';
 
 const gd: libGDevelop = global.gd;
 
@@ -76,7 +94,9 @@ const textResult = (payload: any): McpToolResult => ({
     {
       type: 'text',
       text:
-        typeof payload === 'string' ? payload : JSON.stringify(payload, null, 2),
+        typeof payload === 'string'
+          ? payload
+          : JSON.stringify(payload, null, 2),
     },
   ],
 });
@@ -307,7 +327,8 @@ const callEditorFunction = async ({
 |}): Promise<McpToolResult> => {
   const project = context.getProject();
   const processEditorFunctionCalls =
-    context.processEditorFunctionCalls || getDefaultProcessEditorFunctionCalls();
+    context.processEditorFunctionCalls ||
+    getDefaultProcessEditorFunctionCalls();
 
   const { results } = await processEditorFunctionCalls({
     project,
@@ -340,7 +361,8 @@ const callEditorFunction = async ({
       context.onObjectsModifiedOutsideEditor || (() => {}),
     onObjectGroupsModifiedOutsideEditor:
       context.onObjectGroupsModifiedOutsideEditor || (() => {}),
-    ensureExtensionInstalled: context.ensureExtensionInstalled || (async () => {}),
+    ensureExtensionInstalled:
+      context.ensureExtensionInstalled || (async () => {}),
     onWillInstallExtension: context.onWillInstallExtension || (() => {}),
     onExtensionInstalled: context.onExtensionInstalled || (() => {}),
     searchAndInstallAsset:
@@ -450,6 +472,60 @@ const callMcpTool = async ({
     return textResult(getObjectsSummary(project, args.sceneName));
   }
 
+  if (toolName === 'gdevelop_list_extensions') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(listProjectExtensions(project));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'gdevelop_inspect_extension') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectProjectExtension(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'gdevelop_inspect_extension_function') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectExtensionFunction(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'gdevelop_inspect_extension_behavior') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectExtensionBehavior(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'gdevelop_inspect_extension_object') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectExtensionObject(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'gdevelop_inspect_extension_property') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectExtensionProperty(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'gdevelop_list_commands') {
     return textResult(getCommandSummaries());
   }
@@ -460,11 +536,10 @@ const callMcpTool = async ({
       getEventsJsonExamples({
         project,
         sceneName:
-          args && typeof args.scene_name === 'string'
-            ? args.scene_name
-            : null,
-        includeExistingSceneEvents:
-          !!(args && args.include_existing_scene_events),
+          args && typeof args.scene_name === 'string' ? args.scene_name : null,
+        includeExistingSceneEvents: !!(
+          args && args.include_existing_scene_events
+        ),
       })
     );
   }
@@ -479,9 +554,7 @@ const callMcpTool = async ({
       validateEventsJson({
         project,
         sceneName:
-          args && typeof args.scene_name === 'string'
-            ? args.scene_name
-            : null,
+          args && typeof args.scene_name === 'string' ? args.scene_name : null,
         eventsJson:
           args && typeof args.events_json === 'string'
             ? args.events_json
@@ -558,6 +631,40 @@ const callMcpTool = async ({
     return errorResult(mcpDirectEventsRequiredMessage);
   }
 
+  let extensionWriteToolHandler = null;
+  if (toolName === 'gdevelop_create_or_update_extension') {
+    extensionWriteToolHandler = createOrUpdateExtension;
+  } else if (toolName === 'gdevelop_delete_extension') {
+    extensionWriteToolHandler = deleteExtension;
+  } else if (toolName === 'gdevelop_create_or_update_extension_function') {
+    extensionWriteToolHandler = createOrUpdateExtensionFunction;
+  } else if (toolName === 'gdevelop_delete_extension_function') {
+    extensionWriteToolHandler = deleteExtensionFunction;
+  } else if (toolName === 'gdevelop_create_or_update_extension_behavior') {
+    extensionWriteToolHandler = createOrUpdateExtensionBehavior;
+  } else if (toolName === 'gdevelop_delete_extension_behavior') {
+    extensionWriteToolHandler = deleteExtensionBehavior;
+  } else if (toolName === 'gdevelop_create_or_update_extension_object') {
+    extensionWriteToolHandler = createOrUpdateExtensionObject;
+  } else if (toolName === 'gdevelop_delete_extension_object') {
+    extensionWriteToolHandler = deleteExtensionObject;
+  } else if (toolName === 'gdevelop_create_or_update_extension_property') {
+    extensionWriteToolHandler = createOrUpdateExtensionProperty;
+  } else if (toolName === 'gdevelop_delete_extension_property') {
+    extensionWriteToolHandler = deleteExtensionProperty;
+  }
+
+  if (extensionWriteToolHandler) {
+    if (!project) return errorResult('No project opened.');
+    try {
+      const result = extensionWriteToolHandler(project, args || {});
+      context.triggerUnsavedChanges();
+      return textResult(result);
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   return callEditorFunction({
     toolName,
     args: args || {},
@@ -594,7 +701,8 @@ export const createMcpEditorBridge = (
 
     if (method === 'prompts/get') {
       const prompt = getPrompt(params && params.name);
-      if (!prompt) throw new Error(`Unknown GDevelop MCP prompt: ${params.name}`);
+      if (!prompt)
+        throw new Error(`Unknown GDevelop MCP prompt: ${params.name}`);
       return prompt;
     }
 

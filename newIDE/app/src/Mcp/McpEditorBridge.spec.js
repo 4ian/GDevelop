@@ -240,9 +240,7 @@ describe('McpEditorBridge', () => {
 
       expect(invalidColorValidation.valid).toBe(false);
       expect(invalidColorValidation.issues[0].type).toBe('invalid-parameter');
-      expect(invalidColorValidation.issues[0].parameterValue).toBe(
-        '220;30;55'
-      );
+      expect(invalidColorValidation.issues[0].parameterValue).toBe('220;30;55');
       expect(layout.getEvents().getEventsCount()).toBe(0);
     } finally {
       project.delete();
@@ -292,6 +290,257 @@ describe('McpEditorBridge', () => {
       expect(metadata.kind).toBe('action');
       expect(metadata.parameters.length).toBeGreaterThan(0);
       expect(metadata.parameters[0].type).toBe('variableOrProperty');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('creates, updates, inspects, and deletes project extension content', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const triggerUnsavedChanges: any = jest.fn();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        triggerUnsavedChanges,
+      });
+
+      const createExtensionResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension',
+          arguments: {
+            extension_name: 'McpExt',
+            full_name: 'MCP Extension',
+            short_description: 'Created through MCP',
+            description: 'A test extension created by MCP tools.',
+            version: '1.0.0',
+            category: 'Game mechanic',
+            tags: ['mcp', 'test'],
+          },
+        },
+      });
+      expect(createExtensionResponse.isError).not.toBe(true);
+
+      const invalidFunctionResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'InvalidFunction',
+            function_type: 'action',
+            events_json: '{}',
+          },
+        },
+      });
+      expect(invalidFunctionResponse.isError).toBe(true);
+      expect(
+        project
+          .getEventsFunctionsExtension('McpExt')
+          .getEventsFunctions()
+          .hasEventsFunctionNamed('InvalidFunction')
+      ).toBe(false);
+
+      await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_behavior',
+          arguments: {
+            extension_name: 'McpExt',
+            behavior_name: 'PowerBehavior',
+            full_name: 'Power behavior',
+            description: 'Adds power to an object.',
+            object_type: 'Sprite',
+            is_private: true,
+          },
+        },
+      });
+
+      await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_object',
+          arguments: {
+            extension_name: 'McpExt',
+            object_name: 'PowerObject',
+            full_name: 'Power object',
+            description: 'A custom object created through MCP.',
+            default_name: 'PowerObject',
+            is_rendered_in_3d: true,
+            area: {
+              min_x: 0,
+              min_y: 0,
+              min_z: -5,
+              max_x: 64,
+              max_y: 48,
+              max_z: 15,
+            },
+          },
+        },
+      });
+
+      await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'SetPower',
+            parent_kind: 'behavior',
+            parent_name: 'PowerBehavior',
+            function_type: 'action',
+            full_name: 'Set power',
+            description: 'Set the power value.',
+            sentence: 'Set _PARAM1_ power of _PARAM0_',
+            parameters: [
+              {
+                name: 'Power',
+                type: 'expression',
+                description: 'Power value',
+              },
+            ],
+            events_json:
+              '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]}]',
+          },
+        },
+      });
+
+      await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_property',
+          arguments: {
+            extension_name: 'McpExt',
+            target_kind: 'behavior',
+            target_name: 'PowerBehavior',
+            property_name: 'Power',
+            property_type: 'Number',
+            value: '10',
+            label: 'Power',
+            description: 'Default power.',
+            is_shared: false,
+          },
+        },
+      });
+
+      const inspectResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_inspect_extension',
+          arguments: {
+            extension_name: 'McpExt',
+          },
+        },
+      });
+      const inspectedExtension = JSON.parse(inspectResponse.content[0].text);
+
+      expect(inspectedExtension.extension.name).toBe('McpExt');
+      expect(inspectedExtension.extension.fullName).toBe('MCP Extension');
+      expect(inspectedExtension.freeFunctions).toEqual([]);
+      expect(inspectedExtension.behaviors[0].name).toBe('PowerBehavior');
+      expect(inspectedExtension.behaviors[0].objectType).toBe('Sprite');
+      expect(inspectedExtension.behaviors[0].isPrivate).toBe(true);
+      expect(inspectedExtension.behaviors[0].functions[0].name).toBe(
+        'SetPower'
+      );
+      expect(inspectedExtension.behaviors[0].functions[0].parameters).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            name: 'Power',
+            type: 'expression',
+            description: 'Power value',
+          }),
+        ])
+      );
+      expect(inspectedExtension.behaviors[0].properties[0]).toEqual(
+        expect.objectContaining({
+          name: 'Power',
+          type: 'Number',
+          value: '10',
+          label: 'Power',
+        })
+      );
+      expect(inspectedExtension.objects[0]).toEqual(
+        expect.objectContaining({
+          name: 'PowerObject',
+          isRenderedIn3D: true,
+        })
+      );
+      expect(inspectedExtension.objects[0].area.maxX).toBe(64);
+      expect(triggerUnsavedChanges).toHaveBeenCalled();
+
+      const deletePropertyResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_delete_extension_property',
+          arguments: {
+            extension_name: 'McpExt',
+            target_kind: 'behavior',
+            target_name: 'PowerBehavior',
+            property_name: 'Power',
+            is_shared: false,
+          },
+        },
+      });
+      expect(deletePropertyResponse.isError).not.toBe(true);
+
+      await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_delete_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'SetPower',
+            parent_kind: 'behavior',
+            parent_name: 'PowerBehavior',
+          },
+        },
+      });
+      await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_delete_extension_behavior',
+          arguments: {
+            extension_name: 'McpExt',
+            behavior_name: 'PowerBehavior',
+          },
+        },
+      });
+      await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_delete_extension_object',
+          arguments: {
+            extension_name: 'McpExt',
+            object_name: 'PowerObject',
+          },
+        },
+      });
+      await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_delete_extension',
+          arguments: {
+            extension_name: 'McpExt',
+          },
+        },
+      });
+
+      const listResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_list_extensions',
+          arguments: {},
+        },
+      });
+      const extensions = JSON.parse(listResponse.content[0].text);
+      expect(extensions.extensions).toEqual([]);
     } finally {
       project.delete();
     }

@@ -2888,7 +2888,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       });
       if (resetObjectNames.length > 0) {
         console.info(
-          `Resetting renderers in "${this._getReloadContextName()}" of the edited object and objects including "${editedEventsBasedObject.getName()}": ${resetObjectNames.join(
+          `Resetting renderers in "${this._getReloadContextName()}" of the edited object and objects depending on "${editedEventsBasedObject.getName()}": ${resetObjectNames.join(
             ', '
           )}.`
         );

@@ -41,8 +41,27 @@
   box-sizing: border-box;
 }
 
-.events-graph-preview-toggle-all {
+.events-graph-preview-refresh {
   margin-left: auto;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 4px;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.events-graph-preview-refresh:hover {
+  background: var(--event-sheet-selectable-background-color);
+}
+
+.events-graph-preview-toggle-all {
   min-width: 74px;
   height: 24px;
   border: 0;
@@ -157,8 +176,7 @@
 }
 
 .events-graph-preview-map-group-row.selected {
-  box-shadow:
-    inset 3px 0 0 var(--events-graph-preview-group-border),
+  box-shadow: inset 3px 0 0 var(--events-graph-preview-group-border),
     inset 0 0 0 1px var(--event-sheet-events-highlighted-color);
 }
 
@@ -395,28 +413,4 @@
   text-align: center;
   color: var(--event-sheet-actions-color);
   opacity: 0.7;
-}
-
-.events-graph-preview-group-color-0 {
-  --events-graph-preview-group-border: rgba(77, 160, 255, 0.68);
-}
-
-.events-graph-preview-group-color-1 {
-  --events-graph-preview-group-border: rgba(76, 201, 151, 0.68);
-}
-
-.events-graph-preview-group-color-2 {
-  --events-graph-preview-group-border: rgba(247, 193, 86, 0.7);
-}
-
-.events-graph-preview-group-color-3 {
-  --events-graph-preview-group-border: rgba(237, 111, 111, 0.68);
-}
-
-.events-graph-preview-group-color-4 {
-  --events-graph-preview-group-border: rgba(163, 126, 255, 0.68);
-}
-
-.events-graph-preview-group-color-5 {
-  --events-graph-preview-group-border: rgba(79, 205, 216, 0.68);
 }

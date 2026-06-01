@@ -197,6 +197,33 @@ describe('EventsSheet/EventsGraphPreviewData', () => {
     }
   });
 
+  it('uses the group event background color for catalog group badges', () => {
+    const {
+      project,
+      testSceneProjectScopedContainersAccessor,
+    } = makeTestProject(gd);
+    try {
+      const eventsList = makeEventsList(project, [
+        {
+          type: 'BuiltinCommonInstructions::Group',
+          name: 'Grouped events',
+          events: [],
+        },
+      ]);
+      gd.asGroupEvent(eventsList.getEventAt(0)).setBackgroundColor(255, 0, 0);
+
+      const items = buildEventsGraphPreviewItems({
+        eventsList,
+        projectScopedContainersAccessor: testSceneProjectScopedContainersAccessor,
+      });
+      const groupItem = getGroupItem(items, 0);
+
+      expect(groupItem.backgroundColor).toBe('rgb(255, 0, 0)');
+    } finally {
+      project.delete();
+    }
+  });
+
   it('extracts condition text, event state and valid else links without action nodes', () => {
     const {
       project,

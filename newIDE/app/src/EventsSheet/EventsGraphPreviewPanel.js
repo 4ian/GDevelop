@@ -2,6 +2,7 @@
 import * as React from 'react';
 import classNames from 'classnames';
 import GraphsIcon from '../UI/CustomSvgIcons/Graphs';
+import RefreshIcon from '../UI/CustomSvgIcons/Refresh';
 import {
   buildEventsGraphPreviewItems,
   filterEventsGraphPreviewItemsBySearch,
@@ -9,6 +10,7 @@ import {
   type EventsGraphPreviewGroupItem,
   type EventsGraphPreviewItem,
 } from './EventsGraphPreviewData';
+import { getCollapsedGroupPathsAfterGroupPathChange } from './EventsGraphPreviewPanelState';
 import {
   type EventContext,
   type SelectionState,
@@ -230,9 +232,13 @@ const TreeItem: React.ComponentType<TreeItemProps> = ({
       <li
         className={classNames(
           'events-graph-preview-map-item',
-          'events-graph-preview-map-item-group',
-          `events-graph-preview-group-color-${item.colorIndex}`
+          'events-graph-preview-map-item-group'
         )}
+        style={
+          ({
+            '--events-graph-preview-group-border': item.backgroundColor,
+          }: any)
+        }
       >
         <GroupRow
           item={item}
@@ -356,14 +362,20 @@ export default function EventsGraphPreviewPanel({
   onSelectEvent,
   width,
 }: Props): React.Node {
-  const [searchText, setSearchText] = React.useState<string>('');
-  const [collapsedGroupPaths, setCollapsedGroupPaths] = React.useState<
-    Set<string>
-  >(() => new Set());
+  const [, setCatalogRefreshNonce] = React.useState<number>(0);
   const items = buildEventsGraphPreviewItems({
     eventsList: events,
     projectScopedContainersAccessor,
   });
+  const allGroupPathStrings = getGroupPathStrings(items);
+  const allGroupPathStringsKey = allGroupPathStrings.join('\n');
+  const previousGroupPathStringsRef = React.useRef<Array<string>>(
+    allGroupPathStrings
+  );
+  const [searchText, setSearchText] = React.useState<string>('');
+  const [collapsedGroupPaths, setCollapsedGroupPaths] = React.useState<
+    Set<string>
+  >(() => new Set(allGroupPathStrings));
   const filteredItems = filterEventsGraphPreviewItemsBySearch(
     items,
     searchText
@@ -381,6 +393,30 @@ export default function EventsGraphPreviewPanel({
   const toggleAllVisibleGroupsLabel = areAllVisibleGroupsCollapsed
     ? 'Expand all'
     : 'Collapse all';
+  const refreshCatalog = React.useCallback(() => {
+    setCatalogRefreshNonce(
+      previousCatalogRefreshNonce => previousCatalogRefreshNonce + 1
+    );
+  }, []);
+
+  React.useEffect(
+    () => {
+      const currentGroupPathStrings = allGroupPathStringsKey
+        ? allGroupPathStringsKey.split('\n')
+        : [];
+      const previousGroupPathStrings = previousGroupPathStringsRef.current;
+
+      setCollapsedGroupPaths(previousCollapsedGroupPaths =>
+        getCollapsedGroupPathsAfterGroupPathChange({
+          previousCollapsedGroupPaths,
+          previousGroupPathStrings,
+          currentGroupPathStrings,
+        })
+      );
+      previousGroupPathStringsRef.current = currentGroupPathStrings;
+    },
+    [allGroupPathStringsKey]
+  );
 
   const toggleGroup = React.useCallback((pathString: string) => {
     setCollapsedGroupPaths(previousCollapsedGroupPaths => {
@@ -424,6 +460,15 @@ export default function EventsGraphPreviewPanel({
       <div className="events-graph-preview-header">
         <GraphsIcon fontSize="small" />
         <span>Catalog</span>
+        <button
+          type="button"
+          className="events-graph-preview-refresh"
+          onClick={refreshCatalog}
+          title="Refresh catalog"
+          aria-label="Refresh catalog"
+        >
+          <RefreshIcon fontSize="small" />
+        </button>
         <button
           type="button"
           className="events-graph-preview-toggle-all"

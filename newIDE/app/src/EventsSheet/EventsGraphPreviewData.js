@@ -37,7 +37,7 @@ export type EventsGraphPreviewGroupItem = {|
   displayPath: string,
   title: string,
   typeLabel: string,
-  colorIndex: number,
+  backgroundColor: string,
   disabled: boolean,
   disabledBecauseOfAncestor: boolean,
   relatedCommentLines: Array<string>,
@@ -54,9 +54,6 @@ const joinPath = (path: Array<number>): string => path.join('.');
 
 const getDisplayPath = (path: Array<number>): string =>
   path.map(index => index + 1).join('.');
-
-const getGroupColorIndex = (path: Array<number>): number =>
-  path.reduce((seed, index) => seed * 31 + index + 1, 0) % 6;
 
 const getConditionMetadata = (
   instruction: gdInstruction
@@ -159,6 +156,9 @@ const normalizeCatalogSearchText = (text: string): string =>
 
 const normalizeCatalogCommentText = (text: string): string =>
   text.trim().replace(/\s+/g, ' ');
+
+const getGroupBackgroundColor = (groupEvent: gdGroupEvent): string =>
+  `rgb(${groupEvent.getBackgroundColorR()}, ${groupEvent.getBackgroundColorG()}, ${groupEvent.getBackgroundColorB()})`;
 
 const getItemSearchTextWithoutComments = (
   item: EventsGraphPreviewItem
@@ -454,7 +454,7 @@ export const buildEventsGraphPreviewItems = ({
           displayPath,
           title: groupEvent.getName() || 'Group',
           typeLabel: 'Group',
-          colorIndex: getGroupColorIndex(path),
+          backgroundColor: getGroupBackgroundColor(groupEvent),
           disabled: event.isDisabled(),
           disabledBecauseOfAncestor,
           relatedCommentLines: [],

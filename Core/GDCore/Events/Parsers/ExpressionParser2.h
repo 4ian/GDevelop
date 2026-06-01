@@ -54,15 +54,15 @@ class GD_CORE_API ExpressionParser2 {
    * \return The node representing the expression as a parsed tree.
    */
   std::unique_ptr<ExpressionNode> ParseExpression(
-      const gd::String &expression_) {
-    expression = expression_;
+      const gd::String &expression) {
     // Parse over a UTF-32 (fixed-width) copy of the expression: gd::String is
     // UTF-8, so indexing it by character position (operator[]) and computing
     // its size() are both O(position)/O(length). Doing that for every
     // character would make parsing O(N^2) in the expression length (which is
     // catastrophic for very large expressions). std::u32string gives O(1)
-    // random access and size.
-    expressionUtf32 = expression_.ToUTF32();
+    // random access and size, while keeping the same character indices (and so
+    // the same node locations) as gd::String.
+    expressionUtf32 = expression.ToUTF32();
 
     currentPosition = 0;
     return Start();
@@ -629,8 +629,8 @@ class GD_CORE_API ExpressionParser2 {
 
   bool IsNamespaceSeparator() {
     // Namespace separator is a special kind of delimiter as it is 2 characters
-    // long
-    const std::u32string separator = NAMESPACE_SEPARATOR.ToUTF32();
+    // long. Computed once as the separator is a compile-time constant ("::").
+    static const std::u32string separator = NAMESPACE_SEPARATOR.ToUTF32();
     return (currentPosition + separator.size() <= expressionUtf32.size() &&
             expressionUtf32.compare(
                 currentPosition, separator.size(), separator) == 0);
@@ -741,8 +741,9 @@ class GD_CORE_API ExpressionParser2 {
   }
   ///@}
 
-  gd::String expression;
-  // UTF-32 view of `expression`, used for O(1) character access during parsing.
+  // The expression being parsed, stored as UTF-32 (fixed-width) so that
+  // character access (operator[]) and size() are O(1). See ParseExpression for
+  // the rationale.
   std::u32string expressionUtf32;
   std::size_t currentPosition;
 

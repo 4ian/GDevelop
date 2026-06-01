@@ -51,6 +51,10 @@ import {
   isElseEventValid,
   type MoveFunctionArguments,
 } from './helpers';
+import {
+  getCatalogBlinkClassName,
+  shouldBlinkEventFromCatalog,
+} from './CatalogBlink';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { useLongTouch } from '../../Utils/UseLongTouch';
@@ -153,6 +157,7 @@ type EventsContainerProps = {|
   isValidElseEvent: boolean,
   highlightedSearchText: ?string,
   highlightedSearchMatchCase?: boolean,
+  catalogBlinkClassName: ?string,
 
   node: SortableTreeNode,
   isDragged: boolean,
@@ -266,6 +271,7 @@ const EventContainer = (props: EventsContainerProps) => {
         const content = (
           <div
             ref={containerRef}
+            className={props.catalogBlinkClassName}
             onClick={props.onEventClick}
             onContextMenu={_onEventContextMenu}
             {...longTouchForContextMenuProps}
@@ -444,6 +450,9 @@ type EventsTreeProps = {|
   tutorials: ?Array<Tutorial>,
 
   highlightedAiGeneratedEventIds: Set<string>,
+  catalogBlinkEvent?: ?gdBaseEvent,
+  catalogBlinkNonce?: number,
+  onEventsUpdated?: () => void,
 |};
 
 export type EventsTreeInterface = {|
@@ -522,6 +531,15 @@ const EventsTree: React.ComponentType<{
       });
     },
     [forceUpdate]
+  );
+  const { onEventsUpdated } = props;
+
+  const _onEventUpdated = React.useCallback(
+    () => {
+      forceUpdate();
+      if (onEventsUpdated) onEventsUpdated();
+    },
+    [forceUpdate, onEventsUpdated]
   );
 
   React.useEffect(() => {
@@ -829,6 +847,12 @@ const EventsTree: React.ComponentType<{
       indexInList: node.indexInList,
       projectScopedContainersAccessor: node.projectScopedContainersAccessor,
     };
+    const catalogBlinkClassName = shouldBlinkEventFromCatalog({
+      catalogBlinkEvent: props.catalogBlinkEvent,
+      event,
+    })
+      ? getCatalogBlinkClassName(props.catalogBlinkNonce || 0)
+      : null;
 
     return (
       <div
@@ -851,7 +875,7 @@ const EventsTree: React.ComponentType<{
           leftIndentWidth={
             depth * (getIndentWidth(props.windowSize) * props.indentScale)
           }
-          onUpdate={forceUpdate}
+          onUpdate={_onEventUpdated}
           onAddNewInstruction={instructionsListContext =>
             props.onAddNewInstruction(eventContext, instructionsListContext)
           }
@@ -926,6 +950,7 @@ const EventsTree: React.ComponentType<{
           isValidElseEvent={isValidElseEvent}
           highlightedSearchText={props.highlightedSearchText}
           highlightedSearchMatchCase={props.highlightedSearchMatchCase}
+          catalogBlinkClassName={catalogBlinkClassName}
           highlightedAiGeneratedEventIds={props.highlightedAiGeneratedEventIds}
           node={node}
           isDragged={isDragged}

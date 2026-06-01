@@ -30,6 +30,7 @@ export type FlatButtonProps = {|
   size?: 'medium' | 'large',
   target?: '_blank',
   id?: ?string,
+  noBorder?: boolean,
 |};
 
 /**
@@ -52,6 +53,7 @@ const FlatButton: React.ComponentType<{
       id,
       style,
       noBackground,
+      noBorder,
       ...otherProps
     }: FlatButtonProps,
     ref
@@ -73,6 +75,7 @@ const FlatButton: React.ComponentType<{
           [classes.buttonContainerDanger]: color === 'danger',
           [classes.buttonContainerPremium]: color === 'premium',
           [classes.buttonContainerAi]: color === 'ai',
+          [classes.borderlessButtonContainer]: !!noBorder,
         })}
         style={style}
       >

@@ -18,6 +18,11 @@
     background-color: var(--theme-surface-alternate-canvas-light-background-color);
 }
 
+.borderlessButtonContainer button,
+.borderlessButtonContainer button:hover {
+    border-color: transparent;
+}
+
 .coloredButtonContainer {
     position: relative;
     overflow: hidden;

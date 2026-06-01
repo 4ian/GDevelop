@@ -1,9 +1,10 @@
 //@flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 import IconButton from '../UI/IconButton';
+import FlatButton from '../UI/FlatButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ToolbarCommands from './ToolbarCommands';
 import { type EventMetadata } from './EnumerateEventsMetadata';
@@ -18,6 +19,7 @@ import ToolbarSearchIcon from '../UI/CustomSvgIcons/ToolbarSearch';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
 import AddLocalVariableIcon from '../UI/CustomSvgIcons/LocalVariable';
+import GraphsIcon from '../UI/CustomSvgIcons/Graphs';
 
 type Props = {|
   onAddStandardEvent: () => void,
@@ -39,6 +41,8 @@ type Props = {|
   redo: () => void,
   canRedo: boolean,
   onToggleSearchPanel: () => void,
+  onToggleGraphPreview: () => void,
+  isGraphPreviewVisible: boolean,
   onOpenSettings?: ?() => void,
   settingsIcon?: React.Node,
   moveEventsIntoNewGroup: () => void,
@@ -66,6 +70,8 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
   redo,
   canRedo,
   onToggleSearchPanel,
+  onToggleGraphPreview,
+  isGraphPreviewVisible,
   onOpenSettings,
   settingsIcon,
   moveEventsIntoNewGroup,
@@ -224,6 +230,15 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
         >
           <ToolbarSearchIcon />
         </IconButton>
+        <FlatButton
+          primary={isGraphPreviewVisible}
+          noBorder={!isGraphPreviewVisible}
+          noBackground={!isGraphPreviewVisible}
+          onClick={onToggleGraphPreview}
+          leftIcon={<GraphsIcon />}
+          label={<Trans>Catalog</Trans>}
+          id="toolbar-toggle-events-graph-preview-button"
+        />
         {onOpenSettings && <ToolbarSeparator />}
         {onOpenSettings && (
           <IconButton

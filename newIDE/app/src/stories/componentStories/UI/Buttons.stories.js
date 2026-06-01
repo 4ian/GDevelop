@@ -220,6 +220,12 @@ export const Default = (): React.Node => (
         label="Flat button"
         onClick={action('onClick')()}
       />
+      <FlatButton
+        noBorder
+        noBackground
+        label="No-border Flat button"
+        onClick={action('onClick')()}
+      />
     </LineStackLayout>
     <LineStackLayout noMargin>
       <FlatButton

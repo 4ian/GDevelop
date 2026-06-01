@@ -98,6 +98,12 @@ const readTools: Array<McpTool> = [
     inputSchema: emptyObjectSchema,
   },
   {
+    name: 'gdevelop_get_editor_selection',
+    description:
+      'Return the current editor UI selection state, including selected objects and scene instances when a scene-like editor is active.',
+    inputSchema: emptyObjectSchema,
+  },
+  {
     name: 'gdevelop_get_project_summary',
     description:
       'Return a compact JSON summary of the current GDevelop project, including scenes, objects, variables, resources, and layers.',

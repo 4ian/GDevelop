@@ -52,6 +52,47 @@ describe('McpEditorBridge', () => {
     expect(response.content[0].text).toContain('"hasProject": false');
   });
 
+  it('returns the current editor selection UI state', async () => {
+    const bridge = makeBridge({
+      getEditorSelection: () => ({
+        hasActiveSelectionProvider: true,
+        selections: [
+          {
+            paneIdentifier: 'center',
+            tabKey: 'layout_Level',
+            editorKind: 'layout',
+            projectItemName: 'Level',
+            sceneName: 'Level',
+            lastSelectionType: 'instance',
+            selectedObjectNames: ['Player'],
+            selectedInstances: [
+              {
+                id: 'abcdef1234',
+                objectName: 'Player',
+                layer: '',
+                x: 100,
+                y: 200,
+              },
+            ],
+          },
+        ],
+      }),
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'gdevelop_get_editor_selection',
+        arguments: {},
+      },
+    });
+    const selection = JSON.parse(response.content[0].text);
+
+    expect(selection.hasActiveSelectionProvider).toBe(true);
+    expect(selection.selections[0].selectedObjectNames).toEqual(['Player']);
+    expect(selection.selections[0].selectedInstances[0].id).toBe('abcdef1234');
+  });
+
   it('returns a project summary when a project is open', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();

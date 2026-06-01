@@ -25,6 +25,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('gdevelop_validate_events_json');
     expect(toolNames).toContain('gdevelop_search_instruction_metadata');
     expect(toolNames).toContain('gdevelop_get_instruction_metadata');
+    expect(toolNames).toContain('gdevelop_get_editor_selection');
     expect(toolNames).not.toContain('create_scene');
     expect(toolNames).not.toContain('gdevelop_run_command');
   });

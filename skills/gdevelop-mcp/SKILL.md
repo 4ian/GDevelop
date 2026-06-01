@@ -20,11 +20,12 @@ When a user asks for any GDevelop edit:
 3. Call `gdevelop_get_project_summary`. Scope it to a scene only after you know the scene name.
 4. Call `gdevelop_list_scenes` if the target scene is unclear.
 5. For scene work, call `gdevelop_list_objects` and `read_scene_events` for the target scene.
-6. For layout work, call `describe_instances` before placing, moving, or deleting instances.
-7. For object/behavior work, call `inspect_object_properties` and, when relevant, `inspect_behavior_properties`.
-8. Make the smallest write that satisfies the user request.
-9. Read back with the relevant read tool.
-10. Summarize what changed and mention any remaining uncertainty.
+6. If the user's request refers to "selected", "current object", "this instance", "the thing I clicked", or similar UI context, call `gdevelop_get_editor_selection` before inferring targets from project data.
+7. For layout work, call `describe_instances` before placing, moving, or deleting instances.
+8. For object/behavior work, call `inspect_object_properties` and, when relevant, `inspect_behavior_properties`.
+9. Make the smallest write that satisfies the user request.
+10. Read back with the relevant read tool.
+11. Summarize what changed and mention any remaining uncertainty.
 
 Do not start by reading or rewriting the full project JSON unless a focused tool cannot answer the question.
 
@@ -33,6 +34,7 @@ Do not start by reading or rewriting the full project JSON unless a focused tool
 Read-only context:
 
 - `gdevelop_get_editor_state`: project presence, scene names, permissions.
+- `gdevelop_get_editor_selection`: current editor UI selection state, including active scene-like editor panes, selected objects, selected layers, and selected scene instances.
 - `gdevelop_get_project_summary`: compact project structure, optionally scoped by `sceneName`.
 - `gdevelop_read_project_json`: full project JSON; use sparingly and with `maxLength` for large projects.
 - `gdevelop_list_scenes`: all scenes/layouts.
@@ -218,9 +220,10 @@ Add an object:
 Place or move instances:
 
 1. `describe_instances`.
-2. `inspect_object_properties` for dimensions and type.
-3. `put_2d_instances` or `put_3d_instances`.
-4. `describe_instances` again.
+2. If the user refers to the currently selected instance, call `gdevelop_get_editor_selection` and use `selectedInstances[].id` with `put_2d_instances` or `put_3d_instances`.
+3. `inspect_object_properties` for dimensions and type.
+4. `put_2d_instances` or `put_3d_instances`.
+5. `describe_instances` again.
 
 Add a behavior:
 

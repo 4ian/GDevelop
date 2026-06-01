@@ -3,7 +3,9 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import RaisedButton from '../../UI/RaisedButton';
-import SceneEditor from '../../SceneEditor';
+import SceneEditor, {
+  type SceneEditorSelectionSnapshot,
+} from '../../SceneEditor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -63,6 +65,10 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
   getProject(): ?gdProject {
     return this.props.project;
+  }
+
+  getEditorSelectionSnapshot(): ?SceneEditorSelectionSnapshot {
+    return this.editor ? this.editor.getEditorSelectionSnapshot() : null;
   }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {

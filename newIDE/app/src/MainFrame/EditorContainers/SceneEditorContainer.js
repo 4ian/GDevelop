@@ -1,7 +1,9 @@
 // @flow
 import * as React from 'react';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
-import SceneEditor from '../../SceneEditor';
+import SceneEditor, {
+  type SceneEditorSelectionSnapshot,
+} from '../../SceneEditor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -28,6 +30,10 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
   getProject(): ?gdProject {
     return this.props.project;
+  }
+
+  getEditorSelectionSnapshot(): ?SceneEditorSelectionSnapshot {
+    return this.editor ? this.editor.getEditorSelectionSnapshot() : null;
   }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {

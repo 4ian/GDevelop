@@ -711,6 +711,7 @@ const MainFrame = (props: Props): React.MixedElement => {
    * See `isCurrentProjectFresh`.
    */
   const currentProjectRef = useStableUpToDateRef(currentProject);
+  const editorTabsRef = useStableUpToDateRef(state.editorTabs);
 
   const getEditorOpeningOptions = React.useCallback(
     ({
@@ -5092,6 +5093,48 @@ const MainFrame = (props: Props): React.MixedElement => {
     [openLayout, onCreateProjectFromMcp]
   );
 
+  const getMcpEditorSelection = React.useCallback(
+    () => {
+      const editorTabs = editorTabsRef.current;
+      const selections = [];
+
+      for (const paneIdentifier of Object.keys(editorTabs.panes)) {
+        if (paneIdentifier === 'external') continue;
+
+        const editorTab = getCurrentTabForPane(editorTabs, paneIdentifier);
+        if (!editorTab || !editorTab.editorRef) continue;
+
+        const editorRef: any = editorTab.editorRef;
+        if (typeof editorRef.getEditorSelectionSnapshot !== 'function') {
+          continue;
+        }
+
+        const selection = editorRef.getEditorSelectionSnapshot();
+        if (!selection) continue;
+
+        selections.push({
+          paneIdentifier,
+          tabKey: editorTab.key,
+          editorKind: editorTab.kind,
+          projectItemName: editorTab.projectItemName,
+          ...selection,
+        });
+      }
+
+      const primarySelection =
+        selections.find(selection => selection.paneIdentifier === 'center') ||
+        selections[0] ||
+        null;
+
+      return {
+        hasActiveSelectionProvider: selections.length > 0,
+        primarySelection,
+        selections,
+      };
+    },
+    [editorTabsRef]
+  );
+
   const mcpEditorBridge = React.useMemo(
     () =>
       createMcpEditorBridge({
@@ -5108,6 +5151,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           commandPaletteRef.current.launchCommand((commandName: any));
           return true;
         },
+        getEditorSelection: getMcpEditorSelection,
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
@@ -5127,6 +5171,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       i18n,
       mcpEditorCallbacks,
       triggerUnsavedChanges,
+      getMcpEditorSelection,
       generateEvents,
       onSceneEventsModifiedOutsideEditor,
       onInstancesModifiedOutsideEditor,

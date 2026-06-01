@@ -53,6 +53,7 @@ type McpEditorBridgeContext = {|
   processEditorFunctionCalls?: Function,
   triggerUnsavedChanges: () => void,
   runCommand: string => boolean,
+  getEditorSelection?: () => Object,
   generateEvents?: Function,
   onSceneEventsModifiedOutsideEditor?: Function,
   onInstancesModifiedOutsideEditor?: Function,
@@ -409,6 +410,18 @@ const callMcpTool = async ({
 
   if (toolName === 'gdevelop_get_editor_state') {
     return textResult(getEditorState(project, permissions));
+  }
+
+  if (toolName === 'gdevelop_get_editor_selection') {
+    return textResult(
+      context.getEditorSelection
+        ? context.getEditorSelection()
+        : {
+            hasActiveSelectionProvider: false,
+            selections: [],
+            primarySelection: null,
+          }
+    );
   }
 
   if (toolName === 'gdevelop_get_project_summary') {

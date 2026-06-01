@@ -303,6 +303,43 @@ type CopyCutPasteOptions = {|
   pasteInTheForeground?: boolean,
 |};
 
+export type SceneEditorSelectionSnapshot = {|
+  selectionProvider: 'SceneEditor',
+  isActive: boolean,
+  sceneName: string | null,
+  externalLayoutName: string | null,
+  eventsBasedObjectName: string | null,
+  eventsBasedObjectVariantName: string | null,
+  lastSelectionType: 'instance' | 'object' | 'layer',
+  selectedLayerName: string | null,
+  chosenLayerName: string,
+  selectedObjectNames: Array<string>,
+  selectedInstanceObjectNames: Array<string>,
+  activeSelectedObjectNames: Array<string>,
+  selectedObjects: Array<{|
+    kind: 'object' | 'folder',
+    name: string,
+    global: boolean,
+  |}>,
+  selectedInstances: Array<{|
+    id: string,
+    objectName: string,
+    layer: string,
+    x: number,
+    y: number,
+    z: number,
+    angle: number,
+    zOrder: number,
+    locked: boolean,
+    sealed: boolean,
+    hasCustomSize: boolean,
+    customWidth: number | null,
+    customHeight: number | null,
+    hasCustomDepth: boolean,
+    customDepth: number | null,
+  |}>,
+|};
+
 const editSceneIconReactNode = <EditSceneIcon />;
 
 export default class SceneEditor extends React.Component<Props, State> {
@@ -459,6 +496,85 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   getInstancesEditorSettings(): any {
     return this.state.instancesEditorSettings;
+  }
+
+  getEditorSelectionSnapshot(): SceneEditorSelectionSnapshot {
+    const selectedObjects: Array<{|
+      kind: 'object' | 'folder',
+      name: string,
+      global: boolean,
+    |}> = this.state.selectedObjectFolderOrObjectsWithContext.map(
+      objectFolderOrObjectWithContext => {
+        const { objectFolderOrObject, global } = objectFolderOrObjectWithContext;
+        const kind: 'object' | 'folder' = objectFolderOrObject.isFolder()
+          ? 'folder'
+          : 'object';
+        return {
+          kind,
+          name: getObjectFolderOrObjectUnifiedName(objectFolderOrObject),
+          global,
+        };
+      }
+    );
+    const selectedObjectNames = selectedObjects
+      .filter(selectedObject => selectedObject.kind === 'object')
+      .map(selectedObject => selectedObject.name);
+    const selectedInstances = this.instancesSelection
+      .getSelectedInstances()
+      .map(instance => ({
+        id: instance.getPersistentUuid().slice(0, 10),
+        objectName: instance.getObjectName(),
+        layer: instance.getLayer(),
+        x: instance.getX(),
+        y: instance.getY(),
+        z: instance.getZ(),
+        angle: instance.getAngle(),
+        zOrder: instance.getZOrder(),
+        locked: instance.isLocked(),
+        sealed: instance.isSealed(),
+        hasCustomSize: instance.hasCustomSize(),
+        customWidth: instance.hasCustomSize()
+          ? instance.getCustomWidth()
+          : null,
+        customHeight: instance.hasCustomSize()
+          ? instance.getCustomHeight()
+          : null,
+        hasCustomDepth: instance.hasCustomDepth(),
+        customDepth: instance.hasCustomDepth()
+          ? instance.getCustomDepth()
+          : null,
+      }));
+    const selectedInstanceObjectNames = uniq(
+      selectedInstances.map(instance => instance.objectName)
+    );
+
+    return {
+      selectionProvider: 'SceneEditor',
+      isActive: this.props.isActive,
+      sceneName: this.props.layout ? this.props.layout.getName() : null,
+      externalLayoutName: this.props.externalLayout
+        ? this.props.externalLayout.getName()
+        : null,
+      eventsBasedObjectName: this.props.eventsBasedObject
+        ? this.props.eventsBasedObject.getName()
+        : null,
+      eventsBasedObjectVariantName: this.props.eventsBasedObjectVariant
+        ? this.props.eventsBasedObjectVariant.getName()
+        : null,
+      lastSelectionType: this.state.lastSelectionType,
+      selectedLayerName: this.state.selectedLayer
+        ? this.state.selectedLayer.getName()
+        : null,
+      chosenLayerName: this.state.chosenLayer,
+      selectedObjectNames,
+      selectedInstanceObjectNames,
+      activeSelectedObjectNames:
+        this.state.lastSelectionType === 'instance'
+          ? selectedInstanceObjectNames
+          : selectedObjectNames,
+      selectedObjects,
+      selectedInstances,
+    };
   }
 
   onReceiveInstanceChanges(changes: InstanceChanges) {

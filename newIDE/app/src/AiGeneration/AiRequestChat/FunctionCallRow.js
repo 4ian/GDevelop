@@ -26,7 +26,10 @@ import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import { SafeExtractor } from '../../Utils/SafeExtractor';
 import CircledAdd from '../../UI/CustomSvgIcons/CircledAdd';
 import { AiRequestContext } from '../AiRequestContext';
-import { getFunctionCallToFunctionCallOutputMap } from '../AiRequestUtils';
+import {
+  getFunctionCallToFunctionCallOutputMap,
+  aiRequestHasWorkInProgress,
+} from '../AiRequestUtils';
 import SubAgentInput from '../../UI/CustomSvgIcons/SubAgentInput';
 import SubAgentOutput from '../../UI/CustomSvgIcons/SubAgentOutput';
 
@@ -291,16 +294,35 @@ const SubAgentFunctionCallRow = ({
     existingParsedOutput = null;
   }
 
-  const isFinished =
-    !!existingFunctionCallOutput ||
-    (subAgentRequest &&
-      (subAgentRequest.status === 'ready' ||
-        subAgentRequest.status === 'error'));
   const isStopped = existingParsedOutput && !!existingParsedOutput.stopped;
   const hasErrored =
     (subAgentRequest && subAgentRequest.status === 'error') ||
     (existingParsedOutput && existingParsedOutput.success === false);
-  const isWorking = subAgentRequest && subAgentRequest.status === 'working';
+
+  // The sub-agent request can be "ready" (the server is not actively
+  // processing) while still having function calls or nested sub-agents whose
+  // results have not been processed/sent back yet: in that case the sub-agent
+  // is NOT finished and a progress indicator must keep being shown.
+  const hasWorkInProgress =
+    !!subAgentRequest &&
+    aiRequestHasWorkInProgress(
+      subAgentRequest,
+      getEditorFunctionCallResults(subAgentAiRequestId)
+    );
+
+  // A sub-agent is finished only once its result has been sent back to the
+  // parent (existingFunctionCallOutput is present) or its request has fully
+  // settled with no remaining work in progress.
+  const isFinished =
+    !!existingFunctionCallOutput ||
+    (!hasWorkInProgress &&
+      subAgentRequest &&
+      (subAgentRequest.status === 'ready' ||
+        subAgentRequest.status === 'error'));
+  const isWorking =
+    !isFinished &&
+    ((subAgentRequest && subAgentRequest.status === 'working') ||
+      hasWorkInProgress);
 
   const editorFunction =
     editorFunctions[functionCall.name] ||

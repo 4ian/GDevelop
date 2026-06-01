@@ -20,6 +20,7 @@ import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
 import AddLocalVariableIcon from '../UI/CustomSvgIcons/LocalVariable';
 import GraphsIcon from '../UI/CustomSvgIcons/Graphs';
+import VariableTreeIcon from '../UI/CustomSvgIcons/VariableTree';
 
 type Props = {|
   onAddStandardEvent: () => void,
@@ -108,6 +109,19 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
         onOpenSceneVariables={onOpenSceneVariables}
       />
       <ToolbarGroup lastChild>
+        <IconButton
+          size="small"
+          color="default"
+          onClick={onOpenSceneVariables}
+          id="toolbar-open-variables-button"
+          tooltip={t`Edit variables`}
+          acceleratorString={getShortcutDisplayName(
+            shortcutMap['OPEN_SCENE_VARIABLES']
+          )}
+        >
+          <VariableTreeIcon />
+        </IconButton>
+
         <IconButton
           size="small"
           color="default"

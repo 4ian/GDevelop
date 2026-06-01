@@ -128,7 +128,7 @@ import {
 } from '../MainFrame/ResourcesWatcher';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import LocalVariablesDialog from '../VariablesList/LocalVariablesDialog';
-import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
+import UnifiedVariablesDialog from '../VariablesList/UnifiedVariablesDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent';
 import { findEventByPath } from '../Utils/EventsValidationScanner';
@@ -3173,7 +3173,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           />
         )}
         {this.state.layoutVariablesDialogOpen && (
-          <GlobalAndSceneVariablesDialog
+          <UnifiedVariablesDialog
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             open
             onCancel={() => this.editLayoutVariables(false)}

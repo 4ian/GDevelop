@@ -31,6 +31,8 @@ type TabProps = {
   id: string,
   label: React.Node,
   variablesContainer: gdVariablesContainer,
+  objectName?: ?string,
+  initialInstances?: ?gdInitialInstancesContainer,
   inheritedVariablesContainer?: gdVariablesContainer,
   loopIndexVariableName?: string,
   onRenameLoopIndexVariable?: (newName: string) => void,
@@ -148,11 +150,8 @@ const VariablesEditorDialog = ({
   const onRefactorAndApply = React.useCallback(
     async () => {
       const originalContentSerializedElements = getOriginalContentSerializedElements();
-      for (const {
-        id,
-        variablesContainer,
-        inheritedVariablesContainer,
-      } of tabs) {
+      for (const tab of tabs) {
+        const { id, variablesContainer, inheritedVariablesContainer } = tab;
         const originalContentSerializedElement = originalContentSerializedElements.get(
           id
         );
@@ -169,12 +168,14 @@ const VariablesEditorDialog = ({
             originalContentSerializedElement,
             variablesContainer
           );
-          if (objectName && initialInstances) {
+          const tabObjectName = tab.objectName || objectName;
+          const tabInitialInstances = tab.initialInstances || initialInstances;
+          if (tabObjectName && tabInitialInstances) {
             gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
               project,
               variablesContainer,
-              initialInstances,
-              objectName,
+              tabInitialInstances,
+              tabObjectName,
               changeset,
               originalContentSerializedElement
             );
@@ -283,6 +284,7 @@ const VariablesEditorDialog = ({
           emptyPlaceholderTitle,
           emptyPlaceholderDescription,
           onComputeAllVariableNames,
+          objectName: tabObjectName,
         }) => {
           return (
             currentTab === id && (
@@ -297,7 +299,7 @@ const VariablesEditorDialog = ({
                     projectScopedContainersAccessor
                   }
                   variablesContainer={variablesContainer}
-                  areObjectVariables={!!objectName}
+                  areObjectVariables={!!tabObjectName}
                   initiallySelectedVariableName={
                     actualInitiallySelectedVariableName.current
                   }

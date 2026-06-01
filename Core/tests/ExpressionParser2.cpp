@@ -185,6 +185,117 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Unicode / multi-byte character edge cases") {
+    // gd::String is UTF-8 but indexes by codepoint, and the parser works on a
+    // UTF-32 copy of the expression. These tests make sure parsing and (most
+    // importantly) node locations are computed in codepoints, not bytes, even
+    // for 2, 3 and 4-byte UTF-8 characters.
+    SECTION("Text content is preserved for multi-byte characters") {
+      auto node = parser.ParseExpression("\"héllo wörld\"");
+      REQUIRE(node != nullptr);
+      auto &textNode = dynamic_cast<gd::TextNode &>(*node);
+      REQUIRE(textNode.text == "héllo wörld");
+    }
+    SECTION("Text node location is counted in codepoints (2-byte chars)") {
+      // "héllo" is 5 codepoints (é is 2 bytes in UTF-8). With the surrounding
+      // quotes the whole literal is 7 codepoints (but 8 bytes).
+      auto node = parser.ParseExpression("\"héllo\"");
+      REQUIRE(node != nullptr);
+      auto &textNode = dynamic_cast<gd::TextNode &>(*node);
+      REQUIRE(textNode.text == "héllo");
+      REQUIRE(textNode.location.GetStartPosition() == 0);
+      REQUIRE(textNode.location.GetEndPosition() == 7);
+    }
+    SECTION("Text node location is counted in codepoints (4-byte emoji)") {
+      // "a😀b" is 3 codepoints (😀 is 4 bytes in UTF-8). With the quotes the
+      // whole literal is 5 codepoints (but 8 bytes).
+      auto node = parser.ParseExpression("\"a😀b\"");
+      REQUIRE(node != nullptr);
+      auto &textNode = dynamic_cast<gd::TextNode &>(*node);
+      REQUIRE(textNode.text == "a😀b");
+      REQUIRE(textNode.location.GetStartPosition() == 0);
+      REQUIRE(textNode.location.GetEndPosition() == 5);
+    }
+    SECTION("Locations stay correct across an operator after multi-byte text") {
+      // Indices (codepoints): 0:" 1:c 2:a 3:f 4:é 5:" 6:space 7:+ 8:space 9:"
+      // 10:t 11:h 12:é 13:"
+      auto node = parser.ParseExpression("\"café\" + \"thé\"");
+      REQUIRE(node != nullptr);
+      auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+      auto &leftTextNode =
+          dynamic_cast<gd::TextNode &>(*operatorNode.leftHandSide);
+      REQUIRE(leftTextNode.text == "café");
+      REQUIRE(leftTextNode.location.GetStartPosition() == 0);
+      REQUIRE(leftTextNode.location.GetEndPosition() == 6);
+      auto &rightTextNode =
+          dynamic_cast<gd::TextNode &>(*operatorNode.rightHandSide);
+      REQUIRE(rightTextNode.text == "thé");
+      REQUIRE(rightTextNode.location.GetStartPosition() == 9);
+      REQUIRE(rightTextNode.location.GetEndPosition() == 14);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    SECTION("Identifiers can contain multi-byte characters") {
+      // "Ünïçá" is 5 codepoints (each accented letter is 2 bytes in UTF-8).
+      auto node = parser.ParseExpression("Ünïçá");
+      REQUIRE(node != nullptr);
+      auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
+      REQUIRE(identifierNode.identifierName == "Ünïçá");
+      REQUIRE(identifierNode.identifierNameLocation.GetStartPosition() == 0);
+      REQUIRE(identifierNode.identifierNameLocation.GetEndPosition() == 5);
+    }
+    SECTION("Namespace separator and parameters resolve after multi-byte text") {
+      // A multi-byte parameter must not shift the codepoint positions of the
+      // tokens that come after it (closing quote at 42, closing parenthesis at
+      // 43 - which would be 43 and 44 if positions were counted in bytes).
+      auto node = parser.ParseExpression(
+          "MyExtension::GetNumberWith2Params(5, \"café\")");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+      REQUIRE(functionNode.functionName == "MyExtension::GetNumberWith2Params");
+      REQUIRE(functionNode.parameters.size() == 2);
+      auto &secondArg =
+          dynamic_cast<gd::TextNode &>(*functionNode.parameters[1]);
+      REQUIRE(secondArg.text == "café");
+      REQUIRE(secondArg.location.GetStartPosition() == 37);
+      REQUIRE(secondArg.location.GetEndPosition() == 43);
+      REQUIRE(functionNode.closingParenthesisLocation.GetStartPosition() == 43);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    SECTION("Escaped quotes around multi-byte text") {
+      auto node = parser.ParseExpression("\"süper \\\"café\\\" ☕\"");
+      REQUIRE(node != nullptr);
+      auto &textNode = dynamic_cast<gd::TextNode &>(*node);
+      REQUIRE(textNode.text == "süper \"café\" ☕");
+    }
+    SECTION("Parser can be reused after a multi-byte expression (no stale state)") {
+      // Parse a long multi-byte expression first...
+      auto longNode =
+          parser.ParseExpression("\"héllo 😀 wörld ☕ café\"");
+      REQUIRE(longNode != nullptr);
+      REQUIRE(dynamic_cast<gd::TextNode &>(*longNode).text ==
+              "héllo 😀 wörld ☕ café");
+
+      // ...then a short one with the same parser: the result must reflect only
+      // the new (shorter) input, with no leftover state from the previous one.
+      auto shortNode = parser.ParseExpression("1");
+      REQUIRE(shortNode != nullptr);
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*shortNode);
+      REQUIRE(numberNode.number == "1");
+      REQUIRE(numberNode.location.GetStartPosition() == 0);
+      REQUIRE(numberNode.location.GetEndPosition() == 1);
+
+      auto emptyNode = parser.ParseExpression("");
+      REQUIRE(emptyNode != nullptr);
+      REQUIRE(dynamic_cast<gd::EmptyNode &>(*emptyNode).text == "");
+    }
+  }
+
   SECTION("Invalid texts") {
     {
       auto node = parser.ParseExpression("");

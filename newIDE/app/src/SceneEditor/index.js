@@ -93,6 +93,10 @@ import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertie
 import { addSerializedInstances } from '../InstancesEditor/InstancesAdder';
 import { type EditorViewPosition2D } from '../InstancesEditor';
 import {
+  createSpriteObjectsFromImageFiles,
+  getSupportedImageFilePaths,
+} from './CreateSpriteFromImage';
+import {
   changeViewPosition,
   setCameraState,
 } from '../EmbeddedGame/EmbeddedGameFrame';
@@ -1231,6 +1235,35 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._onInstancesAddedAndSendToEditor3D(instances);
   };
 
+  _addInstancesForObjectsAtPosition = (
+    objects: Array<gdObject>,
+    position: [number, number]
+  ) => {
+    const { editorDisplay } = this;
+    if (!editorDisplay || !objects.length) return;
+
+    const newInstances = [];
+    objects.forEach((object, index) => {
+      newInstances.push(
+        ...editorDisplay.instancesHandlers.addInstances(
+          [position[0] + index * 16, position[1] + index * 16],
+          [object.getName()],
+          this.state.chosenLayer
+        )
+      );
+    });
+
+    this._onInstancesAddedAndSendToEditor3D(newInstances);
+    this.instancesSelection.clearSelection();
+    this.instancesSelection.selectInstances({
+      instances: newInstances,
+      multiSelect: true,
+      layersLocks: null,
+    });
+    this._onInstancesSelected(newInstances);
+    this.forceUpdatePropertiesEditor();
+  };
+
   _onInstancesAddedAndSendToEditor3D = (
     instances: Array<gdInitialInstance>
   ) => {
@@ -1592,27 +1625,82 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (objects.length === 0) {
       return;
     }
-    const object = objects[0];
-    const infoBarDetails = onObjectAdded({
-      object,
-      layersContainer: this.props.layersContainer,
-      globalObjectsContainer: this.props.globalObjectsContainer,
-      objectsContainer: this.props.objectsContainer,
-    });
-    if (infoBarDetails) {
-      this.setState({
-        additionalWorkInfoBar: infoBarDetails,
-        showAdditionalWorkInfoBar: true,
+    this._onObjectsCreated(objects, isTheFirstOfItsTypeInProject);
+    this._addInstanceForNewObject(objects[0].getName());
+  };
+
+  _onObjectsCreated = (
+    objects: Array<gdObject>,
+    isTheFirstOfItsTypeInProject: boolean
+  ) => {
+    if (objects.length === 0) return;
+
+    objects.forEach(object => {
+      const infoBarDetails = onObjectAdded({
+        object,
+        layersContainer: this.props.layersContainer,
+        globalObjectsContainer: this.props.globalObjectsContainer,
+        objectsContainer: this.props.objectsContainer,
       });
-    }
+      if (infoBarDetails) {
+        this.setState({
+          additionalWorkInfoBar: infoBarDetails,
+          showAdditionalWorkInfoBar: true,
+        });
+      }
+    });
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
-
-    this._addInstanceForNewObject(object.getName());
 
     this.props.onObjectListsModified({
       isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
     });
+  };
+
+  _onImageFilesDropped = async (
+    imageFilePaths: Array<string>,
+    position: [number, number]
+  ) => {
+    const storageProvider = this.props.resourceManagementProps.getStorageProvider();
+    if (
+      storageProvider.internalName !== 'LocalFile' ||
+      !this.props.project.getProjectFile()
+    ) {
+      Window.showMessageBox(
+        'Images can only be dropped into saved local projects.',
+        'info'
+      );
+      return;
+    }
+
+    const supportedImageFilePaths = getSupportedImageFilePaths(imageFilePaths);
+    if (!supportedImageFilePaths.length) return;
+
+    const isTheFirstSpriteObjectInProject = !gd.UsedObjectTypeFinder.scanProject(
+      this.props.project,
+      'Sprite'
+    );
+    try {
+      const objects = await createSpriteObjectsFromImageFiles({
+        project: this.props.project,
+        objectsContainer: this.props.objectsContainer,
+        imageFilePaths: supportedImageFilePaths,
+      });
+      this._onObjectsCreated(objects, isTheFirstSpriteObjectInProject);
+      this._addInstancesForObjectsAtPosition(objects, position);
+      if (this.editorDisplay) this.editorDisplay.forceUpdateObjectsList();
+      await this.props.resourceManagementProps.onFetchNewlyAddedResources();
+      this.props.resourceManagementProps.onNewResourcesAdded();
+    } catch (error) {
+      console.error(
+        'Unable to create Sprite object from dropped image:',
+        error
+      );
+      Window.showMessageBox(
+        'Unable to create a Sprite object from the dropped image.',
+        'error'
+      );
+    }
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
@@ -3061,6 +3149,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onInstancesMoved={this._onInstancesMovedAndSendToEditor3D}
                     onInstancesResized={this._onInstancesResized}
                     onInstancesRotated={this._onInstancesRotated}
+                    onImageFilesDropped={this._onImageFilesDropped}
                     isInstanceOf3DObject={this.isInstanceOf3DObject}
                     onSelectAllInstancesOfObjectInLayout={
                       this.onSelectAllInstancesOfObjectInLayout

@@ -133,6 +133,7 @@ import {
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
+import isUserTyping from '../KeyboardShortcuts/IsUserTyping';
 import useMainFrameCommands from './MainFrameCommands';
 import CommandPalette, {
   type CommandPaletteInterface,
@@ -3540,6 +3541,16 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const selectAllInActiveEditors = React.useCallback(
     () => {
+      // On the desktop app, the "Select All" menu item registers a global
+      // CmdOrCtrl+A accelerator. This means the shortcut is intercepted even
+      // when the user is typing in a text field (input, textarea or
+      // contenteditable), where it would otherwise trigger the native
+      // "select all the text" behavior. In this case, reproduce this native
+      // behavior and don't select anything in the editors.
+      if (isUserTyping()) {
+        document.execCommand('selectAll');
+        return;
+      }
       for (const paneIdentifier in state.editorTabs.panes) {
         const currentTab = getCurrentTabForPane(
           state.editorTabs,

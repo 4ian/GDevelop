@@ -62,3 +62,39 @@ export const getDefaultAiConfigurationPresetId = (
     'default'
   );
 };
+
+/**
+ * Whether the given preset (identified by id + mode) is a "free" preset
+ * (costs no credits, usable by everyone). Relies on the `isFree` flag from
+ * the AI settings, so future free presets are detected without hardcoding
+ * their ids.
+ */
+export const getIsFreeAiConfigurationPreset = ({
+  presetId,
+  mode,
+  aiConfigurationPresetsWithAvailability,
+}: {|
+  presetId: ?string,
+  mode: 'chat' | 'agent' | 'orchestrator',
+  aiConfigurationPresetsWithAvailability: Array<AiConfigurationPresetWithAvailability>,
+|}): boolean => {
+  if (!presetId) return false;
+  const preset = aiConfigurationPresetsWithAvailability.find(
+    preset => preset.id === presetId && preset.mode === mode
+  );
+  return !!(preset && preset.isFree);
+};
+
+/**
+ * The id of the first available "free" preset for the given mode (used to
+ * start a new conversation with free, open-source models), or null if none.
+ */
+export const getFirstFreeAiConfigurationPresetId = (
+  mode: 'chat' | 'agent' | 'orchestrator',
+  aiConfigurationPresetsWithAvailability: Array<AiConfigurationPresetWithAvailability>
+): string | null => {
+  const freePreset = aiConfigurationPresetsWithAvailability.find(
+    preset => preset.mode === mode && preset.isFree && !preset.disabled
+  );
+  return freePreset ? freePreset.id : null;
+};

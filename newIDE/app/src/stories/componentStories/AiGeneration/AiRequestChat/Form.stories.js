@@ -461,6 +461,7 @@ export const LowFreePreset = (): React.Node => (
         nameByLocale: { en: 'Low (Free, Open-Source)' },
         mode: 'orchestrator',
         isDefault: true,
+        isFree: true,
         disabled: false,
         enableWith: null,
       },

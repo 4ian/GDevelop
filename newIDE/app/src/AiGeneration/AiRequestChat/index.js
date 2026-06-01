@@ -42,6 +42,8 @@ import classNames from 'classnames';
 import {
   type AiConfigurationPresetWithAvailability,
   getDefaultAiConfigurationPresetId,
+  getIsFreeAiConfigurationPreset,
+  getFirstFreeAiConfigurationPresetId,
 } from '../AiConfiguration';
 import { AiConfigurationPresetSelector } from './AiConfigurationPresetSelector';
 import { FreeAiBanner } from './FreeAiBanner';
@@ -597,14 +599,20 @@ export const AiRequestChat: React.ComponentType<{
         selectedMode,
         aiConfigurationPresetsWithAvailability
       );
-    // Whether the next/current request uses the "low" (free, open-source)
+    // Whether the next/current request uses a "free" (free, open-source)
     // preset, to show a banner about its limitations.
     const isLowFreePreset = aiRequest
-      ? !!(
-          aiRequest.aiConfiguration &&
-          aiRequest.aiConfiguration.presetId === 'low'
-        )
-      : chosenOrDefaultAiConfigurationPresetId === 'low';
+      ? getIsFreeAiConfigurationPreset({
+          presetId:
+            aiRequest.aiConfiguration && aiRequest.aiConfiguration.presetId,
+          mode: aiRequest.mode || 'orchestrator',
+          aiConfigurationPresetsWithAvailability,
+        })
+      : getIsFreeAiConfigurationPreset({
+          presetId: chosenOrDefaultAiConfigurationPresetId,
+          mode: selectedMode,
+          aiConfigurationPresetsWithAvailability,
+        });
     const hasFunctionsCallsToProcess =
       aiRequest &&
       getFunctionCallsToProcess({
@@ -768,15 +776,20 @@ export const AiRequestChat: React.ComponentType<{
       [onSubmitForNewChat]
     );
 
-    // Switch to the "start a new AI request" screen, preselecting the "low"
+    // Switch to the "start a new AI request" screen, preselecting a free
     // (free, open-source) preset (only available in the orchestrator mode).
     const onStartNewChatWithLowFreePreset = React.useCallback(
       () => {
         setSelectedMode('orchestrator');
-        setAiConfigurationPresetId('low');
+        setAiConfigurationPresetId(
+          getFirstFreeAiConfigurationPresetId(
+            'orchestrator',
+            aiConfigurationPresetsWithAvailability
+          )
+        );
         onStartOrOpenChat({ aiRequestId: null });
       },
-      [onStartOrOpenChat]
+      [onStartOrOpenChat, aiConfigurationPresetsWithAvailability]
     );
 
     // Calculate feedback banner visibility for sticky behavior

@@ -939,6 +939,11 @@ export type AiConfigurationPreset = {|
   nameByLocale: MessageByLocale,
   disabled: boolean,
   isDefault?: boolean,
+  // A "free" preset costs no credits and is available to everyone (e.g. the
+  // free, open-source models). There can be several of them (low, super-low,
+  // open-source-only, ...), so detection should rely on this flag rather than
+  // hardcoding preset ids.
+  isFree?: boolean,
 |};
 
 export type AiSettings = {

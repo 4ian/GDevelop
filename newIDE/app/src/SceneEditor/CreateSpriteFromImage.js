@@ -12,6 +12,7 @@ const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const electronClipboard = electron ? electron.clipboard : null;
+const electronWebUtils = electron ? electron.webUtils : null;
 
 const supportedImageExtensions = ['.png', '.jpg', '.jpeg', '.webp'];
 
@@ -37,16 +38,32 @@ export const getSupportedImageFilePaths = (
   filePaths: Array<string>
 ): Array<string> => filePaths.filter(isSupportedImageFilePath);
 
+const getLocalPathFromNativeFile = (file: any, webUtils: any): ?string => {
+  if (!file) return null;
+  if (typeof file.path === 'string' && file.path) return file.path;
+
+  if (webUtils && typeof webUtils.getPathForFile === 'function') {
+    try {
+      const filePath = webUtils.getPathForFile(file);
+      return typeof filePath === 'string' && filePath ? filePath : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  return null;
+};
+
 export const getImageFilePathsFromDataTransfer = (
-  dataTransfer: ?DataTransfer | any
+  dataTransfer: ?DataTransfer | any,
+  webUtils: any = electronWebUtils
 ): Array<string> => {
   if (!dataTransfer || !dataTransfer.files) return [];
   const filePaths = [];
   for (let i = 0; i < dataTransfer.files.length; i++) {
     const file = dataTransfer.files[i];
-    if (file && typeof file.path === 'string') {
-      filePaths.push(file.path);
-    }
+    const filePath = getLocalPathFromNativeFile(file, webUtils);
+    if (filePath) filePaths.push(filePath);
   }
   return getSupportedImageFilePaths(filePaths);
 };

@@ -117,6 +117,22 @@ describe('CreateSpriteFromImage', () => {
     ]);
   });
 
+  test('extracts supported local file paths through Electron webUtils when file.path is unavailable', () => {
+    const heroFile = { name: 'Hero.png' };
+    const notesFile = { name: 'notes.txt' };
+    const dataTransfer = {
+      files: [heroFile, notesFile],
+    };
+    const webUtils = {
+      getPathForFile: file =>
+        file === heroFile ? 'C:\\project\\Hero.png' : 'C:\\project\\notes.txt',
+    };
+
+    expect(getImageFilePathsFromDataTransfer(dataTransfer, webUtils)).toEqual([
+      'C:\\project\\Hero.png',
+    ]);
+  });
+
   test('detects non-empty clipboard images through an injected clipboard', () => {
     expect(
       hasClipboardImage({

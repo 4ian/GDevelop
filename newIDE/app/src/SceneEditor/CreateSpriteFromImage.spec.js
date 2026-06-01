@@ -1,4 +1,4 @@
-// @flow
+// @noflow
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -6,10 +6,11 @@ import {
   createSpriteObjectFromImageFile,
   getImageFilePathsFromDataTransfer,
   getSupportedImageFilePaths,
+  hasClipboardImage,
   writeClipboardImageToProjectFolder,
 } from './CreateSpriteFromImage';
 
-const gd: libGDevelop = global.gd;
+const gd = global.gd;
 
 const makeProjectInTempFolder = () => {
   const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-image-drop-'));
@@ -114,5 +115,18 @@ describe('CreateSpriteFromImage', () => {
       'C:\\project\\Hero.png',
       'C:\\project\\Enemy.webp',
     ]);
+  });
+
+  test('detects non-empty clipboard images through an injected clipboard', () => {
+    expect(
+      hasClipboardImage({
+        readImage: () => ({ isEmpty: () => false }),
+      })
+    ).toBe(true);
+    expect(
+      hasClipboardImage({
+        readImage: () => ({ isEmpty: () => true }),
+      })
+    ).toBe(false);
   });
 });

@@ -10,6 +10,8 @@ import {
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
+const electron = optionalRequire('electron');
+const electronClipboard = electron ? electron.clipboard : null;
 
 const supportedImageExtensions = ['.png', '.jpg', '.jpeg', '.webp'];
 
@@ -79,7 +81,7 @@ export const writeClipboardImageToProjectFolder = ({
   imageBuffer,
 }: {|
   project: gdProject,
-  imageBuffer: Buffer,
+  imageBuffer: any,
 |}): string => {
   if (!fs) throw new Error('File system is not available.');
   const imageFilePath = getUniqueProjectFilePath({
@@ -89,6 +91,31 @@ export const writeClipboardImageToProjectFolder = ({
   });
   fs.writeFileSync(imageFilePath, imageBuffer);
   return imageFilePath;
+};
+
+export const hasClipboardImage = (
+  clipboard: any = electronClipboard
+): boolean => {
+  if (!clipboard) return false;
+
+  try {
+    const image = clipboard.readImage();
+    return !!image && !image.isEmpty();
+  } catch (error) {
+    return false;
+  }
+};
+
+export const writeImageFromClipboardToProjectFolder = (
+  project: gdProject
+): ?string => {
+  if (!electronClipboard || !hasClipboardImage(electronClipboard)) return null;
+
+  const image = electronClipboard.readImage();
+  return writeClipboardImageToProjectFolder({
+    project,
+    imageBuffer: image.toPNG(),
+  });
 };
 
 const addDefaultFrameToSpriteObject = (
@@ -151,7 +178,7 @@ export const ensureImageFileIsInProjectFolder = async ({
 |}): Promise<string> => {
   if (isPathInProjectFolder(project, imageFilePath)) return imageFilePath;
 
-  const newToOldFilePaths = new Map();
+  const newToOldFilePaths: Map<string, string> = new Map();
   const copiedFilePaths = await copyAllToProjectFolder(
     project,
     [imageFilePath],

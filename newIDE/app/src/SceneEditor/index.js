@@ -93,8 +93,11 @@ import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertie
 import { addSerializedInstances } from '../InstancesEditor/InstancesAdder';
 import { type EditorViewPosition2D } from '../InstancesEditor';
 import {
+  createSpriteObjectFromImageFile,
   createSpriteObjectsFromImageFiles,
   getSupportedImageFilePaths,
+  hasClipboardImage,
+  writeImageFromClipboardToProjectFolder,
 } from './CreateSpriteFromImage';
 import {
   changeViewPosition,
@@ -1242,7 +1245,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { editorDisplay } = this;
     if (!editorDisplay || !objects.length) return;
 
-    const newInstances = [];
+    const newInstances: Array<gdInitialInstance> = [];
     objects.forEach((object, index) => {
       newInstances.push(
         ...editorDisplay.instancesHandlers.addInstances(
@@ -2367,7 +2370,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       {
         label: i18n._(t`Paste`),
         click: () => this.paste(),
-        enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
+        enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND) || hasClipboardImage(),
         accelerator: 'CmdOrCtrl+V',
       },
       {
@@ -2519,7 +2522,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         {
           label: i18n._(t`Paste`),
           click: () => this.paste(),
-          enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
+          enabled:
+            Clipboard.has(INSTANCES_CLIPBOARD_KIND) || hasClipboardImage(),
           accelerator: 'CmdOrCtrl+V',
         },
         { type: 'separator' },
@@ -2701,8 +2705,30 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdatePropertiesEditor();
   };
 
-  paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
-    const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
+  _getScenePastePosition = (
+    useLastCursorPosition?: boolean
+  ): [number, number] => {
+    const { editorDisplay } = this;
+    if (!editorDisplay) return [0, 0];
+
+    const viewPosition = editorDisplay.viewControls.getViewPosition();
+    if (!viewPosition) return [0, 0];
+
+    const lastPosition = useLastCursorPosition
+      ? editorDisplay.viewControls.getLastCursorSceneCoordinates()
+      : editorDisplay.viewControls.getLastContextMenuSceneCoordinates();
+    return viewPosition.containsPoint(lastPosition[0], lastPosition[1])
+      ? lastPosition
+      : [viewPosition.getViewX(), viewPosition.getViewY()];
+  };
+
+  _pasteInstancesFromClipboard = ({
+    clipboardContent,
+    useLastCursorPosition,
+  }: {|
+    clipboardContent: any,
+    useLastCursorPosition?: boolean,
+  |}): boolean => {
     const instancesContent = SafeExtractor.extractArrayProperty(
       clipboardContent,
       'instances'
@@ -2714,7 +2740,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         clipboardContent,
         'pasteInTheForeground'
       ) || false;
-    if (x === null || y === null || instancesContent === null) return;
+    if (x === null || y === null || instancesContent === null) return false;
 
     const newInstances = addSerializedInstances({
       project: this.props.project,
@@ -2739,29 +2765,82 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const { editorDisplay } = this;
     if (editorDisplay) {
-      const viewPosition = editorDisplay.viewControls.getViewPosition();
-      if (viewPosition) {
-        const lastPosition = useLastCursorPosition
-          ? editorDisplay.viewControls.getLastCursorSceneCoordinates()
-          : editorDisplay.viewControls.getLastContextMenuSceneCoordinates();
-        const position = viewPosition.containsPoint(
-          lastPosition[0],
-          lastPosition[1]
-        )
-          ? lastPosition
-          : [viewPosition.getViewX(), viewPosition.getViewY()];
-        for (const instance of newInstances) {
-          instance.setX(instance.getX() + position[0]);
-          instance.setY(instance.getY() + position[1]);
-        }
-        editorDisplay.instancesHandlers.snapSelection(newInstances);
-        this._sendUpdatedInstances(newInstances);
+      const position = this._getScenePastePosition(useLastCursorPosition);
+      for (const instance of newInstances) {
+        instance.setX(instance.getX() + position[0]);
+        instance.setY(instance.getY() + position[1]);
       }
+      editorDisplay.instancesHandlers.snapSelection(newInstances);
+      this._sendUpdatedInstances(newInstances);
     }
 
     // Immediately update the properties editor to ensure they keep no reference
     // to the deleted instances.
     this.forceUpdatePropertiesEditor();
+    return true;
+  };
+
+  _pasteImageFromClipboard = async ({
+    useLastCursorPosition,
+  }: CopyCutPasteOptions = {}) => {
+    if (!hasClipboardImage()) return;
+
+    const storageProvider = this.props.resourceManagementProps.getStorageProvider();
+    if (
+      storageProvider.internalName !== 'LocalFile' ||
+      !this.props.project.getProjectFile()
+    ) {
+      Window.showMessageBox(
+        'Images can only be pasted into saved local projects.',
+        'info'
+      );
+      return;
+    }
+
+    try {
+      const imageFilePath = writeImageFromClipboardToProjectFolder(
+        this.props.project
+      );
+      if (!imageFilePath) return;
+
+      const isTheFirstSpriteObjectInProject = !gd.UsedObjectTypeFinder.scanProject(
+        this.props.project,
+        'Sprite'
+      );
+      const object = await createSpriteObjectFromImageFile({
+        project: this.props.project,
+        objectsContainer: this.props.objectsContainer,
+        imageFilePath,
+      });
+      this._onObjectsCreated([object], isTheFirstSpriteObjectInProject);
+      this._addInstancesForObjectsAtPosition(
+        [object],
+        this._getScenePastePosition(useLastCursorPosition)
+      );
+      if (this.editorDisplay) this.editorDisplay.forceUpdateObjectsList();
+      await this.props.resourceManagementProps.onFetchNewlyAddedResources();
+      this.props.resourceManagementProps.onNewResourcesAdded();
+    } catch (error) {
+      console.error('Unable to create Sprite object from pasted image:', error);
+      Window.showMessageBox(
+        'Unable to create a Sprite object from the pasted image.',
+        'error'
+      );
+    }
+  };
+
+  paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
+    const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
+    if (
+      this._pasteInstancesFromClipboard({
+        clipboardContent,
+        useLastCursorPosition,
+      })
+    ) {
+      return;
+    }
+
+    this._pasteImageFromClipboard({ useLastCursorPosition });
   };
 
   extractAsExternalLayout = (chosenName: string) => {

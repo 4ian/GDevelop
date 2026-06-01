@@ -98,6 +98,11 @@ import {
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import Rectangle from '../Utils/Rectangle';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
+import {
+  type EventsBasedObjectChildrenEditedOptions,
+  getImageResourceNamesForEditedObject,
+  shouldResetObjectRendererForCustomObjectChildrenEdit,
+} from './CustomObjectResourceReload';
 
 const gd: libGDevelop = global.gd;
 
@@ -207,10 +212,14 @@ type Props = {|
 
   onOpenMoreSettings?: ?() => void,
   onOpenEvents: (sceneName: string) => void,
-  onObjectEdited: (objectWithContext: ObjectWithContext) => void,
+  onObjectEdited: (
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged?: boolean
+  ) => void,
   onObjectGroupEdited: (objectGroupWithContext: GroupWithContext) => void,
   onEventsBasedObjectChildrenEdited: (
-    eventsBasedObject: gdEventsBasedObject
+    eventsBasedObject: gdEventsBasedObject,
+    options?: EventsBasedObjectChildrenEditedOptions
   ) => void,
 
   onObjectsDeleted: () => void,
@@ -605,18 +614,17 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   }
 
-  _reloadResources = async (resourceNames: string[], reason: string) => {
+  // A human-readable name of the edited scene / external layout / custom object
+  // variant, used to make resource reload logs easier to audit.
+  _getReloadContextName = (): string => {
     const {
-      project,
       layout,
       externalLayout,
       eventsFunctionsExtension,
       eventsBasedObject,
       eventsBasedObjectVariant,
     } = this.props;
-    const { editorDisplay } = this;
-
-    const name = externalLayout
+    return externalLayout
       ? externalLayout.getName()
       : layout
       ? layout.getName()
@@ -624,6 +632,17 @@ export default class SceneEditor extends React.Component<Props, State> {
           .filter(Boolean)
           .map(item => item.getName())
           .join(' > ');
+  };
+
+  _reloadResources = async (
+    resourceNames: string[],
+    reason: string,
+    { reloadFromDisk = true }: {| reloadFromDisk?: boolean |} = {}
+  ) => {
+    const { project } = this.props;
+    const { editorDisplay } = this;
+
+    const name = this._getReloadContextName();
 
     if (!editorDisplay) return;
 
@@ -632,9 +651,13 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     try {
       console.info(
-        `Reloading resources "${resourceNames.join(
-          ', '
-        )}" for scene "${name}" rendering (reason: ${reason}).`
+        reloadFromDisk && resourceNames.length > 0
+          ? `Reloading ${
+              resourceNames.length
+            } resource(s) from disk for "${name}" (reason: ${reason}): ${resourceNames.join(
+              ', '
+            )}.`
+          : `Refreshing "${name}" renderers without reloading resources from disk (reason: ${reason}).`
       );
 
       // When reloading textures, there can be a short time during which
@@ -642,8 +665,15 @@ export default class SceneEditor extends React.Component<Props, State> {
       // through the RenderedInstance's, triggering crashes. So the scene rendering
       // is paused during this period.
       editorDisplay.startSceneRendering(false, pauseReason);
-      for (const resourceName of resourceNames) {
-        await PixiResourcesLoader.reloadResource(project, resourceName);
+      // Reloading textures from the disk is only necessary when a resource file
+      // actually changed (e.g. an image edited in an external editor). Otherwise
+      // we only need to reset the renderers below so they pick up the new object
+      // configuration - reloading every texture from the disk would be needlessly
+      // slow (especially for custom objects using a lot of resources).
+      if (reloadFromDisk) {
+        for (const resourceName of resourceNames) {
+          await PixiResourcesLoader.reloadResource(project, resourceName);
+        }
       }
 
       editorDisplay.forceUpdateObjectsList();
@@ -670,20 +700,17 @@ export default class SceneEditor extends React.Component<Props, State> {
         clear(project)
       );
 
-      console.info(
-        `Resetting instance renderers for objects using resources "${resourceNames.join(
-          ', '
-        )}": ${[...objectNames].join(', ')} (scene: "${name}").`
-      );
+      if (objectNames.size > 0) {
+        console.info(
+          `Resetting renderers of object(s) directly using these resources in "${name}": ${[
+            ...objectNames,
+          ].join(', ')}.`
+        );
+      }
       objectNames.forEach(objectName => {
         editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
       });
     } finally {
-      console.info(
-        `Starting scene rendering again after reloading resources "${resourceNames.join(
-          ', '
-        )}": (scene: "${name}").`
-      );
       editorDisplay.startSceneRendering(true, pauseReason);
     }
   };
@@ -1481,8 +1508,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     hasResourceChanged: boolean
   ) => {
     const { project, layout, resourceManagementProps } = this.props;
-    // It triggers forceUpdateRenderedInstancesOfObject on this editor too.
-    this.props.onObjectEdited(objectWithContext);
+    // It triggers forceUpdateRenderedInstancesOfObject (or
+    // forceUpdateCustomObjectRenderedInstances) on this editor too.
+    this.props.onObjectEdited(objectWithContext, hasResourceChanged);
     if (layout) {
       if (objectWithContext.global) {
         gd.WholeProjectRefactorer.behaviorsAddedToGlobalObject(
@@ -2817,48 +2845,70 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay) this.editorDisplay.forceUpdatePropertiesEditor();
   };
 
-  forceUpdateCustomObjectRenderedInstances = async () => {
+  forceUpdateCustomObjectRenderedInstances = async (
+    editedEventsBasedObject: gdEventsBasedObject,
+    {
+      editedObject,
+      hasResourceChanged = false,
+    }: EventsBasedObjectChildrenEditedOptions = {}
+  ) => {
     const { project, projectScopedContainersAccessor } = this.props;
 
-    const resourcesInUse = new gd.ResourcesInUseHelper(
-      project.getResourcesManager()
-    );
-    projectScopedContainersAccessor.forEachObject(object => {
-      if (project.hasEventsBasedObject(object.getType())) {
-        object.getConfiguration().exposeResources(resourcesInUse);
-      }
-    });
-    const objectResourceNames = resourcesInUse
-      .getAllImages() // TODO: should probably check all resources.
-      .toNewVectorString()
-      .toJSArray();
-    resourcesInUse.delete();
+    // Only the resources of the object that was actually edited may need to be
+    // reloaded from the disk, and only if a resource really changed.
+    const objectResourceNames =
+      hasResourceChanged && editedObject
+        ? getImageResourceNamesForEditedObject(project, editedObject)
+        : [];
 
-    await this._reloadResources(objectResourceNames, 'custom object edited');
+    // _reloadResources also refreshes the objects list and resets the renderers
+    // of every object *directly* using these resources (custom objects nesting
+    // the edited one are handled below). The textures are only read again from
+    // the disk when a resource really changed.
+    await this._reloadResources(objectResourceNames, 'custom object edited', {
+      reloadFromDisk: hasResourceChanged,
+    });
     const { editorDisplay } = this;
     if (editorDisplay) {
+      const resetObjectNames = [];
       projectScopedContainersAccessor.forEachObject(object => {
-        editorDisplay.instancesHandlers.resetInstanceRenderersFor(
-          object.getName()
-        );
+        if (
+          shouldResetObjectRendererForCustomObjectChildrenEdit({
+            project,
+            object,
+            editedEventsBasedObject,
+            editedObject,
+          })
+        ) {
+          resetObjectNames.push(object.getName());
+          editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+            object.getName()
+          );
+        }
       });
+      if (resetObjectNames.length > 0) {
+        console.info(
+          `Resetting renderers in "${this._getReloadContextName()}" of the edited object and objects depending on "${editedEventsBasedObject.getName()}": ${resetObjectNames.join(
+            ', '
+          )}.`
+        );
+      }
     }
   };
 
-  forceUpdateRenderedInstancesOfObject = (object: gdObject) => {
+  forceUpdateRenderedInstancesOfObject = (
+    object: gdObject,
+    hasResourceChanged: boolean = true
+  ) => {
     const { project } = this.props;
-
-    const resourcesInUse = new gd.ResourcesInUseHelper(
-      project.getResourcesManager()
+    const objectResourceNames = getImageResourceNamesForEditedObject(
+      project,
+      object
     );
-    object.getConfiguration().exposeResources(resourcesInUse);
-    const objectResourceNames = resourcesInUse
-      .getAllImages() // TODO: should probably check all resources.
-      .toNewVectorString()
-      .toJSArray();
-    resourcesInUse.delete();
 
-    this._reloadResources(objectResourceNames, 'object edited');
+    this._reloadResources(objectResourceNames, 'object edited', {
+      reloadFromDisk: hasResourceChanged,
+    });
   };
 
   render(): any {
@@ -3114,8 +3164,12 @@ export default class SceneEditor extends React.Component<Props, State> {
                         onCancel={() => {
                           if (editedObjectWithContext) {
                             // Object changes are reverted but not the
-                            // resources modified with an external editor.
-                            this.props.onObjectEdited(editedObjectWithContext);
+                            // resources modified with an external editor, so
+                            // force a reload from the disk to pick those up.
+                            this.props.onObjectEdited(
+                              editedObjectWithContext,
+                              true
+                            );
                           }
                           this.editObject(null);
                           // An hot-reload for an edited image may be on hold.

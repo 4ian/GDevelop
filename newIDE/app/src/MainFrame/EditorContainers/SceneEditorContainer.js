@@ -119,16 +119,25 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   }
 
-  onEventsBasedObjectChildrenEdited() {
+  onEventsBasedObjectChildrenEdited(
+    eventsBasedObject: gdEventsBasedObject,
+    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+  ) {
     const { editor } = this;
     if (editor) {
-      // Update every custom object because some custom objects may include
-      // the one actually edited.
-      editor.forceUpdateCustomObjectRenderedInstances();
+      // Update the edited object and every custom object that includes it.
+      editor.forceUpdateCustomObjectRenderedInstances(
+        eventsBasedObject,
+        options
+      );
     }
   }
 
-  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+  onSceneObjectEdited(
+    scene: gdLayout,
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged?: boolean
+  ) {
     const layout = this.getLayout();
     if (!layout) {
       return;
@@ -139,7 +148,10 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     const { editor } = this;
     if (editor) {
       // Update instances of the object as it was modified in an editor.
-      editor.forceUpdateRenderedInstancesOfObject(objectWithContext.object);
+      editor.forceUpdateRenderedInstancesOfObject(
+        objectWithContext.object,
+        hasResourceChanged
+      );
     }
   }
 
@@ -286,8 +298,12 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         }
         onEffectAdded={this.props.onEffectAdded}
         onObjectListsModified={this.props.onObjectListsModified}
-        onObjectEdited={objectWithContext =>
-          this.props.onSceneObjectEdited(layout, objectWithContext)
+        onObjectEdited={(objectWithContext, hasResourceChanged) =>
+          this.props.onSceneObjectEdited(
+            layout,
+            objectWithContext,
+            hasResourceChanged
+          )
         }
         onObjectsDeleted={() => this.props.onSceneObjectsDeleted(layout)}
         triggerHotReloadInGameEditorIfNeeded={

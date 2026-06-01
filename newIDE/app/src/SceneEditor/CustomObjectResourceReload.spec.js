@@ -65,7 +65,12 @@ describe('CustomObjectResourceReload', () => {
         .insertNew('Container', 0);
       containerEventsBasedObject
         .getObjects()
-        .insertNewObject(project, 'Button::PanelSpriteButton', 'NestedButton', 0);
+        .insertNewObject(
+          project,
+          'Button::PanelSpriteButton',
+          'NestedButton',
+          0
+        );
       const nestingCustomObject = testLayout
         .getObjects()
         .insertNewObject(
@@ -90,7 +95,7 @@ describe('CustomObjectResourceReload', () => {
           0
         );
 
-      const check = object =>
+      const check = (object: gdObject) =>
         shouldResetObjectRendererForCustomObjectChildrenEdit({
           project,
           object,

@@ -614,22 +614,17 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   }
 
-  _reloadResources = async (
-    resourceNames: string[],
-    reason: string,
-    { reloadFromDisk = true }: {| reloadFromDisk?: boolean |} = {}
-  ) => {
+  // A human-readable name of the edited scene / external layout / custom object
+  // variant, used to make resource reload logs easier to audit.
+  _getReloadContextName = (): string => {
     const {
-      project,
       layout,
       externalLayout,
       eventsFunctionsExtension,
       eventsBasedObject,
       eventsBasedObjectVariant,
     } = this.props;
-    const { editorDisplay } = this;
-
-    const name = externalLayout
+    return externalLayout
       ? externalLayout.getName()
       : layout
       ? layout.getName()
@@ -637,6 +632,17 @@ export default class SceneEditor extends React.Component<Props, State> {
           .filter(Boolean)
           .map(item => item.getName())
           .join(' > ');
+  };
+
+  _reloadResources = async (
+    resourceNames: string[],
+    reason: string,
+    { reloadFromDisk = true }: {| reloadFromDisk?: boolean |} = {}
+  ) => {
+    const { project } = this.props;
+    const { editorDisplay } = this;
+
+    const name = this._getReloadContextName();
 
     if (!editorDisplay) return;
 
@@ -645,9 +651,13 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     try {
       console.info(
-        `Reloading resources "${resourceNames.join(
-          ', '
-        )}" for scene "${name}" rendering (reason: ${reason}, reloadFromDisk: ${reloadFromDisk.toString()}).`
+        reloadFromDisk && resourceNames.length > 0
+          ? `Reloading ${
+              resourceNames.length
+            } resource(s) from disk for "${name}" (reason: ${reason}): ${resourceNames.join(
+              ', '
+            )}.`
+          : `Refreshing "${name}" renderers without reloading resources from disk (reason: ${reason}).`
       );
 
       // When reloading textures, there can be a short time during which
@@ -690,20 +700,17 @@ export default class SceneEditor extends React.Component<Props, State> {
         clear(project)
       );
 
-      console.info(
-        `Resetting instance renderers for objects using resources "${resourceNames.join(
-          ', '
-        )}": ${[...objectNames].join(', ')} (scene: "${name}").`
-      );
+      if (objectNames.size > 0) {
+        console.info(
+          `Resetting renderers of object(s) directly using these resources in "${name}": ${[
+            ...objectNames,
+          ].join(', ')}.`
+        );
+      }
       objectNames.forEach(objectName => {
         editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
       });
     } finally {
-      console.info(
-        `Starting scene rendering again after reloading resources "${resourceNames.join(
-          ', '
-        )}": (scene: "${name}").`
-      );
       editorDisplay.startSceneRendering(true, pauseReason);
     }
   };
@@ -2863,6 +2870,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
     const { editorDisplay } = this;
     if (editorDisplay) {
+      const resetObjectNames = [];
       projectScopedContainersAccessor.forEachObject(object => {
         if (
           shouldResetObjectRendererForCustomObjectChildrenEdit({
@@ -2872,11 +2880,19 @@ export default class SceneEditor extends React.Component<Props, State> {
             editedObject,
           })
         ) {
+          resetObjectNames.push(object.getName());
           editorDisplay.instancesHandlers.resetInstanceRenderersFor(
             object.getName()
           );
         }
       });
+      if (resetObjectNames.length > 0) {
+        console.info(
+          `Resetting renderers in "${this._getReloadContextName()}" of the edited object and objects including "${editedEventsBasedObject.getName()}": ${resetObjectNames.join(
+            ', '
+          )}.`
+        );
+      }
     }
   };
 

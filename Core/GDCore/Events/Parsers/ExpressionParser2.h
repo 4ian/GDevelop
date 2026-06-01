@@ -56,6 +56,13 @@ class GD_CORE_API ExpressionParser2 {
   std::unique_ptr<ExpressionNode> ParseExpression(
       const gd::String &expression_) {
     expression = expression_;
+    // Parse over a UTF-32 (fixed-width) copy of the expression: gd::String is
+    // UTF-8, so indexing it by character position (operator[]) and computing
+    // its size() are both O(position)/O(length). Doing that for every
+    // character would make parsing O(N^2) in the expression length (which is
+    // catastrophic for very large expressions). std::u32string gives O(1)
+    // random access and size.
+    expressionUtf32 = expression_.ToUTF32();
 
     currentPosition = 0;
     return Start();
@@ -588,8 +595,8 @@ class GD_CORE_API ExpressionParser2 {
   }
 
   void SkipAllWhitespaces() {
-    while (currentPosition < expression.size() &&
-           IsWhitespace(expression[currentPosition])) {
+    while (currentPosition < expressionUtf32.size() &&
+           IsWhitespace(expressionUtf32[currentPosition])) {
       currentPosition++;
     }
   }
@@ -614,8 +621,8 @@ class GD_CORE_API ExpressionParser2 {
 
   bool CheckIfChar(
       const std::function<bool(gd::String::value_type)> &predicate) {
-    if (currentPosition >= expression.size()) return false;
-    gd::String::value_type character = expression[currentPosition];
+    if (currentPosition >= expressionUtf32.size()) return false;
+    gd::String::value_type character = expressionUtf32[currentPosition];
 
     return predicate(character);
   }
@@ -623,12 +630,13 @@ class GD_CORE_API ExpressionParser2 {
   bool IsNamespaceSeparator() {
     // Namespace separator is a special kind of delimiter as it is 2 characters
     // long
-    return (currentPosition + NAMESPACE_SEPARATOR.size() <= expression.size() &&
-            expression.substr(currentPosition, NAMESPACE_SEPARATOR.size()) ==
-                NAMESPACE_SEPARATOR);
+    const std::u32string separator = NAMESPACE_SEPARATOR.ToUTF32();
+    return (currentPosition + separator.size() <= expressionUtf32.size() &&
+            expressionUtf32.compare(
+                currentPosition, separator.size(), separator) == 0);
   }
 
-  bool IsEndReached() { return currentPosition >= expression.size(); }
+  bool IsEndReached() { return currentPosition >= expressionUtf32.size(); }
 
   // A temporary node used when reading an identifier
   struct IdentifierAndLocation {
@@ -639,11 +647,11 @@ class GD_CORE_API ExpressionParser2 {
   IdentifierAndLocation ReadIdentifierName(bool allowDeprecatedSpacesInName = true) {
     gd::String name;
     size_t startPosition = currentPosition;
-    while (currentPosition < expression.size() &&
+    while (currentPosition < expressionUtf32.size() &&
            (CheckIfChar(IsAllowedInIdentifier)
             // Allow whitespace in identifier name for compatibility
-            || (allowDeprecatedSpacesInName && expression[currentPosition] == ' '))) {
-      name += expression[currentPosition];
+            || (allowDeprecatedSpacesInName && expressionUtf32[currentPosition] == ' '))) {
+      name += expressionUtf32[currentPosition];
       currentPosition++;
     }
 
@@ -676,9 +684,9 @@ class GD_CORE_API ExpressionParser2 {
   std::unique_ptr<EmptyNode> ReadUntilWhitespace() {
     size_t startPosition = GetCurrentPosition();
     gd::String text;
-    while (currentPosition < expression.size() &&
-           !IsWhitespace(expression[currentPosition])) {
-      text += expression[currentPosition];
+    while (currentPosition < expressionUtf32.size() &&
+           !IsWhitespace(expressionUtf32[currentPosition])) {
+      text += expressionUtf32[currentPosition];
       currentPosition++;
     }
 
@@ -691,8 +699,8 @@ class GD_CORE_API ExpressionParser2 {
   std::unique_ptr<EmptyNode> ReadUntilEnd() {
     size_t startPosition = GetCurrentPosition();
     gd::String text;
-    while (currentPosition < expression.size()) {
-      text += expression[currentPosition];
+    while (currentPosition < expressionUtf32.size()) {
+      text += expressionUtf32[currentPosition];
       currentPosition++;
     }
 
@@ -705,8 +713,8 @@ class GD_CORE_API ExpressionParser2 {
   size_t GetCurrentPosition() { return currentPosition; }
 
   gd::String::value_type GetCurrentChar() {
-    if (currentPosition < expression.size()) {
-      return expression[currentPosition];
+    if (currentPosition < expressionUtf32.size()) {
+      return expressionUtf32[currentPosition];
     }
 
     return '\n';  // Should not arise, unless GetCurrentChar was called when
@@ -734,6 +742,8 @@ class GD_CORE_API ExpressionParser2 {
   ///@}
 
   gd::String expression;
+  // UTF-32 view of `expression`, used for O(1) character access during parsing.
+  std::u32string expressionUtf32;
   std::size_t currentPosition;
 
   static gd::String NAMESPACE_SEPARATOR;

@@ -299,6 +299,47 @@
   color: var(--event-sheet-instruction-parameter-warning-color);
 }
 
+.events-graph-preview-related-comments {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2px 0 4px 30px;
+}
+
+.events-graph-preview-related-comment {
+  width: 100%;
+  min-height: 24px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 4px;
+  padding: 3px 5px;
+  background: color-mix(
+    in srgb,
+    var(--event-sheet-conditions-background-color) 52%,
+    transparent
+  );
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  line-height: 17px;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.events-graph-preview-related-comment:hover {
+  background: var(--event-sheet-selectable-background-color);
+}
+
+.events-graph-preview-related-comment-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--event-sheet-actions-color);
+}
+
 .events-graph-preview-details {
   flex: 0 0 auto;
   max-height: 132px;

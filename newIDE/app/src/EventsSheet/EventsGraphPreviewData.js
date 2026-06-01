@@ -24,6 +24,7 @@ export type EventsGraphPreviewEventItem = {|
   isInvalidElse: boolean,
   elseOfPathString: ?string,
   conditionLines: Array<string>,
+  relatedCommentLines: Array<string>,
   children: Array<EventsGraphPreviewItem>,
   eventContext: EventContext,
 |};
@@ -39,6 +40,7 @@ export type EventsGraphPreviewGroupItem = {|
   colorIndex: number,
   disabled: boolean,
   disabledBecauseOfAncestor: boolean,
+  relatedCommentLines: Array<string>,
   children: Array<EventsGraphPreviewItem>,
   eventContext: EventContext,
 |};
@@ -56,7 +58,9 @@ const getDisplayPath = (path: Array<number>): string =>
 const getGroupColorIndex = (path: Array<number>): number =>
   path.reduce((seed, index) => seed * 31 + index + 1, 0) % 6;
 
-const getConditionMetadata = (instruction: gdInstruction): gdInstructionMetadata =>
+const getConditionMetadata = (
+  instruction: gdInstruction
+): gdInstructionMetadata =>
   gd.MetadataProvider.getConditionMetadata(
     gd.JsPlatform.get(),
     instruction.getType()
@@ -80,10 +84,7 @@ const renderConditionLines = (
 
     if (metadata.canHaveSubInstructions()) {
       lines.push(
-        ...renderConditionLines(
-          instruction.getSubInstructions(),
-          `${prefix}  `
-        )
+        ...renderConditionLines(instruction.getSubInstructions(), `${prefix}  `)
       );
     }
   }
@@ -123,7 +124,9 @@ const summarizeConditionLine = (line: string): string => {
     );
     const keyPressedMatch = conditionLine.match(/^(.+) key is pressed$/);
     const fallingMatch = conditionLine.match(/^(.+) is falling$/);
-    const collisionMatch = conditionLine.match(/^(.+) is in collision with (.+)$/);
+    const collisionMatch = conditionLine.match(
+      /^(.+) is in collision with (.+)$/
+    );
 
     if (touchStartedMatch) {
       summary = `${touchStartedMatch[1]} touch started`;
@@ -154,7 +157,12 @@ const normalizeCatalogSearchText = (text: string): string =>
     .replace(/\s+/g, ' ')
     .toLowerCase();
 
-const getItemSearchText = (item: EventsGraphPreviewItem): string => {
+const normalizeCatalogCommentText = (text: string): string =>
+  text.trim().replace(/\s+/g, ' ');
+
+const getItemSearchTextWithoutComments = (
+  item: EventsGraphPreviewItem
+): string => {
   if (item.itemType === 'group') {
     return normalizeCatalogSearchText(
       [item.displayPath, item.title, item.typeLabel].join(' ')
@@ -172,6 +180,24 @@ const getItemSearchText = (item: EventsGraphPreviewItem): string => {
   );
 };
 
+const getMatchingRelatedCommentLines = (
+  item: EventsGraphPreviewItem,
+  query: string
+): Array<string> =>
+  item.relatedCommentLines.filter(
+    commentLine => normalizeCatalogSearchText(commentLine).indexOf(query) !== -1
+  );
+
+const keepOnlyMatchingRelatedCommentLines = (
+  items: Array<EventsGraphPreviewItem>,
+  query: string
+): Array<EventsGraphPreviewItem> =>
+  items.map(item => ({
+    ...item,
+    relatedCommentLines: getMatchingRelatedCommentLines(item, query),
+    children: keepOnlyMatchingRelatedCommentLines(item.children, query),
+  }));
+
 export const filterEventsGraphPreviewItemsBySearch = (
   items: Array<EventsGraphPreviewItem>,
   searchText: string
@@ -181,17 +207,39 @@ export const filterEventsGraphPreviewItemsBySearch = (
 
   const filteredItems = [];
   items.forEach(item => {
-    if (getItemSearchText(item).indexOf(query) !== -1) {
-      filteredItems.push(item);
-      return;
-    }
-
+    const matchingRelatedCommentLines = getMatchingRelatedCommentLines(
+      item,
+      query
+    );
     const filteredChildren = filterEventsGraphPreviewItemsBySearch(
       item.children,
       query
     );
+
+    if (getItemSearchTextWithoutComments(item).indexOf(query) !== -1) {
+      filteredItems.push({
+        ...item,
+        relatedCommentLines: matchingRelatedCommentLines,
+        children: keepOnlyMatchingRelatedCommentLines(item.children, query),
+      });
+      return;
+    }
+
+    if (matchingRelatedCommentLines.length > 0) {
+      filteredItems.push({
+        ...item,
+        relatedCommentLines: matchingRelatedCommentLines,
+        children: filteredChildren,
+      });
+      return;
+    }
+
     if (filteredChildren.length > 0) {
-      filteredItems.push({ ...item, children: filteredChildren });
+      filteredItems.push({
+        ...item,
+        relatedCommentLines: [],
+        children: filteredChildren,
+      });
     }
   });
 
@@ -338,11 +386,33 @@ export const buildEventsGraphPreviewItems = ({
 |}): Array<EventsGraphPreviewItem> => {
   const items: Array<EventsGraphPreviewItem> = [];
   let visibleIndex = 0;
+  let pendingRelatedCommentLines: Array<string> = [];
+
+  const attachPendingComments = (
+    item: EventsGraphPreviewItem
+  ): EventsGraphPreviewItem => {
+    if (pendingRelatedCommentLines.length === 0) {
+      return item;
+    }
+
+    const itemWithRelatedComments = {
+      ...item,
+      relatedCommentLines: pendingRelatedCommentLines,
+    };
+    pendingRelatedCommentLines = [];
+    return itemWithRelatedComments;
+  };
 
   for (let index = 0; index < eventsList.getEventsCount(); index++) {
     const event = eventsList.getEventAt(index);
     const eventType = event.getType();
     if (eventType === 'BuiltinCommonInstructions::Comment') {
+      const commentText = normalizeCatalogCommentText(
+        gd.asCommentEvent(event).getComment()
+      );
+      if (commentText) {
+        pendingRelatedCommentLines.push(commentText);
+      }
       continue;
     }
 
@@ -375,20 +445,23 @@ export const buildEventsGraphPreviewItems = ({
 
     if (eventType === 'BuiltinCommonInstructions::Group') {
       const groupEvent = gd.asGroupEvent(event);
-      items.push({
-        itemType: 'group',
-        id: `group-${pathString}`,
-        path,
-        pathString,
-        displayPath,
-        title: groupEvent.getName() || 'Group',
-        typeLabel: 'Group',
-        colorIndex: getGroupColorIndex(path),
-        disabled: event.isDisabled(),
-        disabledBecauseOfAncestor,
-        children: childItems,
-        eventContext,
-      });
+      items.push(
+        attachPendingComments({
+          itemType: 'group',
+          id: `group-${pathString}`,
+          path,
+          pathString,
+          displayPath,
+          title: groupEvent.getName() || 'Group',
+          typeLabel: 'Group',
+          colorIndex: getGroupColorIndex(path),
+          disabled: event.isDisabled(),
+          disabledBecauseOfAncestor,
+          relatedCommentLines: [],
+          children: childItems,
+          eventContext,
+        })
+      );
       visibleIndex++;
       continue;
     }
@@ -404,19 +477,33 @@ export const buildEventsGraphPreviewItems = ({
       continue;
     }
 
-    items.push({
-      itemType: 'event',
-      id: `event-${pathString}`,
-      path,
-      pathString,
-      displayPath,
-      disabled: event.isDisabled(),
-      disabledBecauseOfAncestor,
-      children: childItems,
-      eventContext,
-      ...details,
-    });
+    items.push(
+      attachPendingComments({
+        itemType: 'event',
+        id: `event-${pathString}`,
+        path,
+        pathString,
+        displayPath,
+        disabled: event.isDisabled(),
+        disabledBecauseOfAncestor,
+        relatedCommentLines: [],
+        children: childItems,
+        eventContext,
+        ...details,
+      })
+    );
     visibleIndex++;
+  }
+
+  if (pendingRelatedCommentLines.length > 0 && items.length > 0) {
+    const lastItemIndex = items.length - 1;
+    const lastItem = items[lastItemIndex];
+    items[lastItemIndex] = {
+      ...lastItem,
+      relatedCommentLines: lastItem.relatedCommentLines.concat(
+        pendingRelatedCommentLines
+      ),
+    };
   }
 
   return items;

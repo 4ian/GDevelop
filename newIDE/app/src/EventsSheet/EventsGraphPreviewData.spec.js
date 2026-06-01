@@ -362,9 +362,9 @@ describe('EventsSheet/EventsGraphPreviewData', () => {
         'falling'
       );
       expect(conditionMatches.map(item => item.pathString)).toEqual(['0']);
-      expect(conditionMatches[0].children.map(item => item.pathString)).toEqual([
-        '0.0',
-      ]);
+      expect(conditionMatches[0].children.map(item => item.pathString)).toEqual(
+        ['0.0']
+      );
 
       const eventMatches = filterEventsGraphPreviewItemsBySearch(
         items,
@@ -376,6 +376,90 @@ describe('EventsSheet/EventsGraphPreviewData', () => {
       ]);
 
       expect(filterEventsGraphPreviewItemsBySearch(items, '   ')).toBe(items);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('searches hidden comments and shows them below the nearest visible catalog item', () => {
+    const {
+      project,
+      testSceneProjectScopedContainersAccessor,
+    } = makeTestProject(gd);
+    try {
+      const eventsList = makeEventsList(project, [
+        {
+          type: 'BuiltinCommonInstructions::Comment',
+          comment: 'Keyboard movement note',
+        },
+        {
+          type: 'BuiltinCommonInstructions::Group',
+          name: 'Player controls',
+          events: [
+            {
+              type: 'BuiltinCommonInstructions::Comment',
+              comment: 'Nested unrelated note',
+            },
+            {
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [],
+            },
+          ],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Comment',
+          comment: 'Cleanup trailing note',
+        },
+      ]);
+      const items = buildEventsGraphPreviewItems({
+        eventsList,
+        projectScopedContainersAccessor: testSceneProjectScopedContainersAccessor,
+      });
+
+      expect(items.map(item => item.pathString)).toEqual(['1', '2']);
+      expect(getGroupItem(items, 0).relatedCommentLines).toEqual([
+        'Keyboard movement note',
+      ]);
+      expect(getEventItem(items, 1).relatedCommentLines).toEqual([
+        'Cleanup trailing note',
+      ]);
+
+      const commentMatches = filterEventsGraphPreviewItemsBySearch(
+        items,
+        'movement'
+      );
+      expect(commentMatches.map(item => item.pathString)).toEqual(['1']);
+      expect(getGroupItem(commentMatches, 0).relatedCommentLines).toEqual([
+        'Keyboard movement note',
+      ]);
+
+      const trailingCommentMatches = filterEventsGraphPreviewItemsBySearch(
+        items,
+        'cleanup'
+      );
+      expect(trailingCommentMatches.map(item => item.pathString)).toEqual([
+        '2',
+      ]);
+      expect(
+        getEventItem(trailingCommentMatches, 0).relatedCommentLines
+      ).toEqual(['Cleanup trailing note']);
+
+      const titleMatches = filterEventsGraphPreviewItemsBySearch(
+        items,
+        'player'
+      );
+      expect(titleMatches.map(item => item.pathString)).toEqual(['1']);
+      expect(getGroupItem(titleMatches, 0).relatedCommentLines).toEqual([]);
+      expect(
+        getEventItem(getGroupItem(titleMatches, 0).children, 0)
+          .relatedCommentLines
+      ).toEqual([]);
     } finally {
       project.delete();
     }

@@ -158,9 +158,7 @@ const GroupRow = ({
       >
         <span className="events-graph-preview-path">{item.displayPath}</span>
         <span className="events-graph-preview-kind">G</span>
-        <span className="events-graph-preview-summary-title">
-          {item.title}
-        </span>
+        <span className="events-graph-preview-summary-title">{item.title}</span>
         <span className="events-graph-preview-child-count">
           {getChildItemsCount(item)}
         </span>
@@ -178,12 +176,44 @@ const GroupRow = ({
   );
 };
 
+const RelatedComments = ({
+  item,
+  onSelectEvent,
+}: {|
+  item: EventsGraphPreviewItem,
+  onSelectEvent: EventContext => void,
+|}) => {
+  if (item.relatedCommentLines.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="events-graph-preview-related-comments">
+      {item.relatedCommentLines.map((commentLine, index) => (
+        <button
+          type="button"
+          className="events-graph-preview-related-comment"
+          key={`${item.id}-comment-${index}`}
+          onClick={() => onSelectEvent(item.eventContext)}
+          title={commentLine}
+        >
+          <span className="events-graph-preview-details-label">Comment</span>
+          <span className="events-graph-preview-related-comment-text">
+            {commentLine}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+};
+
 type TreeItemProps = {|
   item: EventsGraphPreviewItem,
   selection: SelectionState,
   onSelectEvent: EventContext => void,
   collapsedGroupPaths: Set<string>,
   onToggleGroup: string => void,
+  showRelatedComments: boolean,
 |};
 
 const TreeItem: React.ComponentType<TreeItemProps> = ({
@@ -192,6 +222,7 @@ const TreeItem: React.ComponentType<TreeItemProps> = ({
   onSelectEvent,
   collapsedGroupPaths,
   onToggleGroup,
+  showRelatedComments,
 }: TreeItemProps) => {
   if (item.itemType === 'group') {
     const isExpanded = !collapsedGroupPaths.has(item.pathString);
@@ -210,6 +241,9 @@ const TreeItem: React.ComponentType<TreeItemProps> = ({
           isExpanded={isExpanded}
           onToggleExpanded={() => onToggleGroup(item.pathString)}
         />
+        {showRelatedComments && (
+          <RelatedComments item={item} onSelectEvent={onSelectEvent} />
+        )}
         {isExpanded && item.children.length > 0 && (
           <ol className="events-graph-preview-map-children">
             {item.children.map(child => (
@@ -220,6 +254,7 @@ const TreeItem: React.ComponentType<TreeItemProps> = ({
                 onSelectEvent={onSelectEvent}
                 collapsedGroupPaths={collapsedGroupPaths}
                 onToggleGroup={onToggleGroup}
+                showRelatedComments={showRelatedComments}
               />
             ))}
           </ol>
@@ -235,6 +270,9 @@ const TreeItem: React.ComponentType<TreeItemProps> = ({
         selection={selection}
         onSelectEvent={onSelectEvent}
       />
+      {showRelatedComments && (
+        <RelatedComments item={item} onSelectEvent={onSelectEvent} />
+      )}
       {item.children.length > 0 && (
         <ol className="events-graph-preview-map-children">
           {item.children.map(child => (
@@ -245,6 +283,7 @@ const TreeItem: React.ComponentType<TreeItemProps> = ({
               onSelectEvent={onSelectEvent}
               collapsedGroupPaths={collapsedGroupPaths}
               onToggleGroup={onToggleGroup}
+              showRelatedComments={showRelatedComments}
             />
           ))}
         </ol>
@@ -253,11 +292,7 @@ const TreeItem: React.ComponentType<TreeItemProps> = ({
   );
 };
 
-const DetailsPane = ({
-  item,
-}: {|
-  item: ?EventsGraphPreviewItem,
-|}) => {
+const DetailsPane = ({ item }: {| item: ?EventsGraphPreviewItem |}) => {
   if (!item) {
     return (
       <div className="events-graph-preview-details empty">
@@ -424,6 +459,7 @@ export default function EventsGraphPreviewPanel({
                 onSelectEvent={onSelectEvent}
                 collapsedGroupPaths={collapsedGroupPaths}
                 onToggleGroup={toggleGroup}
+                showRelatedComments={isSearching}
               />
             ))}
           </ol>

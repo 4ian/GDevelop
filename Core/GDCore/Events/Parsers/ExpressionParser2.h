@@ -7,6 +7,7 @@
 #define GDCORE_EXPRESSIONPARSER2_H
 
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -55,7 +56,6 @@ class GD_CORE_API ExpressionParser2 {
    */
   std::unique_ptr<ExpressionNode> ParseExpression(
       const gd::String &expression_) {
-    expression = expression_;
     // Parse over a UTF-32 (fixed-width) copy of the expression: gd::String is
     // UTF-8, so indexing it by character position (operator[]) and computing
     // its size() are both O(position)/O(length). Doing that for every
@@ -741,8 +741,8 @@ class GD_CORE_API ExpressionParser2 {
   }
   ///@}
 
-  gd::String expression;
-  // UTF-32 view of `expression`, used for O(1) character access during parsing.
+  // UTF-32 copy of the expression, used for O(1) character access during
+  // parsing.
   std::u32string expressionUtf32;
   std::size_t currentPosition;
 

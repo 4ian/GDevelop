@@ -1,11 +1,7 @@
 // @flow
 import newNameGenerator from '../Utils/NewNameGenerator';
 import optionalRequire from '../Utils/OptionalRequire';
-import {
-  applyResourceDefaults,
-  copyAllToProjectFolder,
-  isPathInProjectFolder,
-} from '../ResourcesList/ResourceUtils';
+import { applyResourceDefaults } from '../ResourcesList/ResourceUtils';
 
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
@@ -15,6 +11,7 @@ const electronClipboard = electron ? electron.clipboard : null;
 const electronWebUtils = electron ? electron.webUtils : null;
 
 const supportedImageExtensions = ['.png', '.jpg', '.jpeg', '.webp'];
+const assetsFolderName = 'assets';
 
 const getProjectFolder = (project: gdProject): string => {
   if (!path) throw new Error('Path module is not available.');
@@ -25,6 +22,34 @@ const getProjectFolder = (project: gdProject): string => {
     );
   }
   return path.dirname(projectFile);
+};
+
+const getAssetsFolder = (project: gdProject): string => {
+  if (!path) throw new Error('Path module is not available.');
+  return path.join(getProjectFolder(project), assetsFolderName);
+};
+
+const ensureAssetsFolderExists = (project: gdProject): string => {
+  if (!fs) throw new Error('File system is not available.');
+  const assetsFolder = getAssetsFolder(project);
+  fs.mkdirSync(assetsFolder, { recursive: true });
+  return assetsFolder;
+};
+
+const isPathInAssetsFolder = (
+  project: gdProject,
+  filePath: string
+): boolean => {
+  if (!path) throw new Error('Path module is not available.');
+  const assetsFolder = path.resolve(getAssetsFolder(project));
+  const resolvedFilePath = path.resolve(filePath);
+  const relativeFilePath = path.relative(assetsFolder, resolvedFilePath);
+  return (
+    relativeFilePath === '' ||
+    (!!relativeFilePath &&
+      !relativeFilePath.startsWith('..') &&
+      !path.isAbsolute(relativeFilePath))
+  );
 };
 
 export const isSupportedImageFilePath = (filePath: string): boolean => {
@@ -85,12 +110,11 @@ const getUniqueProjectFilePath = ({
   extension: string,
 |}): string => {
   if (!fs || !path) throw new Error('File system is not available.');
-  const projectFolder = getProjectFolder(project);
-  const safeBaseName = gd.Project.getSafeName(baseName) || baseName || 'Image';
-  const uniqueBaseName = newNameGenerator(safeBaseName, tentativeName =>
-    fs.existsSync(path.join(projectFolder, tentativeName + extension))
+  const assetsFolder = ensureAssetsFolderExists(project);
+  const uniqueBaseName = newNameGenerator(baseName || 'Image', tentativeName =>
+    fs.existsSync(path.join(assetsFolder, tentativeName + extension))
   );
-  return path.join(projectFolder, uniqueBaseName + extension);
+  return path.join(assetsFolder, uniqueBaseName + extension);
 };
 
 export const writeClipboardImageToProjectFolder = ({
@@ -186,22 +210,29 @@ const addImageResource = ({
   return resourceName;
 };
 
-export const ensureImageFileIsInProjectFolder = async ({
+const ensureImageFileIsInAssetsFolder = async ({
   project,
   imageFilePath,
 }: {|
   project: gdProject,
   imageFilePath: string,
 |}): Promise<string> => {
-  if (isPathInProjectFolder(project, imageFilePath)) return imageFilePath;
+  if (!fs || !path) throw new Error('File system is not available.');
+  if (isPathInAssetsFolder(project, imageFilePath)) return imageFilePath;
 
-  const newToOldFilePaths: Map<string, string> = new Map();
-  const copiedFilePaths = await copyAllToProjectFolder(
+  const extension = path.extname(imageFilePath);
+  const imageFilePathInAssetsFolder = getUniqueProjectFilePath({
     project,
-    [imageFilePath],
-    newToOldFilePaths
-  );
-  return copiedFilePaths[0] || imageFilePath;
+    baseName: path.basename(imageFilePath, extension),
+    extension,
+  });
+
+  return new Promise((resolve, reject) => {
+    fs.copyFile(imageFilePath, imageFilePathInAssetsFolder, error => {
+      if (error) return reject(error);
+      resolve(imageFilePathInAssetsFolder);
+    });
+  });
 };
 
 export const createSpriteObjectFromImageFile = async ({
@@ -213,7 +244,7 @@ export const createSpriteObjectFromImageFile = async ({
   objectsContainer: gdObjectsContainer,
   imageFilePath: string,
 |}): Promise<gdObject> => {
-  const localImageFilePath = await ensureImageFileIsInProjectFolder({
+  const localImageFilePath = await ensureImageFileIsInAssetsFolder({
     project,
     imageFilePath,
   });

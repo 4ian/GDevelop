@@ -46,11 +46,16 @@ describe('CreateSpriteFromImage', () => {
     });
 
     expect(object.getName()).toBe('Hero_Ship');
-    expect(project.getResourcesManager().hasResource('Hero Ship.png')).toBe(
+    expect(
+      project.getResourcesManager().hasResource('assets/Hero Ship.png')
+    ).toBe(true);
+    const resource = project
+      .getResourcesManager()
+      .getResource('assets/Hero Ship.png');
+    expect(resource.getFile()).toBe('assets/Hero Ship.png');
+    expect(fs.existsSync(path.join(folder, 'assets', 'Hero Ship.png'))).toBe(
       true
     );
-    const resource = project.getResourcesManager().getResource('Hero Ship.png');
-    expect(resource.getFile()).toBe('Hero Ship.png');
     expect(
       gd
         .asSpriteConfiguration(object.getConfiguration())
@@ -59,7 +64,7 @@ describe('CreateSpriteFromImage', () => {
         .getDirection(0)
         .getSprite(0)
         .getImageName()
-    ).toBe('Hero Ship.png');
+    ).toBe('assets/Hero Ship.png');
   });
 
   test('creates unique resource and object names', async () => {
@@ -80,10 +85,12 @@ describe('CreateSpriteFromImage', () => {
     });
 
     expect(secondObject.getName()).toBe('Hero2');
-    expect(project.getResourcesManager().hasResource('Hero2.png')).toBe(true);
+    expect(project.getResourcesManager().hasResource('assets/Hero2.png')).toBe(
+      true
+    );
   });
 
-  test('writes clipboard image data to a unique project-local PNG', () => {
+  test('writes clipboard image data to a unique asset PNG', () => {
     const { folder, project } = makeProjectInTempFolder();
     const firstPath = writeClipboardImageToProjectFolder({
       project,
@@ -98,7 +105,7 @@ describe('CreateSpriteFromImage', () => {
     expect(path.basename(secondPath)).toBe('PastedImage2.png');
     expect(fs.readFileSync(firstPath).toString()).toBe('first');
     expect(fs.readFileSync(secondPath).toString()).toBe('second');
-    expect(path.dirname(firstPath)).toBe(folder);
+    expect(path.dirname(firstPath)).toBe(path.join(folder, 'assets'));
   });
 
   test('extracts supported local file paths from a native drop data transfer', () => {

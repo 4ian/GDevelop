@@ -63,11 +63,16 @@ export const getDefaultAiConfigurationPresetId = (
   );
 };
 
+// A preset with a credit multiplier of 0 is "free": it costs no credits and
+// is usable by everyone. Relying on the multiplier (from the AI settings)
+// means future free presets are detected without hardcoding their ids.
+const isFreePreset = (
+  preset: ?AiConfigurationPresetWithAvailability
+): boolean => !!preset && preset.creditsMultiplier === 0;
+
 /**
  * Whether the given preset (identified by id + mode) is a "free" preset
- * (costs no credits, usable by everyone). Relies on the `isFree` flag from
- * the AI settings, so future free presets are detected without hardcoding
- * their ids.
+ * (costs no credits, usable by everyone).
  */
 export const getIsFreeAiConfigurationPreset = ({
   presetId,
@@ -79,10 +84,11 @@ export const getIsFreeAiConfigurationPreset = ({
   aiConfigurationPresetsWithAvailability: Array<AiConfigurationPresetWithAvailability>,
 |}): boolean => {
   if (!presetId) return false;
-  const preset = aiConfigurationPresetsWithAvailability.find(
-    preset => preset.id === presetId && preset.mode === mode
+  return isFreePreset(
+    aiConfigurationPresetsWithAvailability.find(
+      preset => preset.id === presetId && preset.mode === mode
+    )
   );
-  return !!(preset && preset.isFree);
 };
 
 /**
@@ -94,7 +100,7 @@ export const getFirstFreeAiConfigurationPresetId = (
   aiConfigurationPresetsWithAvailability: Array<AiConfigurationPresetWithAvailability>
 ): string | null => {
   const freePreset = aiConfigurationPresetsWithAvailability.find(
-    preset => preset.mode === mode && preset.isFree && !preset.disabled
+    preset => preset.mode === mode && isFreePreset(preset) && !preset.disabled
   );
   return freePreset ? freePreset.id : null;
 };

@@ -53,6 +53,7 @@ import {
   type TileMapTileSelection,
   getTileMapPaintingSelection,
 } from './TileSetVisualizer';
+import { getImageFilePathsFromDataTransfer } from '../SceneEditor/CreateSpriteFromImage';
 import ClickInterceptor from './ClickInterceptor';
 import getObjectByName from '../Utils/GetObjectByName';
 import { AffineTransformation } from '../Utils/AffineTransformation';
@@ -117,6 +118,10 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   onInstancesMoved: (instances: Array<gdInitialInstance>) => void,
   onInstancesResized: (instances: Array<gdInitialInstance>) => void,
   onInstancesRotated: (instances: Array<gdInitialInstance>) => void,
+  onImageFilesDropped?: (
+    imageFilePaths: Array<string>,
+    position: [number, number]
+  ) => void | Promise<void>,
   selectedObjectNames: Array<string>,
   onContextMenu: (
     x: number,
@@ -857,6 +862,58 @@ export default class InstancesEditor extends Component<Props, State> {
     layer: string
   ): Array<gdInitialInstance> => {
     return this._instancesAdder.addInstances(pos, objectNames, layer);
+  };
+
+  _getSceneCoordinatesFromClientPosition = (
+    clientX: number,
+    clientY: number
+  ): ?[number, number] => {
+    const { viewPosition, canvasArea } = this;
+    if (!canvasArea || !viewPosition) return null;
+    const canvasRect = canvasArea.getBoundingClientRect();
+    return viewPosition.toSceneCoordinates(
+      clientX - canvasRect.left,
+      clientY - canvasRect.top
+    );
+  };
+
+  _hasNativeFiles = (event: DragEvent): boolean => {
+    const { dataTransfer } = event;
+    if (!dataTransfer) return false;
+    return Array.from(dataTransfer.types || []).includes('Files');
+  };
+
+  _onNativeDragOver = (event: DragEvent) => {
+    if (!this._hasNativeFiles(event)) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy';
+    }
+  };
+
+  _onNativeDrop = (event: DragEvent) => {
+    if (!this._hasNativeFiles(event)) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const { onImageFilesDropped } = this.props;
+    if (!onImageFilesDropped) return;
+
+    const imageFilePaths = getImageFilePathsFromDataTransfer(
+      event.dataTransfer
+    );
+    if (!imageFilePaths.length) return;
+
+    const position = this._getSceneCoordinatesFromClientPosition(
+      event.clientX,
+      event.clientY
+    );
+    if (!position) return;
+
+    onImageFilesDropped(imageFilePaths, position);
   };
 
   _onMouseMove = (x: number, y: number) => {
@@ -1926,6 +1983,8 @@ export default class InstancesEditor extends Component<Props, State> {
               ref={canvasArea => (this.canvasArea = canvasArea)}
               style={styles.canvasArea}
               id={instancesEditorId}
+              onDragOver={this._onNativeDragOver}
+              onDrop={this._onNativeDrop}
             />
           );
         }}

@@ -35,6 +35,20 @@ export const getSupportedImageFilePaths = (
   filePaths: Array<string>
 ): Array<string> => filePaths.filter(isSupportedImageFilePath);
 
+export const getImageFilePathsFromDataTransfer = (
+  dataTransfer: ?DataTransfer | any
+): Array<string> => {
+  if (!dataTransfer || !dataTransfer.files) return [];
+  const filePaths = [];
+  for (let i = 0; i < dataTransfer.files.length; i++) {
+    const file = dataTransfer.files[i];
+    if (file && typeof file.path === 'string') {
+      filePaths.push(file.path);
+    }
+  }
+  return getSupportedImageFilePaths(filePaths);
+};
+
 const getSafeObjectBaseName = (imageFilePath: string): string => {
   if (!path) return 'Sprite';
   const extension = path.extname(imageFilePath);

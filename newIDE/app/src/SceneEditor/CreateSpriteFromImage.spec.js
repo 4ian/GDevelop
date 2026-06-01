@@ -4,6 +4,7 @@ import os from 'os';
 import path from 'path';
 import {
   createSpriteObjectFromImageFile,
+  getImageFilePathsFromDataTransfer,
   getSupportedImageFilePaths,
   writeClipboardImageToProjectFolder,
 } from './CreateSpriteFromImage';
@@ -97,5 +98,21 @@ describe('CreateSpriteFromImage', () => {
     expect(fs.readFileSync(firstPath).toString()).toBe('first');
     expect(fs.readFileSync(secondPath).toString()).toBe('second');
     expect(path.dirname(firstPath)).toBe(folder);
+  });
+
+  test('extracts supported local file paths from a native drop data transfer', () => {
+    const dataTransfer = {
+      files: [
+        { path: 'C:\\project\\Hero.png' },
+        { path: 'C:\\project\\readme.txt' },
+        { path: 'C:\\project\\Enemy.webp' },
+        { name: 'browser-file-without-local-path.png' },
+      ],
+    };
+
+    expect(getImageFilePathsFromDataTransfer(dataTransfer)).toEqual([
+      'C:\\project\\Hero.png',
+      'C:\\project\\Enemy.webp',
+    ]);
   });
 });

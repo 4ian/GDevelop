@@ -373,9 +373,8 @@ export const getAiRequestStatuses = async (
       },
     }
   );
-  const data = response.data || {};
   return ensureIsArray({
-    data: data.aiRequestStatuses,
+    data: response.data,
     endpointName: '/ai-request?ids=...&include=status of Generation API',
   });
 };

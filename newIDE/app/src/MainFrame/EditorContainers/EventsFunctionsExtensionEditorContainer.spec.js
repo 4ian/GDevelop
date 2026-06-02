@@ -35,4 +35,30 @@ describe('EventsFunctionsExtensionEditorContainer', () => {
 
     expect(container.getEditorSelectionSnapshot()).toBe(snapshot);
   });
+
+  it('forwards matching extension function event modifications to the inner editor', () => {
+    const changes: any = {
+      extensionName: 'McpExt',
+      parentKind: 'extension',
+      parentName: null,
+      functionName: 'SetPower',
+      newOrChangedAiGeneratedEventIds: new Set<string>(),
+    };
+    const container = new EventsFunctionsExtensionEditorContainer(
+      (({
+        project: {},
+        projectItemName: 'McpExt',
+      }: any): any)
+    );
+    const onExtensionFunctionEventsModifiedOutsideEditor: any = jest.fn();
+    container.editor = ({
+      onExtensionFunctionEventsModifiedOutsideEditor,
+    }: any);
+
+    container.onExtensionFunctionEventsModifiedOutsideEditor(changes);
+
+    expect(onExtensionFunctionEventsModifiedOutsideEditor).toHaveBeenCalledWith(
+      changes
+    );
+  });
 });

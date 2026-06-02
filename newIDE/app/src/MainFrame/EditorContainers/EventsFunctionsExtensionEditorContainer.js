@@ -6,6 +6,7 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
+  type ExtensionFunctionEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
@@ -107,6 +108,17 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
 
   onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
     // No thing to be done.
+  }
+
+  onExtensionFunctionEventsModifiedOutsideEditor(
+    changes: ExtensionFunctionEventsOutsideEditorChanges
+  ) {
+    if (this.getEventsFunctionsExtensionName() !== changes.extensionName) {
+      return;
+    }
+    if (this.editor) {
+      this.editor.onExtensionFunctionEventsModifiedOutsideEditor(changes);
+    }
   }
 
   notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {

@@ -74,6 +74,7 @@ type McpEditorBridgeContext = {|
   getEditorSelection?: () => Object,
   generateEvents?: Function,
   onSceneEventsModifiedOutsideEditor?: Function,
+  onExtensionFunctionEventsModifiedOutsideEditor?: Function,
   onInstancesModifiedOutsideEditor?: Function,
   onObjectsModifiedOutsideEditor?: Function,
   onObjectGroupsModifiedOutsideEditor?: Function,
@@ -658,6 +659,29 @@ const callMcpTool = async ({
     if (!project) return errorResult('No project opened.');
     try {
       const result = extensionWriteToolHandler(project, args || {});
+      if (
+        toolName === 'gdevelop_create_or_update_extension_function' &&
+        args &&
+        (typeof args.events_json === 'string' ||
+          (args.serialized_function &&
+            typeof args.serialized_function === 'object')) &&
+        context.onExtensionFunctionEventsModifiedOutsideEditor
+      ) {
+        context.onExtensionFunctionEventsModifiedOutsideEditor({
+          extensionName: args.extension_name,
+          parentKind: result.parentKind || args.parent_kind || 'extension',
+          parentName:
+            result.parentKind === 'extension' ||
+            args.parent_kind === 'extension'
+              ? null
+              : args.parent_name || null,
+          functionName:
+            result.function && result.function.name
+              ? result.function.name
+              : args.new_function_name || args.function_name,
+          newOrChangedAiGeneratedEventIds: new Set(),
+        });
+      }
       context.triggerUnsavedChanges();
       return textResult(result);
     } catch (error) {

@@ -43,6 +43,14 @@ export type SceneEventsOutsideEditorChanges = {|
   newOrChangedAiGeneratedEventIds: Set<string>,
 |};
 
+export type ExtensionFunctionEventsOutsideEditorChanges = {|
+  extensionName: string,
+  parentKind: 'extension' | 'behavior' | 'object',
+  parentName: string | null,
+  functionName: string,
+  newOrChangedAiGeneratedEventIds: Set<string>,
+|};
+
 export type InstancesOutsideEditorChanges = {|
   scene: gdLayout,
 |};

@@ -59,6 +59,14 @@ import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEdito
 
 const gd: libGDevelop = global.gd;
 
+type ExtensionFunctionEventsOutsideEditorChanges = {|
+  extensionName: string,
+  parentKind: 'extension' | 'behavior' | 'object',
+  parentName: string | null,
+  functionName: string,
+  newOrChangedAiGeneratedEventIds: Set<string>,
+|};
+
 export type ExtensionItemConfigurationAttribute =
   | 'type'
   | 'isPrivate'
@@ -316,6 +324,47 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   selectAllEvents = () => {
     if (this.editor) {
       this.editor.selectAllEvents();
+    }
+  };
+
+  onExtensionFunctionEventsModifiedOutsideEditor = (
+    changes: ExtensionFunctionEventsOutsideEditorChanges
+  ) => {
+    const {
+      selectedEventsFunction,
+      selectedEventsBasedBehavior,
+      selectedEventsBasedObject,
+    } = this.state;
+
+    if (this.props.eventsFunctionsExtension.getName() !== changes.extensionName)
+      return;
+    if (
+      !selectedEventsFunction ||
+      selectedEventsFunction.getName() !== changes.functionName
+    )
+      return;
+
+    if (changes.parentKind === 'behavior') {
+      if (
+        !selectedEventsBasedBehavior ||
+        selectedEventsBasedBehavior.getName() !== changes.parentName
+      )
+        return;
+    } else if (changes.parentKind === 'object') {
+      if (
+        !selectedEventsBasedObject ||
+        selectedEventsBasedObject.getName() !== changes.parentName
+      )
+        return;
+    } else if (selectedEventsBasedBehavior || selectedEventsBasedObject) {
+      return;
+    }
+
+    if (this.editor) {
+      this.editor.onEventsModifiedOutsideEditor({
+        newOrChangedAiGeneratedEventIds:
+          changes.newOrChangedAiGeneratedEventIds,
+      });
     }
   };
 

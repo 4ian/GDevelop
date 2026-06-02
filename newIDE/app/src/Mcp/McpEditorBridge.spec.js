@@ -546,6 +546,55 @@ describe('McpEditorBridge', () => {
     }
   });
 
+  it('notifies opened extension editors when MCP replaces extension function events', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const extension = project.insertNewEventsFunctionsExtension('McpExt', 0);
+    extension
+      .getEventsFunctions()
+      .insertNewEventsFunction('SetPower', 0)
+      .setFunctionType('Action');
+    const onExtensionFunctionEventsModifiedOutsideEditor: any = jest.fn();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        onExtensionFunctionEventsModifiedOutsideEditor,
+      });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'SetPower',
+            function_type: 'action',
+            events_json:
+              '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]}]',
+          },
+        },
+      });
+
+      expect(response.isError).not.toBe(true);
+      expect(
+        onExtensionFunctionEventsModifiedOutsideEditor
+      ).toHaveBeenCalledWith({
+        extensionName: 'McpExt',
+        parentKind: 'extension',
+        parentName: null,
+        functionName: 'SetPower',
+        newOrChangedAiGeneratedEventIds: expect.any(Set),
+      });
+    } finally {
+      project.delete();
+    }
+  });
+
   it('blocks write tools when write permission is disabled', async () => {
     const bridge = makeBridge();
 

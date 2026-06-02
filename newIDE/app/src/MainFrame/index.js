@@ -72,6 +72,7 @@ import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/Glob
 import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
+  type ExtensionFunctionEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
@@ -3500,6 +3501,23 @@ const MainFrame = (props: Props): React.MixedElement => {
     [state.editorTabs]
   );
 
+  const onExtensionFunctionEventsModifiedOutsideEditor = React.useCallback(
+    (changes: ExtensionFunctionEventsOutsideEditorChanges) => {
+      for (const editor of getAllEditorTabs(state.editorTabs)) {
+        const { editorRef } = editor;
+        const editorRefAny: any = editorRef;
+        if (
+          editorRefAny &&
+          typeof editorRefAny.onExtensionFunctionEventsModifiedOutsideEditor ===
+            'function'
+        ) {
+          editorRefAny.onExtensionFunctionEventsModifiedOutsideEditor(changes);
+        }
+      }
+    },
+    [state.editorTabs]
+  );
+
   const onInstancesModifiedOutsideEditor = React.useCallback(
     (changes: InstancesOutsideEditorChanges) => {
       for (const editor of getAllEditorTabs(state.editorTabs)) {
@@ -5154,6 +5172,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         getEditorSelection: getMcpEditorSelection,
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
+        onExtensionFunctionEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
@@ -5174,6 +5193,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       getMcpEditorSelection,
       generateEvents,
       onSceneEventsModifiedOutsideEditor,
+      onExtensionFunctionEventsModifiedOutsideEditor,
       onInstancesModifiedOutsideEditor,
       onObjectsModifiedOutsideEditor,
       onObjectGroupsModifiedOutsideEditor,

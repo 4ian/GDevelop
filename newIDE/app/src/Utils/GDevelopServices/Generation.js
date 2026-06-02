@@ -305,40 +305,6 @@ export const getAiRequest = async (
   });
 };
 
-export const getPartialAiRequest = async (
-  getAuthorizationHeader: () => Promise<string>,
-  {
-    userId,
-    aiRequestId,
-    include,
-  }: {|
-    userId: string,
-    aiRequestId: string,
-    include: string,
-  |}
-): // $FlowFixMe[deprecated-utility]
-Promise<$Shape<AiRequest>> => {
-  const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(
-    `${GDevelopGenerationApi.baseUrl}/ai-request/${aiRequestId}`,
-    {
-      params: {
-        userId,
-        include,
-      },
-      headers: {
-        Authorization: authorizationHeader,
-      },
-    }
-  );
-  return ensureObjectHasProperty({
-    data: response.data,
-    propertyName: 'id',
-    endpointName: '/ai-request/{id} of Generation API',
-  });
-};
-
 /**
  * Fetch the status of several AI requests at once (a parent request and all its
  * active sub-agents). This collapses what used to be one status request per

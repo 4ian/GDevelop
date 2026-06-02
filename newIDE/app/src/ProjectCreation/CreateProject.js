@@ -5,19 +5,162 @@ import { getExample } from '../Utils/GDevelopServices/Example';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import optionalRequire from '../Utils/OptionalRequire';
 import {
   type ExampleProjectSetup,
   type NewProjectCreationSource,
 } from './NewProjectSetupDialog';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 const gd: libGDevelop = global.gd;
+const fs = optionalRequire('fs-extra');
+const path = optionalRequire('path');
+
+export type ProjectTemplateFilesSource = {|
+  type: 'github-repository',
+  owner: string,
+  name: string,
+  ref: string,
+|};
 
 export type NewProjectSource = {|
   project: ?gdProject,
   storageProvider: ?StorageProvider,
   fileMetadata: ?FileMetadata,
   templateSlug?: ?string,
+  templateFilesSource?: ?ProjectTemplateFilesSource,
 |};
+
+export const emptyProjectTemplateFilesSource: ProjectTemplateFilesSource = {
+  type: 'github-repository',
+  owner: 'zhouzhipeng',
+  name: 'gd-project-template',
+  ref: 'main',
+};
+
+const getGitHubRepositoryTreeUrl = ({
+  owner,
+  name,
+  ref,
+}: ProjectTemplateFilesSource): string =>
+  `https://api.github.com/repos/${owner}/${name}/git/trees/${ref}?recursive=1`;
+
+const getGitHubRepositoryRawFileUrl = (
+  repository: ProjectTemplateFilesSource,
+  filePath: string
+): string => {
+  const encodedFilePath = filePath
+    .split('/')
+    .map(pathPart => encodeURIComponent(pathPart))
+    .join('/');
+  return `https://raw.githubusercontent.com/${repository.owner}/${
+    repository.name
+  }/${repository.ref}/${encodedFilePath}`;
+};
+
+export const getProjectTemplateFileDestinationPath = ({
+  projectFolder,
+  repositoryFilePath,
+  path: pathModule = path,
+}: {|
+  projectFolder: string,
+  repositoryFilePath: string,
+  path?: any,
+|}): string => {
+  if (!pathModule) throw new Error('Path module is not supported.');
+
+  const normalizedRelativePath = pathModule.normalize(repositoryFilePath);
+  if (
+    !normalizedRelativePath ||
+    normalizedRelativePath === '.' ||
+    normalizedRelativePath === '..' ||
+    pathModule.isAbsolute(normalizedRelativePath) ||
+    normalizedRelativePath.startsWith(`..${pathModule.sep}`)
+  ) {
+    throw new Error(
+      `Unsafe project template file path: ${repositoryFilePath}`
+    );
+  }
+
+  const destinationPath = pathModule.join(
+    projectFolder,
+    normalizedRelativePath
+  );
+  const relativeToProjectFolder = pathModule.relative(
+    projectFolder,
+    destinationPath
+  );
+  if (
+    !relativeToProjectFolder ||
+    relativeToProjectFolder === '..' ||
+    relativeToProjectFolder.startsWith(`..${pathModule.sep}`) ||
+    pathModule.isAbsolute(relativeToProjectFolder)
+  ) {
+    throw new Error(
+      `Unsafe project template file path: ${repositoryFilePath}`
+    );
+  }
+
+  return destinationPath;
+};
+
+export const copyGitHubRepositoryFilesToLocalProjectFolder = async ({
+  projectFilePath,
+  repository,
+  fetch: fetchImpl = typeof fetch !== 'undefined' ? fetch : null,
+  fs: fsModule = fs,
+  path: pathModule = path,
+}: {|
+  projectFilePath: string,
+  repository: ProjectTemplateFilesSource,
+  fetch?: any,
+  fs?: any,
+  path?: any,
+|}): Promise<void> => {
+  if (!fsModule || !pathModule) {
+    throw new Error('Filesystem is not supported.');
+  }
+  if (!fetchImpl) {
+    throw new Error('Network fetch is not supported.');
+  }
+
+  const treeResponse = await fetchImpl(getGitHubRepositoryTreeUrl(repository));
+  if (!treeResponse.ok) {
+    throw new Error('Unable to list project template files.');
+  }
+
+  const treeData = await treeResponse.json();
+  if (!treeData || !Array.isArray(treeData.tree)) {
+    throw new Error('Invalid project template file listing.');
+  }
+  if (treeData.truncated) {
+    throw new Error('Project template has too many files to copy.');
+  }
+
+  const projectFolder = pathModule.dirname(projectFilePath);
+  for (const treeEntry of treeData.tree) {
+    if (!treeEntry || treeEntry.type !== 'blob') continue;
+    const repositoryFilePath = treeEntry.path;
+    if (typeof repositoryFilePath !== 'string') continue;
+
+    const destinationPath = getProjectTemplateFileDestinationPath({
+      projectFolder,
+      repositoryFilePath,
+      path: pathModule,
+    });
+    const fileResponse = await fetchImpl(
+      getGitHubRepositoryRawFileUrl(repository, repositoryFilePath)
+    );
+    if (!fileResponse.ok) {
+      throw new Error(
+        `Unable to download project template file: ${repositoryFilePath}`
+      );
+    }
+
+    const fileContent = new Uint8Array(await fileResponse.arrayBuffer());
+    await fsModule.ensureDir(pathModule.dirname(destinationPath));
+    await fsModule.writeFile(destinationPath, fileContent);
+  }
+};
 
 const getNewProjectSourceFromUrl = (projectUrl: string): NewProjectSource => {
   return {
@@ -98,6 +241,7 @@ export const createNewEmptyProject = ({
     project,
     storageProvider: null,
     fileMetadata: null,
+    templateFilesSource: emptyProjectTemplateFilesSource,
   };
 };
 

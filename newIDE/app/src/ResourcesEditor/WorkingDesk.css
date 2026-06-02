@@ -1,0 +1,106 @@
+.resources-markdown-preview {
+  color: inherit;
+}
+
+.resources-markdown-preview .gd-markdown {
+  display: block;
+  box-sizing: border-box;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 28px 34px 40px;
+  font-size: 15px;
+  line-height: 1.65;
+  letter-spacing: 0;
+}
+
+.resources-markdown-preview .gd-markdown h1,
+.resources-markdown-preview .gd-markdown h2,
+.resources-markdown-preview .gd-markdown h3 {
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.resources-markdown-preview .gd-markdown h1 {
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.28);
+  font-size: 28px;
+}
+
+.resources-markdown-preview .gd-markdown h2 {
+  margin: 28px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.22);
+  font-size: 22px;
+}
+
+.resources-markdown-preview .gd-markdown h3 {
+  margin: 24px 0 10px;
+  font-size: 18px;
+}
+
+.resources-markdown-preview .gd-markdown p {
+  margin: 10px 0;
+}
+
+.resources-markdown-preview .gd-markdown ul,
+.resources-markdown-preview .gd-markdown ol {
+  margin: 10px 0 14px;
+  padding-left: 28px;
+}
+
+.resources-markdown-preview .gd-markdown li + li {
+  margin-top: 4px;
+}
+
+.resources-markdown-preview .gd-markdown blockquote {
+  margin: 16px 0;
+  padding: 10px 16px;
+  border-left: 4px solid var(--markdown-link-color);
+  background: rgba(128, 128, 128, 0.12);
+}
+
+.resources-markdown-preview .gd-markdown pre {
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.24);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.resources-markdown-preview .gd-markdown pre code {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.resources-markdown-preview .gd-markdown code {
+  border-radius: 4px;
+  background: rgba(128, 128, 128, 0.18);
+}
+
+.resources-markdown-preview .gd-markdown table {
+  width: 100%;
+  margin: 16px 0;
+  border-collapse: collapse;
+}
+
+.resources-markdown-preview .gd-markdown th,
+.resources-markdown-preview .gd-markdown td {
+  padding: 8px 10px;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+}
+
+.resources-markdown-preview .gd-markdown th {
+  background: rgba(128, 128, 128, 0.16);
+  text-align: left;
+}
+
+.resources-markdown-preview .gd-markdown img {
+  display: block;
+  max-width: 100%;
+  margin: 18px auto;
+  border-radius: 6px;
+}

@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { t } from '@lingui/macro';
 import {
+  copyGitHubRepositoryFilesToLocalProjectFolder,
   createNewEmptyProject,
   createNewProjectFromExampleShortHeader,
   createNewProjectFromPrivateGameTemplate,
@@ -254,19 +255,33 @@ const useCreateProject = ({
                   console.log(
                     'No storage provider set or no previous FileMetadata (probably creating a blank project) - skipping resources copy.'
                   );
-                  return;
+                } else {
+                  await ensureResourcesAreMoved({
+                    project: currentProject,
+                    newFileMetadata,
+                    newStorageProvider: newProjectSetup.storageProvider,
+                    newStorageProviderOperations: destinationStorageProviderOperations,
+                    oldFileMetadata: newProjectSource.fileMetadata,
+                    oldStorageProvider: sourceStorageProvider,
+                    oldStorageProviderOperations: sourceStorageProviderOperations,
+                    authenticatedUser,
+                  });
                 }
 
-                await ensureResourcesAreMoved({
-                  project: currentProject,
-                  newFileMetadata,
-                  newStorageProvider: newProjectSetup.storageProvider,
-                  newStorageProviderOperations: destinationStorageProviderOperations,
-                  oldFileMetadata: newProjectSource.fileMetadata,
-                  oldStorageProvider: sourceStorageProvider,
-                  oldStorageProviderOperations: sourceStorageProviderOperations,
-                  authenticatedUser,
-                });
+                const templateFilesSource =
+                  newProjectSource.templateFilesSource;
+                if (
+                  templateFilesSource &&
+                  newProjectSetup.storageProvider.internalName === 'LocalFile'
+                ) {
+                  console.log(
+                    'Start copying project template files to the new project...'
+                  );
+                  await copyGitHubRepositoryFilesToLocalProjectFolder({
+                    projectFilePath: newFileMetadata.fileIdentifier,
+                    repository: templateFilesSource,
+                  });
+                }
               },
             }
           );

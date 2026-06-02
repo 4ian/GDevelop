@@ -339,6 +339,47 @@ Promise<$Shape<AiRequest>> => {
   });
 };
 
+/**
+ * Fetch the status of several AI requests at once (a parent request and all its
+ * active sub-agents). This collapses what used to be one status request per
+ * entity into a single request, without changing the polling cadence.
+ */
+export const getAiRequestStatuses = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    aiRequestIds,
+  }: {|
+    userId: string,
+    aiRequestIds: Array<string>,
+  |}
+): Promise<
+  Array<{| id: string, status: GenerationStatus, userId: ?string |}>
+> => {
+  if (aiRequestIds.length === 0) return [];
+
+  const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
+  const response = await axios.get(
+    `${GDevelopGenerationApi.baseUrl}/ai-request`,
+    {
+      params: {
+        userId,
+        ids: aiRequestIds.join(','),
+        include: 'status',
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  const data = response.data || {};
+  return ensureIsArray({
+    data: data.aiRequestStatuses,
+    endpointName: '/ai-request?ids=...&include=status of Generation API',
+  });
+};
+
 export const getAiRequests = async (
   getAuthorizationHeader: () => Promise<string>,
   {

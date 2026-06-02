@@ -3,7 +3,7 @@ import * as React from 'react';
 import TestRenderer from 'react-test-renderer';
 import {
   getAiRequest,
-  getPartialAiRequest,
+  getAiRequestStatuses,
   fetchAiSettings,
   getAiRequests,
   type AiRequest,
@@ -105,7 +105,8 @@ describe('AiRequestProvider sub-agent polling', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     mockFn(getAiRequest).mockReset();
-    mockFn(getPartialAiRequest).mockReset();
+    mockFn(getAiRequestStatuses).mockReset();
+    mockFn(getAiRequestStatuses).mockResolvedValue([]);
     mockFn(fetchAiSettings).mockReset();
     mockFn(fetchAiSettings).mockResolvedValue(null);
     mockFn(getAiRequests).mockReset();
@@ -119,9 +120,9 @@ describe('AiRequestProvider sub-agent polling', () => {
     jest.useRealTimers();
   });
 
-  // Covers bug 2 fix: once the sub-agent is in a non-`working` state, partial
-  // polling that returns the same status must NOT trigger additional full
-  // fetches. Previously the code compared the partial status against the
+  // Covers bug 2 fix: once the sub-agent is in a non-`working` state, the
+  // (batched) status-only polling that returns the same status must NOT trigger
+  // additional full fetches. Previously the code compared the status against the
   // hardcoded `'working'` and full-fetched on every tick afterward.
   it('does not spam full fetches while a sub-agent stays in `ready` state', async () => {
     const { contextRef } = renderProvider();
@@ -129,10 +130,9 @@ describe('AiRequestProvider sub-agent polling', () => {
 
     const subAgentReady = makeAiRequest('sub-1', 'ready');
     mockFn(getAiRequest).mockResolvedValue(subAgentReady);
-    mockFn(getPartialAiRequest).mockResolvedValue({
-      id: 'sub-1',
-      status: 'ready',
-    });
+    mockFn(getAiRequestStatuses).mockResolvedValue([
+      { id: 'sub-1', status: 'ready', userId: 'user-1' },
+    ]);
 
     // Seed the sub-agent in the storage and mark it as active so the polling
     // loop picks it up.
@@ -152,10 +152,10 @@ describe('AiRequestProvider sub-agent polling', () => {
       await flushPromises();
     });
     expect(mockFn(getAiRequest)).toHaveBeenCalledTimes(1);
-    expect(mockFn(getPartialAiRequest)).toHaveBeenCalledTimes(0);
+    expect(mockFn(getAiRequestStatuses)).toHaveBeenCalledTimes(0);
 
     // Subsequent ticks within the 5s full-fetch window: each must do a
-    // partial fetch only. Because the partial status matches the cached
+    // (batched) status-only fetch only. Because the status matches the cached
     // status, no additional full fetch should happen.
     for (let i = 0; i < 3; i++) {
       // eslint-disable-next-line no-await-in-loop
@@ -165,7 +165,7 @@ describe('AiRequestProvider sub-agent polling', () => {
       });
     }
 
-    expect(mockFn(getPartialAiRequest)).toHaveBeenCalledTimes(3);
+    expect(mockFn(getAiRequestStatuses)).toHaveBeenCalledTimes(3);
     // Critical assertion: still only the initial full fetch — the bug
     // would have caused one full fetch per tick after the sub-agent
     // reached `ready`.
@@ -174,7 +174,7 @@ describe('AiRequestProvider sub-agent polling', () => {
 
   // Covers bug 2 fix from the opposite angle: a real status change *must*
   // still trigger an immediate full fetch.
-  it('triggers a full fetch immediately when the partial fetch reports a status change', async () => {
+  it('triggers a full fetch immediately when the batched status fetch reports a status change', async () => {
     const { contextRef } = renderProvider();
     if (!contextRef.current) throw new Error('Context not captured');
 
@@ -201,21 +201,20 @@ describe('AiRequestProvider sub-agent polling', () => {
     });
     expect(mockFn(getAiRequest)).toHaveBeenCalledTimes(1);
 
-    // Now backend switches the sub-agent to `ready`. Partial fetch reports
-    // the new status, so the polling loop should immediately do another
+    // Now backend switches the sub-agent to `ready`. The batched status fetch
+    // reports the new status, so the polling loop should immediately do another
     // full fetch even though the 5s window has not elapsed.
     mockFn(getAiRequest).mockResolvedValue(subAgentReady);
-    mockFn(getPartialAiRequest).mockResolvedValue({
-      id: 'sub-1',
-      status: 'ready',
-    });
+    mockFn(getAiRequestStatuses).mockResolvedValue([
+      { id: 'sub-1', status: 'ready', userId: 'user-1' },
+    ]);
 
     await act(async () => {
       jest.advanceTimersByTime(POLLING_INTERVAL_IN_MS);
       await flushPromises();
     });
 
-    expect(mockFn(getPartialAiRequest)).toHaveBeenCalledTimes(1);
+    expect(mockFn(getAiRequestStatuses)).toHaveBeenCalledTimes(1);
     expect(mockFn(getAiRequest)).toHaveBeenCalledTimes(2);
   });
 });
@@ -224,7 +223,8 @@ describe('AiRequestProvider sub-agent cleanup on navigation', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     mockFn(getAiRequest).mockReset();
-    mockFn(getPartialAiRequest).mockReset();
+    mockFn(getAiRequestStatuses).mockReset();
+    mockFn(getAiRequestStatuses).mockResolvedValue([]);
     mockFn(fetchAiSettings).mockReset();
     mockFn(fetchAiSettings).mockResolvedValue(null);
     mockFn(getAiRequests).mockReset();

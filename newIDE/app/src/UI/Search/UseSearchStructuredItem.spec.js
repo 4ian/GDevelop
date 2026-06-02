@@ -306,3 +306,68 @@ describe('UseSearchStructuredItem', () => {
     );
   });
 });
+
+describe('UseSearchStructuredItem accent-insensitive search', () => {
+  const cameraInstruction = {
+    displayedName: 'Caméra de la scène',
+    description: 'Centre la caméra sur un objet.',
+    fullGroupName: 'Général/Caméra',
+  };
+  const sceneVariableInstruction = {
+    displayedName: 'Variable de scène',
+    description: 'La valeur de la variable de la scène.',
+    fullGroupName: 'Général/Scène/Variables',
+  };
+
+  it('should match accented results when searching without accents', () => {
+    const results = applySearch('camera', [
+      sceneVariableInstruction,
+      cameraInstruction,
+    ]);
+
+    expect(results.length).toBe(1);
+    expect(results[0].item.displayedName).toEqual(
+      cameraInstruction.displayedName
+    );
+  });
+
+  it('should match accented results when searching with accents', () => {
+    const results = applySearch('caméra', [
+      sceneVariableInstruction,
+      cameraInstruction,
+    ]);
+
+    expect(results.length).toBe(1);
+    expect(results[0].item.displayedName).toEqual(
+      cameraInstruction.displayedName
+    );
+  });
+
+  it('should match "scene" against "scène"', () => {
+    const results = applySearch('scene', [
+      textCondition,
+      sceneVariableInstruction,
+    ]);
+
+    expect(
+      results.some(
+        result =>
+          result.item.displayedName === sceneVariableInstruction.displayedName
+      )
+    ).toBe(true);
+  });
+
+  it('should highlight the matching part using indices aligned with the original (accented) text', () => {
+    const results = applySearch('camera', [cameraInstruction]);
+
+    const displayedNameMatch = results[0].matches.find(
+      match => match.key === 'displayedName'
+    );
+    expect(displayedNameMatch).toBeDefined();
+    const [start, end] = displayedNameMatch.indices[0];
+    // The highlighted slice on the original (accented) text is "Caméra".
+    expect(cameraInstruction.displayedName.slice(start, end + 1)).toEqual(
+      'Caméra'
+    );
+  });
+});

@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
-import EventsSheet, { type EventsSheetInterface } from '../../EventsSheet';
+import EventsSheet, {
+  type EventsSheetInterface,
+  type EventsSheetSelectionSnapshot,
+} from '../../EventsSheet';
 import type { EventPath } from '../../Utils/EventPath';
 import { sendEventsExtractedAsFunction } from '../../Utils/Analytics/EventSender';
 import {
@@ -91,6 +94,10 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
 
   selectAllInsideEditor() {
     if (this.editor) this.editor.selectAllEvents();
+  }
+
+  getEditorSelectionSnapshot(): ?EventsSheetSelectionSnapshot {
+    return this.editor ? this.editor.getEditorSelectionSnapshot() : null;
   }
 
   forceUpdateEditor() {

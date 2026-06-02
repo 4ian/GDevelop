@@ -136,6 +136,12 @@ import type { SearchFilterParams } from '../Utils/Search';
 import type { InitialSearchFilterParams } from './SearchPanel';
 import { isNullPtr } from '../Utils/IsNullPtr';
 import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
+import {
+  getEventsSheetSelectionSnapshot,
+  type EventsSheetSelectionSnapshot,
+} from './SelectionSnapshot';
+
+export type { EventsSheetSelectionSnapshot } from './SelectionSnapshot';
 
 const gd: libGDevelop = global.gd;
 
@@ -418,6 +424,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (this._catalogBlinkTimeoutId) {
       clearTimeout(this._catalogBlinkTimeoutId);
     }
+  }
+
+  getEditorSelectionSnapshot(): EventsSheetSelectionSnapshot {
+    return getEventsSheetSelectionSnapshot({
+      events: this.props.events,
+      selection: this.state.selection,
+      isActive: this.props.isActive,
+      scope: this.props.scope,
+    });
   }
 
   componentDidUpdate(prevProps: ComponentProps, prevState: State) {
@@ -3214,6 +3229,7 @@ export type EventsSheetInterface = {|
   ) => void,
   clearGlobalSearchResults: () => void,
   selectAllEvents: () => void,
+  getEditorSelectionSnapshot: () => ?EventsSheetSelectionSnapshot,
 |};
 
 // EventsSheet is a wrapper so that the component can use multiple
@@ -3228,6 +3244,7 @@ const EventsSheet = (props, ref) => {
     setGlobalSearchResults,
     clearGlobalSearchResults,
     selectAllEvents,
+    getEditorSelectionSnapshot,
   }));
 
   const {
@@ -3269,6 +3286,11 @@ const EventsSheet = (props, ref) => {
   };
   const selectAllEvents = () => {
     if (component.current) component.current.selectAllEvents();
+  };
+  const getEditorSelectionSnapshot = () => {
+    if (component.current)
+      return component.current.getEditorSelectionSnapshot();
+    return null;
   };
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

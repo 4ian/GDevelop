@@ -20,7 +20,7 @@ When a user asks for any GDevelop edit:
 3. Call `gdevelop_get_project_summary`. Scope it to a scene only after you know the scene name.
 4. Call `gdevelop_list_scenes` if the target scene is unclear.
 5. For scene work, call `gdevelop_list_objects` and `read_scene_events` for the target scene.
-6. If the user's request refers to "selected", "current object", "this instance", "the thing I clicked", or similar UI context, call `gdevelop_get_editor_selection` before inferring targets from project data.
+6. If the user's request refers to "selected", "current object", "this instance", "this event", "the thing I clicked", or similar UI context, call `gdevelop_get_editor_selection` before inferring targets from project data.
 7. For layout work, call `describe_instances` before placing, moving, or deleting instances.
 8. For object/behavior work, call `inspect_object_properties` and, when relevant, `inspect_behavior_properties`.
 9. For extension work, call `gdevelop_list_extensions` and then `gdevelop_inspect_extension` for the target extension before editing functions, events-based objects, events-based behaviors, or extension properties.
@@ -35,7 +35,7 @@ Do not start by reading or rewriting the full project JSON unless a focused tool
 Read-only context:
 
 - `gdevelop_get_editor_state`: project presence, scene names, permissions.
-- `gdevelop_get_editor_selection`: current editor UI selection state, including active scene-like editor panes, selected objects, selected layers, and selected scene instances.
+- `gdevelop_get_editor_selection`: current editor UI selection state, including active scene-like editor panes, selected objects, selected layers, selected scene instances, and selected events/instructions when an events sheet is active.
 - `gdevelop_get_project_summary`: compact project structure, optionally scoped by `sceneName`.
 - `gdevelop_read_project_json`: full project JSON; use sparingly and with `maxLength` for large projects.
 - `gdevelop_list_scenes`: all scenes/layouts.
@@ -125,16 +125,17 @@ Tools are permission-gated by the editor:
 Use this sequence for adding or modifying events:
 
 1. `read_scene_events` to understand the current event sheet.
-2. `gdevelop_get_events_json_examples` to refresh the serialized shape if needed.
-3. `gdevelop_search_instruction_metadata` for each action, condition, or expression you plan to use.
-4. `gdevelop_get_instruction_metadata` for exact internal type and parameter order.
-5. Draft `events_json` as a JSON string containing an array of serialized GDevelop events.
-6. `gdevelop_validate_events_json` with the drafted string.
-7. If validation reports any issue, stop and fix the JSON, metadata choice, parameter value, or missing project object/variable first. Do not write invalid events.
-8. If valid, call `add_scene_events` with `events_json` for append-at-end, or `event_changes` for precise placement/replacement.
-9. If the write tool rejects the events with validation errors, treat the write as not applied. Fix and validate again before retrying.
-10. `read_scene_events` again.
-11. If object/variable/resource references were created or expected, read the relevant object/variable/scene summary too.
+2. If the user asked to modify or insert near the currently selected event, call `gdevelop_get_editor_selection` while the events editor has focus. Use `primarySelection.selectedEvents[0].eventPath` or `selectedEventPaths[0]` as the `event_changes.operation_target_event`; do not guess the path from rendered text when the selection tool can provide it.
+3. `gdevelop_get_events_json_examples` to refresh the serialized shape if needed.
+4. `gdevelop_search_instruction_metadata` for each action, condition, or expression you plan to use.
+5. `gdevelop_get_instruction_metadata` for exact internal type and parameter order.
+6. Draft `events_json` as a JSON string containing an array of serialized GDevelop events.
+7. `gdevelop_validate_events_json` with the drafted string.
+8. If validation reports any issue, stop and fix the JSON, metadata choice, parameter value, or missing project object/variable first. Do not write invalid events.
+9. If valid, call `add_scene_events` with `events_json` for append-at-end, or `event_changes` for precise placement/replacement.
+10. If the write tool rejects the events with validation errors, treat the write as not applied. Fix and validate again before retrying.
+11. `read_scene_events` again.
+12. If object/variable/resource references were created or expected, read the relevant object/variable/scene summary too.
 
 Never use `add_scene_events` with a natural language description expecting server-side generation. MCP direct event writing does not call the GDevelop AI event generation service. Always pass `events_json` or `event_changes`.
 
@@ -263,10 +264,11 @@ Change variables:
 Add gameplay logic:
 
 1. Read current scene events and objects.
-2. Search exact instruction metadata for needed conditions/actions.
-3. Validate event JSON.
-4. Write with `add_scene_events`.
-5. Read events back.
+2. If the user refers to the currently selected event, call `gdevelop_get_editor_selection` and use `primarySelection.selectedEvents[0].eventPath` or `selectedEventPaths[0]` as the target path for `event_changes`.
+3. Search exact instruction metadata for needed conditions/actions.
+4. Validate event JSON.
+5. Write with `add_scene_events`.
+6. Read events back.
 
 Create or edit an extension:
 

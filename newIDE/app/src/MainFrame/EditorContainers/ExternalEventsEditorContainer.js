@@ -1,7 +1,10 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import React from 'react';
-import EventsSheet, { type EventsSheetInterface } from '../../EventsSheet';
+import EventsSheet, {
+  type EventsSheetInterface,
+  type EventsSheetSelectionSnapshot,
+} from '../../EventsSheet';
 import RaisedButton from '../../UI/RaisedButton';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import {
@@ -122,6 +125,10 @@ export class ExternalEventsEditorContainer extends React.Component<
 
   selectAllInsideEditor() {
     if (this.editor) this.editor.selectAllEvents();
+  }
+
+  getEditorSelectionSnapshot(): ?EventsSheetSelectionSnapshot {
+    return this.editor ? this.editor.getEditorSelectionSnapshot() : null;
   }
 
   forceUpdateEditor() {

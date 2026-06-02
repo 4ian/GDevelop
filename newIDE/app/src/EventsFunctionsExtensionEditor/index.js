@@ -5,7 +5,10 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import EventsSheet, { type EventsSheetInterface } from '../EventsSheet';
+import EventsSheet, {
+  type EventsSheetInterface,
+  type EventsSheetSelectionSnapshot,
+} from '../EventsSheet';
 import EditorMosaic, {
   type EditorMosaicInterface,
   mosaicContainsNode,
@@ -314,6 +317,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (this.editor) {
       this.editor.selectAllEvents();
     }
+  };
+
+  getEditorSelectionSnapshot = (): ?EventsSheetSelectionSnapshot => {
+    return this.editor ? this.editor.getEditorSelectionSnapshot() : null;
   };
 
   selectEventsFunctionByName = (

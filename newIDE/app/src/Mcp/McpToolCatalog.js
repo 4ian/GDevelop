@@ -187,7 +187,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_get_editor_selection',
     description:
-      'Return the current editor UI selection state, including selected objects and scene instances when a scene-like editor is active.',
+      'Return the current editor UI selection state, including selected objects, scene instances, layers, and selected events/instructions when supported by the active editor.',
     inputSchema: emptyObjectSchema,
   },
   {

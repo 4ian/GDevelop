@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import EventsFunctionsExtensionEditor from '../../EventsFunctionsExtensionEditor';
+import { type EventsSheetSelectionSnapshot } from '../../EventsSheet';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
@@ -38,6 +39,10 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
 
   getLayout(): ?gdLayout {
     return null;
+  }
+
+  getEditorSelectionSnapshot(): ?EventsSheetSelectionSnapshot {
+    return this.editor ? this.editor.getEditorSelectionSnapshot() : null;
   }
 
   updateToolbar() {
